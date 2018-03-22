@@ -46,7 +46,7 @@ class WalletGenerationPresenter(
     headerTitle = CreateWalletText.create
   }
 
-  /** 返回助记词生成界面 */
+  // 返回助记词生成界面
   private fun WalletGenerationFragment.recoveryHeaderToMnemonicBackup(fragment: Fragment) {
     removeChildFragment(fragment)
     /** 恢复上一个 `Fragment` 的显示 */
