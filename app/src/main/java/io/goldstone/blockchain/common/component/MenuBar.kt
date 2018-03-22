@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.component
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.view.View
@@ -10,12 +11,9 @@ import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.Grayscale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.utils.into
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.matchParent
 
 /**
  * @date 23/03/2018 1:00 AM
@@ -25,21 +23,49 @@ import org.jetbrains.anko.matchParent
 class MenuBar(context: Context) : LinearLayout(context) {
 
   private val titles = arrayListOf("mnemonic", "keystore", "private key", "watch only")
+  private var totalItemWidth = 0
 
   init {
 
-    layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
     backgroundColor = Spectrum.white
-    titles.forEach {
-      addView(Item(context).apply {
-        if (it == titles[0]) { setUnSelectedStyle(true) }
-        text = it
-        layoutParams = LinearLayout.LayoutParams(getTextWidth(it), 35.uiPX()).apply {
-          leftMargin = PaddingSize.device
-          rightMargin = 10.uiPX()
-          topMargin = 20.uiPX()
+    titles.forEachIndexed { index, string ->
+      Item(context)
+        .apply {
+          id = index
+          text = string
+          layoutParams = LinearLayout.LayoutParams(getTextWidth(string), 35.uiPX()).apply {
+            setMargins(PaddingSize.device, 20.uiPX(), 10.uiPX(), 0)
+            totalItemWidth += getTextWidth(string) + 30.uiPX() // 计算总的 `Menu` 宽度
+          }
         }
-      })
+        .into(this)
+    }
+
+    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width + 50.uiPX(), 70.uiPX())
+  }
+
+  fun selectItem(index: Int) {
+    (0 until titles.size).forEach {
+      findViewById<Item>(it)?.apply {
+        if (it == index) setSelectedStyle(true)
+        else setSelectedStyle(false)
+      }
+    }
+  }
+
+  fun floatRight() {
+    (0 until titles.size).forEach {
+      findViewById<Item>(it)?.apply {
+        x -= totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
+      }
+    }
+  }
+
+  fun floatLeft() {
+    (0 until titles.size).forEach {
+      findViewById<Item>(it)?.apply {
+        x += totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
+      }
     }
   }
 
@@ -93,7 +119,7 @@ private class Item(context: Context) : View(context) {
 
   }
 
-  fun setUnSelectedStyle(isSelect: Boolean) {
+  fun setSelectedStyle(isSelect: Boolean) {
     hasUnderLine = isSelect
     invalidate()
   }

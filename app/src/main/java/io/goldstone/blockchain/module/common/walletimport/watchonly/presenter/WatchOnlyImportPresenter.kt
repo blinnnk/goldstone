@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnltyImportFragment
+import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 
 /**
  * @date 23/03/2018 2:16 AM
@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOn
  */
 
 class WatchOnlyImportPresenter(
-  override val fragment: WatchOnltyImportFragment
-  ) : BasePresenter<WatchOnltyImportFragment>() {
+  override val fragment: WatchOnlyImportFragment
+  ) : BasePresenter<WatchOnlyImportFragment>() {
 
 }

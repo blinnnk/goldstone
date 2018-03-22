@@ -10,7 +10,8 @@ import io.goldstone.blockchain.common.value.ViewPagerID
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
-import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnltyImportFragment
+import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
+import org.jetbrains.anko.support.v4.onPageChangeListener
 import java.util.*
 
 @SuppressLint("ViewConstructor")
@@ -25,7 +26,9 @@ class WalletImportViewPager(val fragment: Fragment) : ViewPager(fragment.context
   private val mnemonicImportFragment = MnemonicImportDetailFragment()
   private val keystoreImportFragment = KeystoreImportFragment()
   private val privateKeyFragment = PrivateKeyImportFragment()
-  private val watchOnlyFragment = WatchOnltyImportFragment()
+  private val watchOnlyFragment = WatchOnlyImportFragment()
+
+  private var hasMovedToLeft = false
 
   init {
     id = ViewPagerID.walletImport
@@ -36,6 +39,30 @@ class WalletImportViewPager(val fragment: Fragment) : ViewPager(fragment.context
       add(SubFragment(watchOnlyFragment, FragmentTag.watchOnlyImport))
     }
     adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
+
+    onPageChangeListener {
+      onPageSelected {
+        (fragment as WalletImportFragment).menuBar.apply {
+          selectItem(currentItem)
+          if (currentItem == 3 && !hasMovedToLeft) {
+            hasMovedToLeft = true
+            floatRight()
+          }
+          if (currentItem == 0 && hasMovedToLeft) {
+            hasMovedToLeft = false
+            floatLeft()
+          }
+        }
+      }
+    }
+
+  }
+
+  override fun onPageScrolled(position: Int, offset: Float, offsetPixels: Int) {
+    super.onPageScrolled(position, offset, offsetPixels)
+    (fragment as WalletImportFragment).menuBar.apply {
+      selectItem(currentItem)
+    }
   }
 
 }

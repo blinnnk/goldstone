@@ -14,6 +14,7 @@ object ContainerID {
 object ElementID {
   const val backButton = 20001
   const val closeButton = 20002
+  const val attentionText = 20003
 }
 
 object ViewPagerID {

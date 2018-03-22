@@ -64,6 +64,12 @@ object ImportWalletText {
     HoneyLanguage.English.code -> "Import Wallet"
     else -> ""
   }
+
+  @JvmField
+  val address = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Address"
+    else -> ""
+  }
 }
 
 object CommonText {
@@ -71,6 +77,11 @@ object CommonText {
   @JvmField
   val confirm = when (currentLanguage) {
     HoneyLanguage.English.code -> "Confirm"
+    else -> ""
+  }
+  @JvmField
+  val startImporting = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Start Importing"
     else -> ""
   }
 

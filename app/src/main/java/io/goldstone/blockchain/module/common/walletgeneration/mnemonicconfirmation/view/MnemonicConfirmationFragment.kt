@@ -8,7 +8,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.MnemonicEditText
+import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
@@ -24,7 +24,7 @@ import org.jetbrains.anko.*
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
 
   private val confirmButton by lazy { RoundButton(context!!) }
-  private val mnemonicInput by lazy { MnemonicEditText(context!!) }
+  private val mnemonicInput by lazy { WalletEditText(context!!) }
   private val attentionTextView by lazy { AttentionTextView(context!!) }
 
   override val presenter = MnemonicConfirmationPresenter(this)

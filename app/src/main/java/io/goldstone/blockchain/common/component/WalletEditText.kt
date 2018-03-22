@@ -20,7 +20,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class MnemonicEditText(context: Context) : EditText(context) {
+class WalletEditText(context: Context) : EditText(context) {
 
   init {
     addCorner(CornerSize.default.toInt(), Grayscale.whiteGray)

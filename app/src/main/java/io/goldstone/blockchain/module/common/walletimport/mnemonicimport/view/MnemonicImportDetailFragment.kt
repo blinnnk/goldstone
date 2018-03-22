@@ -6,7 +6,7 @@ import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
-import io.goldstone.blockchain.common.component.MnemonicEditText
+import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -26,7 +26,7 @@ import org.jetbrains.anko.*
 
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
 
-  private val mnemonicInput by lazy { MnemonicEditText(context!!) }
+  private val mnemonicInput by lazy { WalletEditText(context!!) }
   private val pathInput by lazy { RoundInput(context!!) }
   private val passwordInput by lazy { RoundInput(context!!) }
   private val repeatPassword by lazy { RoundInput(context!!) }
@@ -70,8 +70,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
         confirmButton
           .apply {
-            setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-            text = CommonText.confirm
+            text = CommonText.confirm.toUpperCase()
             setBlueStyle()
           }
           .into(this)
