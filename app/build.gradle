@@ -1,0 +1,62 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "io.goldstone.blockchain"
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        kotlinOptions.allWarningsAsErrors = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    // Glide Image Loader
+    compile 'com.github.bumptech.glide:glide:4.6.1'
+    // Recycler View
+    compile 'com.android.support:recyclerview-v7:27.1.0'
+    // Anko
+    compile('org.jetbrains.anko:anko:0.10.4') {
+        exclude group: 'com.google.android', module: 'android'
+    }
+    // 黑蜜动画及其他便捷工具依赖工程
+    compile 'com.blinnnk:honeyui:0.2.7.0'
+    // Glide Image Loader
+    compile 'com.github.bumptech.glide:glide:4.6.1'
+    // Crypto
+    compile 'org.ethereum:geth:1.8.2'
+    compile 'com.github.walleth.kethereum:functions:0.40'
+    compile 'com.github.walleth.kethereum:bip44:0.40'
+    compile 'com.github.walleth.kethereum:bip39:0.40'
+}
+
+repositories {
+    mavenCentral()
+    kotlin { experimental { coroutines 'enable' } }
+}
+
+kotlin {
+    experimental { coroutines "error" }
+    experimental { coroutines 'enable' }
+}
+
