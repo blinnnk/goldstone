@@ -85,7 +85,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
             marginTop = PaddingSize.content
             setWhiteStyle()
           }
-          .click { presenter.showImportWalletFragment() }
+          .click { presenter.showImportWalletFragment()}
           .into(this)
 
 

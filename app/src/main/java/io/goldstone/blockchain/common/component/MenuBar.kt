@@ -13,6 +13,8 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.Grayscale
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 
 /**
@@ -27,7 +29,7 @@ class MenuBar(context: Context) : LinearLayout(context) {
   init {
 
     layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
-
+    backgroundColor = Spectrum.white
     titles.forEach {
       addView(Item(context).apply {
         if (it == titles[0]) { setUnSelectedStyle(true) }
@@ -43,7 +45,7 @@ class MenuBar(context: Context) : LinearLayout(context) {
 
   private fun getTextWidth(text: String): Int {
     val textPaint = Paint()
-    textPaint.textSize = 14.uiPX().toFloat()
+    textPaint.textSize = 16.uiPX().toFloat()
     textPaint.typeface = GoldStoneFont.heavy(context)
     return textPaint.measureText(text).toInt()
   }
@@ -60,8 +62,7 @@ private class Item(context: Context) : View(context) {
   private var titleColor = Grayscale.black
   private val paint = Paint()
   private val textPaint = Paint()
-
-  private val textSize = 14.uiPX().toFloat()
+  private val textSize = 16.uiPX().toFloat()
 
   init {
     paint.isAntiAlias = true

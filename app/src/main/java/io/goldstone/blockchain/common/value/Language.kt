@@ -66,6 +66,16 @@ object ImportWalletText {
   }
 }
 
+object CommonText {
+
+  @JvmField
+  val confirm = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Confirm"
+    else -> ""
+  }
+
+}
+
 // 设定当前系统语言为软件界面语言
 
 var currentLanguage = HoneyLanguage.Chinese.code

@@ -10,4 +10,6 @@ object FragmentTag {
   const val mnemonicBackup = "mnemonicBackup"
   const val mnemonicImportDetail = "mnemonicImportDetail"
   const val keystoreImport = "keystoreImport"
+  const val privateKeyImport = "privateKeyImport"
+  const val watchOnlyImport = "watchOnlyImport"
 }

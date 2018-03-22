@@ -8,6 +8,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.component.MnemonicEditText
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
@@ -22,8 +23,8 @@ import org.jetbrains.anko.*
 
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
 
-  val confirmButton by lazy { RoundButton(context!!) }
-
+  private val confirmButton by lazy { RoundButton(context!!) }
+  private val mnemonicInput by lazy { MnemonicEditText(context!!) }
   private val attentionTextView by lazy { AttentionTextView(context!!) }
 
   override val presenter = MnemonicConfirmationPresenter(this)
@@ -32,33 +33,19 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
     verticalLayout {
 
       attentionTextView
-        .apply {
-          text = CreateWalletText.mnemonicConfirmationDescription
-        }
+        .apply { text = CreateWalletText.mnemonicConfirmationDescription }
         .into(this)
 
-      editText {
-        addCorner(CornerSize.default.toInt(), Grayscale.whiteGray)
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 120.uiPX()).apply {
-          leftMargin = PaddingSize.device
-          topMargin = 40.uiPX()
-          padding = 20.uiPX()
-        }
-        hint = "mnemonics split with space"
-        hintTextColor = Grayscale.midGray
-        textSize = 5.uiPX().toFloat()
-        textColor = Grayscale.black
-        typeface = GoldStoneFont.heavy(context)
-        gravity = Gravity.START
-      }
+      mnemonicInput
+        .into(this)
 
       confirmButton
         .apply {
-          text = "Confirm".toUpperCase()
+          text = CommonText.confirm.toUpperCase()
           marginTop = 20.uiPX()
           setBlueStyle()
         }
-        .click {  }
+        .click { }
         .into(this)
 
       textView("What is mnemonic?") {
