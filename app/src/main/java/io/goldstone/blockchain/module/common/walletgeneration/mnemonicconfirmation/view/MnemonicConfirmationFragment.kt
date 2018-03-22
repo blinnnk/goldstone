@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.mnemonicconfirmation.view
+package io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.common.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
 import org.jetbrains.anko.*
 
 /**

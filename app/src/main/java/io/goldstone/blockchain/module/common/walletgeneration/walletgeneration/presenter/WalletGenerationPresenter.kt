@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.walletgeneration.presenter
+package io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.presenter
 
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.findChildFragmentByTag
@@ -7,10 +7,10 @@ import io.goldstone.blockchain.common.utils.removeChildFragment
 import io.goldstone.blockchain.common.utils.showChildFragment
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.module.common.createwallet.view.CreateWalletFragment
-import io.goldstone.blockchain.module.common.mnemonicbackup.view.MnemonicBackupFragment
-import io.goldstone.blockchain.module.common.mnemonicconfirmation.view.MnemonicConfirmationFragment
-import io.goldstone.blockchain.module.common.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 
 /**
  * @date 22/03/2018 9:38 PM

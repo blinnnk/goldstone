@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.createwallet.view
+package io.goldstone.blockchain.module.common.walletgeneration.createwallet.view
 
 import android.graphics.Color
 import android.support.v4.app.Fragment
@@ -19,7 +19,7 @@ import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.utils.setMargins
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.module.common.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor

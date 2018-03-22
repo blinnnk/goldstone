@@ -58,6 +58,14 @@ object CreateWalletText {
   }
 }
 
+object ImportWalletText {
+  @JvmField
+  val importWallet = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Import Wallet"
+    else -> ""
+  }
+}
+
 // 设定当前系统语言为软件界面语言
 
 var currentLanguage = HoneyLanguage.Chinese.code

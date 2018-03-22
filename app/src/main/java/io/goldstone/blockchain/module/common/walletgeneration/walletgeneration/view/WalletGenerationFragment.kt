@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.walletgeneration.view
+package io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view
 
 import android.view.ViewGroup
 import com.blinnnk.extension.orZero
@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.utils.getRealScreenHeight
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.module.common.createwallet.view.CreateWalletFragment
-import io.goldstone.blockchain.module.common.walletgeneration.presenter.WalletGenerationPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.presenter.WalletGenerationPresenter
 
 /**
  * @date 22/03/2018 9:37 PM

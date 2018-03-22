@@ -3,7 +3,8 @@ package io.goldstone.blockchain.module.entrance.starting.presenter
 import com.blinnnk.extension.addFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.module.common.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
 /**
@@ -15,6 +16,10 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 
   fun showCreateWalletFragment() {
     fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.splash)
+  }
+
+  fun showImportWalletFragment() {
+    fragment.activity?.addFragment<WalletImportFragment>(ContainerID.splash)
   }
 
 }

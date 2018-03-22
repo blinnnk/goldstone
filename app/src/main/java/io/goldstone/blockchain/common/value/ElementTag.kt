@@ -8,4 +8,6 @@ package io.goldstone.blockchain.common.value
 object FragmentTag {
   const val walletCreation = "walletCreation"
   const val mnemonicBackup = "mnemonicBackup"
+  const val mnemonicImportDetail = "mnemonicImportDetail"
+  const val keystoreImport = "keystoreImport"
 }

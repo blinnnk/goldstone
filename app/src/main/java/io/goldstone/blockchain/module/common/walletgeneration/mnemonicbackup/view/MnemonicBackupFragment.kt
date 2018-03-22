@@ -1,8 +1,7 @@
-package io.goldstone.blockchain.module.common.mnemonicbackup.view
+package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view
 
 import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
-import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
@@ -15,7 +14,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.common.mnemonicbackup.presenter.MnemonicBackupPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter.MnemonicBackupPresenter
 import org.jetbrains.anko.*
 
 /**

@@ -15,3 +15,7 @@ object ElementID {
   const val backButton = 20001
   const val closeButton = 20002
 }
+
+object ViewPagerID {
+  const val walletImport = 30001
+}
