@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.wallet.presenter.WalletDetailPresenter
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
 
 /**
@@ -46,6 +47,10 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, Int>() 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     wrapper.addView(header)
+
+    header.historyButton.onClick {
+      presenter.showTransactionsFragment()
+    }
   }
 
   override fun observingRecyclerViewVerticalOffset(offset: Int) {

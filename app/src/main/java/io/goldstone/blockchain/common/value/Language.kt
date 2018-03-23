@@ -93,7 +93,29 @@ object WalletText {
     HoneyLanguage.English.code -> "Add More Token".toUpperCase()
     else -> ""
   }
+}
 
+object TransactionText {
+  @JvmField
+  val trannsaction = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Transaction History"
+    else -> ""
+  }
+  @JvmField
+  val manage = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Manage My Wallets"
+    else -> ""
+  }
+  @JvmField
+  val section = when (currentLanguage) {
+    HoneyLanguage.English.code -> "My tokens type:"
+    else -> ""
+  }
+  @JvmField
+  val addToken = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Add More Token".toUpperCase()
+    else -> ""
+  }
 }
 
 object CommonText {

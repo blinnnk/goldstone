@@ -10,7 +10,7 @@ object ContainerID {
   const val overlay = 10002
   const val content = 10003
   const val main = 10005
-  const val wallet = 10006
+  const val home = 10006
 }
 
 object ElementID {

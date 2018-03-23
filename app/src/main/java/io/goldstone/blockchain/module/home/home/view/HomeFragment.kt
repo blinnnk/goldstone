@@ -31,7 +31,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
       GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
 
       verticalLayout {
-        id = ContainerID.wallet
+        id = ContainerID.home
         addFragment<WalletDetailFragment>(this.id)
       }
 

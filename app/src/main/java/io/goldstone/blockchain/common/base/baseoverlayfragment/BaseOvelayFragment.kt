@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
@@ -74,8 +75,11 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
     overlayView.header.title.text = headerTitle
 
     /** 关闭悬浮曾 */
-    overlayView.header.closeButton.onClick {
-      presenter.removeSelfFromActivity()
+    overlayView.header.closeButton.apply {
+      onClick {
+        presenter.removeSelfFromActivity()
+        preventDuplicateClicks()
+      }
     }
 
     /** 返回上一级 */

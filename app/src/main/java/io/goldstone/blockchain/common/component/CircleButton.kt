@@ -84,7 +84,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 
   fun setDefaultStyle() {
     buttonTitle.textColor = Spectrum.opacity5White
-    setIconViewColor(Spectrum.opacity5White)
+    setIconViewColor(Spectrum.opacity2White)
   }
 
 }

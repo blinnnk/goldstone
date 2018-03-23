@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import org.jetbrains.anko.matchParent
 
@@ -22,7 +23,7 @@ import org.jetbrains.anko.matchParent
 
 class WalletDetailHeader(context: Context) : RelativeLayout(context) {
 
-  private val historyButton by lazy { CircleButton(context) }
+  val historyButton by lazy { CircleButton(context) }
   private val notifyButton by lazy { CircleButton(context) }
   private val balance by lazy { TwoLineTitles(context) }
 
@@ -66,7 +67,7 @@ class WalletDetailHeader(context: Context) : RelativeLayout(context) {
         }
 
         subtitle.apply {
-          text = WalletText.totalAssets
+          text = WalletText.totalAssets + SymbolText.usd
           textSize = 4.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
           y -= 3.uiPX()
