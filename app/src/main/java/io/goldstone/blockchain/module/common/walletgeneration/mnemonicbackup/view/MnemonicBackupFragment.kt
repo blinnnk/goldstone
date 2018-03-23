@@ -45,7 +45,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
       mnemonic
         .apply {
-          addCorner(CornerSize.default.toInt(), Grayscale.whiteGray)
+          addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
           layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 80.uiPX()).apply {
             leftMargin = PaddingSize.device
             topMargin = 20.uiPX()
@@ -53,7 +53,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
           }
 
           textSize = 5.uiPX().toFloat()
-          textColor = Grayscale.black
+          textColor = GrayScale.black
           typeface = GoldStoneFont.heavy(context)
           text = "mnemonic split with space test what are you doing now baby"
         }

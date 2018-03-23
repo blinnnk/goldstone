@@ -1,18 +1,16 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.view
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.utils.setMargins
@@ -50,7 +48,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
       attentionView
         .apply {
           setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-          text = "Kevin Federline has two kids with Britney Spears and four more with other women -- and if he's not spending his child support checks properly, that could pose some new problems for him in court."
+          text = "You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
         }
         .into(this)
 

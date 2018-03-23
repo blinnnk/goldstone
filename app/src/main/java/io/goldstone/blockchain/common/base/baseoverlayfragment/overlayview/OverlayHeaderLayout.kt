@@ -9,10 +9,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.uikit.GradientStyle
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
-import com.bumptech.glide.load.resource.bitmap.CenterInside
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.addTopLRCorner
@@ -33,7 +31,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     ImageView(context).apply {
       id = ElementID.closeButton
       imageResource = R.drawable.close
-      setColorFilter(Grayscale.lightGray)
+      setColorFilter(GrayScale.lightGray)
       layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
         topMargin = 18.uiPX()
         rightMargin = 20.uiPX()
@@ -47,7 +45,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     ImageView(context).apply {
       id = ElementID.backButton
       imageResource = R.drawable.back
-      setColorFilter(Grayscale.lightGray)
+      setColorFilter(GrayScale.lightGray)
       scaleType = ImageView.ScaleType.CENTER_INSIDE
       layoutParams = RelativeLayout.LayoutParams(iconSize + 5.uiPX(), iconSize + 5.uiPX()).apply {
         topMargin = 18.uiPX()
@@ -69,14 +67,14 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     addTopLRCorner(CornerSize.big, Spectrum.white)
 
     title = textView {
-      textColor = Grayscale.black
+      textColor = GrayScale.black
       textSize = FontSize.header
       typeface = GoldStoneFont.heavy(context)
       gravity = Gravity.CENTER
       layoutParams = RelativeLayout.LayoutParams(matchParent, headerHeight)
     }
 
-    paint.color = Grayscale.lightGray
+    paint.color = GrayScale.lightGray
     paint.isAntiAlias = true
     paint.style = Paint.Style.FILL
 

@@ -12,6 +12,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         kotlinOptions.allWarningsAsErrors = true
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -48,6 +49,9 @@ dependencies {
     compile 'com.github.walleth.kethereum:functions:0.40'
     compile 'com.github.walleth.kethereum:bip44:0.40'
     compile 'com.github.walleth.kethereum:bip39:0.40'
+
+    // BlurView
+    compile 'com.github.mmin18:realtimeblurview:1.1.0'
 }
 
 repositories {

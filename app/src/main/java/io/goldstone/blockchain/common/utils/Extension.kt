@@ -11,6 +11,7 @@ import android.text.SpannableString
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.fallOut
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -137,4 +138,38 @@ fun<T: Fragment> T.hideChildFragment(fragment: Fragment) {
 
 fun<T: Fragment> T.showChildFragment(fragment: Fragment) {
   childFragmentManager.beginTransaction().show(fragment).commit()
+}
+
+/**
+ * @description 便捷的给 `View` 设定在 `Relative Layout` 父级中相对位置
+ */
+
+fun<T: View> T.setCenterInHorizontal(){
+  layoutParams.let {
+    (it as? RelativeLayout.LayoutParams)?.apply { addRule(RelativeLayout.CENTER_HORIZONTAL) }
+  }
+}
+
+fun<T: View> T.setCenterInVertical(){
+  layoutParams.let {
+    (it as? RelativeLayout.LayoutParams)?.apply { addRule(RelativeLayout.CENTER_VERTICAL) }
+  }
+}
+
+fun<T: View> T.setCenterInParent(){
+  layoutParams.let {
+    (it as? RelativeLayout.LayoutParams)?.apply { addRule(RelativeLayout.CENTER_IN_PARENT) }
+  }
+}
+
+fun<T: View> T.setAlignParentRight(){
+  layoutParams.let {
+    (it as? RelativeLayout.LayoutParams)?.apply { addRule(RelativeLayout.ALIGN_PARENT_RIGHT) }
+  }
+}
+
+fun<T: View> T.setAlignParentBottom(){
+  layoutParams.let {
+    (it as? RelativeLayout.LayoutParams)?.apply { addRule(RelativeLayout.ALIGN_PARENT_BOTTOM) }
+  }
 }

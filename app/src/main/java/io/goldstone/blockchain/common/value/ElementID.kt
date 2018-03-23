@@ -9,6 +9,8 @@ object ContainerID {
   const val splash = 10001
   const val overlay = 10002
   const val content = 10003
+  const val main = 10005
+  const val wallet = 10006
 }
 
 object ElementID {

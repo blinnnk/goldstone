@@ -1,0 +1,133 @@
+package io.goldstone.blockchain.common.base.baserecyclerfragment
+
+import android.content.Context
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.base.BaseRecyclerView
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.support.v4.UI
+
+/**
+ * @date 23/03/2018 3:46 PM
+ * @author KaySaith
+ */
+
+abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> : Fragment() {
+
+  lateinit var wrapper: RelativeLayout
+  lateinit var recyclerView: BaseRecyclerView
+
+  /**
+   * @description
+   * 每一个 `Fragment` 都会配备一个 `Presenter` 来进行数据及UI 的控制, 这个 `Presenter`
+   * 必须是配套的 [BaseRecyclerPresenter] `Fragment` 和 `Presenter` 之间
+   * 有固定的约定实现协议, 来更方便安全和便捷的使用.
+   */
+  abstract val presenter: T
+
+  /**
+   * `RecyclerFragment` 的默认 `LayoutManager` 是 `LinearLayoutManager`. 提供了下面这个
+   * 可被修改的方法来更改 内嵌的 `RecyclerView` 的 `LayoutManager`
+   */
+  open fun setRecyclerViewLayoutManager(recyclerView: BaseRecyclerView) {
+    // Do Something
+  }
+
+  open fun observingRecyclerViewScrollState(state: Int) {
+    // Do Something
+  }
+
+  open fun observingRecyclerViewScrolled(dx: Int, dy: Int) {
+    // Do Something
+  }
+
+  open fun observingRecyclerViewVerticalOffset(offset: Int) {
+    // Do Something
+  }
+
+  open fun observingRecyclerViewHorizontalOffset(offset: Int) {
+    // Do Something
+  }
+
+  /**
+   * @description
+   * `RecyclerFragment` 把 `RecyclerView` 内置在 `Fragment` 中所以协议提供了一个强制实现的
+   * 方法必须指定一个 `Adapter` 这个方法是初始化 `Adapter` 数据的. 只会在 `Adapter` 为空的时候进行
+   * 处理。
+   * @param
+   * [recyclerView] 这个就是内嵌的 `RecyclerView` 的实体, 作为参数传递主要是在继承场景中不用寻找隐形的 `RecyclerView`
+   * 可以直接调用参数联动。
+   * [asyncData] 这个数据是在 `Presenter` 里面实现好后返回到这里的实体.
+   */
+  abstract fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<D>?)
+
+  /**
+   * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
+   */
+  open fun setRecyclerViewParams(width: Int, height: Int): RelativeLayout.LayoutParams =
+    RelativeLayout.LayoutParams(width, height)
+
+  override fun onAttach(context: Context?) {
+    super.onAttach(context)
+    presenter.onFragmentAttach()
+  }
+
+  override fun onDetach() {
+    super.onDetach()
+    presenter.onFragmentDetach()
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    presenter.onFragmentCreate()
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    presenter.onFragmentCreateView()
+    return UI {
+      wrapper = relativeLayout {
+        layoutParams = setRecyclerViewParams(matchParent, matchParent)
+        recyclerView = BaseRecyclerView(context)
+        setRecyclerViewLayoutManager(recyclerView)
+        addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
+      }
+    }.view
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    presenter.onFragmentViewCreated()
+    // 这个赋值的时机暂时放在这里, 等实现数据逻辑的时候再切换到正确的位置 by KaySaith
+    setRecyclerViewAdapter(recyclerView, null)
+
+    // 监听 `RecyclerView` 滑动
+    recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+      override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+        /**
+         * [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动
+         */
+        super.onScrollStateChanged(recyclerView, newState)
+        observingRecyclerViewScrollState(newState)
+      }
+
+      override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+        super.onScrolled(recyclerView, dx, dy)
+        observingRecyclerViewScrolled(dx, dy)
+        observingRecyclerViewVerticalOffset(recyclerView?.computeVerticalScrollOffset().orZero())
+        observingRecyclerViewHorizontalOffset(recyclerView?.computeHorizontalScrollOffset().orZero())
+      }
+    })
+  }
+
+}

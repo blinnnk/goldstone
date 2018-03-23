@@ -11,7 +11,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Grayscale
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
@@ -71,8 +71,8 @@ class RoundButton(context: Context) : View(context) {
       leftMargin = PaddingSize.device
     }
 
-    addTouchRippleAnimation(Grayscale.lightGray, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = Grayscale.midGray
+    addTouchRippleAnimation(GrayScale.lightGray, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f)
+    textPaint.color = GrayScale.midGray
     invalidate()
   }
 

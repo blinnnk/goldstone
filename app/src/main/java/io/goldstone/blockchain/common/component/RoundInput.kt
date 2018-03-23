@@ -37,7 +37,7 @@ class RoundInput(context: Context) : EditText(context) {
 
     paint.isAntiAlias = true
     paint.style = Paint.Style.STROKE
-    paint.color = Grayscale.lightGray
+    paint.color = GrayScale.lightGray
     paint.strokeWidth = BorderSize.bold
 
     backgroundPaint.isAntiAlias = true
@@ -46,7 +46,7 @@ class RoundInput(context: Context) : EditText(context) {
 
     textPaint.isAntiAlias = true
     textPaint.style = Paint.Style.FILL
-    textPaint.color = Grayscale.midGray
+    textPaint.color = GrayScale.midGray
     textPaint.typeface = GoldStoneFont.heavy(context)
     textPaint.textSize = titleSize
 
@@ -60,7 +60,7 @@ class RoundInput(context: Context) : EditText(context) {
     }
     leftPadding = 35.uiPX()
     backgroundTintMode = PorterDuff.Mode.CLEAR
-    textColor = Grayscale.black
+    textColor = GrayScale.black
     typeface = GoldStoneFont.heavy(context)
     setCursorColor(Spectrum.blue)
   }

@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".module.home.home.MainActivity">
+        <activity android:name=".module.home.home.view.MainActivity">
 
         </activity>
     </application>

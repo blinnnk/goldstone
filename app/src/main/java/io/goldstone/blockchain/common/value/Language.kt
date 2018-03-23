@@ -72,6 +72,30 @@ object ImportWalletText {
   }
 }
 
+object WalletText {
+  @JvmField
+  val totalAssets = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Total Assets"
+    else -> ""
+  }
+  @JvmField
+  val manage = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Manage My Wallets"
+    else -> ""
+  }
+  @JvmField
+  val section = when (currentLanguage) {
+    HoneyLanguage.English.code -> "My tokens type:"
+    else -> ""
+  }
+  @JvmField
+  val addToken = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Add More Token".toUpperCase()
+    else -> ""
+  }
+
+}
+
 object CommonText {
 
   @JvmField
@@ -82,6 +106,16 @@ object CommonText {
   @JvmField
   val startImporting = when (currentLanguage) {
     HoneyLanguage.English.code -> "Start Importing"
+    else -> ""
+  }
+
+}
+
+object SymbolText {
+
+  @JvmField
+  val usd = when (currentLanguage) {
+    HoneyLanguage.English.code -> " (USD)"
     else -> ""
   }
 

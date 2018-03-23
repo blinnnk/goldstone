@@ -3,18 +3,22 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmat
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 22/03/2018 11:40 PM
@@ -45,7 +49,9 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
           marginTop = 20.uiPX()
           setBlueStyle()
         }
-        .click { }
+        .click {
+          presenter.clickConfirmationButton()
+        }
         .into(this)
 
       textView("What is mnemonic?") {

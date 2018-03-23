@@ -11,12 +11,15 @@ import com.blinnnk.uikit.uiPX
  * Common interface parameters, including color, original size, etc.
  */
 
-object Grayscale {
+object GrayScale {
   @JvmField val black = Color.parseColor("#FF000000")
   @JvmField val lightGray = Color.parseColor("#FFE5E5E5")
   @JvmField val whiteGray = Color.parseColor("#FFF1F1F1")
   @JvmField val gray = Color.parseColor("#FFAAAAAA")
   @JvmField val midGray = Color.parseColor("#FFCCCCCC")
+  @JvmField val Opacity5Black = Color.parseColor("#80000000")
+  @JvmField val Opacity7Black = Color.parseColor("#B3000000")
+  @JvmField val Opacity8Black = Color.parseColor("#CC000000")
 }
 
 object Spectrum {
@@ -27,6 +30,10 @@ object Spectrum {
   @JvmField val red = Color.parseColor("#FFFA0D0D")
   @JvmField val lightRed = Color.parseColor("#FFFF6464")
   @JvmField val yellow = Color.parseColor("#FFFFF53C")
+  @JvmField val opacity1White = Color.parseColor("#1AFFFFFF")
+  @JvmField val opacity3White = Color.parseColor("#4DFFFFFF")
+  @JvmField val opacity2White = Color.parseColor("#33FFFFFF")
+  @JvmField val opacity5White = Color.parseColor("#80FFFFFF")
 }
 
 object FontSize {
@@ -38,8 +45,8 @@ object FontSize {
 }
 
 object ShadowSize {
-  @JvmField val Button = 15.uiPX()
-  @JvmField val Overlay = 15.uiPX()
+  @JvmField val Button = 10.uiPX().toFloat()
+  @JvmField val Overlay = 15.uiPX().toFloat()
 }
 
 object PaddingSize {

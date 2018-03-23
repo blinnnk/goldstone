@@ -3,13 +3,13 @@ package io.goldstone.blockchain.common.component
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import com.github.mmin18.widget.RealtimeBlurView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.value.*
@@ -26,7 +26,6 @@ class MenuBar(context: Context) : LinearLayout(context) {
   private var totalItemWidth = 0
 
   init {
-
     backgroundColor = Spectrum.white
     titles.forEachIndexed { index, string ->
       Item(context)
@@ -85,7 +84,7 @@ private class Item(context: Context) : View(context) {
   }
 
   private var hasUnderLine = false
-  private var titleColor = Grayscale.black
+  private var titleColor = GrayScale.black
   private val paint = Paint()
   private val textPaint = Paint()
   private val textSize = 16.uiPX().toFloat()
@@ -93,7 +92,7 @@ private class Item(context: Context) : View(context) {
   init {
     paint.isAntiAlias = true
     paint.style = Paint.Style.FILL
-    paint.color = Grayscale.black
+    paint.color = GrayScale.black
 
     textPaint.isAntiAlias = true
     textPaint.style = Paint.Style.FILL
@@ -106,12 +105,12 @@ private class Item(context: Context) : View(context) {
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
 
-    textPaint.color = Grayscale.midGray
+    textPaint.color = GrayScale.midGray
 
     if (hasUnderLine) {
       val rectF = RectF(0f, height - BorderSize.bold, width.toFloat(), height.toFloat())
       canvas?.drawRect(rectF, paint)
-      textPaint.color = Grayscale.black
+      textPaint.color = GrayScale.black
     }
 
     val textY = (height + textSize) / 2 - 3.uiPX()
