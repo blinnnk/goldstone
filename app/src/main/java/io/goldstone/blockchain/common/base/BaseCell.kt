@@ -3,11 +3,16 @@ package io.goldstone.blockchain.common.base
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.widget.RelativeLayout
+import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneySvgPathConvert
+import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SvgPath
 
@@ -33,6 +38,10 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
   private val path = HoneySvgPathConvert()
   private val arrow = path.parser(SvgPath.arrow)
 
+  init {
+    this.setWillNotDraw(false)
+  }
+
   @SuppressLint("DrawAllocation")
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
@@ -51,5 +60,11 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
     )
   }
 
+  fun setGrayStyle() {
+    iconPaint.color = GrayScale.Opacity1Black
+    paint.color = GrayScale.Opacity1Black
+    invalidate()
+    addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
+  }
 
 }

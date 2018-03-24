@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orZero
+import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
@@ -23,6 +26,19 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
   lateinit var wrapper: RelativeLayout
   lateinit var recyclerView: BaseRecyclerView
+
+  /**
+   * @description
+   * 当 `RecyclerView` 需要异步数据更新列表的时候, 通常网络的业务都会是异步的,就可以通过在异步为
+   * asyncData 赋值来达到 `RecyclerView` 更新数据的效果.
+   */
+  var asyncData: ArrayList<D>? by observing(null) {
+    recyclerView.adapter.isNull().isTrue {
+      setRecyclerViewAdapter(recyclerView, asyncData)
+    }
+    /** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
+    setSlideUpAnimation()
+  }
 
   /**
    * @description
@@ -54,6 +70,20 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
   open fun observingRecyclerViewHorizontalOffset(offset: Int) {
     // Do Something
+  }
+
+  /**
+   * 当设定 `Cell` 的单元高度后,就会在 `OnViewCreated` 的时机执行 `updateParentContentLayoutHeight`
+   * 来动画伸展出初始界面.
+   */
+  open fun setSlideUpWithCellHeight(): Int? = null
+
+  open fun setSlideUpAnimation() {
+    // 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
+    if (isResumed) return
+    setSlideUpWithCellHeight()?.let { cellHeight: Int ->
+      presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), cellHeight)
+    }
   }
 
   /**
@@ -108,15 +138,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     presenter.onFragmentViewCreated()
-    // 这个赋值的时机暂时放在这里, 等实现数据逻辑的时候再切换到正确的位置 by KaySaith
-    setRecyclerViewAdapter(recyclerView, null)
 
     // 监听 `RecyclerView` 滑动
     recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
       override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-        /**
-         * [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动
-         */
+        /** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
         super.onScrollStateChanged(recyclerView, newState)
         observingRecyclerViewScrollState(newState)
       }

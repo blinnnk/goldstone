@@ -4,6 +4,7 @@ import com.blinnnk.extension.addFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.wallet.view.WalletDetailFragment
 
 /**
@@ -13,7 +14,7 @@ import io.goldstone.blockchain.module.home.wallet.wallet.view.WalletDetailFragme
 
 class WalletDetailPresenter(
   override val fragment: WalletDetailFragment
-  ) : BaseRecyclerPresenter<WalletDetailFragment, Int>() {
+  ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
   fun showTransactionsFragment() {
     fragment.activity?.addFragment<TransactionFragment>(ContainerID.main)

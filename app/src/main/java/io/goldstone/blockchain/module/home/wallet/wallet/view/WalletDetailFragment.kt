@@ -16,7 +16,7 @@ import java.util.*
  * @author KaySaith
  */
 
-class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, Int>() {
+class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
   private val header by lazy { WalletDetailHeader(context!!) }
 
@@ -27,21 +27,11 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, Int>() 
 
   override fun setRecyclerViewAdapter(
     recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<Int>?
+    asyncData: ArrayList<WalletDetailCellModel>?
   ) {
-    val testData =
-      arrayListOf(
-        WalletDetailCellModel(R.drawable.etc_icon, "ETH", "Global, Ethereum", 12.68, 6583.78),
-        WalletDetailCellModel(R.drawable.xmr_icon, "XMR", "Global, EOS", 6.92, 548.65),
-        WalletDetailCellModel(R.drawable.xrp_icon, "XRP", "Global, Monero", 1.6, 8.65),
-        WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99),
-        WalletDetailCellModel(R.drawable.etc_icon, "ETH", "Global, Ethereum", 12.68, 6583.78),
-        WalletDetailCellModel(R.drawable.xmr_icon, "XMR", "Global, EOS", 6.92, 548.65),
-        WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99),
-        WalletDetailCellModel(R.drawable.xrp_icon, "XRP", "Global, Monero", 1.6, 8.65),
-        WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99)
-      )
-    recyclerView.adapter = WalletDetailAdapter(testData)
+    asyncData?.let {
+      recyclerView.adapter = WalletDetailAdapter(it)
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +41,19 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, Int>() 
     header.historyButton.onClick {
       presenter.showTransactionsFragment()
     }
+
+    asyncData = arrayListOf(
+      WalletDetailCellModel(R.drawable.etc_icon, "ETH", "Global, Ethereum", 12.68, 6583.78),
+      WalletDetailCellModel(R.drawable.xmr_icon, "XMR", "Global, EOS", 6.92, 548.65),
+      WalletDetailCellModel(R.drawable.xrp_icon, "XRP", "Global, Monero", 1.6, 8.65),
+      WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99),
+      WalletDetailCellModel(R.drawable.etc_icon, "ETH", "Global, Ethereum", 12.68, 6583.78),
+      WalletDetailCellModel(R.drawable.xmr_icon, "XMR", "Global, EOS", 6.92, 548.65),
+      WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99),
+      WalletDetailCellModel(R.drawable.xrp_icon, "XRP", "Global, Monero", 1.6, 8.65),
+      WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99)
+    )
+
   }
 
   override fun observingRecyclerViewVerticalOffset(offset: Int) {

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.wallet.view
 
 import android.content.Context
 import android.widget.LinearLayout
+import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.extension.setMargins
@@ -11,10 +12,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
 
 /**
@@ -37,7 +36,6 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
   private val valueInfo by lazy { TwoLineTitles(context) }
 
   init {
-    setWillNotDraw(false)
 
     layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
       leftMargin = PaddingSize.device
@@ -50,18 +48,11 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
       }
       .into(this)
 
-    tokenInfo
-      .apply {
-        title.text = "ETH"
-        subtitle.text = "Global, Ethereum"
-      }
-      .into(this)
+    tokenInfo.into(this)
 
     valueInfo
       .apply {
         isFloatRight = true
-        title.text = "12.68"
-        subtitle.text = "≈ 6583.78 ${ SymbolText.usd }"
       }
       .into(this)
 

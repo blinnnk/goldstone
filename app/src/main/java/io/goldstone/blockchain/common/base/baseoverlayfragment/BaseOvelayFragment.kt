@@ -25,7 +25,6 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragment<T>>> : Fragment() {
 
   abstract val presenter: T
-  abstract fun setContentHeight(): Int
   abstract fun ViewGroup.initView()
 
   /** 观察悬浮曾的 `Header` 状态 */
@@ -44,6 +43,8 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
   lateinit var overlayView: OverlayView
 
   private val minHeight = 265.uiPX()
+
+  open fun setContentHeight(): Int = minHeight
 
   override fun onAttach(context: Context?) {
     super.onAttach(context)
