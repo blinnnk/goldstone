@@ -5,16 +5,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneySvgPathConvert
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.SvgPath
+import io.goldstone.blockchain.common.value.*
 
 /**
  * @date 23/03/2018 11:46 PM
@@ -40,6 +38,10 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 
   init {
     this.setWillNotDraw(false)
+
+    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
+      leftMargin = PaddingSize.device
+    }
   }
 
   @SuppressLint("DrawAllocation")

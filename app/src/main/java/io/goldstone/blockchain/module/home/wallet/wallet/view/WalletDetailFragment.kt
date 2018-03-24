@@ -19,9 +19,9 @@ import java.util.*
 
 class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
-  private val header by lazy { WalletDetailHeader(context!!) }
+  private val slideHeader by lazy { WalletSlideHeader(context!!) }
   private var isShow = false
-  private val headerHeight by lazy { HoneyUIUtils.getHeight(header) }
+  private val headerHeight by lazy { HoneyUIUtils.getHeight(slideHeader) }
 
   override val presenter = WalletDetailPresenter(this)
 
@@ -30,18 +30,23 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
     asyncData: ArrayList<WalletDetailCellModel>?
   ) {
     recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray()) {
-      headerView?.currentAccount?.onClick {
-        presenter.showWalletListFragment()
+      headerView?.apply {
+        currentAccount.onClick { presenter.showWalletListFragment() }
+        manageButton.onClick { presenter.showWalletListFragment() }
+        addTokenButton.onClick { presenter.showTokenManagementFragment() }
       }
     }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    wrapper.addView(header)
 
-    header.historyButton.onClick {
-      presenter.showTransactionsFragment()
+    wrapper.addView(slideHeader)
+
+    /** 这个 `slideHeader` 是上下滑动后的开关层, 与 `RecyclerView` 的 `headerView` 不在一个层级 */
+    slideHeader.apply {
+      historyButton.onClick { presenter.showTransactionsFragment() }
+      notifyButton.onClick { presenter.showNotificationListFragment() }
     }
 
     asyncData = arrayListOf(
@@ -60,12 +65,12 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
   override fun observingRecyclerViewVerticalOffset(offset: Int) {
 
     if (offset >= headerHeight && !isShow) {
-      header.onHeaderShowedStyle()
+      slideHeader.onHeaderShowedStyle()
       isShow = true
     }
 
     if (offset < headerHeight && isShow) {
-      header.onHeaderHidesStyle()
+      slideHeader.onHeaderHidesStyle()
       isShow = false
     }
   }

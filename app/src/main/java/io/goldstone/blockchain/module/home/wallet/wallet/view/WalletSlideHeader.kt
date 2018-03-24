@@ -26,7 +26,7 @@ import org.jetbrains.anko.matchParent
  * @author KaySaith
  */
 @SuppressLint("SetTextI18n")
-class WalletDetailHeader(context: Context) : RelativeLayout(context) {
+class WalletSlideHeader(context: Context) : RelativeLayout(context) {
 
   val historyButton by lazy { CircleButton(context) }
   val notifyButton by lazy { CircleButton(context) }

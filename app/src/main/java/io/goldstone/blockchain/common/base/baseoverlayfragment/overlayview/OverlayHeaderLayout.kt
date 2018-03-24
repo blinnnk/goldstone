@@ -63,8 +63,9 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
   init {
 
+    setWillNotDraw(false)
+
     layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, headerHeight)
-    addTopLRCorner(CornerSize.big, Spectrum.white)
 
     title = textView {
       textColor = GrayScale.black

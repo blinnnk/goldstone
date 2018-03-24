@@ -3,9 +3,12 @@ package io.goldstone.blockchain.common.component
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.view.View
+import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -23,10 +26,14 @@ class RoundBorderButton(context: Context) : View(context) {
     invalidate()
   }
 
+  var touchColor: Int by observing(0) {
+    addTouchRippleAnimation(Color.TRANSPARENT, touchColor, RippleMode.Round)
+  }
+
   private val paint = Paint().apply {
     isAntiAlias = true
     style = Paint.Style.STROKE
-    strokeWidth = BorderSize.bold
+    strokeWidth = BorderSize.default
     color = Spectrum.white
   }
 
@@ -45,10 +52,10 @@ class RoundBorderButton(context: Context) : View(context) {
     super.onDraw(canvas)
 
     val rectF = RectF(
-      BorderSize.bold,
-      BorderSize.bold,
-      width - BorderSize.bold,
-      height - BorderSize.bold
+      BorderSize.default,
+      BorderSize.default,
+      width - BorderSize.default,
+      height - BorderSize.default
     )
 
     canvas?.drawRoundRect(rectF, height / 2f, height / 2f, paint)

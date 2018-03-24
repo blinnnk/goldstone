@@ -37,10 +37,6 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
   init {
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
-      leftMargin = PaddingSize.device
-    }
-
     icon
       .apply {
         src = R.drawable.etc_icon

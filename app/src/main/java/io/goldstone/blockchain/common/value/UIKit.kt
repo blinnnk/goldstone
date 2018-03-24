@@ -18,6 +18,7 @@ object GrayScale {
   @JvmField val gray = Color.parseColor("#FFAAAAAA")
   @JvmField val midGray = Color.parseColor("#FFCCCCCC")
   @JvmField val Opacity1Black = Color.parseColor("#1A000000")
+  @JvmField val Opacity2Black = Color.parseColor("#33000000")
   @JvmField val Opacity5Black = Color.parseColor("#80000000")
   @JvmField val Opacity7Black = Color.parseColor("#B3000000")
   @JvmField val Opacity8Black = Color.parseColor("#CC000000")
@@ -38,7 +39,7 @@ object Spectrum {
 }
 
 object FontSize {
-  @JvmField val header = 6.uiPX().toFloat()
+  @JvmField val header = 5.uiPX().toFloat()
   @JvmField val cellTitle = 16.uiPX().toFloat()
   @JvmField val cellSubtitle = 11.uiPX().toFloat()
   @JvmField val cellDate = 10.uiPX().toFloat()

@@ -99,6 +99,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
       .apply {
         text = WalletText.addToken
         layoutParams = LinearLayout.LayoutParams(125.uiPX(), 24.uiPX())
+        touchColor = Spectrum.yellow
         x -= PaddingSize.device
         y -= 10.uiPX()
       }
