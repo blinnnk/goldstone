@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.wallet.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.timeUpThen
+import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -29,11 +29,9 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
     recyclerView: BaseRecyclerView,
     asyncData: ArrayList<WalletDetailCellModel>?
   ) {
-    asyncData?.let {
-      recyclerView.adapter = WalletDetailAdapter(it) {
-        it?.currentAccount?.onClick {
-          presenter.showWalletListFragment()
-        }
+    recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray()) {
+      headerView?.currentAccount?.onClick {
+        presenter.showWalletListFragment()
       }
     }
   }

@@ -15,14 +15,14 @@ import org.jetbrains.anko.matchParent
 
 class WalletDetailAdapter(
   private var dataSet: ArrayList<WalletDetailCellModel>,
-  private val holdHeaderView: (WalletDetailHeaderView?) -> Unit = {}
+  private val hold: WalletDetailAdapter.() -> Unit = {}
 ) : RecyclerView.Adapter<WalletDetailAdapter.ViewHolder>() {
 
   enum class CellType(val value: Int) {
     Header(0), Cell(1), Footer(2)
   }
 
-  private var headerView: WalletDetailHeaderView? = null
+  internal var headerView: WalletDetailHeaderView? = null
   private var normalCell: WalletDetailCell? = null
   private var footerView: ViewGroup? = null
 
@@ -32,7 +32,6 @@ class WalletDetailAdapter(
       CellType.Header.value -> {
         headerView = WalletDetailHeaderView(parent.context)
         viewHolder = ViewHolder(headerView)
-        holdHeaderView(headerView)
       }
 
       CellType.Cell.value -> {
@@ -47,8 +46,8 @@ class WalletDetailAdapter(
         }
         viewHolder = ViewHolder(footerView)
       }
-
     }
+    hold(this)
     return viewHolder!!
   }
 
