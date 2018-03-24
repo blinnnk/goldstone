@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view
 
 import android.view.ViewGroup
+import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
-import com.blinnnk.util.addFragment
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.utils.getRealScreenHeight
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
@@ -21,7 +21,9 @@ class WalletGenerationFragment : BaseOverlayFragment<WalletGenerationPresenter>(
   override fun setContentHeight() = activity?.getRealScreenHeight().orZero()
 
   override fun ViewGroup.initView() {
-    addFragment<CreateWalletFragment>(this.id, FragmentTag.walletCreation)
+    addFragmentAndSetArgument<CreateWalletFragment>(this.id, FragmentTag.walletCreation) {
+      // Send Argument
+    }
     headerTitle = CreateWalletText.create
   }
 

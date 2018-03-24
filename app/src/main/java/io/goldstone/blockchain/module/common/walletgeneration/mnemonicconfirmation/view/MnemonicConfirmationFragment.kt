@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmat
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.getRealScreenHeight
+import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -12,7 +14,8 @@ import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.ScreenSize
+import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
 import org.jetbrains.anko.AnkoContext
@@ -58,7 +61,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
         textSize = 5.uiPX().toFloat()
         typeface = GoldStoneFont.heavy(context)
         layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-          topMargin = activity?.getRealScreenHeight().orZero() - 460.uiPX() - UIUtils.getHeight(attentionTextView)
+          topMargin = activity?.getRealScreenHeight().orZero() - 460.uiPX() - HoneyUIUtils.getHeight(attentionTextView)
         }
         textColor = Spectrum.blue
         gravity = Gravity.CENTER

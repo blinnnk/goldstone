@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.wallet.view
 
 import android.os.Bundle
 import android.view.View
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.wallet.presenter.WalletDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -23,7 +23,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, Int>() 
   override val presenter = WalletDetailPresenter(this)
 
   private var isShow = false
-  private val headerHeight by lazy { UIUtils.getHeight(header) }
+  private val headerHeight by lazy { HoneyUIUtils.getHeight(header) }
 
   override fun setRecyclerViewAdapter(
     recyclerView: BaseRecyclerView,

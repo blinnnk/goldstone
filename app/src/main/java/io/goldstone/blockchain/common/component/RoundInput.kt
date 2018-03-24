@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.textColor
+import com.blinnnk.uikit.ScreenSize
 
 /**
  * @date 22/03/2018 3:11 PM

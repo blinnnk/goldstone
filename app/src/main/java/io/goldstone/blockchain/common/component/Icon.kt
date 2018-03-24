@@ -7,9 +7,9 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.widget.ImageView
 import android.widget.LinearLayout
+import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.imageResource

@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.
 
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.findChildFragmentByTag
+import com.blinnnk.extension.removeChildFragment
+import com.blinnnk.extension.showChildFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.utils.removeChildFragment
-import io.goldstone.blockchain.common.utils.showChildFragment
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment

@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
+import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
-import io.goldstone.blockchain.common.utils.getRealScreenHeight
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI

@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimport.view
 
 import android.view.ViewGroup
+import com.blinnnk.extension.getRealScreenHeight
+import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.MenuBar
-import io.goldstone.blockchain.common.utils.getRealScreenHeight
-import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 

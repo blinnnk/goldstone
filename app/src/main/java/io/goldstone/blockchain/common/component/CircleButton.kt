@@ -9,11 +9,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.into
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.into
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.*
 

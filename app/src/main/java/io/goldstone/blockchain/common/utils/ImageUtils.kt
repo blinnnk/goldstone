@@ -9,7 +9,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
  * @author KaySaith
  */
 
-private val fadeDuration = 200
+private const val fadeDuration = 200
 
 fun <T> ImageView.glideImage(imagePath: T?) {
   Glide

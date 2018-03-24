@@ -6,16 +6,16 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.into
-import io.goldstone.blockchain.common.utils.setMargins
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
+import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import org.jetbrains.anko.*
 

@@ -20,6 +20,4 @@ object UIUtils {
     width: Float = ScreenSize.Width.toFloat(),
     height: Float = ScreenSize.Height.toFloat()
   ) = LinearGradient(0f,0f, width, height, startColor, endColor, Shader.TileMode.CLAMP)
-
-  fun getHeight(view: View) = view.layoutParams.height
 }

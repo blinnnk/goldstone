@@ -8,10 +8,15 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInHorizontal
+import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText

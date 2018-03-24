@@ -5,11 +5,15 @@ import android.graphics.Color
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateColorAnimation
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText

@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.value.ContainerID
 import org.jetbrains.anko.*
@@ -42,7 +43,7 @@ class OverlayView(context: Context) : RelativeLayout(context) {
         }.lparams {
           width = matchParent
           height = 200.uiPX()
-          topMargin = UIUtils.getHeight(header)
+          topMargin = HoneyUIUtils.getHeight(header)
         }
       }
 

@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter
 
-import com.blinnnk.util.addFragment
+import com.blinnnk.extension.hideChildFragment
+import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.hideChildFragment
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -24,7 +24,9 @@ class CreateWalletPresenter(
     fragment.getParentFragment<WalletGenerationFragment>()?.apply {
       // 隐藏当前 `Fragment` 节省内存
       hideChildFragment(fragment)
-      addFragment<MnemonicBackupFragment>(ContainerID.content, FragmentTag.mnemonicBackup)
+      addFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content, FragmentTag.mnemonicBackup) {
+        // Send Argument Parameters
+      }
       hasBackButton = true
       hasCloseButton = false
       headerTitle = CreateWalletText.mnemonicBackUp

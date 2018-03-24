@@ -13,8 +13,8 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
+import com.blinnnk.uikit.ScreenSize
 
 /**
  * @date 21/03/2018 11:00 PM

@@ -9,11 +9,11 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import com.github.mmin18.widget.RealtimeBlurView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.into
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
+import com.blinnnk.uikit.ScreenSize
 
 /**
  * @date 23/03/2018 1:00 AM

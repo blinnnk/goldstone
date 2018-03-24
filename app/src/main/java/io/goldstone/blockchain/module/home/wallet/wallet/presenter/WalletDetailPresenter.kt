@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.wallet.presenter
 
 import com.blinnnk.extension.addFragment
-import com.blinnnk.util.addFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment

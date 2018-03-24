@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.module.home.home.view
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.addFragment
-import io.goldstone.blockchain.common.utils.hideStatusBar
+import com.blinnnk.extension.hideStatusBar
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.value.ContainerID
 import org.jetbrains.anko.relativeLayout
 
@@ -16,7 +17,10 @@ class MainActivity : AppCompatActivity() {
 
     relativeLayout {
       id = ContainerID.main
-      addFragment<HomeFragment>(this.id)
+      savedInstanceState.isNull {
+        // 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+        addFragment<HomeFragment>(this.id)
+      }
     }.let {
       setContentView(it)
     }

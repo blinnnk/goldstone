@@ -10,10 +10,12 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.GradientType
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
+import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
+import com.blinnnk.extension.into
+import com.blinnnk.util.HoneyUIUtils
 
 /**
  * @date 21/03/2018 10:15 PM
@@ -90,7 +92,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 
 
       }.lparams {
-        height = (ScreenSize.Height * 0.135).toInt() + UIUtils.getHeight(importButton) * 2
+        height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
         alignParentBottom()
       }
 

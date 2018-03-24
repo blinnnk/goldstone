@@ -6,6 +6,10 @@ import android.graphics.Paint
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInHorizontal
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneySvgPathConvert
 import com.blinnnk.util.observing
@@ -16,6 +20,7 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SvgPath
 import org.jetbrains.anko.matchParent
+
 
 /**
  * @date 23/03/2018 12:55 PM

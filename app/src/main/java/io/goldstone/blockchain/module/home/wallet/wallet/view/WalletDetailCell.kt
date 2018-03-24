@@ -2,16 +2,16 @@ package io.goldstone.blockchain.module.home.wallet.wallet.view
 
 import android.content.Context
 import android.widget.LinearLayout
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.into
-import io.goldstone.blockchain.common.utils.setAlignParentRight
-import io.goldstone.blockchain.common.utils.setCenterInVertical
-import io.goldstone.blockchain.common.utils.setMargins
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.SymbolText

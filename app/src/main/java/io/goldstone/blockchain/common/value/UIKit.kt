@@ -68,26 +68,6 @@ object BorderSize {
 }
 
 object ScreenSize {
-  @JvmField
-  val Width = Resources.getSystem().displayMetrics.widthPixels
-  // This height will lose control bar height when there is a soft control bar
-  @JvmField
-  val Height = Resources.getSystem().displayMetrics.heightPixels
-  @JvmField
-  val centerX = Width / 2f
-  @JvmField
-  val centerY = Height / 2f
-  @JvmField val statusBarHeight = getStatusBarHeight()
   val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
-}
-
-// 获取状态栏高度的方法
-private fun getStatusBarHeight(): Int {
-  var result = 0
-  val resourceId = Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android")
-  if (resourceId > 0) {
-    result = Resources.getSystem().getDimensionPixelSize(resourceId)
-  }
-  return result
 }
 

@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter
 
-import com.blinnnk.util.addFragment
+import com.blinnnk.extension.hideChildFragment
+import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.hideChildFragment
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -22,7 +22,9 @@ class MnemonicBackupPresenter(
   fun goToMnemonicConfirmation() {
     fragment.getParentFragment<WalletGenerationFragment>()?.apply {
       hideChildFragment(fragment)
-      addFragment<MnemonicConfirmationFragment>(ContainerID.content)
+      addFragmentAndSetArgument<MnemonicConfirmationFragment>(ContainerID.content) {
+        // Send Argument
+      }
       headerTitle = CreateWalletText.mnemonicConfirmation
     }
   }

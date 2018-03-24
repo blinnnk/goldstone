@@ -5,17 +5,18 @@ import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.into
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter.MnemonicBackupPresenter
 import org.jetbrains.anko.*
+
 
 /**
  * @date 22/03/2018 9:32 PM

@@ -5,13 +5,13 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.into
-import io.goldstone.blockchain.common.utils.setAlignParentRight
-import io.goldstone.blockchain.common.utils.setCenterInVertical
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.imageResource

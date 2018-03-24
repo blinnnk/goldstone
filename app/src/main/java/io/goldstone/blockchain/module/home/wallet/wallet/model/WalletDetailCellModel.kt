@@ -10,6 +10,6 @@ data class WalletDetailCellModel(
   var tokenSymbol: String = "",
   var tokenName: String = "",
   var count: Double = 0.0,
-  var money: Double = 0.0,
+  private var money: Double = 0.0,
   var moneyText: String = "≈ $money USD"
 )

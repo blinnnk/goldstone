@@ -2,11 +2,11 @@ package io.goldstone.blockchain.module.home.home.view
 
 import android.support.v4.app.Fragment
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.addFragment
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.TabBarView
-import io.goldstone.blockchain.common.utils.into
+import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.GradientType
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
@@ -32,7 +32,9 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 
       verticalLayout {
         id = ContainerID.home
-        addFragment<WalletDetailFragment>(this.id)
+        addFragmentAndSetArgument<WalletDetailFragment>(this.id) {
+          // Send Argument
+        }
       }
 
       tabBar
