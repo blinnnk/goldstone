@@ -143,6 +143,16 @@ object SymbolText {
 
 }
 
+object CurrentWalletText {
+
+  @JvmField
+  val Wallets = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Wallets"
+    else -> ""
+  }
+
+}
+
 // 设定当前系统语言为软件界面语言
 
 var currentLanguage = HoneyLanguage.Chinese.code

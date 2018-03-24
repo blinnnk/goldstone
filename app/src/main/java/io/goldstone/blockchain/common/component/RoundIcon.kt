@@ -23,6 +23,7 @@ class RoundIcon(context: Context) : ImageView(context) {
 
   var src: Int by observing(0) {
     imageResource = src
+    setColorFilter(Spectrum.white)
   }
 
   var iconSize: Int by observing(50.uiPX()) {
@@ -31,7 +32,6 @@ class RoundIcon(context: Context) : ImageView(context) {
 
   init {
     layoutParams = ViewGroup.LayoutParams(iconSize, iconSize)
-    setColorFilter(Spectrum.white)
     scaleType = ScaleType.CENTER_INSIDE
   }
 

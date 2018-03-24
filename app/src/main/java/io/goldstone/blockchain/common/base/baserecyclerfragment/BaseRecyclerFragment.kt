@@ -72,6 +72,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
     // Do Something
   }
 
+  open fun afterSetAdapter() {
+    // Do Something
+  }
+
   /**
    * 当设定 `Cell` 的单元高度后,就会在 `OnViewCreated` 的时机执行 `updateParentContentLayoutHeight`
    * 来动画伸展出初始界面.

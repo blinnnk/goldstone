@@ -10,6 +10,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
+import io.goldstone.blockchain.common.base.BaseInfoCell.BaseValueCell
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
@@ -25,7 +26,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class TransactionListCell(context: Context) : BaseCell(context) {
+class TransactionListCell(context: Context) : BaseValueCell(context) {
 
   var model: TransactionListModel by observing(TransactionListModel()) {
 
@@ -53,41 +54,9 @@ class TransactionListCell(context: Context) : BaseCell(context) {
 
   }
 
-  private val icon by lazy { RoundIcon(context) }
-  private val info by lazy { TwoLineTitles(context) }
-  private val count by lazy { TwoLineTitles(context) }
-
   init {
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX()).apply {
-      leftMargin = PaddingSize.device
-    }
-
-    icon.into(this)
-
-    info
-      .apply {
-        setBlackTitles()
-        x += 60.uiPX()
-      }
-      .into(this)
-
-    count
-      .apply {
-        isFloatRight = true
-        x -= 30.uiPX()
-        setBlackTitles()
-      }
-      .into(this)
-
     setGrayStyle()
-
-    icon.setCenterInVertical()
-    info.setCenterInVertical()
-    count.apply {
-      setCenterInVertical()
-      setAlignParentRight()
-    }
 
   }
 

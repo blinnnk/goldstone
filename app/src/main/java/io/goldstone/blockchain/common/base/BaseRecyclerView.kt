@@ -46,11 +46,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
   }
 
   inline fun <reified T> getItemViewAtAdapterPosition(position: Int, crossinline block: T.() -> Unit) {
-    coroutinesTask({
-      findViewHolderForAdapterPosition(position)?.itemView
-    }) {
-      block(it as T)
-    }
+    block(findViewHolderForAdapterPosition(position)?.itemView as T)
   }
 
   inline fun <reified T : RecyclerView.LayoutManager> getManager(block: T.() -> Unit) {

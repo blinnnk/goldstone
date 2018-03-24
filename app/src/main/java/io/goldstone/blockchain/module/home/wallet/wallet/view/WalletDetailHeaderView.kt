@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import com.blinnnk.extension.into
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
@@ -33,11 +34,11 @@ import org.jetbrains.anko.verticalLayout
 
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-  private val balanceTitle by lazy { TextView(context) }
-  private val manageButton by lazy { RoundButtonWithIcon(context) }
-  private val addTokenButton by lazy { RoundBorderButton(context) }
-  private val currentAccount by lazy { CurrentAccountView(context) }
+  val manageButton by lazy { RoundButtonWithIcon(context) }
+  val addTokenButton by lazy { RoundBorderButton(context) }
+  val currentAccount by lazy { CurrentAccountView(context) }
 
+  private val balanceTitle by lazy { TextView(context) }
   private val sectionHeaderHeight = 50.uiPX()
 
   init {

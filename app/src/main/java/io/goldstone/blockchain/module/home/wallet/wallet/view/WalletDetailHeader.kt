@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.wallet.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.View
@@ -24,11 +25,11 @@ import org.jetbrains.anko.matchParent
  * @date 24/03/2018 12:50 AM
  * @author KaySaith
  */
-
+@SuppressLint("SetTextI18n")
 class WalletDetailHeader(context: Context) : RelativeLayout(context) {
 
   val historyButton by lazy { CircleButton(context) }
-  private val notifyButton by lazy { CircleButton(context) }
+  val notifyButton by lazy { CircleButton(context) }
   private val balance by lazy { TwoLineTitles(context) }
 
   init {

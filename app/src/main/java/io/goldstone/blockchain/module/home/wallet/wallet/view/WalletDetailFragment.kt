@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.wallet.view
 
 import android.os.Bundle
 import android.view.View
+import com.blinnnk.extension.timeUpThen
 import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -19,18 +20,21 @@ import java.util.*
 class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
   private val header by lazy { WalletDetailHeader(context!!) }
-
-  override val presenter = WalletDetailPresenter(this)
-
   private var isShow = false
   private val headerHeight by lazy { HoneyUIUtils.getHeight(header) }
+
+  override val presenter = WalletDetailPresenter(this)
 
   override fun setRecyclerViewAdapter(
     recyclerView: BaseRecyclerView,
     asyncData: ArrayList<WalletDetailCellModel>?
   ) {
     asyncData?.let {
-      recyclerView.adapter = WalletDetailAdapter(it)
+      recyclerView.adapter = WalletDetailAdapter(it) {
+        it?.currentAccount?.onClick {
+          presenter.showWalletListFragment()
+        }
+      }
     }
   }
 
@@ -53,7 +57,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
       WalletDetailCellModel(R.drawable.xrp_icon, "XRP", "Global, Monero", 1.6, 8.65),
       WalletDetailCellModel(R.drawable.eos_icon, "EOS", "Global, BitShares", 322.87, 1380.99)
     )
-
   }
 
   override fun observingRecyclerViewVerticalOffset(offset: Int) {
