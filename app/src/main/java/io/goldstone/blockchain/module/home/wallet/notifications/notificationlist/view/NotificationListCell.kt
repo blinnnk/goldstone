@@ -38,7 +38,9 @@ class NotificationListCell(context: Context) : BaseCell(context) {
   init {
 
     info
-      .apply { setBlackTitles() }
+      .apply {
+        setNormalTitles()
+      }
       .into(this)
     info.setCenterInVertical()
 

@@ -29,9 +29,11 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
     super.onViewCreated(view, savedInstanceState)
 
     asyncData = arrayListOf(
-      WalletListModel("KaySaith", "0x87d8s9......38x767d8", 19282.23, "https://b-ssl.duitang.com/uploads/item/201609/26/20160926124027_vxRkt.jpeg"),
-      WalletListModel("Kay", "0x87d8s9......38x767d8", 0.0, "https://b-ssl.duitang.com/uploads/item/201609/26/20160926124020_ekBTr.thumb.700_0.jpeg"),
-      WalletListModel("John", "0x87d8s9......38x767d8", 82.09, "https://img.qq1234.org/uploads/allimg/140717/3_140717103028_5.jpg")
+      WalletListModel("KaySaith", "0x87d8s9...38x767d8", 19282.23, "https://b-ssl.duitang.com/uploads/item/201609/26/20160926124027_vxRkt.jpeg"),
+      WalletListModel("Kay", "0x87d8s9...38x767d8", 0.0, "https://b-ssl.duitang.com/uploads/item/201609/26/20160926124020_ekBTr.thumb.700_0.jpeg"),
+      WalletListModel("John", "0x87d8s9...38x767d8", 82.09, "https://img.qq1234.org/uploads/allimg/140717/3_140717103028_5.jpg"),
+      WalletListModel("KaySaith", "0x87d8s9...38x767d8", 19282.23, "https://b-ssl.duitang.com/uploads/item/201609/26/20160926124027_vxRkt.jpeg"),
+      WalletListModel("John", "0x87d8s9...38x767d8", 82.09, "https://img.qq1234.org/uploads/allimg/140717/3_140717103028_5.jpg")
     )
   }
 

@@ -28,6 +28,7 @@ object Spectrum {
   @JvmField val white = Color.parseColor("#FFFFFFFF")
   @JvmField val blue = Color.parseColor("#FF00B1FF")
   @JvmField val green = Color.parseColor("#FF1CC881")
+  @JvmField val lightGreen = Color.parseColor("#801CC881")
   @JvmField val darkBlue = Color.parseColor("#FF0863B8")
   @JvmField val red = Color.parseColor("#FFFA0D0D")
   @JvmField val lightRed = Color.parseColor("#FFFF6464")
@@ -39,11 +40,7 @@ object Spectrum {
 }
 
 object FontSize {
-  @JvmField val header = 5.uiPX().toFloat()
-  @JvmField val cellTitle = 16.uiPX().toFloat()
-  @JvmField val cellSubtitle = 11.uiPX().toFloat()
-  @JvmField val cellDate = 10.uiPX().toFloat()
-  @JvmField val cellNumber = 18.uiPX().toFloat()
+  @JvmField val header = 5.uiPX() + 1f
 }
 
 object ShadowSize {

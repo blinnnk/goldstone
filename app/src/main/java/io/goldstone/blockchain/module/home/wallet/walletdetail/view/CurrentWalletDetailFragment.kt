@@ -24,6 +24,7 @@ class CurrentWalletDetailFragment : BaseOverlayFragment<CurrentWalletDetailPrese
     addFragmentAndSetArgument<WalletListFragment>(ContainerID.content) {
       // Send Argument
     }
+
   }
 
 }

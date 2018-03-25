@@ -28,14 +28,14 @@ class NotificationListFragment : BaseRecyclerFragment<NotificationListPresenter,
     super.onViewCreated(view, savedInstanceState)
 
     asyncData = arrayListOf(
-      NotificationListModel("12.92 EOS received successful", "From: 0x83o2pd......8d87s6d7f ", "3 days ago"),
-      NotificationListModel("5.28 ETH received successful", "From: 0x83o2pd......8d87s6d7f ", "4 days ago"),
-      NotificationListModel("1 ETH received successful", "From: 0x83o2pd......8d87s6d7f ", "1 week ago"),
-      NotificationListModel("12 EOS received successful", "From: 0x83o2pd......8d87s6d7f ", "1 week ago"),
-      NotificationListModel("12.92 EOS received successful", "From: 0x83o2pd......8d87s6d7f ", "3 days ago"),
-      NotificationListModel("5.28 ETH received successful", "From: 0x83o2pd......8d87s6d7f ", "4 days ago"),
-      NotificationListModel("1 ETH received successful", "From: 0x83o2pd......8d87s6d7f ", "1 week ago"),
-      NotificationListModel("12 EOS received successful", "From: 0x83o2pd......8d87s6d7f ", "1 week ago")
+      NotificationListModel("12.92 EOS received successful", "From: 0x82p6...8d87s7f ", "3 days ago"),
+      NotificationListModel("5.28 ETH received successful", "From: 0x82p4...8d87s7f ", "4 days ago"),
+      NotificationListModel("1 ETH received successful", "From: 0x82p8...8d87s7f ", "1 week ago"),
+      NotificationListModel("12 EOS received successful", "From: 0x82p9...8d87s7f ", "1 week ago"),
+      NotificationListModel("12.92 EOS received successful", "From: 0x82p2...8d87s7f ", "3 days ago"),
+      NotificationListModel("5.28 ETH received successful", "From: 0x82p1...8d87s7f ", "4 days ago"),
+      NotificationListModel("1 ETH received successful", "From: 0x82p2...8d87s7f ", "1 week ago"),
+      NotificationListModel("12 EOS received successful", "From: 0x82p3...8d87s7f ", "1 week ago")
     )
 
   }

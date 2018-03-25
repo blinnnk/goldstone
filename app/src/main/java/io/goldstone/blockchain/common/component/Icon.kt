@@ -11,6 +11,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.imageResource
 
@@ -56,6 +57,11 @@ class SquareIcon(context: Context) : LinearLayout(context) {
     val rectF = RectF(0f, 0f, iconSize.toFloat(), iconSize.toFloat())
     canvas?.drawRoundRect(rectF, CornerSize.default, CornerSize.default, paint)
 
+  }
+
+  fun setGrayStyle() {
+    paint.color = GrayScale.Opacity2Black
+    invalidate()
   }
 
 }

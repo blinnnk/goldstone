@@ -20,13 +20,12 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
   val title = textView {
     textSize = 5.uiPX().toFloat()
-    typeface = GoldStoneFont.heavy(context)
     textColor = Spectrum.white
   }
 
   val subtitle = textView {
-    textSize = 3.uiPX().toFloat() + 1f
-    typeface = GoldStoneFont.light(context)
+    textSize = 4.uiPX().toFloat()
+    typeface = GoldStoneFont.medium(context)
     textColor = Spectrum.opacity5White
     y -= 2.uiPX()
   }
@@ -44,7 +43,18 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
   }
 
   fun setBlackTitles() {
-    title.textColor = GrayScale.black
+    title.apply {
+      typeface = GoldStoneFont.heavy(context)
+      textColor = GrayScale.black
+    }
+    subtitle.textColor = GrayScale.gray
+  }
+
+  fun setNormalTitles() {
+    title.apply {
+      typeface = GoldStoneFont.book(context)
+      textColor = GrayScale.black
+    }
     subtitle.textColor = GrayScale.gray
   }
 
