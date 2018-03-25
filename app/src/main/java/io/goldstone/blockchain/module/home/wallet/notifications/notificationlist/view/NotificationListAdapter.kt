@@ -15,7 +15,7 @@ class NotificationListAdapter(
 
   override fun generateCell(context: Context) = NotificationListCell(context)
 
-  override fun NotificationListCell.bindCell(data: NotificationListModel) {
+  override fun NotificationListCell.bindCell(data: NotificationListModel, position: Int) {
     model = data
   }
 

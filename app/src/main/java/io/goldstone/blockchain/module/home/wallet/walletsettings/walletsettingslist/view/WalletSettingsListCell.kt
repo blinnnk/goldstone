@@ -35,11 +35,13 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
   private val qrIcon by lazy { ImageView(context) }
   private val description by lazy { TextView(context) }
 
+  private var titleColor = GrayScale.black
+
   init {
 
     title
       .apply {
-        textColor = GrayScale.black
+        textColor = titleColor
         textSize = 4.uiPX().toFloat() + 1f
         typeface = GoldStoneFont.medium(context)
       }
@@ -47,7 +49,7 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
 
     description
       .apply {
-        textSize = 4.uiPX().toFloat()
+        textSize = 4.uiPX().toFloat() + 1f
         typeface = GoldStoneFont.medium(context)
         textColor = GrayScale.gray
         x -= 30.uiPX()

@@ -15,7 +15,7 @@ class WalletListAdapter(
 
   override fun generateCell(context: Context) = WalletListCell(context)
 
-  override fun WalletListCell.bindCell(data: WalletListModel) {
+  override fun WalletListCell.bindCell(data: WalletListModel, position: Int) {
     model = data
   }
 

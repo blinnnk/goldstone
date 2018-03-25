@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 
 /**
@@ -15,7 +16,7 @@ class WalletSettingsListAdapter(
 
   override fun generateCell(context: Context) = WalletSettingsListCell(context)
 
-  override fun WalletSettingsListCell.bindCell(data: WalletSettingsListModel) {
+  override fun WalletSettingsListCell.bindCell(data: WalletSettingsListModel, position: Int) {
     model = data
   }
 

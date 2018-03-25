@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.view
+package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.content.Context
 import android.widget.TextView
@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.module.home.profile.model.ProfileModel
+import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import org.jetbrains.anko.textColor
 
 /**

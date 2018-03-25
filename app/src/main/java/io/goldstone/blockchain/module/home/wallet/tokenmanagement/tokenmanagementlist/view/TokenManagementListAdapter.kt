@@ -15,7 +15,7 @@ class TokenManagementListAdapter(
 
   override fun generateCell(context: Context) = TokenManagementListCell(context)
 
-  override fun TokenManagementListCell.bindCell(data: TokenManagementListModel) {
+  override fun TokenManagementListCell.bindCell(data: TokenManagementListModel, position: Int) {
     model = data
   }
 

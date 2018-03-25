@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.view
+package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.content.Context
 import android.graphics.Color

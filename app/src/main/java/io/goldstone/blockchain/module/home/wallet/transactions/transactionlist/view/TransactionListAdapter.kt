@@ -15,7 +15,7 @@ class TransactionListAdapter(
 
   override fun generateCell(context: Context) = TransactionListCell(context)
 
-  override fun TransactionListCell.bindCell(data: TransactionListModel) {
+  override fun TransactionListCell.bindCell(data: TransactionListModel, position: Int) {
     model = data
   }
 

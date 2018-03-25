@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -35,7 +36,8 @@ class WalletSettingsListFragment : BaseRecyclerFragment<WalletSettingsListPresen
       WalletSettingsListModel("Password Hint", "······"),
       WalletSettingsListModel("Change Password"),
       WalletSettingsListModel("Export Private Key"),
-      WalletSettingsListModel("Export Keystore")
+      WalletSettingsListModel("Export Keystore"),
+      WalletSettingsListModel("Delete Wallet")
     )
 
   }

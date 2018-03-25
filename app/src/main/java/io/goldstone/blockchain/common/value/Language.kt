@@ -216,6 +216,12 @@ object WalletSettingsText {
     else -> ""
   }
 
+  @JvmField
+  val delete = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Delete Wallet"
+    else -> ""
+  }
+
 }
 
 object ProfileText {

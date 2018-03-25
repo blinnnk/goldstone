@@ -120,6 +120,7 @@ class TabItem(context: Context) : View(context) {
 
   init {
     layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+    isClickable = true
   }
 
   override fun onDraw(canvas: Canvas?) {
