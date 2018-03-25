@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import com.blinnnk.extension.into
-import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
@@ -47,7 +47,11 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
     layoutParams = RelativeLayout.LayoutParams(matchParent, 365.uiPX())
 
-    currentAccount.into(this)
+    currentAccount
+      .apply {
+        currentAccount.avatar.glideImage("http://img3.imgtn.bdimg.com/it/u=2727319063,4252015704&fm=27&gp=0.jpg")
+      }
+      .into(this)
     currentAccount.apply {
       setCenterInHorizontal()
       y += 30.uiPX()

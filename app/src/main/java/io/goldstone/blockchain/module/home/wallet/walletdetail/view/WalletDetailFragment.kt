@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.os.Bundle
 import android.view.View
@@ -7,8 +7,8 @@ import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
-import io.goldstone.blockchain.module.home.wallet.wallet.presenter.WalletDetailPresenter
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.util.*
 
@@ -20,8 +20,6 @@ import java.util.*
 class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
   private val slideHeader by lazy { WalletSlideHeader(context!!) }
-  private var isShow = false
-  private val headerHeight by lazy { HoneyUIUtils.getHeight(slideHeader) }
 
   override val presenter = WalletDetailPresenter(this)
 
@@ -31,7 +29,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
   ) {
     recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray()) {
       headerView?.apply {
-        currentAccount.onClick { presenter.showWalletListFragment() }
+        currentAccount.onClick { presenter.showWalletSettingsFragment() }
         manageButton.onClick { presenter.showWalletListFragment() }
         addTokenButton.onClick { presenter.showTokenManagementFragment() }
       }
@@ -62,8 +60,10 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
     )
   }
 
-  override fun observingRecyclerViewVerticalOffset(offset: Int) {
+  private var isShow = false
+  private val headerHeight by lazy { HoneyUIUtils.getHeight(slideHeader) }
 
+  override fun observingRecyclerViewVerticalOffset(offset: Int) {
     if (offset >= headerHeight && !isShow) {
       slideHeader.onHeaderShowedStyle()
       isShow = true

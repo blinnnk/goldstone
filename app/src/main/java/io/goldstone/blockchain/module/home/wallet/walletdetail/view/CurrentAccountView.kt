@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.content.Context
 import android.widget.ImageView
@@ -23,8 +23,8 @@ import org.jetbrains.anko.imageResource
 
 class CurrentAccountView(context: Context) : RelativeLayout(context) {
 
-  private val avatar by lazy { ImageView(context) }
-  private val info by lazy { TwoLineTitles(context) }
+  val avatar by lazy { ImageView(context) }
+  val info by lazy { TwoLineTitles(context) }
   private val qrIcon by lazy { ImageView(context) }
 
   init {

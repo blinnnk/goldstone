@@ -1,11 +1,11 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.matchParent
 
 /**

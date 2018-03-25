@@ -70,3 +70,8 @@ object ScreenSize {
   val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 }
 
+object CommonCellSize {
+  val rightPadding = 30.uiPX()
+  val iconPadding = 40.uiPX()
+}
+

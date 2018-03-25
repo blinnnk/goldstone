@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.annotation.SuppressLint
 import android.content.Context

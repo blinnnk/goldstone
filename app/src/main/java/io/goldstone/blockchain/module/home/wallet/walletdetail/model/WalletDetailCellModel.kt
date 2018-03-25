@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.model
+package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 /**
  * @date 23/03/2018 11:57 PM

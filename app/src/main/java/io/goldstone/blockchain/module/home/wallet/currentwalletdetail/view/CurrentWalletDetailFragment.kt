@@ -1,11 +1,11 @@
-package io.goldstone.blockchain.module.home.wallet.walletdetail.view
+package io.goldstone.blockchain.module.home.wallet.currentwalletdetail.view
 
 import android.view.ViewGroup
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CurrentWalletText
-import io.goldstone.blockchain.module.home.wallet.walletdetail.presneter.CurrentWalletDetailPresenter
+import io.goldstone.blockchain.module.home.wallet.currentwalletdetail.presneter.CurrentWalletDetailPresenter
 import io.goldstone.blockchain.module.home.wallet.walletlist.view.WalletListFragment
 
 /**

@@ -7,11 +7,16 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.TabBarView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setAlignParentBottom
+import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.GradientType
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
-import io.goldstone.blockchain.module.home.wallet.wallet.view.WalletDetailFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 23/03/2018 12:59 PM
@@ -32,20 +37,35 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 
       verticalLayout {
         id = ContainerID.home
-        addFragmentAndSetArgument<WalletDetailFragment>(this.id) {
+        addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail) {
           // Send Argument
         }
       }
 
       tabBar
         .apply {
-          lparams {
-            width = matchParent
-            height = 80.uiPX()
-            alignParentBottom()
+          walletButton.setStyleAndClick {
+            presenter.showWalletDetailFragment()
+          }
+          profileButton.setStyleAndClick {
+            presenter.showProfileFragment()
           }
         }
         .into(this)
+      tabBar.setAlignParentBottom()
+    }
+  }
+
+  private fun TabItem.setStyleAndClick(callback: () -> Unit) {
+    onClick {
+      tabBar.apply {
+        walletButton.resetStyle()
+        marketButton.resetStyle()
+        profileButton.resetStyle()
+      }
+      callback()
+      setSelectedStyle()
+      preventDuplicateClicks()
     }
   }
 

@@ -15,7 +15,6 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TokenManagementListModel
-import org.jetbrains.anko.rightPadding
 
 /**
  * @date 25/03/2018 5:12 PM
@@ -36,7 +35,6 @@ class TokenManagementListCell(context: Context) : BaseCell(context) {
   private val switch by lazy { HoneyBaseSwitch(context) }
 
   init {
-    rightPadding
 
     hasArrow = false
 

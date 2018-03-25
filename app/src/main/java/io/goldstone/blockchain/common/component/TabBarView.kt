@@ -29,9 +29,9 @@ import org.jetbrains.anko.matchParent
 
 class TabBarView(context: Context) : RelativeLayout(context) {
 
-  private val walletButton by lazy { TabItem(context) }
-  private val marketButton by lazy { TabItem(context) }
-  private val profileButton by lazy { TabItem(context) }
+  val walletButton by lazy { TabItem(context) }
+  val marketButton by lazy { TabItem(context) }
+  val profileButton by lazy { TabItem(context) }
 
   init {
     layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
@@ -152,6 +152,12 @@ class TabItem(context: Context) : View(context) {
   fun setSelectedStyle() {
     iconPaint.color = GrayScale.Opacity7Black
     textPaint.color = GrayScale.Opacity7Black
+    invalidate()
+  }
+
+  fun resetStyle() {
+    iconPaint.color = Spectrum.white
+    textPaint.color = Spectrum.white
     invalidate()
   }
 

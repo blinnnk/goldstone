@@ -173,6 +173,61 @@ object TokenManagementText {
 
 }
 
+object WalletSettingsText {
+
+  @JvmField
+  val copy = when (currentLanguage) {
+    HoneyLanguage.English.code -> "click to copy address"
+    else -> ""
+  }
+  @JvmField
+  val checkQRCode = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Check QR Code"
+    else -> ""
+  }
+
+  @JvmField
+  val balance = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Balance"
+    else -> ""
+  }
+
+  @JvmField
+  val walletName = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Wallet Name"
+    else -> ""
+  }
+
+  @JvmField
+  val hint = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Password Hint"
+    else -> ""
+  }
+
+  @JvmField
+  val exportPrivateKey = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Export Private Key"
+    else -> ""
+  }
+
+  @JvmField
+  val exportKeystore = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Export Keystore"
+    else -> ""
+  }
+
+}
+
+object ProfileText {
+
+  @JvmField
+  val profile = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Profile"
+    else -> ""
+  }
+
+}
+
 // 设定当前系统语言为软件界面语言
 
 var currentLanguage = HoneyLanguage.Chinese.code

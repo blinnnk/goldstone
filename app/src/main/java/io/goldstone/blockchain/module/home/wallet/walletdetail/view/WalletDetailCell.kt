@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.wallet.view
+package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.content.Context
 import android.widget.LinearLayout
@@ -12,9 +12,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.wallet.wallet.model.WalletDetailCellModel
+import io.goldstone.blockchain.common.value.CommonCellSize
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 
 /**
  * @date 23/03/2018 6:19 PM
@@ -37,12 +36,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
   init {
 
-    icon
-      .apply {
-        src = R.drawable.etc_icon
-        setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
-      }
-      .into(this)
+    icon.into(this)
 
     tokenInfo.into(this)
 
@@ -54,8 +48,10 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
     tokenInfo.apply {
       setCenterInVertical()
-      x += 40.uiPX()
+      x += CommonCellSize.iconPadding
     }
+
+    icon.setCenterInVertical()
 
     valueInfo.apply {
       setAlignParentRight()

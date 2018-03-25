@@ -11,11 +11,12 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
-import io.goldstone.blockchain.common.utils.UIUtils
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -47,6 +48,29 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
   private val minHeight = 265.uiPX()
 
+  /**
+   * 通过对 `Runnable` 的变化监控, 重新定制控件的 `Header`
+   */
+  open var customHeader: (OverlayHeaderLayout.() -> Unit)? by observing(null) {
+    overlayView.header.apply {
+      title.visibility = View.GONE
+      customHeader?.let {
+        it()
+        overlayView.contentLayout.setMargins<RelativeLayout.LayoutParams> {
+          topMargin = layoutParams.height
+        }
+      }
+    }
+  }
+
+  // 这个是用来还原 `Header` 的边界方法, 当自定义 `Header` 后还原的操作
+  fun recoveryOverlayHeader() {
+    overlayView.header.apply {
+      title.visibility = View.VISIBLE
+      layoutParams.height = 65.uiPX()
+    }
+  }
+
   open fun setContentHeight(): Int = minHeight
 
   override fun onAttach(context: Context?) {
@@ -72,7 +96,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
           showCloseButton(hasCloseButton)
         }
       }
-
     }.view
   }
 
