@@ -20,11 +20,10 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
   override val presenter = ProfileOverlayPresenter(this)
 
   override fun ViewGroup.initView() {
+
     headerTitle = title.orEmpty()
 
-    addFragmentAndSetArgument<ContactsFragment>(ContainerID.content) {
-      // Send Arguments
-    }
+    presenter.showTargetFragmentByTitle(title.orEmpty())
 
   }
 

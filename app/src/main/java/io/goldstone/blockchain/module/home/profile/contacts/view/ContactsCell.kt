@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.profile.contacts.view
 
 import android.content.Context
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseInfoCell.BaseValueCell
+import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.module.home.profile.contacts.model.ContactsModel
 

@@ -2,11 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.walletlist.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.ImageView
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseInfoCell.BaseValueCell
+import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel

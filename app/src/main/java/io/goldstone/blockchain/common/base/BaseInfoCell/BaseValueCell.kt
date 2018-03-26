@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.base.BaseInfoCell
+package io.goldstone.blockchain.common.base.baseInfocell
 
 import android.content.Context
 import android.widget.ImageView
@@ -62,6 +62,7 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
       setCenterInVertical()
       setAlignParentRight()
     }
+
   }
 
 }

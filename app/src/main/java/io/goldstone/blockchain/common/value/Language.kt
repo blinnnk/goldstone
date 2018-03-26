@@ -231,6 +231,21 @@ object ProfileText {
     HoneyLanguage.English.code -> "Profile"
     else -> ""
   }
+  @JvmField
+  val contacts = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Contacts"
+    else -> ""
+  }
+  @JvmField
+  val currency = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Currency Settings"
+    else -> ""
+  }
+  @JvmField
+  val language = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Language"
+    else -> ""
+  }
 
 }
 
