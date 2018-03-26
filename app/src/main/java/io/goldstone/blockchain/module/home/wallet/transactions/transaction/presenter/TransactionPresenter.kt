@@ -32,6 +32,7 @@ class TransactionPresenter(
           }
           overlayView.header.apply {
             showBackButton(true) { popFragment() }
+            showCloseButton(false)
           }
         }
       }
@@ -41,7 +42,10 @@ class TransactionPresenter(
   private fun TransactionFragment.popFragment() {
     childFragmentManager.fragments.apply {
       if (last() is TransactionDetailFragment) removeChildFragment(last())
-      overlayView.header.showBackButton(false)
+      overlayView.header.apply {
+        showBackButton(false)
+        showCloseButton(true)
+      }
       // 恢复 `TransactionListFragment` 的视图
       this[size - 2].recoveryHeight()
     }

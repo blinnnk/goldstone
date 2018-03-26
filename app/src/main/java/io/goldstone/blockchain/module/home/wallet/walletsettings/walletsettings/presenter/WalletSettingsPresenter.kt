@@ -29,7 +29,7 @@ class WalletSettingsPresenter(
       WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
       WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
       WalletSettingsText.checkQRCode -> showQRCodeFragment()
-      else -> showWalletSettingListFragment()
+      "" -> showWalletSettingListFragment()
     }
   }
 
@@ -42,7 +42,10 @@ class WalletSettingsPresenter(
           header = WalletSettingsHeader(context)
           addView(header)
         } otherwise {
-          overlayView.header.showBackButton(false)
+          overlayView.header.apply {
+            showBackButton(false)
+            showCloseButton(true)
+          }
           header?.visibility = View.VISIBLE
         }
       }
@@ -85,6 +88,7 @@ class WalletSettingsPresenter(
     header?.visibility = View.GONE
     overlayView.apply {
       header.showBackButton(true) { showWalletSettingListFragment() }
+      header.showCloseButton(false)
       contentLayout.updateHeightAnimation(contentHeight)
     }
   }

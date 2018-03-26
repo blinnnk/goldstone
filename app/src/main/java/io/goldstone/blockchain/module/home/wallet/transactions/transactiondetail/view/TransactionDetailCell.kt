@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -59,7 +58,6 @@ class TransactionDetailCell(context: Context) : RelativeLayout(context) {
           textColor = GrayScale.black
           typeface = GoldStoneFont.medium(context)
           layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 25.uiPX())
-          gravity = Gravity.CENTER_VERTICAL
         }
         .into(this)
 

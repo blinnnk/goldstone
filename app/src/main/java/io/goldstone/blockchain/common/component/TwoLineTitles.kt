@@ -37,6 +37,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
   var isCenter by observing(false) {
     gravity = Gravity.CENTER_HORIZONTAL
+    subtitle.gravity = Gravity.CENTER_HORIZONTAL
   }
 
   init {
