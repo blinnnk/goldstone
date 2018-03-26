@@ -47,6 +47,9 @@ class HomeFragment : BaseFragment<HomePresenter>() {
           walletButton.setStyleAndClick {
             presenter.showWalletDetailFragment()
           }
+          marketButton.setStyleAndClick {
+            presenter.showQuotationFragment()
+          }
           profileButton.setStyleAndClick {
             presenter.showProfileFragment()
           }

@@ -11,13 +11,15 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
  */
 
 class WalletSettingsListAdapter(
-  override val dataSet: ArrayList<WalletSettingsListModel>
+  override val dataSet: ArrayList<WalletSettingsListModel>,
+  private val callback: WalletSettingsListCell.() -> Unit
   ) : HoneyBaseAdapter<WalletSettingsListModel, WalletSettingsListCell>() {
 
   override fun generateCell(context: Context) = WalletSettingsListCell(context)
 
   override fun WalletSettingsListCell.bindCell(data: WalletSettingsListModel, position: Int) {
     model = data
+    callback(this)
   }
 
 

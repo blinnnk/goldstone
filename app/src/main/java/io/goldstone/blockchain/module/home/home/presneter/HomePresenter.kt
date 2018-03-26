@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
+import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**
@@ -26,6 +27,10 @@ class HomePresenter(
 
   fun showProfileFragment() {
     fragment.showOrAddFragment<ProfileFragment>(FragmentTag.profile)
+  }
+
+  fun showQuotationFragment() {
+    fragment.showOrAddFragment<QuotationFragment>(FragmentTag.quotation)
   }
 
   private inline fun<reified T: Fragment> Fragment.showOrAddFragment(

@@ -199,6 +199,18 @@ object WalletSettingsText {
   }
 
   @JvmField
+  val walletNameSettings = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Wallet Name"
+    else -> ""
+  }
+
+  @JvmField
+  val passwordSettings = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Change Password"
+    else -> ""
+  }
+
+  @JvmField
   val hint = when (currentLanguage) {
     HoneyLanguage.English.code -> "Password Hint"
     else -> ""
@@ -244,6 +256,43 @@ object ProfileText {
   @JvmField
   val language = when (currentLanguage) {
     HoneyLanguage.English.code -> "Language"
+    else -> ""
+  }
+
+  @JvmField
+  val aboutUs = when (currentLanguage) {
+    HoneyLanguage.English.code -> "About Us"
+    else -> ""
+  }
+
+}
+
+object QuotationText {
+
+  @JvmField
+  val market = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Market"
+    else -> ""
+  }
+  @JvmField
+  val contacts = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Contacts"
+    else -> ""
+  }
+  @JvmField
+  val currency = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Currency Settings"
+    else -> ""
+  }
+  @JvmField
+  val language = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Language"
+    else -> ""
+  }
+
+  @JvmField
+  val aboutUs = when (currentLanguage) {
+    HoneyLanguage.English.code -> "About Us"
     else -> ""
   }
 

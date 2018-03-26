@@ -11,13 +11,16 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addTopLRCorner
+import com.blinnnk.extension.into
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 22/03/2018 2:37 AM
@@ -89,8 +92,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     }
   }
 
-  fun showBackButton(isShow: Boolean) {
-    if (isShow) addView(backButton)
+  fun showBackButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+    if (isShow) {
+      backButton
+        .click { setClickEvent(backButton) }
+        .into(this)
+    }
     else findViewById<ImageView>(ElementID.backButton)?.let {
       removeView(it)
     }

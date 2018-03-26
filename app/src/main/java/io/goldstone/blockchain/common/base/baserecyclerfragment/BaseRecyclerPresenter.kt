@@ -4,8 +4,11 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.getScreenHeightWithoutStatusBar
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -54,7 +57,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
   ) {
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-      overlayView.contentLayout.updateHeightAnimation(dataCount * cellHeight, maxHeight)
+      overlayView.contentLayout.updateHeightAnimation(
+        dataCount * cellHeight,
+        maxHeight - HoneyUIUtils.getHeight(overlayView.header)
+      )
     }
   }
 

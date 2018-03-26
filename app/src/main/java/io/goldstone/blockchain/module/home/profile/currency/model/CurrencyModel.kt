@@ -5,7 +5,7 @@ package io.goldstone.blockchain.module.home.profile.currency.model
  * @author KaySaith
  */
 
-class CurrencyModel(
+data class CurrencyModel(
   val symbol: String = "",
   val isChecked: Boolean = false
 )

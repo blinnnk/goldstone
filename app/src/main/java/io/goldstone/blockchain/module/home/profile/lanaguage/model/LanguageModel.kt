@@ -5,7 +5,7 @@ package io.goldstone.blockchain.module.home.profile.lanaguage.model
  * @author KaySaith
  */
 
-class LanguageModel(
+data class LanguageModel(
   val name: String = "",
   val isChecked: Boolean = false
 )

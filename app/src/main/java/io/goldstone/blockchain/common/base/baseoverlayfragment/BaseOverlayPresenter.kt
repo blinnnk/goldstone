@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.common.base.baseoverlayfragment
 
+import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.util.SoftKeyboard
-import io.goldstone.blockchain.common.utils.removeSelfWithAnimation
 
 /**
  * @date 22/03/2018 2:29 AM

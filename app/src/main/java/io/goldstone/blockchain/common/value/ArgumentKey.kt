@@ -7,4 +7,5 @@ package io.goldstone.blockchain.common.value
 
 object ArgumentKey {
   const val profileTitle = "profileTitle"
+  const val walletTitle = "walletTitle"
 }

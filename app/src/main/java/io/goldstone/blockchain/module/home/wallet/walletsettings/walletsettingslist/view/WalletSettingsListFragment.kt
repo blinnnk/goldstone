@@ -3,13 +3,14 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter.WalletSettingsListPresenter
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -21,7 +22,12 @@ class WalletSettingsListFragment : BaseRecyclerFragment<WalletSettingsListPresen
   override val presenter = WalletSettingsListPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?) {
-    recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray())
+    recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray()) {
+      onClick {
+        presenter.showTargetFragment(model.title)
+        preventDuplicateClicks()
+      }
+    }
   }
 
   override fun setSlideUpWithCellHeight() = 50.uiPX()

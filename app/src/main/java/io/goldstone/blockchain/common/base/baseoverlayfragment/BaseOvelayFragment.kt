@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.base.baseoverlayfragment
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -65,9 +67,12 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
   // 这个是用来还原 `Header` 的边界方法, 当自定义 `Header` 后还原的操作
   fun recoveryOverlayHeader() {
-    overlayView.header.apply {
-      title.visibility = View.VISIBLE
-      layoutParams.height = 65.uiPX()
+    overlayView.apply {
+      header.title.visibility = View.VISIBLE
+      header.layoutParams.height = 65.uiPX()
+      contentLayout.setMargins<RelativeLayout.LayoutParams> {
+        topMargin = 65.uiPX()
+      }
     }
   }
 

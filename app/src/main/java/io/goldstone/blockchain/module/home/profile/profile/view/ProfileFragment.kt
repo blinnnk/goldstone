@@ -54,7 +54,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
       ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),
       ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
       ProfileModel(R.drawable.language_icon, "Language", "EN"),
-      ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),
+      ProfileModel(R.drawable.contacts_icon, "About Us", "8"),
       ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
       ProfileModel(R.drawable.language_icon, "Language", "EN"),
       ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),

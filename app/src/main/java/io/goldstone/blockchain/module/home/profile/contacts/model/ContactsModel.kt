@@ -5,7 +5,7 @@ package io.goldstone.blockchain.module.home.profile.contacts.model
  * @author KaySaith
  */
 
-class ContactsModel(
+data class ContactsModel(
   val avatar: String = "",
   val name: String = "",
   val address: String = ""
