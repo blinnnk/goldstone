@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.base.BaseInfoCell
 
 import android.content.Context
+import android.widget.ImageView
 import android.widget.LinearLayout
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
@@ -8,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 
@@ -29,6 +31,7 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
       leftMargin = PaddingSize.device
     }
 
+    icon.iconColor = GrayScale.lightGray
     this.addView(icon)
 
     this.addView(info
@@ -37,6 +40,17 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
         x += 60.uiPX()
       })
 
+
+    icon.setCenterInVertical()
+    info.setCenterInVertical()
+
+  }
+
+  fun setValueStyle(isScaleIcon: Boolean = false) {
+
+    if (isScaleIcon) icon.scaleType = ImageView.ScaleType.CENTER_INSIDE
+    else icon.scaleType = ImageView.ScaleType.CENTER_CROP
+
     this.addView(count
       .apply {
         isFloatRight = true
@@ -44,13 +58,10 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
         setBlackTitles()
       })
 
-    icon.setCenterInVertical()
-    info.setCenterInVertical()
     count.apply {
       setCenterInVertical()
       setAlignParentRight()
     }
-
   }
 
 }

@@ -32,10 +32,10 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
     }
 
     icon.apply {
-      iconColor = GrayScale.lightGray
-      scaleType = ImageView.ScaleType.CENTER_CROP
       glideImage(model.avatar)
     }
+
+    setValueStyle()
 
   }
 
