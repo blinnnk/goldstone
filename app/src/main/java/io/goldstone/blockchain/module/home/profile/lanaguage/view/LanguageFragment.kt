@@ -37,12 +37,12 @@ class LanguageFragment : BaseRecyclerFragment<LanguagePresenter, LanguageModel>(
     super.onViewCreated(view, savedInstanceState)
 
     asyncData = arrayListOf(
-      LanguageModel("EN", true),
-      LanguageModel("CN", false),
-      LanguageModel("JP", false),
-      LanguageModel("KR", false),
-      LanguageModel("RU", false),
-      LanguageModel("UK", false)
+      LanguageModel("English", true),
+      LanguageModel("Chinese", false),
+      LanguageModel("Japanese", false),
+      LanguageModel("Korean", false),
+      LanguageModel("Russia", false),
+      LanguageModel("German", false)
     )
 
   }

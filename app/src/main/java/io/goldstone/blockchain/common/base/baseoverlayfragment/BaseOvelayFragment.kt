@@ -13,11 +13,13 @@ import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
+import io.goldstone.blockchain.common.utils.UIUtils
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -92,7 +94,8 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
       addView(overlayView, RelativeLayout.LayoutParams(matchParent, minHeight))
 
       overlayView.apply {
-        val maxHeight = context?.getRealScreenHeight().orZero() - HoneyUIUtils.getHeight(overlayView.header)
+        val maxHeight =
+          context?.getRealScreenHeight().orZero()
         /** 执行伸展动画 */
         contentLayout.updateHeightAnimation(setContentHeight(), maxHeight)
         /** 设置悬浮曾的 `Header` 初始状态 */

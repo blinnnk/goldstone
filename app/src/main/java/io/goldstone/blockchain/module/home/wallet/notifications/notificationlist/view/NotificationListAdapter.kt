@@ -10,13 +10,15 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
  */
 
 class NotificationListAdapter(
-  override val dataSet: ArrayList<NotificationListModel>
+  override val dataSet: ArrayList<NotificationListModel>,
+  private val callback: NotificationListCell.() -> Unit
   ) : HoneyBaseAdapter<NotificationListModel, NotificationListCell>() {
 
   override fun generateCell(context: Context) = NotificationListCell(context)
 
   override fun NotificationListCell.bindCell(data: NotificationListModel, position: Int) {
     model = data
+    callback(this)
   }
 
 

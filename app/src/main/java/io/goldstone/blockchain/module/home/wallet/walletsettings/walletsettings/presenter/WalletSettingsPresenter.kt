@@ -2,16 +2,14 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.view.View
 import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsHeader
@@ -30,7 +28,7 @@ class WalletSettingsPresenter(
     when (title) {
       WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
       WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
-      ProfileText.aboutUs -> showWalletSettingListFragment()
+      WalletSettingsText.checkQRCode -> showQRCodeFragment()
       else -> showWalletSettingListFragment()
     }
   }
@@ -50,6 +48,15 @@ class WalletSettingsPresenter(
       }
 
       replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content) {
+        // Send Arguments
+      }
+    }
+  }
+
+  private fun showQRCodeFragment() {
+    fragment.apply {
+      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
+      replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content) {
         // Send Arguments
       }
     }

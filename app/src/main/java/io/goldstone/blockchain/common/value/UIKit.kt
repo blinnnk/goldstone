@@ -75,3 +75,7 @@ object CommonCellSize {
   val iconPadding = 40.uiPX()
 }
 
+object TransactionSize {
+  @JvmField val headerView = 220.uiPX()
+  @JvmField val cellHeight = 65.uiPX()
+}

@@ -59,7 +59,16 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
       overlayView.contentLayout.updateHeightAnimation(
         dataCount * cellHeight,
-        maxHeight - HoneyUIUtils.getHeight(overlayView.header)
+        maxHeight
+      )
+    }
+  }
+
+  fun recoveryFragmentHeight() {
+    fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
+      overlayView.contentLayout.updateHeightAnimation(
+        fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero(),
+        fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
       )
     }
   }

@@ -2,11 +2,13 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.os.Bundle
 import android.view.View
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 24/03/2018 2:12 PM
@@ -22,7 +24,12 @@ class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, T
     asyncData: ArrayList<TransactionListModel>?
   ) {
     asyncData?.let {
-      recyclerView.adapter = TransactionListAdapter(it)
+      recyclerView.adapter = TransactionListAdapter(it) {
+        onClick {
+          presenter.showTransactionDetail()
+          preventDuplicateClicks()
+        }
+      }
     }
   }
 

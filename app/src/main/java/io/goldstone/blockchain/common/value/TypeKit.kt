@@ -6,5 +6,5 @@ package io.goldstone.blockchain.common.value
  */
 
 enum class GradientType {
-  Blue, PinkToYellow, BlueGreen
+  Blue, PinkToYellow, BlueGreen, DarkGreen
 }

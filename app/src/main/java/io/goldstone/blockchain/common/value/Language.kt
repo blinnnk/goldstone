@@ -97,7 +97,7 @@ object WalletText {
 
 object TransactionText {
   @JvmField
-  val trannsaction = when (currentLanguage) {
+  val transaction = when (currentLanguage) {
     HoneyLanguage.English.code -> "Transaction History"
     else -> ""
   }
@@ -116,6 +116,14 @@ object TransactionText {
     HoneyLanguage.English.code -> "Add More Token".toUpperCase()
     else -> ""
   }
+
+  @JvmField
+  val url = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Open A Url"
+    else -> ""
+  }
+
+
 }
 
 object CommonText {
@@ -123,6 +131,16 @@ object CommonText {
   @JvmField
   val confirm = when (currentLanguage) {
     HoneyLanguage.English.code -> "Confirm"
+    else -> ""
+  }
+  @JvmField
+  val saveToAlbum = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Save TO Album"
+    else -> ""
+  }
+  @JvmField
+  val copyAddress = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Copy Address"
     else -> ""
   }
   @JvmField
@@ -189,6 +207,12 @@ object WalletSettingsText {
   @JvmField
   val balance = when (currentLanguage) {
     HoneyLanguage.English.code -> "Balance"
+    else -> ""
+  }
+
+  @JvmField
+  val qrcode = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Check QR Code"
     else -> ""
   }
 
@@ -297,6 +321,8 @@ object QuotationText {
   }
 
 }
+
+
 
 // 设定当前系统语言为软件界面语言
 

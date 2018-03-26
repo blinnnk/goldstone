@@ -10,13 +10,15 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
  */
 
 class TransactionListAdapter(
-  override val dataSet: ArrayList<TransactionListModel>
+  override val dataSet: ArrayList<TransactionListModel>,
+  private val callback: TransactionListCell.() -> Unit
   ) : HoneyBaseAdapter<TransactionListModel, TransactionListCell>() {
 
   override fun generateCell(context: Context) = TransactionListCell(context)
 
   override fun TransactionListCell.bindCell(data: TransactionListModel, position: Int) {
     model = data
+    callback(this)
   }
 
 

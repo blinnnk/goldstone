@@ -18,13 +18,8 @@ class NotificationFragment : BaseOverlayFragment<NotificationPresenter>() {
   override val presenter = NotificationPresenter(this)
 
   override fun ViewGroup.initView() {
-
     headerTitle = NotificationText.notification
-
-    addFragmentAndSetArgument<NotificationListFragment>(ContainerID.content) {
-      // Send Argument
-    }
-
+    presenter.showTargetFragment(false)
   }
 
 }

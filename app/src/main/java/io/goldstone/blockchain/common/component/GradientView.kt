@@ -30,17 +30,21 @@ class GradientView(context: Context) : View(context) {
   }
 
   // Set Style through `GradientType`
-  fun setStyle(type: GradientType) {
-    val realHeight = context.getRealScreenHeight().orZero()
+  fun setStyle(type: GradientType, distance: Int = context.getRealScreenHeight().orZero()) {
     shaderStyle = when(type) {
       GradientType.Blue ->
         setGradientColor(Color.parseColor("#FF0E2552"), Color.parseColor("#FF4FA9C8"))
       GradientType.PinkToYellow ->
         setGradientColor(Color.parseColor("#FF00FF80"), Color.parseColor("#FF0076FF"))
       GradientType.BlueGreen ->
-        LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), realHeight.toFloat(),
+        LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
           intArrayOf(Color.rgb(2, 209, 142), Color.rgb(1, 128, 175)),
-          floatArrayOf(0f, realHeight * 1.3f),
+          floatArrayOf(0f, distance * 1.3f),
+          Shader.TileMode.CLAMP)
+      GradientType.DarkGreen ->
+        LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
+          intArrayOf(Color.parseColor("#FF204E4D"), Color.parseColor("#FF40857B")),
+          floatArrayOf(0f, distance * 1f),
           Shader.TileMode.CLAMP)
 
     }

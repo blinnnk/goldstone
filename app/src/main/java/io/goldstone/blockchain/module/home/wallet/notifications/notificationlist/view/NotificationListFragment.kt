@@ -3,11 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationListModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationListPresenter
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 25/03/2018 1:48 AM
@@ -19,7 +21,12 @@ class NotificationListFragment : BaseRecyclerFragment<NotificationListPresenter,
   override val presenter = NotificationListPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<NotificationListModel>?) {
-    recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray())
+    recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
+      onClick {
+        presenter.showTransactionListDetailFragment()
+        preventDuplicateClicks()
+      }
+    }
   }
 
   override fun setSlideUpWithCellHeight() = 60.uiPX()

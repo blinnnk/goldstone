@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -14,6 +15,10 @@ class TransactionListPresenter(
   override val fragment: TransactionListFragment
   ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 
-
+  fun showTransactionDetail() {
+    fragment.getParentFragment<TransactionFragment>()?.apply {
+      presenter.showTargetFragment(true)
+    }
+  }
 
 }
