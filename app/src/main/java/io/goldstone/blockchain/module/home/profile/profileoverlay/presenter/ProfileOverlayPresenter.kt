@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.view.ContactsFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
+import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
 /**
@@ -29,11 +30,17 @@ class ProfileOverlayPresenter(
     }
   }
 
+  private fun showLanguageFragment() {
+    fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content) {
+      // Send Arguments
+    }
+  }
+
   fun showTargetFragmentByTitle(title: String) {
     when(title) {
       ProfileText.contacts -> showContactsFragment()
       ProfileText.currency -> showCurrencyFragment()
-      ProfileText.language -> showContactsFragment()
+      ProfileText.language -> showLanguageFragment()
     }
   }
 

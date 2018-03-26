@@ -41,7 +41,7 @@ dependencies {
         exclude group: 'com.google.android', module: 'android'
     }
     // 黑蜜动画及其他便捷工具依赖工程
-    compile 'com.blinnnk:honeyui:0.2.7.7'
+    compile 'com.blinnnk:honeyui:0.2.7.8'
     // Glide Image Loader
     compile 'com.github.bumptech.glide:glide:4.6.1'
     // Crypto

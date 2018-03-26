@@ -18,7 +18,7 @@ class CurrencyAdapter(
 
   override fun CurrencyCell.bindCell(data: CurrencyModel, position: Int) {
     model = data
-    callback(this@bindCell, position)
+    callback(this, position)
   }
 
 }
