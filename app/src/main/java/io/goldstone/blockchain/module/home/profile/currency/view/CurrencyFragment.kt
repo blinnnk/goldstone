@@ -19,7 +19,7 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, CurrencyModel>(
   override val presenter = CurrencyPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<CurrencyModel>?) {
-    recyclerView.adapter = CurrencyAdapter(asyncData.orEmptyArray()) { item, position ->
+    recyclerView.adapter = CurrencyAdapter(asyncData.orEmptyArray()) { _, _ ->
 
     }
   }
