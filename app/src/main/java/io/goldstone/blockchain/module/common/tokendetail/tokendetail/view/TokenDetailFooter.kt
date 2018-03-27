@@ -22,7 +22,7 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
   private val receivedButton = RoundBorderButton(context)
 
   init {
-
+    isClickable = true
     layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
     backgroundColor = Spectrum.white
 
