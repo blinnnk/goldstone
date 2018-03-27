@@ -23,6 +23,7 @@ class ContactsCell(context: Context) : BaseValueCell(context) {
 
   init {
     setGrayStyle()
+    hasArrow = false
   }
 
 }

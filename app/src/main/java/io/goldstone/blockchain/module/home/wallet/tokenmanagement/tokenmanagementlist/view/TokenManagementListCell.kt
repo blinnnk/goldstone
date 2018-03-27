@@ -21,7 +21,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  * @author KaySaith
  */
 
-class TokenManagementListCell(context: Context) : BaseCell(context) {
+open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
   var model: TokenManagementListModel by observing(TokenManagementListModel()) {
     icon.src = model.icon
@@ -38,23 +38,20 @@ class TokenManagementListCell(context: Context) : BaseCell(context) {
 
     hasArrow = false
 
-    icon
+    this.addView(icon
       .apply {
         setGrayStyle()
         src = R.drawable.etc_icon
         setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
-      }
-      .into(this)
+      })
 
-    tokenInfo
-      .apply { setBlackTitles() }
-      .into(this)
+    this.addView(tokenInfo
+      .apply { setBlackTitles() })
 
-    switch
+    this.addView(switch
       .apply {
         setThemColor(Spectrum.green, Spectrum.lightGreen)
-      }
-      .into(this)
+      })
 
     tokenInfo.apply {
       setCenterInVertical()

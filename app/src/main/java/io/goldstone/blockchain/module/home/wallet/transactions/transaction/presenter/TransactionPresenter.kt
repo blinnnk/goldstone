@@ -1,7 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter
 
-import android.support.v4.app.Fragment
-import com.blinnnk.extension.*
+import com.blinnnk.extension.hideChildFragment
+import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
@@ -31,30 +32,13 @@ class TransactionPresenter(
             // Send Arguments
           }
           overlayView.header.apply {
-            showBackButton(true) { popFragment() }
+            showBackButton(true) {
+              popFragmentFrom<TransactionDetailFragment>()
+            }
             showCloseButton(false)
           }
         }
       }
-    }
-  }
-
-  private fun TransactionFragment.popFragment() {
-    childFragmentManager.fragments.apply {
-      if (last() is TransactionDetailFragment) removeChildFragment(last())
-      overlayView.header.apply {
-        showBackButton(false)
-        showCloseButton(true)
-      }
-      // 恢复 `TransactionListFragment` 的视图
-      this[size - 2].recoveryHeight()
-    }
-  }
-
-  private fun Fragment.recoveryHeight() {
-    if (this is TransactionListFragment) {
-      fragment.showChildFragment(this)
-      presenter.recoveryFragmentHeight()
     }
   }
 

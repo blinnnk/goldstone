@@ -10,17 +10,16 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.extension.addTopLRCorner
-import com.blinnnk.extension.into
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 22/03/2018 2:37 AM
@@ -36,6 +35,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
       id = ElementID.closeButton
       imageResource = R.drawable.close
       setColorFilter(GrayScale.lightGray)
+      scaleType = ImageView.ScaleType.CENTER_INSIDE
       layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
         topMargin = 18.uiPX()
         rightMargin = 20.uiPX()
@@ -51,13 +51,32 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
       imageResource = R.drawable.back
       setColorFilter(GrayScale.lightGray)
       scaleType = ImageView.ScaleType.CENTER_INSIDE
-      layoutParams = RelativeLayout.LayoutParams(iconSize + 5.uiPX(), iconSize + 5.uiPX()).apply {
+      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
         topMargin = 18.uiPX()
         leftMargin = 15.uiPX()
         alignParentLeft()
       }
       addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
     }
+  }
+
+  private val searchButton by lazy {
+    ImageView(context).apply {
+      id = ElementID.searchButton
+      imageResource = R.drawable.search_icon
+      setColorFilter(GrayScale.lightGray)
+      scaleType = ImageView.ScaleType.CENTER_INSIDE
+      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
+        topMargin = 18.uiPX()
+        leftMargin = 15.uiPX()
+        alignParentLeft()
+      }
+      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+    }
+  }
+
+  private val searchInput by lazy {
+    EditTextWithButton(context)
   }
 
   private val headerHeight = 65.uiPX()
@@ -86,9 +105,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   }
 
   fun showCloseButton(isShow: Boolean) {
-    if (isShow) addView(closeButton)
-    else findViewById<ImageView>(ElementID.closeButton)?.let {
-      removeView(it)
+    findViewById<ImageView>(ElementID.closeButton).apply {
+      if (isShow) {
+        isNull().isTrue { addView(closeButton) }
+      } else {
+        isNull().isFalse { removeView(this) }
+      }
     }
   }
 
@@ -97,10 +119,46 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
       backButton
         .click { setClickEvent(backButton) }
         .into(this)
-    }
-    else findViewById<ImageView>(ElementID.backButton)?.let {
+    } else findViewById<ImageView>(ElementID.backButton)?.let {
       removeView(it)
     }
+  }
+
+  fun showSearchButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+    if (isShow) {
+      searchButton
+        .click { setClickEvent(searchButton) }
+        .into(this)
+    } else findViewById<ImageView>(ElementID.searchButton)?.let {
+      removeView(it)
+    }
+  }
+
+  fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit = {}) {
+
+    isShow.isTrue {
+      title.visibility = View.GONE
+      findViewById<EditTextWithButton>(ElementID.searchInput).let {
+        it.isNull().isTrue {
+          searchInput
+            .apply {
+              setCancelButton {
+                showSearchInput(false)
+                cancelEvent()
+              }
+            }
+            .into(this)
+        } otherwise {
+          it.visibility = View.VISIBLE
+        }
+      }
+    } otherwise {
+      title.visibility = View.VISIBLE
+      searchInput.visibility = View.GONE
+    }
+
+    showCloseButton(!isShow)
+
   }
 
   override fun onDraw(canvas: Canvas?) {

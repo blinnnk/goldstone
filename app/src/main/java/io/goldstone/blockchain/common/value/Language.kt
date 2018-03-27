@@ -134,6 +134,11 @@ object CommonText {
     else -> ""
   }
   @JvmField
+  val cancel = when (currentLanguage) {
+    HoneyLanguage.English.code -> "cancel"
+    else -> ""
+  }
+  @JvmField
   val saveToAlbum = when (currentLanguage) {
     HoneyLanguage.English.code -> "Save TO Album"
     else -> ""
