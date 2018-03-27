@@ -16,7 +16,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class TransactionListCell(context: Context) : BaseValueCell(context) {
+open class TransactionListCell(context: Context) : BaseValueCell(context) {
 
   var model: TransactionListModel by observing(TransactionListModel()) {
 

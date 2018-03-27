@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 import com.blinnnk.extension.addFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -38,6 +40,10 @@ class WalletDetailPresenter(
 
   fun showWalletSettingsFragment() {
     fragment.activity?.addFragment<WalletSettingsFragment>(ContainerID.main)
+  }
+
+  fun showMyTokenDetailFragment() {
+    fragment.activity?.addFragment<TokenDetailOverlayFragment>(ContainerID.main)
   }
 
 }

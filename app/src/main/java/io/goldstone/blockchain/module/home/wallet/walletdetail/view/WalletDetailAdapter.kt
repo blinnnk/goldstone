@@ -22,8 +22,8 @@ class WalletDetailAdapter(
     Header(0), Cell(1), Footer(2)
   }
 
-  internal var headerView: WalletDetailHeaderView? = null
-  private var normalCell: WalletDetailCell? = null
+  var headerView: WalletDetailHeaderView? = null
+  var normalCell: WalletDetailCell? = null
   private var footerView: ViewGroup? = null
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

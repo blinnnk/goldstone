@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.p
 class WalletGenerationFragment : BaseOverlayFragment<WalletGenerationPresenter>() {
 
   override val presenter = WalletGenerationPresenter(this)
+
   override fun setContentHeight() = activity?.getRealScreenHeight().orZero()
 
   override fun ViewGroup.initView() {

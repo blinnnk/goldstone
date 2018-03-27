@@ -101,6 +101,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
     addTokenButton
       .apply {
+        themeColor = Spectrum.white
         text = WalletText.addToken
         layoutParams = LinearLayout.LayoutParams(125.uiPX(), 24.uiPX())
         touchColor = Spectrum.yellow

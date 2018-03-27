@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.value.Spectrum
  * @author KaySaith
  */
 
-class RoundBorderButton(context: Context) : View(context) {
+open class RoundBorderButton(context: Context) : View(context) {
 
   var text by observing("") {
     invalidate()
@@ -30,11 +30,15 @@ class RoundBorderButton(context: Context) : View(context) {
     addTouchRippleAnimation(Color.TRANSPARENT, touchColor, RippleMode.Round)
   }
 
+  var themeColor: Int by observing(Spectrum.white) {
+    paint.color = themeColor
+    textPaint.color = themeColor
+    invalidate()
+  }
+
   private val paint = Paint().apply {
     isAntiAlias = true
     style = Paint.Style.STROKE
-    strokeWidth = BorderSize.default
-    color = Spectrum.white
   }
 
   private val titleSize = 11.uiPX().toFloat()
@@ -42,9 +46,16 @@ class RoundBorderButton(context: Context) : View(context) {
   private val textPaint = Paint().apply {
     isAntiAlias = true
     style = Paint.Style.FILL
-    color = Spectrum.white
     textSize = titleSize
     typeface = GoldStoneFont.heavy(context)
+  }
+
+  open fun setBorderWidth(width: Float = BorderSize.default) {
+    paint.strokeWidth = width
+  }
+
+  init {
+    this.setBorderWidth()
   }
 
   @SuppressLint("DrawAllocation")

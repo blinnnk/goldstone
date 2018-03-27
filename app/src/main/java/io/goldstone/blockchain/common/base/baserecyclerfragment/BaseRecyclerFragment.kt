@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orZero
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import org.jetbrains.anko.matchParent
@@ -81,8 +82,12 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   open fun setSlideUpAnimation() {
     // 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
     if (isResumed) return
-    setSlideUpWithCellHeight()?.let { cellHeight: Int ->
-      presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), cellHeight)
+    setSlideUpWithCellHeight().let {
+      it.isNull().isTrue {
+        presenter.updateParentContentLayoutHeight()
+      } otherwise {
+        presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), it.orZero())
+      }
     }
   }
 

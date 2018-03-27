@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.common.base.baseoverlayfragment
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -13,14 +12,10 @@ import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
-import io.goldstone.blockchain.common.utils.UIUtils
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI

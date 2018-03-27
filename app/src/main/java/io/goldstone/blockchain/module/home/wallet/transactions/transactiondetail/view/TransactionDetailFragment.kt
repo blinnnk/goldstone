@@ -3,10 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.TransactionSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.TransactionDetailPresenter
 
@@ -22,9 +20,6 @@ class TransactionDetailFragment : BaseRecyclerFragment<TransactionDetailPresente
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionDetailModel>?) {
     recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray())
   }
-
-  override fun setSlideUpWithCellHeight() =
-    (TransactionSize.headerView + asyncData?.size.orZero() * TransactionSize.cellHeight) / asyncData?.size.orZero()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

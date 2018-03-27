@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -32,6 +33,12 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
         currentAccount.onClick { presenter.showWalletSettingsFragment() }
         manageButton.onClick { presenter.showWalletListFragment() }
         addTokenButton.onClick { presenter.showTokenManagementFragment() }
+      }
+      normalCell?.apply {
+        onClick {
+          presenter.showMyTokenDetailFragment()
+          preventDuplicateClicks()
+        }
       }
     }
   }

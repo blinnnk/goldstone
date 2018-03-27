@@ -4,11 +4,8 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.getScreenHeightWithoutStatusBar
 import com.blinnnk.extension.orZero
-import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -52,13 +49,16 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
    * 状态而决定是否执行.
    */
   open fun updateParentContentLayoutHeight(
-    dataCount: Int,
-    cellHeight: Int,
+    dataCount: Int = 0,
+    cellHeight: Int = 0,
     maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
   ) {
+    val targetHeight =
+      if (dataCount == 0) fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+      else dataCount * cellHeight
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
       overlayView.contentLayout.updateHeightAnimation(
-        dataCount * cellHeight,
+        targetHeight,
         maxHeight
       )
     }
