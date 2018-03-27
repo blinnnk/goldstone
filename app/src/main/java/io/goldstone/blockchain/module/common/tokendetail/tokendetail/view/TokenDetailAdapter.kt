@@ -11,7 +11,8 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
  */
 
 class TokenDetailAdapter(
-  private var dataSet: ArrayList<TransactionListModel>
+  private var dataSet: ArrayList<TransactionListModel>,
+  private val callback: TokenDetailCell.() -> Unit
 ) : RecyclerView.Adapter<TokenDetailAdapter.ViewHolder>() {
 
   enum class CellType(val value: Int) {
@@ -32,6 +33,7 @@ class TokenDetailAdapter(
       CellType.Cell.value -> {
         normalCell = TokenDetailCell(parent.context)
         viewHolder = ViewHolder(normalCell)
+        normalCell?.let { callback(it) }
       }
 
     }
