@@ -31,47 +31,26 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   var title: TextView
 
   val closeButton by lazy {
-    ImageView(context).apply {
+    HeaderIcon(context).apply {
       id = ElementID.closeButton
-      imageResource = R.drawable.close
-      setColorFilter(GrayScale.lightGray)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-        topMargin = 18.uiPX()
-        rightMargin = 20.uiPX()
-        alignParentRight()
-      }
-      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+      imageResource = R.drawable.close_icon
+      setRightPosition()
     }
   }
 
   val backButton by lazy {
-    ImageView(context).apply {
+    HeaderIcon(context).apply {
       id = ElementID.backButton
       imageResource = R.drawable.back
-      setColorFilter(GrayScale.lightGray)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-        topMargin = 18.uiPX()
-        leftMargin = 15.uiPX()
-        alignParentLeft()
-      }
-      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+      setLeftPosition()
     }
   }
 
   private val searchButton by lazy {
-    ImageView(context).apply {
+    HeaderIcon(context).apply {
       id = ElementID.searchButton
       imageResource = R.drawable.search_icon
-      setColorFilter(GrayScale.lightGray)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-        topMargin = 18.uiPX()
-        leftMargin = 15.uiPX()
-        alignParentLeft()
-      }
-      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+      setLeftPosition()
     }
   }
 
@@ -80,8 +59,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   }
 
   private val headerHeight = 65.uiPX()
-  private val iconSize = 30.uiPX()
-
   private val paint = Paint()
 
   init {
@@ -172,6 +149,34 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     )
 
     canvas?.save()
+  }
+
+}
+
+class HeaderIcon(context: Context) : ImageView(context) {
+
+  private val iconSize = 30.uiPX()
+
+  init {
+    setColorFilter(GrayScale.lightGray)
+    scaleType = ImageView.ScaleType.CENTER_INSIDE
+    addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+  }
+
+  fun setLeftPosition() {
+    layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
+      topMargin = 18.uiPX()
+      leftMargin = 15.uiPX()
+      alignParentLeft()
+    }
+  }
+
+  fun setRightPosition() {
+    layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
+      topMargin = 18.uiPX()
+      rightMargin = 15.uiPX()
+      alignParentRight()
+    }
   }
 
 }

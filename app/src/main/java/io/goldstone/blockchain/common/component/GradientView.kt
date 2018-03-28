@@ -8,12 +8,15 @@ import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.common.utils.UIUtils.setGradientColor
-import io.goldstone.blockchain.common.value.GradientType
 
 /**
  * @date 21/03/2018 8:54 PM
  * @author KaySaith
  */
+
+enum class GradientType {
+  Blue, PinkToYellow, BlueGreen, DarkGreen, DarkGreenYellow
+}
 
 class GradientView(context: Context) : View(context) {
 
@@ -44,6 +47,11 @@ class GradientView(context: Context) : View(context) {
       GradientType.DarkGreen ->
         LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
           intArrayOf(Color.parseColor("#FF204E4D"), Color.parseColor("#FF40857B")),
+          floatArrayOf(0f, distance * 1f),
+          Shader.TileMode.CLAMP)
+      GradientType.DarkGreenYellow ->
+        LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
+          intArrayOf(Color.parseColor("#FF045855"), Color.parseColor("#FF2E320B")),
           floatArrayOf(0f, distance * 1f),
           Shader.TileMode.CLAMP)
 

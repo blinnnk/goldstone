@@ -27,12 +27,12 @@ object CreateWalletText {
     else -> ""
   }
   @JvmField
-  val mnemonicBackupAttention = when(currentLanguage) {
+  val mnemonicBackupAttention = when (currentLanguage) {
     HoneyLanguage.English.code -> "confirm your mnemonic words to remember your account baby tell me why and what happened it"
     else -> ""
   }
   @JvmField
-  val mnemonicConfirmationDescription = when(currentLanguage) {
+  val mnemonicConfirmationDescription = when (currentLanguage) {
     HoneyLanguage.English.code -> "please confirm your mnemonic words to remember your account baby tell me why and what happened it"
     else -> ""
   }
@@ -101,6 +101,13 @@ object TransactionText {
     HoneyLanguage.English.code -> "Transaction History"
     else -> ""
   }
+
+  @JvmField
+  val detail = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Transaction Detail"
+    else -> ""
+  }
+
   @JvmField
   val manage = when (currentLanguage) {
     HoneyLanguage.English.code -> "Manage My Wallets"
@@ -126,6 +133,27 @@ object TransactionText {
 
 }
 
+object TokenDetailText {
+
+  @JvmField
+  val address = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Address Selection"
+    else -> ""
+  }
+
+  @JvmField
+  val transferDetail = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Transfer Detail"
+    else -> ""
+  }
+
+  @JvmField
+  val customMiner = when (currentLanguage) {
+    HoneyLanguage.English.code -> "custom miner fee"
+    else -> ""
+  }
+}
+
 object CommonText {
 
   @JvmField
@@ -136,6 +164,11 @@ object CommonText {
   @JvmField
   val cancel = when (currentLanguage) {
     HoneyLanguage.English.code -> "cancel"
+    else -> ""
+  }
+  @JvmField
+  val next = when (currentLanguage) {
+    HoneyLanguage.English.code -> "next"
     else -> ""
   }
   @JvmField
@@ -326,8 +359,6 @@ object QuotationText {
   }
 
 }
-
-
 
 // 设定当前系统语言为软件界面语言
 

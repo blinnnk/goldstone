@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        tools:ignore="RtlEnabled"
+        tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
         tools:targetApi="donut"
         android:theme="@style/MainTheme">
         <!-- 登录和闪屏界面 -->

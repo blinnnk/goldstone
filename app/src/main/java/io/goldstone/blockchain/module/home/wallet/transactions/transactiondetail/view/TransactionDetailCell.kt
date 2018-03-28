@@ -23,7 +23,7 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 
-class TransactionDetailCell(context: Context) : RelativeLayout(context) {
+open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
   var model: TransactionDetailModel by observing(TransactionDetailModel()) {
     description.text = model.description
@@ -35,7 +35,7 @@ class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
   init {
 
-    setWillNotDraw(false)
+    this.setWillNotDraw(false)
 
     layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.cellHeight)
 
@@ -88,6 +88,11 @@ class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
   fun setTitleColor(color: Int) {
     info.textColor = color
+  }
+
+  fun setGrayInfoStyle() {
+    info.textSize = 4.uiPX().toFloat() - 1f
+    info.textColor = GrayScale.midGray
   }
 
 }

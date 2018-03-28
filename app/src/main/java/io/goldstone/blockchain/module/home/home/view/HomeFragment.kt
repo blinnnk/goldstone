@@ -1,22 +1,24 @@
 package io.goldstone.blockchain.module.home.home.view
 
 import android.support.v4.app.Fragment
-import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.TabBarView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.util.addFragmentAndSetArgument
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.GradientType
+import io.goldstone.blockchain.common.component.GradientView
+import io.goldstone.blockchain.common.component.TabBarView
 import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.GradientType
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 12:59 PM

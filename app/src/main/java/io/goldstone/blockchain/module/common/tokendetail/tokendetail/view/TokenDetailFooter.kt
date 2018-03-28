@@ -18,8 +18,8 @@ import org.jetbrains.anko.matchParent
 
 class TokenDetailFooter(context: Context) : LinearLayout(context) {
 
-  private val sendButton = RoundBorderButton(context)
-  private val receivedButton = RoundBorderButton(context)
+  val sendButton = RoundBorderButton(context)
+  val receivedButton = RoundBorderButton(context)
 
   init {
     isClickable = true
@@ -30,7 +30,7 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 
     sendButton
       .apply {
-        text = "Deposit".toUpperCase()
+        text = "Send".toUpperCase()
         themeColor = Spectrum.green
         layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
           leftMargin = PaddingSize.device
@@ -42,7 +42,7 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 
     receivedButton
       .apply {
-        text = "Send".toUpperCase()
+        text = "Deposit".toUpperCase()
         themeColor = Spectrum.blue
         layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
           topMargin = 15.uiPX()

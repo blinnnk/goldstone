@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.getScreenHeightWithoutStatusBar
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
@@ -43,6 +44,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     // Do Something
   }
 
+  open fun onFragmentShowFromHidden() {
+    // Do Something
+  }
+
   /**
    * @description
    * 这个方法会在 [BaseRecyclerFragment] 中根据 `setSlideUpWithCellHeight` 的设定
@@ -61,6 +66,12 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
         targetHeight,
         maxHeight
       )
+    }
+  }
+
+  fun setHeightMatchParent() {
+    fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
+      overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
     }
   }
 

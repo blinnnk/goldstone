@@ -20,7 +20,6 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
 
   private val footer by lazy { TokenDetailFooter(context!!) }
-
   override val presenter = TokenDetailPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionListModel>?) {
@@ -36,7 +35,13 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
     super.onViewCreated(view, savedInstanceState)
 
     footer.into(wrapper)
-    footer.setAlignParentBottom()
+    footer.apply {
+      setAlignParentBottom()
+      sendButton.onClick {
+        System.out.println("hello")
+        presenter.showAddressSelectionFragment()
+      }
+    }
 
     asyncData = arrayListOf(
       TransactionListModel("KingsDom", "3 days ago incoming from 0x89d7", 12.92, "ETH", true),
@@ -47,7 +52,6 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
       TransactionListModel("0x82u7...67s65d", "1 days ago incoming from 0x89d7", 6.5, "EOS", false),
       TransactionListModel("KingsDom", "3 days ago incoming from 0x89d7", 18.92, "ETH", true),
       TransactionListModel("Jean Jelly", "1 days ago incoming from 0x89d7", 5.1, "EOS", false)
-
     )
 
   }

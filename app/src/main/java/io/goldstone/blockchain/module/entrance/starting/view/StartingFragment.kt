@@ -2,20 +2,22 @@ package io.goldstone.blockchain.module.entrance.starting.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import com.blinnnk.extension.into
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.GradientType
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
-import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
-import com.blinnnk.extension.into
-import com.blinnnk.util.HoneyUIUtils
 
 /**
  * @date 21/03/2018 10:15 PM

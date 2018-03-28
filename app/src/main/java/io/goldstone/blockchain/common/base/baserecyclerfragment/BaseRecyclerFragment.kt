@@ -161,4 +161,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
     })
   }
 
+  override fun onHiddenChanged(hidden: Boolean) {
+    super.onHiddenChanged(hidden)
+    if (!hidden) {
+      presenter.onFragmentShowFromHidden()
+    }
+  }
+
 }

@@ -81,7 +81,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
         addData(dataSet)
         show(0)
 
-        setClickablePointRadius(50.uiPX().toFloat())
+        setClickablePointRadius(30.uiPX().toFloat())
         setOnEntryClickListener { _, entryIndex, _ ->
           context.toast(chartData[entryIndex].value.toString())
         }

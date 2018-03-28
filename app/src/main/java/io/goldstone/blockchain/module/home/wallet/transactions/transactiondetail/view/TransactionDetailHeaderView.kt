@@ -9,10 +9,10 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.value.GradientType
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionSize
