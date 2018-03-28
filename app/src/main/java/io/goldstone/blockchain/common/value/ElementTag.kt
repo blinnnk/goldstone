@@ -11,6 +11,7 @@ object FragmentTag {
   const val quotation = "quotation"
   const val walletCreation = "walletCreation"
   const val mnemonicBackup = "mnemonicBackup"
+  const val agreement = "agreement"
   const val mnemonicImportDetail = "mnemonicImportDetail"
   const val keystoreImport = "keystoreImport"
   const val privateKeyImport = "privateKeyImport"

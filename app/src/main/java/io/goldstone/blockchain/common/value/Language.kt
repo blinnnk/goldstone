@@ -27,6 +27,11 @@ object CreateWalletText {
     else -> ""
   }
   @JvmField
+  val agreement = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Agreement"
+    else -> ""
+  }
+  @JvmField
   val mnemonicBackupAttention = when (currentLanguage) {
     HoneyLanguage.English.code -> "confirm your mnemonic words to remember your account baby tell me why and what happened it"
     else -> ""

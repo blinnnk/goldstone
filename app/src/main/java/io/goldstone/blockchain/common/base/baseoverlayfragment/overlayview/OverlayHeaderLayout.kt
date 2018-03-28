@@ -92,12 +92,20 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   }
 
   fun showBackButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
-    if (isShow) {
-      backButton
-        .click { setClickEvent(backButton) }
-        .into(this)
-    } else findViewById<ImageView>(ElementID.backButton)?.let {
-      removeView(it)
+    findViewById<ImageView>(ElementID.backButton).let {
+      it.isNull().isTrue {
+        isShow.isTrue {
+          backButton.click { setClickEvent(backButton) }.into(this)
+        }
+      } otherwise {
+        isShow.isTrue {
+          removeView(it)
+          backButton.click { setClickEvent(backButton) }.into(this)
+        } otherwise {
+          removeView(it)
+        }
+
+      }
     }
   }
 

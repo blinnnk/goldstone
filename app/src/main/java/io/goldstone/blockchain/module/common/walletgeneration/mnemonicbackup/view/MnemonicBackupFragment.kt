@@ -25,8 +25,8 @@ import org.jetbrains.anko.*
 
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
-  val mnemonic by lazy { TextView(context) }
-  val confirmButton by lazy { RoundButton(context!!) }
+  private val mnemonic by lazy { TextView(context) }
+  private val confirmButton by lazy { RoundButton(context!!) }
 
   private val attentionTextView by lazy { AttentionTextView(context!!) }
 
@@ -68,7 +68,6 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
         }
         .click { presenter.goToMnemonicConfirmation() }
         .into(this)
-
     }
   }
 

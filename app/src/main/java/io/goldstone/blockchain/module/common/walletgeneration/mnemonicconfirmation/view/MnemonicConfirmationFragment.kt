@@ -38,7 +38,6 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
-
       attentionTextView
         .apply { text = CreateWalletText.mnemonicConfirmationDescription }
         .into(this)
@@ -66,7 +65,6 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
         textColor = Spectrum.blue
         gravity = Gravity.CENTER
       }
-
     }
   }
 

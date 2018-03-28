@@ -37,6 +37,13 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
     presenter.onFragmentViewCreated()
   }
 
+  override fun onHiddenChanged(hidden: Boolean) {
+    super.onHiddenChanged(hidden)
+    if (!hidden) {
+      presenter.onFragmentShowFromHidden()
+    }
+  }
+
   override fun onDetach() {
     super.onDetach()
     presenter.onFragmentDetach()

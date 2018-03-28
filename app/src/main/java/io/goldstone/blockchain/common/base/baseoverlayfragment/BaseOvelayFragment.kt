@@ -116,11 +116,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
           preventDuplicateClicks()
         }
       }
-
-      /** 返回上一级 */
-      header.backButton.onClick {
-        presenter.backToLastFragment()
-      }
     }
 
     presenter.onFragmentViewCreated()

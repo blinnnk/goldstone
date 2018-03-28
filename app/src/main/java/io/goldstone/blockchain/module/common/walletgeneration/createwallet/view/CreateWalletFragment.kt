@@ -83,6 +83,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
         .into(this)
 
       agreementView
+        .click { presenter.showAgreementFragment() }
         .into(this)
 
       createButton

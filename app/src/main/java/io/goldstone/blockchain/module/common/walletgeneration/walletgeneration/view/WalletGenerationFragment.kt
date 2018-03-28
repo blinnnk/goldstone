@@ -22,10 +22,7 @@ class WalletGenerationFragment : BaseOverlayFragment<WalletGenerationPresenter>(
   override fun setContentHeight() = activity?.getRealScreenHeight().orZero()
 
   override fun ViewGroup.initView() {
-    addFragmentAndSetArgument<CreateWalletFragment>(this.id, FragmentTag.walletCreation) {
-      // Send Argument
-    }
-    headerTitle = CreateWalletText.create
+    presenter.showCreateWalletFragment()
   }
 
 }

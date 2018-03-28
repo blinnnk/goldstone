@@ -5,6 +5,7 @@ import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 
 /**
@@ -28,20 +29,28 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
   }
 
   /**
-   * 这个方法目前只支持 `2` 级内的跳转, 因为业务大多数是 `2` 级跳, 所以简单封装
+   * 为了体验之前的 `Fragment` 都是使用隐藏, 当级别超过 `2` 层记得去从隐藏到显示
+   * 状态的 `Fragment` 中, 在 `presenter.onFragmentShowFromHidden` 方法
+   * 中重设回退按钮点击状态
    */
   inline fun<reified R: Fragment> popFragmentFrom() {
     fragment.apply {
       childFragmentManager.fragments.apply {
         if (last() is R) removeChildFragment(last())
-        overlayView.header.apply {
-          showBackButton(false)
-          showCloseButton(true)
+        // 组内只有一个 `Fragment` 的时候销毁掉回退按钮
+        if (size == 2) {
+          overlayView.header.apply {
+            showBackButton(false)
+            showCloseButton(true)
+          }
         }
         // 恢复 `TransactionListFragment` 的视图
-        this[size - 2].let {
+        this[size - 2]?.let {
+          showChildFragment(it)
+          // 两种不同的父级进行高度恢复
           if (it is BaseRecyclerFragment<*, *>) {
-            showChildFragment(it)
+            it.presenter.recoveryFragmentHeight()
+          } else if(it is BaseFragment<*>) {
             it.presenter.recoveryFragmentHeight()
           }
         }
