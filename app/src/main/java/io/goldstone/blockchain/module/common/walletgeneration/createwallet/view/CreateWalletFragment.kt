@@ -59,6 +59,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
       nameEditText
         .apply {
           text = CreateWalletText.name
+          hint = "My Wallet"
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 30.uiPX()
           }
@@ -101,7 +102,11 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
           }
         }
         .click {
-          presenter.generateWalletWith(passwordEditText, repeatPasswordEditText)
+          presenter.generateWalletWith(
+            passwordEditText,
+            repeatPasswordEditText,
+            agreementView.radioButton.isChecked
+          )
         }
         .into(this)
 

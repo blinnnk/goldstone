@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.HoneyUIUtils
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
 import org.jetbrains.anko.AnkoContext
@@ -30,6 +31,7 @@ import org.jetbrains.anko.verticalLayout
 
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
 
+  private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
   private val confirmButton by lazy { RoundButton(context!!) }
   private val mnemonicInput by lazy { WalletEditText(context!!) }
   private val attentionTextView by lazy { AttentionTextView(context!!) }
@@ -38,6 +40,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
+      System.out.println(mnemonicCode)
       attentionTextView
         .apply { text = CreateWalletText.mnemonicConfirmationDescription }
         .into(this)
@@ -52,7 +55,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
           setBlueStyle()
         }
         .click {
-          presenter.clickConfirmationButton()
+          presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
         }
         .into(this)
 

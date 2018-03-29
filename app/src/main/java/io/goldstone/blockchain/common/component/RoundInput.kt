@@ -9,16 +9,19 @@ import android.graphics.RectF
 import android.text.InputType
 import android.widget.EditText
 import android.widget.LinearLayout
-import com.blinnnk.extension.isFalse
 import com.blinnnk.honey.setCursorColor
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.leftPadding
-import org.jetbrains.anko.textColor
-import com.blinnnk.uikit.ScreenSize
 import org.jetbrains.anko.singleLine
+import org.jetbrains.anko.textColor
 
 /**
  * @date 22/03/2018 3:11 PM
@@ -54,6 +57,8 @@ class RoundInput(context: Context) : EditText(context) {
     textPaint.typeface = GoldStoneFont.heavy(context)
     textPaint.textSize = titleSize
     singleLine = true
+
+    hintTextColor = GrayScale.lightGray
 
     setWillNotDraw(false)
 

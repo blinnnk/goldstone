@@ -9,8 +9,12 @@ import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
 /**
- * @date 21/03/2018 7:35 PM
- * @author KaySaith
+——————————————————————————————————————————————————————————
+▒█▀▀█ ▒█▀▀▀█ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀█ ▀▀█▀▀ ▒█▀▀▀█ ▒█▄░▒█ ▒█▀▀▀
+▒█░▄▄ ▒█░░▒█ ▒█░░░ ▒█░▒█ ░▀▀▀▄▄ ░▒█░░ ▒█░░▒█ ▒█▒█▒█ ▒█▀▀▀
+▒█▄▄█ ▒█▄▄▄█ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄█ ░▒█░░ ▒█▄▄▄█ ▒█░░▀█ ▒█▄▄▄
+——————————————————————————————————————————————————————————
+Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
  */
 
 

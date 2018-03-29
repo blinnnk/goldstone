@@ -32,6 +32,16 @@ object CreateWalletText {
     else -> ""
   }
   @JvmField
+  val agreeRemind = when (currentLanguage) {
+    HoneyLanguage.English.code -> "You need agree the terms"
+    else -> ""
+  }
+  @JvmField
+  val repeatPasswordRemind = when (currentLanguage) {
+    HoneyLanguage.English.code -> "repeat password must be the same as password"
+    else -> ""
+  }
+  @JvmField
   val mnemonicBackupAttention = when (currentLanguage) {
     HoneyLanguage.English.code -> "confirm your mnemonic words to remember your account baby tell me why and what happened it"
     else -> ""

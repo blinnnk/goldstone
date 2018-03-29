@@ -1,12 +1,15 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter
 
+import android.os.Bundle
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.UnsafeReasons
 import io.goldstone.blockchain.common.utils.checkPasswordInRules
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -30,25 +33,37 @@ class CreateWalletPresenter(
     )
   }
 
-  fun generateWalletWith(passwordInput: EditText, repeatPasswordInput: EditText) {
-    passwordInput.text.checkPasswordInRules { safeLevel, reasons ->
-      fragment.context?.toast(safeLevel.info)
-      if (reasons == UnsafeReasons.None) {
-        (passwordInput.text.toString() == repeatPasswordInput.text.toString()).isTrue {
-          showMnemonicBackupFragment()
-        } otherwise {
-          fragment.toast("repeat password must be the same as password")
+  fun generateWalletWith(passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean) {
+    fragment.context?.apply {
+      passwordInput.text.checkPasswordInRules { _, reasons ->
+        if (reasons == UnsafeReasons.None) {
+          (passwordInput.text.toString() == repeatPasswordInput.text.toString()).isTrue {
+            isAgree.isTrue {
+              generateWallet(passwordInput.text.toString()) { mnemonicCode, address ->
+                val arguments = Bundle().apply {
+                  putString(ArgumentKey.mnemonicCode, mnemonicCode)
+                  putString(ArgumentKey.walletAddress, address)
+                }
+                showMnemonicBackupFragment(arguments)
+              }
+            } otherwise {
+              toast(CreateWalletText.agreeRemind)
+            }
+          } otherwise {
+            toast(CreateWalletText.repeatPasswordRemind)
+          }
+        } else {
+          toast(reasons.info)
         }
-      } else {
-        fragment.toast(reasons.info)
       }
     }
   }
 
-  private fun showMnemonicBackupFragment() {
+  private fun showMnemonicBackupFragment(arguments: Bundle) {
     showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
       CreateWalletText.mnemonicBackUp,
-      CreateWalletText.create
+      CreateWalletText.create,
+      arguments
     )
   }
 

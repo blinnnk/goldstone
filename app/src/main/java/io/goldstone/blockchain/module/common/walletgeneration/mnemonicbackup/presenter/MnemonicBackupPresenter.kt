@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter
 
+import android.os.Bundle
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.CreateWalletText
@@ -17,10 +18,11 @@ class MnemonicBackupPresenter(
   override val fragment: MnemonicBackupFragment
   ) : BasePresenter<MnemonicBackupFragment>() {
 
-  fun goToMnemonicConfirmation() {
+  fun goToMnemonicConfirmation(arguments: Bundle) {
     showTargetFragment<MnemonicConfirmationFragment, WalletGenerationFragment>(
       CreateWalletText.mnemonicConfirmation,
-      CreateWalletText.mnemonicBackUp
+      CreateWalletText.mnemonicBackUp,
+      arguments
     )
   }
 
