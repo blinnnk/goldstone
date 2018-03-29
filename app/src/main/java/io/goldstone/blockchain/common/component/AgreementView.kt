@@ -2,61 +2,71 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.view.View
+import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.blinnnk.component.HoneyRadioButton
+import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.textColor
 
 /**
  * @date 22/03/2018 3:52 PM
  * @author KaySaith
  */
 
-class AgreementView(context: Context) : View(context) {
+@SuppressLint("SetTextI18n")
+class AgreementView(context: Context) : RelativeLayout(context) {
 
-  val text = "Agree on Terms of service and privacy policy"
+  val radioButton = HoneyRadioButton(context)
+  val textView = TextView(context)
 
-  private val paint = Paint()
-  private val radius = 5.uiPX().toFloat()
-
-  private val textPaint = Paint()
+  private var isChecked = false
 
   init {
-    paint.isAntiAlias = true
-    paint.style = Paint.Style.STROKE
-    paint.color = GrayScale.midGray
-    paint.strokeWidth = BorderSize.bold
 
-    textPaint.isAntiAlias = true
-    textPaint.style = Paint.Style.FILL
-    textPaint.color = GrayScale.gray
-    textPaint.textSize = 12.uiPX().toFloat()
-    textPaint.typeface = GoldStoneFont.book(context)
+    setWillNotDraw(false)
 
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
       topMargin = 20.uiPX()
     }
+
+    val terms = "Service and privacy policy"
+    textView
+      .apply {
+        layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
+        text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 9.uiPX())
+        textSize = 3.uiPX().toFloat()
+        textColor = GrayScale.midGray
+        typeface = GoldStoneFont.book(context)
+        gravity = Gravity.CENTER
+        x += 15.uiPX()
+      }
+      .into(this)
+
+    radioButton
+      .apply {
+        scaleX = 0.7f
+        scaleY = 0.7f
+        setColorStyle(GrayScale.midGray, Spectrum.green)
+      }
+      .into(this)
+
+    radioButton.x =
+      (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 15.uiPX()
+
   }
 
-  @SuppressLint("DrawAllocation")
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
-    val left = (width - textPaint.measureText(text) - radius * 2) / 2
-    canvas?.drawCircle(radius + left, radius + 3.uiPX().toFloat(), radius, paint)
-    var textX = 15.uiPX().toFloat()
-    text.forEachIndexed { index, char ->
-      if (index <= 8) textPaint.color = GrayScale.midGray
-      else textPaint.color = Spectrum.blue
-      canvas?.drawText(char.toString(), textX + left, 11.uiPX().toFloat(), textPaint)
-      textX += textPaint.measureText(char.toString())
-    }
-
+  fun setRadioStatus() {
+    isChecked = !isChecked
+    radioButton.isChecked = isChecked
   }
 
 }

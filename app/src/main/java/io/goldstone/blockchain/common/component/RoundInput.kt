@@ -6,8 +6,10 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.RectF
+import android.text.InputType
 import android.widget.EditText
 import android.widget.LinearLayout
+import com.blinnnk.extension.isFalse
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -16,6 +18,7 @@ import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.textColor
 import com.blinnnk.uikit.ScreenSize
+import org.jetbrains.anko.singleLine
 
 /**
  * @date 22/03/2018 3:11 PM
@@ -50,6 +53,7 @@ class RoundInput(context: Context) : EditText(context) {
     textPaint.color = GrayScale.midGray
     textPaint.typeface = GoldStoneFont.heavy(context)
     textPaint.textSize = titleSize
+    singleLine = true
 
     setWillNotDraw(false)
 
@@ -90,7 +94,16 @@ class RoundInput(context: Context) : EditText(context) {
     canvas?.drawRect(textBackground, backgroundPaint)
 
     canvas?.drawText(text, 35.uiPX().toFloat(), 12.uiPX().toFloat(), textPaint)
+  }
 
+  fun setNumberInput() {
+    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+  }
+
+  fun setPasswordInput(show: Boolean = false) {
+    inputType =
+      if (show == false) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+      else InputType.TYPE_CLASS_TEXT
   }
 
 }

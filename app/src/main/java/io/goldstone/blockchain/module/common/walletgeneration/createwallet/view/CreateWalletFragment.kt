@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
 
@@ -67,6 +68,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
       passwordEditText
         .apply {
           text = CreateWalletText.password
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 30.uiPX()
           }
@@ -76,6 +78,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
       repeatPasswordEditText
         .apply {
           text = CreateWalletText.repeatPassword
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 10.uiPX()
           }
@@ -83,7 +86,10 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
         .into(this)
 
       agreementView
-        .click { presenter.showAgreementFragment() }
+        .apply {
+          radioButton.onClick { setRadioStatus() }
+          textView.onClick { presenter.showAgreementFragment() }
+        }
         .into(this)
 
       createButton
@@ -94,7 +100,9 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
             topMargin = 20.uiPX()
           }
         }
-        .click { presenter.showMnemonicBackupFragment() }
+        .click {
+          presenter.generateWalletWith(passwordEditText, repeatPasswordEditText)
+        }
         .into(this)
 
       importButton

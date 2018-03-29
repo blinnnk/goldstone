@@ -16,12 +16,7 @@ class MnemonicConfirmationPresenter(
   ) : BasePresenter<MnemonicConfirmationFragment>() {
 
   fun clickConfirmationButton() {
-    generationWallet()
     if (fragment.activity is SplashActivity) goToMainActivity()
-  }
-
-  private fun generationWallet() {
-
   }
 
   private fun goToMainActivity() {

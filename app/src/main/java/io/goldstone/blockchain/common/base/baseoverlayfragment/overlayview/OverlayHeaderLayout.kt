@@ -99,8 +99,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
         }
       } otherwise {
         isShow.isTrue {
-          removeView(it)
-          backButton.click { setClickEvent(backButton) }.into(this)
+          backButton.click { setClickEvent(backButton) }
         } otherwise {
           removeView(it)
         }

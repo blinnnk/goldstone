@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.utils
 
 import android.graphics.LinearGradient
+import android.graphics.Paint
 import android.graphics.Shader
 import android.view.View
 import android.view.WindowManager
