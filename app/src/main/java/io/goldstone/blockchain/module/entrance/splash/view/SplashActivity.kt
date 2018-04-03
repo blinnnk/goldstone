@@ -6,6 +6,7 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
 /**
@@ -22,10 +23,14 @@ class SplashActivity : AppCompatActivity() {
 
   private val container by lazy { SplashContainer(this) }
 
+  private val presenter = SplashPresenter(this)
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     hideStatusBar()
+
+    presenter.hasAccountThenLogin()
 
     container.apply {
       savedInstanceState.isNull {
@@ -35,5 +40,6 @@ class SplashActivity : AppCompatActivity() {
     }.let {
       setContentView(it)
     }
+
   }
 }

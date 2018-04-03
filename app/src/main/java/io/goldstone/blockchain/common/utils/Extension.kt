@@ -36,3 +36,7 @@ fun CharSequence.measureTextWidth(fontSize: Float): Float {
   }
   return textPaint.measureText(this.toString())
 }
+
+fun<T> List<T>.toArrayList(): ArrayList<T> {
+  return this.mapTo(arrayListOf()) { it }
+}

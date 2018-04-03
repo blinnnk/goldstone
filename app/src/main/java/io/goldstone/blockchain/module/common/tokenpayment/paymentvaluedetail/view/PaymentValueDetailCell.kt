@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
 
 import android.content.Context
-import android.widget.RadioButton
 import android.widget.TextView
 import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.into
@@ -9,7 +8,6 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.GoldStoneApplication
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont

@@ -1,20 +1,24 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.isFalse
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.UnsafeReasons
 import io.goldstone.blockchain.common.utils.checkPasswordInRules
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.generateWallet
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
-import org.jetbrains.anko.support.v4.toast
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.toast
 
 /**
@@ -33,27 +37,62 @@ class CreateWalletPresenter(
     )
   }
 
-  fun generateWalletWith(passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean) {
+  fun generateWalletWith(nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean) {
+
+    isAgree.isFalse {
+      fragment.context?.toast(CreateWalletText.agreeRemind)
+      return
+    }
+
+    if (passwordInput.text.toString() != repeatPasswordInput.text.toString()) {
+      fragment.context?.toast(CreateWalletText.repeatPasswordRemind)
+      return
+    }
+
+    val walletName =
+      if (nameInput.text.toString().isEmpty()) "Wallet"
+      else nameInput.text.toString()
+
     fragment.context?.apply {
       passwordInput.text.checkPasswordInRules { _, reasons ->
         if (reasons == UnsafeReasons.None) {
-          (passwordInput.text.toString() == repeatPasswordInput.text.toString()).isTrue {
-            isAgree.isTrue {
-              generateWallet(passwordInput.text.toString()) { mnemonicCode, address ->
-                val arguments = Bundle().apply {
-                  putString(ArgumentKey.mnemonicCode, mnemonicCode)
-                  putString(ArgumentKey.walletAddress, address)
-                }
-                showMnemonicBackupFragment(arguments)
-              }
-            } otherwise {
-              toast(CreateWalletText.agreeRemind)
-            }
-          } otherwise {
-            toast(CreateWalletText.repeatPasswordRemind)
-          }
+          generateWalletWith(passwordInput.text.toString(), walletName)
         } else {
           toast(reasons.info)
+        }
+      }
+    }
+  }
+
+  private fun Context.generateWalletWith(password: String, name: String) {
+    generateWallet(password) { mnemonicCode, address ->
+
+      generateMyTokenInfo(address) { hasCreatedWallet?.run() }
+
+      // 将基础的不存在安全问题的信息插入数据库
+      WalletTable.insert(WalletTable(0, name, address, true)) {
+        // 传递数据到下一个 `Fragment`
+        val arguments = Bundle().apply {
+          putString(ArgumentKey.mnemonicCode, mnemonicCode)
+          putString(ArgumentKey.walletAddress, address)
+        }
+        showMnemonicBackupFragment(arguments)
+      }
+    }
+  }
+
+  /**
+   * 手下拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
+   */
+  private fun generateMyTokenInfo(walletAddress: String, callback: () -> Unit) {
+    DefaultTokenTable.getTokens { tokenList ->
+      tokenList.forEachIndexed { index, tokenInfo ->
+        // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
+        if (tokenInfo.forceShow == TinyNumber.True.value || tokenInfo.isUsed) {
+          GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, walletAddress) { balance ->
+            MyTokenTable.insert(MyTokenTable(0, walletAddress, tokenInfo.symbol, balance))
+            if(index == tokenList.lastIndex) callback()
+          }
         }
       }
     }
@@ -65,6 +104,14 @@ class CreateWalletPresenter(
       CreateWalletText.create,
       arguments
     )
+  }
+
+  companion object {
+    /**
+     * 创建钱包首先会从服务拉取默认显示的 `Tokens Type` 这一步需要经过
+     * 耗时的查询, 余额, 信息等. 所以在这里增加一个结束的回调判断.
+     */
+    var hasCreatedWallet: Runnable? = null
   }
 
 }

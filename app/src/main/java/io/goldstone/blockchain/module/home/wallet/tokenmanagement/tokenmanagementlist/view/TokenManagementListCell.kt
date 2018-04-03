@@ -2,8 +2,8 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.content.Context
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.extension.setMargins
@@ -13,8 +13,10 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TokenManagementListModel
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.matchParent
 
 /**
  * @date 25/03/2018 5:12 PM
@@ -23,16 +25,19 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
-  var model: TokenManagementListModel by observing(TokenManagementListModel()) {
-    icon.src = model.icon
-    tokenInfo.title.text = model.symbols
-    tokenInfo.subtitle.text = model.tokenName
-    switch.isChecked = model.isAdded
+  var model: DefaultTokenTable? by observing(null) {
+    model?.apply {
+      icon.image.glideImage(iconUrl)
+      tokenInfo.title.text = symbol
+      tokenInfo.subtitle.text = name
+      switch.isChecked = isUsed
+    }
   }
 
-  private val icon by lazy { SquareIcon(context) }
+  val switch by lazy { HoneyBaseSwitch(context) }
+
   private val tokenInfo by lazy { TwoLineTitles(context) }
-  private val switch by lazy { HoneyBaseSwitch(context) }
+  private val icon by lazy { SquareIcon(context) }
 
   init {
 
@@ -50,6 +55,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
     this.addView(switch
       .apply {
+        layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
         setThemColor(Spectrum.green, Spectrum.lightGreen)
       })
 
@@ -66,5 +72,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
     setGrayStyle()
 
   }
+
+  fun getSymbol(): String = tokenInfo.title.text.toString()
 
 }

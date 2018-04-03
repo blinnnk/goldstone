@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -26,8 +27,10 @@ class SquareIcon(context: Context) : LinearLayout(context) {
     image.imageResource = src
   }
 
-  private val image by lazy { ImageView(context) }
+  val image by lazy { ImageView(context) }
+
   private val iconSize = 28.uiPX()
+  private val imageSize = 20.uiPX()
 
   init {
 
@@ -37,8 +40,11 @@ class SquareIcon(context: Context) : LinearLayout(context) {
 
     image
       .apply {
-        layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
-        scaleType = ImageView.ScaleType.CENTER_INSIDE
+        layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
+          topMargin = UIUtils.subtractThenHalf(iconSize, imageSize)
+          leftMargin = UIUtils.subtractThenHalf(iconSize, imageSize)
+        }
+        scaleType = ImageView.ScaleType.CENTER_CROP
         setColorFilter(Spectrum.white)
       }
       .into(this)

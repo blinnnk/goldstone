@@ -43,7 +43,7 @@ class AgreementView(context: Context) : RelativeLayout(context) {
       .apply {
         layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
         text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 9.uiPX())
-        textSize = 3.uiPX().toFloat()
+        textSize = 3.uiPX().toFloat() + 1f
         textColor = GrayScale.midGray
         typeface = GoldStoneFont.book(context)
         gravity = Gravity.CENTER

@@ -32,4 +32,8 @@ class MnemonicConfirmationPresenter(
     fragment.activity?.jump<MainActivity>()
   }
 
+  private fun getWalletAddressInfo() {
+
+  }
+
 }

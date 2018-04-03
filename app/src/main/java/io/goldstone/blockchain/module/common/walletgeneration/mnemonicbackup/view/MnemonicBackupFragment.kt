@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
@@ -29,6 +29,7 @@ import org.jetbrains.anko.verticalLayout
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
   private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
+  private val walletAddress by lazy { arguments?.getString(ArgumentKey.walletAddress) }
 
   private val mnemonic by lazy { TextView(context) }
   private val confirmButton by lazy { RoundButton(context!!) }
@@ -36,29 +37,25 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
   override val presenter = MnemonicBackupPresenter(this)
 
-  @SuppressLint("SetTextI18n")
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
 
       lparams(matchParent, matchParent)
-
       attentionTextView
-        .apply {
-          text = CreateWalletText.mnemonicBackupAttention
-        }
+        .apply { text = CreateWalletText.mnemonicBackupAttention }
         .into(this)
 
       mnemonic
         .apply {
           addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
           layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2,
-            88.uiPX()
+            92.uiPX()
           ).apply {
             leftMargin = PaddingSize.device
             topMargin = 20.uiPX()
             setPadding(20.uiPX(), 16.uiPX(), 20.uiPX(), 10.uiPX())
           }
-
+          gravity = Gravity.CENTER_VERTICAL
           textSize = 5.uiPX().toFloat()
           textColor = GrayScale.black
           typeface = GoldStoneFont.heavy(context)

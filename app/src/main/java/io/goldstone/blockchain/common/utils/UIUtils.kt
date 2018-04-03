@@ -21,4 +21,6 @@ object UIUtils {
     width: Float = ScreenSize.Width.toFloat(),
     height: Float = ScreenSize.Height.toFloat()
   ) = LinearGradient(0f,0f, width, height, startColor, endColor, Shader.TileMode.CLAMP)
+
+  fun subtractThenHalf(first: Int, second: Int) = (first - second) / 2
 }

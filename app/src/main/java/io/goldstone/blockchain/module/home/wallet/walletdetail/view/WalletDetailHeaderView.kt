@@ -8,15 +8,13 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInHorizontal
-import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.observing
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
@@ -32,7 +30,22 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 
+data class WalletDetailHeaderModel(val avatar: String?, val name: String, val address: String, val totalBalance: String, val totalAccount: Int)
+
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
+
+  var model: WalletDetailHeaderModel? by observing(null) {
+    model?.apply {
+
+      if (avatar.isNull()) currentAccount.avatar.glideImage(R.drawable.avatar)
+      else currentAccount.avatar.glideImage(avatar)
+
+      currentAccount.info.title.text = name
+      currentAccount.info.subtitle.text = address
+      balanceTitle.text = totalBalance
+      manageButton.text = (WalletText.manage + " ($totalAccount)").toUpperCase()
+    }
+  }
 
   val manageButton by lazy { RoundButtonWithIcon(context) }
   val addTokenButton by lazy { RoundBorderButton(context) }
@@ -47,11 +60,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
     layoutParams = RelativeLayout.LayoutParams(matchParent, 365.uiPX())
 
-    currentAccount
-      .apply {
-        currentAccount.avatar.glideImage("http://img3.imgtn.bdimg.com/it/u=2727319063,4252015704&fm=27&gp=0.jpg")
-      }
-      .into(this)
+    currentAccount.into(this)
     currentAccount.apply {
       setCenterInHorizontal()
       y += 30.uiPX()
@@ -63,7 +72,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
           textSize = 12.uiPX().toFloat()
           typeface = GoldStoneFont.black(context)
           textColor = Spectrum.white
-          text = "192456.82"
+          gravity = Gravity.CENTER_HORIZONTAL
         }
         .into(this)
 
@@ -80,7 +89,6 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
     manageButton
       .apply {
-        text = (WalletText.manage + " (5)").toUpperCase()
         y -= sectionHeaderHeight + 25.uiPX()
       }
       .into(this)

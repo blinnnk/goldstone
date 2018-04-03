@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
@@ -16,7 +17,6 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -45,6 +45,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
+
       attentionView
         .apply {
           text = CreateWalletText.attention
@@ -59,7 +60,6 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
       nameEditText
         .apply {
           text = CreateWalletText.name
-          hint = "My Wallet"
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 30.uiPX()
           }
@@ -103,6 +103,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
         }
         .click {
           presenter.generateWalletWith(
+            nameEditText,
             passwordEditText,
             repeatPasswordEditText,
             agreementView.radioButton.isChecked

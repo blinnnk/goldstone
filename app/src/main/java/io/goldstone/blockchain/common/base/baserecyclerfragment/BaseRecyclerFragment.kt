@@ -81,7 +81,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
   open fun setSlideUpAnimation() {
     // 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
-    if (isResumed) return
     setSlideUpWithCellHeight().let {
       it.isNull().isTrue {
         presenter.updateParentContentLayoutHeight()
@@ -137,6 +136,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         setRecyclerViewLayoutManager(recyclerView)
         addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
       }
+      presenter.updateData(asyncData)
     }.view
   }
 
@@ -146,6 +146,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
     // 监听 `RecyclerView` 滑动
     recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
       override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
         /** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
         super.onScrollStateChanged(recyclerView, newState)

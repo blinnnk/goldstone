@@ -1,69 +1,77 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+  compileSdkVersion 27
     defaultConfig {
-        applicationId "io.goldstone.blockchain"
-        minSdkVersion 21
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        kotlinOptions.allWarningsAsErrors = true
-        renderscriptSupportModeEnabled true
+      applicationId "io.goldstone.blockchain"
+      minSdkVersion 21
+      targetSdkVersion 27
+      versionCode 1
+      versionName "1.0"
+      testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+      kotlinOptions.allWarningsAsErrors = true
+      renderscriptSupportModeEnabled true
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     // Glide Image Loader
-    compile 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
     // Recycler View
-    compile 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
     // Anko
-    compile('org.jetbrains.anko:anko:0.10.4') {
+    implementation('org.jetbrains.anko:anko:0.10.4') {
         exclude group: 'com.google.android', module: 'android'
     }
     // 黑蜜动画及其他便捷工具依赖工程
-    compile 'com.blinnnk:honeyui:0.2.8.1'
+    implementation 'com.blinnnk:honeyui:0.2.8.1'
     // Glide Image Loader
-    compile 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
     // Crypto
-    compile 'org.ethereum:geth:1.8.2'
-    compile 'com.github.walleth.kethereum:functions:0.40'
-    compile 'com.github.walleth.kethereum:bip44:0.40'
-    compile 'com.github.walleth.kethereum:bip39:0.40'
-
+    implementation 'org.ethereum:geth:1.8.2'
+    implementation 'com.github.walleth.kethereum:functions:0.40'
+    implementation 'com.github.walleth.kethereum:bip44:0.40'
+    implementation 'com.github.walleth.kethereum:bip39:0.40'
     // BlurView
-    compile 'com.github.mmin18:realtimeblurview:1.1.0'
-
+    implementation 'com.github.mmin18:realtimeblurview:1.1.0'
     // Chart
-    compile 'com.diogobernardino:williamchart:2.5.0'
+    implementation 'com.diogobernardino:williamchart:2.5.0'
+    // Room Database
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
+    kapt "android.arch.persistence.room:compiler:1.0.0"
+    // OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
 }
 
 repositories {
-    mavenCentral()
-    kotlin { experimental { coroutines 'enable' } }
+  mavenCentral()
+  kotlin { experimental { coroutines 'enable' } }
 }
 
 kotlin {
-    experimental { coroutines "error" }
-    experimental { coroutines 'enable' }
+  experimental { coroutines "error" }
+  experimental { coroutines 'enable' }
 }
 
+//使用生成文件
+kapt {
+  generateStubs = true
+}

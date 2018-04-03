@@ -63,7 +63,8 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
   fun setSmallStyle() {
     title.textSize = 4.uiPX() + 1f
     subtitle.textSize = 3.uiPX() + 1f
-    subtitle.y -= 1.uiPX()
+    title.y += 1.uiPX()
+    subtitle.y -= 2.uiPX()
   }
 
   fun setWildStyle() {

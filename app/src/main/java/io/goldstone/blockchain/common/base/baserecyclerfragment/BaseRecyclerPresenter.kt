@@ -17,6 +17,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
   abstract val fragment: T
 
+  open fun updateData(asyncData: ArrayList<D>?) {
+    // Do Something
+  }
+
   /**
    * @description
    * 在依赖的 `Fragment` 的对应的生命周期提供的依赖方法
