@@ -5,9 +5,12 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment
@@ -23,6 +26,10 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
 class WalletSettingsPresenter(
   override val fragment: WalletSettingsFragment
 ) : BaseOverlayPresenter<WalletSettingsFragment>() {
+
+  override fun onFragmentViewCreated() {
+    showCurrentWalletInfo()
+  }
 
   fun showTargetFragmentByTitle(title: String) {
     when (title) {
@@ -90,6 +97,20 @@ class WalletSettingsPresenter(
       header.showBackButton(true) { showWalletSettingListFragment() }
       header.showCloseButton(false)
       contentLayout.updateHeightAnimation(contentHeight)
+    }
+  }
+
+  private fun showCurrentWalletInfo() {
+    WalletTable.getCurrentWalletInfo {
+      it?.apply {
+        fragment.header?.apply {
+          walletInfo.apply {
+            title.text = name
+            subtitle.text = address
+          }
+          avatarImage.glideImage(R.drawable.avatar)
+        }
+      }
     }
   }
 

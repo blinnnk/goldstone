@@ -1,13 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view
 
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable.Companion.insertBySymbol
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick

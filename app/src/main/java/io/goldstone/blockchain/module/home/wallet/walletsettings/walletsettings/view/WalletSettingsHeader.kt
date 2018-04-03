@@ -16,7 +16,6 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -31,14 +30,15 @@ import org.jetbrains.anko.textColor
 
 class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 
-  private val avatarImage = ImageView(context)
-  private val walletInfo = TwoLineTitles(context)
+  val walletInfo = TwoLineTitles(context)
+  val avatarImage = ImageView(context)
+
   private val copyButton = TextView(context)
 
   init {
     orientation = VERTICAL
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 80.uiPX(), matchParent).apply {
-      leftMargin = 40.uiPX()
+    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), matchParent).apply {
+      leftMargin = 50.uiPX()
       topMargin = 25.uiPX()
     }
 
@@ -46,7 +46,6 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 
     avatarImage
       .apply {
-        glideImage("http://img1.touxiang.cn/uploads/20121212/12-055756_227.png")
         layoutParams = LinearLayout.LayoutParams(70.uiPX(), 70.uiPX())
         addCorner(35.uiPX(), GrayScale.lightGray)
       }
@@ -55,8 +54,6 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
     walletInfo
       .apply {
         setBlackTitles()
-        title.text = "KaySaith"
-        subtitle.text = "0x98s9d789s9x8d7567567s756d57s7898as8a7658x87d678s876d678s87c68s"
         isCenter = true
         subtitle.gravity = Gravity.CENTER_HORIZONTAL
       }
@@ -70,9 +67,7 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
         typeface = GoldStoneFont.book(context)
         gravity = Gravity.CENTER_HORIZONTAL
         addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
-        onClick {
-          context.clickToCopy(walletInfo.subtitle.text.toString())
-        }
+        onClick { context.clickToCopy(walletInfo.getSubtitleValue()) }
       }
       .into(this)
 

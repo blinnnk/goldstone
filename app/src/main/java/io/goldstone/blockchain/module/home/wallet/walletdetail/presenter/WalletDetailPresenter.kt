@@ -27,7 +27,7 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
-    WalletTable.getCurrentWalletAddress {
+    WalletTable.getCurrentWalletInfo {
       it?.let { getAllTokensInWalletBy(it) }
     }
   }
@@ -36,9 +36,17 @@ class WalletDetailPresenter(
     WalletDetailCellModel.getModels(walletInfo.address) {
       fragment.context?.runOnUiThread {
         fragment.asyncData = it
-        val totalBalance = it.sumByDouble { it.balance }.toString()
+        val totalBalance = it.sumByDouble { it.balance }
+        // 计算完毕后同步给当前账户的 `model`
+        WalletTable.myBalance = totalBalance
         fragment.recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
-          model = WalletDetailHeaderModel(null, walletInfo.name, CryptoUtils.scaleAddress(walletInfo.address), totalBalance, 5)
+          model = WalletDetailHeaderModel(
+            null,
+            walletInfo.name,
+            CryptoUtils.scaleAddress(walletInfo.address),
+            totalBalance.toString(),
+            5
+          )
         }
       }
     }

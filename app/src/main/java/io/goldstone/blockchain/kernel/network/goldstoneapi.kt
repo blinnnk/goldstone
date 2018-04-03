@@ -52,6 +52,7 @@ object GoldStoneAPI {
         val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
         hold(gson.fromJson(jsonData, collectionType))
       }
+
     })
   }
 }

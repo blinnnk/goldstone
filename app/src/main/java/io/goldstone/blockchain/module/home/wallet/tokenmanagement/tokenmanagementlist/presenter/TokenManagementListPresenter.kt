@@ -28,7 +28,7 @@ class TokenManagementListPresenter(
       if (switch.isChecked) {
         // 如果选中状态那么把当前选中的数据插入到 `MyTokenTable` 中
         WalletTable.apply {
-          getCurrentWalletAddress {
+          getCurrentWalletInfo {
             MyTokenTable.insertBySymbol(getSymbol(), it?.address.orEmpty())
           }
         }

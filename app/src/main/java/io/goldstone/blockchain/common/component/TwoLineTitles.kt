@@ -72,4 +72,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
     subtitle.y += 5.uiPX()
   }
 
+  fun getSubtitleValue() = subtitle.text.toString()
+
 }

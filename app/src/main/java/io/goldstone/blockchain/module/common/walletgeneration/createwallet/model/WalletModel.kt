@@ -16,9 +16,13 @@ data class WalletTable(
   var id: Int,
   var name: String,
   var address: String,
-  var isUsing: Boolean
+  var isUsing: Boolean,
+  var balance: Double? = null
 ) {
   companion object {
+
+    var myBalance: Double? = null
+
     fun insert(model: WalletTable, callback: () -> Unit = {}) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().apply {
@@ -48,9 +52,11 @@ data class WalletTable(
       }
     }
 
-    fun getCurrentWalletAddress(hold: (WalletTable?) -> Unit) {
+    fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
       coroutinesTask({
-        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
+          balance =  myBalance
+        }
       }) {
         hold(it)
       }

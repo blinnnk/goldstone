@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.SymbolText
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
@@ -15,6 +17,22 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
 class  WalletSettingsListPresenter(
   override val fragment: WalletSettingsListFragment
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
+
+  override fun updateData(asyncData: ArrayList<WalletSettingsListModel>?) {
+    WalletTable.getCurrentWalletInfo {
+      val balanceText = it?.balance.toString() + SymbolText.usd
+      fragment.asyncData = arrayListOf(
+        WalletSettingsListModel("Check QR Code", ""),
+        WalletSettingsListModel("Balance", balanceText),
+        WalletSettingsListModel("Wallet Name", "${it?.name}"),
+        WalletSettingsListModel("Password Hint", "······"),
+        WalletSettingsListModel("Change Password"),
+        WalletSettingsListModel("Export Private Key"),
+        WalletSettingsListModel("Export Keystore"),
+        WalletSettingsListModel("Delete Wallet")
+      )
+    }
+  }
 
   fun showTargetFragment(title: String) {
     fragment.getParentFragment<WalletSettingsFragment>()?.apply {
