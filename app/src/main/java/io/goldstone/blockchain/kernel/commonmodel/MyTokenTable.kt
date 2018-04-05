@@ -50,15 +50,10 @@ data class MyTokenTable(
       coroutinesTask({
         GoldStoneDataBase.database.apply {
           // 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-          myTokenDao().getTokenBySymbol(symbol).let {
-            it.isNull().isTrue {
-              // 获取 `Symbol` 的 `ContractAddress`
-              val symbolToken = defaultTokenDao().getTokenBySymbol(symbol)
-              // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-              GoldStoneEthCall.getTokenBalanceWithContract(symbolToken.contract, ownerAddress) {
-                insert(MyTokenTable(0, ownerAddress, symbol, it))
-              }
-            }
+          myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull().isTrue {
+            // 获取 `Symbol` 的 `ContractAddress`
+            val symbolToken = defaultTokenDao().getTokenBySymbol(symbol)
+            getBalanceWithSymbol(symbol, symbolToken.contract, ownerAddress)
           }
         }
       }) {
@@ -66,6 +61,20 @@ data class MyTokenTable(
       }
     }
 
+    fun getBalanceWithSymbol(symbol: String, contractAddress: String, ownerAddress: String, callback: (balance: Double) -> Unit = {}) {
+      // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+      if (symbol == "ETH") {
+        GoldStoneEthCall.getEthBalance(ownerAddress) {
+          insert(MyTokenTable(0, ownerAddress, symbol, it))
+          callback(it)
+        }
+      } else {
+        GoldStoneEthCall.getTokenBalanceWithContract(contractAddress, ownerAddress) {
+          insert(MyTokenTable(0, ownerAddress, symbol, it))
+          callback(it)
+        }
+      }
+    }
   }
 }
 

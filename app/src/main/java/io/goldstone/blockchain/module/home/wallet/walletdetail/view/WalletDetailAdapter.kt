@@ -14,7 +14,7 @@ import org.jetbrains.anko.matchParent
  */
 
 class WalletDetailAdapter(
-  private var dataSet: ArrayList<WalletDetailCellModel>,
+  var dataSet: ArrayList<WalletDetailCellModel>,
   private val hold: WalletDetailAdapter.() -> Unit = {}
 ) : RecyclerView.Adapter<WalletDetailAdapter.ViewHolder>() {
 

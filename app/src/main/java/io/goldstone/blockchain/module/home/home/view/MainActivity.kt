@@ -6,6 +6,7 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import org.jetbrains.anko.relativeLayout
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
       id = ContainerID.main
       savedInstanceState.isNull {
         // 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-        addFragment<HomeFragment>(this.id)
+        addFragment<HomeFragment>(this.id, FragmentTag.home)
       }
     }.let {
       setContentView(it)

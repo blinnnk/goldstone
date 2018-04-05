@@ -36,6 +36,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   var asyncData: ArrayList<D>? by observing(null) {
     recyclerView.adapter.isNull().isTrue {
       setRecyclerViewAdapter(recyclerView, asyncData)
+    } otherwise {
+      System.out.println("what")
+      recyclerView.adapter.notifyDataSetChanged()
     }
     /** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
     setSlideUpAnimation()

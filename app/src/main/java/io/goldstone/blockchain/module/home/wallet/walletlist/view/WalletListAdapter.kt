@@ -10,13 +10,15 @@ import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListMod
  */
 
 class WalletListAdapter(
-  override val dataSet: ArrayList<WalletListModel>
+  override val dataSet: ArrayList<WalletListModel>,
+  private val callback: WalletListCell.() -> Unit
   ) : HoneyBaseAdapter<WalletListModel, WalletListCell>() {
 
   override fun generateCell(context: Context) = WalletListCell(context)
 
   override fun WalletListCell.bindCell(data: WalletListModel, position: Int) {
     model = data
+    callback(this)
   }
 
 }

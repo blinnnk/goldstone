@@ -16,7 +16,7 @@ fun String.toAscii(): String {
   val length: Int = hex.length
   rmd = length % 2
   if (rmd == 1)
-    hex = "0" + hex
+    hex = "0$hex"
 
   // split into two characters
   var i = 0

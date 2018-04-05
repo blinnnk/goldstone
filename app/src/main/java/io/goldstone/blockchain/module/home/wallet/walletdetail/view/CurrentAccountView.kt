@@ -48,6 +48,7 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
         setBlackTitles()
         setSmallStyle()
         x += 45.uiPX()
+        y += 2.uiPX()
       }
       .into(this)
 

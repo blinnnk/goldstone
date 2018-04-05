@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")
@@ -21,7 +22,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 
     info.apply {
       title.text = model.addressName
-      subtitle.text = model.address
+      subtitle.text = CryptoUtils.scaleTO16(model.address)
     }
 
     count.apply {

@@ -15,6 +15,7 @@ import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import com.blinnnk.uikit.ScreenSize
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import org.jetbrains.anko.*
@@ -28,6 +29,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
   private val privateKeyInput by lazy { WalletEditText(context!!) }
   private val passwordHintInput by lazy { RoundInput(context!!) }
+
+  private val nameInput by lazy { RoundInput(context!!) }
   private val passwordInput by lazy { RoundInput(context!!) }
   private val repeatPassword by lazy { RoundInput(context!!) }
   private val agreementView by lazy { AgreementView(context!!) }
@@ -38,21 +41,31 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
   override fun AnkoContext<Fragment>.initView() {
     scrollView {
       verticalLayout {
+
         privateKeyInput
           .apply {
             setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
           }
           .into(this)
 
-        passwordInput
+        nameInput
           .apply {
             setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+            text = CreateWalletText.name
+          }
+          .into(this)
+
+        passwordInput
+          .apply {
+            setPasswordInput()
+            setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
             text = CreateWalletText.password
           }
           .into(this)
 
         repeatPassword
           .apply {
+            setPasswordInput()
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
             text = CreateWalletText.repeatPassword
           }
@@ -71,6 +84,15 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
           .apply {
             text = CommonText.confirm.toUpperCase()
             setBlueStyle()
+          }
+          .click {
+            presenter.importWalletByPrivateKey(
+              privateKeyInput,
+              passwordInput,
+              repeatPassword,
+              agreementView.radioButton.isChecked,
+              nameInput
+            )
           }
           .into(this)
 

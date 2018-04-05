@@ -29,7 +29,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
       tokenInfo.title.text = symbol
       tokenInfo.subtitle.text = name
       valueInfo.title.text = balance.toString()
-      valueInfo.subtitle.text = "≈ " + (price * balance).toString() + SymbolText.usd
+      valueInfo.subtitle.text = "≈ " + currency + SymbolText.usd
     }
   }
 

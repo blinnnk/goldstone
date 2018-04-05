@@ -2,10 +2,15 @@
   <dictionary name="saithkay">
     <words>
       <w>blockchain</w>
+      <w>cipherparams</w>
+      <w>ciphertext</w>
+      <w>dklen</w>
       <w>ethereum</w>
       <w>goldstone</w>
       <w>gwei</w>
+      <w>kdfparams</w>
       <w>lateinit</w>
+      <w>qrcode</w>
       <w>ropstan</w>
       <w>wallettable</w>
     </words>

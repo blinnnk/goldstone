@@ -7,7 +7,6 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -70,5 +69,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
       isShow = false
     }
   }
-
 }
+
+
+

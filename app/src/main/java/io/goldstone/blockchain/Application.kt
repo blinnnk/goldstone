@@ -38,48 +38,50 @@ class GoldStoneApp : Application() {
 
   }
 
-}
+  companion object {
 
-fun updateLocalDefaultTokens(context: Context) {
+    fun updateLocalDefaultTokens(context: Context) {
 
-  // 准备默认的 `Token List`
-  GoldStoneAPI.getDefaultTokens { serverTokens ->
-    DefaultTokenTable.getTokens { localTokens ->
-      /** 如果本地的 `Tokens` 是空的则直接插入全部服务端获取的 `Default Tokens` */
-      localTokens.isEmpty().isTrue {
-        context.doAsync {
-          serverTokens.forEach {
-            GoldStoneDataBase.database.defaultTokenDao().insert(it)
-          }
-        }
-      } otherwise {
-        /** 如果本地的 `Tokens` 不是空的, 那么筛选出本地没有的插入到数据库 */
-        localTokens.forEach { localToken ->
-          serverTokens.find { it.symbol == localToken.symbol }?.let {
-            serverTokens.remove(it)
-          }
-        }
-
-        if (serverTokens.size > 0) {
-          context.doAsync {
-            serverTokens.forEach {
-              GoldStoneDataBase.database.defaultTokenDao().insert(it)
+      // 准备默认的 `Token List`
+      GoldStoneAPI.getDefaultTokens { serverTokens ->
+        DefaultTokenTable.getTokens { localTokens ->
+          /** 如果本地的 `Tokens` 是空的则直接插入全部服务端获取的 `Default Tokens` */
+          localTokens.isEmpty().isTrue {
+            context.doAsync {
+              serverTokens.forEach {
+                GoldStoneDataBase.database.defaultTokenDao().insert(it)
+              }
             }
-          }
-        }
+          } otherwise {
+            /** 如果本地的 `Tokens` 不是空的, 那么筛选出本地没有的插入到数据库 */
+            localTokens.forEach { localToken ->
+              serverTokens.find { it.symbol == localToken.symbol }?.let {
+                serverTokens.remove(it)
+              }
+            }
 
-        /** 筛选出服务器没有本地却有的 `Tokens` 从本地移除 */
-        serverTokens.forEach { serverToken ->
-          localTokens.find { it.symbol == serverToken.symbol }?.let {
-            localTokens.remove(it)
-          }
-        }
+            if (serverTokens.size > 0) {
+              context.doAsync {
+                serverTokens.forEach {
+                  GoldStoneDataBase.database.defaultTokenDao().insert(it)
+                }
+              }
+            }
 
-        if (localTokens.size > 0) {
-          context.doAsync {
-            localTokens.forEach {
-              it.isDefault = false
-              GoldStoneDataBase.database.defaultTokenDao().update(it)
+            /** 筛选出服务器没有本地却有的 `Tokens` 从本地移除 */
+            serverTokens.forEach { serverToken ->
+              localTokens.find { it.symbol == serverToken.symbol }?.let {
+                localTokens.remove(it)
+              }
+            }
+
+            if (localTokens.size > 0) {
+              context.doAsync {
+                localTokens.forEach {
+                  it.isDefault = false
+                  GoldStoneDataBase.database.defaultTokenDao().update(it)
+                }
+              }
             }
           }
         }

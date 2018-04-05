@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 
 import android.arch.persistence.room.*
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 
 /**
@@ -22,6 +23,7 @@ data class WalletTable(
   companion object {
 
     var myBalance: Double? = null
+    var walletCount: Int? = null
 
     fun insert(model: WalletTable, callback: () -> Unit = {}) {
       coroutinesTask({
@@ -36,11 +38,11 @@ data class WalletTable(
       }
     }
 
-    fun getAll(callback: List<WalletTable>.() -> Unit = {}) {
+    fun getAll(callback: ArrayList<WalletTable>.() -> Unit = {}) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().getAllWallets()
       }) {
-        callback(it)
+        callback(it.toArrayList())
       }
     }
 
@@ -61,6 +63,36 @@ data class WalletTable(
         hold(it)
       }
     }
+
+    fun updateName(newName: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let {
+            update(it.apply { name = newName })
+          }
+        }
+      }) {
+        callback()
+      }
+    }
+
+    fun switchCurrentWallet(walletAddress: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let {
+            update(it.apply { it.isUsing = false })
+          }
+          getWalletByAddress(walletAddress)?.let {
+            update(it.apply {
+              it.isUsing = true
+              balance =  myBalance
+            })
+          }
+        }
+      }) {
+        callback()
+      }
+    }
   }
 
 }
@@ -69,6 +101,9 @@ data class WalletTable(
 interface WalletDao {
   @Query("SELECT * FROM wallet WHERE isUsing LIKE :status")
   fun findWhichIsUsing(status: Boolean): WalletTable?
+
+  @Query("SELECT * FROM wallet WHERE address LIKE :walletAddress")
+  fun getWalletByAddress(walletAddress: String): WalletTable?
 
   @Query("SELECT * FROM wallet")
   fun getAllWallets(): List<WalletTable>

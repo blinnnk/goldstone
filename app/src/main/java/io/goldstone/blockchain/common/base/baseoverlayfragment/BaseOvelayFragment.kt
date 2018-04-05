@@ -126,6 +126,11 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
     presenter.onFragmentDetach()
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    presenter.onFragmentDestroy()
+  }
+
   override fun onResume() {
     super.onResume()
     presenter.onFragmentResume()

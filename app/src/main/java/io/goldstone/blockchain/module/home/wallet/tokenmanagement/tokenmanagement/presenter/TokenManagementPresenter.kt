@@ -1,12 +1,18 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.presenter
 
+import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**
  * @date 25/03/2018 2:46 AM
@@ -15,7 +21,16 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class TokenManagementPresenter(
   override val fragment: TokenManagementFragment
-  ) : BaseOverlayPresenter<TokenManagementFragment>() {
+) : BaseOverlayPresenter<TokenManagementFragment>() {
+
+  override fun onFragmentDestroy() {
+    (fragment.activity as? MainActivity)?.apply {
+      supportFragmentManager.findFragmentByTag(FragmentTag.home)
+        .findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
+          WalletTable.getCurrentWalletInfo { presenter.updateAllTokensInWalletBy(it!!) }
+        }
+    }
+  }
 
   fun showTokenManagementFragment() {
     fragment.apply {

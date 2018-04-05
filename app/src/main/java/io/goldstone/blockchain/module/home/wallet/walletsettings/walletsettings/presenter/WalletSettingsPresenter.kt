@@ -11,7 +11,9 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -35,6 +37,8 @@ class WalletSettingsPresenter(
     when (title) {
       WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
       WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
+      WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
+      WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
       WalletSettingsText.checkQRCode -> showQRCodeFragment()
       "" -> showWalletSettingListFragment()
     }
@@ -58,6 +62,24 @@ class WalletSettingsPresenter(
       }
 
       replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content) {
+        // Send Arguments
+      }
+    }
+  }
+
+  private fun showPrivateKeyExportFragment() {
+    fragment.apply {
+      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
+      replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
+        // Send Arguments
+      }
+    }
+  }
+
+  private fun showKeystoreExportFragment() {
+    fragment.apply {
+      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
+      replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
         // Send Arguments
       }
     }

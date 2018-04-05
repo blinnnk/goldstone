@@ -78,6 +78,10 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
     // Do Something
   }
 
+  open fun onFragmentDestroy() {
+    // Do Something
+  }
+
   open fun onFragmentResume() {
     // Do Something
   }

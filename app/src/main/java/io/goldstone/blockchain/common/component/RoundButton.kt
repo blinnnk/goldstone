@@ -8,13 +8,13 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.uikit.RippleMode
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
-import com.blinnnk.uikit.ScreenSize
 
 /**
  * @date 21/03/2018 11:00 PM
@@ -32,13 +32,15 @@ class RoundButton(context: Context) : View(context) {
   }
 
   private val textPaint = Paint()
-  private val textSize = 14.uiPX().toFloat()
+  private var textSize: Float by observing(0f) {
+    textPaint.textSize = textSize
+    invalidate()
+  }
 
   init {
 
     textPaint.isAntiAlias = true
     textPaint.style = Paint.Style.FILL
-    textPaint.textSize = textSize
     textPaint.typeface = GoldStoneFont.heavy(context)
 
   }
@@ -48,13 +50,16 @@ class RoundButton(context: Context) : View(context) {
     super.onDraw(canvas)
 
     val textX = (width - textPaint.measureText(text)) / 2
-    val textY = (height + textSize) / 2 - 3.uiPX()
+    val textY = (height + textSize) / 2 - 2.uiPX()
     canvas?.drawText(text, textX, textY, textPaint)
 
     canvas?.save()
   }
 
   fun setWhiteStyle() {
+
+    textSize = 14.uiPX().toFloat()
+
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
       topMargin = marginTop
       leftMargin = PaddingSize.device
@@ -66,6 +71,9 @@ class RoundButton(context: Context) : View(context) {
   }
 
   fun setGrayStyle() {
+
+    textSize = 14.uiPX().toFloat()
+
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
       topMargin = marginTop
       leftMargin = PaddingSize.device
@@ -77,12 +85,29 @@ class RoundButton(context: Context) : View(context) {
   }
 
   fun setBlueStyle() {
+
+    textSize = 14.uiPX().toFloat()
+
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
       topMargin = marginTop
       leftMargin = PaddingSize.device
     }
 
     addTouchRippleAnimation(Spectrum.blue, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
+    textPaint.color = Spectrum.white
+    invalidate()
+  }
+
+  fun setSmallButton(color: Int) {
+
+    textSize = 12.uiPX().toFloat()
+
+    layoutParams = LinearLayout.LayoutParams(75.uiPX(), 35.uiPX()).apply {
+      topMargin = marginTop
+      leftMargin = PaddingSize.device
+    }
+
+    addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
     textPaint.color = Spectrum.white
     invalidate()
   }

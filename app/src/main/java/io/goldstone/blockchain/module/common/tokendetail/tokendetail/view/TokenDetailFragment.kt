@@ -38,7 +38,6 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
     footer.apply {
       setAlignParentBottom()
       sendButton.onClick {
-        System.out.println("hello")
         presenter.showAddressSelectionFragment()
       }
     }

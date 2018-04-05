@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
-import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -11,6 +11,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notification.vie
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
@@ -28,25 +29,47 @@ class WalletDetailPresenter(
 
   override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
     WalletTable.getCurrentWalletInfo {
-      it?.let { getAllTokensInWalletBy(it) }
+      it?.let { updateAllTokensInWalletBy(it) }
     }
   }
 
-  private fun getAllTokensInWalletBy(walletInfo: WalletTable) {
-    WalletDetailCellModel.getModels(walletInfo.address) {
-      fragment.context?.runOnUiThread {
-        fragment.asyncData = it
-        val totalBalance = it.sumByDouble { it.balance }
-        // 计算完毕后同步给当前账户的 `model`
-        WalletTable.myBalance = totalBalance
-        fragment.recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
-          model = WalletDetailHeaderModel(
-            null,
-            walletInfo.name,
-            CryptoUtils.scaleAddress(walletInfo.address),
-            totalBalance.toString(),
-            5
-          )
+  fun updateAllTokensInWalletBy(walletInfo: WalletTable) {
+    // Check the count of local wallets
+    WalletTable.apply {
+      getAll { walletCount = size }
+    }
+    // heck the info of wallet currency list
+    WalletDetailCellModel.getModels(walletInfo.address) { newDataSet ->
+      fragment.apply {
+        context?.runOnUiThread {
+          asyncData.isNull().isTrue {
+            asyncData = newDataSet
+          } otherwise {
+            getAdapter<WalletDetailAdapter>()?.apply {
+              // Comparison the data, if they are different then update adapter
+              diffDataSetChanged(dataSet, newDataSet) {
+                it.isTrue {
+                  dataSet.clear()
+                  dataSet.addAll(newDataSet)
+                  notifyDataSetChanged()
+                }
+              }
+            }
+          }
+          val totalBalance = asyncData?.sumByDouble {
+            CryptoUtils.formatDouble(it.currency)
+          }
+          // Once the calculation is finished then update `WalletTable`
+          WalletTable.myBalance = totalBalance
+          recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
+            model = WalletDetailHeaderModel(
+              null,
+              walletInfo.name,
+              CryptoUtils.scaleAddress(walletInfo.address),
+              totalBalance.toString(),
+              WalletTable.walletCount.orZero()
+            )
+          }
         }
       }
     }
@@ -74,5 +97,18 @@ class WalletDetailPresenter(
 
   fun showMyTokenDetailFragment() {
     fragment.activity?.addFragment<TokenDetailOverlayFragment>(ContainerID.main)
+  }
+
+  private fun diffDataSetChanged(
+    oldData: ArrayList<WalletDetailCellModel> ,
+    newData: ArrayList<WalletDetailCellModel>,
+    hold: (Boolean) -> Unit
+  ){
+    if (oldData.size != newData.size) hold(true)
+    else {
+      oldData.forEach { data ->
+        hold( newData.firstOrNull { it.symbol == data.symbol }.isNull())
+      }
+    }
   }
 }

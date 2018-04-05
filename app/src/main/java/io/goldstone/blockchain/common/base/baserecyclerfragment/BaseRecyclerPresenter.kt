@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
+import android.support.v7.widget.RecyclerView
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.getScreenHeightWithoutStatusBar
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 
@@ -52,6 +54,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     // Do Something
   }
 
+  /** 获取依赖的 `Adapter` */
+  inline fun<reified T: RecyclerView.Adapter<*>> getAdapter() = fragment.recyclerView.adapter as? T
+
   /**
    * @description
    * 这个方法会在 [BaseRecyclerFragment] 中根据 `setSlideUpWithCellHeight` 的设定
@@ -62,9 +67,13 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     cellHeight: Int = 0,
     maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
   ) {
+    val actualHeight = dataCount * cellHeight
     val targetHeight =
-      if (dataCount == 0) fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-      else dataCount * cellHeight
+      when {
+        dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+        actualHeight > 250.uiPX() -> actualHeight
+        else -> 250.uiPX()
+      }
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
       overlayView.contentLayout.updateHeightAnimation(
         targetHeight,

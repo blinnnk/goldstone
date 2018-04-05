@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.common.utils
 
-import android.text.Editable
 import com.blinnnk.extension.isNull
 
 /**
@@ -36,7 +35,7 @@ enum class SafeLevel(val info: String) {
 }
 
 // 推荐使用的封装方式
-inline fun Editable.checkPasswordInRules(
+inline fun String.checkPasswordInRules(
   holdSafeLevel: (
     safeLevel: SafeLevel,
     reasons: UnsafeReasons
@@ -62,19 +61,19 @@ inline fun Editable.checkPasswordInRules(
   }
 }
 
-fun Editable.checkValueCountIsCorrect() = count() > SafeConditions.minCount
+fun String.checkValueCountIsCorrect() = count() > SafeConditions.minCount
 
-fun Editable.checkValueContainsIllegalChars() = any { char ->
+fun String.checkValueContainsIllegalChars() = any { char ->
   SafeConditions.illegalChars.contains(char.toString())
 }
 
-fun Editable.checkValueContainsNumberAndLetter() =
+fun String.checkValueContainsNumberAndLetter() =
   filterNot { it.toString().toIntOrNull().isNull() }.count() in 0 until length
 
-fun Editable.containsCapitalAndLowercase() =
+fun String.containsCapitalAndLowercase() =
   matches(SafeConditions.capitalRegex) && matches(SafeConditions.lowercaseRegex)
 
-fun Editable.containsTooMuchSameValue(): Boolean {
+fun String.containsTooMuchSameValue(): Boolean {
   val splitSameCharArray = arrayListOf<Char>()
   forEachIndexed { index, char ->
     if (index == 0) {
@@ -86,7 +85,7 @@ fun Editable.containsTooMuchSameValue(): Boolean {
   return count() - splitSameCharArray.count() >= SafeConditions.maxSameChars
 }
 
-fun Editable.checkSafeLevel(): SafeLevel {
+fun String.checkSafeLevel(): SafeLevel {
   /** 维护更多安全条件, 增加积分的计数来重新衡量安全度 */
   val countScore = if (count() > 8) 1 else 0
   val specialCharScore = if (matches(SafeConditions.highSafeChar)) 2 else 0

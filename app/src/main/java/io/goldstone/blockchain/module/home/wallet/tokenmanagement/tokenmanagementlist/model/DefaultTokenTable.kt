@@ -25,11 +25,27 @@ data class DefaultTokenTable(
   @SerializedName("force_show") var forceShow: Int,
   @SerializedName("price") var price: Double,
   @SerializedName("name") var name: String,
-  var decimal: String? = null,
+  @SerializedName("decimals") var decimals: Double,
   var totalSupply: String? = null,
-  var isUsed: Boolean = false,
-  var isDefault: Boolean = true
-) {
+  var isDefault: Boolean = true,
+  @Ignore
+  var isUsed: Boolean
+  ) {
+  /** 默认的 `constructor` */
+  constructor() : this(
+    0,
+    "",
+    "",
+    "",
+    0,
+    0.0,
+    "",
+    0.0,
+    "",
+    true,
+    false
+  )
+
   companion object {
 
     fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {

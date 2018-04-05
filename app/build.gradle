@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-platform-android'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -46,16 +47,17 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.6.1'
     // Crypto
     implementation 'org.ethereum:geth:1.8.2'
-    implementation 'com.github.walleth.kethereum:functions:0.40'
-    implementation 'com.github.walleth.kethereum:bip44:0.40'
     implementation 'com.github.walleth.kethereum:bip39:0.40'
+    implementation 'com.github.walleth.kethereum:base58:0.41'
+    implementation ('org.web3j:core:3.3.1-android')
+
     // BlurView
     implementation 'com.github.mmin18:realtimeblurview:1.1.0'
     // Chart
     implementation 'com.diogobernardino:williamchart:2.5.0'
     // Room Database
     implementation 'android.arch.persistence.room:runtime:1.0.0'
-    kapt "android.arch.persistence.room:compiler:1.0.0"
+    kapt 'android.arch.persistence.room:compiler:1.0.0'
     // OkHttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.google.code.gson:gson:2.8.2'
