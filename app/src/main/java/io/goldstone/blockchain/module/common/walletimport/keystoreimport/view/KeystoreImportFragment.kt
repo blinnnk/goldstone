@@ -11,6 +11,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -29,6 +30,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
   private val attentionView by lazy { AttentionTextView(context!!) }
   private val keystoreEditText by lazy { WalletEditText(context!!) }
+  private val nameInput by lazy { RoundInput(context!!) }
   private val passwordInput by lazy { RoundInput(context!!) }
   private val agreementView by lazy { AgreementView(context!!) }
   private val confirmButton by lazy { RoundButton(context!!) }
@@ -52,8 +54,16 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
         }
         .into(this)
 
+      nameInput
+        .apply {
+          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+          text = CreateWalletText.name
+        }
+        .into(this)
+
       passwordInput
         .apply {
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
           text = CreateWalletText.password
         }
@@ -70,6 +80,14 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
           setBlueStyle()
           text = CommonText.confirm.toUpperCase()
           y += 10.uiPX()
+        }
+        .click {
+          presenter.importKeystoreWallet(
+            keystoreEditText.text.toString(),
+            passwordInput,
+            nameInput,
+            agreementView.radioButton.isChecked
+          )
         }
         .into(this)
 

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter
 
+import android.support.v4.app.Fragment
 import android.widget.EditText
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
@@ -38,26 +39,31 @@ class PrivateKeyImportPresenter(
       repeatPasswordInput.text.toString(),
       isAgree
     ) { passwordValue, walletName ->
-      importWallet(privateKeyInput.text.toString(), passwordValue, walletName)
+      importWallet(privateKeyInput.text.toString(), passwordValue, walletName, fragment)
     }
   }
+  companion object {
 
-  private fun importWallet(privateKey: String, password: String, name: String) {
-    fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
-      address.isNull().isFalse {
-        coroutinesTask({
-          GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-            it.isNull().isFalse {
-              GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
+    /**
+     * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
+     * */
+    fun importWallet(privateKey: String, password: String, name: String, fragment: Fragment) {
+      fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
+        address.isNull().isFalse {
+          coroutinesTask({
+            GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
+              it.isNull().isFalse {
+                GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
+              }
+              WalletTable.insert(WalletTable(0, name, address!!, true))
+              CreateWalletPresenter.generateMyTokenInfo(address)
             }
-            WalletTable.insert(WalletTable(0, name, address!!, true))
-            CreateWalletPresenter.generateMyTokenInfo(address)
-          }
-        }) { fragment.activity?.jump<MainActivity>() }
-      } otherwise {
-        System.out.println("import failed $address")
+          }) { fragment.activity?.jump<MainActivity>() }
+        } otherwise {
+          System.out.println("import failed $address")
+        }
       }
     }
-  }
 
+  }
 }

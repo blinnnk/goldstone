@@ -76,13 +76,12 @@ fun Context.getWalletByPrivateKey(
   /** Format PrivateKey */
   val keyString =
     when {
-      privateKey.substring(0, 1) == "0" -> "0" + (currentPrivateKey.toString(16))
-      privateKey.length == 63 -> "0" + (currentPrivateKey.toString(16))
+      privateKey.substring(0, 1) == "0" -> "0" + currentPrivateKey.toString(16)
+      privateKey.length == 63 -> "0" + currentPrivateKey.toString(16)
       else -> currentPrivateKey.toString(16)
     }
-  val privateKeyByteArray = keyString.hexToByteArray()
   /** Import Private Key to Keystore */
-  keyStore.importECDSAKey(privateKeyByteArray, password)
+  keyStore.importECDSAKey(keyString.hexToByteArray(), password)
   hold(address)
 }
 

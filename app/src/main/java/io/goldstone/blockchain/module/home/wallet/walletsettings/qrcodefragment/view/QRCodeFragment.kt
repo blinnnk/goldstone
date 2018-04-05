@@ -10,12 +10,10 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import org.jetbrains.anko.AnkoContext
@@ -31,7 +29,7 @@ import org.jetbrains.anko.verticalLayout
 class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 
   val address by lazy { AttentionTextView(context!!) }
-  private val qrImage by lazy { ImageView(context) }
+  val qrImage by lazy { ImageView(context) }
   private val saveImageButton by lazy { RoundButton(context!!) }
   private val copyAddressButton by lazy { RoundButton(context!!) }
 
@@ -49,7 +47,6 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
               leftMargin = (ScreenSize.Width * 0.1).toInt()
             }
             scaleType = ImageView.ScaleType.CENTER_CROP
-            presenter.generateQRCode(this)
           }
           .into(this)
 
@@ -73,6 +70,9 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
             text = CommonText.saveToAlbum
             setBlueStyle()
             setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+          }
+          .click {
+            presenter.saveQRCodeImageToAlbum(address.text.toString())
           }
           .into(this)
       }.apply {
