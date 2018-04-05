@@ -18,6 +18,7 @@ data class WalletTable(
   var name: String,
   var address: String,
   var isUsing: Boolean,
+  var passwordHint: String? = null,
   var balance: Double? = null
 ) {
   companion object {
@@ -43,14 +44,6 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().getAllWallets()
       }) {
         callback(it.toArrayList())
-      }
-    }
-
-    fun getDataByIndex(index: Int, callback: WalletTable.() -> Unit = {}) {
-      coroutinesTask({
-        GoldStoneDataBase.database.walletDao().getAllWallets()
-      }) {
-        callback(it[index])
       }
     }
 
@@ -85,7 +78,6 @@ data class WalletTable(
           getWalletByAddress(walletAddress)?.let {
             update(it.apply {
               it.isUsing = true
-              balance =  myBalance
             })
           }
         }

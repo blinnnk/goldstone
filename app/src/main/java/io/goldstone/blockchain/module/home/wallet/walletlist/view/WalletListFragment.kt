@@ -21,7 +21,7 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
     asyncData?.let {
       recyclerView.adapter = WalletListAdapter(it) {
         onClick {
-          presenter.switchWalle(model.address)
+          presenter.switchWallet(model.address)
           preventDuplicateClicks()
         }
       }

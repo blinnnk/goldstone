@@ -8,6 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import org.jetbrains.anko.AnkoContext
@@ -35,6 +36,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
       oldPassword
         .apply {
           text = "Old Password"
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
         }
         .into(this)
@@ -42,6 +44,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
       newPassword
         .apply {
           text = "New Password"
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
         }
         .into(this)
@@ -49,6 +52,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
       repeatPassword
         .apply {
           text = "Repeat Password"
+          setPasswordInput()
           setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
         }
         .into(this)
@@ -65,6 +69,9 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
           text = CommonText.confirm
           setGrayStyle()
           setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+        }
+        .click {
+          presenter.updatePassword(oldPassword, newPassword, repeatPassword)
         }
         .into(this)
 

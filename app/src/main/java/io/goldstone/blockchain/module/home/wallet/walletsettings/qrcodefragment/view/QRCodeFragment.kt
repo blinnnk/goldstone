@@ -30,7 +30,7 @@ import org.jetbrains.anko.verticalLayout
 
 class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 
-  private val address by lazy { AttentionTextView(context!!) }
+  val address by lazy { AttentionTextView(context!!) }
   private val qrImage by lazy { ImageView(context) }
   private val saveImageButton by lazy { RoundButton(context!!) }
   private val copyAddressButton by lazy { RoundButton(context!!) }
@@ -44,18 +44,17 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
       verticalLayout {
         qrImage
           .apply {
-            val size = (ScreenSize.Width * 0.7).toInt()
+            val size = (ScreenSize.Width * 0.8).toInt()
             layoutParams = LinearLayout.LayoutParams(size, size).apply {
-              leftMargin = (ScreenSize.Width * 0.15).toInt()
+              leftMargin = (ScreenSize.Width * 0.1).toInt()
             }
             scaleType = ImageView.ScaleType.CENTER_CROP
-            glideImage(R.drawable.qrcode)
+            presenter.generateQRCode(this)
           }
           .into(this)
 
         address
           .apply {
-            text = "0x89d9s87d99sd879x98789d78979s7897d7979s786d678s876789d9s"
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
           }
           .into(this)

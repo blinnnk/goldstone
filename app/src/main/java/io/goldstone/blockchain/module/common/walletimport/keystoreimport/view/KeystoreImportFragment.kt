@@ -69,6 +69,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
         .apply {
           setBlueStyle()
           text = CommonText.confirm.toUpperCase()
+          y += 10.uiPX()
         }
         .into(this)
 

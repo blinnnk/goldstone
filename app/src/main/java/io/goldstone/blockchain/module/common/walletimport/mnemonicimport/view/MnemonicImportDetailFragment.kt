@@ -84,6 +84,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
           .apply {
             text = CommonText.confirm.toUpperCase()
             setBlueStyle()
+            y += 10.uiPX()
           }
           .click {
             presenter.importWalletByMnemonic(

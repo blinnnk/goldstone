@@ -37,7 +37,7 @@ class WalletListPresenter(
     }
   }
 
-  fun switchWalle(address: String) {
+  fun switchWallet(address: String) {
     WalletTable.switchCurrentWallet(address) {
       fragment.activity?.jump<MainActivity>()
     }

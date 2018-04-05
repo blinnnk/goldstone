@@ -34,7 +34,10 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
       nameInput
         .apply {
           text = WalletSettingsText.walletNameSettings
-          setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+          setMargins<LinearLayout.LayoutParams> {
+            topMargin = 40.uiPX()
+            bottomMargin = 30.uiPX()
+          }
           addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }

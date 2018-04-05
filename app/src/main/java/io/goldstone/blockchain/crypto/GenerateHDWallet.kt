@@ -74,7 +74,13 @@ fun Context.getWalletByPrivateKey(
   val publicKey = Keys.getAddress(publicKeyFromPrivate(currentPrivateKey))
   val address = "0x" + publicKey.toLowerCase()
   /** Format PrivateKey */
-  val privateKeyByteArray = currentPrivateKey.toString(16).hexToByteArray()
+  val keyString =
+    when {
+      privateKey.substring(0, 1) == "0" -> "0" + (currentPrivateKey.toString(16))
+      privateKey.length == 63 -> "0" + (currentPrivateKey.toString(16))
+      else -> currentPrivateKey.toString(16)
+    }
+  val privateKeyByteArray = keyString.hexToByteArray()
   /** Import Private Key to Keystore */
   keyStore.importECDSAKey(privateKeyByteArray, password)
   hold(address)
@@ -92,11 +98,34 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
   }
 }
 
-fun Context.getPrivateKey(walletAddress: String, password: String, hold: (ECKeyPair) -> Unit) {
+fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String) -> Unit) {
   getKeystoreFile(walletAddress, password) {
     Wallet.decrypt(
       password,
       DecryptKeystore.GenerateFile(it.convertKeystoreToModel())
-    ).let { hold(it) }
+    ).let { hold(it.privateKey.toString(16)) }
+  }
+}
+
+fun Context.deleteAccount(walletAddress: String, password: String, callback: () -> Unit) {
+  val keystoreFile by lazy { File(filesDir!!, "keystore") }
+  val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+  (0 until keyStore.accounts.size()).forEach { index ->
+    keyStore.accounts.get(index).address.hex.let {
+      it.equals(walletAddress, true).isTrue {
+        keyStore.deleteAccount(keyStore.accounts.get(index), password)
+        callback()
+      }
+    }
+  }
+}
+
+fun Context.updatePassword(walletAddress: String, oldPassword: String, newPassword: String, callback: () -> Unit) {
+  getPrivateKey(walletAddress, oldPassword) { privateKey ->
+    deleteAccount(walletAddress, oldPassword) {
+      getWalletByPrivateKey(privateKey, newPassword) {
+        callback()
+      }
+    }
   }
 }

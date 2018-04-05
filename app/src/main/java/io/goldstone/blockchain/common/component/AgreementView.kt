@@ -42,10 +42,10 @@ class AgreementView(context: Context) : RelativeLayout(context) {
     textView
       .apply {
         layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
-        text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 9.uiPX())
-        textSize = 3.uiPX().toFloat() + 1f
+        text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 10.uiPX())
+        textSize = 3.uiPX().toFloat() + 2f
         textColor = GrayScale.midGray
-        typeface = GoldStoneFont.book(context)
+        typeface = GoldStoneFont.medium(context)
         gravity = Gravity.CENTER
         x += 15.uiPX()
       }
@@ -60,7 +60,7 @@ class AgreementView(context: Context) : RelativeLayout(context) {
       .into(this)
 
     radioButton.x =
-      (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 15.uiPX()
+      (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 25.uiPX()
 
   }
 

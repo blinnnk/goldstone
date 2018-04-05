@@ -84,6 +84,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
           .apply {
             text = CommonText.confirm.toUpperCase()
             setBlueStyle()
+            y += 10.uiPX()
           }
           .click {
             presenter.importWalletByPrivateKey(
