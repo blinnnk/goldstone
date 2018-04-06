@@ -2,12 +2,19 @@ package io.goldstone.blockchain.module.home.wallet.walletlist.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isTrue
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")
@@ -34,12 +41,27 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
       glideImage(model.avatar)
     }
 
+    model.isWatchOnly.isTrue {
+      signalIcon.into(this)
+    }
+
     setValueStyle()
 
+  }
+
+  private val signalIcon by lazy {
+    RoundIcon(context)
+      .apply {
+        src = R.drawable.watch_only_icon
+        iconColor = Spectrum.darkBlue
+        iconSize = 20.uiPX()
+        y += 12.uiPX()
+      }
   }
 
   init {
     setGrayStyle()
   }
+
 
 }

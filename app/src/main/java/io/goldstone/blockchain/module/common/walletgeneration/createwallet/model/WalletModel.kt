@@ -1,11 +1,17 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 
 import android.arch.persistence.room.*
+import android.content.Context
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orFalse
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 
 /**
  * @date 29/03/2018 10:35 PM
@@ -20,6 +26,7 @@ data class WalletTable(
   var name: String,
   var address: String,
   var isUsing: Boolean,
+  var isWatchOnly: Boolean = false,
   var passwordHint: String? = null,
   var language: Int = HoneyLanguage.English.code,
   var balance: Double? = null
@@ -28,6 +35,7 @@ data class WalletTable(
 
     var myBalance: Double? = null
     var walletCount: Int? = null
+    var isWatchingWallet: Boolean? = null
 
     fun insert(model: WalletTable, callback: () -> Unit = {}) {
       coroutinesTask({
@@ -36,8 +44,9 @@ data class WalletTable(
             update(it.apply { isUsing = false })
           }
           insert(model)
-        }
+        }.findWhichIsUsing(true)
       }) {
+        isWatchingWallet = it?.isWatchOnly.orFalse()
         callback()
       }
     }
@@ -50,9 +59,9 @@ data class WalletTable(
       }
     }
 
-    fun getCurrentWalletInfo(hold: (WalletTable) -> Unit) {
+    fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
       coroutinesTask({
-        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)!!.apply {
+        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
           balance =  myBalance
         }
       }) {
@@ -84,20 +93,19 @@ data class WalletTable(
       }
     }
 
-    fun switchCurrentWallet(walletAddress: String, callback: () -> Unit) {
+    fun switchCurrentWallet(walletAddress: String, callback: (WalletTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let {
             update(it.apply { it.isUsing = false })
           }
           getWalletByAddress(walletAddress)?.let {
-            update(it.apply {
-              it.isUsing = true
-            })
+            update(it.apply { it.isUsing = true })
           }
-        }
+        }.findWhichIsUsing(true)
       }) {
-        callback()
+        isWatchingWallet = it?.isWatchOnly.orFalse()
+        callback(it)
       }
     }
 
@@ -115,8 +123,16 @@ data class WalletTable(
         callback()
       }
     }
-  }
 
+    fun isWatchOnlyWalletShowAlertOrElse(context: Context, callback: () -> Unit) {
+      isWatchingWallet?.isTrue {
+        context.alert(Appcompat, AlertText.watchOnly).show()
+        return
+      }
+      callback()
+    }
+
+  }
 }
 
 @Dao

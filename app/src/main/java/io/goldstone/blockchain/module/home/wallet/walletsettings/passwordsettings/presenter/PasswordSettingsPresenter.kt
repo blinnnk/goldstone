@@ -31,7 +31,7 @@ class PasswordSettingsPresenter(
     ) { password, _ ->
       WalletTable.getCurrentWalletInfo {
         fragment.context?.updatePassword(
-          it.address,
+          it!!.address,
           oldPasswordInput.text.toString(),
           password
         ) {

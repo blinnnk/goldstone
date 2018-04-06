@@ -2,8 +2,11 @@
 
 package io.goldstone.blockchain.common.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Paint
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -74,3 +77,11 @@ fun <T> Context.saveDataToSharedPreferences(key: String, data: T) {
 
 fun Context.getIntFromSharedPreferences(key: String): Int =
   getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).getInt(key, 100)
+
+inline fun<reified T: AppCompatActivity> Fragment.reboot() {
+  (activity as? T)?.apply {
+    System.out.println("baby")
+    finish()
+    startActivity(intent)
+  }
+}

@@ -69,18 +69,22 @@ class WalletSettingsPresenter(
 
   private fun showPrivateKeyExportFragment() {
     fragment.apply {
-      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
-      replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
-        // Send Arguments
+      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+        setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+        replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
+          // Send Arguments
+        }
       }
     }
   }
 
   private fun showKeystoreExportFragment() {
     fragment.apply {
-      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
-      replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
-        // Send Arguments
+      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+        setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+        replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
+          // Send Arguments
+        }
       }
     }
   }
@@ -105,9 +109,11 @@ class WalletSettingsPresenter(
 
   private fun showPasswordSettingsFragment() {
     fragment.apply {
-      setNormalHeaderWithHeight(420.uiPX())
-      replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content) {
-        // Send Arguments
+      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+        setNormalHeaderWithHeight(420.uiPX())
+        replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content) {
+          // Send Arguments
+        }
       }
     }
   }
@@ -126,7 +132,7 @@ class WalletSettingsPresenter(
     WalletTable.getCurrentWalletInfo {
       fragment.header?.apply {
         walletInfo.apply {
-          title.text = it.name
+          title.text = it!!.name
           subtitle.text = it.address
         }
         avatarImage.glideImage(R.drawable.avatar)

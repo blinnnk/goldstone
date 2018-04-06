@@ -27,7 +27,8 @@ class WalletListPresenter(
             wallet.name,
             wallet.address,
             wallet.balance.orElse(0.0),
-            R.drawable.avatar
+            R.drawable.avatar,
+            wallet.isWatchOnly
           )
         )
         if (index == lastIndex && walletList.size == size) {

@@ -22,7 +22,7 @@ class TokenManagementListPresenter(
     DefaultTokenTable.getTokens { defaultTokens ->
       WalletTable.getCurrentWalletInfo { currentWallet ->
         defaultTokens.forEachIndexed { index, defaultToken ->
-          MyTokenTable.getTokensWith(currentWallet.address) { myTokens ->
+          MyTokenTable.getTokensWith(currentWallet!!.address) { myTokens ->
             defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
             if (index == defaultTokens.lastIndex) fragment.asyncData = defaultTokens
           }
@@ -37,7 +37,7 @@ class TokenManagementListPresenter(
         // 如果选中状态那么把当前选中的数据插入到 `MyTokenTable` 中
         WalletTable.apply {
           getCurrentWalletInfo {
-            MyTokenTable.insertBySymbol(getSymbol(), it.address)
+            MyTokenTable.insertBySymbol(getSymbol(), it!!.address)
           }
         }
       } else {

@@ -30,7 +30,7 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
-    WalletTable.getCurrentWalletInfo { updateAllTokensInWalletBy(it) }
+    WalletTable.getCurrentWalletInfo { updateAllTokensInWalletBy(it!!) }
   }
 
   fun updateAllTokensInWalletBy(walletInfo: WalletTable) {

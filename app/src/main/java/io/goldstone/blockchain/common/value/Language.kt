@@ -200,6 +200,14 @@ object CommonText {
 
 }
 
+object AlertText {
+  @JvmField
+  val watchOnly = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Current wallet is watch only type, This kind of operation is not allowed."
+    else -> ""
+  }
+}
+
 object SymbolText {
 
   @JvmField

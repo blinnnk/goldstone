@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -42,7 +43,8 @@ class GoldStoneApp : Application() {
     * set and displaying the interface from the database.
     */
     WalletTable.getCurrentWalletInfo {
-      currentLanguage = it.language
+      currentLanguage = it?.language ?: HoneyLanguage.English.code
+      WalletTable.isWatchingWallet = it?.isWatchOnly
     }
 
   }

@@ -5,17 +5,19 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.blinnnk.extension.into
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import com.blinnnk.extension.into
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import org.jetbrains.anko.*
 
@@ -27,7 +29,9 @@ import org.jetbrains.anko.*
 class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
   private val attentionView by lazy { AttentionTextView(context!!) }
-  private val addressInput by lazy { RoundInput(context!!) }
+
+  private val nameInput by lazy { RoundInput(context!!) }
+  private val addressInput by lazy { WalletEditText(context!!) }
   private val confirmButton by lazy { RoundButton(context!!) }
 
   override val presenter =  WatchOnlyImportPresenter(this)
@@ -53,10 +57,17 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
         .into(this)
 
 
+      nameInput
+        .apply {
+          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+          text = CreateWalletText.name
+        }
+        .into(this)
+
       addressInput
         .apply {
           setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-          text = ImportWalletText.address
+          hint = "Enter Address That You Want to Watch"
         }
         .into(this)
 
@@ -65,6 +76,9 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
           marginTop = 20.uiPX()
           setBlueStyle()
           text = CommonText.startImporting.toUpperCase()
+        }
+        .click {
+          presenter.importWatchOnlyWallet(addressInput, nameInput)
         }
         .into(this)
 

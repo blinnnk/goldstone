@@ -56,6 +56,7 @@ class RoundInput(context: Context) : EditText(context) {
     textPaint.color = GrayScale.midGray
     textPaint.typeface = GoldStoneFont.heavy(context)
     textPaint.textSize = titleSize
+
     singleLine = true
 
     hintTextColor = GrayScale.lightGray
@@ -68,6 +69,7 @@ class RoundInput(context: Context) : EditText(context) {
     ).apply {
       leftMargin = PaddingSize.device
     }
+
     leftPadding = 35.uiPX()
     backgroundTintMode = PorterDuff.Mode.CLEAR
     textColor = GrayScale.black
@@ -103,6 +105,10 @@ class RoundInput(context: Context) : EditText(context) {
 
   fun setNumberInput() {
     inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+  }
+
+  fun setTextInput() {
+    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
   }
 
   fun setPasswordInput(show: Boolean = false) {

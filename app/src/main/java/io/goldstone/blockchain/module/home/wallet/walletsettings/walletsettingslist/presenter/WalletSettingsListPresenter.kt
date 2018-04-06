@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.text.InputType
 import android.widget.EditText
+import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
@@ -24,13 +25,13 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 
-class  WalletSettingsListPresenter(
+class WalletSettingsListPresenter(
   override val fragment: WalletSettingsListFragment
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletSettingsListModel>?) {
     WalletTable.getCurrentWalletInfo {
-      val balanceText = it.balance.toString() + SymbolText.usd
+      val balanceText = it!!.balance.toString() + SymbolText.usd
       fragment.asyncData = arrayListOf(
         WalletSettingsListModel(WalletSettingsText.checkQRCode),
         WalletSettingsListModel(WalletSettingsText.balance, balanceText),
@@ -59,25 +60,24 @@ class  WalletSettingsListPresenter(
     fragment.context?.apply {
       alert(
         WalletSettingsText.deleteInfoSubtitle,
-        WalletSettingsText.deleteInfoTitle) {
-
-        customView {
-          verticalLayout {
-            lparams {
-              padding = 20.uiPX()
-            }
-
-            input = editText {
-              inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-              hint = CommonText.enterPassword
-              hintTextColor = Spectrum.opacity1White
+        WalletSettingsText.deleteInfoTitle
+      ) {
+        WalletTable.isWatchingWallet?.isFalse {
+          customView {
+            verticalLayout {
+              lparams {
+                padding = 20.uiPX()
+              }
+              input = editText {
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                hint = CommonText.enterPassword
+                hintTextColor = Spectrum.opacity1White
+              }
             }
           }
         }
-        yesButton {
-          deleteWalletData(input?.text.toString())
-        }
-        noButton {  }
+        yesButton { deleteWalletData(input?.text.toString()) }
+        noButton { }
       }.show()
     }
   }
@@ -85,15 +85,33 @@ class  WalletSettingsListPresenter(
   private fun deleteWalletData(password: String) {
     // get current wallet address
     WalletTable.getCurrentWalletInfo {
-      // delete `keystore` file
-      fragment.context?.deleteAccount(it.address, password) {
-        // delete all records of this `address` in `myTokenTable`
-        MyTokenTable.deleteByAddress(it.address) {
-          // delete wallet record in `walletTable`
-          WalletTable.deleteCurrentWallet {
-            fragment.activity?.jump<SplashActivity>()
-          }
+      it?.apply {
+        if (isWatchOnly) {
+          deleteWatchOnlyWallet(address)
+        } else {
+          deleteRoutineWallet(address, password)
         }
+      }
+    }
+  }
+
+  private fun deleteRoutineWallet(address: String, password: String) {
+    // delete `keystore` file
+    fragment.context?.deleteAccount(address, password) {
+      // delete all records of this `address` in `myTokenTable`
+      MyTokenTable.deleteByAddress(address) {
+        // delete wallet record in `walletTable`
+        WalletTable.deleteCurrentWallet {
+          fragment.activity?.jump<SplashActivity>()
+        }
+      }
+    }
+  }
+
+  private fun deleteWatchOnlyWallet(address: String) {
+    MyTokenTable.deleteByAddress(address) {
+      WalletTable.deleteCurrentWallet {
+        fragment.activity?.jump<SplashActivity>()
       }
     }
   }

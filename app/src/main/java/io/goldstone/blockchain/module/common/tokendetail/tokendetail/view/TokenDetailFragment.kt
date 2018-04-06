@@ -37,9 +37,8 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
     footer.into(wrapper)
     footer.apply {
       setAlignParentBottom()
-      sendButton.onClick {
-        presenter.showAddressSelectionFragment()
-      }
+      sendButton.onClick { presenter.showAddressSelectionFragment() }
+      receivedButton.onClick { presenter.showDepositFragment() }
     }
 
     asyncData = arrayListOf(

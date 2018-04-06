@@ -27,7 +27,7 @@ class TokenManagementPresenter(
     (fragment.activity as? MainActivity)?.apply {
       supportFragmentManager.findFragmentByTag(FragmentTag.home)
         .findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-          WalletTable.getCurrentWalletInfo { presenter.updateAllTokensInWalletBy(it) }
+          WalletTable.getCurrentWalletInfo { presenter.updateAllTokensInWalletBy(it!!) }
         }
     }
   }

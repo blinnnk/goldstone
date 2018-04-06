@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 
@@ -24,11 +25,20 @@ class TokenDetailPresenter(
   ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
   fun showAddressSelectionFragment() {
-    shoTargetFragment<AddressSelectionFragment>(TokenDetailText.address)
+    WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
+      shoTargetFragment<AddressSelectionFragment>(TokenDetailText.address)
+    }
+
   }
 
   fun showTransactionDetailFragment() {
     shoTargetFragment<TransactionDetailFragment>(TransactionText.detail)
+  }
+
+  fun showDepositFragment() {
+    WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
+      //
+    }
   }
 
   private inline fun<reified T: Fragment> shoTargetFragment(title: String) {

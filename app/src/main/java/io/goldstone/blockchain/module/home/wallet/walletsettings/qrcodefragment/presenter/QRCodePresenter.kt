@@ -38,7 +38,7 @@ class QRCodePresenter(
 
   private fun getCurrentWalletAddress(hold: String.() -> Unit) {
     WalletTable.getCurrentWalletInfo {
-      hold(it.address)
+      hold(it!!.address)
     }
   }
 
