@@ -192,6 +192,12 @@ object CommonText {
     else -> "开始导入"
   }
 
+  @JvmField
+  val enterPassword = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Enter your password"
+    else -> "输入你的密码"
+  }
+
 }
 
 object SymbolText {
@@ -299,6 +305,18 @@ object WalletSettingsText {
   val delete = when (currentLanguage) {
     HoneyLanguage.English.code -> "Delete Wallet"
     else -> "删除钱包"
+  }
+
+  @JvmField
+  val deleteInfoTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Are you sure to delete current wallet?"
+    else -> ""
+  }
+
+  @JvmField
+  val deleteInfoSubtitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Before you delete your wallet please backup your wallet information, we never save your data, so we can't recovery this operation."
+    else -> ""
   }
 
 }

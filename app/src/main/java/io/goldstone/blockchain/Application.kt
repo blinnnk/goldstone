@@ -42,7 +42,7 @@ class GoldStoneApp : Application() {
     * set and displaying the interface from the database.
     */
     WalletTable.getCurrentWalletInfo {
-      it?.apply { currentLanguage = language }
+      currentLanguage = it.language
     }
 
   }

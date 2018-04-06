@@ -17,10 +17,8 @@ class KeystoreExportPresenter(
 
   fun getPrivateKeyByAddress(passwordInput: EditText, hold: String.() -> Unit) {
     WalletTable.getCurrentWalletInfo {
-      it?.apply {
-        fragment.context?.getKeystoreFile(address, passwordInput.text.toString()) {
-          hold(it)
-        }
+      fragment.context?.getKeystoreFile(it.address, passwordInput.text.toString()) {
+        hold(it)
       }
     }
   }

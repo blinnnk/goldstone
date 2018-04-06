@@ -46,6 +46,16 @@ data class MyTokenTable(
       }
     }
 
+    fun deleteByAddress(address: String, callback: () -> Unit = {}) {
+      coroutinesTask({
+        GoldStoneDataBase.database.myTokenDao().apply {
+          getTokensBy(address).forEach { delete(it) }
+        }
+      }) {
+        callback()
+      }
+    }
+
     fun insertBySymbol(symbol: String, ownerAddress: String, callback: () -> Unit = {}) {
       coroutinesTask({
         GoldStoneDataBase.database.apply {

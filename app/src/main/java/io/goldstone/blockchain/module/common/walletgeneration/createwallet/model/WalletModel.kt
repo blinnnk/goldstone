@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isTrue
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.HoneyLanguage
@@ -49,9 +50,9 @@ data class WalletTable(
       }
     }
 
-    fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
+    fun getCurrentWalletInfo(hold: (WalletTable) -> Unit) {
       coroutinesTask({
-        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
+        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)!!.apply {
           balance =  myBalance
         }
       }) {
@@ -99,6 +100,21 @@ data class WalletTable(
         callback()
       }
     }
+
+    fun deleteCurrentWallet(callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let { delete(it) }
+          getAllWallets().let {
+            it.isNotEmpty().isTrue {
+              update(it.first().apply { isUsing = true })
+            }
+          }
+        }
+      }) {
+        callback()
+      }
+    }
   }
 
 }
@@ -116,6 +132,9 @@ interface WalletDao {
 
   @Insert
   fun insert(wallet: WalletTable)
+
+  @Delete
+  fun delete(wallet: WalletTable)
 
   @Update
   fun update(wallet: WalletTable)

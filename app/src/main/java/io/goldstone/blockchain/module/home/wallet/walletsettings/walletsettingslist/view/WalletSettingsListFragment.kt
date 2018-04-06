@@ -5,6 +5,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter.WalletSettingsListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -21,7 +22,11 @@ class WalletSettingsListFragment : BaseRecyclerFragment<WalletSettingsListPresen
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?) {
     recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray()) {
       onClick {
-        presenter.showTargetFragment(model.title)
+        if(model.title == WalletSettingsText.delete) {
+          presenter.deleteWallet()
+        } else {
+          presenter.showTargetFragment(model.title)
+        }
         preventDuplicateClicks()
       }
     }

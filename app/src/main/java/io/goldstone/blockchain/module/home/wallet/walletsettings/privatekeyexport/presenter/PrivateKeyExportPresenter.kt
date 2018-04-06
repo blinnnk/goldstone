@@ -17,10 +17,8 @@ class PrivateKeyExportPresenter(
 
   fun getPrivateKeyByAddress(passwordInput: EditText, hold: String.() -> Unit) {
     WalletTable.getCurrentWalletInfo {
-      it?.apply {
-        fragment.context?.getPrivateKey(address, passwordInput.text.toString()) {
-          hold(it)
-        }
+      fragment.context?.getPrivateKey(it.address, passwordInput.text.toString()) {
+        hold(it)
       }
     }
   }
