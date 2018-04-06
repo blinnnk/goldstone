@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 
 /**
@@ -19,6 +20,7 @@ data class WalletTable(
   var address: String,
   var isUsing: Boolean,
   var passwordHint: String? = null,
+  var language: Int = HoneyLanguage.English.code,
   var balance: Double? = null
 ) {
   companion object {
@@ -62,6 +64,18 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let {
             update(it.apply { name = newName })
+          }
+        }
+      }) {
+        callback()
+      }
+    }
+
+    fun updateLanguage(code: Int, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let {
+            update(it.apply { language = code })
           }
         }
       }) {

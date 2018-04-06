@@ -10,7 +10,6 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.module.home.profile.currency.model.CurrencyModel
 import org.jetbrains.anko.textColor
 
 /**
@@ -20,7 +19,9 @@ import org.jetbrains.anko.textColor
 
 open class BaseRadioCell(context: Context) : BaseCell(context) {
 
-  protected var checkedStatus = false
+  var checkedStatus: Boolean by observing(false) {
+    radioButton.isChecked = checkedStatus
+  }
   protected val title = TextView(context)
 
   private val radioButton = HoneyRadioButton(context)
@@ -41,7 +42,6 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 
     this.addView(radioButton
       .apply {
-        isChecked = checkedStatus
         setColorStyle(GrayScale.midGray, Spectrum.green)
       })
 
@@ -56,6 +56,10 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 
   fun setSwitchStatus() {
     radioButton.isChecked = !radioButton.isChecked
+  }
+
+  fun setSwitchStatusBy(isSelected: Boolean) {
+    radioButton.isChecked = isSelected
   }
 
 }

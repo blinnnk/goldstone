@@ -10,7 +10,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -29,7 +30,7 @@ class MnemonicImportDetailPresenter(
     nameInput: EditText
     ) {
     mnemonicInput.text.isEmpty().isTrue {
-      fragment.context?.toast("mnemonic is not correct")
+      fragment.context?.alert(Appcompat, "mnemonic is not correct")?.show()
       return
     }
     CreateWalletPresenter.checkInputValue(

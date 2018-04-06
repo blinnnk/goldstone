@@ -77,4 +77,9 @@ open class RoundBorderButton(context: Context) : View(context) {
 
   }
 
+  fun setAdjustWidth() {
+    // 有些地方需要做自适应宽度的 `Button` 需要用这个工具来测量
+    layoutParams.width = textPaint.measureText(text).toInt() + 35.uiPX()
+  }
+
 }

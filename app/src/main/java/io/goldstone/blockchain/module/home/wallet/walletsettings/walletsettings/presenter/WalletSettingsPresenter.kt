@@ -40,7 +40,7 @@ class WalletSettingsPresenter(
       WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
       WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
       WalletSettingsText.checkQRCode -> showQRCodeFragment()
-      "" -> showWalletSettingListFragment()
+      WalletSettingsText.walletSettings -> showWalletSettingListFragment()
     }
   }
 

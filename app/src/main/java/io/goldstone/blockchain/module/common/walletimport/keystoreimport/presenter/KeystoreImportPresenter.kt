@@ -5,9 +5,12 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.crypto.convertKeystoreToModel
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.toast
 import org.web3j.crypto.Wallet
 
@@ -34,7 +37,7 @@ class KeystoreImportPresenter(
         )
       }
     } otherwise {
-      fragment.context?.toast("You must agree terms")
+      fragment.context?.alert(Appcompat, "You must agree terms")?.show()
     }
 
   }

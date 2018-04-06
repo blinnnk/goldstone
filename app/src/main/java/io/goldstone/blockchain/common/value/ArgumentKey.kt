@@ -6,6 +6,7 @@ package io.goldstone.blockchain.common.value
  */
 
 object ArgumentKey {
+  const val walletSettingsTitle = "walletSettingsTitle"
   const val profileTitle = "profileTitle"
   const val mnemonicCode = "mnemonicCode"
   const val walletAddress = "walletAddress"

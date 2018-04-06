@@ -20,6 +20,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vie
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.toast
 
 /**
@@ -115,12 +117,12 @@ class CreateWalletPresenter(
       ) {
 
       isAgree.isFalse {
-        GoldStoneAPI.context.toast(CreateWalletText.agreeRemind)
+        GoldStoneAPI.context.alert(Appcompat, CreateWalletText.agreeRemind).show()
         return
       }
 
       if (password != repeatPassword) {
-        GoldStoneAPI.context.toast(CreateWalletText.repeatPasswordRemind)
+        GoldStoneAPI.context.alert(Appcompat, CreateWalletText.repeatPasswordRemind).show()
         return
       }
 
@@ -130,7 +132,7 @@ class CreateWalletPresenter(
         if (reasons == UnsafeReasons.None) {
           callback(password, walletName)
         } else {
-          GoldStoneAPI.context.toast(reasons.info)
+          GoldStoneAPI.context.alert(Appcompat, reasons.info).show()
         }
       }
     }

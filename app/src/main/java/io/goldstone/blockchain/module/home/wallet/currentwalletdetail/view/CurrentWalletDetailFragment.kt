@@ -7,6 +7,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CurrentWalletText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -35,7 +36,7 @@ class CurrentWalletDetailFragment : BaseOverlayFragment<CurrentWalletDetailPrese
     createWalletButton
       .apply {
         setSmallButton(Spectrum.green)
-        text = "Create".toUpperCase()
+        text = CommonText.create.toUpperCase()
         y += 20.uiPX()
       }
       .click { presenter.showCreateWalletFragment() }

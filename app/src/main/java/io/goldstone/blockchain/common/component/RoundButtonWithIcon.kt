@@ -25,20 +25,22 @@ import org.jetbrains.anko.backgroundColor
 
 class RoundButtonWithIcon(context: Context) : View(context) {
 
-  var text by observing("") {
+  var text: String by observing("") {
+    // 按钮宽度跟随文字来自适应
+    layoutParams.width = textPaint.measureText(text).toInt() + 60.uiPX()
     invalidate()
   }
 
   private val viewHeight = 30.uiPX()
 
   init {
-    layoutParams = LinearLayout.LayoutParams(220.uiPX(), viewHeight)
+    layoutParams = LinearLayout.LayoutParams(0, viewHeight)
     backgroundColor = Color.WHITE
     addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square, viewHeight / 2f)
     elevation = ShadowSize.Button
   }
 
-  private val titleSize = 11.uiPX().toFloat()
+  private val titleSize = 12.uiPX().toFloat()
 
   private val textPaint = Paint().apply {
     isAntiAlias = true

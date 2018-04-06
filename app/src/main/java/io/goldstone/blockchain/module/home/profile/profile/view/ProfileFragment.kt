@@ -11,6 +11,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -48,18 +49,18 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
     wrapper.addView(slideHeader)
 
     asyncData = arrayListOf(
-      ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),
-      ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
-      ProfileModel(R.drawable.language_icon, "Language", "EN"),
-      ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),
-      ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
-      ProfileModel(R.drawable.language_icon, "Language", "EN"),
-      ProfileModel(R.drawable.contacts_icon, "About Us", "8"),
-      ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
-      ProfileModel(R.drawable.language_icon, "Language", "EN"),
-      ProfileModel(R.drawable.contacts_icon, "Contacts", "8"),
-      ProfileModel(R.drawable.currency_icon, "Currency Settings", "USD"),
-      ProfileModel(R.drawable.language_icon, "Language", "EN")
+      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
+      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
+      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
+      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
+      ProfileModel(R.drawable.contacts_icon, ProfileText.aboutUs, "8"),
+      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
+      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
+      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN")
     )
   }
 

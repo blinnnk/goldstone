@@ -98,7 +98,7 @@ class RoundInput(context: Context) : EditText(context) {
     )
     canvas?.drawRect(textBackground, backgroundPaint)
 
-    canvas?.drawText(text, 35.uiPX().toFloat(), 12.uiPX().toFloat(), textPaint)
+    canvas?.drawText(text, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
   }
 
   fun setNumberInput() {

@@ -31,7 +31,6 @@ class SplashActivity : AppCompatActivity() {
     hideStatusBar()
 
     presenter.hasAccountThenLogin()
-
     container.apply {
       savedInstanceState.isNull {
         // 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`

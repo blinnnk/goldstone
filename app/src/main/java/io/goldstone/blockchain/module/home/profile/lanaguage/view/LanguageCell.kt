@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.home.profile.lanaguage.view
 
 import android.content.Context
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRadioCell
+import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 
 /**
@@ -14,7 +17,7 @@ class LanguageCell(context: Context) : BaseRadioCell(context) {
 
   var model: LanguageModel by observing(LanguageModel()) {
     title.text = model.name
-    checkedStatus = model.isChecked
+    checkedStatus = GoldStoneApp.currentLanguage == HoneyLanguage.getLanguageCode(model.name)
   }
 
 }

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.presenter.WalletSettingsPresenter
 
 /**
@@ -13,11 +14,13 @@ class WalletSettingsFragment : BaseOverlayFragment<WalletSettingsPresenter>() {
 
   var header: WalletSettingsHeader? = null
 
+  private val titles by lazy { arguments?.getString(ArgumentKey.walletSettingsTitle) }
+
   override val presenter = WalletSettingsPresenter(this)
 
   override fun ViewGroup.initView() {
 
-    presenter.showTargetFragmentByTitle(headerTitle)
+    presenter.showTargetFragmentByTitle(titles ?: headerTitle)
 
   }
 

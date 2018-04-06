@@ -1,13 +1,17 @@
 package io.goldstone.blockchain
 
+import android.app.AlarmManager
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.common.value.setLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 
@@ -21,9 +25,6 @@ class GoldStoneApp : Application() {
   override fun onCreate() {
     super.onCreate()
 
-    // 根据系统语言国际化
-    setLanguage()
-
     // 创建数据库
     GoldStoneDataBase.initDatabase(this)
 
@@ -36,9 +37,30 @@ class GoldStoneApp : Application() {
     // 检查本地的默认 `Tokens`
     updateLocalDefaultTokens(this)
 
+    /*
+    * Querying the language type of the current account
+    * set and displaying the interface from the database.
+    */
+    WalletTable.getCurrentWalletInfo {
+      it?.apply { currentLanguage = language }
+    }
+
   }
 
   companion object {
+
+    var currentLanguage: Int? = null
+
+    fun reload(context: Context) {
+      val startActivity = Intent(context, SplashActivity::class.java)
+      val pendingIntentId = 123456
+      val pendingIntent = PendingIntent.getActivity(context, pendingIntentId, startActivity,
+        PendingIntent.FLAG_CANCEL_CURRENT
+      )
+      val service = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      service.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent)
+      System.exit(2)
+    }
 
     fun updateLocalDefaultTokens(context: Context) {
 

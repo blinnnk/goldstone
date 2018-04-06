@@ -11,7 +11,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -30,7 +31,7 @@ class PrivateKeyImportPresenter(
     nameInput: EditText
   ) {
     privateKeyInput.text.isEmpty().isTrue {
-      fragment.context?.toast("privateKey is not correct")
+      fragment.context?.alert(Appcompat, "privateKey is not correct")?.show()
       return
     }
     CreateWalletPresenter.checkInputValue(
@@ -46,7 +47,7 @@ class PrivateKeyImportPresenter(
 
     /**
      * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
-     * */
+     */
     fun importWallet(privateKey: String, password: String, name: String, fragment: Fragment) {
       fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
         address.isNull().isFalse {

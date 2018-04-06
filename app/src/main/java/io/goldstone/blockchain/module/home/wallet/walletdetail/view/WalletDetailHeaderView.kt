@@ -20,17 +20,20 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 4:21 PM
  * @author KaySaith
  */
 
-data class WalletDetailHeaderModel(val avatar: String?, val name: String, val address: String, val totalBalance: String, val totalAccount: Int)
+data class WalletDetailHeaderModel(
+  val avatar: String?,
+  val name: String,
+  val address: String,
+  val totalBalance: String,
+  val totalAccount: Int
+)
 
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
@@ -121,6 +124,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
     addTokenButton.apply {
       setAlignParentRight()
       setAlignParentBottom()
+      setAdjustWidth()
     }
 
   }

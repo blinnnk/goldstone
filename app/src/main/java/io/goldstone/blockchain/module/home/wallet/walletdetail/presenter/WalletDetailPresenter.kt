@@ -2,7 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -92,7 +94,9 @@ class WalletDetailPresenter(
   }
 
   fun showWalletSettingsFragment() {
-    fragment.activity?.addFragment<WalletSettingsFragment>(ContainerID.main)
+    fragment.activity?.addFragmentAndSetArguments<WalletSettingsFragment>(ContainerID.main) {
+      putString(ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings)
+    }
   }
 
   fun showMyTokenDetailFragment() {
