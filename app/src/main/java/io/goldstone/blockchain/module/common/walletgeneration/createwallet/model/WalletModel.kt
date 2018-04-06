@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import android.content.Context
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orFalse
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.AlertText
@@ -12,6 +13,8 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 29/03/2018 10:35 PM
@@ -110,17 +113,21 @@ data class WalletTable(
     }
 
     fun deleteCurrentWallet(callback: () -> Unit) {
-      coroutinesTask({
+      doAsync {
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let { delete(it) }
           getAllWallets().let {
-            it.isNotEmpty().isTrue {
+            it.isEmpty().isTrue {
+              GoldStoneAPI.context.runOnUiThread { callback() }
+            } otherwise {
               update(it.first().apply { isUsing = true })
+              GoldStoneAPI.context.runOnUiThread {
+                isWatchingWallet = it.first().isWatchOnly.orFalse()
+                callback()
+              }
             }
           }
         }
-      }) {
-        callback()
       }
     }
 

@@ -26,32 +26,36 @@ class GoldStoneApp : Application() {
   override fun onCreate() {
     super.onCreate()
 
-    // 创建数据库
+    // create and init database
     GoldStoneDataBase.initDatabase(this)
 
-    // 初始化加密查询的 `Context`
+    // init ethereum utils `Context`
     GoldStoneEthCall.context = this
 
-    // 初始化 `Api` 的上下文
+    // init `Api` context
     GoldStoneAPI.context = this
 
-    // 检查本地的默认 `Tokens`
+    // update local `Tokens` info list
     updateLocalDefaultTokens(this)
 
     /*
     * Querying the language type of the current account
     * set and displaying the interface from the database.
     */
-    WalletTable.getCurrentWalletInfo {
-      currentLanguage = it?.language ?: HoneyLanguage.English.code
-      WalletTable.isWatchingWallet = it?.isWatchOnly
-    }
+    initLaunchLanguage()
 
   }
 
   companion object {
 
     var currentLanguage: Int? = null
+
+    fun initLaunchLanguage() {
+      WalletTable.getCurrentWalletInfo {
+        currentLanguage = it?.language ?: HoneyLanguage.English.code
+        WalletTable.isWatchingWallet = it?.isWatchOnly
+      }
+    }
 
     fun reload(context: Context) {
       val startActivity = Intent(context, SplashActivity::class.java)
@@ -92,7 +96,7 @@ class GoldStoneApp : Application() {
               }
             }
 
-            /** 筛选出服务器没有本地却有的 `Tokens` 从本地移除 */
+            /** Filter `Tokens`  which doesn't exist in server but exist in local */
             serverTokens.forEach { serverToken ->
               localTokens.find { it.symbol == serverToken.symbol }?.let {
                 localTokens.remove(it)

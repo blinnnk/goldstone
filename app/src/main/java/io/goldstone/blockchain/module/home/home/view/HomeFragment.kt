@@ -35,6 +35,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
     relativeLayout {
 
       lparams(matchParent, matchParent)
+
       GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
 
       verticalLayout {

@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
@@ -109,6 +110,8 @@ fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String
 fun Context.deleteAccount(walletAddress: String, password: String, callback: () -> Unit) {
   val keystoreFile by lazy { File(filesDir!!, "keystore") }
   val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+  // If there is't account found then return
+  if (keyStore.accounts.size() == 0L) return
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
       it.equals(walletAddress, true).isTrue {

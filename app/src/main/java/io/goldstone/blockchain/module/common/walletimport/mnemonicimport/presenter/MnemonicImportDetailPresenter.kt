@@ -9,7 +9,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
-import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 
@@ -54,7 +54,7 @@ class MnemonicImportDetailPresenter(
             WalletTable.insert(WalletTable(0, name, address!!, true))
             CreateWalletPresenter.generateMyTokenInfo(address)
           }
-        }) { fragment.activity?.jump<MainActivity>() }
+        }) { fragment.activity?.jump<SplashActivity>() }
       } otherwise {
         System.out.println("import failed $address")
       }

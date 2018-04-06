@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")
@@ -37,13 +36,10 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
       subtitle.text = WalletText.totalAssets + SymbolText.usd
     }
 
-    icon.apply {
-      glideImage(model.avatar)
-    }
+    icon.apply { glideImage(model.avatar) }
 
-    model.isWatchOnly.isTrue {
-      signalIcon.into(this)
-    }
+    model.isWatchOnly.isTrue { signalIcon.into(this) }
+    model.isUsing.isTrue { currentIcon.into(this) }
 
     setValueStyle()
 
@@ -56,6 +52,17 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
         iconColor = Spectrum.darkBlue
         iconSize = 20.uiPX()
         y += 12.uiPX()
+      }
+  }
+
+  private val currentIcon by lazy {
+    RoundIcon(context)
+      .apply {
+        src = R.drawable.current_icon
+        iconColor = Spectrum.green
+        iconSize = 20.uiPX()
+        y += 45.uiPX()
+        x += 32.uiPX()
       }
   }
 

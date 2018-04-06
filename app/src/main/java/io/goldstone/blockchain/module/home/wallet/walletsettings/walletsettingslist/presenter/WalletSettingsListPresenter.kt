@@ -111,6 +111,7 @@ class WalletSettingsListPresenter(
   private fun deleteWatchOnlyWallet(address: String) {
     MyTokenTable.deleteByAddress(address) {
       WalletTable.deleteCurrentWallet {
+        System.out.println("hello 2")
         fragment.activity?.jump<SplashActivity>()
       }
     }

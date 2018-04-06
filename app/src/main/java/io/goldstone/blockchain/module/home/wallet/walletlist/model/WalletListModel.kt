@@ -12,5 +12,6 @@ data class WalletListModel(
   val address: String = "",
   val count: Double = 0.0,
   val avatar: Int = R.drawable.avatar,
-  val isWatchOnly: Boolean = false
+  val isWatchOnly: Boolean = false,
+  val isUsing: Boolean = false
 )

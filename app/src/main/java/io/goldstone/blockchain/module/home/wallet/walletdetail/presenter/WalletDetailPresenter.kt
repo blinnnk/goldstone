@@ -30,15 +30,15 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
-    WalletTable.getCurrentWalletInfo { updateAllTokensInWalletBy(it!!) }
+    WalletTable.getCurrentWalletInfo {
+      updateAllTokensInWalletBy(it!!)
+    }
   }
 
   fun updateAllTokensInWalletBy(walletInfo: WalletTable) {
     // Check the count of local wallets
-    WalletTable.apply {
-      getAll { walletCount = size }
-    }
-    // heck the info of wallet currency list
+    WalletTable.apply { getAll { walletCount = size } }
+    // Check the info of wallet currency list
     WalletDetailCellModel.getModels(walletInfo.address) { newDataSet ->
       fragment.apply {
         context?.runOnUiThread {

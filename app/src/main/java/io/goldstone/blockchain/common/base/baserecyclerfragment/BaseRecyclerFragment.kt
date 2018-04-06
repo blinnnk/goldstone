@@ -34,11 +34,12 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
    * asyncData 赋值来达到 `RecyclerView` 更新数据的效果.
    */
   var asyncData: ArrayList<D>? by observing(null) {
-    recyclerView.adapter.isNull().isTrue {
-      setRecyclerViewAdapter(recyclerView, asyncData)
-    } otherwise {
-      System.out.println("what")
-      recyclerView.adapter.notifyDataSetChanged()
+    recyclerView.adapter.apply {
+      isNull().isTrue {
+        setRecyclerViewAdapter(recyclerView, asyncData)
+      } otherwise {
+       notifyDataSetChanged()
+      }
     }
     /** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
     setSlideUpAnimation()
@@ -139,7 +140,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         setRecyclerViewLayoutManager(recyclerView)
         addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
       }
-      presenter.updateData(asyncData)
     }.view
   }
 
@@ -163,6 +163,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         observingRecyclerViewHorizontalOffset(recyclerView?.computeHorizontalScrollOffset().orZero())
       }
     })
+
+    presenter.updateData(asyncData)
   }
 
   override fun onHiddenChanged(hidden: Boolean) {
