@@ -29,6 +29,8 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 
   init {
 
+    isClickable = true
+
     layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 
     updateColorAnimation(GrayScale.Opacity1Black, GrayScale.Opacity5Black)
