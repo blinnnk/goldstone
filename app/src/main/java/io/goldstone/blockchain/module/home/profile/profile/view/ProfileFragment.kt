@@ -51,7 +51,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
     asyncData = arrayListOf(
       ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
       ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
-      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
+      ProfileModel(R.drawable.language_icon, ProfileText.language, presenter.getCurrentLanguageSymbol()),
       ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
       ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
       ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),

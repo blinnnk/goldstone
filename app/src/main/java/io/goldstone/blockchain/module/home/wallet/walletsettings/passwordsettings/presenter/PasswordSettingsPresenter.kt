@@ -29,14 +29,12 @@ class PasswordSettingsPresenter(
       repeatPasswordInput.text.toString(),
       true
     ) { password, _ ->
-      WalletTable.getCurrentWalletInfo {
-        fragment.context?.updatePassword(
-          it!!.address,
-          oldPasswordInput.text.toString(),
-          password
-        ) {
-          fragment.context?.toast("Revise the password successfully")
-        }
+      fragment.context?.updatePassword(
+        WalletTable.currentWallet.address,
+        oldPasswordInput.text.toString(),
+        password
+      ) {
+        fragment.context?.toast("Revise the password successfully")
       }
     }
   }

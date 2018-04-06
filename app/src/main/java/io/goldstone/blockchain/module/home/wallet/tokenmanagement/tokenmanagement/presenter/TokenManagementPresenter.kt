@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -24,10 +24,10 @@ class TokenManagementPresenter(
 ) : BaseOverlayPresenter<TokenManagementFragment>() {
 
   override fun onFragmentDestroy() {
-    (fragment.activity as? MainActivity)?.apply {
+    fragment.getMainActivity()?.apply {
       supportFragmentManager.findFragmentByTag(FragmentTag.home)
         .findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-          WalletTable.getCurrentWalletInfo { presenter.updateAllTokensInWalletBy(it!!) }
+          presenter.updateAllTokensInWalletBy()
         }
     }
   }

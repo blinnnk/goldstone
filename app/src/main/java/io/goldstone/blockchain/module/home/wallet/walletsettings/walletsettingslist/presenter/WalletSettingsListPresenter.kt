@@ -30,19 +30,17 @@ class WalletSettingsListPresenter(
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletSettingsListModel>?) {
-    WalletTable.getCurrentWalletInfo {
-      val balanceText = it!!.balance.toString() + SymbolText.usd
-      fragment.asyncData = arrayListOf(
-        WalletSettingsListModel(WalletSettingsText.checkQRCode),
-        WalletSettingsListModel(WalletSettingsText.balance, balanceText),
-        WalletSettingsListModel(WalletSettingsText.walletName, it.name),
-        WalletSettingsListModel(WalletSettingsText.hint, "······"),
-        WalletSettingsListModel(WalletSettingsText.passwordSettings),
-        WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
-        WalletSettingsListModel(WalletSettingsText.exportKeystore),
-        WalletSettingsListModel(WalletSettingsText.delete)
-      )
-    }
+    val balanceText = WalletTable.currentWallet.balance.toString() + SymbolText.usd
+    fragment.asyncData = arrayListOf(
+      WalletSettingsListModel(WalletSettingsText.checkQRCode),
+      WalletSettingsListModel(WalletSettingsText.balance, balanceText),
+      WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.currentWallet.name),
+      WalletSettingsListModel(WalletSettingsText.hint, "······"),
+      WalletSettingsListModel(WalletSettingsText.passwordSettings),
+      WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
+      WalletSettingsListModel(WalletSettingsText.exportKeystore),
+      WalletSettingsListModel(WalletSettingsText.delete)
+    )
   }
 
   fun showTargetFragment(title: String) {
@@ -62,7 +60,7 @@ class WalletSettingsListPresenter(
         WalletSettingsText.deleteInfoSubtitle,
         WalletSettingsText.deleteInfoTitle
       ) {
-        WalletTable.isWatchingWallet?.isFalse {
+        WalletTable.currentWallet.isWatchOnly.isFalse {
           customView {
             verticalLayout {
               lparams {
@@ -84,13 +82,11 @@ class WalletSettingsListPresenter(
 
   private fun deleteWalletData(password: String) {
     // get current wallet address
-    WalletTable.getCurrentWalletInfo {
-      it?.apply {
-        if (isWatchOnly) {
-          deleteWatchOnlyWallet(address)
-        } else {
-          deleteRoutineWallet(address, password)
-        }
+    WalletTable.currentWallet.apply {
+      if (isWatchOnly) {
+        deleteWatchOnlyWallet(address)
+      } else {
+        deleteRoutineWallet(address, password)
       }
     }
   }
@@ -111,7 +107,6 @@ class WalletSettingsListPresenter(
   private fun deleteWatchOnlyWallet(address: String) {
     MyTokenTable.deleteByAddress(address) {
       WalletTable.deleteCurrentWallet {
-        System.out.println("hello 2")
         fragment.activity?.jump<SplashActivity>()
       }
     }

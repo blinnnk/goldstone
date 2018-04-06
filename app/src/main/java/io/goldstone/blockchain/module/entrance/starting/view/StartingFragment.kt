@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.entrance.starting.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyUIUtils
@@ -11,7 +10,6 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.LoadingOverlayView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click

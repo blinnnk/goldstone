@@ -2,11 +2,14 @@ package io.goldstone.blockchain.module.home.profile.profile.presenter
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileCell
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
@@ -39,5 +42,8 @@ class ProfilePresenter(
       }
     }
   }
+
+  fun getCurrentLanguageSymbol() =
+    HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero())
 
 }

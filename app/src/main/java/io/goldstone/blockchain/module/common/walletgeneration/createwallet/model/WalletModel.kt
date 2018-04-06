@@ -36,9 +36,8 @@ data class WalletTable(
 ) {
   companion object {
 
-    var myBalance: Double? = null
+    var currentWallet: WalletTable = WalletTable(0, "", "", false)
     var walletCount: Int? = null
-    var isWatchingWallet: Boolean? = null
 
     fun insert(model: WalletTable, callback: () -> Unit = {}) {
       coroutinesTask({
@@ -49,7 +48,7 @@ data class WalletTable(
           insert(model)
         }.findWhichIsUsing(true)
       }) {
-        isWatchingWallet = it?.isWatchOnly.orFalse()
+        currentWallet.isWatchOnly = it?.isWatchOnly.orFalse()
         callback()
       }
     }
@@ -65,7 +64,7 @@ data class WalletTable(
     fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-          balance =  myBalance
+          balance =  currentWallet.balance
         }
       }) {
         hold(it)
@@ -107,7 +106,8 @@ data class WalletTable(
           }
         }.findWhichIsUsing(true)
       }) {
-        isWatchingWallet = it?.isWatchOnly.orFalse()
+        currentWallet.isWatchOnly = it?.isWatchOnly.orFalse()
+        currentWallet.address = it?.address!!
         callback(it)
       }
     }
@@ -122,7 +122,7 @@ data class WalletTable(
             } otherwise {
               update(it.first().apply { isUsing = true })
               GoldStoneAPI.context.runOnUiThread {
-                isWatchingWallet = it.first().isWatchOnly.orFalse()
+                currentWallet.isWatchOnly = it.first().isWatchOnly.orFalse()
                 callback()
               }
             }
@@ -132,7 +132,7 @@ data class WalletTable(
     }
 
     fun isWatchOnlyWalletShowAlertOrElse(context: Context, callback: () -> Unit) {
-      isWatchingWallet?.isTrue {
+      currentWallet.isWatchOnly.isTrue {
         context.alert(Appcompat, AlertText.watchOnly).show()
         return
       }

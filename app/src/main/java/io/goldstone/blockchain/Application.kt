@@ -5,6 +5,7 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.value.HoneyLanguage
@@ -14,8 +15,10 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.configuration
 import org.jetbrains.anko.doAsync
 
+@Suppress("DEPRECATION")
 /**
  * @date 22/03/2018 3:02 PM
  * @author KaySaith
@@ -50,10 +53,14 @@ class GoldStoneApp : Application() {
 
     var currentLanguage: Int? = null
 
-    fun initLaunchLanguage() {
+    fun Application.initLaunchLanguage() {
       WalletTable.getCurrentWalletInfo {
-        currentLanguage = it?.language ?: HoneyLanguage.English.code
-        WalletTable.isWatchingWallet = it?.isWatchOnly
+        it.isNull().isTrue {
+          currentLanguage = HoneyLanguage.getLanguageCode(configuration.locale.displayLanguage)
+        } otherwise {
+          currentLanguage = it!!.language
+          WalletTable.currentWallet = it
+        }
       }
     }
 

@@ -30,16 +30,15 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
-    WalletTable.getCurrentWalletInfo {
-      updateAllTokensInWalletBy(it!!)
-    }
+    updateAllTokensInWalletBy()
   }
 
-  fun updateAllTokensInWalletBy(walletInfo: WalletTable) {
+  fun updateAllTokensInWalletBy() {
+    val wallet = WalletTable.currentWallet
     // Check the count of local wallets
     WalletTable.apply { getAll { walletCount = size } }
     // Check the info of wallet currency list
-    WalletDetailCellModel.getModels(walletInfo.address) { newDataSet ->
+    WalletDetailCellModel.getModels(wallet.address) { newDataSet ->
       fragment.apply {
         context?.runOnUiThread {
           asyncData.isNull().isTrue {
@@ -60,12 +59,12 @@ class WalletDetailPresenter(
             CryptoUtils.formatDouble(it.currency)
           }
           // Once the calculation is finished then update `WalletTable`
-          WalletTable.myBalance = totalBalance
+          WalletTable.currentWallet.balance = totalBalance
           recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
             model = WalletDetailHeaderModel(
               null,
-              walletInfo.name,
-              CryptoUtils.scaleAddress(walletInfo.address),
+              wallet.name,
+              CryptoUtils.scaleAddress(wallet.address),
               totalBalance.toString(),
               WalletTable.walletCount.orZero()
             )

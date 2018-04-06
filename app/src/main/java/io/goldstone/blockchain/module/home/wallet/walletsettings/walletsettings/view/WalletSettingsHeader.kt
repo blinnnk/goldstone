@@ -69,7 +69,6 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
         addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
         onClick {
           context.clickToCopy(walletInfo.getSubtitleValue())
-          System.out.println(walletInfo.getSubtitleValue())
         }
       }
       .into(this)

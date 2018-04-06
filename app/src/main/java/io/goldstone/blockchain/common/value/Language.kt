@@ -378,13 +378,24 @@ enum class HoneyLanguage(val code: Int, val language: String) {
 
   companion object {
     fun getLanguageCode(language: String): Int {
-      return when(language) {
+      return when (language) {
         HoneyLanguage.English.language -> HoneyLanguage.English.code
         HoneyLanguage.Chinese.language -> HoneyLanguage.Chinese.code
         HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
         HoneyLanguage.Russian.language -> HoneyLanguage.Russian.code
         HoneyLanguage.Korean.language -> HoneyLanguage.Korean.code
         else -> 100
+      }
+    }
+
+    fun getLanguageSymbol(code: Int): String {
+      return when (code) {
+        HoneyLanguage.English.code -> "EN"
+        HoneyLanguage.Chinese.code -> "CN"
+        HoneyLanguage.Japanese.code -> "JP"
+        HoneyLanguage.Russian.code -> "RU"
+        HoneyLanguage.Korean.code -> "KR"
+        else -> ""
       }
     }
   }

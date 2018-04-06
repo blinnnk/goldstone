@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -20,27 +21,26 @@ class TokenManagementListPresenter(
 
   override fun updateData(asyncData: ArrayList<DefaultTokenTable>?) {
     DefaultTokenTable.getTokens { defaultTokens ->
-      WalletTable.getCurrentWalletInfo { currentWallet ->
-        defaultTokens.forEachIndexed { index, defaultToken ->
-          MyTokenTable.getTokensWith(currentWallet!!.address) { myTokens ->
-            defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
-            if (index == defaultTokens.lastIndex) fragment.asyncData = defaultTokens
-          }
+      defaultTokens.forEachIndexed { index, defaultToken ->
+        val address = WalletTable.currentWallet.address
+        MyTokenTable.getTokensWith(address) { myTokens ->
+          defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
+          if (index == defaultTokens.lastIndex) fragment.asyncData = defaultTokens
         }
       }
     }
   }
 
   fun updateMyTokensInfoBy(cell: TokenManagementListCell) {
+    fragment.getMainActivity()?.showLoadingView()
     cell.apply {
       if (switch.isChecked) {
         // 如果选中状态那么把当前选中的数据插入到 `MyTokenTable` 中
-        WalletTable.apply {
-          getCurrentWalletInfo {
-            MyTokenTable.insertBySymbol(getSymbol(), it!!.address)
-          }
+        MyTokenTable.insertBySymbol(getSymbol(), WalletTable.currentWallet.address) {
+          fragment.getMainActivity()?.removeLoadingView()
         }
       } else {
+        fragment.getMainActivity()?.removeLoadingView()
         // 如果是关闭选中那么就在 `MyTokenTable` 中删除这条数据
         MyTokenTable.deleteBySymbol(getSymbol())
       }

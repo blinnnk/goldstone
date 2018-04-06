@@ -2,12 +2,12 @@
 
 package io.goldstone.blockchain.common.utils
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Paint
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -80,8 +80,9 @@ fun Context.getIntFromSharedPreferences(key: String): Int =
 
 inline fun<reified T: AppCompatActivity> Fragment.reboot() {
   (activity as? T)?.apply {
-    System.out.println("baby")
     finish()
     startActivity(intent)
   }
 }
+
+fun Fragment.getMainActivity() = activity as? MainActivity

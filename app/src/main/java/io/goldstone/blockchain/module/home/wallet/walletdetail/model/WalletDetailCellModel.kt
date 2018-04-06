@@ -44,9 +44,7 @@ data class WalletDetailCellModel(
               it.price,
               CryptoUtils.formatDouble(count * it.price)
             ))
-            if (index == allTokens.lastIndex) {
-              hold(tokenList)
-            }
+            if (index == allTokens.lastIndex) { hold(tokenList) }
           }
         }
       }
