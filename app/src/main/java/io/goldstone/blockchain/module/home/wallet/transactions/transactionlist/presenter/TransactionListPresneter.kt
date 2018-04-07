@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
-import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -34,7 +33,7 @@ class TransactionListPresenter(
         fragment.getTransactionDataFromEtherScan()
       } otherwise {
         fragment.asyncData = it.map { TransactionListModel(it) }.toArrayList()
-        System.out.println("There is local data about transaction")
+        System.out.println("There are local data about transaction")
       }
     }
   }
@@ -50,6 +49,14 @@ class TransactionListPresenter(
     getMainActivity()?.showLoadingView()
     // Get transaction data from `etherScan`
     GoldStoneAPI.getTransactionListByAddress(WalletTable.currentWallet.address) {
+      if (isEmpty()) {
+        context?.runOnUiThread {
+          // There isn't data in blockchain
+          getMainActivity()?.removeLoadingView()
+          // Show empty view in recycler view
+        }
+        return@getTransactionListByAddress
+      }
       doAsync {
         completeTransactionInfo {
           forEachIndexed { index, it ->
