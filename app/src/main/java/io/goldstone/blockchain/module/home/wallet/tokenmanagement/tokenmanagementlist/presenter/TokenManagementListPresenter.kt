@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.timeUpThen
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -12,7 +10,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
-import rx.internal.operators.SingleOnErrorReturn
 
 /**
  * @date 25/03/2018 5:11 PM
@@ -37,9 +34,11 @@ class TokenManagementListPresenter(
 
   private var needShowLoadingView = true
 
-
   fun updateMyTokensInfoBy(cell: TokenManagementListCell) {
-    // show `Loading View` at 100ms later to prevent too fast to response the result that make ui flash
+    /**
+     * show `Loading View` at 100ms later to prevent too fast
+     * to response the result that make ui flash
+     */
     100L timeUpThen {
       if (needShowLoadingView) {
         fragment.getMainActivity()?.showLoadingView()
@@ -47,7 +46,7 @@ class TokenManagementListPresenter(
     }
     cell.apply {
       if (switch.isChecked) {
-        // 如果选中状态那么把当前选中的数据插入到 `MyTokenTable` 中
+        // once it is checked then insert this symbol into `MyTokenTable` database
         MyTokenTable.insertBySymbol(getSymbol(), WalletTable.currentWallet.address) {
           needShowLoadingView = false
           fragment.getMainActivity()?.removeLoadingView()
@@ -55,10 +54,10 @@ class TokenManagementListPresenter(
       } else {
         needShowLoadingView = false
         fragment.getMainActivity()?.removeLoadingView()
-        // 如果是关闭选中那么就在 `MyTokenTable` 中删除这条数据
+        // once it is unchecked then delete this symbol from `MyTokenTable` database
         MyTokenTable.deleteBySymbol(getSymbol())
       }
-      // 防止重复点击
+      // prevent duplicate clicks
       cell.switch.preventDuplicateClicks()
     }
   }

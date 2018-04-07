@@ -6,6 +6,8 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenDao
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionDao
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletDao
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
@@ -16,11 +18,12 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  * @author KaySaith
  */
 
-@Database(entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class)], version = GoldStoneDataBase.databaseVersion, exportSchema = false)
+@Database(entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class), (TransactionTable::class)], version = GoldStoneDataBase.databaseVersion, exportSchema = false)
 abstract class GoldStoneDataBase : RoomDatabase() {
   abstract fun walletDao(): WalletDao
   abstract fun myTokenDao(): MyTokenDao
   abstract fun defaultTokenDao(): DefaultTokenDao
+  abstract fun transactionDao(): TransactionDao
 
   companion object {
     const val databaseVersion = 1

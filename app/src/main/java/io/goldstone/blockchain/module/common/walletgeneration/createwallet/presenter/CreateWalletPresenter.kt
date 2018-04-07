@@ -4,9 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
 import com.blinnnk.extension.isFalse
+import com.blinnnk.util.UnsafeReasons
+import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.UnsafeReasons
-import io.goldstone.blockchain.common.utils.checkPasswordInRules
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
@@ -22,7 +22,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
-import org.jetbrains.anko.toast
 
 /**
  * @date 22/03/2018 2:46 AM
@@ -38,7 +37,6 @@ class CreateWalletPresenter(
       CreateWalletText.agreement,
       CreateWalletText.mnemonicBackUp
     )
-
   }
 
   fun generateWalletWith(nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean) {

@@ -7,10 +7,10 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.DateUtils
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import java.util.*
 
 /**
  * @date 23/03/2018 3:44 PM
@@ -47,7 +47,9 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 
     wrapper.addView(slideHeader)
 
-    /** 这个 `slideHeader` 是上下滑动后的开关层, 与 `RecyclerView` 的 `headerView` 不在一个层级 */
+    // this `slideHeader` will show or hide depends on the distance that user sliding the
+    // recyclerView, and not in the same layer with `RecyclerView's headerView`
+
     slideHeader.apply {
       historyButton.onClick { presenter.showTransactionsFragment() }
       notifyButton.onClick { presenter.showNotificationListFragment() }

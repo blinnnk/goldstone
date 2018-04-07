@@ -20,6 +20,4 @@ class TransactionListAdapter(
     model = data
     callback(this)
   }
-
-
 }

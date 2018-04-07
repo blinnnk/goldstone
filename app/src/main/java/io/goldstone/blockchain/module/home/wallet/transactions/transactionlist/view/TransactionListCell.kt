@@ -7,6 +7,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
 
@@ -18,30 +19,30 @@ import org.jetbrains.anko.textColor
 
 open class TransactionListCell(context: Context) : BaseValueCell(context) {
 
-  var model: TransactionListModel by observing(TransactionListModel()) {
+  var model: TransactionListModel? by observing(null) {
+    model?.let {
+      icon.apply {
+        if (it.isReceived) {
+          src = R.drawable.receive_icon
+          iconColor = Spectrum.green
+          count.title.textColor = Spectrum.green
+        } else {
+          src = R.drawable.send_icon
+          iconColor = GrayScale.midGray
+          count.title.textColor = Spectrum.red
+        }
+      }
 
-    icon.apply {
-      if (model.isReceived) {
-        src = R.drawable.receive_icon
-        iconColor = Spectrum.green
-        count.title.textColor = Spectrum.green
-      } else {
-        src = R.drawable.send_icon
-        iconColor = GrayScale.midGray
-        count.title.textColor = Spectrum.red
+      info.apply {
+        title.text = CryptoUtils.scaleTo16(it.addressName)
+        subtitle.text = it.addressInfo
+      }
+
+      count.apply {
+        title.text = (if (it.isReceived) "+" else "-") + it.count.toString()
+        subtitle.text = it.symbol
       }
     }
-
-    info.apply {
-      title.text = model.addressName
-      subtitle.text = model.addressInfo
-    }
-
-    count.apply {
-      title.text = (if (model.isReceived) "+" else "-") + model.count.toString()
-      subtitle.text = model.symbol
-    }
-
   }
 
   init {

@@ -41,18 +41,15 @@ class GoldStoneApp : Application() {
     // update local `Tokens` info list
     updateLocalDefaultTokens(this)
 
-    /*
-    * Querying the language type of the current account
-    * set and displaying the interface from the database.
-    */
+
+    // Querying the language type of the current account
+    // set and displaying the interface from the database.
     initLaunchLanguage()
 
   }
 
   companion object {
-
     var currentLanguage: Int? = null
-
     fun Application.initLaunchLanguage() {
       WalletTable.getCurrentWalletInfo {
         it.isNull().isTrue {
@@ -72,7 +69,7 @@ class GoldStoneApp : Application() {
       )
       val service = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
       service.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent)
-      System.exit(2)
+      System.exit(0)
     }
 
     fun updateLocalDefaultTokens(context: Context) {
@@ -95,7 +92,7 @@ class GoldStoneApp : Application() {
               }
             }
 
-            if (serverTokens.size > 0) {
+            if (serverTokens.isNotEmpty()) {
               context.doAsync {
                 serverTokens.forEach {
                   GoldStoneDataBase.database.defaultTokenDao().insert(it)
@@ -110,7 +107,7 @@ class GoldStoneApp : Application() {
               }
             }
 
-            if (localTokens.size > 0) {
+            if (localTokens.isNotEmpty()) {
               context.doAsync {
                 localTokens.forEach {
                   it.isDefault = false

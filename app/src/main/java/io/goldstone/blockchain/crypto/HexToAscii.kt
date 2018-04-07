@@ -36,7 +36,7 @@ fun String.toAscii(): String {
 private fun checkCode(dec: Int): String {
   var str: String
 
-  //convert the decimal to character
+  // convert the decimal to character
   str = Character.toString(dec.toChar())
 
   if (dec < 32 || dec in 127 .. 160) str = ""

@@ -18,12 +18,12 @@ object GoldStoneEthCall {
   lateinit var context: Context
 
   private enum class Method(val method: String, val code: String = "") {
-    GetSymbol("eth_call", "0x95d89b41000000000000000000000000"),
-    GetTokenBalance("eth_call", "0x70a08231000000000000000000000000"),
+    GetSymbol("eth_call", SolidityCode.ethCall),
+    GetTokenBalance("eth_call", SolidityCode.getTokenBalance),
     GetBalance("eth_getBalance"),
-    GetTotalSupply("eth_call", "0x18160ddd0000000000000000000000000000000000000000000000000000000000000005"),
-    GetTokenDecimal("eth_call", "0x313ce5670000000000000000000000000000000000000000000000000000000000000005"),
-    GetTokenName("eth_call", "0x06fdde030000000000000000000000000000000000000000000000000000000000000005")
+    GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
+    GetTokenDecimal("eth_call", SolidityCode.getDecimal),
+    GetTokenName("eth_call", SolidityCode.getTokenName)
   }
 
   @JvmStatic private val contentType = MediaType.parse("application/json; charset=utf-8")
@@ -88,7 +88,7 @@ object GoldStoneEthCall {
   }
 
   @JvmStatic
-  fun getTokenDecimal(contractAddress: String, holdValue: (Double) -> Unit = {}) {
+  private fun getTokenDecimal(contractAddress: String, holdValue: (Double) -> Unit = {}) {
     RequestBody.create(contentType,
       "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
     ).let {
@@ -97,7 +97,7 @@ object GoldStoneEthCall {
   }
 
   @JvmStatic
-  fun getTokenName(contractAddress: String, holdValue: (String) -> Unit = {}) {
+  private fun getTokenName(contractAddress: String, holdValue: (String) -> Unit = {}) {
     RequestBody.create(contentType,
       "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}"
     ).let {
@@ -113,7 +113,7 @@ object GoldStoneEthCall {
     }
   }
 
-  fun getTokenTotalSupply(contractAddress: String, holdValue: (Double) -> Unit = {}) {
+  private fun getTokenTotalSupply(contractAddress: String, holdValue: (Double) -> Unit = {}) {
     RequestBody.create(contentType,
       "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
     ).let {

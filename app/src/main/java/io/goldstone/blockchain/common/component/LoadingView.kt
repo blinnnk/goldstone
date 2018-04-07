@@ -47,24 +47,23 @@ class LoadingView(context: Context) : RelativeLayout(context) {
           width = 80.uiPX()
           height = 80.uiPX()
           centerInParent()
-          y -= 35.uiPX()
+          y -= 30.uiPX()
         }
       }
       addView(loading)
 
       introView
         .apply {
-          textSize = 4.uiPX().toFloat()
+          textSize = 4.uiPX().toFloat() + 1f
           textColor = GrayScale.gray
           gravity = Gravity.CENTER_HORIZONTAL
-          text = "obtaining token information from ethereum now"
           leftPadding = 30.uiPX()
           rightPadding = 30.uiPX()
           lparams {
             width = matchParent
-            height = 30.uiPX()
+            height = 50.uiPX()
             centerInParent()
-            y += 45.uiPX()
+            y += 50.uiPX()
           }
         }
         .into(this)
@@ -75,6 +74,12 @@ class LoadingView(context: Context) : RelativeLayout(context) {
         height = size
       }
     }
+
+    setIntroText("obtaining token information from ethereum now just wait a moment")
+  }
+
+  fun setIntroText(intro: String) {
+    introView.text = intro
   }
 
 }

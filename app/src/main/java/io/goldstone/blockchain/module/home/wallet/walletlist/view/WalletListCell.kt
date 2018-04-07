@@ -28,7 +28,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 
     info.apply {
       title.text = model.addressName
-      subtitle.text = CryptoUtils.scaleTO16(model.address)
+      subtitle.text = CryptoUtils.scaleTo16(model.address)
     }
 
     count.apply {
