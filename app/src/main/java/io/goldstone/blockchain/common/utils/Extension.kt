@@ -78,11 +78,5 @@ fun <T> Context.saveDataToSharedPreferences(key: String, data: T) {
 fun Context.getIntFromSharedPreferences(key: String): Int =
   getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).getInt(key, 100)
 
-inline fun<reified T: AppCompatActivity> Fragment.reboot() {
-  (activity as? T)?.apply {
-    finish()
-    startActivity(intent)
-  }
-}
 
 fun Fragment.getMainActivity() = activity as? MainActivity

@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
 
-import io.goldstone.blockchain.common.utils.DateUtils
+import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
@@ -19,7 +19,7 @@ data class TransactionListModel(
 
   constructor(data: TransactionTable) : this(
     data.to,
-    CryptoUtils.scaleTo28(DateUtils.getSinceTime(data.timeStamp) + " incoming from" + data.fromAddress),
+    CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp) + " incoming from" + data.fromAddress),
     CryptoUtils.formatDouble(data.value.toDouble()),
     data.symbol,
     data.isReceive

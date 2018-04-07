@@ -34,7 +34,7 @@ class TransactionListPresenter(
         fragment.getTransactionDataFromEtherScan()
       } otherwise {
         fragment.asyncData = it.map { TransactionListModel(it) }.toArrayList()
-        System.out.println("has local data about transaction")
+        System.out.println("There is local data about transaction")
       }
     }
   }
