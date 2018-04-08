@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -26,9 +27,9 @@ import org.jetbrains.anko.verticalLayout
 
 class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
+  private val info = TwoLineTitles(context)
   private val gradientView = GradientView(context)
   private val icon = RoundIcon(context)
-  private val info = TwoLineTitles(context)
 
   init {
 
@@ -50,8 +51,6 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
       icon
         .apply {
-          iconColor = Spectrum.yellow
-          src = R.drawable.receive_icon
           setColorFilter(GrayScale.Opacity2Black)
           setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
           elevation = 15.uiPX().toFloat()
@@ -60,14 +59,28 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
       info
         .apply {
-          title.text = "Received 3 ETH From"
-          subtitle.text = "0x9s889d2u7e657s6d78s7d65f7s65d57fs7s87d68f86s76d8f76s86d86f75d6s64f672"
           layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
           isCenter = true
           setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
           setWildStyle()
         }
         .into(this)
+    }
+  }
+
+  @SuppressLint("SetTextI18n")
+  fun setIconStyle(count: Double, targetAddress: String, isReceive: Boolean) {
+    val type = if(isReceive) "Received " else "Send "
+    info.title.text = "$type$count ETH From"
+    info.subtitle.text = targetAddress
+
+    if(!isReceive) {
+      icon.iconColor = Spectrum.yellow
+      icon.src = R.drawable.send_icon
+      icon.setColorFilter(GrayScale.Opacity5Black)
+    } else {
+      icon.iconColor = Spectrum.green
+      icon.src = R.drawable.receive_icon
     }
   }
 
