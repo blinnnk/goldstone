@@ -24,7 +24,7 @@ class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, T
     asyncData?.let {
       recyclerView.adapter = TransactionListAdapter(it) {
         onClick {
-          presenter.showTransactionDetail()
+          presenter.showTransactionDetail(model)
           preventDuplicateClicks()
         }
       }

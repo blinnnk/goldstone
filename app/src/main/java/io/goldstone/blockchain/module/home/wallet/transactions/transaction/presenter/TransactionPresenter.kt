@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.otherwise
@@ -19,7 +20,7 @@ class TransactionPresenter(
   override val fragment: TransactionFragment
 ) : BaseOverlayPresenter<TransactionFragment>() {
 
-  fun showTargetFragment(isDetail: Boolean) {
+  fun showTargetFragment(isDetail: Boolean, bundle: Bundle? = null) {
     fragment.apply {
       isDetail.isFalse {
         addFragmentAndSetArgument<TransactionListFragment>(ContainerID.content) {
@@ -30,6 +31,7 @@ class TransactionPresenter(
           if (it is TransactionListFragment) hideChildFragment(it)
           addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
             // Send Arguments
+            putAll(bundle)
           }
           overlayView.header.apply {
             showBackButton(true) {

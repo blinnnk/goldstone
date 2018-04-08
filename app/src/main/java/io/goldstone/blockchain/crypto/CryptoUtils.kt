@@ -31,6 +31,10 @@ object CryptoUtils {
     return DecimalFormat("0.00").format(value).toDouble()
   }
 
+  fun formatFeeDouble(value: Double): Double {
+    return DecimalFormat("0.0000000").format(value).toDouble()
+  }
+
   fun toCountByDecimal(value: Double, decimal: Double): Double {
     return value / Math.pow(10.0, decimal)
   }
@@ -71,4 +75,10 @@ object CryptoUtils {
   private fun isTransferInputCode(inputCode: String) =
     inputCode.length == 138
     && inputCode.substring(0, SolidityCode.contractTransfer.length) == SolidityCode.contractTransfer
+}
+
+fun Double.toEthCount(): String {
+  val formatEditor = DecimalFormat("#")
+  formatEditor.maximumFractionDigits = 18
+  return "0" + formatEditor.format(this / 1000000000000000000.0) + " ETH"
 }

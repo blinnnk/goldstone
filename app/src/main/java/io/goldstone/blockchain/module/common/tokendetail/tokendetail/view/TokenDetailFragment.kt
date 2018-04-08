@@ -41,17 +41,6 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
       receivedButton.onClick { presenter.showDepositFragment() }
     }
 
-    asyncData = arrayListOf(
-      TransactionListModel("KingsDom", "3 days ago incoming from 0x89d7", 12.92, "ETH", true),
-      TransactionListModel("Jean Jelly", "1 days ago incoming from 0x89ds", 5.0, "EOS", false),
-      TransactionListModel("0x82u7...67s65d", "1 days ago incoming from 0x89d7", 1.0, "EOS", false),
-      TransactionListModel("KingsDom", "3 days ago incoming from 0x89d7", 18.92, "ETH", true),
-      TransactionListModel("Jean Jelly", "1 days ago incoming from 0x89d7", 5.1, "EOS", false),
-      TransactionListModel("0x82u7...67s65d", "1 days ago incoming from 0x89d7", 6.5, "EOS", false),
-      TransactionListModel("KingsDom", "3 days ago incoming from 0x89d7", 18.92, "ETH", true),
-      TransactionListModel("Jean Jelly", "1 days ago incoming from 0x89d7", 5.1, "EOS", false)
-    )
-
   }
 
 }

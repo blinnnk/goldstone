@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toArrayList
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -38,9 +40,12 @@ class TransactionListPresenter(
     }
   }
 
-  fun showTransactionDetail() {
+  fun showTransactionDetail(model: TransactionListModel?) {
     fragment.getParentFragment<TransactionFragment>()?.apply {
-      presenter.showTargetFragment(true)
+      val bundle = Bundle().apply {
+        putSerializable(ArgumentKey.transactionDetail, model)
+      }
+      presenter.showTargetFragment(true, bundle)
     }
   }
 

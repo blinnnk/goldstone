@@ -13,7 +13,8 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
  */
 
 class TransactionDetailAdapter(
-  private var dataSet: ArrayList<TransactionDetailModel>
+  private var dataSet: ArrayList<TransactionDetailModel>,
+  private val hold: TransactionDetailCell.() -> Unit
 ) : RecyclerView.Adapter<TransactionDetailAdapter.ViewHolder>() {
 
   enum class CellType(val value: Int) {
@@ -34,13 +35,13 @@ class TransactionDetailAdapter(
       CellType.Cell.value -> {
         normalCell = TransactionDetailCell(parent.context)
         viewHolder = ViewHolder(normalCell)
+        hold(normalCell!!)
       }
-
     }
     return viewHolder!!
   }
 
-  override fun getItemViewType(position: Int): Int = when(position){
+  override fun getItemViewType(position: Int): Int = when(position) {
     0 -> CellType.Header.value
     else -> CellType.Cell.value
   }

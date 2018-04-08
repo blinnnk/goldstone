@@ -19,4 +19,8 @@ object EtherScanApi {
   @JvmStatic val transactions: (address: String) -> String = {
     "$header/api?module=account&action=txlist&address=$it&startblock=0&endblock=99999999&sort=desc&apikey=$apikey"
   }
+
+  @JvmStatic val singleTransactionHas: (hash: String) -> String = {
+    "$header/api?module=account&action=txlistinternal&txhash=$it&apikey=$apikey"
+  }
 }
