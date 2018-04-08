@@ -24,9 +24,7 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "wallet")
 data class WalletTable(
   //@PrimaryKey autoGenerate 自增
-  @PrimaryKey(autoGenerate = true)
-  var id: Int,
-  var name: String,
+  @PrimaryKey(autoGenerate = true) var id: Int, var name: String,
   var address: String,
   var isUsing: Boolean,
   var isWatchOnly: Boolean = false,
@@ -64,7 +62,7 @@ data class WalletTable(
     fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-          balance =  currentWallet.balance
+          balance = currentWallet.balance
         }
       }) {
         hold(it)
@@ -96,19 +94,19 @@ data class WalletTable(
     }
 
     fun switchCurrentWallet(walletAddress: String, callback: (WalletTable?) -> Unit) {
-      coroutinesTask({
+      doAsync {
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let {
             update(it.apply { it.isUsing = false })
           }
           getWalletByAddress(walletAddress)?.let {
             update(it.apply { it.isUsing = true })
+            GoldStoneAPI.context.runOnUiThread {
+              currentWallet = it
+              callback(it)
+            }
           }
-        }.findWhichIsUsing(true)
-      }) {
-        currentWallet.isWatchOnly = it?.isWatchOnly.orFalse()
-        currentWallet.address = it?.address!!
-        callback(it)
+        }
       }
     }
 

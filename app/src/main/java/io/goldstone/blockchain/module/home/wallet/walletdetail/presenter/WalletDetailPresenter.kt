@@ -59,7 +59,7 @@ class WalletDetailPresenter(
             CryptoUtils.formatDouble(it.currency)
           }
           // Once the calculation is finished then update `WalletTable`
-          WalletTable.currentWallet.balance = totalBalance
+          wallet.balance = totalBalance
           recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
             model = WalletDetailHeaderModel(
               null,
