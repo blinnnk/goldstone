@@ -80,3 +80,4 @@ fun Context.getIntFromSharedPreferences(key: String): Int =
 
 
 fun Fragment.getMainActivity() = activity as? MainActivity
+fun Context.getMainActivity() = this as? MainActivity

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.vie
 import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 
 /**
@@ -14,11 +15,13 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 
   var valueHeader: TwoLineTitles? = null
 
+  val symbol by lazy { arguments?.getString(ArgumentKey.tokenDetail) }
+
   override val presenter = TokenDetailOverlayPresenter(this)
 
   override fun ViewGroup.initView() {
-    presenter.setValueHeader()
-    presenter.showTokenDetailFragment()
+    presenter.setValueHeader(symbol)
+    presenter.showTokenDetailFragment(symbol)
   }
 
 }

@@ -40,7 +40,6 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
       sendButton.onClick { presenter.showAddressSelectionFragment() }
       receivedButton.onClick { presenter.showDepositFragment() }
     }
-
   }
 
 }

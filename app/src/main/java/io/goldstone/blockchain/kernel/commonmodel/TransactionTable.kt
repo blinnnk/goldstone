@@ -93,6 +93,24 @@ data class TransactionTable(
         hold(it.toArrayList())
       }
     }
+
+    fun getTransactionsByAddressAndSymbol(address: String, symbol: String, hold: (ArrayList<TransactionTable>) -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.transactionDao().getTransactionsByAddressAndSymbol(address, symbol)
+      }) {
+        hold(it.toArrayList())
+      }
+    }
+
+    fun deleteByAddress(address: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.transactionDao().apply {
+          getTransactionsByAddress(address).forEach { delete(it) }
+        }
+      }) {
+        callback()
+      }
+    }
   }
 }
 
@@ -100,6 +118,12 @@ data class TransactionTable(
 interface TransactionDao {
   @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress")
   fun getTransactionsByAddress(walletAddress: String): List<TransactionTable>
+
+  @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol")
+  fun getTransactionsByAddressAndSymbol(
+    walletAddress: String,
+    targetSymbol: String
+  ): List<TransactionTable>
 
   @Insert
   fun insert(token: TransactionTable)

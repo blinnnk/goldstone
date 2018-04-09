@@ -71,7 +71,7 @@ data class MyTokenTable(
       }
     }
 
-    fun getBalanceWithSymbol(symbol: String, contractAddress: String, ownerAddress: String, callback: (balance: Double) -> Unit = {}) {
+    private fun getBalanceWithSymbol(symbol: String, contractAddress: String, ownerAddress: String, callback: (balance: Double) -> Unit = {}) {
       // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
       if (symbol == "ETH") {
         GoldStoneEthCall.getEthBalance(ownerAddress) {

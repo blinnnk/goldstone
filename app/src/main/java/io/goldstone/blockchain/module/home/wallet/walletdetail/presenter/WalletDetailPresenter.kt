@@ -35,8 +35,10 @@ class WalletDetailPresenter(
 
   fun updateAllTokensInWalletBy() {
     val wallet = WalletTable.currentWallet
+
     // Check the count of local wallets
     WalletTable.apply { getAll { walletCount = size } }
+
     // Check the info of wallet currency list
     WalletDetailCellModel.getModels(wallet.address) { newDataSet ->
       fragment.apply {
@@ -58,6 +60,7 @@ class WalletDetailPresenter(
           val totalBalance = asyncData?.sumByDouble {
             CryptoUtils.formatDouble(it.currency)
           }
+
           // Once the calculation is finished then update `WalletTable`
           wallet.balance = totalBalance
           recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
@@ -96,8 +99,10 @@ class WalletDetailPresenter(
     }
   }
 
-  fun showMyTokenDetailFragment() {
-    fragment.activity?.addFragment<TokenDetailOverlayFragment>(ContainerID.main)
+  fun showMyTokenDetailFragment(symbol: String) {
+    fragment.activity?.addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main) {
+      putString(ArgumentKey.tokenDetail, symbol)
+    }
   }
 
   private fun diffDataSetChanged(

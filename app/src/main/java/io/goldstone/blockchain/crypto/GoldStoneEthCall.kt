@@ -69,6 +69,14 @@ object GoldStoneEthCall {
     }
   }
 
+  fun getTokenCountWithDecimalByContract(contractAddress: String, walletAddress: String, hold: (Double) -> Unit) {
+    getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
+      getTokenDecimal(contractAddress) {
+        hold(tokenBalance / Math.pow(10.0, it))
+      }
+    }
+  }
+
   @JvmStatic
   fun getTokenBalanceWithContract(contractAddress: String, address: String, holdValue: (Double) -> Unit) {
     RequestBody.create(contentType,

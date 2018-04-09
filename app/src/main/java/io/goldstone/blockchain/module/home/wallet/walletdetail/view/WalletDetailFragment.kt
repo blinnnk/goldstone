@@ -34,7 +34,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
       }
       normalCell?.apply {
         onClick {
-          presenter.showMyTokenDetailFragment()
+          presenter.showMyTokenDetailFragment(getTokenSymbol())
           preventDuplicateClicks()
         }
       }

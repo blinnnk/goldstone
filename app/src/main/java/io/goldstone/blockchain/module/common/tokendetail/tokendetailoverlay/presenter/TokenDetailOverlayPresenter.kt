@@ -7,6 +7,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -20,10 +21,11 @@ class TokenDetailOverlayPresenter(
   override val fragment: TokenDetailOverlayFragment
   ) : BaseOverlayPresenter<TokenDetailOverlayFragment>() {
 
-  fun showTokenDetailFragment() {
+  fun showTokenDetailFragment(symbol: String?) {
     fragment.apply {
       addFragmentAndSetArgument<TokenDetailFragment>(ContainerID.content) {
         // Send Arguments
+        putString(ArgumentKey.tokenDetail, symbol)
       }
     }
   }
@@ -36,7 +38,7 @@ class TokenDetailOverlayPresenter(
   }
 
   @SuppressLint("SetTextI18n")
-  fun setValueHeader() {
+  fun setValueHeader(symbol: String?) {
     fragment.apply {
       overlayView.header.title.isHidden()
       valueHeader.isNull().isTrue {
@@ -44,7 +46,7 @@ class TokenDetailOverlayPresenter(
           valueHeader = TwoLineTitles(context)
           valueHeader
             ?.apply {
-              title.text = "MY ETH"
+              title.text = "MY $symbol"
               subtitle.text = "2.38 ETH ≈(1126.32 USD)"
               setBlackTitles()
               isCenter = true

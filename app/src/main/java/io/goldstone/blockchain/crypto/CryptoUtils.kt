@@ -1,9 +1,18 @@
 package io.goldstone.blockchain.crypto
 
+import android.os.Build
+import android.support.annotation.RequiresApi
+import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import jnr.ffi.annotations.In
 import java.text.DecimalFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneId.systemDefault
+import java.util.*
 
 /**
  * @date 01/04/2018 7:54 PM
@@ -68,6 +77,20 @@ object CryptoUtils {
     }
   }
 
+  fun getTargetDayInMills(distanceSinceToday: Int = 0): Long {
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val date = calendar.get(Calendar.DATE) + distanceSinceToday
+    calendar.clear()
+    calendar.set(year, month, date)
+    return calendar.timeInMillis
+  }
+
+  val dateInDay: (Long) -> String = {
+    DateUtils.formatDateTime(GoldStoneAPI.context, it, DateUtils.FORMAT_NO_YEAR)
+  }
+
   private fun toHexValue(value: String): String {
     return "0x$value"
   }
@@ -81,4 +104,23 @@ fun Double.toEthCount(): String {
   val formatEditor = DecimalFormat("#")
   formatEditor.maximumFractionDigits = 18
   return "0" + formatEditor.format(this / 1000000000000000000.0) + " ETH"
+}
+
+fun Double.toEthValue(): Double {
+  return this / 1000000000000000000.0
+}
+
+fun Int.daysAgoInMills(): Long = CryptoUtils.getTargetDayInMills(-this)
+
+
+enum class TimeType {
+  Second, Minute, Hour, Day
+}
+fun String.toMills(timeType: TimeType = TimeType.Second): Long {
+  return when(timeType) {
+    TimeType.Second -> this.toLong() * 1000L
+    TimeType.Minute -> this.toLong() * 1000L * 60L
+    TimeType.Hour -> this.toLong() * 1000L * 60L * 60L
+    TimeType.Day -> this.toLong() * 1000L * 60L * 60L * 12L
+  }
 }

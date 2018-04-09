@@ -13,6 +13,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -32,7 +33,9 @@ class TransactionListPresenter(
   override fun updateData(asyncData: ArrayList<TransactionListModel>?) {
     TransactionTable.getAllTransactionsByAddress(WalletTable.currentWallet.address) {
       it.isEmpty().isTrue {
-        fragment.getTransactionDataFromEtherScan()
+        getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {
+          fragment.asyncData = it
+        }
       } otherwise {
         fragment.asyncData = it.map { TransactionListModel(it) }.toArrayList()
         System.out.println("There are local data about transaction")
@@ -49,86 +52,92 @@ class TransactionListPresenter(
     }
   }
 
-  private fun TransactionListFragment.getTransactionDataFromEtherScan() {
-    // Show loading view
-    getMainActivity()?.showLoadingView()
-    // Get transaction data from `etherScan`
-    GoldStoneAPI.getTransactionListByAddress(WalletTable.currentWallet.address) {
-      if (isEmpty()) {
-        context?.runOnUiThread {
-          // There isn't data in blockchain
-          getMainActivity()?.removeLoadingView()
-          // Show empty view in recycler view
-        }
-        return@getTransactionListByAddress
-      }
-      doAsync {
-        completeTransactionInfo {
-          forEachIndexed { index, it ->
-            it.to.isNotEmpty().isTrue { GoldStoneDataBase.database.transactionDao().insert(it) }
-            if (index == lastIndex) {
-              val transactions = filter { it.to.isNotEmpty() }.toArrayList()
-              context?.runOnUiThread {
-                getMainActivity()?.removeLoadingView()
-                asyncData = transactions.map { TransactionListModel(it) }.toArrayList()
+  companion object {
+
+    private fun completeTransactionInfo(data: ArrayList<TransactionTable>, hold: ArrayList<TransactionTable>.() -> Unit) {
+      data.apply {
+        forEachIndexed { index, it ->
+          CryptoUtils.isERC20Transfer(it) {
+            // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
+            val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(it.input)
+            // 判断是否是接受交易
+            val receiveStatus = WalletTable.currentWallet.address == transactionInfo?.address
+            // 首先从本地数据库检索 `contract` 对应的 `symbol`
+            DefaultTokenTable.getTokenByContractAddress(it.to) { tokenInfo ->
+              val count = CryptoUtils.toCountByDecimal(
+                transactionInfo?.count.orElse(0.0), tokenInfo?.decimals.orElse(0.0)
+              )
+              tokenInfo.isNull().isTrue {
+                // 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
+                GoldStoneEthCall.getTokenSymbol(it.to) { tokenSymbol ->
+                  it.apply {
+                    isReceive = receiveStatus
+                    isERC20 = true
+                    symbol = tokenSymbol
+                    value = count.toString()
+                    tokenReceiveAddress = transactionInfo?.address
+                  }
+
+                  if (index == lastIndex) {
+                    hold(this)
+                  }
+
+                }
+              } otherwise {
+                it.apply {
+                  isReceive = receiveStatus
+                  isERC20 = true
+                  symbol = tokenInfo!!.symbol
+                  value = count.toString()
+                  tokenReceiveAddress = transactionInfo?.address
+                }
+
+                if (index == lastIndex) {
+                  hold(this)
+                }
               }
             }
-          }
-        }
-      }
-    }
-  }
-
-  private fun ArrayList<TransactionTable>.completeTransactionInfo(hold: ArrayList<TransactionTable>.() -> Unit) {
-    forEachIndexed { index, it ->
-      CryptoUtils.isERC20Transfer(it) {
-        // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
-        val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(it.input)
-        // 判断是否是接受交易
-        val receiveStatus = WalletTable.currentWallet.address == transactionInfo?.address
-        // 首先从本地数据库检索 `contract` 对应的 `symbol`
-        DefaultTokenTable.getTokenByContractAddress(it.to) { tokenInfo ->
-          val count = CryptoUtils.toCountByDecimal(
-            transactionInfo?.count.orElse(0.0), tokenInfo?.decimals.orElse(0.0)
-          )
-          tokenInfo.isNull().isTrue {
-            // 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
-            GoldStoneEthCall.getTokenSymbol(it.to) { tokenSymbol ->
-              it.apply {
-                isReceive = receiveStatus
-                isERC20 = true
-                symbol = tokenSymbol
-                value = count.toString()
-                tokenReceiveAddress = transactionInfo?.address
-              }
-
-              if (index == lastIndex) {
-                hold(this)
-              }
-
-            }
-          } otherwise {
+          }.isFalse {
             it.apply {
-              isReceive = receiveStatus
-              isERC20 = true
-              symbol = tokenInfo!!.symbol
-              value = count.toString()
-              tokenReceiveAddress = transactionInfo?.address
+              isReceive = WalletTable.currentWallet.address == it.to
+              symbol = "ETH"
+              value = CryptoUtils.toCountByDecimal(it.value.toDouble(), 18.0).toString()
             }
-
             if (index == lastIndex) {
               hold(this)
             }
           }
         }
-      }.isFalse {
-        it.apply {
-          isReceive = WalletTable.currentWallet.address == it.to
-          symbol = "ETH"
-          value = CryptoUtils.toCountByDecimal(it.value.toDouble(), 18.0).toString()
+      }
+    }
+
+    fun getTransactionDataFromEtherScan(activity: MainActivity, hold: (ArrayList<TransactionListModel>) -> Unit) {
+      // Show loading view
+      activity.showLoadingView()
+      // Get transaction data from `etherScan`
+      GoldStoneAPI.getTransactionListByAddress(WalletTable.currentWallet.address) {
+        if (isEmpty()) {
+          GoldStoneAPI.context.runOnUiThread {
+            // There isn't data in blockchain
+            getMainActivity()?.removeLoadingView()
+            // Show empty view in recycler view
+          }
+          return@getTransactionListByAddress
         }
-        if (index == lastIndex) {
-          hold(this)
+        val data = this
+        doAsync {
+          completeTransactionInfo(data) {
+            forEachIndexed { index, it ->
+              it.to.isNotEmpty().isTrue { GoldStoneDataBase.database.transactionDao().insert(it) }
+              if (index == lastIndex) {
+                val transactions = filter { it.to.isNotEmpty() }.toArrayList()
+                GoldStoneAPI.context.runOnUiThread {
+                  activity.removeLoadingView()
+                  hold(transactions.map { TransactionListModel(it) }.toArrayList())
+                }
+              }
+            }
+          }
         }
       }
     }

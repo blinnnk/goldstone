@@ -41,7 +41,6 @@ class GoldStoneApp : Application() {
     // update local `Tokens` info list
     updateLocalDefaultTokens(this)
 
-
     // Querying the language type of the current account
     // set and displaying the interface from the database.
     initLaunchLanguage()

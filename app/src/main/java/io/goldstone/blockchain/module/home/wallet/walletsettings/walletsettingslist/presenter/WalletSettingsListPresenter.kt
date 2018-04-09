@@ -13,12 +13,15 @@ import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
 import org.jetbrains.anko.*
+import java.util.stream.StreamSupport
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -96,9 +99,13 @@ class WalletSettingsListPresenter(
     fragment.context?.deleteAccount(address, password) {
       // delete all records of this `address` in `myTokenTable`
       MyTokenTable.deleteByAddress(address) {
-        // delete wallet record in `walletTable`
-        WalletTable.deleteCurrentWallet {
-          fragment.activity?.jump<SplashActivity>()
+        TransactionTable.deleteByAddress(address) {
+          TokenBalanceTable.deleteByAddress(address) {
+            // delete wallet record in `walletTable`
+            WalletTable.deleteCurrentWallet {
+              fragment.activity?.jump<SplashActivity>()
+            }
+          }
         }
       }
     }
@@ -106,8 +113,12 @@ class WalletSettingsListPresenter(
 
   private fun deleteWatchOnlyWallet(address: String) {
     MyTokenTable.deleteByAddress(address) {
-      WalletTable.deleteCurrentWallet {
-        fragment.activity?.jump<SplashActivity>()
+      TransactionTable.deleteByAddress(address) {
+        TokenBalanceTable.deleteByAddress(address) {
+          WalletTable.deleteCurrentWallet {
+            fragment.activity?.jump<SplashActivity>()
+          }
+        }
       }
     }
   }

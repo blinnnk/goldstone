@@ -5,6 +5,8 @@ import android.text.format.DateUtils.FORMAT_SHOW_TIME
 import android.text.format.DateUtils.FORMAT_SHOW_YEAR
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.toAscii
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -44,12 +46,20 @@ data class TransactionListModel(
     if (data.isReceive) data.fromAddress else data.to,
     data.blockNumber,
     data.hash,
-    "Leave A Message",
+    getMemoFromInputCode(data.input),
     data.gasUsed.toDouble() * data.gasPrice.toDouble(),
     EtherScanApi.singleTransactionHas(data.hash)
   )
 }
 
+private val getMemoFromInputCode: (inputCode: String) -> String = {
+  if (it == SolidityCode.ethTransfer) { it.toAscii() }
+  else {
+    if (it.length > 138) it.substring(138, it.length).toAscii()
+    else "There isn't a memo"
+  }
+}
+
 private val descriptionText: (isReceive: Boolean) -> String = {
-  if(it) " incoming from" else " send from"
+  if(it) " incoming from " else " send from "
 }

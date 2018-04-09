@@ -64,4 +64,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
   }
 
+  fun getTokenSymbol(): String {
+    return tokenInfo.title.text.toString()
+  }
+
 }

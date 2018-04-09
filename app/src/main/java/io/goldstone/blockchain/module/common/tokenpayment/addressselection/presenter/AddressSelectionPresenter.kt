@@ -44,7 +44,7 @@ class AddressSelectionPresenter(
     /** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       overlayView.header.showBackButton(true) {
-        presenter.setValueHeader()
+        presenter.setValueHeader(symbol)
         presenter.popFragmentFrom<AddressSelectionFragment>()
         setHeightMatchParent()
       }
