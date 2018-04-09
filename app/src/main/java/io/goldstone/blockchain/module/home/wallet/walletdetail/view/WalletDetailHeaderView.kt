@@ -11,16 +11,17 @@ import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.froratCurrency
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
@@ -43,10 +44,8 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
   var model: WalletDetailHeaderModel? by observing(null) {
     model?.apply {
-
-      if (avatar.isNull()) currentAccount.avatar.glideImage(R.drawable.avatar)
+      if (avatar.isNull()) currentAccount.avatar.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
       else currentAccount.avatar.glideImage(avatar)
-
       currentAccount.info.title.text = name
       currentAccount.info.subtitle.text = address
       balanceTitle.text = totalBalance.toDouble().froratCurrency()

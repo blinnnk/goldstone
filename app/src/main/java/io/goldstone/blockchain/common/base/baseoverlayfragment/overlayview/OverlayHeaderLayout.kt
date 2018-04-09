@@ -103,7 +103,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
         } otherwise {
           removeView(it)
         }
-
       }
     }
   }
@@ -147,14 +146,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
-
     canvas?.drawLine(
       PaddingSize.device.toFloat(),
       height - BorderSize.default,
       (ScreenSize.Width - PaddingSize.device).toFloat(),
       height - BorderSize.default, paint
     )
-
     canvas?.save()
   }
 

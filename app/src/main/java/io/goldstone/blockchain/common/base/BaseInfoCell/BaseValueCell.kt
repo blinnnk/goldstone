@@ -40,7 +40,6 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
         x += 60.uiPX()
       })
 
-
     icon.setCenterInVertical()
     info.setCenterInVertical()
 

@@ -7,6 +7,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -134,7 +135,7 @@ class WalletSettingsPresenter(
         title.text = WalletTable.current.name
         subtitle.text = WalletTable.current.address
       }
-      avatarImage.glideImage(R.drawable.avatar)
+      avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
     }
   }
 

@@ -2,8 +2,8 @@ package io.goldstone.blockchain.module.home.wallet.walletlist.presenter
 
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
@@ -27,7 +27,7 @@ class WalletListPresenter(
             wallet.name,
             wallet.address,
             wallet.balance.orElse(0.0),
-            R.drawable.avatar,
+            UIUtils.generateAvatar(wallet.id),
             wallet.isWatchOnly,
             wallet.isUsing
           )
