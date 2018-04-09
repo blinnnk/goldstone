@@ -8,12 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.component.EmptyType
+import io.goldstone.blockchain.common.component.EmptyView
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.support.v4.UI
@@ -23,7 +23,8 @@ import org.jetbrains.anko.support.v4.UI
  * @author KaySaith
  */
 
-abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> : Fragment() {
+abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> :
+  Fragment() {
 
   lateinit var wrapper: RelativeLayout
   lateinit var recyclerView: BaseRecyclerView
@@ -38,9 +39,15 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
       isNull().isTrue {
         setRecyclerViewAdapter(recyclerView, asyncData)
       } otherwise {
-       notifyDataSetChanged()
+        notifyDataSetChanged()
       }
     }
+
+    /** 如果数据返回时空的显示占位图 */
+    asyncData?.isEmpty()?.isTrue {
+      wrapper.showEmptyView()
+    }
+
     /** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
     setSlideUpAnimation()
   }
@@ -128,9 +135,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   }
 
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+    inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
   ): View? {
     presenter.onFragmentCreateView()
     return UI {
@@ -172,6 +177,20 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
     if (!hidden) {
       presenter.onFragmentShowFromHidden()
     }
+  }
+
+  private var emptyLayout: EmptyView? = null
+
+  open fun ViewGroup.showEmptyView() {
+    emptyLayout = EmptyView(context).apply {
+      when (this@BaseRecyclerFragment) {
+        is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
+        else -> setStyle(EmptyType.TransactionDetail)
+      }
+    }
+    emptyLayout?.into(this)
+    if (this@BaseRecyclerFragment is TokenDetailFragment) emptyLayout?.setCenterInHorizontal()
+    else emptyLayout?.setCenterInParent()
   }
 
 }

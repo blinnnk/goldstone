@@ -360,6 +360,37 @@ object ProfileText {
 
 }
 
+object EmptyText {
+
+  @JvmField
+  val tokenDetailTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "No Token Transactions Found"
+    else -> ""
+  }
+  @JvmField
+  val tokenDetailSubtitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "There isn't transaction in blockchain, so you haven't chart and records"
+    else -> ""
+  }
+  @JvmField
+  val currency = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Currency Settings"
+    else -> "货币"
+  }
+  @JvmField
+  val language = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Language"
+    else -> "语言"
+  }
+
+  @JvmField
+  val aboutUs = when (currentLanguage) {
+    HoneyLanguage.English.code -> "About Us"
+    else -> "关于我们"
+  }
+
+}
+
 object QuotationText {
 
   @JvmField

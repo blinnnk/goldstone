@@ -79,3 +79,8 @@ object TransactionSize {
   @JvmField val headerView = 220.uiPX()
   @JvmField val cellHeight = 65.uiPX()
 }
+
+
+object TokenDetailSize {
+  @JvmField val headerHeight = 280.uiPX()
+}

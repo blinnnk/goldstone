@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
+import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
@@ -120,13 +121,14 @@ class TransactionListPresenter(
       // Get transaction data from `etherScan`
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
         if (isEmpty()) {
-          GoldStoneAPI.context.runOnUiThread {
-            // There isn't data in blockchain
-            getMainActivity()?.removeLoadingView()
-            // Show empty view in recycler view
+          (activity as Context).runOnUiThread {
+            activity.removeLoadingView()
+            // 没有数据返回空数组
+            hold(arrayListOf())
           }
           return@getTransactionListByAddress
         }
+
         val data = this
         doAsync {
           completeTransactionInfo(data) {

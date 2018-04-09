@@ -38,6 +38,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
   var isCenter by observing(false) {
     gravity = Gravity.CENTER_HORIZONTAL
     subtitle.gravity = Gravity.CENTER_HORIZONTAL
+    title.gravity = Gravity.CENTER_HORIZONTAL
   }
 
   init {
@@ -58,6 +59,16 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
       textColor = GrayScale.black
     }
     subtitle.textColor = GrayScale.gray
+  }
+
+  fun setGrayTitles() {
+    title.apply {
+      typeface = GoldStoneFont.book(context)
+      textColor = GrayScale.black
+    }
+    title.textColor = GrayScale.gray
+    subtitle.y += 3.uiPX()
+    subtitle.textColor = GrayScale.midGray
   }
 
   fun setSmallStyle() {

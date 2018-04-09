@@ -16,6 +16,7 @@ import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.TokenDetailSize
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
@@ -85,7 +86,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
   }
 
   init {
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 280.uiPX())
+    layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
   }
 
   fun setCharData(data: ArrayList<Point>, maxY: Float, unitY: Float) {

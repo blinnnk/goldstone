@@ -97,7 +97,6 @@ class TokenDetailPresenter(
   }
 
   private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
-    System.out.println("hello mother fuck $size")
     fragment.recyclerView.getItemViewAtAdapterPosition<TokenDetailHeaderView>(0) {
       val maxChartCount = 6
       val chartArray = arrayListOf<Point>()
@@ -127,7 +126,6 @@ class TokenDetailPresenter(
         balances.apply {
           if (size > 2) {
             if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
-              System.out.println("hello shit $size")
               callback(this)
               return@getTokenBalanceBySymbol
             }
@@ -135,7 +133,6 @@ class TokenDetailPresenter(
         }
         // 计算过去7天的所有余额
         generateHistoryBalance(todayBalance) { history ->
-
           coroutinesTask({
             history.forEach {
               TokenBalanceTable.insertOrUpdate(symbol, WalletTable.current.address, it.date, it.balance)
