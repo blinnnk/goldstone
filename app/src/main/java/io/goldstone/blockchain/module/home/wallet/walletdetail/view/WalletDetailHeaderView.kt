@@ -20,8 +20,11 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
-import io.goldstone.blockchain.crypto.fromatCurrency
-import org.jetbrains.anko.*
+import io.goldstone.blockchain.crypto.froratCurrency
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 4:21 PM
@@ -46,7 +49,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
       currentAccount.info.title.text = name
       currentAccount.info.subtitle.text = address
-      balanceTitle.text = totalBalance.toDouble().fromatCurrency()
+      balanceTitle.text = totalBalance.toDouble().froratCurrency()
       manageButton.text = (WalletText.manage + " ($totalAccount)").toUpperCase()
     }
   }

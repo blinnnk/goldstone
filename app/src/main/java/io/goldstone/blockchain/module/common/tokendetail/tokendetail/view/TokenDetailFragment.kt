@@ -25,8 +25,10 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionListModel>?) {
     recyclerView.adapter = TokenDetailAdapter(asyncData.orEmptyArray()) {
       onClick {
-        presenter.showTransactionDetailFragment()
-        preventDuplicateClicks()
+        model?.let {
+          presenter.showTransactionDetailFragment(it)
+          preventDuplicateClicks()
+        }
       }
     }
   }

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.isNull
@@ -63,8 +64,11 @@ class TokenDetailPresenter(
     }
   }
 
-  fun showTransactionDetailFragment() {
-    shoTargetFragment<TransactionDetailFragment>(TransactionText.detail)
+  fun showTransactionDetailFragment(model: TransactionListModel) {
+    val arguments = Bundle().apply {
+      putSerializable(ArgumentKey.transactionDetail, model)
+    }
+    shoTargetFragment<TransactionDetailFragment>(TransactionText.detail, arguments)
   }
 
   fun showDepositFragment() {
@@ -108,7 +112,7 @@ class TokenDetailPresenter(
       forEachIndexed { index, it ->
         chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
         if (index == charCount) {
-          var maxY = Math.ceil(chartArray.maxBy { it.value }?.value!!.toDouble()) * 1.5
+          var maxY = maxYValue(chartArray)
           var unitY = Math.ceil((maxY / 10)).toFloat()
           if (maxY == 0.0) maxY = 10.0
           if (unitY == 0f) unitY = 1f
@@ -116,6 +120,12 @@ class TokenDetailPresenter(
         }
       }
     }
+  }
+
+  // 计算出 `chartView` Y 轴的最大值
+  private val maxYValue: (ArrayList<Point>) -> Double = {
+    val maxValue = Math.ceil(it.maxBy { it.value }?.value!!.toDouble())
+    if (maxValue > 10) maxValue * 1.5 else maxValue + 5
   }
 
   private fun ArrayList<TransactionTable>.prepareTokenHistoryBalance(
@@ -200,11 +210,11 @@ class TokenDetailPresenter(
 
   private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) 1 else -1
 
-  private inline fun <reified T : Fragment> shoTargetFragment(title: String) {
+  private inline fun <reified T : Fragment> shoTargetFragment(title: String, bundle: Bundle? = null) {
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       hideChildFragment(fragment)
       addFragmentAndSetArgument<T>(ContainerID.content) {
-        // Send Arguments
+        putAll(bundle)
       }
       overlayView.header.apply {
         showBackButton(true) {
