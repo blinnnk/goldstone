@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
+import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -54,7 +55,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
   fun setStyle(type: EmptyType) {
     when(type) {
       EmptyType.TokenDetail -> {
-        y += TokenDetailSize.headerHeight
+        y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - ScreenSize.Width) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
         icon.imageResource = R.drawable.token_detail_empty_icon
         introTitles.title.text = EmptyText.tokenDetailTitle
         introTitles.subtitle.text = EmptyText.tokenDetailSubtitle

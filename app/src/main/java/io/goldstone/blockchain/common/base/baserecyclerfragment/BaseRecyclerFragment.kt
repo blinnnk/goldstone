@@ -189,8 +189,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
       }
     }
     emptyLayout?.into(this)
-    if (this@BaseRecyclerFragment is TokenDetailFragment) emptyLayout?.setCenterInHorizontal()
-    else emptyLayout?.setCenterInParent()
+    if (this@BaseRecyclerFragment !is TokenDetailFragment) emptyLayout?.setCenterInParent()
   }
 
 }

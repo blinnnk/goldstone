@@ -81,17 +81,21 @@ class TokenDetailPresenter(
       transactions.isNotEmpty().isTrue {
         hold(transactions)
       } otherwise {
-        // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-        TransactionListPresenter.getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {
-          it.isNotEmpty().isTrue {
-            singleRunMark.isNull {
-              prepareTokenDetailData(hold)
-              singleRunMark = true
+        // 若更新了链上数据后还是没有筛选出交易记录返回空数组
+        if (singleRunMark == true) {
+          fragment.getMainActivity()?.removeLoadingView()
+          hold(arrayListOf())
+        } else {
+          // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+          TransactionListPresenter.getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {
+            it.isNotEmpty().isTrue {
+              singleRunMark.isNull {
+                prepareTokenDetailData(hold)
+                singleRunMark = true
+              }
             }
           }
         }
-        // 若更新了链上数据后还是没有筛选出交易记录返回空数组
-        if (singleRunMark == true) hold(arrayListOf())
       }
     }
   }
