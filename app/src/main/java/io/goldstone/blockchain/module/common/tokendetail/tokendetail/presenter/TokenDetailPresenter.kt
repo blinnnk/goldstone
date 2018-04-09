@@ -6,6 +6,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.addFragmentAndSetArgument
+import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -75,7 +76,7 @@ class TokenDetailPresenter(
   private var singleRunMark: Boolean? = null
   private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit = {}) {
     TransactionTable.getTransactionsByAddressAndSymbol(
-      WalletTable.currentWallet.address,
+      WalletTable.current.address,
       symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
@@ -98,7 +99,7 @@ class TokenDetailPresenter(
 
   private fun TokenDetailFragment.updateChartAndHeaderData() {
     recyclerView.getItemViewAtAdapterPosition<TokenDetailHeaderView>(0) {
-      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.currentWallet.address, symbol!!) {
+      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol!!) {
         val maxChartCount = 6
         val chartArray = arrayListOf<Point>()
         val charCount = if (size > maxChartCount) maxChartCount else lastIndex
@@ -118,30 +119,36 @@ class TokenDetailPresenter(
   }
 
   private fun ArrayList<TransactionTable>.prepareTokenHistoryBalance(
-    symbol: String, callback: (ArrayList<DateBalance>) -> Unit
+    symbol: String, callback: () -> Unit
   ) {
     // 首先更新此刻最新的余额数据到今天的数据
     TokenBalanceTable.updateTodayBalanceBySymbol(
-      WalletTable.currentWallet.address,
+      WalletTable.current.address,
       symbol
     ) { todayBalance ->
 
-      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.currentWallet.address, symbol) {
+      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) {
         // 如果除今天以外的最近一条数据更新的时间是昨天的整体时间, 那么只更新今天的价格
         if (size > 2) {
-          if (this[lastIndex - 1].date == 2.daysAgoInMills()) return@getTokenBalanceBySymbol
+          if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
+            callback()
+            return@getTokenBalanceBySymbol
+          }
         }
         // 计算过去7天的所有余额
         generateHistoryBalance(todayBalance) {
-          it.forEach {
-            TokenBalanceTable.insertOrUpdate(
-              symbol,
-              WalletTable.currentWallet.address,
-              it.date,
-              it.balance
-            )
+          coroutinesTask({
+            it.forEach {
+              TokenBalanceTable.insertOrUpdate(
+                symbol,
+                WalletTable.current.address,
+                it.date,
+                it.balance
+              )
+            }
+          }) {
+            callback()
           }
-          callback(it)
         }
       }
     }
@@ -184,8 +191,7 @@ class TokenDetailPresenter(
         DateBalance(4.daysAgoInMills(), fourDaysAgoBalance),
         DateBalance(3.daysAgoInMills(), threeDaysAgoBalance),
         DateBalance(2.daysAgoInMills(), twoDaysAgoBalance),
-        DateBalance(1.daysAgoInMills(), oneDayAgoBalance),
-        DateBalance(0.daysAgoInMills(), todayBalance)
+        DateBalance(1.daysAgoInMills(), oneDayAgoBalance)
       )
     )
   }

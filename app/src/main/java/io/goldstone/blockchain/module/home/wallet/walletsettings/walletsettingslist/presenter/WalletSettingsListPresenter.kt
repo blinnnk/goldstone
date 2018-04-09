@@ -7,6 +7,7 @@ import com.blinnnk.extension.jump
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
@@ -21,7 +22,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
 import org.jetbrains.anko.*
-import java.util.stream.StreamSupport
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -33,11 +33,11 @@ class WalletSettingsListPresenter(
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
 
   override fun updateData(asyncData: ArrayList<WalletSettingsListModel>?) {
-    val balanceText = WalletTable.currentWallet.balance.toString() + SymbolText.usd
+    val balanceText = WalletTable.current.balance.toString() + SymbolText.usd
     fragment.asyncData = arrayListOf(
       WalletSettingsListModel(WalletSettingsText.checkQRCode),
       WalletSettingsListModel(WalletSettingsText.balance, balanceText),
-      WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.currentWallet.name),
+      WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.current.name),
       WalletSettingsListModel(WalletSettingsText.hint, "······"),
       WalletSettingsListModel(WalletSettingsText.passwordSettings),
       WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
@@ -63,7 +63,7 @@ class WalletSettingsListPresenter(
         WalletSettingsText.deleteInfoSubtitle,
         WalletSettingsText.deleteInfoTitle
       ) {
-        WalletTable.currentWallet.isWatchOnly.isFalse {
+        WalletTable.current.isWatchOnly.isFalse {
           customView {
             verticalLayout {
               lparams {
@@ -84,8 +84,9 @@ class WalletSettingsListPresenter(
   }
 
   private fun deleteWalletData(password: String) {
+    fragment.getMainActivity()?.showLoadingView()
     // get current wallet address
-    WalletTable.currentWallet.apply {
+    WalletTable.current.apply {
       if (isWatchOnly) {
         deleteWatchOnlyWallet(address)
       } else {
@@ -116,6 +117,7 @@ class WalletSettingsListPresenter(
       TransactionTable.deleteByAddress(address) {
         TokenBalanceTable.deleteByAddress(address) {
           WalletTable.deleteCurrentWallet {
+            fragment.getMainActivity()?.removeLoadingView()
             fragment.activity?.jump<SplashActivity>()
           }
         }

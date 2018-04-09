@@ -34,7 +34,7 @@ class WalletDetailPresenter(
   }
 
   fun updateAllTokensInWalletBy() {
-    val wallet = WalletTable.currentWallet
+    val wallet = WalletTable.current
 
     // Check the count of local wallets
     WalletTable.apply { getAll { walletCount = size } }

@@ -131,8 +131,8 @@ class WalletSettingsPresenter(
   private fun showCurrentWalletInfo() {
     fragment.header?.apply {
       walletInfo.apply {
-        title.text = WalletTable.currentWallet.name
-        subtitle.text = WalletTable.currentWallet.address
+        title.text = WalletTable.current.name
+        subtitle.text = WalletTable.current.address
       }
       avatarImage.glideImage(R.drawable.avatar)
     }

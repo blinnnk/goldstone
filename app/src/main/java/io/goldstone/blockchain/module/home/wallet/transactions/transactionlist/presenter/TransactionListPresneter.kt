@@ -31,7 +31,7 @@ class TransactionListPresenter(
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 
   override fun updateData(asyncData: ArrayList<TransactionListModel>?) {
-    TransactionTable.getAllTransactionsByAddress(WalletTable.currentWallet.address) {
+    TransactionTable.getAllTransactionsByAddress(WalletTable.current.address) {
       it.isEmpty().isTrue {
         getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {
           fragment.asyncData = it
@@ -61,7 +61,7 @@ class TransactionListPresenter(
             // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
             val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(it.input)
             // 判断是否是接受交易
-            val receiveStatus = WalletTable.currentWallet.address == transactionInfo?.address
+            val receiveStatus = WalletTable.current.address == transactionInfo?.address
             // 首先从本地数据库检索 `contract` 对应的 `symbol`
             DefaultTokenTable.getTokenByContractAddress(it.to) { tokenInfo ->
               val count = CryptoUtils.toCountByDecimal(
@@ -76,6 +76,7 @@ class TransactionListPresenter(
                     symbol = tokenSymbol
                     value = count.toString()
                     tokenReceiveAddress = transactionInfo?.address
+                    recordOwnerAddress = WalletTable.current.address
                   }
 
                   if (index == lastIndex) {
@@ -90,6 +91,7 @@ class TransactionListPresenter(
                   symbol = tokenInfo!!.symbol
                   value = count.toString()
                   tokenReceiveAddress = transactionInfo?.address
+                  recordOwnerAddress = WalletTable.current.address
                 }
 
                 if (index == lastIndex) {
@@ -99,9 +101,10 @@ class TransactionListPresenter(
             }
           }.isFalse {
             it.apply {
-              isReceive = WalletTable.currentWallet.address == it.to
+              isReceive = WalletTable.current.address == it.to
               symbol = "ETH"
               value = CryptoUtils.toCountByDecimal(it.value.toDouble(), 18.0).toString()
+              recordOwnerAddress = WalletTable.current.address
             }
             if (index == lastIndex) {
               hold(this)
@@ -115,7 +118,7 @@ class TransactionListPresenter(
       // Show loading view
       activity.showLoadingView()
       // Get transaction data from `etherScan`
-      GoldStoneAPI.getTransactionListByAddress(WalletTable.currentWallet.address) {
+      GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
         if (isEmpty()) {
           GoldStoneAPI.context.runOnUiThread {
             // There isn't data in blockchain

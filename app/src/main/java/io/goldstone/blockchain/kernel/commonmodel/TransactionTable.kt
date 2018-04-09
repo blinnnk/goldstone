@@ -55,7 +55,7 @@ data class TransactionTable(
   var isReceive: Boolean,
   var isERC20: Boolean,
   var symbol: String,
-  var recordOwnerAddress: String = WalletTable.currentWallet.address,
+  var recordOwnerAddress: String,
   var tokenReceiveAddress: String? = null,
   var transactionVolume: Int? = null
 ) {
@@ -82,6 +82,7 @@ data class TransactionTable(
     "",
     false,
     false,
+    "",
     ""
   )
 

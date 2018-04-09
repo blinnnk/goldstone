@@ -55,7 +55,7 @@ class GoldStoneApp : Application() {
           currentLanguage = HoneyLanguage.getLanguageCode(configuration.locale.displayLanguage)
         } otherwise {
           currentLanguage = it?.language
-          WalletTable.currentWallet = it!!
+          WalletTable.current = it!!
         }
       }
     }

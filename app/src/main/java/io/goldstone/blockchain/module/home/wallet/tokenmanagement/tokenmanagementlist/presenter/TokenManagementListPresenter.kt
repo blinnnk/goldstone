@@ -23,7 +23,7 @@ class TokenManagementListPresenter(
   override fun updateData(asyncData: ArrayList<DefaultTokenTable>?) {
     DefaultTokenTable.getTokens { defaultTokens ->
       defaultTokens.forEachIndexed { index, defaultToken ->
-        val address = WalletTable.currentWallet.address
+        val address = WalletTable.current.address
         MyTokenTable.getTokensWith(address) { myTokens ->
           defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
           if (index == defaultTokens.lastIndex) fragment.asyncData = defaultTokens
@@ -47,7 +47,7 @@ class TokenManagementListPresenter(
     cell.apply {
       if (switch.isChecked) {
         // once it is checked then insert this symbol into `MyTokenTable` database
-        MyTokenTable.insertBySymbol(getSymbol(), WalletTable.currentWallet.address) {
+        MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
           needShowLoadingView = false
           fragment.getMainActivity()?.removeLoadingView()
         }
