@@ -27,7 +27,7 @@ class PaymentValueDetailCell(context: Context) : BaseCell(context) {
     info.title.text = model.count
     info.subtitle.text = model.info
     feeTypeDescription.text = model.type
-    radioButton.isChecked = false
+    radioButton.isChecked = model.isSelected
   }
 
   private val info by lazy { TwoLineTitles(context) }

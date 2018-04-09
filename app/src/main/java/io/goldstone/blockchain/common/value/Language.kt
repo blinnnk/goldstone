@@ -137,8 +137,8 @@ object TokenDetailText {
 
   @JvmField
   val address = when (currentLanguage) {
-    HoneyLanguage.English.code -> "Address Selection"
-    else -> "选择接收地址"
+    HoneyLanguage.English.code -> "Address"
+    else -> "接收地址"
   }
 
   @JvmField

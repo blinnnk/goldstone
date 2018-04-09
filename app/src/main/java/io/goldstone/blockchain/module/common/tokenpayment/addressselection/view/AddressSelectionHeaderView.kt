@@ -2,10 +2,13 @@ package io.goldstone.blockchain.module.common.tokenpayment.addressselection.view
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orZero
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GradientType
@@ -34,7 +37,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
     addressInput
       .apply {
         layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-        hint = "enter an wallet address or select a contacts below"
+        hint = "Enter an wallet address or select a contacts below"
         textSize = 5.uiPX().toFloat()
         textColor = Spectrum.white
         hintTextColor = Spectrum.opacity5White
@@ -47,7 +50,21 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
         typeface = GoldStoneFont.medium(context)
       }
       .into(this)
+  }
 
+  fun setFocusStatus() {
+    addressInput.hintTextColor = Spectrum.opacity1White
+    addressInput.requestFocus()
+  }
+
+  fun getInputStatus(hold: (isEditing: Boolean, address: String?) -> Unit) {
+    addressInput.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(char: Editable?) {
+        hold(char?.length.orZero() > 0, char?.toString())
+      }
+      override fun beforeTextChanged(char: CharSequence?, start: Int, count: Int, after: Int) { }
+      override fun onTextChanged(char: CharSequence?, start: Int, before: Int, count: Int) { }
+    })
   }
 
 }

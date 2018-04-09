@@ -116,4 +116,13 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
   }
 
+  fun setInputFocus() {
+    valueInput.hintTextColor = Spectrum.opacity1White
+    valueInput.requestFocus()
+  }
+
+  fun showTargetAddress(address: String) {
+    addressRemind.info.text = address
+  }
+
 }

@@ -4,14 +4,13 @@ import android.widget.EditText
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.appcompat.v7.Appcompat
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -30,7 +29,7 @@ class MnemonicImportDetailPresenter(
     nameInput: EditText
     ) {
     mnemonicInput.text.isEmpty().isTrue {
-      fragment.context?.alert(Appcompat, "mnemonic is not correct")?.show()
+      fragment.context?.alert("mnemonic is not correct")
       return
     }
     CreateWalletPresenter.checkInputValue(

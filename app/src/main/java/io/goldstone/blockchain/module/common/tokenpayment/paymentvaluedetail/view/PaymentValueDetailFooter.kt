@@ -8,6 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -20,6 +21,7 @@ import org.jetbrains.anko.textView
 
 class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 
+  var confirmClickEvent: Runnable? = null
   private val customButton by lazy { BaseCell(context) }
   private val confirmButton by lazy { RoundButton(context) }
 
@@ -49,8 +51,8 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
         setBlueStyle()
         text = CommonText.next.toUpperCase()
       }
+      .click { confirmClickEvent?.run() }
       .into(this)
-
   }
 
 }
