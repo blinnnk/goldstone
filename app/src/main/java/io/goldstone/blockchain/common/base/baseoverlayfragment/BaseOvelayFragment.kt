@@ -8,10 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
+import com.blinnnk.extension.getRealScreenHeight
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
-import io.goldstone.blockchain.common.utils.getRealScreenHeight
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -24,7 +28,6 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragment<T>>> : Fragment() {
 
   abstract val presenter: T
-  abstract fun setContentHeight(): Int
   abstract fun ViewGroup.initView()
 
   /** 观察悬浮曾的 `Header` 状态 */
@@ -44,6 +47,34 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
   private val minHeight = 265.uiPX()
 
+  /**
+   * 通过对 `Runnable` 的变化监控, 重新定制控件的 `Header`
+   */
+  open var customHeader: (OverlayHeaderLayout.() -> Unit)? by observing(null) {
+    overlayView.header.apply {
+      title.visibility = View.GONE
+      customHeader?.let {
+        it()
+        overlayView.contentLayout.setMargins<RelativeLayout.LayoutParams> {
+          topMargin = layoutParams.height
+        }
+      }
+    }
+  }
+
+  // 这个是用来还原 `Header` 的边界方法, 当自定义 `Header` 后还原的操作
+  fun recoveryOverlayHeader() {
+    overlayView.apply {
+      header.title.visibility = View.VISIBLE
+      header.layoutParams.height = 65.uiPX()
+      contentLayout.setMargins<RelativeLayout.LayoutParams> {
+        topMargin = 65.uiPX()
+      }
+    }
+  }
+
+  open fun setContentHeight(): Int = minHeight
+
   override fun onAttach(context: Context?) {
     super.onAttach(context)
     presenter.onFragmentAttach()
@@ -52,42 +83,52 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     presenter.onFragmentCreateView()
     return UI {
+
       overlayView = OverlayView(context!!)
       overlayView.contentLayout.initView()
       addView(overlayView, RelativeLayout.LayoutParams(matchParent, minHeight))
 
-      /** 执行动画 */
-      overlayView.contentLayout
-        .updateHeightAnimation(setContentHeight(), context?.getRealScreenHeight())
-
-      /** 设置悬浮曾的 `Header` 初始状态 */
-      overlayView.header.showBackButton(hasBackButton)
-      overlayView.header.showCloseButton(hasCloseButton)
-
+      overlayView.apply {
+        val maxHeight =
+          context?.getRealScreenHeight().orZero()
+        /** 执行伸展动画 */
+        contentLayout.updateHeightAnimation(setContentHeight(), maxHeight)
+        /** 设置悬浮曾的 `Header` 初始状态 */
+        header.apply {
+          showBackButton(hasBackButton)
+          showCloseButton(hasCloseButton)
+        }
+      }
     }.view
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    /** 设定标题的时机 */
-    overlayView.header.title.text = headerTitle
+    overlayView.apply {
+      /** 设定标题的时机 */
+      header.title.text = headerTitle
 
-    /** 关闭悬浮曾 */
-    overlayView.header.closeButton.onClick {
-      presenter.removeSelfFromActivity()
+      /** 关闭悬浮曾 */
+      header.closeButton.apply {
+        onClick {
+          presenter.removeSelfFromActivity()
+          preventDuplicateClicks()
+        }
+      }
     }
 
-    /** 返回上一级 */
-    overlayView.header.backButton.onClick {
-      presenter.backToLastFragment()
-    }
     presenter.onFragmentViewCreated()
   }
 
   override fun onDetach() {
     super.onDetach()
     presenter.onFragmentDetach()
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    presenter.onFragmentDestroy()
   }
 
   override fun onResume() {

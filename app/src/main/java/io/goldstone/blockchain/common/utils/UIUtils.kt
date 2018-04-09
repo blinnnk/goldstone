@@ -2,9 +2,8 @@ package io.goldstone.blockchain.common.utils
 
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.view.View
-import android.view.WindowManager
 import com.blinnnk.uikit.ScreenSize
+import io.goldstone.blockchain.R.drawable.*
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -21,5 +20,10 @@ object UIUtils {
     height: Float = ScreenSize.Height.toFloat()
   ) = LinearGradient(0f,0f, width, height, startColor, endColor, Shader.TileMode.CLAMP)
 
-  fun getHeight(view: View) = view.layoutParams.height
+  fun subtractThenHalf(first: Int, second: Int) = (first - second) / 2
+
+  fun generateAvatar(id: Int): Int {
+    val avatars = arrayListOf(avatar_1, avatar_2, avatar_3, avatar_4)
+    return avatars[id % 4]
+  }
 }

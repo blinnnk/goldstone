@@ -2,15 +2,19 @@ package io.goldstone.blockchain.module.entrance.starting.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import com.blinnnk.extension.into
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.GradientType
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
@@ -76,9 +80,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
             marginTop = 0
             setWhiteStyle()
           }
-          .click {
-            presenter.showCreateWalletFragment()
-          }
+          .click { presenter.showCreateWalletFragment() }
           .into(this)
 
         importButton
@@ -87,17 +89,14 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
             marginTop = PaddingSize.content
             setWhiteStyle()
           }
-          .click {
-            // Do Something
-          }
+          .click { presenter.showImportWalletFragment()}
           .into(this)
 
 
       }.lparams {
-        height = (ScreenSize.Height * 0.135).toInt() + UIUtils.getHeight(importButton) * 2
+        height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
         alignParentBottom()
       }
-
     }
   }
 

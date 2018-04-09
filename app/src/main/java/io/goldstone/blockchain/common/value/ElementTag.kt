@@ -6,6 +6,15 @@ package io.goldstone.blockchain.common.value
  */
 
 object FragmentTag {
+  const val home = "home"
+  const val walletDetail = "walletDetail"
+  const val profile = "profile"
+  const val quotation = "quotation"
   const val walletCreation = "walletCreation"
   const val mnemonicBackup = "mnemonicBackup"
+  const val agreement = "agreement"
+  const val mnemonicImportDetail = "mnemonicImportDetail"
+  const val keystoreImport = "keystoreImport"
+  const val privateKeyImport = "privateKeyImport"
+  const val watchOnlyImport = "watchOnlyImport"
 }

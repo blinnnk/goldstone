@@ -1,40 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="io.goldstone.blockchain">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="io.goldstone.blockchain">
 
-    <!-- 网络权限 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <!-- 网络权限 -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <!-- 本地读写权限 -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <!-- 相机使用权限 -->
+  <uses-permission android:name="android.permission.CAMERA" />
 
-    <application
-        android:name=".GoldStoneApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:screenOrientation="portrait"
-        android:supportsRtl="true"
-        tools:ignore="RtlEnabled"
-        tools:targetApi="donut"
-        android:theme="@style/MainTheme">
-        <!-- 登录和闪屏界面 -->
-        <activity
-            android:name=".module.entrance.splash.view.SplashActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait"
-            tools:ignore="InnerclassSeparator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
-        <activity android:name=".module.home.home.MainActivity">
+  <application
+    android:name=".GoldStoneApp"
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:screenOrientation="portrait"
+    android:supportsRtl="true"
+    android:theme="@style/MainTheme"
+    tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
+    tools:targetApi="donut">
+    <!-- 登录和闪屏界面 -->
+    <activity
+      android:name=".module.entrance.splash.view.SplashActivity"
+      android:screenOrientation="portrait"
+      android:windowSoftInputMode="adjustResize"
+      tools:ignore="InnerclassSeparator">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
 
-        </activity>
-    </application>
+    <activity android:name=".module.home.home.view.MainActivity">
+
+    </activity>
+  </application>
 
 </manifest>

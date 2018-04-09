@@ -5,19 +5,20 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.uikit.GradientStyle
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import com.bumptech.glide.load.resource.bitmap.CenterInside
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.addTopLRCorner
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
 
 /**
@@ -30,83 +31,156 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   var title: TextView
 
   val closeButton by lazy {
-    ImageView(context).apply {
+    HeaderIcon(context).apply {
       id = ElementID.closeButton
-      imageResource = R.drawable.close
-      setColorFilter(Grayscale.lightGray)
-      layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-        topMargin = 18.uiPX()
-        rightMargin = 20.uiPX()
-        alignParentRight()
-      }
-      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+      imageResource = R.drawable.close_icon
+      setRightPosition()
     }
   }
 
   val backButton by lazy {
-    ImageView(context).apply {
+    HeaderIcon(context).apply {
       id = ElementID.backButton
       imageResource = R.drawable.back
-      setColorFilter(Grayscale.lightGray)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      layoutParams = RelativeLayout.LayoutParams(iconSize + 5.uiPX(), iconSize + 5.uiPX()).apply {
-        topMargin = 18.uiPX()
-        leftMargin = 15.uiPX()
-        alignParentLeft()
-      }
-      addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+      setLeftPosition()
     }
   }
 
-  private val headerHeight = 65.uiPX()
-  private val iconSize = 30.uiPX()
+  private val searchButton by lazy {
+    HeaderIcon(context).apply {
+      id = ElementID.searchButton
+      imageResource = R.drawable.search_icon
+      setLeftPosition()
+    }
+  }
 
+  private val searchInput by lazy {
+    EditTextWithButton(context)
+  }
+
+  private val headerHeight = 65.uiPX()
   private val paint = Paint()
 
   init {
 
+    setWillNotDraw(false)
+
     layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, headerHeight)
-    addTopLRCorner(CornerSize.big, Spectrum.white)
 
     title = textView {
-      textColor = Grayscale.black
+      textColor = GrayScale.black
       textSize = FontSize.header
       typeface = GoldStoneFont.heavy(context)
       gravity = Gravity.CENTER
       layoutParams = RelativeLayout.LayoutParams(matchParent, headerHeight)
     }
 
-    paint.color = Grayscale.lightGray
+    paint.color = GrayScale.lightGray
     paint.isAntiAlias = true
     paint.style = Paint.Style.FILL
 
   }
 
   fun showCloseButton(isShow: Boolean) {
-    if (isShow) addView(closeButton)
-    else findViewById<ImageView>(ElementID.closeButton)?.let {
+    findViewById<ImageView>(ElementID.closeButton).apply {
+      if (isShow) {
+        isNull().isTrue { addView(closeButton) }
+      } else {
+        isNull().isFalse { removeView(this) }
+      }
+    }
+  }
+
+  fun showBackButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+    findViewById<ImageView>(ElementID.backButton).let {
+      it.isNull().isTrue {
+        isShow.isTrue {
+          backButton.click { setClickEvent(backButton) }.into(this)
+        }
+      } otherwise {
+        isShow.isTrue {
+          backButton.click { setClickEvent(backButton) }
+        } otherwise {
+          removeView(it)
+        }
+      }
+    }
+  }
+
+  fun showSearchButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+    if (isShow) {
+      searchButton
+        .click { setClickEvent(searchButton) }
+        .into(this)
+    } else findViewById<ImageView>(ElementID.searchButton)?.let {
       removeView(it)
     }
   }
 
-  fun showBackButton(isShow: Boolean) {
-    if (isShow) addView(backButton)
-    else findViewById<ImageView>(ElementID.backButton)?.let {
-      removeView(it)
+  fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit = {}) {
+
+    isShow.isTrue {
+      title.visibility = View.GONE
+      findViewById<EditTextWithButton>(ElementID.searchInput).let {
+        it.isNull().isTrue {
+          searchInput
+            .apply {
+              setCancelButton {
+                showSearchInput(false)
+                cancelEvent()
+              }
+            }
+            .into(this)
+        } otherwise {
+          it.visibility = View.VISIBLE
+        }
+      }
+    } otherwise {
+      title.visibility = View.VISIBLE
+      searchInput.visibility = View.GONE
     }
+
+    showCloseButton(!isShow)
+
   }
 
   override fun onDraw(canvas: Canvas?) {
     super.onDraw(canvas)
-
     canvas?.drawLine(
       PaddingSize.device.toFloat(),
       height - BorderSize.default,
       (ScreenSize.Width - PaddingSize.device).toFloat(),
       height - BorderSize.default, paint
     )
-
     canvas?.save()
+  }
+
+}
+
+class HeaderIcon(context: Context) : ImageView(context) {
+
+  private val iconSize = 30.uiPX()
+
+  init {
+    setColorFilter(GrayScale.lightGray)
+    scaleType = ImageView.ScaleType.CENTER_INSIDE
+    addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+  }
+
+  fun setLeftPosition() {
+    layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
+      topMargin = 18.uiPX()
+      leftMargin = 15.uiPX()
+      alignParentLeft()
+    }
+  }
+
+  fun setRightPosition() {
+    layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
+      topMargin = 18.uiPX()
+      rightMargin = 15.uiPX()
+      alignParentRight()
+    }
   }
 
 }
