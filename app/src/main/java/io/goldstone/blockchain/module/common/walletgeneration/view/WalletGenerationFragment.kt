@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.utils.getRealScreenHeight
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.createwallet.view.CreateWalletFragment
-import io.goldstone.blockchain.module.common.walletgeneration.presenter.WalletGenerationPresenter
 
 /**
  * @date 22/03/2018 9:37 PM
