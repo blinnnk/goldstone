@@ -8,6 +8,9 @@ import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 01/04/2018 12:38 AM
@@ -37,12 +40,15 @@ data class MyTokenTable(
     }
 
     fun deleteBySymbol(symbol: String, callback: () -> Unit = {}) {
-      coroutinesTask({
+      doAsync {
         GoldStoneDataBase.database.myTokenDao().apply {
-          getTokenBySymbol(symbol).let { it.isNull().isFalse { delete(it) } }
+          getTokenBySymbol(symbol).let { it.isNull().isFalse {
+            delete(it) }
+            GoldStoneAPI.context.runOnUiThread {
+              callback()
+            }
+          }
         }
-      }) {
-        callback()
       }
     }
 
@@ -57,17 +63,17 @@ data class MyTokenTable(
     }
 
     fun insertBySymbol(symbol: String, ownerAddress: String, callback: () -> Unit = {}) {
-      coroutinesTask({
+      doAsync {
         GoldStoneDataBase.database.apply {
           // 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
           myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull().isTrue {
             // 获取 `Symbol` 的 `ContractAddress`
             val symbolToken = defaultTokenDao().getTokenBySymbol(symbol)
             getBalanceWithSymbol(symbol, symbolToken.contract, ownerAddress)
+            // 结束后启用回调
+            GoldStoneAPI.context.runOnUiThread {  callback() }
           }
         }
-      }) {
-        callback()
       }
     }
 

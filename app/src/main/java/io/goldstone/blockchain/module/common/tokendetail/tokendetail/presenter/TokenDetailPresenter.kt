@@ -46,12 +46,12 @@ class TokenDetailPresenter(
       isNotEmpty().isTrue {
         fragment.asyncData = map { TransactionListModel(it) }.toArrayList()
         prepareTokenHistoryBalance(symbol!!) {
-          fragment.updateChartAndHeaderData()
+          it.updateChartAndHeaderData()
         }
       } otherwise {
         fragment.asyncData = arrayListOf() // TODO 还需要显示空的占位图
         prepareTokenHistoryBalance(symbol!!) {
-          fragment.updateChartAndHeaderData()
+          it.updateChartAndHeaderData()
         }
       }
     }
@@ -76,8 +76,7 @@ class TokenDetailPresenter(
   private var singleRunMark: Boolean? = null
   private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit = {}) {
     TransactionTable.getTransactionsByAddressAndSymbol(
-      WalletTable.current.address,
-      symbol!!
+      WalletTable.current.address, symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
         hold(transactions)
@@ -97,57 +96,55 @@ class TokenDetailPresenter(
     }
   }
 
-  private fun TokenDetailFragment.updateChartAndHeaderData() {
-    recyclerView.getItemViewAtAdapterPosition<TokenDetailHeaderView>(0) {
-      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol!!) {
-        val maxChartCount = 6
-        val chartArray = arrayListOf<Point>()
-        val charCount = if (size > maxChartCount) maxChartCount else lastIndex
-        forEachIndexed { index, it ->
-          chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
-          if (index == charCount) {
-            var maxY = Math.ceil(chartArray.maxBy { it.value }?.value!!.toDouble()) * 1.5
-            var unitY = Math.ceil((maxY / 10)).toFloat()
-            if (maxY == 0.0) maxY = 10.0
-            if (unitY == 0f) unitY = 1f
-            setCharData(chartArray, maxY.toFloat(), unitY)
-            return@getTokenBalanceBySymbol
-          }
+  private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
+    System.out.println("hello mother fuck $size")
+    fragment.recyclerView.getItemViewAtAdapterPosition<TokenDetailHeaderView>(0) {
+      val maxChartCount = 6
+      val chartArray = arrayListOf<Point>()
+      val charCount = if (size > maxChartCount) maxChartCount else lastIndex
+      forEachIndexed { index, it ->
+        chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
+        if (index == charCount) {
+          var maxY = Math.ceil(chartArray.maxBy { it.value }?.value!!.toDouble()) * 1.5
+          var unitY = Math.ceil((maxY / 10)).toFloat()
+          if (maxY == 0.0) maxY = 10.0
+          if (unitY == 0f) unitY = 1f
+          setCharData(chartArray, maxY.toFloat(), unitY)
         }
       }
     }
   }
 
   private fun ArrayList<TransactionTable>.prepareTokenHistoryBalance(
-    symbol: String, callback: () -> Unit
+    symbol: String, callback: (ArrayList<TokenBalanceTable>) -> Unit
   ) {
     // 首先更新此刻最新的余额数据到今天的数据
     TokenBalanceTable.updateTodayBalanceBySymbol(
-      WalletTable.current.address,
-      symbol
+      WalletTable.current.address, symbol
     ) { todayBalance ->
-
-      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) {
+      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) { balances ->
         // 如果除今天以外的最近一条数据更新的时间是昨天的整体时间, 那么只更新今天的价格
-        if (size > 2) {
-          if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
-            callback()
-            return@getTokenBalanceBySymbol
+        balances.apply {
+          if (size > 2) {
+            if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
+              System.out.println("hello shit $size")
+              callback(this)
+              return@getTokenBalanceBySymbol
+            }
           }
         }
         // 计算过去7天的所有余额
-        generateHistoryBalance(todayBalance) {
+        generateHistoryBalance(todayBalance) { history ->
+
           coroutinesTask({
-            it.forEach {
-              TokenBalanceTable.insertOrUpdate(
-                symbol,
-                WalletTable.current.address,
-                it.date,
-                it.balance
-              )
+            history.forEach {
+              TokenBalanceTable.insertOrUpdate(symbol, WalletTable.current.address, it.date, it.balance)
             }
           }) {
-            callback()
+            // 更新数据完毕后在主线程从新从数据库获取数据
+            TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) {
+              callback(it)
+            }
           }
         }
       }
@@ -160,31 +157,31 @@ class TokenDetailPresenter(
     todayBalance: Double, callback: (ArrayList<DateBalance>) -> Unit
   ) {
 
-    val oneDayAgoBalance = todayBalance - filter {
-      it.timeStamp.toMills() in 1.daysAgoInMills() .. 0.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+    coroutinesTask({
+      val oneDayAgoBalance = todayBalance - filter {
+        it.timeStamp.toMills() in 1.daysAgoInMills() .. 0.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    val twoDaysAgoBalance = oneDayAgoBalance - filter {
-      it.timeStamp.toMills() in 2.daysAgoInMills() .. 1.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      val twoDaysAgoBalance = oneDayAgoBalance - filter {
+        it.timeStamp.toMills() in 2.daysAgoInMills() .. 1.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    val threeDaysAgoBalance = twoDaysAgoBalance - filter {
-      it.timeStamp.toMills() in 3.daysAgoInMills() .. 2.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      val threeDaysAgoBalance = twoDaysAgoBalance - filter {
+        it.timeStamp.toMills() in 3.daysAgoInMills() .. 2.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    val fourDaysAgoBalance = threeDaysAgoBalance - filter {
-      it.timeStamp.toMills() in 4.daysAgoInMills() .. 3.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      val fourDaysAgoBalance = threeDaysAgoBalance - filter {
+        it.timeStamp.toMills() in 4.daysAgoInMills() .. 3.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    val fiveDaysAgoBalance = fourDaysAgoBalance - filter {
-      it.timeStamp.toMills() in 5.daysAgoInMills() .. 4.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      val fiveDaysAgoBalance = fourDaysAgoBalance - filter {
+        it.timeStamp.toMills() in 5.daysAgoInMills() .. 4.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    val sixDaysAgoBalance = fiveDaysAgoBalance - filter {
-      it.timeStamp.toMills() in 6.daysAgoInMills() .. 5.daysAgoInMills()
-    }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      val sixDaysAgoBalance = fiveDaysAgoBalance - filter {
+        it.timeStamp.toMills() in 6.daysAgoInMills() .. 5.daysAgoInMills()
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
 
-    callback(
       arrayListOf(
         DateBalance(6.daysAgoInMills(), sixDaysAgoBalance),
         DateBalance(5.daysAgoInMills(), fiveDaysAgoBalance),
@@ -193,7 +190,11 @@ class TokenDetailPresenter(
         DateBalance(2.daysAgoInMills(), twoDaysAgoBalance),
         DateBalance(1.daysAgoInMills(), oneDayAgoBalance)
       )
-    )
+
+    }) {
+      // 确保全部数据计算完毕进行回调
+      callback(it)
+    }
   }
 
   private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) 1 else -1

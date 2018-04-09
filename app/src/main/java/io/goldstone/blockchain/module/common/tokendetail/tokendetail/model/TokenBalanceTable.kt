@@ -33,7 +33,7 @@ data class TokenBalanceTable(
 
   companion object {
 
-    fun getTokenBalanceBySymbol(address: String, symbol: String, hold: ArrayList<TokenBalanceTable>.() -> Unit) {
+    fun getTokenBalanceBySymbol(address: String, symbol: String, hold: (ArrayList<TokenBalanceTable>) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.tokenBalanceDao().getTokenBalanceBySymbolAndAddress(address, symbol)
       }) {
@@ -67,15 +67,13 @@ data class TokenBalanceTable(
     }
 
     fun insertOrUpdate(symbol: String, address: String, date: Long, balance: Double) {
-      doAsync {
-        val addTime = System.currentTimeMillis()
-        GoldStoneDataBase.database.tokenBalanceDao().apply {
-          getBalanceByDate(date, address, symbol).let {
-            it.isEmpty().isTrue {
-              insert(TokenBalanceTable(0, symbol, date, addTime, balance, address))
-            } otherwise {
-              update(it[0].apply { insertTime = addTime })
-            }
+      val addTime = System.currentTimeMillis()
+      GoldStoneDataBase.database.tokenBalanceDao().apply {
+        getBalanceByDate(date, address, symbol).let {
+          it.isEmpty().isTrue {
+            insert(TokenBalanceTable(0, symbol, date, addTime, balance, address))
+          } otherwise {
+            update(it[0].apply { insertTime = addTime })
           }
         }
       }

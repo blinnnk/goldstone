@@ -2,15 +2,14 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 
 import android.arch.persistence.room.*
 import android.content.Context
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orFalse
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
@@ -135,6 +134,28 @@ data class WalletTable(
         return
       }
       callback()
+    }
+
+    fun getWalletByAddress(address: String, callback: (WalletTable?) -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
+      }) {
+        callback(it)
+      }
+    }
+
+    fun insertAddressAndGenerateTokenInfo(address: String, name: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
+          it.isNull().isFalse {
+            GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
+          }
+          WalletTable.insert(WalletTable(0, name, address, true))
+          CreateWalletPresenter.generateMyTokenInfo(address)
+        }
+      }) {
+        callback()
+      }
     }
 
   }
