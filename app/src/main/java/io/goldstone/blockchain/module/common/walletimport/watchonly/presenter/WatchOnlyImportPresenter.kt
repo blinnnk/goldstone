@@ -3,16 +3,13 @@ package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.web3j.crypto.WalletUtils
 
 /**
@@ -26,6 +23,12 @@ class WatchOnlyImportPresenter(
 
   fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
     val address = addressInput.text.toString()
+
+    if(!WalletUtils.isValidAddress(address)) {
+      fragment.context?.alert("address isn't valid")
+      return
+    }
+
     WalletUtils.isValidAddress(address).isTrue {
       val name =
         if  (nameInput.text.toString().isEmpty()) "Wallet"
@@ -36,9 +39,6 @@ class WatchOnlyImportPresenter(
       }) {
         fragment.activity?.jump<SplashActivity>()
       }
-    } otherwise {
-      fragment.context?.alert(Appcompat, "Address Content Is Incorrect")?.show()
     }
-
   }
 }

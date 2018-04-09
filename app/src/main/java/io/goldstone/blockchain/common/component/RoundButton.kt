@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
@@ -42,6 +43,9 @@ class RoundButton(context: Context) : View(context) {
     textPaint.isAntiAlias = true
     textPaint.style = Paint.Style.FILL
     textPaint.typeface = GoldStoneFont.heavy(context)
+
+    // 视觉垂直居中的微调
+    y += 2.uiPX()
 
   }
 
@@ -98,17 +102,23 @@ class RoundButton(context: Context) : View(context) {
     invalidate()
   }
 
-  fun setSmallButton(color: Int) {
+  fun setSmallButton(color: Int, textColor: Int = Spectrum.white) {
 
-    textSize = 12.uiPX().toFloat()
+    textSize = 11.uiPX().toFloat()
 
-    layoutParams = LinearLayout.LayoutParams(75.uiPX(), 35.uiPX()).apply {
+    layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
       topMargin = marginTop
       leftMargin = PaddingSize.device
     }
 
     addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = Spectrum.white
+    textPaint.color = textColor
+    invalidate()
+  }
+
+  fun updateColor(color: Int, textColor: Int = Spectrum.white) {
+    addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
+    textPaint.color = textColor
     invalidate()
   }
 

@@ -23,7 +23,8 @@ object GoldStoneEthCall {
     GetBalance("eth_getBalance"),
     GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
     GetTokenDecimal("eth_call", SolidityCode.getDecimal),
-    GetTokenName("eth_call", SolidityCode.getTokenName)
+    GetTokenName("eth_call", SolidityCode.getTokenName),
+    SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName)
   }
 
   @JvmStatic private val contentType = MediaType.parse("application/json; charset=utf-8")
@@ -74,6 +75,15 @@ object GoldStoneEthCall {
       getTokenDecimal(contractAddress) {
         hold(tokenBalance / Math.pow(10.0, it))
       }
+    }
+  }
+
+  @JvmStatic
+  fun sendRawTransaction(signTransactions: String, holdValue: (String) -> Unit) {
+    RequestBody.create(contentType,
+      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
+    ).let {
+      callEthBy(it) { holdValue(it) }
     }
   }
 

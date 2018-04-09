@@ -32,6 +32,7 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 
     // 内容的容器用来做动画
     overlayLayout = relativeLayout {
+
       layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
       isClickable = true
 

@@ -8,5 +8,6 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.mo
 data class PaymentValueDetailModel(
   val count: String = "",
   val info: String = "",
-  val type: String = ""
+  val type: String = "",
+  val isSelected: Boolean = false
 )

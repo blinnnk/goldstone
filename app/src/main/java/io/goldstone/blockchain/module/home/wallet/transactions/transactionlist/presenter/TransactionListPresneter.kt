@@ -55,7 +55,10 @@ class TransactionListPresenter(
 
   companion object {
 
-    private fun completeTransactionInfo(data: ArrayList<TransactionTable>, hold: ArrayList<TransactionTable>.() -> Unit) {
+    private fun completeTransactionInfo(
+      data: ArrayList<TransactionTable>,
+      hold: ArrayList<TransactionTable>.() -> Unit
+    ) {
       data.apply {
         forEachIndexed { index, it ->
           CryptoUtils.isERC20Transfer(it) {
@@ -115,7 +118,10 @@ class TransactionListPresenter(
       }
     }
 
-    fun getTransactionDataFromEtherScan(activity: MainActivity, hold: (ArrayList<TransactionListModel>) -> Unit) {
+    fun getTransactionDataFromEtherScan(
+      activity: MainActivity,
+      hold: (ArrayList<TransactionListModel>) -> Unit
+    ) {
       // Show loading view
       activity.showLoadingView()
       // Get transaction data from `etherScan`
@@ -129,16 +135,36 @@ class TransactionListPresenter(
           return@getTransactionListByAddress
         }
 
-        val data = this
-        doAsync {
-          completeTransactionInfo(data) {
-            forEachIndexed { index, it ->
-              it.to.isNotEmpty().isTrue { GoldStoneDataBase.database.transactionDao().insert(it) }
-              if (index == lastIndex) {
-                val transactions = filter { it.to.isNotEmpty() }.toArrayList()
-                GoldStoneAPI.context.runOnUiThread {
-                  activity.removeLoadingView()
-                  hold(transactions.map { TransactionListModel(it) }.toArrayList())
+        val chainData = this
+        TransactionTable.getAllTransactionsByAddress(WalletTable.current.address) { localData ->
+          doAsync {
+
+            // 目前判断链上数据个数和本地数据个数相同就认定是不用更新
+            if (localData.size == chainData.size) {
+              GoldStoneAPI.context.runOnUiThread {
+                activity.removeLoadingView()
+                hold(localData.map { TransactionListModel(it) }.toArrayList())
+              }
+              return@doAsync
+            }
+            
+            localData.forEach { transaction ->
+              chainData.find { it.hash == transaction.hash }?.let {
+                chainData.remove(it)
+              }
+            }
+            if (chainData.isNotEmpty()) {
+              completeTransactionInfo(chainData) {
+                forEachIndexed { index, it ->
+                  it.to.isNotEmpty()
+                    .isTrue { GoldStoneDataBase.database.transactionDao().insert(it) }
+                  if (index == lastIndex) {
+                    val transactions = filter { it.to.isNotEmpty() }.toArrayList()
+                    GoldStoneAPI.context.runOnUiThread {
+                      activity.removeLoadingView()
+                      hold(transactions.map { TransactionListModel(it) }.toArrayList())
+                    }
+                  }
                 }
               }
             }

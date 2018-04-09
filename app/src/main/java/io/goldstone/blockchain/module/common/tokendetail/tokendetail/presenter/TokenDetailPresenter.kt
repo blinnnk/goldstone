@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
@@ -214,7 +211,7 @@ class TokenDetailPresenter(
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       hideChildFragment(fragment)
       addFragmentAndSetArgument<T>(ContainerID.content) {
-        putAll(bundle)
+        bundle.isNotNull { putAll(bundle) }
       }
       overlayView.header.apply {
         showBackButton(true) {

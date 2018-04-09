@@ -2,6 +2,8 @@ package io.goldstone.blockchain.module.home.wallet.currentwalletdetail.view
 
 import android.view.ViewGroup
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
@@ -33,14 +35,13 @@ class CurrentWalletDetailFragment : BaseOverlayFragment<CurrentWalletDetailPrese
       // Send Argument
     }
 
-    createWalletButton
-      .apply {
-        setSmallButton(Spectrum.green)
-        text = CommonText.create.toUpperCase()
-        y += 20.uiPX()
-      }
-      .click { presenter.showCreateWalletFragment() }
-      .into(overlayView.header)
+    createWalletButton.apply {
+      setSmallButton(Spectrum.green)
+      text = CommonText.create.toUpperCase()
+    }.click {
+      presenter.showCreateWalletFragment()
+    }.into(overlayView.header)
+    createWalletButton.setCenterInVertical()
 
   }
 

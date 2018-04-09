@@ -11,7 +11,6 @@ import io.goldstone.blockchain.R.drawable.*
  */
 
 object UIUtils {
-
   // easy to set gradient color
   fun setGradientColor(
     startColor: Int,

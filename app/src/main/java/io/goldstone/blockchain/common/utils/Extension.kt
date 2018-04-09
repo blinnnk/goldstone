@@ -5,9 +5,10 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.graphics.Paint
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -81,3 +82,7 @@ fun Context.getIntFromSharedPreferences(key: String): Int =
 
 fun Fragment.getMainActivity() = activity as? MainActivity
 fun Context.getMainActivity() = this as? MainActivity
+
+fun Context.alert(message: String) {
+  alert(Appcompat, message).show()
+}
