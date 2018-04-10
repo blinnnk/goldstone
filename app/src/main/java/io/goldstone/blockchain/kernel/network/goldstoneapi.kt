@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.extension.forEachOrEnd
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.toArrayList
@@ -29,9 +30,9 @@ object GoldStoneAPI {
   @JvmStatic
   fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
     requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list") {
-      forEachIndexed { index, token ->
+      forEachOrEnd { token, isEnd ->
         if(token.forceShow == TinyNumber.True.value) token.isUsed = true
-        if (index == lastIndex) hold(this.toArrayList())
+        if (isEnd) hold(this.toArrayList())
       }
     }
   }

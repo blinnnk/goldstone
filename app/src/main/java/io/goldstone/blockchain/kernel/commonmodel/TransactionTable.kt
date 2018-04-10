@@ -23,7 +23,7 @@ data class TransactionTable(
   @SerializedName("hash")
   var hash: String,
   @Ignore @SerializedName("nonce")
-  private var nonce: String, // Ignore
+  var nonce: String, // Ignore
   @SerializedName("blockHash")
   var blockHash: String,
   @Ignore @SerializedName("transactionIndex")

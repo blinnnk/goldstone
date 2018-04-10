@@ -1,9 +1,22 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter
 
+import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.kernel.network.APIPath
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import org.web3j.crypto.Credentials
+import org.web3j.crypto.RawTransaction
+import org.web3j.crypto.TransactionEncoder
+import org.web3j.protocol.Web3jFactory
+import org.web3j.protocol.http.HttpService
+import org.web3j.utils.Convert
+import org.web3j.utils.Numeric
+import java.math.BigInteger
 
 /**
  * @date 28/03/2018 12:23 PM
@@ -14,16 +27,51 @@ class PaymentValueDetailPresenter(
   override val fragment: PaymentValueDetailFragment
 ) : BaseRecyclerPresenter<PaymentValueDetailFragment, PaymentValueDetailModel>() {
 
-  fun beginTransfer() {
-    transfer()
+  fun beginTransfer(address: String) {
+    transfer(address)
   }
 
-  private fun transfer() {
-    val code = "0xf8ad830f42408505d21dba00830493e0944c0a1ffca1c5a08a73ef7d7021e74ddbfed4975d80b844a9059cbb000000000000000000000000b1fdd955d6179d84299cd98c268d80542746600b0000000000000000000000000000000000000000000000008ac7230489e800002aa09b1c5a9a638c23f6108d1b90fd515d4ade2e3234c9765c0f831216f69f1d6282a0695bfe5dc901cd1b38ed04f7c1ee77c3bd884b8e2bcb854f05d1b74ef7cc3674"
+  private fun transfer(toAddress: String) {
+    fragment.context?.getPrivateKey(WalletTable.current.address, "125883Kay") { privateKey ->
 
-    GoldStoneEthCall.sendRawTransaction(code) {
-      System.out.println(it)
+      val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
+
+      coroutinesTask({
+        web3j.ethGasPrice().sendAsync().get().gasPrice
+
+      }) { gasPrice ->
+
+        GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
+
+          val getNonce = first().nonce + 3
+          val gasLimit = BigInteger.valueOf(4_300_000)
+
+          System.out.println("hello nonce $getNonce")
+          System.out.println("hello gasPrice $gasPrice")
+          System.out.println("hello address $toAddress")
+          System.out.println("hello limit $gasLimit")
+
+          try {
+            val nonce = BigInteger(getNonce)
+            val value = Convert.toWei("0.1", Convert.Unit.ETHER).toBigInteger()
+            val rawTransaction = RawTransaction.createEtherTransaction(
+              nonce, gasPrice, gasLimit, toAddress, value
+            )
+            val credentials = Credentials.create(privateKey)
+            val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
+            val hexValue = Numeric.toHexString(signedMessage)
+
+            GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
+              System.out.println("hello$taxHash")
+            }
+
+          } catch (e: Exception) {
+            e.printStackTrace()
+          }
+        }
+      }
     }
   }
+
 
 }
