@@ -106,7 +106,7 @@ fun Double.toEthCount(): String {
   return "0" + formatEditor.format(this / 1000000000000000000.0) + " ETH"
 }
 
-fun Double.fromatCurrency(): String {
+fun Double.formatCurrency(): String {
   val formatEditor = DecimalFormat("#")
   formatEditor.maximumFractionDigits = 3
   return formatEditor.format(this)

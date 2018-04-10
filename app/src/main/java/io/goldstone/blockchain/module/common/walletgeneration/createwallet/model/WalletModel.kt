@@ -23,7 +23,8 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "wallet")
 data class WalletTable(
   //@PrimaryKey autoGenerate 自增
-  @PrimaryKey(autoGenerate = true) var id: Int, var name: String,
+  @PrimaryKey(autoGenerate = true)
+  var id: Int, var name: String,
   var address: String,
   var isUsing: Boolean,
   var isWatchOnly: Boolean = false,
@@ -163,7 +164,7 @@ data class WalletTable(
 
 @Dao
 interface WalletDao {
-  @Query("SELECT * FROM wallet WHERE isUsing LIKE :status")
+  @Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
   fun findWhichIsUsing(status: Boolean): WalletTable?
 
   @Query("SELECT * FROM wallet WHERE address LIKE :walletAddress")

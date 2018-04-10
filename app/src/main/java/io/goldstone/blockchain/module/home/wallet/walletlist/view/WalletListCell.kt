@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")
@@ -32,7 +33,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
     }
 
     count.apply {
-      title.text = model.count.toString()
+      title.text = model.count.formatCurrency()
       subtitle.text = WalletText.totalAssets + SymbolText.usd
     }
 
