@@ -44,13 +44,11 @@ data class WalletDetailCellModel(
               it.price,
               CryptoUtils.formatDouble(count * it.price)
             ))
-
             if (isEnd) hold(tokenList)
           }
         }
       }
     }
-
 
   }
 }

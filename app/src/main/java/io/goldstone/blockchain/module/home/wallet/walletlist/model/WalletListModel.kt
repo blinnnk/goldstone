@@ -1,15 +1,29 @@
 package io.goldstone.blockchain.module.home.wallet.walletlist.model
 
+import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+
 /**
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
  */
 
 data class WalletListModel(
-  val addressName: String = "",
-  val address: String = "",
-  val count: Double = 0.0,
-  val avatar: Int = 0,
-  val isWatchOnly: Boolean = false,
-  val isUsing: Boolean = false
-)
+  var id: Int = 0,
+  var addressName: String = "",
+  var address: String = "",
+  var count: Double = 0.0,
+  var avatar: Int = 0,
+  var isWatchOnly: Boolean = false,
+  var isUsing: Boolean = false
+) {
+  constructor(data: WalletTable, balance: Double) : this(
+    data.id,
+    data.name,
+    data.address,
+    balance,
+    UIUtils.generateAvatar(data.id),
+    data.isWatchOnly,
+    data.isUsing
+  )
+}
