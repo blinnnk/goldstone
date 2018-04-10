@@ -60,7 +60,7 @@ class TransactionListPresenter(
       hold: ArrayList<TransactionTable>.() -> Unit
     ) {
       data.apply {
-        forEachIndexed { index, it ->
+        forEachOrEnd { it, isEnd ->
           CryptoUtils.isERC20Transfer(it) {
             // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
             val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(it.input)
@@ -83,9 +83,7 @@ class TransactionListPresenter(
                     recordOwnerAddress = WalletTable.current.address
                   }
 
-                  if (index == lastIndex) {
-                    hold(this)
-                  }
+                  if (isEnd) hold(this)
 
                 }
               } otherwise {
@@ -98,9 +96,8 @@ class TransactionListPresenter(
                   recordOwnerAddress = WalletTable.current.address
                 }
 
-                if (index == lastIndex) {
-                  hold(this)
-                }
+                if (isEnd) hold(this)
+
               }
             }
           }.isFalse {
@@ -110,9 +107,9 @@ class TransactionListPresenter(
               value = CryptoUtils.toCountByDecimal(it.value.toDouble(), 18.0).toString()
               recordOwnerAddress = WalletTable.current.address
             }
-            if (index == lastIndex) {
-              hold(this)
-            }
+
+            if (isEnd) hold(this)
+
           }
         }
       }
@@ -155,10 +152,10 @@ class TransactionListPresenter(
             }
             if (chainData.isNotEmpty()) {
               completeTransactionInfo(chainData) {
-                forEachIndexed { index, it ->
+                forEachOrEnd { it, isEnd ->
                   it.to.isNotEmpty()
                     .isTrue { GoldStoneDataBase.database.transactionDao().insert(it) }
-                  if (index == lastIndex) {
+                  if (isEnd) {
                     val transactions = filter { it.to.isNotEmpty() }.toArrayList()
                     GoldStoneAPI.context.runOnUiThread {
                       activity.removeLoadingView()

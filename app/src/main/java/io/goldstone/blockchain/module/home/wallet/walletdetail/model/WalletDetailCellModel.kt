@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
+import com.blinnnk.extension.forEachOrEnd
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -32,7 +33,7 @@ data class WalletDetailCellModel(
     ) {
       val tokenList = ArrayList<WalletDetailCellModel>()
       MyTokenTable.getTokensWith(walletAddress) { allTokens ->
-        allTokens.forEachIndexed { index, token ->
+        allTokens.forEachOrEnd { token, isEnd ->
           defaultTokens.find { it.symbol == token.symbol }?.let {
             val count = CryptoUtils.formatDouble(token.balance / Math.pow(10.0, it.decimals))
             tokenList.add(WalletDetailCellModel(
@@ -43,7 +44,8 @@ data class WalletDetailCellModel(
               it.price,
               CryptoUtils.formatDouble(count * it.price)
             ))
-            if (index == allTokens.lastIndex) { hold(tokenList) }
+
+            if (isEnd) hold(tokenList)
           }
         }
       }

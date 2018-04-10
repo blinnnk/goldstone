@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletlist.presenter
 
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -21,7 +22,7 @@ class WalletListPresenter(
   override fun updateData(asyncData: ArrayList<WalletListModel>?) {
     val walletList = ArrayList<WalletListModel>()
     WalletTable.getAll {
-      forEachIndexed { index, wallet ->
+      forEachOrEnd { wallet, isEnd ->
         walletList.add(
           WalletListModel(
             wallet.name,
@@ -32,9 +33,7 @@ class WalletListPresenter(
             wallet.isUsing
           )
         )
-        if (index == lastIndex && walletList.size == size) {
-          fragment.asyncData = walletList
-        }
+        if (isEnd) fragment.asyncData = walletList
       }
     }
   }

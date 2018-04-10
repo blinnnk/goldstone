@@ -46,39 +46,6 @@ fun<T> List<T>.toArrayList(): ArrayList<T> {
   return this.mapTo(arrayListOf()) { it }
 }
 
-/** Context Utils */
-
-private const val sharedPreferencesName = "share_date"
-
-fun <T> Context.saveDataToSharedPreferences(key: String, data: T) {
-  val sharedPreferencesEdit = getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).edit()
-  when (data) {
-    is String -> {
-      sharedPreferencesEdit.putString(key, data)
-      sharedPreferencesEdit.apply()
-    }
-    is Int -> {
-      sharedPreferencesEdit.putInt(key, data)
-      sharedPreferencesEdit.apply()
-    }
-    is Boolean -> {
-      sharedPreferencesEdit.putBoolean(key, data)
-      sharedPreferencesEdit.apply()
-    }
-    is Float -> {
-      sharedPreferencesEdit.putFloat(key, data)
-      sharedPreferencesEdit.apply()
-    }
-    is Long -> {
-      sharedPreferencesEdit.putLong(key, data)
-      sharedPreferencesEdit.apply()
-    }
-  }
-}
-
-fun Context.getIntFromSharedPreferences(key: String): Int =
-  getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE).getInt(key, 100)
-
 
 fun Fragment.getMainActivity() = activity as? MainActivity
 fun Context.getMainActivity() = this as? MainActivity

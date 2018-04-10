@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
@@ -87,7 +88,7 @@ class CreateWalletPresenter(
      */
     fun generateMyTokenInfo(ownerAddress: String, callback: () -> Unit = {}) {
       DefaultTokenTable.getTokens { tokenList ->
-        tokenList.forEachIndexed { index, tokenInfo ->
+        tokenList.forEachOrEnd { tokenInfo, isEnd ->
           // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
           if (tokenInfo.forceShow == TinyNumber.True.value) {
             // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
@@ -100,7 +101,7 @@ class CreateWalletPresenter(
                 MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
               }
             }
-            if(index == tokenList.lastIndex) callback()
+            if(isEnd) callback()
           }
         }
       }

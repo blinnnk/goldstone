@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.timeUpThen
@@ -22,11 +23,11 @@ class TokenManagementListPresenter(
 
   override fun updateData(asyncData: ArrayList<DefaultTokenTable>?) {
     DefaultTokenTable.getTokens { defaultTokens ->
-      defaultTokens.forEachIndexed { index, defaultToken ->
+      defaultTokens.forEachOrEnd { defaultToken, isEnd ->
         val address = WalletTable.current.address
         MyTokenTable.getTokensWith(address) { myTokens ->
           defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
-          if (index == defaultTokens.lastIndex) fragment.asyncData = defaultTokens
+          if (isEnd) fragment.asyncData = defaultTokens
         }
       }
     }

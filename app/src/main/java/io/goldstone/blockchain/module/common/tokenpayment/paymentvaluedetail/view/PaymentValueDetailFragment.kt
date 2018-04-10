@@ -40,8 +40,7 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(4) {
       confirmClickEvent = Runnable {
-        System.out.println("hello work")
-        presenter.beginTransfer()
+        address?.apply { presenter.beginTransfer(this) }
       }
     }
 
