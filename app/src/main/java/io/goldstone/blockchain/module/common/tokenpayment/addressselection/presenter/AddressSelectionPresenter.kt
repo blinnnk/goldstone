@@ -35,7 +35,8 @@ class AddressSelectionPresenter(
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       hideChildFragment(fragment)
       addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
-        putString(ArgumentKey.paymentValueDetail, address)
+        putString(ArgumentKey.paymentAddress, address)
+        putString(ArgumentKey.paymentSymbol, symbol)
       }
       overlayView.header.apply {
         backButton.onClick {

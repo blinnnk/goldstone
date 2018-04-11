@@ -23,8 +23,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
   override val presenter = WalletDetailPresenter(this)
 
   override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<WalletDetailCellModel>?
+    recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletDetailCellModel>?
   ) {
     recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray()) {
       headerView?.apply {

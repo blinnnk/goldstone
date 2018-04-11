@@ -37,18 +37,16 @@ class TokenDetailPresenter(
   override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
-  private val symbol by lazy { fragment.arguments?.getString(ArgumentKey.tokenDetail) }
-
-  override fun updateData(asyncData: ArrayList<TransactionListModel>?) {
+  override fun updateData() {
     prepareTokenDetailData {
       isNotEmpty().isTrue {
         fragment.asyncData = map { TransactionListModel(it) }.toArrayList()
-        prepareTokenHistoryBalance(symbol!!) {
+        prepareTokenHistoryBalance(fragment.symbol!!) {
           it.updateChartAndHeaderData()
         }
       } otherwise {
         fragment.asyncData = arrayListOf() // TODO 还需要显示空的占位图
-        prepareTokenHistoryBalance(symbol!!) {
+        prepareTokenHistoryBalance(fragment.symbol!!) {
           it.updateChartAndHeaderData()
         }
       }
@@ -77,7 +75,7 @@ class TokenDetailPresenter(
   private var singleRunMark: Boolean? = null
   private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit = {}) {
     TransactionTable.getTransactionsByAddressAndSymbol(
-      WalletTable.current.address, symbol!!
+      WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
         hold(transactions)

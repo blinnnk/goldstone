@@ -1,15 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter
 
-import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Environment
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.PermissionCategory
-import com.blinnnk.util.requestPermissionListener
-import com.blinnnk.util.verifyMultiplePermissions
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.checkPermissionThen
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
@@ -17,8 +17,6 @@ import org.jetbrains.anko.support.v4.toast
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
-import android.content.Intent
-import android.net.Uri
 
 /**
  * @date 26/03/2018 11:07 PM
@@ -54,26 +52,12 @@ class QRCodePresenter(
   }
 
   fun saveQRCodeImageToAlbum(address: String) {
-    fragment.activity?.checkPermissionThen {
+    fragment.activity?.checkPermissionThen(PermissionCategory.Write) {
       val size = (ScreenSize.Width * 0.8).toInt()
       val barcodeEncoder = BarcodeEncoder()
       val bitmap = barcodeEncoder.encodeBitmap(address, BarcodeFormat.QR_CODE, size, size)
       saveImage(bitmap)
       fragment.toast("QR code image has saved to album")
-    }
-  }
-
-  private fun Activity.checkPermissionThen(callback: () -> Unit) {
-    if (verifyMultiplePermissions(PermissionCategory.Write)) {
-      callback()
-    } else {
-      requestPermissionListener(PermissionCategory.Write) { hasPermission ->
-        if (hasPermission) {
-          callback()
-        } else {
-          checkPermissionThen(callback)
-        }
-      }
     }
   }
 

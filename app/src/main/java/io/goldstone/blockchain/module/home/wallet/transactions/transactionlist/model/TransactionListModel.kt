@@ -10,6 +10,8 @@ import io.goldstone.blockchain.crypto.toAscii
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import org.web3j.protocol.core.methods.response.Transaction
 import java.io.Serializable
 
 /**
@@ -48,6 +50,25 @@ data class TransactionListModel(
     data.hash,
     getMemoFromInputCode(data.input),
     data.gasUsed.toDouble() * data.gasPrice.toDouble(),
+    EtherScanApi.singleTransactionHas(data.hash)
+  )
+
+  constructor(data: Transaction, symbol: String) : this(
+    data.to,
+    CryptoUtils.scaleTo28(
+      HoneyDateUtil.getSinceTime("100")
+        + descriptionText(WalletTable.current.address == data.to)
+        + data.from
+    ),
+    CryptoUtils.formatDouble(data.value.toDouble()),
+    symbol,
+    WalletTable.current.address == data.to,
+    DateUtils.formatDateTime(GoldStoneAPI.context, 100 * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, 100 * 1000, FORMAT_SHOW_TIME),
+    if (WalletTable.current.address == data.to) data.from else data.to,
+    data.blockNumber.toString(),
+    data.hash,
+    getMemoFromInputCode(data.input),
+    data.gas.toDouble() * data.gasPrice.toDouble(),
     EtherScanApi.singleTransactionHas(data.hash)
   )
 }

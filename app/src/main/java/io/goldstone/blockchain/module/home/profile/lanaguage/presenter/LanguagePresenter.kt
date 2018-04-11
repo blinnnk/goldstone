@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.reload
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
@@ -45,7 +45,7 @@ class LanguagePresenter(
     }
 
     WalletTable.updateLanguage(code) {
-      GoldStoneApp.reload(fragment.context!!)
+      fragment.context?.reload()
     }
   }
 

@@ -56,6 +56,14 @@ data class DefaultTokenTable(
       }
     }
 
+    fun getTokenBySymbol(symbol: String, hold: (DefaultTokenTable) -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
+      }) {
+        hold(it)
+      }
+    }
+
     fun getTokenByContractAddress(contractAddress: String, hold: (DefaultTokenTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.defaultTokenDao().getSymbolByContractAddress(contractAddress)

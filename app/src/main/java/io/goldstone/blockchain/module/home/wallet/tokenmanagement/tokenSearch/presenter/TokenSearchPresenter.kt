@@ -13,7 +13,7 @@ class TokenSearchPresenter(
   override val fragment: TokenSearchFragment
   ) : BaseRecyclerPresenter<TokenSearchFragment, DefaultTokenTable>() {
 
-  override fun updateData(asyncData: ArrayList<DefaultTokenTable>?) {
+  override fun updateData() {
     DefaultTokenTable.getTokens {
       fragment.asyncData = it
     }

@@ -28,7 +28,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
       icon.image.glideImage(iconUrl)
       tokenInfo.title.text = symbol
       tokenInfo.subtitle.text = name
-      valueInfo.title.text = balance.toString()
+      valueInfo.title.text = count.toString()
       valueInfo.subtitle.text = "≈ " + currency + SymbolText.usd
     }
   }

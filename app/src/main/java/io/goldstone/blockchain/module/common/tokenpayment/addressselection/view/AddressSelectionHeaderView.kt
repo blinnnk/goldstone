@@ -57,7 +57,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
     addressInput.requestFocus()
   }
 
-  fun getInputStatus(hold: (isEditing: Boolean, address: String?) -> Unit) {
+  fun getInputStatus(hold: (hasInput: Boolean, address: String?) -> Unit) {
     addressInput.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(char: Editable?) {
         hold(char?.length.orZero() > 0, char?.toString())

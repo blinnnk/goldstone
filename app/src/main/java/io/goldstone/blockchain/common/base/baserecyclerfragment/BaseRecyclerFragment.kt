@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
+import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.support.v4.UI
@@ -169,7 +170,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
       }
     })
 
-    presenter.updateData(asyncData)
+    presenter.updateData()
   }
 
   override fun onHiddenChanged(hidden: Boolean) {
@@ -184,6 +185,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   open fun ViewGroup.showEmptyView() {
     emptyLayout = EmptyView(context).apply {
       when (this@BaseRecyclerFragment) {
+        is PaymentValueDetailFragment -> return
         is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
         else -> setStyle(EmptyType.TransactionDetail)
       }

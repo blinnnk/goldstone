@@ -3,13 +3,17 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.vi
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
@@ -20,6 +24,9 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import org.jetbrains.anko.*
@@ -34,7 +41,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
   private val gradientView by lazy { GradientView(context) }
   private val description by lazy { TextView(context) }
   private val valueInput by lazy { EditText(context) }
-  private val infoInput by lazy { TextView(context) }
+  private val priceInfo by lazy { TextView(context) }
   private val addressRemind by lazy { TransactionDetailCell(context) }
 
   private val gradientViewHeight = 170.uiPX()
@@ -56,7 +63,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
       description
         .apply {
           layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
-            topMargin = 18.uiPX()
+            topMargin = 15.uiPX()
           }
           text = "Send ETH Count"
           textColor = Spectrum.opacity5White
@@ -74,18 +81,19 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
           textSize = 16.uiPX().toFloat()
           typeface = GoldStoneFont.heavy(context)
           gravity = Gravity.CENTER
-          inputType = InputType.TYPE_CLASS_NUMBER
+          inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
           setCursorColor(Spectrum.blue)
           backgroundTintMode = PorterDuff.Mode.CLEAR
+          y -= 3.uiPX()
         }
         .into(this)
 
-      infoInput
+      priceInfo
         .apply {
           layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
-            topMargin = -(20.uiPX())
+            topMargin = -(18.uiPX())
           }
-          text = "≈ 1298.29 (USD)"
+          text = "≈ 0.0 (USD)"
           textColor = Spectrum.opacity5White
           textSize = 4.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
@@ -123,6 +131,20 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
   fun showTargetAddress(address: String) {
     addressRemind.info.text = address
+  }
+
+  fun updateCurrencyValue(value: Double?) {
+    priceInfo.text = "≈ ${ value.orElse(0.0).formatCurrency() } (USD)"
+  }
+
+  fun inputTextListener(hold: (String) -> Unit) {
+    valueInput.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(text: Editable?) {
+        text?.apply { hold(toString()) }
+      }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    })
   }
 
 }

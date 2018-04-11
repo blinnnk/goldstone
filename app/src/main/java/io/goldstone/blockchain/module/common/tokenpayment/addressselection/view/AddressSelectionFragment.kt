@@ -2,14 +2,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.addressselection.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.AddressSelectionPresenter
 import io.goldstone.blockchain.module.home.profile.contacts.model.ContactsModel
@@ -21,6 +18,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactsModel>() {
+
+  val symbol by lazy { arguments?.getString(ArgumentKey.tokenDetail) }
 
   override val presenter = AddressSelectionPresenter(this)
 
@@ -48,8 +47,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
       setFocusStatus()
       getParentFragment<TokenDetailOverlayFragment> {
         showConfirmButton()
-        getInputStatus { isEditing, address ->
-          setConfirmStatus(isEditing)
+        getInputStatus { hasInput, address ->
+          setConfirmStatus(hasInput)
           address?.apply {
             confirmButtonClickEvent = Runnable {
               this@AddressSelectionFragment.presenter.showPaymentValueDetailFragment(address)
@@ -60,13 +59,28 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
     }
   }
 
+
   override fun onDestroyView() {
     super.onDestroyView()
     getParentFragment<TokenDetailOverlayFragment> {
       showConfirmButton(false)
       activity?.apply { SoftKeyboard.hide(this) }
-
     }
+  }
+
+  override fun onHiddenChanged(hidden: Boolean) {
+    super.onHiddenChanged(hidden)
+    // 通过自己的显示状态管理父级头部的 `ConfirmButton` 显示状态
+    getParentFragment<TokenDetailOverlayFragment> {
+      hidden.isTrue {
+        showConfirmButton(false)
+      } otherwise {
+        showConfirmButton()
+        setConfirmStatus(true)
+        activity?.apply { SoftKeyboard.hide(this) }
+      }
+    }
+
   }
 
 }
