@@ -21,7 +21,7 @@ class TokenManagementListPresenter(
   override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 
-  override fun updateData(asyncData: ArrayList<DefaultTokenTable>?) {
+  override fun updateData() {
     DefaultTokenTable.getTokens { defaultTokens ->
       defaultTokens.forEachOrEnd { defaultToken, isEnd ->
         val address = WalletTable.current.address
@@ -56,7 +56,7 @@ class TokenManagementListPresenter(
         needShowLoadingView = false
         fragment.getMainActivity()?.removeLoadingView()
         // once it is unchecked then delete this symbol from `MyTokenTable` database
-        MyTokenTable.deleteBySymbol(getSymbol())
+        MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
       }
       // prevent duplicate clicks
       cell.switch.preventDuplicateClicks()

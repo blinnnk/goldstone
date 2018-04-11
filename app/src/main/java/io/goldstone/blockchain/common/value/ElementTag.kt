@@ -18,3 +18,7 @@ object FragmentTag {
   const val privateKeyImport = "privateKeyImport"
   const val watchOnlyImport = "watchOnlyImport"
 }
+
+object ViewTag {
+  const val paymentCell = "paymentCell"
+}

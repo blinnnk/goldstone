@@ -32,7 +32,7 @@ class WalletSettingsListPresenter(
   override val fragment: WalletSettingsListFragment
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
 
-  override fun updateData(asyncData: ArrayList<WalletSettingsListModel>?) {
+  override fun updateData() {
     val balanceText = WalletTable.current.balance.toString() + SymbolText.usd
     fragment.asyncData = arrayListOf(
       WalletSettingsListModel(WalletSettingsText.checkQRCode),

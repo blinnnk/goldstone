@@ -14,10 +14,24 @@ data class WalletDetailCellModel(
   var iconUrl: String = "",
   var symbol: String = "",
   var name: String = "",
-  var balance: Double = 0.0,
+  var decimal: Double = 0.0,
+  var count: Double = 0.0,
   var price: Double = 0.0,
   var currency: Double = 0.0
 ) {
+
+  constructor(data: DefaultTokenTable, balance: Double) : this(
+    data.iconUrl,
+    data.symbol,
+    data.name,
+    data.decimals,
+    CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
+    data.price,
+    0.0
+  ) {
+    currency = CryptoUtils.formatDouble(count * data.price)
+  }
+
   companion object {
 
     fun getModels(walletAddress: String, hold: (ArrayList<WalletDetailCellModel>) -> Unit) {
@@ -33,18 +47,10 @@ data class WalletDetailCellModel(
     ) {
       val tokenList = ArrayList<WalletDetailCellModel>()
       MyTokenTable.getTokensWith(walletAddress) { allTokens ->
-        allTokens.forEachOrEnd { token, isEnd ->
+        allTokens.forEach { token ->
           defaultTokens.find { it.symbol == token.symbol }?.let {
-            val count = CryptoUtils.formatDouble(token.balance / Math.pow(10.0, it.decimals))
-            tokenList.add(WalletDetailCellModel(
-              it.iconUrl,
-              it.symbol,
-              it.name,
-              count,
-              it.price,
-              CryptoUtils.formatDouble(count * it.price)
-            ))
-            if (isEnd) hold(tokenList)
+            tokenList.add(WalletDetailCellModel(it, token.balance))
+            if (tokenList.size == allTokens.size) hold(tokenList)
           }
         }
       }

@@ -18,3 +18,7 @@ object SolidityCode {
 object CryptoValue {
   const val bip39AddressLength = 39
 }
+
+object CryptoSymbol {
+  const val eth = "ETH"
+}

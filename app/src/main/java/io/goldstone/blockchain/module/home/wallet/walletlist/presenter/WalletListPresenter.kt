@@ -22,7 +22,7 @@ class WalletListPresenter(
   override val fragment: WalletListFragment
 ) : BaseRecyclerPresenter<WalletListFragment, WalletListModel>() {
 
-  override fun updateData(asyncData: ArrayList<WalletListModel>?) {
+  override fun updateData() {
     updateAllWalletBalance {
       fragment.asyncData = this
     }
@@ -39,14 +39,14 @@ class WalletListPresenter(
     // 获取全部本机钱包
     WalletTable.getAll {
       // 获取全部本地记录的 `Token` 信息
-      DefaultTokenTable.getTokens { tokensInfo ->
+      DefaultTokenTable.getTokens { allTokens ->
         doAsync {
           forEach { wallet ->
             // 获取对应的钱包下的全部 `token`
             MyTokenTable.getTokensWith(wallet.address) {
               // 计算当前钱包下的 `token` 对应的货币总资产
               WalletListModel(wallet, it.sumByDouble { walletToken ->
-                val thisToken = tokensInfo.find { it.symbol == walletToken.symbol }!!
+                val thisToken = allTokens.find { it.symbol == walletToken.symbol }!!
                 CryptoUtils.toCountByDecimal(walletToken.balance, thisToken.decimals) * thisToken.price
               }).let {
                 data.add(it)

@@ -12,5 +12,6 @@ object ArgumentKey {
   const val walletAddress = "walletAddress"
   const val transactionDetail = "transactionDetail"
   const val tokenDetail = "tokenDetail"
-  const val paymentValueDetail = "paymentValueDetail"
+  const val paymentAddress = "paymentAddress"
+  const val paymentSymbol = "paymentSymbol"
 }

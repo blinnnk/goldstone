@@ -61,8 +61,13 @@ object GoldStoneAPI {
         val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
         val jsonData = dataObject[keyName].toString()
         val gson = Gson()
+
         val collectionType = object : TypeToken<Collection<T>>() {}.type
-        hold(gson.fromJson(jsonData, collectionType))
+        try {
+          hold(gson.fromJson(jsonData, collectionType))
+        } catch (error: Exception) {
+          System.out.println(error)
+        }
       }
     })
   }

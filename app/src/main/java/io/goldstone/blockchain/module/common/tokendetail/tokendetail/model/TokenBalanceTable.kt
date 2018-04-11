@@ -46,9 +46,9 @@ data class TokenBalanceTable(
       if (symbol == "ETH") {
         doAsync {
           GoldStoneEthCall.getEthBalance(address) { balance ->
-            insertOrUpdate(symbol, address, today, balance.toEthValue())
+            insertOrUpdate(symbol, address, today, balance.toEthCount())
             GoldStoneAPI.context.runOnUiThread {
-              callback(balance.toEthValue())
+              callback(balance.toEthCount())
             }
           }
         }

@@ -30,8 +30,8 @@ class PaymentValueDetailCell(context: Context) : BaseCell(context) {
     radioButton.isChecked = model.isSelected
   }
 
+  val radioButton by lazy { HoneyRadioButton(context) }
   private val info by lazy { TwoLineTitles(context) }
-  private val radioButton by lazy { HoneyRadioButton(context) }
   private val feeTypeDescription by lazy { TextView(context) }
 
   init {
@@ -46,7 +46,7 @@ class PaymentValueDetailCell(context: Context) : BaseCell(context) {
     feeTypeDescription
       .apply {
         textSize = 4.uiPX().toFloat()
-        textColor = GrayScale.midGray
+        textColor = GrayScale.gray
         typeface = GoldStoneFont.book(context)
       }
       .into(this)
@@ -76,6 +76,10 @@ class PaymentValueDetailCell(context: Context) : BaseCell(context) {
 
     hasArrow = false
 
+  }
+
+  fun unSelectedRadio() {
+    radioButton.isChecked = false
   }
 
 }

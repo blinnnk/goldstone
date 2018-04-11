@@ -19,7 +19,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
   abstract val fragment: T
 
-  open fun updateData(asyncData: ArrayList<D>?) {
+  open fun updateData() {
     // Do Something
   }
 

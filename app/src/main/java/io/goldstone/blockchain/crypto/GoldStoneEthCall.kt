@@ -5,7 +5,6 @@ import android.content.Context
 import io.goldstone.blockchain.kernel.network.APIPath
 import okhttp3.*
 import org.json.JSONObject
-import org.web3j.abi.datatypes.Bool
 import java.io.IOException
 
 @SuppressLint("StaticFieldLeak")
@@ -84,7 +83,7 @@ object GoldStoneEthCall {
     RequestBody.create(contentType,
       "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
     ).let {
-      callEthBy(it, true) { holdValue(it) }
+      callEthBy(it) { holdValue(it) }
     }
   }
 
@@ -140,7 +139,7 @@ object GoldStoneEthCall {
     }
   }
 
-  private fun callEthBy(body: RequestBody, isResponseBody: Boolean = false, hold: (String) -> Unit) {
+  private fun callEthBy(body: RequestBody, hold: (String) -> Unit) {
     val client = OkHttpClient()
     val request = Request.Builder()
       .url(APIPath.ropstan)
@@ -156,11 +155,12 @@ object GoldStoneEthCall {
       @SuppressLint("SetTextI18n")
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
-        if (isResponseBody) {
-          hold(data!!)
-        } else {
-          val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+        val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+        try {
           hold(dataObject["result"].toString())
+        } catch (error: Exception) {
+          hold(data.orEmpty())
+          System.out.println(error)
         }
       }
     })

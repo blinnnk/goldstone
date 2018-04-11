@@ -31,7 +31,7 @@ class TransactionListPresenter(
   override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 
-  override fun updateData(asyncData: ArrayList<TransactionListModel>?) {
+  override fun updateData() {
     TransactionTable.getAllTransactionsByAddress(WalletTable.current.address) {
       it.isEmpty().isTrue {
         getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {

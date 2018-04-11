@@ -1,17 +1,11 @@
 package io.goldstone.blockchain.crypto
 
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import jnr.ffi.annotations.In
 import java.text.DecimalFormat
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZoneId.systemDefault
 import java.util.*
 
 /**
@@ -100,20 +94,36 @@ object CryptoUtils {
     && inputCode.substring(0, SolidityCode.contractTransfer.length) == SolidityCode.contractTransfer
 }
 
-fun Double.toEthCount(): String {
+fun Double.toEthValue(): String {
   val formatEditor = DecimalFormat("#")
   formatEditor.maximumFractionDigits = 18
-  return "0" + formatEditor.format(this / 1000000000000000000.0) + " ETH"
+  val value = this / 1000000000000000000.0
+  val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
+  return "$prefix${ formatEditor.format(this / 1000000000000000000.0) } ETH"
+}
+
+fun Double.toEthCount(): Double {
+  return this / 1000000000000000000.0
+}
+
+fun Double.toGasValue(): String {
+  val formatEditor = DecimalFormat("#")
+  formatEditor.maximumFractionDigits = 9
+  return formatEditor.format(this)
+}
+
+fun Double.toGWeiValue(): String {
+  val formatEditor = DecimalFormat("#")
+  formatEditor.maximumFractionDigits = 9
+  return formatEditor.format(this / 1000000000)
 }
 
 fun Double.formatCurrency(): String {
   val formatEditor = DecimalFormat("#")
   formatEditor.maximumFractionDigits = 3
-  return formatEditor.format(this)
-}
-
-fun Double.toEthValue(): Double {
-  return this / 1000000000000000000.0
+  val value = formatEditor.format(this).toDouble()
+  val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
+  return prefix + formatEditor.format(this)
 }
 
 fun Int.daysAgoInMills(): Long = CryptoUtils.getTargetDayInMills(-this)
@@ -130,3 +140,7 @@ fun String.toMills(timeType: TimeType = TimeType.Second): Long {
     TimeType.Day -> this.toLong() * 1000L * 60L * 60L * 12L
   }
 }
+
+fun Double.toGwei() = this / 1000000000.0
+
+fun Double.scaleToGwei() = this * 1000000000.0

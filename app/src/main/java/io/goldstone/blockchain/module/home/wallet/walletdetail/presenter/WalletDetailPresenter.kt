@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -29,7 +30,7 @@ class WalletDetailPresenter(
   override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
-  override fun updateData(asyncData: ArrayList<WalletDetailCellModel>?) {
+  override fun updateData() {
     updateAllTokensInWalletBy()
   }
 
@@ -40,7 +41,8 @@ class WalletDetailPresenter(
     WalletTable.apply { getAll { walletCount = size } }
 
     // Check the info of wallet currency list
-    WalletDetailCellModel.getModels(wallet.address) { newDataSet ->
+    WalletDetailCellModel.getModels(wallet.address) { it ->
+      val newDataSet = it.sortedByDescending { it.currency }.toArrayList()
       fragment.apply {
         context?.runOnUiThread {
           asyncData.isNull().isTrue {
@@ -57,9 +59,7 @@ class WalletDetailPresenter(
               }
             }
           }
-          val totalBalance = asyncData?.sumByDouble {
-            CryptoUtils.formatDouble(it.currency)
-          }
+          val totalBalance = asyncData?.sumByDouble { it.currency }
 
           // Once the calculation is finished then update `WalletTable`
           wallet.balance = totalBalance

@@ -60,17 +60,6 @@ class GoldStoneApp : Application() {
       }
     }
 
-    fun reload(context: Context) {
-      val startActivity = Intent(context, SplashActivity::class.java)
-      val pendingIntentId = 123456
-      val pendingIntent = PendingIntent.getActivity(context, pendingIntentId, startActivity,
-        PendingIntent.FLAG_CANCEL_CURRENT
-      )
-      val service = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-      service.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent)
-      System.exit(0)
-    }
-
     fun updateLocalDefaultTokens(context: Context) {
 
       // 准备默认的 `Token List`
