@@ -37,12 +37,8 @@ object CryptoUtils {
     return DecimalFormat("0.00").format(value).toDouble()
   }
 
-  fun formatFeeDouble(value: Double): Double {
-    return DecimalFormat("0.0000000").format(value).toDouble()
-  }
-
   fun toCountByDecimal(value: Double, decimal: Double): Double {
-    return value / Math.pow(10.0, decimal)
+    return value / Math.pow(10.0, if (decimal < 4) 18.0 else decimal)
   }
 
   fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {

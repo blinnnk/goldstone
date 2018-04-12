@@ -61,7 +61,7 @@ class TokenDetailPresenter(
 
   fun showTransactionDetailFragment(model: TransactionListModel) {
     val arguments = Bundle().apply {
-      putSerializable(ArgumentKey.transactionDetail, model)
+      putSerializable(ArgumentKey.transactionFromList, model)
     }
     shoTargetFragment<TransactionDetailFragment>(TransactionText.detail, arguments)
   }
