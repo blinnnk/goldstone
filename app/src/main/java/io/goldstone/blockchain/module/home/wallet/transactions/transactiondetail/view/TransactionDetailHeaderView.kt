@@ -71,9 +71,9 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
   }
 
   @SuppressLint("SetTextI18n")
-  fun setIconStyle(count: Double, targetAddress: String, isReceive: Boolean, isPending: Boolean) {
+  fun setIconStyle(count: Double, targetAddress: String, symbol: String, isReceive: Boolean, isPending: Boolean) {
     val type = if(isReceive) "Received " else "Send "
-    info.title.text = "$type$count ETH ${if(isReceive) "From" else "To"}"
+    info.title.text = "$type$count $symbol ${if(isReceive) "From" else "To"}"
     info.subtitle.text = targetAddress
 
     if (isPending) {

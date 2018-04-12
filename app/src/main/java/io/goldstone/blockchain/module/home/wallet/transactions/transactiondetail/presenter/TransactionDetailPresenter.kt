@@ -44,7 +44,7 @@ class TransactionDetailPresenter(
   override fun updateData() {
 
     dataFromList?.apply {
-      updateHeaderValue(count, targetAddress, false, isReceived)
+      updateHeaderValue(count, targetAddress, symbol, false, isReceived)
       fragment.asyncData = generateModels(this)
     }
 
@@ -52,7 +52,7 @@ class TransactionDetailPresenter(
       transactionHash = taxHash
       count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimals)
       fragment.asyncData = generateModels()
-      updateHeaderValue(count, address, true)
+      updateHeaderValue(count, address, token.symbol, true)
       observerTransaction()
     }
 
@@ -117,9 +117,9 @@ class TransactionDetailPresenter(
   }
 
   private fun updateHeaderValue(
-    count: Double, address: String, isPending: Boolean, isReceive: Boolean = false) {
+    count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false) {
     fragment.recyclerView.getItemViewAtAdapterPosition<TransactionDetailHeaderView>(0) {
-      setIconStyle(count, address, isReceive, isPending)
+      setIconStyle(count, address, symbol, isReceive, isPending)
     }
   }
 
