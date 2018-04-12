@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.honey.setCursorColor
@@ -24,10 +23,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.formatCurrency
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import org.jetbrains.anko.*
 
@@ -107,7 +103,6 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
       addressRemind.into(this)
       addressRemind.apply {
         setGrayInfoStyle()
-        model = TransactionDetailModel("0x9d0x8d79s86d56s77d9s76d45s6d67s9d87f68s87d0", "Address To")
       }
 
       textView {
@@ -123,6 +118,8 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
     }.setAlignParentBottom()
 
   }
+
+  fun getInputValue() = valueInput.text.toString().toDouble()
 
   fun setInputFocus() {
     valueInput.hintTextColor = Spectrum.opacity1White

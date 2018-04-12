@@ -1,14 +1,15 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.toEthCount
-import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -33,7 +34,7 @@ data class TokenBalanceTable(
 
   companion object {
 
-    fun getTokenBalanceBySymbol(address: String, symbol: String, hold: (ArrayList<TokenBalanceTable>) -> Unit) {
+    fun getBalanceBySymbol(address: String, symbol: String, hold: (ArrayList<TokenBalanceTable>) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.tokenBalanceDao().getTokenBalanceBySymbolAndAddress(address, symbol)
       }) {
@@ -43,7 +44,7 @@ data class TokenBalanceTable(
 
     fun updateTodayBalanceBySymbol(address: String, symbol: String, callback: (Double) -> Unit) {
       val today = CryptoUtils.getTargetDayInMills(Calendar.DATE)
-      if (symbol == "ETH") {
+      if (symbol == CryptoSymbol.eth) {
         doAsync {
           GoldStoneEthCall.getEthBalance(address) { balance ->
             insertOrUpdate(symbol, address, today, balance.toEthCount())
@@ -70,10 +71,14 @@ data class TokenBalanceTable(
       val addTime = System.currentTimeMillis()
       GoldStoneDataBase.database.tokenBalanceDao().apply {
         getBalanceByDate(date, address, symbol).let {
-          it.isEmpty().isTrue {
+          it.isNull().isTrue {
             insert(TokenBalanceTable(0, symbol, date, addTime, balance, address))
           } otherwise {
-            update(it[0].apply { insertTime = addTime })
+            it?.apply {
+              this.balance = balance
+              insertTime = addTime
+              update(it)
+            }
           }
         }
       }
@@ -98,11 +103,11 @@ interface TokenBalanceDao {
   @Query("SELECT * FROM tokenBalance WHERE address LIKE :address")
   fun getTokenBalanceByAddress(address: String): List<TokenBalanceTable>
 
-  @Query("SELECT * FROM tokenBalance WHERE symbol LIKE :symbol AND address LIKE :address ORDER BY date ASC")
+  @Query("SELECT * FROM tokenBalance WHERE symbol LIKE :symbol AND address LIKE :address ORDER BY date DESC")
   fun getTokenBalanceBySymbolAndAddress(address: String, symbol: String): List<TokenBalanceTable>
 
   @Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND symbol LIKE :symbol")
-  fun getBalanceByDate(date: Long, address: String, symbol: String): List<TokenBalanceTable>
+  fun getBalanceByDate(date: Long, address: String, symbol: String): TokenBalanceTable?
 
   @Insert
   fun insert(token: TokenBalanceTable)

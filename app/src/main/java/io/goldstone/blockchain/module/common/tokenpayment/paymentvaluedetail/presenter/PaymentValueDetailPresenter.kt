@@ -20,8 +20,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.vie
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailHeaderView
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -33,7 +33,6 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
-import rx.Subscription
 import java.math.BigInteger
 
 /**
@@ -45,7 +44,6 @@ class PaymentValueDetailPresenter(
   override val fragment: PaymentValueDetailFragment
 ) : BaseRecyclerPresenter<PaymentValueDetailFragment, PaymentValueDetailModel>() {
 
-  private var transactionObserver: Subscription? = null
   private var currentNonce: BigInteger? = null
   private var currentToken: DefaultTokenTable? = null
 
@@ -63,7 +61,7 @@ class PaymentValueDetailPresenter(
       // 数据在异步计算, 先生成空的数据占位, 避免页面抖动
       generateEmptyData()
       // 计算三种 `Gas` 设置的值, 初始默认的 `count` 设定为 `0`
-      prepareRawTransactionByGasPrices(0.0000001) {
+      prepareRawTransactionByGasPrices(0.00000001) {
         context?.runOnUiThread {
           fragment.asyncData?.clear()
           fragment.asyncData?.addAll(generateModels(it, defaultGasPrices))
@@ -73,21 +71,9 @@ class PaymentValueDetailPresenter(
     }
   }
 
-  fun setCellClickEvent(cell: PaymentValueDetailCell) {
-    cell.apply {
-      onClick {
-        event()
-        preventDuplicateClicks()
-      }
-    }
-    cell.radioButton.apply {
-      onClick {
-        cell.event()
-        preventDuplicateClicks()
-      }
-    }
-  }
-
+  /**
+   * 随着用户更改需要转出的数字的时候动态更新副标题对应的 `currency` 价值.
+   */
   fun updateHeaderValue(header: PaymentValueDetailHeaderView) {
     DefaultTokenTable.getTokenBySymbol(fragment.symbol!!) { token ->
       header.apply {
@@ -105,12 +91,15 @@ class PaymentValueDetailPresenter(
     }
   }
 
+  /**
+   * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
+   * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
+   */
   fun transfer(type: String, password: String) {
     doAsync {
       // 获取当前账户的私钥
       fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
-        val priceAscRaw
-          = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
+        val priceAscRaw = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
 
         val raw = when (type) {
           MinerFeeType.Cheap.content -> priceAscRaw[0].rawTransaction
@@ -125,21 +114,20 @@ class PaymentValueDetailPresenter(
         val hexValue = Numeric.toHexString(signedMessage)
         // 发起 `sendRawTransaction` 请求
         GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
-          System.out.println(taxHash)
-          // 开启监听交易是否完成
-          transactionObserver = web3j.transactionObservable().filter {
-            System.out.println("checking ${ it.hash }")
-            it.hash == taxHash
-          }.subscribe {
-            System.out.println("succeed")
-            onTransactionFinished(taxHash)
+          println(taxHash)
+          // 主线程跳转到账目详情界面
+          fragment.context?.runOnUiThread {
+            goToTransactionDetailFragment(fragment.address!!, raw!!, currentToken!!, taxHash)
           }
         }
-
       }
     }
   }
 
+  /**
+   * 业务实现的是随着用户没更新一个 `input` 信息重新测算 `gasLimit` 所以这个函数式用来
+   * 实时更新界面的数值的.
+   */
   private fun updateTransactionAndAdapter(value: Double) {
     prepareRawTransactionByGasPrices(value) {
       fragment.asyncData?.clear()
@@ -148,42 +136,8 @@ class PaymentValueDetailPresenter(
     }
   }
 
-  private fun onTransactionFinished(taxHash: String) {
-    transactionObserver!!.unsubscribe()
-    // 主线程没变化需要排查
-    fragment.context?.runOnUiThread {
-      // TODO 整理 Model
-      val model = TransactionListModel(
-        web3j.ethGetTransactionByHash(taxHash).sendAsync().get().transaction,
-        fragment.symbol!!
-      )
-      goToTransactionDetailFragment(model)
-    }
-  }
-
-  private fun goToTransactionDetailFragment(model: TransactionListModel) {
-    // 准备跳转到下一个界面
-    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-      // 如果有键盘收起键盘
-      activity?.apply { SoftKeyboard.hide(this) }
-      hideChildFragment(fragment)
-      addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-        putSerializable(ArgumentKey.transactionDetail, model)
-      }
-      overlayView.header.apply {
-        backButton.onClick {
-          headerTitle = TokenDetailText.transferDetail
-          presenter.popFragmentFrom<TransactionDetailFragment>()
-          setHeightMatchParent()
-          showCloseButton(false)
-        }
-      }
-      headerTitle = TokenDetailText.transferDetail
-    }
-  }
-
   /**
-   * 查询当前
+   * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成对应不同速度的 `RawTransaction
    */
   private fun prepareRawTransactionByGasPrices(
     value: Double, hold: (ArrayList<RawTransaction>) -> Unit
@@ -191,8 +145,7 @@ class PaymentValueDetailPresenter(
     // 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
     currentNonce.isNull().isTrue {
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
-        val myLatestNonce
-          = first { it.fromAddress == WalletTable.current.address }.nonce.toLong()
+        val myLatestNonce = first { it.fromAddress == WalletTable.current.address }.nonce.toLong()
         getTokenBySymbol { token ->
           currentNonce = BigInteger.valueOf(myLatestNonce + 1)
           generateTransaction(fragment.address!!, value, token, hold)
@@ -214,8 +167,14 @@ class PaymentValueDetailPresenter(
     }
   }
 
+  /**
+   * 测量 `input` 测量 `gasLimit` 以及生成对应的 `RawTransaction`
+   */
   private fun generateTransaction(
-    toAddress: String, value: Double, token: DefaultTokenTable?, hold: (ArrayList<RawTransaction>) -> Unit
+    toAddress: String,
+    value: Double,
+    token: DefaultTokenTable?,
+    hold: (ArrayList<RawTransaction>) -> Unit
   ) {
 
     val count: BigInteger
@@ -229,7 +188,8 @@ class PaymentValueDetailPresenter(
     } else {
       to = token!!.contract
       count = BigInteger.valueOf((value * Math.pow(10.0, token.decimals)).toLong())
-      data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() + count.toDataString()
+      data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() +
+        count.toDataString()
     }
 
     // 这个 `Transaction` 是用来测量估算可能要用的 `gasLimit` 不是用来转账用的.
@@ -246,7 +206,7 @@ class PaymentValueDetailPresenter(
     // 测量 `Transaction` 得出 `GasLimit`
     val gasLimit = if (fragment.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
     else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
-    // 因为获取估算的 `gasAmountUsed` 需要在异步和 `链` 交互, 固这里在协程中解决
+
     defaultGasPrices.map { price ->
       // 生成 `RawTransaction` 对象
       RawTransaction.createTransaction(currentNonce, price, gasLimit, to, count, data)
@@ -264,6 +224,53 @@ class PaymentValueDetailPresenter(
   private fun generateEmptyData() {
     fragment.asyncData =
       arrayListOf(PaymentValueDetailModel(), PaymentValueDetailModel(), PaymentValueDetailModel())
+  }
+
+  /**
+   * 转账开始后跳转到转账监听界面
+   */
+  private fun goToTransactionDetailFragment(
+    address: String, raw: RawTransaction, token: DefaultTokenTable, taxHash: String
+  ) {
+    // 准备跳转到下一个界面
+    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+      // 如果有键盘收起键盘
+      activity?.apply { SoftKeyboard.hide(this) }
+      removeChildFragment(fragment)
+
+      val model = ReceiptModel(address, raw, token, taxHash, System.currentTimeMillis())
+      addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+        putSerializable(ArgumentKey.transactionDetail, model)
+      }
+
+      overlayView.header.apply {
+        backButton.onClick {
+          headerTitle = TokenDetailText.transferDetail
+          presenter.popFragmentFrom<TransactionDetailFragment>()
+          setHeightMatchParent()
+          showCloseButton(true)
+        }
+      }
+      headerTitle = TokenDetailText.transferDetail
+    }
+  }
+
+  /**
+   * 点选燃气设置后更新界面
+   */
+  fun setCellClickEvent(cell: PaymentValueDetailCell) {
+    cell.apply {
+      onClick {
+        event()
+        preventDuplicateClicks()
+      }
+    }
+    cell.radioButton.apply {
+      onClick {
+        cell.event()
+        preventDuplicateClicks()
+      }
+    }
   }
 
   // 更新 `RadioBox` 选中的状态

@@ -54,7 +54,7 @@ object GoldStoneAPI {
       .build()
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, error: IOException) {
-        System.out.println("$error")
+        println("$error")
       }
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
@@ -66,7 +66,7 @@ object GoldStoneAPI {
         try {
           hold(gson.fromJson(jsonData, collectionType))
         } catch (error: Exception) {
-          System.out.println(error)
+          println(error)
         }
       }
     })

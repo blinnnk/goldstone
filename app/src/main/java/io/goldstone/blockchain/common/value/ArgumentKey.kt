@@ -11,6 +11,7 @@ object ArgumentKey {
   const val mnemonicCode = "mnemonicCode"
   const val walletAddress = "walletAddress"
   const val transactionDetail = "transactionDetail"
+  const val transactionFromList = "transactionFromList"
   const val tokenDetail = "tokenDetail"
   const val paymentAddress = "paymentAddress"
   const val paymentSymbol = "paymentSymbol"

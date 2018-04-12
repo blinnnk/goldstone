@@ -43,7 +43,7 @@ object GoldStoneEthCall {
           getTokenTotalSupply(contractAddress) { totalSupply ->
             getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
               // 用的时候再完善这里
-              System.out.println(symbol + name + decimal + totalSupply + tokenBalance)
+              println(symbol + name + decimal + totalSupply + tokenBalance)
             }
           }
         }
@@ -62,7 +62,7 @@ object GoldStoneEthCall {
           getTokenDecimal(contractAddress) { decimal ->
             getTokenTotalSupply(contractAddress) { totalSupply ->
               // 用的时候再完善这里
-              System.out.println(symbol + name + decimal + totalSupply + tokenBalance)
+              println(symbol + name + decimal + totalSupply + tokenBalance)
             }
           }
         }
@@ -149,7 +149,7 @@ object GoldStoneEthCall {
 
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, error: IOException) {
-        System.out.println("$error")
+        println("$error")
       }
 
       @SuppressLint("SetTextI18n")
@@ -160,7 +160,7 @@ object GoldStoneEthCall {
           hold(dataObject["result"].toString())
         } catch (error: Exception) {
           hold(data.orEmpty())
-          System.out.println(error)
+          println(error)
         }
       }
     })

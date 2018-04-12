@@ -47,7 +47,7 @@ class QRCodePresenter(
       val bitmap = barcodeEncoder.encodeBitmap(address, BarcodeFormat.QR_CODE, size, size)
       fragment.qrImage.glideImage(bitmap)
     } catch (error: Exception) {
-      System.out.println(error)
+      println(error)
     }
   }
 
