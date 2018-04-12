@@ -1,15 +1,22 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
 
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter.PaymentValueDetailPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import org.jetbrains.anko.*
 
 /**
  * @date 28/03/2018 12:23 PM
@@ -43,10 +50,34 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
       confirmClickEvent = Runnable {
-        address?.apply { presenter.transfer(currentMinerFeeType, "125883") }
+        address?.apply { showConfirmAttentionView() }
       }
     }
+  }
 
+  private val passwordInput by lazy { EditText(context!!) }
+  private fun showConfirmAttentionView() {
+    context?.apply {
+      alert(
+        CommonText.enterPassword.toUpperCase(),
+        TransactionText.confirmTransaction
+      ) {
+        WalletTable.current.isWatchOnly.isFalse {
+          customView {
+            verticalLayout {
+              lparams { padding = 20.uiPX() }
+              passwordInput.apply {
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                hint = CommonText.enterPassword
+                hintTextColor = Spectrum.opacity1White
+              }.into(this)
+            }
+          }
+        }
+        yesButton { presenter.transfer(currentMinerFeeType, passwordInput.text.toString()) }
+        noButton { }
+      }.show()
+    }
   }
 
 }

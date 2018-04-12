@@ -77,7 +77,7 @@ kotlin {
   experimental { coroutines 'enable' }
 }
 
-//使用生成文件
+// 使用生成文件
 kapt {
   generateStubs = true
 }

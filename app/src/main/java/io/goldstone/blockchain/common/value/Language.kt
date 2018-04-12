@@ -130,7 +130,11 @@ object TransactionText {
     else -> ""
   }
 
-
+  @JvmField
+  val confirmTransaction = when (currentLanguage) {
+    HoneyLanguage.English.code -> "confirm transaction with your password then transaction will begin"
+    else -> ""
+  }
 }
 
 object TokenDetailText {
