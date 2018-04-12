@@ -149,7 +149,9 @@ class TransactionDetailPresenter(
    * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
    */
   private fun onTransactionSucceed() {
-    updateHeaderValue(count, data!!.address, false, false)
+    data?.apply {
+      updateHeaderValue(count, address, token.symbol,false, false)
+    }
     transactionObserver!!.unsubscribe()
     transactionObserver = null
     fragment.getTransactionFromChain()
