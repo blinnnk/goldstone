@@ -4,12 +4,11 @@ import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_SHOW_TIME
 import android.text.format.DateUtils.FORMAT_SHOW_YEAR
 import com.blinnnk.util.HoneyDateUtil
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.SolidityCode
-import io.goldstone.blockchain.crypto.toAscii
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import java.io.Serializable
 
 /**
@@ -20,7 +19,7 @@ import java.io.Serializable
 data class TransactionListModel(
   val addressName:String,
   val addressInfo: String,
-  val count: Double,
+  var count: Double,
   val symbol: String,
   val isReceived: Boolean,
   val date: String,
@@ -28,7 +27,7 @@ data class TransactionListModel(
   val blockNumber: String,
   val transactionHash: String,
   val memo: String,
-  val minerFee: Double,
+  val minerFee: String,
   val url: String
 ) : Serializable {
 
@@ -39,7 +38,7 @@ data class TransactionListModel(
         + descriptionText(data.isReceive)
         + data.fromAddress
     ),
-    CryptoUtils.formatDouble(data.value.toDouble()),
+    data.value.toDouble(),
     data.symbol,
     data.isReceive,
     DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_TIME),
@@ -47,7 +46,7 @@ data class TransactionListModel(
     data.blockNumber,
     data.hash,
     getMemoFromInputCode(data.input),
-    data.gasUsed.toDouble() * data.gasPrice.toDouble(),
+    (data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(),
     EtherScanApi.singleTransactionHas(data.hash)
   )
 
