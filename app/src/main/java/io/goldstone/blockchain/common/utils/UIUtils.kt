@@ -22,7 +22,18 @@ object UIUtils {
   fun subtractThenHalf(first: Int, second: Int) = (first - second) / 2
 
   fun generateAvatar(id: Int): Int {
-    val avatars = arrayListOf(avatar_1, avatar_2, avatar_3, avatar_4, avatar_5, avatar_6, avatar_7)
-    return avatars[id % 7]
+    val avatars = arrayListOf(
+      avatar_1,
+      avatar_2,
+      avatar_3,
+      avatar_4,
+      avatar_5,
+      avatar_6,
+      avatar_7,
+      avatar_8,
+      avatar_9,
+      avatar_10
+    )
+    return avatars[id % 10]
   }
 }

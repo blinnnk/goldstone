@@ -59,7 +59,7 @@ object CryptoUtils {
       count = inputCode.substring(inputCode.length - 64, inputCode.length).hexToDecimal()
       return InputCodeData("transfer", address, count)
     } otherwise {
-      System.out.println("not a contract transfer")
+      println("not a contract transfer")
       return null
     }
   }
@@ -161,6 +161,6 @@ fun BigInteger.toDataString() =
 
 
 fun String.toDataStringFromAddress(): String {
-  if (length < 42) { System.out.println("Wrong Address") }
+  if (length < 42) { println("Wrong Address") }
   return "000000000000000000000000" + substring(2, length)
 }

@@ -45,7 +45,7 @@ class TokenDetailPresenter(
           it.updateChartAndHeaderData()
         }
       } otherwise {
-        fragment.asyncData = arrayListOf() // TODO 还需要显示空的占位图
+        fragment.asyncData = arrayListOf()
         prepareTokenHistoryBalance(fragment.symbol!!) {
           it.updateChartAndHeaderData()
         }
@@ -73,7 +73,7 @@ class TokenDetailPresenter(
   }
 
   private var singleRunMark: Boolean? = null
-  private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit = {}) {
+  private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit) {
     TransactionTable.getTransactionsByAddressAndSymbol(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
@@ -83,6 +83,7 @@ class TokenDetailPresenter(
         // 若更新了链上数据后还是没有筛选出交易记录返回空数组
         if (singleRunMark == true) {
           fragment.getMainActivity()?.removeLoadingView()
+          // 链上和本地都没有数据就更新一个空数组作为默认
           hold(arrayListOf())
         } else {
           // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
@@ -92,6 +93,9 @@ class TokenDetailPresenter(
                 prepareTokenDetailData(hold)
                 singleRunMark = true
               }
+            } otherwise {
+              // 链上和本地都没有数据就更新一个空数组作为默认
+              hold(arrayListOf())
             }
           }
         }
@@ -104,14 +108,14 @@ class TokenDetailPresenter(
       val maxChartCount = 6
       val chartArray = arrayListOf<Point>()
       val charCount = if (size > maxChartCount) maxChartCount else lastIndex
-      forEachIndexed { index, it ->
+      forEach {
         chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
-        if (index == charCount) {
+        if (chartArray.size == charCount) {
           var maxY = maxYValue(chartArray)
           var unitY = Math.ceil((maxY / 10)).toFloat()
           if (maxY == 0.0) maxY = 10.0
           if (unitY == 0f) unitY = 1f
-          setCharData(chartArray, maxY.toFloat(), unitY)
+          setCharData(chartArray.reversed().toArrayList(), maxY.toFloat(), unitY)
         }
       }
     }
@@ -130,13 +134,13 @@ class TokenDetailPresenter(
     TokenBalanceTable.updateTodayBalanceBySymbol(
       WalletTable.current.address, symbol
     ) { todayBalance ->
-      TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) { balances ->
+      TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) { balances ->
         // 如果除今天以外的最近一条数据更新的时间是昨天的整体时间, 那么只更新今天的价格
         balances.apply {
           if (size > 2) {
             if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
               callback(this)
-              return@getTokenBalanceBySymbol
+              return@getBalanceBySymbol
             }
           }
         }
@@ -144,11 +148,16 @@ class TokenDetailPresenter(
         generateHistoryBalance(todayBalance) { history ->
           coroutinesTask({
             history.forEach {
-              TokenBalanceTable.insertOrUpdate(symbol, WalletTable.current.address, it.date, it.balance)
+              TokenBalanceTable.insertOrUpdate(
+                symbol,
+                WalletTable.current.address,
+                it.date,
+                it.balance
+              )
             }
           }) {
             // 更新数据完毕后在主线程从新从数据库获取数据
-            TokenBalanceTable.getTokenBalanceBySymbol(WalletTable.current.address, symbol) {
+            TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) {
               callback(it)
             }
           }
@@ -205,7 +214,10 @@ class TokenDetailPresenter(
 
   private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) 1 else -1
 
-  private inline fun <reified T : Fragment> shoTargetFragment(title: String, bundle: Bundle? = null) {
+  private inline fun <reified T : Fragment> shoTargetFragment(
+    title: String,
+    bundle: Bundle? = null
+  ) {
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       hideChildFragment(fragment)
       addFragmentAndSetArgument<T>(ContainerID.content) {

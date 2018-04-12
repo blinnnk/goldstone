@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
@@ -33,11 +35,18 @@ class WatchOnlyImportPresenter(
       val name =
         if  (nameInput.text.toString().isEmpty()) "Wallet"
         else nameInput.text.toString()
-      coroutinesTask({
-        WalletTable.insert(WalletTable(0, name, address, true, true))
-        CreateWalletPresenter.generateMyTokenInfo(address)
-      }) {
-        fragment.activity?.jump<SplashActivity>()
+
+      WalletTable.getWalletByAddress(address) {
+        it.isNull().isTrue {
+          coroutinesTask({
+            WalletTable.insert(WalletTable(0, name, address, true, true))
+            CreateWalletPresenter.generateMyTokenInfo(address)
+          }) {
+            fragment.activity?.jump<SplashActivity>()
+          }
+        } otherwise {
+          fragment.context?.alert("There is already this account in gold stone")
+        }
       }
     }
   }

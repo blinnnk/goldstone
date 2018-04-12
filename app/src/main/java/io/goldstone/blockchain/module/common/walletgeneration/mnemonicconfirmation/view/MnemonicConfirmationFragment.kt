@@ -40,7 +40,6 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
-      System.out.println(mnemonicCode)
       attentionTextView
         .apply { text = CreateWalletText.mnemonicConfirmationDescription }
         .into(this)

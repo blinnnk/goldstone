@@ -55,7 +55,7 @@ class MnemonicImportDetailPresenter(
           }
         }) { fragment.activity?.jump<SplashActivity>() }
       } otherwise {
-        System.out.println("import failed $address")
+        println("import failed $address")
       }
     }
   }

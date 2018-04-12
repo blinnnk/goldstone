@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
 /**
- * @date 27/03/2018 3:27 AM
+ * @date 12/04/2018 10:41 PM
  * @author KaySaith
  */
 

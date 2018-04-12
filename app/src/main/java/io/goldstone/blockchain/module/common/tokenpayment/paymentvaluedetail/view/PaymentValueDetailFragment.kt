@@ -9,6 +9,7 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.*
@@ -74,7 +75,10 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
             }
           }
         }
-        yesButton { presenter.transfer(currentMinerFeeType, passwordInput.text.toString()) }
+        yesButton {
+          presenter.transfer(currentMinerFeeType, passwordInput.text.toString())
+          activity?.apply { SoftKeyboard.hide(this) }
+        }
         noButton { }
       }.show()
     }

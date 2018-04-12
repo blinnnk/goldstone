@@ -4,9 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -30,6 +31,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
   private val info = TwoLineTitles(context)
   private val gradientView = GradientView(context)
   private val icon = RoundIcon(context)
+  private var pendingIcon: ProgressBar? = null
 
   init {
 
@@ -69,18 +71,40 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
   }
 
   @SuppressLint("SetTextI18n")
-  fun setIconStyle(count: Double, targetAddress: String, isReceive: Boolean) {
+  fun setIconStyle(count: Double, targetAddress: String, isReceive: Boolean, isPending: Boolean) {
     val type = if(isReceive) "Received " else "Send "
     info.title.text = "$type$count ETH ${if(isReceive) "From" else "To"}"
     info.subtitle.text = targetAddress
 
-    if(!isReceive) {
-      icon.iconColor = Spectrum.yellow
-      icon.src = R.drawable.send_icon
-      icon.setColorFilter(GrayScale.Opacity5Black)
+    if (isPending) {
+      icon.iconColor = Spectrum.lightRed
+      showPendingIcon()
     } else {
-      icon.iconColor = Spectrum.green
-      icon.src = R.drawable.receive_icon
+      showPendingIcon(false)
+      if(!isReceive) {
+        icon.iconColor = Spectrum.yellow
+        icon.src = R.drawable.send_icon
+        icon.setColorFilter(GrayScale.Opacity5Black)
+      } else {
+        icon.iconColor = Spectrum.green
+        icon.src = R.drawable.receive_icon
+      }
+    }
+  }
+
+  private fun showPendingIcon(status: Boolean = true) {
+    pendingIcon.isNotNull {
+      if (!status) removeView(pendingIcon)
+    } otherwise {
+      if (status) {
+        pendingIcon = ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
+          indeterminateDrawable.setColorFilter(HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY)
+          RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
+          y += 46.uiPX()
+        }
+        addView(pendingIcon)
+        pendingIcon?.setCenterInHorizontal()
+      }
     }
   }
 

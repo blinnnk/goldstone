@@ -15,13 +15,13 @@ abstract class SequentialTask {
     first()
     second()
     third()
-    System.out.println("start sequential task")
+    println("start sequential task")
   }
 
   private suspend fun first() {
     launch(CommonPool) {
       firstJob()
-      System.out.println("start job1")
+      println("start job1")
     }.join()
   }
 
@@ -30,7 +30,7 @@ abstract class SequentialTask {
   private suspend fun second() {
     launch(CommonPool) {
       secondJob()
-      System.out.println("start job2")
+      println("start job2")
     }.join()
   }
 
@@ -39,7 +39,7 @@ abstract class SequentialTask {
   private suspend fun third() {
     launch(CommonPool) {
       thirdJob()
-      System.out.println("start job3")
+      println("start job3")
     }.join()
   }
 
