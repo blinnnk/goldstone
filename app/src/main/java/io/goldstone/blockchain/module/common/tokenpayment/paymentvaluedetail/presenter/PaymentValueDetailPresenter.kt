@@ -99,8 +99,7 @@ class PaymentValueDetailPresenter(
     doAsync {
       // 获取当前账户的私钥
       fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
-        val priceAscRaw
-          = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
+        val priceAscRaw = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
 
         val raw = when (type) {
           MinerFeeType.Cheap.content -> priceAscRaw[0].rawTransaction
@@ -146,8 +145,7 @@ class PaymentValueDetailPresenter(
     // 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
     currentNonce.isNull().isTrue {
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
-        val myLatestNonce
-          = first { it.fromAddress == WalletTable.current.address }.nonce.toLong()
+        val myLatestNonce = first { it.fromAddress == WalletTable.current.address }.nonce.toLong()
         getTokenBySymbol { token ->
           currentNonce = BigInteger.valueOf(myLatestNonce + 1)
           generateTransaction(fragment.address!!, value, token, hold)
@@ -173,7 +171,10 @@ class PaymentValueDetailPresenter(
    * 测量 `input` 测量 `gasLimit` 以及生成对应的 `RawTransaction`
    */
   private fun generateTransaction(
-    toAddress: String, value: Double, token: DefaultTokenTable?, hold: (ArrayList<RawTransaction>) -> Unit
+    toAddress: String,
+    value: Double,
+    token: DefaultTokenTable?,
+    hold: (ArrayList<RawTransaction>) -> Unit
   ) {
 
     val count: BigInteger
@@ -187,7 +188,8 @@ class PaymentValueDetailPresenter(
     } else {
       to = token!!.contract
       count = BigInteger.valueOf((value * Math.pow(10.0, token.decimals)).toLong())
-      data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() + count.toDataString()
+      data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() +
+        count.toDataString()
     }
 
     // 这个 `Transaction` 是用来测量估算可能要用的 `gasLimit` 不是用来转账用的.
@@ -228,11 +230,8 @@ class PaymentValueDetailPresenter(
    * 转账开始后跳转到转账监听界面
    */
   private fun goToTransactionDetailFragment(
-    address: String,
-    raw: RawTransaction,
-    token: DefaultTokenTable,
-    taxHash: String
-    ) {
+    address: String, raw: RawTransaction, token: DefaultTokenTable, taxHash: String
+  ) {
     // 准备跳转到下一个界面
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       // 如果有键盘收起键盘
@@ -273,7 +272,6 @@ class PaymentValueDetailPresenter(
       }
     }
   }
-
 
   // 更新 `RadioBox` 选中的状态
   private fun PaymentValueDetailCell.event() {

@@ -10,6 +10,7 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -69,9 +70,7 @@ data class MyTokenTable(
         GoldStoneDataBase.database.apply {
           // 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
           myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull().isTrue {
-            // 获取 `Symbol` 的 `ContractAddress`
-            val symbolToken = defaultTokenDao().getTokenBySymbol(symbol)
-            getBalanceWithSymbol(symbol, symbolToken.contract, ownerAddress)
+            getBalanceAndInsertWithSymbol(symbol, ownerAddress)
           }
         }
       }) {
@@ -79,11 +78,8 @@ data class MyTokenTable(
       }
     }
 
-    private fun getBalanceWithSymbol(
-      symbol: String,
-      contractAddress: String,
-      ownerAddress: String,
-      callback: (balance: Double) -> Unit = {}
+    private fun getBalanceAndInsertWithSymbol(
+      symbol: String, ownerAddress: String, callback: (balance: Double) -> Unit = {}
     ) {
       // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
       if (symbol == CryptoSymbol.eth) {
@@ -92,9 +88,30 @@ data class MyTokenTable(
           callback(it)
         }
       } else {
-        GoldStoneEthCall.getTokenBalanceWithContract(contractAddress, ownerAddress) {
-          insert(MyTokenTable(0, ownerAddress, symbol, it))
+        DefaultTokenTable.getTokenBySymbol(symbol) {
+          GoldStoneEthCall.getTokenBalanceWithContract(it.contract, ownerAddress) {
+            insert(MyTokenTable(0, ownerAddress, symbol, it))
+            callback(it)
+          }
+        }
+      }
+    }
+
+    fun getBalanceWithSymbol(
+      symbol: String,
+      ownerAddress: String,
+      callback: (balance: Double) -> Unit = {}
+    ) {
+      // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+      if (symbol == CryptoSymbol.eth) {
+        GoldStoneEthCall.getEthBalance(ownerAddress) {
           callback(it)
+        }
+      } else {
+        DefaultTokenTable.getTokenBySymbol(symbol) {
+          GoldStoneEthCall.getTokenBalanceWithContract(it.contract, ownerAddress) {
+            callback(it)
+          }
         }
       }
     }

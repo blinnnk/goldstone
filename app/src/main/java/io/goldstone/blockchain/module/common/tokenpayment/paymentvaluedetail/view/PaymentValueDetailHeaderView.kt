@@ -119,6 +119,8 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
   }
 
+  fun getInputValue() = valueInput.text.toString().toDouble()
+
   fun setInputFocus() {
     valueInput.hintTextColor = Spectrum.opacity1White
     valueInput.requestFocus()
