@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
+import com.blinnnk.extension.reboot
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.reload
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
 import org.jetbrains.anko.alert
@@ -45,7 +46,7 @@ class LanguagePresenter(
     }
 
     WalletTable.updateLanguage(code) {
-      fragment.context?.reload()
+      fragment.reboot<SplashActivity>()
     }
   }
 

@@ -4,9 +4,7 @@ import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_SHOW_TIME
 import android.text.format.DateUtils.FORMAT_SHOW_YEAR
 import com.blinnnk.util.HoneyDateUtil
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.SolidityCode
-import io.goldstone.blockchain.crypto.toAscii
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -60,7 +58,7 @@ data class TransactionListModel(
         + descriptionText(WalletTable.current.address == data.to)
         + data.from
     ),
-    CryptoUtils.formatDouble(data.value.toDouble()),
+    data.value.toDouble().toEthCount(),
     symbol,
     WalletTable.current.address == data.to,
     DateUtils.formatDateTime(GoldStoneAPI.context, 100 * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, 100 * 1000, FORMAT_SHOW_TIME),

@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import java.util.ArrayList
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -50,27 +51,11 @@ fun CharSequence.measureTextWidth(fontSize: Float): Float {
   return textPaint.measureText(this.toString())
 }
 
-fun<T> List<T>.toArrayList(): ArrayList<T> {
-  return this.mapTo(arrayListOf()) { it }
-}
-
-
 fun Fragment.getMainActivity() = activity as? MainActivity
 fun Context.getMainActivity() = this as? MainActivity
 
 fun Context.alert(message: String) {
   alert(Appcompat, message).show()
-}
-
-fun Context.reload() {
-  val startActivity = Intent(this, SplashActivity::class.java)
-  val pendingIntentId = 123456
-  val pendingIntent = PendingIntent.getActivity(this, pendingIntentId, startActivity,
-    PendingIntent.FLAG_CANCEL_CURRENT
-  )
-  val service = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-  service.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent)
-  System.exit(0)
 }
 
 fun Activity.checkPermissionThen(type: PermissionCategory, callback: () -> Unit) {
@@ -85,4 +70,8 @@ fun Activity.checkPermissionThen(type: PermissionCategory, callback: () -> Unit)
       }
     }
   }
+}
+
+fun<T> List<T>.toArrayList(): ArrayList<T> {
+  return this.mapTo(arrayListOf()) { it }
 }

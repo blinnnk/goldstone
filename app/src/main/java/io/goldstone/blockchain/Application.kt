@@ -5,6 +5,8 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -57,6 +59,13 @@ class GoldStoneApp : Application() {
           currentLanguage = it?.language
           WalletTable.current = it!!
         }
+      }
+    }
+
+    inline fun<reified T: AppCompatActivity> Fragment.reboot() {
+      (activity as? T)?.apply {
+        finish()
+        startActivity(intent)
       }
     }
 
