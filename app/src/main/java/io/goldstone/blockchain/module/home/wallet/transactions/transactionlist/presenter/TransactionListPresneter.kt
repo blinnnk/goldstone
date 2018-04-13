@@ -20,6 +20,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter.Companion.getTransactionDataFromEtherScan
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -29,41 +30,28 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
+// 从数据库去除交易记录存放到内存里, 提升用户体验.
+var localTransactions: ArrayList<TransactionListModel>? = null
+
 class TransactionListPresenter(
   override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 
   override fun updateData() {
     fragment.apply {
-      getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
-        localData.isEmpty().isTrue {
-          getMainActivity()?.getTransactionDataFromEtherScan { asyncData = it }
-        } otherwise {
-          // 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
-          val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
-          // 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-          getMainActivity()?.getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
-            // 如果梅拉去到直接更新本地数据
-            newData.isEmpty().isTrue {
-              asyncData = localData
-            } otherwise {
-              doAsync {
-                // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-                newData.forEach { data ->
-                  localData.find {
-                    it.transactionHash == data.transactionHash
-                  }?.let {
-                    TransactionTable.deleteByTaxHash(it.transactionHash)
-                  }
-                }
-                // 数据清理干净后在主线程更新 `UI`
-                context?.runOnUiThread {
-                  // 拉取到后, 把最新获取的数据合并本地数据更新到界面
-                  localData.addAll(0, newData)
-                  asyncData = localData
-                }
-              }
-              Log.d("DEBUG", "updated new transaction data")
+      localTransactions.isNotNull {
+        asyncData = localTransactions
+        // 更新显示数据后, 异步继续更新新的数据.并动态刷新到界面
+        getMainActivity()?.updateTransactionInAsync(localTransactions!!)
+      } otherwise {
+        getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
+          localData.isNotEmpty().isTrue {
+            asyncData = localData
+            localTransactions = localData
+          } otherwise {
+            getMainActivity()?.getTransactionDataFromEtherScan {
+              asyncData = it
+              localTransactions = it
             }
           }
         }
@@ -77,6 +65,35 @@ class TransactionListPresenter(
         putSerializable(ArgumentKey.transactionFromList, model)
         presenter.showTargetFragment(true, this)
       }
+    }
+  }
+
+  private fun MainActivity.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
+    // 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
+    val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
+    // 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
+    getMainActivity()?.getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
+      // 如果梅拉去到直接更新本地数据
+      doAsync {
+        // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
+        newData.forEach { data ->
+          localData.find {
+            it.transactionHash == data.transactionHash
+          }?.let {
+            TransactionTable.deleteByTaxHash(it.transactionHash)
+          }
+        }
+        // 数据清理干净后在主线程更新 `UI`
+        runOnUiThread {
+          // 拉取到后, 把最新获取的数据合并本地数据更新到界面
+          localData.addAll(0, newData)
+          // 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
+          localTransactions = localData
+          fragment.asyncData?.addAll(0, localData)
+          fragment.recyclerView.adapter.notifyItemRangeInserted(0, newData.lastIndex)
+        }
+      }
+      Log.d("DEBUG", "updated new transaction data")
     }
   }
 
