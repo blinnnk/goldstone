@@ -30,7 +30,8 @@ data class TransactionListModel(
   val transactionHash: String,
   val memo: String,
   val minerFee: String,
-  val url: String
+  val url: String,
+  val isPending: Boolean
 ) : Serializable {
 
   constructor(data: TransactionTable) : this(
@@ -44,12 +45,13 @@ data class TransactionListModel(
     data.symbol,
     data.isReceive,
     DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_TIME), // 拼接时间
-    if (data.isReceive) data.fromAddress else data.to,
+    if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
     data.blockNumber,
     data.hash,
     getMemoFromInputCode(data.input),
     (data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
-    EtherScanApi.singleTransactionHas(data.hash) // Api 地址拼接
+    EtherScanApi.singleTransactionHas(data.hash), // Api 地址拼接
+    data.isPending
   )
 
 }

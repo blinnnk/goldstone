@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter.PaymentValueDetailPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -32,7 +31,6 @@ class PaymentValueDetailFragment :
   val symbol by lazy { arguments?.getString(ArgumentKey.paymentSymbol) }
 
   private var transferCount = 0.0
-  private var currentMinerFeeType = MinerFeeType.Recommend.content
   override val presenter = PaymentValueDetailPresenter(this)
 
   override fun setRecyclerViewAdapter(
@@ -90,7 +88,7 @@ class PaymentValueDetailFragment :
           }
         }
         yesButton {
-          presenter.transfer(currentMinerFeeType, passwordInput.text.toString())
+          presenter.transfer(passwordInput.text.toString())
         }
         noButton { }
       }.show()

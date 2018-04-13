@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
 import android.os.Bundle
+import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -10,8 +11,10 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.commonmodel.TransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getAllTransactionsByAddress
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getTransactionListModelsByAddress
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -20,6 +23,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -33,23 +37,36 @@ class TransactionListPresenter(
 
   override fun updateData() {
     fragment.apply {
-      getAllTransactionsByAddress(WalletTable.current.address) { localData ->
+      getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
         localData.isEmpty().isTrue {
           getMainActivity()?.getTransactionDataFromEtherScan { asyncData = it }
         } otherwise {
-          val localModes = localData.map { TransactionListModel(it) }.toArrayList()
+          // 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
+          val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
           // 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-          getMainActivity()?.getTransactionDataFromEtherScan(
-            localData.first().blockNumber
-          ) {
+          getMainActivity()?.getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
             // 如果梅拉去到直接更新本地数据
-            it.isEmpty().isTrue {
-              asyncData = localModes
+            newData.isEmpty().isTrue {
+              asyncData = localData
             } otherwise {
-              // 拉取到后, 把最新获取的数据合并本地数据更新到界面
-              localModes.addAll(it)
-              asyncData = localModes
-              println("updated new transaction data")
+              doAsync {
+                // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
+                newData.forEach { data ->
+                  localData.find {
+                    it.transactionHash == data.transactionHash
+                  }?.let {
+                    TransactionTable.deleteByTaxHash(it.transactionHash)
+                  }
+                }
+                // 数据清理干净后在主线程更新 `UI`
+                context?.runOnUiThread {
+                  // 拉取到后, 把最新获取的数据合并本地数据更新到界面
+                  localData.addAll(0, newData)
+                  asyncData = localData
+                }
+
+              }
+              Log.d("DEBUG", "updated new transaction data")
             }
           }
         }
@@ -75,9 +92,6 @@ class TransactionListPresenter(
         CryptoUtils.isERC20Transfer(transaction) {
           // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
           val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
-          if (transaction.value == 9000000000.toString()) {
-            System.out.println("mother fuck$transactionInfo and to ${transaction.to}")
-          }
           // 判断是否是接收交易
           val receiveStatus = WalletTable.current.address == transactionInfo?.address
           // 首先从本地数据库检索 `contract` 对应的 `symbol`
@@ -133,28 +147,17 @@ class TransactionListPresenter(
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address, startBlock) {
         val chainData = this
         if (chainData.isEmpty()) {
-          removeLoadingView()
-          // 没有数据返回空数组
-          hold(arrayListOf())
+          runOnUiThread {
+            removeLoadingView()
+            // 没有数据返回空数组
+            hold(arrayListOf())
+          }
           return@getTransactionListByAddress
         }
-        //  `startBlock` 是 `0` 意味着从头开始拉, 不用个判断本地比对.
-        if (startBlock == "0") {
-          filterCompletedData(chainData, hold)
-        } else {
-          println("startBlock $startBlock")
-          getAllTransactionsByAddress(WalletTable.current.address) { localData ->
-            removeLoadingView()
-            if (localData.first().blockNumber == chainData.first().blockNumber) {
-              completeTransactionInfo(chainData) {
-                hold(localData.map { TransactionListModel(it) }.toArrayList())
-              }
-            } else {
-              println("update the new data from chain")
-              filterCompletedData(chainData, hold)
-            }
-          }
-        }
+        // 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
+        removeLoadingView()
+        filterCompletedData(chainData, hold)
+        Log.d("DEBUG", "update the new data from chain")
       }
     }
 

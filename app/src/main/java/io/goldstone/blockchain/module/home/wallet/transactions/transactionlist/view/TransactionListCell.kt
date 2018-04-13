@@ -28,8 +28,8 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
           iconColor = Spectrum.green
           count.title.textColor = Spectrum.green
         } else {
-          src = R.drawable.send_icon
-          iconColor = GrayScale.midGray
+          src = if (model?.isPending == true) R.drawable.pending_icon else R.drawable.send_icon
+          iconColor = if (model?.isPending == true) Spectrum.lightRed else GrayScale.midGray
           count.title.textColor = Spectrum.red
         }
       }

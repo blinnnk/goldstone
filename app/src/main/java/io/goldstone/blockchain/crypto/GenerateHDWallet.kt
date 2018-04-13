@@ -58,7 +58,11 @@ fun Context.getWalletByMnemonic(mnemonicCode: String, password: String, hold: (a
   val publicKey = Keys.getAddress(masterKey.publicKey)
   val address = "0x" + publicKey.toLowerCase()
   /** Import Private Key to Keystore */
-  keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
+  try {
+    keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
+  } catch (error: Exception) {
+    println(error)
+  }
   hold(address)
 }
 
@@ -84,7 +88,11 @@ fun Context.getWalletByPrivateKey(
       else -> currentPrivateKey.toString(16)
     }
   /** Import Private Key to Keystore */
-  keyStore.importECDSAKey(keyString.hexToByteArray(), password)
+  try {
+    keyStore.importECDSAKey(keyString.hexToByteArray(), password)
+  } catch (error: Exception) {
+    println(error)
+  }
   hold(address)
 }
 
@@ -106,7 +114,11 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
       it.equals(walletAddress, true).isTrue {
-        hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
+        try {
+          hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
+        } catch (error: Exception) {
+          println(error)
+        }
       }
     }
   }
@@ -114,10 +126,13 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
 
 fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String) -> Unit) {
   getKeystoreFile(walletAddress, password) {
-    Wallet.decrypt(
-      password,
-      DecryptKeystore.GenerateFile(it.convertKeystoreToModel())
-    ).let { hold(it.privateKey.toString(16)) }
+    try {
+      Wallet.decrypt(password, DecryptKeystore.GenerateFile(it.convertKeystoreToModel())).let {
+        hold(it.privateKey.toString(16))
+      }
+    } catch (error: Exception) {
+      println(error)
+    }
   }
 }
 
@@ -129,7 +144,11 @@ fun Context.deleteAccount(walletAddress: String, password: String, callback: () 
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
       it.equals(walletAddress, true).isTrue {
-        keyStore.deleteAccount(keyStore.accounts.get(index), password)
+        try {
+          keyStore.deleteAccount(keyStore.accounts.get(index), password)
+        } catch (error: Exception) {
+          println(error)
+        }
         callback()
       }
     }

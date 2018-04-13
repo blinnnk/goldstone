@@ -27,7 +27,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
   var model: TransactionDetailModel by observing(TransactionDetailModel()) {
     description.text = model.description
-    info.text = model.info
+    info.text = if(model.info.isEmpty()) "waiting" else model.info
   }
 
   private val description = TextView(context)

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter
 
+import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
@@ -10,6 +11,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -46,6 +49,7 @@ class PaymentValueDetailPresenter(
 
   private var currentNonce: BigInteger? = null
   private var currentToken: DefaultTokenTable? = null
+  private var minerFeeType = MinerFeeType.Recommend.content
 
   private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
   private val defaultGasPrices by lazy {
@@ -95,13 +99,13 @@ class PaymentValueDetailPresenter(
    * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
    * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
    */
-  fun transfer(type: String, password: String) {
+  fun transfer(password: String) {
     doAsync {
       // 获取当前账户的私钥
       fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
         val priceAscRaw = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
 
-        val raw = when (type) {
+        val raw = when (minerFeeType) {
           MinerFeeType.Cheap.content -> priceAscRaw[0].rawTransaction
           MinerFeeType.Fast.content -> priceAscRaw[2].rawTransaction
           else -> priceAscRaw[1].rawTransaction
@@ -114,10 +118,12 @@ class PaymentValueDetailPresenter(
         val hexValue = Numeric.toHexString(signedMessage)
         // 发起 `sendRawTransaction` 请求
         GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
-          println(taxHash)
+          Log.d("DEBUG", "taxHash $taxHash")
+          // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+          insertPendingDataToTransactionTable(raw!!, taxHash, currentToken!!)
           // 主线程跳转到账目详情界面
           fragment.context?.runOnUiThread {
-            goToTransactionDetailFragment(fragment.address!!, raw!!, currentToken!!, taxHash)
+            goToTransactionDetailFragment(fragment.address!!, raw, currentToken!!, taxHash)
           }
         }
       }
@@ -226,6 +232,27 @@ class PaymentValueDetailPresenter(
       arrayListOf(PaymentValueDetailModel(), PaymentValueDetailModel(), PaymentValueDetailModel())
   }
 
+  private fun insertPendingDataToTransactionTable(raw: RawTransaction, taxHash: String, token: DefaultTokenTable) {
+    TransactionTable().apply {
+      isReceive = false
+      symbol = fragment.symbol!!
+      timeStamp = (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
+      fromAddress = WalletTable.current.address
+      value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimals).formatCurrency()
+      hash = taxHash
+      gasPrice = raw.gasPrice.toString()
+      gasUsed = raw.gasLimit.toString()
+      isPending = true
+      recordOwnerAddress = WalletTable.current.address
+      tokenReceiveAddress = fragment.address
+      isERC20 = fragment.symbol == CryptoSymbol.eth
+      nonce = currentNonce.toString()
+      to = raw.to
+      input = raw.data
+    }.let {
+      GoldStoneDataBase.database.transactionDao().insert(it)
+    }
+  }
   /**
    * 转账开始后跳转到转账监听界面
    */
@@ -276,6 +303,7 @@ class PaymentValueDetailPresenter(
 
   // 更新 `RadioBox` 选中的状态
   private fun PaymentValueDetailCell.event() {
+    minerFeeType = model.type
     fragment.asyncData?.forEachOrEnd { item, isEnd ->
       item.isSelected = item.type == model.type
       if (isEnd) fragment.recyclerView.adapter.notifyDataSetChanged()

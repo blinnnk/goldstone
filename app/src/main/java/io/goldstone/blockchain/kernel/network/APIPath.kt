@@ -23,6 +23,6 @@ object EtherScanApi {
     "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=$apikey"
   }
   @JvmStatic val singleTransactionHas: (hash: String) -> String = {
-    "$header/api?module=account&action=txlistinternal&txhash=$it&apikey=$apikey"
+    "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=$apikey"
   }
 }

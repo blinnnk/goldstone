@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import org.web3j.protocol.core.methods.response.TransactionReceipt
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -22,8 +24,8 @@ data class TransactionTable(
   var timeStamp: String,
   @SerializedName("hash")
   var hash: String,
-  @Ignore @SerializedName("nonce")
-  var nonce: String, // Ignore
+  @SerializedName("nonce")
+  var nonce: String,
   @SerializedName("blockHash")
   var blockHash: String,
   @Ignore @SerializedName("transactionIndex")
@@ -57,7 +59,7 @@ data class TransactionTable(
   var symbol: String,
   var recordOwnerAddress: String,
   var tokenReceiveAddress: String? = null,
-  var transactionVolume: Int? = null
+  var isPending: Boolean = false
 ) {
   /** 默认的 `constructor` */
   constructor() : this(
@@ -87,11 +89,20 @@ data class TransactionTable(
   )
 
   companion object {
+
     fun getAllTransactionsByAddress(address: String, hold: (ArrayList<TransactionTable>) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
       }) {
         hold(it.toArrayList())
+      }
+    }
+
+    fun getTransactionListModelsByAddress(address: String, hold: (ArrayList<TransactionListModel>) -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+      }) {
+        hold(it.map { TransactionListModel(it) }.toArrayList())
       }
     }
 
@@ -112,15 +123,27 @@ data class TransactionTable(
         callback()
       }
     }
+
+    // 异步方法
+    fun deleteByTaxHash(taxHash: String) {
+      GoldStoneDataBase.database.transactionDao().apply {
+        getTransactionsByTaxHash(taxHash)?.let {
+          delete(it)
+        }
+      }
+    }
   }
 }
 
 @Dao
 interface TransactionDao {
-  @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress")
+  @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
   fun getTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
-  @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol")
+  @Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
+  fun getTransactionsByTaxHash(taxHash: String): TransactionTable?
+
+  @Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC")
   fun getTransactionsByAddressAndSymbol(
     walletAddress: String,
     targetSymbol: String
