@@ -157,3 +157,5 @@ fun String.toDataStringFromAddress(): String {
   if (length < 42) { println("Wrong Address") }
   return "000000000000000000000000" + substring(2, length)
 }
+
+fun String.isValidTaxHash() = length == CryptoValue.taxHashLength

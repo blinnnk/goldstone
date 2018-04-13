@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.toEthValue
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -48,7 +47,6 @@ class TransactionDetailPresenter(
   private var currentHash = ""
 
   override fun updateData() {
-
     dataFromList?.apply {
       updateHeaderValue(count, targetAddress, symbol, isPending, isReceived)
       fragment.asyncData = generateModels(this)

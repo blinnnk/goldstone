@@ -17,6 +17,7 @@ object SolidityCode {
 
 object CryptoValue {
   const val bip39AddressLength = 39
+  const val taxHashLength = 66
 }
 
 object CryptoSymbol {

@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -51,7 +52,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
       historyButton.onClick { presenter.showTransactionsFragment() }
       notifyButton.onClick { presenter.showNotificationListFragment() }
     }
-
   }
 
   private var isShow = false

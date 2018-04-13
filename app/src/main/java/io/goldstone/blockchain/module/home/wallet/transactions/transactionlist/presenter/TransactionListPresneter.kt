@@ -11,9 +11,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
-import io.goldstone.blockchain.kernel.commonmodel.TransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getAllTransactionsByAddress
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getTransactionListModelsByAddress
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -64,7 +62,6 @@ class TransactionListPresenter(
                   localData.addAll(0, newData)
                   asyncData = localData
                 }
-
               }
               Log.d("DEBUG", "updated new transaction data")
             }
@@ -154,8 +151,8 @@ class TransactionListPresenter(
           }
           return@getTransactionListByAddress
         }
+
         // 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
-        removeLoadingView()
         filterCompletedData(chainData, hold)
         Log.d("DEBUG", "update the new data from chain")
       }
@@ -167,7 +164,6 @@ class TransactionListPresenter(
       hold: (ArrayList<TransactionListModel>) -> Unit
     ) {
       activity?.getTransactionDataFromEtherScan(startBlock, hold)
-
     }
 
     private fun MainActivity.filterCompletedData(
@@ -181,7 +177,7 @@ class TransactionListPresenter(
           }
           if (isEnd) {
             val transactions = filter { it.to.isNotEmpty() }.toArrayList()
-            GoldStoneAPI.context.runOnUiThread {
+            runOnUiThread {
               removeLoadingView()
               hold(transactions.map { TransactionListModel(it) }.toArrayList())
             }

@@ -119,11 +119,14 @@ class PaymentValueDetailPresenter(
         // 发起 `sendRawTransaction` 请求
         GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
           Log.d("DEBUG", "taxHash $taxHash")
-          // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-          insertPendingDataToTransactionTable(raw!!, taxHash, currentToken!!)
+          // 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+          taxHash.isValidTaxHash().isTrue {
+            // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+            insertPendingDataToTransactionTable(raw!!, taxHash, currentToken!!)
+          }
           // 主线程跳转到账目详情界面
           fragment.context?.runOnUiThread {
-            goToTransactionDetailFragment(fragment.address!!, raw, currentToken!!, taxHash)
+            goToTransactionDetailFragment(fragment.address!!, raw!!, currentToken!!, taxHash)
           }
         }
       }
@@ -264,7 +267,6 @@ class PaymentValueDetailPresenter(
       // 如果有键盘收起键盘
       activity?.apply { SoftKeyboard.hide(this) }
       removeChildFragment(fragment)
-
       val model = ReceiptModel(address, raw, token, taxHash, System.currentTimeMillis())
       addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
         putSerializable(ArgumentKey.transactionDetail, model)
