@@ -9,6 +9,7 @@ object FragmentTag {
   const val home = "home"
   const val walletDetail = "walletDetail"
   const val profile = "profile"
+  const val transactionList = "transactionList"
   const val quotation = "quotation"
   const val walletCreation = "walletCreation"
   const val mnemonicBackup = "mnemonicBackup"

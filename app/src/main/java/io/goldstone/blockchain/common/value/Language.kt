@@ -135,6 +135,36 @@ object TransactionText {
     HoneyLanguage.English.code -> "confirm transaction with your password then transaction will begin"
     else -> ""
   }
+
+  @JvmField
+  val minerFee = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Miner Fee"
+    else -> ""
+  }
+
+  @JvmField
+  val memo = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Memo"
+    else -> ""
+  }
+
+  @JvmField
+  val transactionHash = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Transaction Hash"
+    else -> ""
+  }
+
+  @JvmField
+  val blockNumber = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Block Number"
+    else -> ""
+  }
+
+  @JvmField
+  val transactionDate = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Transaction Date"
+    else -> ""
+  }
 }
 
 object TokenDetailText {
@@ -373,7 +403,7 @@ object EmptyText {
   }
   @JvmField
   val tokenDetailSubtitle = when (currentLanguage) {
-    HoneyLanguage.English.code -> "There isn't transaction in blockchain, so you haven't chart and records"
+    HoneyLanguage.English.code -> "There isn't transaction in blockChain, so you haven't chart and records"
     else -> ""
   }
   @JvmField

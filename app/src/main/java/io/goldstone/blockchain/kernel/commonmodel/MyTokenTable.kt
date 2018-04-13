@@ -6,8 +6,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.toArrayList
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -100,17 +99,21 @@ data class MyTokenTable(
     fun getBalanceWithSymbol(
       symbol: String,
       ownerAddress: String,
+      convertByDecimal: Boolean = false,
       callback: (balance: Double) -> Unit = {}
     ) {
       // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
       if (symbol == CryptoSymbol.eth) {
         GoldStoneEthCall.getEthBalance(ownerAddress) {
-          callback(it)
+          val balance = if (convertByDecimal) it.toEthCount() else it
+          callback(balance)
         }
       } else {
-        DefaultTokenTable.getTokenBySymbol(symbol) {
-          GoldStoneEthCall.getTokenBalanceWithContract(it.contract, ownerAddress) {
-            callback(it)
+        DefaultTokenTable.getTokenBySymbol(symbol) { token ->
+          GoldStoneEthCall.getTokenBalanceWithContract(token.contract, ownerAddress) {
+            val balance =
+              if (convertByDecimal) CryptoUtils.toCountByDecimal(it, token.decimals) else it
+            callback(balance)
           }
         }
       }

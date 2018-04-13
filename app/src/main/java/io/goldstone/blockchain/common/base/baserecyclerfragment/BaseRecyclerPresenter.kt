@@ -47,7 +47,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
   }
 
   open fun onFragmentViewCreated() {
-    // Do Something
+    // 当 `ViewCreated`后执行更新数据函数
+    updateData()
   }
 
   open fun onFragmentShowFromHidden() {

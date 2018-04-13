@@ -1,12 +1,17 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.text.format.DateUtils
+import android.util.Log
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.toEthValue
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
+import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -39,21 +44,29 @@ class TransactionDetailPresenter(
     fragment.arguments?.get(ArgumentKey.transactionFromList) as? TransactionListModel
   }
   private var count = 0.0
-  private var transactionHash = ""
+  private var currentHash = ""
 
   override fun updateData() {
-
     dataFromList?.apply {
-      updateHeaderValue(count, targetAddress, symbol, false, isReceived)
+      updateHeaderValue(count, targetAddress, symbol, isPending, isReceived)
       fragment.asyncData = generateModels(this)
+      currentHash = transactionHash
+      if (isPending) {
+        // 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
+        doAsync {
+          fragment.getTransactionFromChain(transactionHash) {
+            updateHeaderValue(count, targetAddress, symbol, false)
+          }
+        }
+      }
     }
 
     data?.apply {
-      transactionHash = taxHash
+      currentHash = taxHash
       count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimals)
       fragment.asyncData = generateModels()
-      updateHeaderValue(count, address, token.symbol, true)
       observerTransaction()
+      updateHeaderValue(count, address, token.symbol, true)
     }
 
   }
@@ -62,16 +75,15 @@ class TransactionDetailPresenter(
     receipt: Any? = null
   ): ArrayList<TransactionDetailModel> {
 
-    var minerFee = ""
-    var date = ""
-    data?.apply {
-      minerFee = (raw.gasLimit * raw.gasPrice).toDouble().toEthValue()
-      date = DateUtils.formatDateTime(
-        GoldStoneAPI.context, data!!.timestamp, DateUtils.FORMAT_SHOW_YEAR
-      ) + " " + DateUtils.formatDateTime(
-        GoldStoneAPI.context, data!!.timestamp * 1000, DateUtils.FORMAT_SHOW_TIME
-      )
-    }
+    val minerFee = if (data.isNull()) dataFromList?.minerFee
+    else (data!!.raw.gasLimit * data!!.raw.gasPrice).toDouble().toEthValue()
+
+    val date = if (data.isNull()) dataFromList?.date
+    else DateUtils.formatDateTime(
+      GoldStoneAPI.context, data!!.timestamp, DateUtils.FORMAT_SHOW_YEAR
+    ) + " " + DateUtils.formatDateTime(
+      GoldStoneAPI.context, data!!.timestamp * 1000, DateUtils.FORMAT_SHOW_TIME
+    )
 
     val receiptData = when (receipt) {
       is TransactionListModel -> {
@@ -89,10 +101,10 @@ class TransactionDetailPresenter(
         arrayListOf(
           minerFee,
           "There isn't a memo",
-          transactionHash,
+          currentHash,
           receipt.blockNumber.toBigDecimal(),
           date,
-          "https://etherscan.io/account"
+          EtherScanApi.transactionsByHash(currentHash)
         )
       }
 
@@ -100,15 +112,20 @@ class TransactionDetailPresenter(
         arrayListOf(
           minerFee,
           "There isn't a memo",
-          transactionHash,
+          currentHash,
           "waiting",
           date,
-          "https://etherscan.io/account"
+          EtherScanApi.transactionsByHash(currentHash)
         )
       }
     }
     arrayListOf(
-      "Miner Fee", "Memo", "Transaction Hash", "Block Number", "Transaction Date", "Open A Url"
+      TransactionText.minerFee,
+      TransactionText.memo,
+      TransactionText.transactionHash,
+      TransactionText.blockNumber,
+      TransactionText.transactionDate,
+      TransactionText.url
     ).mapIndexed { index, it ->
       TransactionDetailModel(receiptData[index].toString(), it)
     }.let {
@@ -117,7 +134,8 @@ class TransactionDetailPresenter(
   }
 
   private fun updateHeaderValue(
-    count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false) {
+    count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false
+  ) {
     fragment.recyclerView.getItemViewAtAdapterPosition<TransactionDetailHeaderView>(0) {
       setIconStyle(count, address, symbol, isReceive, isPending)
     }
@@ -133,8 +151,8 @@ class TransactionDetailPresenter(
       try {
         // 开启监听交易是否完成
         transactionObserver = web3j.transactionObservable().filter {
-          println("checking ${it.hash}")
-          it.hash == transactionHash
+          Log.d("DEBUG", it.hash)
+          it.hash == currentHash
         }.subscribe {
           println("succeed")
           onTransactionSucceed()
@@ -150,22 +168,38 @@ class TransactionDetailPresenter(
    */
   private fun onTransactionSucceed() {
     data?.apply {
-      updateHeaderValue(count, address, token.symbol,false, false)
-    }
-    transactionObserver!!.unsubscribe()
-    transactionObserver = null
-    fragment.getTransactionFromChain()
-  }
-
-  private fun TransactionDetailFragment.getTransactionFromChain() {
-    val receipt = web3j.ethGetTransactionReceipt(data!!.taxHash).sendAsync().get().transactionReceipt
-    context?.runOnUiThread {
-      println(receipt)
-      asyncData?.clear()
-      asyncData?.addAll(generateModels(receipt))
-      recyclerView.adapter.notifyItemRangeChanged(1, 6)
+      updateHeaderValue(count, address, token.symbol, false, false)
+      transactionObserver!!.unsubscribe()
+      transactionObserver = null
+      fragment.getTransactionFromChain(taxHash)
     }
   }
 
+  private fun TransactionDetailFragment.getTransactionFromChain(taxHash: String, callback: () -> Unit = {}) {
+    web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
+      context?.runOnUiThread {
+        println(it)
+        asyncData?.clear()
+        asyncData?.addAll(generateModels(it))
+        recyclerView.adapter.notifyItemRangeChanged(1, 6)
+        callback()
+      }
+      // 成功获取数据后在异步线程更新数据库记录
+      updateDataInDatabase(it)
+    }
+  }
+
+  private fun updateDataInDatabase(data: TransactionReceipt) {
+    GoldStoneDataBase.database.transactionDao().apply {
+      getTransactionsByTaxHash(data.transactionHash)?.let {
+        update(it.apply {
+          blockNumber = data.blockNumber.toString()
+          isPending = false
+          hasError = "0"
+          txreceipt_status = "1"
+        })
+      }
+    }
+  }
 
 }

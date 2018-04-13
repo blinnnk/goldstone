@@ -4,12 +4,8 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.alert
@@ -18,7 +14,6 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter.PaymentValueDetailPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -36,7 +31,6 @@ class PaymentValueDetailFragment :
   val symbol by lazy { arguments?.getString(ArgumentKey.paymentSymbol) }
 
   private var transferCount = 0.0
-  private var currentMinerFeeType = MinerFeeType.Recommend.content
   override val presenter = PaymentValueDetailPresenter(this)
 
   override fun setRecyclerViewAdapter(
@@ -56,13 +50,13 @@ class PaymentValueDetailFragment :
       address?.apply { showTargetAddress(this) }
       presenter.updateHeaderValue(this)
       inputTextListener {
-        transferCount = it.toDouble()
+        it.isNotEmpty().isTrue { transferCount = it.toDouble() }
       }
     }
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
-      confirmClickEvent = Runnable {
-        MyTokenTable.getBalanceWithSymbol(symbol!!, WalletTable.current.address) {
+      MyTokenTable.getBalanceWithSymbol(symbol!!, WalletTable.current.address, true) {
+        confirmClickEvent = Runnable {
           if (it > transferCount) showConfirmAttentionView()
           else {
             context?.runOnUiThread {
@@ -94,8 +88,7 @@ class PaymentValueDetailFragment :
           }
         }
         yesButton {
-          presenter.transfer(currentMinerFeeType, passwordInput.text.toString())
-          activity?.apply { SoftKeyboard.hide(this) }
+          presenter.transfer(passwordInput.text.toString())
         }
         noButton { }
       }.show()

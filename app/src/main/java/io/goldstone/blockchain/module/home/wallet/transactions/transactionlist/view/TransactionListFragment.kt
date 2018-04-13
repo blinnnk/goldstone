@@ -30,7 +30,6 @@ class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, T
       }
     }
   }
-
   override fun setSlideUpWithCellHeight() = 75.uiPX()
 
 }

@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
 
@@ -27,8 +28,8 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
           iconColor = Spectrum.green
           count.title.textColor = Spectrum.green
         } else {
-          src = R.drawable.send_icon
-          iconColor = GrayScale.midGray
+          src = if (model?.isPending == true) R.drawable.pending_icon else R.drawable.send_icon
+          iconColor = if (model?.isPending == true) Spectrum.lightRed else GrayScale.midGray
           count.title.textColor = Spectrum.red
         }
       }
@@ -39,7 +40,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
       }
 
       count.apply {
-        title.text = (if (it.isReceived) "+" else "-") + it.count.toString()
+        title.text = (if (it.isReceived) "+" else "-") + it.count.formatCurrency()
         subtitle.text = it.symbol
       }
     }

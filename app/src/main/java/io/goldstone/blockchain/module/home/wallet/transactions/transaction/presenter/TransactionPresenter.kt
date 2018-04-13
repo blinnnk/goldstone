@@ -7,6 +7,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
@@ -23,7 +24,7 @@ class TransactionPresenter(
   fun showTargetFragment(isDetail: Boolean, bundle: Bundle? = null) {
     fragment.apply {
       isDetail.isFalse {
-        addFragmentAndSetArgument<TransactionListFragment>(ContainerID.content) {
+        addFragmentAndSetArgument<TransactionListFragment>(ContainerID.content, FragmentTag.transactionList) {
           // Send Arguments
         }
       } otherwise {
