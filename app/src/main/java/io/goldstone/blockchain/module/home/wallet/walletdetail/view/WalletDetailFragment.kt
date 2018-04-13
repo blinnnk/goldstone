@@ -42,7 +42,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
     wrapper.addView(slideHeader)
 
     // this `slideHeader` will show or hide depends on the distance that user sliding the

@@ -21,6 +21,7 @@ class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, T
     recyclerView: BaseRecyclerView,
     asyncData: ArrayList<TransactionListModel>?
   ) {
+
     asyncData?.let {
       recyclerView.adapter = TransactionListAdapter(it) {
         onClick {
@@ -29,6 +30,8 @@ class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, T
         }
       }
     }
+
+    System.out.println("hello")
   }
 
   override fun setSlideUpWithCellHeight() = 75.uiPX()

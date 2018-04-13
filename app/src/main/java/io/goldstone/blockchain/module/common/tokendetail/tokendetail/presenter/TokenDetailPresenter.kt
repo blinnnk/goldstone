@@ -87,7 +87,7 @@ class TokenDetailPresenter(
           hold(arrayListOf())
         } else {
           // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-          TransactionListPresenter.getTransactionDataFromEtherScan(fragment.getMainActivity()!!) {
+          TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
             it.isNotEmpty().isTrue {
               singleRunMark.isNull {
                 prepareTokenDetailData(hold)

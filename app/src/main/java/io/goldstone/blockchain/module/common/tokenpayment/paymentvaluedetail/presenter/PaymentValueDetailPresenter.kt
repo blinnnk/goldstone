@@ -248,8 +248,9 @@ class PaymentValueDetailPresenter(
           headerTitle = TokenDetailText.transferDetail
           presenter.popFragmentFrom<TransactionDetailFragment>()
           setHeightMatchParent()
-          showCloseButton(true)
+          showCloseButton(false)
         }
+        showCloseButton(true)
       }
       headerTitle = TokenDetailText.transferDetail
     }

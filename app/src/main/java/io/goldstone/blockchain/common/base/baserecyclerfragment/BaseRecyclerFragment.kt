@@ -169,8 +169,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         observingRecyclerViewHorizontalOffset(recyclerView?.computeHorizontalScrollOffset().orZero())
       }
     })
-
-    presenter.updateData()
   }
 
   override fun onHiddenChanged(hidden: Boolean) {

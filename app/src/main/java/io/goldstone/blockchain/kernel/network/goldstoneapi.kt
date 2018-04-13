@@ -41,8 +41,8 @@ object GoldStoneAPI {
    * 从 `EtherScan` 获取指定钱包地址的 `TransactionList`
    */
   @JvmStatic
-  fun getTransactionListByAddress(address: String, hold: ArrayList<TransactionTable>.() -> Unit) {
-    requestData<TransactionTable>(EtherScanApi.transactions(address), "result") {
+  fun getTransactionListByAddress(address: String, startBlock: String = "0", hold: ArrayList<TransactionTable>.() -> Unit) {
+    requestData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
       hold(this.toArrayList())
     }
   }

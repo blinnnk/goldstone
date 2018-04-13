@@ -52,7 +52,7 @@ object CryptoUtils {
       )
       address = toHexValue(address.substring(address.length - 40, address.length))
       // analysis input code and get the received count
-      count = inputCode.substring(inputCode.length - 64, inputCode.length).hexToDecimal()
+      count = inputCode.substring(74, 138).hexToDecimal()
       return InputCodeData("transfer", address, count)
     } otherwise {
       println("not a contract transfer")
@@ -61,10 +61,10 @@ object CryptoUtils {
   }
 
   fun isERC20Transfer(transactionTable: TransactionTable, hold: () -> Unit): Boolean {
-    return if (transactionTable.value == "0" && transactionTable.input.length > 10 && isTransferInputCode(
-        transactionTable.input
-      )
-    ) {
+    return if (
+      transactionTable.input.length >= 138
+      && isTransferInputCode(transactionTable.input)
+      ) {
       hold()
       true
     } else {
@@ -91,10 +91,7 @@ object CryptoUtils {
   }
 
   private fun isTransferInputCode(inputCode: String) =
-    inputCode.length == 138 && inputCode.substring(
-      0,
-      SolidityCode.contractTransfer.length
-    ) == SolidityCode.contractTransfer
+    inputCode.length > 10 && inputCode.substring(0, SolidityCode.contractTransfer.length) == SolidityCode.contractTransfer
 }
 
 fun Double.toEthValue(): String {

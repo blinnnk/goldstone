@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
 
@@ -39,7 +40,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
       }
 
       count.apply {
-        title.text = (if (it.isReceived) "+" else "-") + it.count.toString()
+        title.text = (if (it.isReceived) "+" else "-") + it.count.formatCurrency()
         subtitle.text = it.symbol
       }
     }

@@ -51,6 +51,17 @@ object GoldStoneEthCall {
     }
   }
 
+  @JvmStatic
+  fun getTokenInfoByContractAddress(contractAddress: String, hold: (symbol: String, name: String, decimal: Double) -> Unit) {
+    getTokenSymbol(contractAddress) { symbol ->
+      getTokenName(contractAddress) { name ->
+        getTokenDecimal(contractAddress) { decimal ->
+          hold(symbol, name, decimal)
+        }
+      }
+    }
+  }
+
   /**
    * @description 查询某一个 [walletAddress] 在 [contractAddress] 下是否存有余额
    */
