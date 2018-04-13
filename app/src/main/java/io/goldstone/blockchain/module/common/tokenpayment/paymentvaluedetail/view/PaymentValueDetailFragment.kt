@@ -4,12 +4,8 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.alert
@@ -56,13 +52,13 @@ class PaymentValueDetailFragment :
       address?.apply { showTargetAddress(this) }
       presenter.updateHeaderValue(this)
       inputTextListener {
-        transferCount = it.toDouble()
+        it.isNotEmpty().isTrue { transferCount = it.toDouble() }
       }
     }
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
-      confirmClickEvent = Runnable {
-        MyTokenTable.getBalanceWithSymbol(symbol!!, WalletTable.current.address) {
+      MyTokenTable.getBalanceWithSymbol(symbol!!, WalletTable.current.address, true) {
+        confirmClickEvent = Runnable {
           if (it > transferCount) showConfirmAttentionView()
           else {
             context?.runOnUiThread {
@@ -95,7 +91,6 @@ class PaymentValueDetailFragment :
         }
         yesButton {
           presenter.transfer(currentMinerFeeType, passwordInput.text.toString())
-          activity?.apply { SoftKeyboard.hide(this) }
         }
         noButton { }
       }.show()
