@@ -13,10 +13,15 @@ object SolidityCode {
   const val getTotalSupply = "0x18160ddd0000000000000000000000000000000000000000000000000000000000000005"
   const val getDecimal = "0x313ce5670000000000000000000000000000000000000000000000000000000000000005"
   const val getTokenName = "0x06fdde030000000000000000000000000000000000000000000000000000000000000005"
+  const val logTransferFilter = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+}
+
+object JsonRPCMethod {
+  const val ethCall = "eth_call"
 }
 
 object CryptoValue {
-  const val bip39AddressLength = 39
+  const val bip39AddressLength = 42 // 包含 `0x`
   const val taxHashLength = 66
 }
 

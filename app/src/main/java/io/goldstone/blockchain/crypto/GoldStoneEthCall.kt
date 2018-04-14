@@ -24,7 +24,7 @@ object GoldStoneEthCall {
     GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
     GetTokenDecimal("eth_call", SolidityCode.getDecimal),
     GetTokenName("eth_call", SolidityCode.getTokenName),
-    SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName)
+    SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
   }
 
   @JvmStatic private val contentType = MediaType.parse("application/json; charset=utf-8")

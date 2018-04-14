@@ -61,3 +61,18 @@ fun String.hexToDecimal():  Double {
     }
   return value
 }
+
+fun String.toDecimalFromHex():  Long {
+  // 以太坊的地址都是含有 `0x` 开头, 这里首先去掉 `0x`
+  var hexNum = this.substring(2, length)
+  val digits = "0123456789ABCDEF"
+  hexNum = hexNum.toUpperCase()
+  var value  = 0.0
+  (0 until hexNum.length)
+    .map { hexNum[it] }
+    .map { digits.indexOf(it.toString()) }
+    .forEachIndexed { index, it ->
+      value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toLong()
+    }
+  return value.toLong()
+}

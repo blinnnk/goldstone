@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.common.value.SymbolText
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 
 @SuppressLint("SetTextI18n")
@@ -28,8 +29,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
       icon.image.glideImage(iconUrl)
       tokenInfo.title.text = symbol
       tokenInfo.subtitle.text = name
-      valueInfo.title.text = count.toString()
-      valueInfo.subtitle.text = "≈ " + currency + SymbolText.usd
+      valueInfo.title.text = count.formatCurrency()
+      valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + SymbolText.usd
     }
   }
 

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getTransactionListModelsByAddress
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -109,8 +110,6 @@ class TransactionListPresenter(
         CryptoUtils.isERC20Transfer(transaction) {
           // 解析 `input code` 获取 `ERC20` 接受 `address`, 及接受 `count`
           val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
-          // 判断是否是接收交易
-          val receiveStatus = WalletTable.current.address == transactionInfo?.address
           // 首先从本地数据库检索 `contract` 对应的 `symbol`
           DefaultTokenTable.getTokenByContractAddress(transaction.to) { tokenInfo ->
             val count = CryptoUtils.toCountByDecimal(
@@ -119,36 +118,34 @@ class TransactionListPresenter(
             tokenInfo.isNull().isTrue {
               // 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
               GoldStoneEthCall.getTokenSymbol(transaction.to) { tokenSymbol ->
-                transaction.apply {
-                  isReceive = receiveStatus
-                  isERC20 = true
-                  symbol = tokenSymbol
-                  value = count.toString()
-                  tokenReceiveAddress = transactionInfo?.address
-                  recordOwnerAddress = WalletTable.current.address
-                }
+                TransactionTable.updateModelInfoFromChain(
+                  transaction,
+                  true,
+                  tokenSymbol,
+                  count.toString(),
+                  transactionInfo?.address
+                )
                 if (isEnd) hold(data)
               }
             } otherwise {
-              transaction.apply {
-                isReceive = receiveStatus
-                isERC20 = true
-                symbol = tokenInfo!!.symbol
-                value = count.toString()
-                tokenReceiveAddress = transactionInfo?.address
-                recordOwnerAddress = WalletTable.current.address
-              }
+              TransactionTable.updateModelInfoFromChain(
+                transaction,
+                true,
+                tokenInfo!!.symbol,
+                count.toString(),
+                transactionInfo?.address
+              )
               if (isEnd) hold(data)
             }
           }
         }.isFalse {
-          transaction.apply {
-            isReceive = WalletTable.current.address == transaction.to
-            symbol = CryptoSymbol.eth
-            value = CryptoUtils.toCountByDecimal(transaction.value.toDouble(), 18.0).toString()
-            recordOwnerAddress = WalletTable.current.address
-            tokenReceiveAddress = transaction.to
-          }
+          TransactionTable.updateModelInfoFromChain(
+            transaction,
+            false,
+            CryptoSymbol.eth,
+            transaction.value.toDouble().toEthCount().toString(),
+            transaction.to
+          )
           if (isEnd) hold(data)
         }
       }
@@ -160,6 +157,9 @@ class TransactionListPresenter(
     ) {
       // Show loading view
       showLoadingView()
+
+      GoldStoneAPI.getDefaultTokens {  }
+
       // Get transaction data from `etherScan`
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address, startBlock) {
         val chainData = this
