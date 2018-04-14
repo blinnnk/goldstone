@@ -62,7 +62,7 @@ fun String.hexToDecimal():  Double {
   return value
 }
 
-fun String.toDecimalFromHex():  Long {
+fun String.toDecimalFromHex():  String {
   // 以太坊的地址都是含有 `0x` 开头, 这里首先去掉 `0x`
   var hexNum = this.substring(2, length)
   val digits = "0123456789ABCDEF"
@@ -74,5 +74,5 @@ fun String.toDecimalFromHex():  Long {
     .forEachIndexed { index, it ->
       value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toLong()
     }
-  return value.toLong()
+  return value.formatCurrency()
 }

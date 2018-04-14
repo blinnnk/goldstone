@@ -212,7 +212,7 @@ class TokenDetailPresenter(
     }
   }
 
-  private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) 1 else -1
+  private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) -1 else 1
 
   private inline fun <reified T : Fragment> shoTargetFragment(
     title: String,
