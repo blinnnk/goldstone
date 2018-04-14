@@ -29,7 +29,7 @@ data class TransactionTable(
   @SerializedName("blockHash")
   var blockHash: String,
   @Ignore @SerializedName("transactionIndex")
-  private var transactionIndex: String, // Ignore
+  private var transactionIndex: String,
   @SerializedName("from")
   var fromAddress: String,
   @SerializedName("to")
@@ -45,21 +45,22 @@ data class TransactionTable(
   @SerializedName("txreceipt_status")
   var txreceipt_status: String,
   @Ignore @SerializedName("input")
-  var input: String, // Ignore
+  var input: String,
   @SerializedName("contractAddress")
   var contractAddress: String, @Ignore
   @SerializedName("cumulativeGasUsed")
-  private var cumulativeGasUsed: String, // Ignore
+  private var cumulativeGasUsed: String,
   @SerializedName("gasUsed")
   var gasUsed: String,
   @Ignore @SerializedName("confirmations")
-  private var confirmations: String, // Ignore
+  private var confirmations: String,
   var isReceive: Boolean,
   var isERC20: Boolean,
   var symbol: String,
   var recordOwnerAddress: String,
   var tokenReceiveAddress: String? = null,
-  var isPending: Boolean = false
+  var isPending: Boolean = false,
+  var logIndex: String = ""
 ) {
   /** 默认的 `constructor` */
   constructor() : this(
@@ -89,6 +90,23 @@ data class TransactionTable(
   )
 
   companion object {
+
+    fun updateModelInfoFromChain(
+      transaction: TransactionTable,
+      isERC20: Boolean,
+      symbol: String,
+      value: String,
+      tokenReceiveAddress: String?
+    ) {
+      transaction.apply {
+        this.isReceive = WalletTable.current.address == tokenReceiveAddress
+        this.isERC20 = isERC20
+        this.symbol = symbol
+        this.value = value
+        this.tokenReceiveAddress = tokenReceiveAddress
+        this.recordOwnerAddress = WalletTable.current.address
+      }
+    }
 
     fun getAllTransactionsByAddress(address: String, hold: (ArrayList<TransactionTable>) -> Unit) {
       coroutinesTask({

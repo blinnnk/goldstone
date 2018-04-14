@@ -37,7 +37,7 @@ object CryptoUtils {
     return DecimalFormat("0.00").format(value).toDouble()
   }
 
-  fun toCountByDecimal(value: Double, decimal: Double): Double {
+  fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
     return value / Math.pow(10.0, if (decimal < 4) 18.0 else decimal)
   }
 
@@ -159,3 +159,21 @@ fun String.toDataStringFromAddress(): String {
 }
 
 fun String.isValidTaxHash() = length == CryptoValue.taxHashLength
+
+
+// 这个是返回 `EventLog` 中需要的地址格式
+fun String.toAddressCode(): String {
+  return if (length == CryptoValue.bip39AddressLength) {
+    "0x000000000000000000000000" + substring(2, length)
+  } else {
+    "it is not address format"
+  }
+}
+
+fun String.toAddressFromCode(): String {
+  return if (length == 66) {
+    "0x" + substring(26, length)
+  } else {
+    "it is not address format"
+  }
+}

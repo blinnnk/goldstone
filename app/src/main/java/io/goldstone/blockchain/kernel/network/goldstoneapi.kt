@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -34,6 +35,12 @@ object GoldStoneAPI {
         if(token.forceShow == TinyNumber.True.value) token.isUsed = true
         if (isEnd) hold(this.toArrayList())
       }
+    }
+  }
+
+  fun getERC20TokenTransaction(address: String, startBlock: String = "0", hold: (ArrayList<ERC20TransactionModel>) -> Unit) {
+    requestData<ERC20TransactionModel>(EtherScanApi.getAllTokenTransaction(address, startBlock), "result") {
+      hold(this.toArrayList())
     }
   }
 
