@@ -4,12 +4,14 @@ import android.arch.persistence.room.*
 import android.content.Context
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
+import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.localTransactions
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
@@ -34,7 +36,10 @@ data class WalletTable(
 ) {
   companion object {
 
-    var current: WalletTable = WalletTable(0, "", "", false)
+    var current: WalletTable by observing(WalletTable(0, "", "", false)) {
+      // 每次切换账户需要清空放在内存里面的当前账户的信息.
+      localTransactions = null
+    }
     var walletCount: Int? = null
 
     fun insert(model: WalletTable, callback: () -> Unit = {}) {

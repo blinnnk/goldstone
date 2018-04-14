@@ -9,6 +9,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import org.jetbrains.anko.matchParent
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -91,9 +92,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
   fun recoveryFragmentHeight() {
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
+      val recoveryHeight = fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
+      val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
       overlayView.contentLayout.updateHeightAnimation(
-        fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero(),
-        fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+        if (recoveryHeight == 0) maxHeight else recoveryHeight, maxHeight
       )
     }
   }

@@ -1,11 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.toEthValue
@@ -13,6 +17,10 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -20,6 +28,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.web3j.protocol.Web3jFactory
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
@@ -68,7 +77,28 @@ class TransactionDetailPresenter(
       observerTransaction()
       updateHeaderValue(count, address, token.symbol, true)
     }
+  }
 
+  override fun onFragmentShowFromHidden() {
+    super.onFragmentShowFromHidden()
+    fragment.getParentFragment<TransactionFragment>()?.apply {
+      overlayView.header.backButton.onClick {
+        headerTitle = TransactionText.detail
+        presenter.popFragmentFrom<TransactionDetailFragment>()
+        setHeightMatchParent()
+      }
+    }
+  }
+
+  fun showEtherScanTransactionFragment() {
+    fragment.getParentFragment<TransactionFragment> {
+      Bundle().apply {
+        putString(ArgumentKey.webViewUrl, "https://ropsten.etherscan.io/tx/$currentHash")
+      }.let {
+        presenter.showTargetFragment<WebViewFragment>(TransactionText.etherScanTransaction, TransactionText.detail, it)
+      }
+
+    }
   }
 
   private fun generateModels(

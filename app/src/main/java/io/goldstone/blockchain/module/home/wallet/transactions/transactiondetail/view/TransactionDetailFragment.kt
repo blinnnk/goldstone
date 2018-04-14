@@ -5,6 +5,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.TransactionDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -24,7 +25,11 @@ class TransactionDetailFragment : BaseRecyclerFragment<TransactionDetailPresente
   ) {
     recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) {
       onClick {
-        this@TransactionDetailFragment.context?.clickToCopy(info.text.toString())
+        if(model.description == TransactionText.url) {
+          presenter.showEtherScanTransactionFragment()
+        } else {
+          this@TransactionDetailFragment.context?.clickToCopy(info.text.toString())
+        }
         preventDuplicateClicks()
       }
     }

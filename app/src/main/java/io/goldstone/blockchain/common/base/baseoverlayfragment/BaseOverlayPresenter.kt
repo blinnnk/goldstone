@@ -29,9 +29,11 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
   }
 
   /**
-   * 为了体验之前的 `Fragment` 都是使用隐藏, 当级别超过 `2` 层记得去从隐藏到显示
+   * 为了体验, 之前的 `Fragment` 都是使用隐藏,
+   * @important 当级别超过 `2` 层记得去从隐藏到显示
    * 状态的 `Fragment` 中, 在 `presenter.onFragmentShowFromHidden` 方法
    * 中重设回退按钮点击状态
+   * @example [TransactionDetailPresenter.onFragmentShowFromHidden]
    */
   inline fun<reified R: Fragment> popFragmentFrom() {
     fragment.apply {
@@ -56,10 +58,6 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
         }
       }
     }
-  }
-
-  open fun backToLastFragment() {
-    // Do Something
   }
 
   fun onFragmentAttach() {

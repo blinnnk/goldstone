@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.aboutus.view
+package io.goldstone.blockchain.module.common.webview.view
 
 import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
@@ -9,7 +9,9 @@ import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.module.home.profile.aboutus.presenter.AboutUsPresenter
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -20,20 +22,23 @@ import org.jetbrains.anko.webView
  * @author KaySaith
  */
 
-class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
+class WebViewFragment : BaseFragment<WebViewPresenter>() {
 
-  override val presenter = AboutUsPresenter(this)
+  private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
+
+  override val presenter = WebViewPresenter(this)
 
   @SuppressLint("SetJavaScriptEnabled")
   override fun AnkoContext<Fragment>.initView() {
     webView {
       settings.javaScriptEnabled = true
       webViewClient = WebViewClient()
-      this.loadUrl("https://eos.io/")
+      this.loadUrl(urlPath)
       layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
     }
 
-    getParentFragment<ProfileOverlayFragment>()?.apply {
+    // 需要添加到 `BaseOverlayFragment` 下面
+    getParentFragment<BaseOverlayFragment<*>>()?.apply {
       overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
     }
   }

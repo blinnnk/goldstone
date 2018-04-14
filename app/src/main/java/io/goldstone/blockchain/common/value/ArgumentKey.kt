@@ -15,4 +15,6 @@ object ArgumentKey {
   const val tokenDetail = "tokenDetail"
   const val paymentAddress = "paymentAddress"
   const val paymentSymbol = "paymentSymbol"
+  const val webViewUrl = "webViewUrl"
+  const val fragmentTitle = "fragmentTitle"
 }
