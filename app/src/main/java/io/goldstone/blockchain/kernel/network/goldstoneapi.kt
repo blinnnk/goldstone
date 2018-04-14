@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
@@ -44,11 +45,17 @@ object GoldStoneAPI {
     }
   }
 
+  fun getERC20TokenIncomingTransaction(startBlock: String = "0", address: String = WalletTable.current.address, hold: (ArrayList<ERC20TransactionModel>) -> Unit) {
+    requestData<ERC20TransactionModel>(EtherScanApi.getTokenIncomingTransaction(address, startBlock), "result") {
+      hold(this.toArrayList())
+    }
+  }
+
   /**
    * 从 `EtherScan` 获取指定钱包地址的 `TransactionList`
    */
   @JvmStatic
-  fun getTransactionListByAddress(address: String, startBlock: String = "0", hold: ArrayList<TransactionTable>.() -> Unit) {
+  fun getTransactionListByAddress(startBlock: String = "0", address: String = WalletTable.current.address, hold: ArrayList<TransactionTable>.() -> Unit) {
     requestData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
       hold(this.toArrayList())
     }
@@ -68,7 +75,6 @@ object GoldStoneAPI {
         val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
         val jsonData = dataObject[keyName].toString()
         val gson = Gson()
-
         val collectionType = object : TypeToken<Collection<T>>() {}.type
         try {
           hold(gson.fromJson(jsonData, collectionType))

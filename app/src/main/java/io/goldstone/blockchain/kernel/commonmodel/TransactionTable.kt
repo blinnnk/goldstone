@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 
@@ -89,6 +91,36 @@ data class TransactionTable(
     ""
   )
 
+  // 这个是专门为入账的 `ERC20 Token` 准备的
+  constructor(data: ERC20TransactionModel) : this(
+    0,
+    data.blockNumber,
+    data.timeStamp,
+    data.transactionHash,
+    "",
+    "",
+    data.transactionIndex,
+    data.from,
+    data.to,
+    data.value,
+    "",
+    data.gasPrice,
+    "0",
+    "1",
+    "",
+    data.contract,
+    "",
+    data.gasUsed,
+    "",
+    data.isReceive,
+    true,
+    "",
+    data.to,
+    data.to,
+    false,
+    data.logIndex
+  )
+
   companion object {
 
     fun updateModelInfoFromChain(
@@ -99,7 +131,8 @@ data class TransactionTable(
       tokenReceiveAddress: String?
     ) {
       transaction.apply {
-        this.isReceive = WalletTable.current.address == tokenReceiveAddress
+        System.out.println(tokenReceiveAddress)
+        this.isReceive = WalletTable.current.address.equals(tokenReceiveAddress, true)
         this.isERC20 = isERC20
         this.symbol = symbol
         this.value = value

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
 
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.crypto.hexToDecimal
 import io.goldstone.blockchain.crypto.toAddressFromCode
 import io.goldstone.blockchain.crypto.toDecimalFromHex
 
@@ -11,7 +12,7 @@ import io.goldstone.blockchain.crypto.toDecimalFromHex
 
 data class ERC20TransactionModel(
   @SerializedName("address")
-  private val contract: String,
+  val contract: String,
   @SerializedName("topics")
   private val topics: ArrayList<String>,
   val from: String = topics[1],
@@ -19,32 +20,34 @@ data class ERC20TransactionModel(
   @SerializedName("data")
   val value: String,
   @SerializedName("blockNumber")
-  private val blockNumber: String,
+  val blockNumber: String,
   @SerializedName("timeStamp")
-  private val timeStamp: String,
+  val timeStamp: String,
   @SerializedName("gasPrice")
-  private val gasPrice: String,
+  val gasPrice: String,
   @SerializedName("gasUsed")
-  private val gasUsed: String,
+  val gasUsed: String,
   @SerializedName("logIndex")
-  private val logIndex: String,
+  val logIndex: String,
   @SerializedName("transactionHash")
-  private val transactionHash: String,
+  val transactionHash: String,
   @SerializedName("transactionIndex")
-  private val transactionIndex: String
+  val transactionIndex: String,
+  val isReceive: Boolean
 ) {
   constructor(data: ERC20TransactionModel) : this(
     data.contract,
     data.topics,
     data.topics[1].toAddressFromCode(), // fromAddress
     data.topics[2].toAddressFromCode(), // toAddress
-    data.value.toDecimalFromHex().toString(),
-    data.blockNumber.toDecimalFromHex().toString(),
-    data.timeStamp.toDecimalFromHex().toString(),
-    data.gasPrice.toDecimalFromHex().toString(),
-    data.gasUsed.toDecimalFromHex().toString(),
-    data.logIndex.toDecimalFromHex().toString(),
+    data.value.toDecimalFromHex(),
+    data.blockNumber.toDecimalFromHex(),
+    data.timeStamp.toDecimalFromHex(),
+    data.gasPrice.toDecimalFromHex(),
+    data.gasUsed.toDecimalFromHex(),
+    data.logIndex.toDecimalFromHex(),
     data.transactionHash,
-    data.transactionIndex.toDecimalFromHex().toString()
+    data.transactionIndex.toDecimalFromHex(),
+    true
   )
 }
