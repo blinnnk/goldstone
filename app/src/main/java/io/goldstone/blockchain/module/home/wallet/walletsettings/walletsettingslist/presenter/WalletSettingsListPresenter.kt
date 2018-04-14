@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter
 
+import android.support.v4.app.Fragment
 import android.text.InputType
 import android.widget.EditText
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -90,21 +92,25 @@ class WalletSettingsListPresenter(
       if (isWatchOnly) {
         deleteWatchOnlyWallet(address)
       } else {
-        deleteRoutineWallet(address, password)
+        fragment.deleteRoutineWallet(address, password)
       }
     }
   }
 
-  private fun deleteRoutineWallet(address: String, password: String) {
+  private fun Fragment.deleteRoutineWallet(address: String, password: String) {
     // delete `keystore` file
-    fragment.context?.deleteAccount(address, password) {
-      // delete all records of this `address` in `myTokenTable`
-      MyTokenTable.deleteByAddress(address) {
-        TransactionTable.deleteByAddress(address) {
-          TokenBalanceTable.deleteByAddress(address) {
-            // delete wallet record in `walletTable`
-            WalletTable.deleteCurrentWallet {
-              fragment.activity?.jump<SplashActivity>()
+    context?.deleteAccount(address, password) {
+      it.isFalse {
+        getMainActivity()?.removeLoadingView()
+      } otherwise {
+        // delete all records of this `address` in `myTokenTable`
+        MyTokenTable.deleteByAddress(address) {
+          TransactionTable.deleteByAddress(address) {
+            TokenBalanceTable.deleteByAddress(address) {
+              // delete wallet record in `walletTable`
+              WalletTable.deleteCurrentWallet {
+                activity?.jump<SplashActivity>()
+              }
             }
           }
         }

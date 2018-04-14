@@ -2,9 +2,10 @@ package io.goldstone.blockchain.module.home.profile.profileoverlay.presenter
 
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ProfileText
-import io.goldstone.blockchain.module.home.profile.aboutus.view.AboutUsFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.view.ContactsFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
@@ -38,8 +39,8 @@ class ProfileOverlayPresenter(
   }
 
   private fun showAboutUsFragment() {
-    fragment.addFragmentAndSetArgument<AboutUsFragment>(ContainerID.content) {
-      // Send Arguments
+    fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+      putString(ArgumentKey.webViewUrl, "https://www.ethereum.org/")
     }
   }
 

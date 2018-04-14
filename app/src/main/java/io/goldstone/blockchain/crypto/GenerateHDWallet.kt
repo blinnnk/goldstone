@@ -5,15 +5,18 @@ package io.goldstone.blockchain.crypto
 import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Account
 import org.ethereum.geth.Accounts
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
+import org.jetbrains.anko.alert
 import org.kethereum.bip39.Mnemonic
 import org.kethereum.crypto.Keys
 import org.kethereum.crypto.publicKeyFromPrivate
 import org.walleth.khex.hexToByteArray
+import org.web3j.abi.datatypes.Bool
 import org.web3j.crypto.ECKeyPair
 import org.web3j.crypto.Wallet
 import java.io.File
@@ -136,7 +139,7 @@ fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String
   }
 }
 
-fun Context.deleteAccount(walletAddress: String, password: String, callback: () -> Unit) {
+fun Context.deleteAccount(walletAddress: String, password: String, callback: (correctPassword: Boolean) -> Unit) {
   val keystoreFile by lazy { File(filesDir!!, "keystore") }
   val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
   // If there is't account found then return
@@ -146,10 +149,12 @@ fun Context.deleteAccount(walletAddress: String, password: String, callback: () 
       it.equals(walletAddress, true).isTrue {
         try {
           keyStore.deleteAccount(keyStore.accounts.get(index), password)
+          callback(true)
         } catch (error: Exception) {
+          alert("Wrong Password")
+          callback(false)
           println(error)
         }
-        callback()
       }
     }
   }

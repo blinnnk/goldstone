@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
@@ -19,11 +20,10 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter.Companion.getTransactionDataFromEtherScan
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 24/03/2018 2:12 PM
@@ -63,7 +63,7 @@ class TransactionListPresenter(
     fragment.getParentFragment<TransactionFragment>()?.apply {
       Bundle().apply {
         putSerializable(ArgumentKey.transactionFromList, model)
-        presenter.showTargetFragment(true, this)
+        presenter.showTargetFragment<TransactionDetailFragment>(TransactionText.detail, TransactionText.transaction, this)
       }
     }
   }
@@ -76,21 +76,24 @@ class TransactionListPresenter(
       // 如果梅拉去到直接更新本地数据
       doAsync {
         // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-        newData.forEach { data ->
+        newData.forEachOrEnd { item, isEnd ->
           localData.find {
-            it.transactionHash == data.transactionHash
+            it.transactionHash == item.transactionHash
           }?.let {
+            localData.remove(it)
             TransactionTable.deleteByTaxHash(it.transactionHash)
           }
-        }
-        // 数据清理干净后在主线程更新 `UI`
-        runOnUiThread {
-          // 拉取到后, 把最新获取的数据合并本地数据更新到界面
-          localData.addAll(0, newData)
-          // 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
-          localTransactions = localData
-          fragment.asyncData?.addAll(0, localData)
-          fragment.recyclerView.adapter.notifyItemRangeInserted(0, newData.lastIndex)
+          if (isEnd) {
+            // 数据清理干净后在主线程更新 `UI`
+            runOnUiThread {
+              // 拉取到后, 把最新获取的数据合并本地数据更新到界面
+              localData.addAll(0, newData)
+              // 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
+              localTransactions = localData
+              fragment.asyncData?.addAll(0, localData)
+              fragment.recyclerView.adapter.notifyItemRangeInserted(0, newData.lastIndex)
+            }
+          }
         }
       }
       Log.d("DEBUG", "updated new transaction data")

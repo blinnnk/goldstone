@@ -121,7 +121,13 @@ object TransactionText {
   @JvmField
   val detail = when (currentLanguage) {
     HoneyLanguage.English.code -> "Transaction Detail"
-    else -> "交易明细"
+    else -> "交易详情"
+  }
+
+  @JvmField
+  val etherScanTransaction = when (currentLanguage) {
+    HoneyLanguage.English.code -> "EtherScan Detail"
+    else -> ""
   }
 
   @JvmField

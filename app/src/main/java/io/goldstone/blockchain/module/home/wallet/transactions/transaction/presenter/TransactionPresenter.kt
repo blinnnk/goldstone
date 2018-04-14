@@ -1,16 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
 
 /**
  * @date 24/03/2018 2:37 AM
@@ -21,25 +17,21 @@ class TransactionPresenter(
   override val fragment: TransactionFragment
 ) : BaseOverlayPresenter<TransactionFragment>() {
 
-  fun showTargetFragment(isDetail: Boolean, bundle: Bundle? = null) {
+  inline fun<reified T: Fragment> showTargetFragment(title: String, previousTitle: String, bundle: Bundle? = null) {
+    System.out.println("fuck what happened")
     fragment.apply {
-      isDetail.isFalse {
-        addFragmentAndSetArgument<TransactionListFragment>(ContainerID.content, FragmentTag.transactionList) {
-          // Send Arguments
+      headerTitle = title
+      childFragmentManager.fragments.last()?.let {
+        hideChildFragment(it)
+        addFragmentAndSetArgument<T>(ContainerID.content) {
+          putAll(bundle)
         }
-      } otherwise {
-        childFragmentManager.fragments.last()?.let {
-          if (it is TransactionListFragment) hideChildFragment(it)
-          addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-            // Send Arguments
-            putAll(bundle)
+        overlayView.header.apply {
+          showBackButton(true) {
+            headerTitle = previousTitle
+            popFragmentFrom<T>()
           }
-          overlayView.header.apply {
-            showBackButton(true) {
-              popFragmentFrom<TransactionDetailFragment>()
-            }
-            showCloseButton(false)
-          }
+          showCloseButton(false)
         }
       }
     }
