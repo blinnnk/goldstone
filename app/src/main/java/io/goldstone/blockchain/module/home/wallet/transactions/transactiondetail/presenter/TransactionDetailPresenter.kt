@@ -91,6 +91,7 @@ class TransactionDetailPresenter(
   }
 
   fun showEtherScanTransactionFragment() {
+    System.out.println("currentHash $currentHash")
     fragment.getParentFragment<TransactionFragment> {
       Bundle().apply {
         putString(ArgumentKey.webViewUrl, "https://ropsten.etherscan.io/tx/$currentHash")

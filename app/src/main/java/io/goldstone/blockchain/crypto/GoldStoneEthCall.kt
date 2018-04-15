@@ -170,7 +170,6 @@ object GoldStoneEthCall {
         try {
           hold(dataObject["result"].toString())
         } catch (error: Exception) {
-          hold(data.orEmpty())
           println(error)
         }
       }

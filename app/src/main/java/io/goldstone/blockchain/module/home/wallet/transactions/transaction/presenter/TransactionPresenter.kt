@@ -18,7 +18,6 @@ class TransactionPresenter(
 ) : BaseOverlayPresenter<TransactionFragment>() {
 
   inline fun<reified T: Fragment> showTargetFragment(title: String, previousTitle: String, bundle: Bundle? = null) {
-    System.out.println("fuck what happened")
     fragment.apply {
       headerTitle = title
       childFragmentManager.fragments.last()?.let {
