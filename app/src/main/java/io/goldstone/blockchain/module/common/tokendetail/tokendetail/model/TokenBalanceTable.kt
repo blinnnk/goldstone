@@ -4,8 +4,8 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall

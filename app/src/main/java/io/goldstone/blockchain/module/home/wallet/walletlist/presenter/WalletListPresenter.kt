@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.walletlist.presenter
 
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable

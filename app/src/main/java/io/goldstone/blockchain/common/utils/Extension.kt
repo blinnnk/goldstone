@@ -2,23 +2,14 @@
 
 package io.goldstone.blockchain.common.utils
 
-import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Paint
 import android.support.v4.app.Fragment
 import android.view.View
-import com.blinnnk.util.PermissionCategory
-import com.blinnnk.util.requestPermissionListener
-import com.blinnnk.util.verifyMultiplePermissions
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import java.util.ArrayList
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -56,22 +47,4 @@ fun Context.getMainActivity() = this as? MainActivity
 
 fun Context.alert(message: String) {
   alert(Appcompat, message).show()
-}
-
-fun Activity.checkPermissionThen(type: PermissionCategory, callback: () -> Unit) {
-  if (verifyMultiplePermissions(type)) {
-    callback()
-  } else {
-    requestPermissionListener(type) { hasPermission ->
-      if (hasPermission) {
-        callback()
-      } else {
-        checkPermissionThen(type, callback)
-      }
-    }
-  }
-}
-
-fun<T> List<T>.toArrayList(): ArrayList<T> {
-  return this.mapTo(arrayListOf()) { it }
 }

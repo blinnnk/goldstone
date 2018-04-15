@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 
 /**

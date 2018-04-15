@@ -1,15 +1,13 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import org.web3j.protocol.core.methods.response.TransactionReceipt
 
 /**
  * @date 07/04/2018 7:32 PM

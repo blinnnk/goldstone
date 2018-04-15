@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
