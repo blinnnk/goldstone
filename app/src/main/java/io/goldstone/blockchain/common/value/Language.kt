@@ -192,6 +192,12 @@ object TokenDetailText {
     HoneyLanguage.English.code -> "custom miner fee"
     else -> ""
   }
+
+  @JvmField
+  val tokenDetail = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Token Detail"
+    else -> ""
+  }
 }
 
 object CommonText {

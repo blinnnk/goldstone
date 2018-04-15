@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import com.blinnnk.extension.*
-import com.blinnnk.util.addFragmentAndSetArgument
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -24,6 +23,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
@@ -55,15 +55,26 @@ class TokenDetailPresenter(
 
   fun showAddressSelectionFragment() {
     WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-      shoTargetFragment<AddressSelectionFragment>(TokenDetailText.address)
+      fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+        presenter.showTargetFragment<AddressSelectionFragment>(
+          TokenDetailText.address,
+          TokenDetailText.tokenDetail
+        )
+      }
     }
   }
 
   fun showTransactionDetailFragment(model: TransactionListModel) {
-    val arguments = Bundle().apply {
+    val argument = Bundle().apply {
       putSerializable(ArgumentKey.transactionFromList, model)
     }
-    shoTargetFragment<TransactionDetailFragment>(TransactionText.detail, arguments)
+    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+      presenter.showTargetFragment<TransactionDetailFragment>(
+        TransactionText.detail,
+        TokenDetailText.tokenDetail,
+        argument
+      )
+    }
   }
 
   fun showDepositFragment() {
@@ -213,27 +224,5 @@ class TokenDetailPresenter(
   }
 
   private fun modulusByReceiveStatus(isReceive: Boolean) = if (isReceive) -1 else 1
-
-  private inline fun <reified T : Fragment> shoTargetFragment(
-    title: String,
-    bundle: Bundle? = null
-  ) {
-    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-      hideChildFragment(fragment)
-      addFragmentAndSetArgument<T>(ContainerID.content) {
-        bundle.isNotNull { putAll(bundle) }
-      }
-      overlayView.header.apply {
-        showBackButton(true) {
-          presenter.setValueHeader(title)
-          presenter.popFragmentFrom<T>()
-          setHeightMatchParent()
-        }
-        showCloseButton(false)
-      }
-      presenter.resetHeader()
-      headerTitle = title
-    }
-  }
 
 }

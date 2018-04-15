@@ -10,9 +10,11 @@ import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -35,12 +37,16 @@ class CreateWalletPresenter(
 
   fun showAgreementFragment() {
     showTargetFragment<AgreementFragment, WalletGenerationFragment>(
-      CreateWalletText.agreement,
-      CreateWalletText.mnemonicBackUp
+      CreateWalletText.agreement, CreateWalletText.mnemonicBackUp
     )
   }
 
-  fun generateWalletWith(nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean) {
+  fun generateWalletWith(
+    nameInput: EditText,
+    passwordInput: EditText,
+    repeatPasswordInput: EditText,
+    isAgree: Boolean
+  ) {
     checkInputValue(
       nameInput.text.toString(),
       passwordInput.text.toString(),
@@ -70,9 +76,7 @@ class CreateWalletPresenter(
 
   private fun showMnemonicBackupFragment(arguments: Bundle) {
     showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
-      CreateWalletText.mnemonicBackUp,
-      CreateWalletText.create,
-      arguments
+      CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments
     )
   }
 
@@ -92,7 +96,7 @@ class CreateWalletPresenter(
           // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
           if (tokenInfo.forceShow == TinyNumber.True.value) {
             // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-            if (tokenInfo.symbol == "ETH") {
+            if (tokenInfo.symbol == CryptoSymbol.eth) {
               GoldStoneEthCall.getEthBalance(ownerAddress) {
                 MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
               }
@@ -101,7 +105,31 @@ class CreateWalletPresenter(
                 MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
               }
             }
-            if(isEnd) callback()
+            if (isEnd) callback()
+          }
+        }
+      }
+    }
+
+    fun updateMyTokensValue(
+      walletAddress: String = WalletTable.current.address,
+      callback: () -> Unit = {}
+    ) {
+      DefaultTokenTable.getTokens { tokenInfo ->
+        MyTokenTable.getTokensWith(walletAddress) { myTokens ->
+          myTokens.forEachOrEnd { token, isEnd ->
+            val tokenContract = tokenInfo.find { it.symbol == token.symbol }?.contract
+            // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+            if (token.symbol == CryptoSymbol.eth) {
+              GoldStoneEthCall.getEthBalance(walletAddress) {
+                GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
+              }
+            } else {
+              GoldStoneEthCall.getTokenBalanceWithContract(tokenContract!!, walletAddress) {
+                GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
+              }
+            }
+            if (isEnd) callback()
           }
         }
       }
@@ -113,7 +141,7 @@ class CreateWalletPresenter(
       repeatPassword: String,
       isAgree: Boolean,
       callback: (password: String, walletName: String) -> Unit
-      ) {
+    ) {
 
       isAgree.isFalse {
         GoldStoneAPI.context.alert(Appcompat, CreateWalletText.agreeRemind).show()

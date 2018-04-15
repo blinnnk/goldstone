@@ -6,7 +6,9 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.kethereum.extensions.toHexStringZeroPadded
+import org.walleth.khex.toHexString
 import java.math.BigInteger
+import java.security.MessageDigest
 import java.text.DecimalFormat
 import java.util.*
 
@@ -177,5 +179,16 @@ fun String.toAddressFromCode(): String {
     "0x" + substring(26, length)
   } else {
     "it is not address format"
+  }
+}
+
+fun <T: List<*>> T.getObjectMD5HexString(): String {
+  return try {
+    val byteArray = this.toString().toByteArray()
+    val md = MessageDigest.getInstance("MD5")
+    md.digest(byteArray).toHexString()
+  } catch (error: Exception) {
+    println(error)
+    "error"
   }
 }

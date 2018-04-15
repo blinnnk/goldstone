@@ -1,12 +1,16 @@
 package io.goldstone.blockchain.common.base.baseoverlayfragment
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.ContainerID
 
 /**
  * @date 22/03/2018 2:29 AM
@@ -55,6 +59,25 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
           } else if(it is BaseFragment<*>) {
             it.presenter.recoveryFragmentHeight()
           }
+        }
+      }
+    }
+  }
+
+  inline fun<reified T: Fragment> showTargetFragment(title: String, previousTitle: String, bundle: Bundle = Bundle()) {
+    fragment.apply {
+      headerTitle = title
+      childFragmentManager.fragments.last()?.let {
+        hideChildFragment(it)
+        addFragmentAndSetArgument<T>(ContainerID.content) {
+          putAll(bundle)
+        }
+        overlayView.header.apply {
+          showBackButton(true) {
+            headerTitle = previousTitle
+            popFragmentFrom<T>()
+          }
+          showCloseButton(false)
         }
       }
     }

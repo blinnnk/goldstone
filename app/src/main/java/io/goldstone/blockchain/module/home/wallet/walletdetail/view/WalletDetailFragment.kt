@@ -26,18 +26,15 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
   override fun setRecyclerViewAdapter(
     recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletDetailCellModel>?
   ) {
-    recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray()) {
-      headerView?.apply {
-        currentAccount.onClick { presenter.showWalletSettingsFragment() }
-        manageButton.onClick { presenter.showWalletListFragment() }
-        addTokenButton.onClick { presenter.showTokenManagementFragment() }
+    recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
+      onClick {
+        presenter.showMyTokenDetailFragment(getTokenSymbol())
+        preventDuplicateClicks()
       }
-      normalCell?.apply {
-        onClick {
-          presenter.showMyTokenDetailFragment(getTokenSymbol())
-          preventDuplicateClicks()
-        }
-      }
+    }) {
+      currentAccount.onClick { presenter.showWalletSettingsFragment() }
+      manageButton.onClick { presenter.showWalletListFragment() }
+      addTokenButton.onClick { presenter.showTokenManagementFragment() }
     }
   }
 
@@ -69,6 +66,4 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
     }
   }
 }
-
-
 

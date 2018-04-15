@@ -2,14 +2,13 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.support.v7.widget.RecyclerView
 import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.getRealScreenHeight
-import com.blinnnk.extension.getScreenHeightWithoutStatusBar
-import com.blinnnk.extension.orZero
+import com.blinnnk.base.HoneyBaseAdapter
+import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import org.jetbrains.anko.matchParent
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -56,8 +55,47 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     // Do Something
   }
 
+  open fun onFragmentResume() {
+
+  }
+
   /** 获取依赖的 `Adapter` */
-  inline fun<reified T: RecyclerView.Adapter<*>> getAdapter() = fragment.recyclerView.adapter as? T
+  inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
+    fragment.recyclerView.adapter as? T
+
+  // 适配的是有 `Header`， `Footer` 的 `adapter`
+  inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(newData: ArrayList<D>) {
+    getAdapter<T>()?.apply {
+      // Comparison the data, if they are different then update adapter
+      diffDataSetChanged(dataSet, newData) {
+        it.isFalse {
+          dataSet.clear()
+          dataSet.addAll(newData)
+          notifyDataSetChanged()
+        }
+      }
+    }
+  }
+
+  // 适配的是有 `Header`， `Footer` 的 `adapter`
+  inline fun <reified T : HoneyBaseAdapter<D, *>> diffAndUpdateSingleCellAdapterData(newData: ArrayList<D>) {
+    getAdapter<T>()?.apply {
+      // Comparison the data, if they are different then update adapter
+      diffDataSetChanged(dataSet, newData) {
+        it.isFalse {
+          dataSet.clear()
+          dataSet.addAll(newData)
+          notifyDataSetChanged()
+        }
+      }
+    }
+  }
+
+  fun diffDataSetChanged(
+    oldData: ArrayList<D>, newData: ArrayList<D>, hold: (Boolean) -> Unit
+  ) {
+    hold(oldData.getObjectMD5HexString() == newData.getObjectMD5HexString())
+  }
 
   /**
    * @description
@@ -70,16 +108,14 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
   ) {
     val actualHeight = dataCount * cellHeight
-    val targetHeight =
-      when {
-        dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-        actualHeight > 250.uiPX() -> actualHeight
-        else -> 250.uiPX()
-      }
+    val targetHeight = when {
+      dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+      actualHeight > 250.uiPX() -> actualHeight
+      else -> 250.uiPX()
+    }
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
       overlayView.contentLayout.updateHeightAnimation(
-        targetHeight,
-        maxHeight
+        targetHeight, maxHeight
       )
     }
   }
@@ -92,7 +128,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
   fun recoveryFragmentHeight() {
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-      val recoveryHeight = fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
+      val recoveryHeight =
+        fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
       val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
       overlayView.contentLayout.updateHeightAnimation(
         if (recoveryHeight == 0) maxHeight else recoveryHeight, maxHeight
