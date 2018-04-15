@@ -19,8 +19,6 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactsModel>() {
 
-  val symbol by lazy { arguments?.getString(ArgumentKey.tokenDetail) }
-
   override val presenter = AddressSelectionPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<ContactsModel>?) {

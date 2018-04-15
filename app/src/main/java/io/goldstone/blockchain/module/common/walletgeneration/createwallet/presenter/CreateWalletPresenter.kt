@@ -3,11 +3,11 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.MultipleAsyncCombine
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
@@ -88,20 +88,29 @@ class CreateWalletPresenter(
      */
     fun generateMyTokenInfo(ownerAddress: String, callback: () -> Unit = {}) {
       DefaultTokenTable.getTokens { tokenList ->
-        tokenList.forEachOrEnd { tokenInfo, isEnd ->
-          // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
-          if (tokenInfo.forceShow == TinyNumber.True.value) {
-            // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-            if (tokenInfo.symbol == "ETH") {
-              GoldStoneEthCall.getEthBalance(ownerAddress) {
-                MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
-              }
-            } else {
-              GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, ownerAddress) {
-                MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+        object : MultipleAsyncCombine() {
+          override var asyncCount: Int = tokenList.size
+          override fun concurrentJobs() {
+            tokenList.forEach { tokenInfo  ->
+              // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
+              if (tokenInfo.forceShow == TinyNumber.True.value) {
+                // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+                if (tokenInfo.symbol == "ETH") {
+                  GoldStoneEthCall.getEthBalance(ownerAddress) {
+                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+                    completeMark()
+                  }
+                } else {
+                  GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, ownerAddress) {
+                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+                    completeMark()
+                  }
+                }
               }
             }
-            if(isEnd) callback()
+          }
+          override fun mergeCallBack() {
+            callback()
           }
         }
       }

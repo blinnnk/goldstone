@@ -5,7 +5,6 @@ import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.MultipleAsyncCombine
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -27,7 +26,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
-import jnr.ffi.annotations.In
 import org.jetbrains.anko.doAsync
 
 /**
@@ -79,27 +77,24 @@ class TransactionListPresenter(
     // 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
     val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
     // 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-    getMainActivity()?.getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
-      // 如果梅拉去到直接更新本地数据
-      doAsync {
-        // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-        newData.forEachOrEnd { item, isEnd ->
-          localData.find {
-            it.transactionHash == item.transactionHash
-          }?.let {
-            localData.remove(it)
-            TransactionTable.deleteByTaxHash(it.transactionHash)
-          }
-          if (isEnd) {
-            // 数据清理干净后在主线程更新 `UI`
-            runOnUiThread {
-              // 拉取到后, 把最新获取的数据合并本地数据更新到界面
-              localData.addAll(0, newData)
-              // 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
-              localTransactions = localData
-              fragment.asyncData = localTransactions
-              fragment.recyclerView.adapter.notifyDataSetChanged()
-            }
+    getTransactionDataFromEtherScan (lastBlockNumber) { newData ->
+      // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
+      newData.forEachOrEnd { item, isEnd ->
+        localData.find {
+          it.transactionHash == item.transactionHash
+        }?.let {
+          localData.remove(it)
+          TransactionTable.deleteByTaxHash(it.transactionHash)
+        }
+        if (isEnd) {
+          // 数据清理干净后在主线程更新 `UI`
+          runOnUiThread {
+            // 拉取到后, 把最新获取的数据合并本地数据更新到界面
+            localData.addAll(0, newData)
+            // 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
+            localTransactions = localData
+            fragment.asyncData = localTransactions
+            fragment.recyclerView.adapter.notifyDataSetChanged()
           }
         }
       }
@@ -115,6 +110,8 @@ class TransactionListPresenter(
     ) {
       // Show loading view
       showLoadingView()
+
+      System.out.println("startBlockNumber $startBlock")
       mergeNormalAndTokenIncomingTransactions(startBlock) {
         it.isNotEmpty().isTrue {
           // 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
@@ -182,10 +179,12 @@ class TransactionListPresenter(
         forEachOrEnd { it, isEnd ->
           doAsync {
             GoldStoneDataBase.database.transactionDao().insert(it)
-          }
-          if (isEnd) {
-            removeLoadingView()
-            hold( map { TransactionListModel(it) }.toArrayList())
+            runOnUiThread {
+              if (isEnd) {
+                removeLoadingView()
+                hold( map { TransactionListModel(it) }.toArrayList())
+              }
+            }
           }
         }
       }
