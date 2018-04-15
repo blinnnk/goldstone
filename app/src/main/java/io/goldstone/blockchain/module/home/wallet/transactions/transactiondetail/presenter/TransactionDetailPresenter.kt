@@ -3,13 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
-import com.blinnnk.util.getParentFragment
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -18,10 +15,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
-import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel

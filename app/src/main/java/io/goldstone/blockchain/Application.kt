@@ -1,12 +1,7 @@
 package io.goldstone.blockchain
 
-import android.app.AlarmManager
 import android.app.Application
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -15,7 +10,6 @@ import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.doAsync
@@ -59,13 +53,6 @@ class GoldStoneApp : Application() {
           currentLanguage = it?.language
           WalletTable.current = it!!
         }
-      }
-    }
-
-    inline fun<reified T: AppCompatActivity> Fragment.reboot() {
-      (activity as? T)?.apply {
-        finish()
-        startActivity(intent)
       }
     }
 

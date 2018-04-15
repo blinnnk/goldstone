@@ -6,10 +6,10 @@ import android.net.Uri
 import android.os.Environment
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.PermissionCategory
+import com.blinnnk.util.checkPermissionThen
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.checkPermissionThen
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment

@@ -3,9 +3,9 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable

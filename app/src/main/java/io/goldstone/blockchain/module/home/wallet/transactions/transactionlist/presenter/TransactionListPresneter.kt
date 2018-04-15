@@ -3,12 +3,11 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import android.util.Log
 import com.blinnnk.extension.*
+import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.MultipleAsyncCombine
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -137,8 +136,8 @@ class TransactionListPresenter(
 
     private fun mergeNormalAndTokenIncomingTransactions(
       startBlock: String, hold: (ArrayList<TransactionTable>) -> Unit
-    ): MultipleAsyncCombine {
-      return object : MultipleAsyncCombine() {
+    ): ConcurrentCombine {
+      return object : ConcurrentCombine() {
         override var asyncCount: Int = 2
         // Get transaction data from `etherScan`
         var chainData = ArrayList<TransactionTable>()
@@ -197,7 +196,7 @@ class TransactionListPresenter(
     private fun completeTransactionInfo(
       data: ArrayList<TransactionTable>, hold: ArrayList<TransactionTable>.() -> Unit
     ) {
-      object : MultipleAsyncCombine() {
+      object : ConcurrentCombine() {
         override var asyncCount: Int = data.size
         override fun concurrentJobs() {
           data.forEach { transaction ->

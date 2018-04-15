@@ -5,7 +5,6 @@ import android.content.Context
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.utils.toArrayList
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
