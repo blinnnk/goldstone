@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
-import android.support.v7.widget.RecyclerView
-import android.view.View
-import android.view.ViewGroup
+import android.content.Context
+import android.widget.LinearLayout
+import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import org.jetbrains.anko.matchParent
 
 /**
  * @date 27/03/2018 3:36 PM
@@ -11,57 +13,22 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
  */
 
 class TokenDetailAdapter(
-  private var dataSet: ArrayList<TransactionListModel>,
+  override val dataSet: ArrayList<TransactionListModel>,
   private val callback: TokenDetailCell.() -> Unit
-) : RecyclerView.Adapter<TokenDetailAdapter.ViewHolder>() {
+  ) : HoneyBaseAdapterWithHeaderAndFooter<TransactionListModel, TokenDetailHeaderView, TokenDetailCell, LinearLayout>() {
 
-  enum class CellType(val value: Int) {
-    Header(0), Cell(1)
+  override fun generateCell(context: Context) = TokenDetailCell(context)
+
+  override fun generateFooter(context: Context) = LinearLayout(context).apply {
+    // 让出 覆盖在上面的 `Footer` 的高度
+    layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
   }
 
-  private var headerView: TokenDetailHeaderView? = null
-  private var normalCell: TokenDetailCell? = null
+  override fun generateHeader(context: Context) = TokenDetailHeaderView(context)
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    var viewHolder: ViewHolder? = null
-    when (viewType) {
-      CellType.Header.value -> {
-        headerView = TokenDetailHeaderView(parent.context)
-        viewHolder = ViewHolder(headerView)
-      }
-
-      CellType.Cell.value -> {
-        normalCell = TokenDetailCell(parent.context)
-        viewHolder = ViewHolder(normalCell)
-        normalCell?.let { callback(it) }
-      }
-
-    }
-    return viewHolder!!
+  override fun TokenDetailCell.bindCell(data: TransactionListModel, position: Int) {
+    model = data
+    callback(this)
   }
-
-  override fun getItemViewType(position: Int): Int = when(position){
-    0 -> CellType.Header.value
-    else -> CellType.Cell.value
-  }
-
-  override fun getItemCount(): Int = dataSet.size + 1
-
-  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val cellType = getItemViewType(position)
-    when (cellType) {
-      CellType.Header.value -> {
-        // 赋值
-      }
-      CellType.Cell.value -> {
-        // 赋值
-        (holder.itemView as? TokenDetailCell)?.apply {
-          model = dataSet[position - 1]
-        }
-      }
-    }
-  }
-
-  inner class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView)
 
 }

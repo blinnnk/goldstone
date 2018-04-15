@@ -114,7 +114,7 @@ data class TransactionTable(
     "",
     data.isReceive,
     true,
-    "",
+    data.symbol,
     data.to,
     data.to,
     false,
@@ -131,7 +131,6 @@ data class TransactionTable(
       tokenReceiveAddress: String?
     ) {
       transaction.apply {
-        System.out.println(tokenReceiveAddress)
         this.isReceive = WalletTable.current.address.equals(tokenReceiveAddress, true)
         this.isERC20 = isERC20
         this.symbol = symbol
@@ -152,6 +151,14 @@ data class TransactionTable(
     fun getTransactionListModelsByAddress(address: String, hold: (ArrayList<TransactionListModel>) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+      }) {
+        hold(it.map { TransactionListModel(it) }.toArrayList())
+      }
+    }
+
+    fun getTransactionListModelsByAddressAndModel(address: String, symbol: String, hold: (ArrayList<TransactionListModel>) -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.transactionDao().getTransactionsByAddressAndSymbol(address, symbol)
       }) {
         hold(it.map { TransactionListModel(it) }.toArrayList())
       }

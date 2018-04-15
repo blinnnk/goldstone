@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
 
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.crypto.hexToDecimal
 import io.goldstone.blockchain.crypto.toAddressFromCode
 import io.goldstone.blockchain.crypto.toDecimalFromHex
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**
  * @date 15/04/2018 1:13 AM
@@ -33,7 +33,8 @@ data class ERC20TransactionModel(
   val transactionHash: String,
   @SerializedName("transactionIndex")
   val transactionIndex: String,
-  val isReceive: Boolean
+  val isReceive: Boolean,
+  var symbol: String
 ) {
   constructor(data: ERC20TransactionModel) : this(
     data.contract,
@@ -48,6 +49,11 @@ data class ERC20TransactionModel(
     data.logIndex.toDecimalFromHex(),
     data.transactionHash,
     data.transactionIndex.toDecimalFromHex(),
-    true
-  )
+    true,
+    ""
+  ) {
+    DefaultTokenTable.getTokenByContractAddress(data.contract) {
+      it?.apply { symbol = it.symbol }
+    }
+  }
 }

@@ -1,11 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.os.Bundle
+import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.ArgumentKey
