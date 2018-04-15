@@ -1,8 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import com.blinnnk.extension.forEachOrEnd
+import io.goldstone.blockchain.common.utils.MultipleAsyncCombine
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**
@@ -34,27 +35,34 @@ data class WalletDetailCellModel(
 
   companion object {
 
-    fun getModels(walletAddress: String, hold: (ArrayList<WalletDetailCellModel>) -> Unit) {
-      DefaultTokenTable.getTokens {
-        completeTokensInfo(it, walletAddress, hold)
-      }
+    fun getModels(
+      walletAddress: String = WalletTable.current.address,
+      hold: (ArrayList<WalletDetailCellModel>) -> Unit
+    ) {
+      completeTokensInfo(walletAddress, hold)
     }
 
     private fun completeTokensInfo(
-      defaultTokens: ArrayList<DefaultTokenTable>,
       walletAddress: String,
       hold: (ArrayList<WalletDetailCellModel>) -> Unit
     ) {
-      val tokenList = ArrayList<WalletDetailCellModel>()
       MyTokenTable.getTokensWith(walletAddress) { allTokens ->
-        allTokens.forEach { token ->
-          defaultTokens.find { it.symbol == token.symbol }?.let {
-            tokenList.add(WalletDetailCellModel(it, token.balance))
-            if (tokenList.size == allTokens.size) hold(tokenList)
+        object : MultipleAsyncCombine() {
+          val tokenList = ArrayList<WalletDetailCellModel>()
+          override var asyncCount: Int = allTokens.size
+          override fun concurrentJobs() {
+            DefaultTokenTable.getTokens { localTokens ->
+              allTokens.forEach { token ->
+                localTokens.find { it.symbol == token.symbol }?.let {
+                  tokenList.add(WalletDetailCellModel(it, token.balance))
+                  completeMark()
+                }
+              }
+            }
           }
-        }
+          override fun mergeCallBack() = hold(tokenList)
+        }.start()
       }
     }
-
   }
 }

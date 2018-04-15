@@ -178,6 +178,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
     }
   }
 
+  override fun onResume() {
+    super.onResume()
+    presenter.onFragmentResume()
+  }
+
   private var emptyLayout: EmptyView? = null
 
   open fun ViewGroup.showEmptyView() {
