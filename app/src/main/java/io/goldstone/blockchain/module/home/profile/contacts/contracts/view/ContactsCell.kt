@@ -20,7 +20,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class ContactsCell(context: Context) : BaseValueCell(context) {
+open class ContactsCell(context: Context) : BaseValueCell(context) {
 
   var model: ContactTable by observing(ContactTable()) {
     info.apply {
@@ -42,8 +42,8 @@ class ContactsCell(context: Context) : BaseValueCell(context) {
   init {
     setGrayStyle()
     hasArrow = false
-    removeView(icon)
-    fontIcon.into(this)
+    this.removeView(icon)
+    this.addView(fontIcon)
     fontIcon.setCenterInVertical()
   }
 
