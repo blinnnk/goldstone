@@ -31,7 +31,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
   }
 
   private val description = TextView(context)
-  val info = TextView(context)
+  private val info = TextView(context)
 
   init {
 

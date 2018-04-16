@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter
 
-import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -12,7 +11,8 @@ import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
-import io.goldstone.blockchain.module.home.profile.contacts.model.ContactsModel
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.web3j.crypto.WalletUtils
 
@@ -23,7 +23,13 @@ import org.web3j.crypto.WalletUtils
 
 class AddressSelectionPresenter(
   override val fragment: AddressSelectionFragment
-) : BaseRecyclerPresenter<AddressSelectionFragment, ContactsModel>() {
+) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
+
+  override fun updateData() {
+    updateAddressList {
+      fragment.updateHeaderViewStatus()
+    }
+  }
 
   fun showPaymentValueDetailFragment(address: String) {
 
@@ -36,7 +42,7 @@ class AddressSelectionPresenter(
       hideChildFragment(fragment)
       addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
         putString(ArgumentKey.paymentAddress, address)
-        putString(ArgumentKey.paymentSymbol, symbol)
+        putSerializable(ArgumentKey.paymentSymbol, token)
       }
       overlayView.header.apply {
         backButton.onClick {
@@ -55,10 +61,25 @@ class AddressSelectionPresenter(
     /** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       overlayView.header.showBackButton(true) {
-        presenter.setValueHeader(symbol)
+        presenter.setValueHeader(token)
         presenter.popFragmentFrom<AddressSelectionFragment>()
         setHeightMatchParent()
       }
+    }
+  }
+
+  private fun updateAddressList(callback: () -> Unit) {
+    ContactTable.getAllContacts {
+      it.isEmpty().isTrue {
+        fragment.asyncData = arrayListOf()
+      } otherwise {
+        if (fragment.asyncData.isNullOrEmpty()) {
+          fragment.asyncData = it
+        } else {
+          diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)
+        }
+      }
+      callback()
     }
   }
 

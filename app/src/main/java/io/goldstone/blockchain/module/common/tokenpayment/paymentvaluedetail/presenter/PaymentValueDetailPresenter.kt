@@ -21,9 +21,9 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.vie
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailHeaderView
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -47,7 +47,7 @@ class PaymentValueDetailPresenter(
 ) : BaseRecyclerPresenter<PaymentValueDetailFragment, PaymentValueDetailModel>() {
 
   private var currentNonce: BigInteger? = null
-  private var currentToken: DefaultTokenTable? = null
+  private var tokenInfo: WalletDetailCellModel? = null
   private var minerFeeType = MinerFeeType.Recommend.content
 
   private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
@@ -78,19 +78,18 @@ class PaymentValueDetailPresenter(
    * 随着用户更改需要转出的数字的时候动态更新副标题对应的 `currency` 价值.
    */
   fun updateHeaderValue(header: PaymentValueDetailHeaderView) {
-    DefaultTokenTable.getTokenBySymbol(fragment.symbol!!) { token ->
-      header.apply {
-        inputTextListener { count ->
-          count.isNotEmpty().isTrue {
-            updateCurrencyValue(count.toDouble() * token.price)
-            // 根据数量更新 `Transaction`
-            updateTransactionAndAdapter(count.toDouble())
-          } otherwise {
-            updateCurrencyValue(0.0)
-            updateTransactionAndAdapter(0.0)
-          }
+    header.apply {
+      inputTextListener { count ->
+        count.isNotEmpty().isTrue {
+          updateCurrencyValue(count.toDouble() * fragment.token?.price.orElse(0.0))
+          // 根据数量更新 `Transaction`
+          updateTransactionAndAdapter(count.toDouble())
+        } otherwise {
+          updateCurrencyValue(0.0)
+          updateTransactionAndAdapter(0.0)
         }
       }
+
     }
   }
 
@@ -121,11 +120,11 @@ class PaymentValueDetailPresenter(
           // 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
           taxHash.isValidTaxHash().isTrue {
             // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-            insertPendingDataToTransactionTable(raw!!, taxHash, currentToken!!)
+            insertPendingDataToTransactionTable(raw!!, taxHash, tokenInfo!!)
           }
           // 主线程跳转到账目详情界面
           fragment.context?.runOnUiThread {
-            goToTransactionDetailFragment(fragment.address!!, raw!!, currentToken!!, taxHash)
+            goToTransactionDetailFragment(fragment.address!!, raw!!, tokenInfo!!, taxHash)
           }
         }
       }
@@ -153,25 +152,13 @@ class PaymentValueDetailPresenter(
     // 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
     currentNonce.isNull().isTrue {
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
-        val myLatestNonce = first { it.fromAddress.equals(WalletTable.current.address, true) }.nonce.toLong()
-        getTokenBySymbol { token ->
-          currentNonce = BigInteger.valueOf(myLatestNonce + 1)
-          generateTransaction(fragment.address!!, value, token, hold)
-        }
+        val myLatestNonce =
+          first { it.fromAddress.equals(WalletTable.current.address, true) }.nonce.toLong()
+        currentNonce = BigInteger.valueOf(myLatestNonce + 1)
+        generateTransaction(fragment.address!!, value, tokenInfo, hold)
       }
     } otherwise {
-      generateTransaction(fragment.address!!, value, currentToken!!, hold)
-    }
-  }
-
-  private fun getTokenBySymbol(hold: (DefaultTokenTable) -> Unit) {
-    currentToken.isNotNull {
-      hold(currentToken!!)
-    } otherwise {
-      DefaultTokenTable.getTokenBySymbol(fragment.symbol!!) {
-        currentToken = it
-        hold(it)
-      }
+      generateTransaction(fragment.address!!, value, tokenInfo!!, hold)
     }
   }
 
@@ -181,7 +168,7 @@ class PaymentValueDetailPresenter(
   private fun generateTransaction(
     toAddress: String,
     value: Double,
-    token: DefaultTokenTable?,
+    token: WalletDetailCellModel?,
     hold: (ArrayList<RawTransaction>) -> Unit
   ) {
 
@@ -189,13 +176,13 @@ class PaymentValueDetailPresenter(
     val data: String
     val to: String
     // `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
-    if (fragment.symbol == CryptoSymbol.eth) {
+    if (fragment.token?.symbol == CryptoSymbol.eth) {
       to = toAddress
       data = ""
       count = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
     } else {
       to = token!!.contract
-      count = BigInteger.valueOf((value * Math.pow(10.0, token.decimals)).toLong())
+      count = BigInteger.valueOf((value * Math.pow(10.0, token.decimal)).toLong())
       data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() +
         count.toDataString()
     }
@@ -212,7 +199,7 @@ class PaymentValueDetailPresenter(
     )
 
     // 测量 `Transaction` 得出 `GasLimit`
-    val gasLimit = if (fragment.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
+    val gasLimit = if (fragment.token?.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
     else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
 
     defaultGasPrices.map { price ->
@@ -234,20 +221,25 @@ class PaymentValueDetailPresenter(
       arrayListOf(PaymentValueDetailModel(), PaymentValueDetailModel(), PaymentValueDetailModel())
   }
 
-  private fun insertPendingDataToTransactionTable(raw: RawTransaction, taxHash: String, token: DefaultTokenTable) {
+  private fun insertPendingDataToTransactionTable(
+    raw: RawTransaction,
+    taxHash: String,
+    token: WalletDetailCellModel
+  ) {
     TransactionTable().apply {
       isReceive = false
-      symbol = fragment.symbol!!
-      timeStamp = (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
+      symbol = fragment.token?.symbol!!
+      timeStamp =
+        (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
       fromAddress = WalletTable.current.address
-      value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimals).formatCurrency()
+      value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal).formatCurrency()
       hash = taxHash
       gasPrice = raw.gasPrice.toString()
       gasUsed = raw.gasLimit.toString()
       isPending = true
       recordOwnerAddress = WalletTable.current.address
       tokenReceiveAddress = fragment.address
-      isERC20 = fragment.symbol == CryptoSymbol.eth
+      isERC20 = fragment.token?.symbol == CryptoSymbol.eth
       nonce = currentNonce.toString()
       to = raw.to
       input = raw.data
@@ -255,11 +247,12 @@ class PaymentValueDetailPresenter(
       GoldStoneDataBase.database.transactionDao().insert(it)
     }
   }
+
   /**
    * 转账开始后跳转到转账监听界面
    */
   private fun goToTransactionDetailFragment(
-    address: String, raw: RawTransaction, token: DefaultTokenTable, taxHash: String
+    address: String, raw: RawTransaction, token: WalletDetailCellModel, taxHash: String
   ) {
     // 准备跳转到下一个界面
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {

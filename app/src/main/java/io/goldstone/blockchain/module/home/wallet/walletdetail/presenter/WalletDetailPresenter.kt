@@ -76,9 +76,9 @@ class WalletDetailPresenter(
     }
   }
 
-  fun showMyTokenDetailFragment(symbol: String) {
+  fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
     fragment.activity?.addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main) {
-      putString(ArgumentKey.tokenDetail, symbol)
+      putSerializable(ArgumentKey.tokenDetail, model)
     }
   }
 

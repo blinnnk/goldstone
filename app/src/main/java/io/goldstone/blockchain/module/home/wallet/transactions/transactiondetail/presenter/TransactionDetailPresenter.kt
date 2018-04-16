@@ -69,7 +69,7 @@ class TransactionDetailPresenter(
 
     data?.apply {
       currentHash = taxHash
-      count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimals)
+      count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal)
       fragment.asyncData = generateModels()
       observerTransaction()
       updateHeaderValue(count, address, token.symbol, true)

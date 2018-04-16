@@ -85,12 +85,10 @@ class TokenDetailPresenter(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
-        System.out.println("hello baby")
         hold( transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
         // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
         TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
-          System.out.println("hello baby hello")
           it.isNotEmpty().isTrue {
             // 有数据后重新执行从数据库拉取数据
             prepareTokenDetailData(hold)

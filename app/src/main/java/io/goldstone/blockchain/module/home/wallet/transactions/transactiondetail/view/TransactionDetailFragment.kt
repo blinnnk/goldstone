@@ -28,7 +28,7 @@ class TransactionDetailFragment : BaseRecyclerFragment<TransactionDetailPresente
         if(model.description == TransactionText.url) {
           presenter.showEtherScanTransactionFragment()
         } else {
-          this@TransactionDetailFragment.context?.clickToCopy(info.text.toString())
+          this@TransactionDetailFragment.context?.clickToCopy(model.info)
         }
         preventDuplicateClicks()
       }

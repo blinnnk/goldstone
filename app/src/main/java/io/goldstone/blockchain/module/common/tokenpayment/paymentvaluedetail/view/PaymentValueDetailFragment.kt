@@ -17,6 +17,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter.PaymentValueDetailPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.*
 
 /**
@@ -28,7 +29,7 @@ class PaymentValueDetailFragment :
   BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
 
   val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
-  val symbol by lazy { arguments?.getString(ArgumentKey.paymentSymbol) }
+  val token by lazy { arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel }
 
   private var transferCount = 0.0
   override val presenter = PaymentValueDetailPresenter(this)
@@ -55,7 +56,7 @@ class PaymentValueDetailFragment :
     }
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
-      MyTokenTable.getBalanceWithSymbol(symbol!!, WalletTable.current.address, true) {
+      MyTokenTable.getBalanceWithSymbol(token?.symbol!!, WalletTable.current.address, true) {
         confirmClickEvent = Runnable {
           if (it > transferCount) showConfirmAttentionView()
           else {

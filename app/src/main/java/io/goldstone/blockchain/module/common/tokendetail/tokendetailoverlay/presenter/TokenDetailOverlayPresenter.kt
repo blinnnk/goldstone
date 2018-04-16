@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 
 /**ø
  * @date 27/03/2018 3:41 PM
@@ -30,15 +31,8 @@ class TokenDetailOverlayPresenter(
     }
   }
 
-  fun resetHeader() {
-    fragment.apply {
-      valueHeader?.isHidden()
-      recoveryOverlayHeader()
-    }
-  }
-
   @SuppressLint("SetTextI18n")
-  fun setValueHeader(symbol: String?) {
+  fun setValueHeader(token: WalletDetailCellModel?) {
     fragment.apply {
       overlayView.header.title.isHidden()
       valueHeader.isNull().isTrue {
@@ -46,8 +40,8 @@ class TokenDetailOverlayPresenter(
           valueHeader = TwoLineTitles(context)
           valueHeader
             ?.apply {
-              title.text = "MY $symbol"
-              subtitle.text = "2.38 ETH ≈(1126.32 USD)"
+              title.text = "MY ${token?.symbol}"
+              subtitle.text = "${token?.count} ${token?.symbol} ≈(${token?.currency} USD)"
               setBlackTitles()
               isCenter = true
             }
