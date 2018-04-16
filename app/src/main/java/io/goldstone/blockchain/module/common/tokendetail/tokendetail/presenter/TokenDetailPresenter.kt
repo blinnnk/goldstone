@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
@@ -39,7 +38,7 @@ class TokenDetailPresenter(
   override fun updateData() {
     prepareTokenDetailData {
       isNotEmpty().isTrue {
-        fragment.asyncData = map { TransactionListModel(it) }.toArrayList()
+        fragment.asyncData = this
         prepareTokenHistoryBalance(fragment.symbol!!) {
           it.updateChartAndHeaderData()
         }
@@ -79,21 +78,18 @@ class TokenDetailPresenter(
     }
   }
 
-  private var hasCalledChain: Boolean = false
-  private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit) {
+  private fun prepareTokenDetailData(hold: ArrayList<TransactionListModel>.() -> Unit) {
     TransactionTable.getTransactionsByAddressAndSymbol(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
-        hold(transactions)
+        hold( transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
         // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
         TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
           it.isNotEmpty().isTrue {
-            hasCalledChain.isFalse {
-              prepareTokenDetailData(hold)
-              hasCalledChain = true
-            }
+            // 拉取的防落数据已经存放在数据库为了速度直接先显示内存里的数据
+            hold(it.filter { it.symbol == fragment.symbol }.toArrayList())
           } otherwise {
             // 链上和本地都没有数据就更新一个空数组作为默认
             hold(arrayListOf())
@@ -127,7 +123,7 @@ class TokenDetailPresenter(
     if (maxValue > 10) maxValue * 1.5 else maxValue + 5
   }
 
-  private fun ArrayList<TransactionTable>.prepareTokenHistoryBalance(
+  private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
     symbol: String, callback: (ArrayList<TokenBalanceTable>) -> Unit
   ) {
     // 首先更新此刻最新的余额数据到今天的数据
@@ -165,34 +161,34 @@ class TokenDetailPresenter(
 
   data class DateBalance(val date: Long, val balance: Double)
 
-  private fun ArrayList<TransactionTable>.generateHistoryBalance(
+  private fun ArrayList<TransactionListModel>.generateHistoryBalance(
     todayBalance: Double, callback: (ArrayList<DateBalance>) -> Unit
   ) {
 
     coroutinesTask({
       val oneDayAgoBalance = todayBalance - filter {
         it.timeStamp.toMills() in 1.daysAgoInMills() .. 0.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       val twoDaysAgoBalance = oneDayAgoBalance - filter {
         it.timeStamp.toMills() in 2.daysAgoInMills() .. 1.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       val threeDaysAgoBalance = twoDaysAgoBalance - filter {
         it.timeStamp.toMills() in 3.daysAgoInMills() .. 2.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       val fourDaysAgoBalance = threeDaysAgoBalance - filter {
         it.timeStamp.toMills() in 4.daysAgoInMills() .. 3.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       val fiveDaysAgoBalance = fourDaysAgoBalance - filter {
         it.timeStamp.toMills() in 5.daysAgoInMills() .. 4.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       val sixDaysAgoBalance = fiveDaysAgoBalance - filter {
         it.timeStamp.toMills() in 6.daysAgoInMills() .. 5.daysAgoInMills()
-      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceive) }
+      }.sumByDouble { it.value.toDouble() * modulusByReceiveStatus(it.isReceived) }
 
       arrayListOf(
         DateBalance(6.daysAgoInMills(), sixDaysAgoBalance),

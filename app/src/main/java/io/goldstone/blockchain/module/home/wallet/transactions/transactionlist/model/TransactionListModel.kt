@@ -31,7 +31,9 @@ data class TransactionListModel(
   val memo: String,
   val minerFee: String,
   val url: String,
-  val isPending: Boolean
+  val isPending: Boolean,
+  val timeStamp: String,
+  val value: String
 ) : Serializable {
 
   constructor(data: TransactionTable) : this(
@@ -51,7 +53,9 @@ data class TransactionListModel(
     getMemoFromInputCode(data.input),
     (data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
     EtherScanApi.singleTransactionHas(data.hash), // Api 地址拼接
-    data.isPending
+    data.isPending,
+    data.timeStamp,
+    data.value
   )
 
 }
