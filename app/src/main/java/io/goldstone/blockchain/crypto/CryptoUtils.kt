@@ -35,6 +35,11 @@ object CryptoUtils {
     else address.substring(0, 28) + "···"
   }
 
+  fun scaleMiddleAddress(address: String): String {
+    return if(address.length == CryptoValue.bip39AddressLength) address.substring(0, 14) + " ··· " + address.substring(address.length - 14, address.length)
+    else "wrong address"
+  }
+
   fun formatDouble(value: Double): Double {
     return DecimalFormat("0.00").format(value).toDouble()
   }

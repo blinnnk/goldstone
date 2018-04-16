@@ -28,7 +28,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
   ) {
     recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
       onClick {
-        presenter.showMyTokenDetailFragment(getTokenSymbol())
+        getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
         preventDuplicateClicks()
       }
     }) {

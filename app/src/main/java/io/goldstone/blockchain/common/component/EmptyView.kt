@@ -21,7 +21,7 @@ import org.jetbrains.anko.matchParent
  */
 
 enum class EmptyType {
-  TokenDetail, TransactionDetail
+  TokenDetail, TransactionDetail, Contact
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -64,6 +64,11 @@ class EmptyView(context: Context) : LinearLayout(context) {
         icon.imageResource = R.drawable.transaction_empty_icon
         introTitles.title.text = EmptyText.tokenDetailTitle
         introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
+      }
+      EmptyType.Contact -> {
+        icon.imageResource = R.drawable.contract_empty_icon
+        introTitles.title.text = EmptyText.contractTitle
+        introTitles.subtitle.text = EmptyText.contractSubtitle
       }
     }
   }

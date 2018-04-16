@@ -14,7 +14,9 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
+import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.support.v4.UI
@@ -190,6 +192,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
       when (this@BaseRecyclerFragment) {
         is PaymentValueDetailFragment -> return
         is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
+        is ContactFragment, is AddressSelectionFragment -> setStyle(EmptyType.Contact)
         else -> setStyle(EmptyType.TransactionDetail)
       }
     }

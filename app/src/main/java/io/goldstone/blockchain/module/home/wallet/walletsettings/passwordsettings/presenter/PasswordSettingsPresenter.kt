@@ -27,7 +27,8 @@ class PasswordSettingsPresenter(
       "",
       newPasswordInput.text.toString(),
       repeatPasswordInput.text.toString(),
-      true
+      true,
+      fragment.context
     ) { password, _ ->
       fragment.context?.updatePassword(
         WalletTable.current.address,

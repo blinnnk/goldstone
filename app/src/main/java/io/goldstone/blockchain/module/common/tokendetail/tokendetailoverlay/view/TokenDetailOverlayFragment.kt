@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -19,15 +20,15 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 
   var valueHeader: TwoLineTitles? = null
 
-  val symbol by lazy { arguments?.getString(ArgumentKey.tokenDetail) }
+  val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
 
   var confirmButton: RoundButton? = null
 
   override val presenter = TokenDetailOverlayPresenter(this)
 
   override fun ViewGroup.initView() {
-    presenter.setValueHeader(symbol)
-    presenter.showTokenDetailFragment(symbol)
+    presenter.setValueHeader(token)
+    presenter.showTokenDetailFragment(token?.symbol)
   }
 
   fun showConfirmButton(status: Boolean = true) {

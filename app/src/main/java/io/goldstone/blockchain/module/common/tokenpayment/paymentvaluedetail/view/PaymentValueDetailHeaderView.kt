@@ -24,6 +24,7 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import org.jetbrains.anko.*
 
@@ -119,15 +120,13 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
   }
 
-  fun getInputValue() = valueInput.text.toString().toDouble()
-
   fun setInputFocus() {
     valueInput.hintTextColor = Spectrum.opacity1White
     valueInput.requestFocus()
   }
 
   fun showTargetAddress(address: String) {
-    addressRemind.info.text = address
+    addressRemind.model = TransactionDetailModel(address, "Target Address")
   }
 
   fun updateCurrencyValue(value: Double?) {

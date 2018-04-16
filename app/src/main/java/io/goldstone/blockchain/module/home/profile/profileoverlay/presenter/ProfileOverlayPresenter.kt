@@ -6,7 +6,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
-import io.goldstone.blockchain.module.home.profile.contacts.view.ContactsFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -20,8 +21,21 @@ class ProfileOverlayPresenter(
   override val fragment: ProfileOverlayFragment
 ) : BaseOverlayPresenter<ProfileOverlayFragment>() {
 
+  fun showContactInputFragment() {
+    showTargetFragment<ContractInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
+  }
+
+  fun showTargetFragmentByTitle(title: String) {
+    when(title) {
+      ProfileText.contacts -> showContactsFragment()
+      ProfileText.currency -> showCurrencyFragment()
+      ProfileText.language -> showLanguageFragment()
+      ProfileText.aboutUs -> showAboutUsFragment()
+    }
+  }
+
   private fun showContactsFragment() {
-    fragment.addFragmentAndSetArgument<ContactsFragment>(ContainerID.content) {
+    fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content) {
       // Send Arguments
     }
   }
@@ -41,15 +55,6 @@ class ProfileOverlayPresenter(
   private fun showAboutUsFragment() {
     fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
       putString(ArgumentKey.webViewUrl, "https://www.ethereum.org/")
-    }
-  }
-
-  fun showTargetFragmentByTitle(title: String) {
-    when(title) {
-      ProfileText.contacts -> showContactsFragment()
-      ProfileText.currency -> showCurrencyFragment()
-      ProfileText.language -> showLanguageFragment()
-      ProfileText.aboutUs -> showAboutUsFragment()
     }
   }
 

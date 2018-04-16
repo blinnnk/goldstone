@@ -36,7 +36,8 @@ class MnemonicImportDetailPresenter(
       nameInput.text.toString(),
       passwordInput.text.toString(),
       repeatPasswordInput.text.toString(),
-      isAgree
+      isAgree,
+      fragment.context
       ) { passwordValue, walletName ->
       importWallet(mnemonicInput.text.toString(), passwordValue, walletName)
     }

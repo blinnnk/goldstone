@@ -21,10 +21,10 @@ import org.jetbrains.anko.verticalLayout
 
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
-  val oldPassword by lazy { RoundInput(context!!) }
-  val newPassword by lazy { RoundInput(context!!) }
-  val repeatPassword by lazy { RoundInput(context!!) }
-  val passwordHint by lazy { RoundInput(context!!) }
+  private val oldPassword by lazy { RoundInput(context!!) }
+  private val newPassword by lazy { RoundInput(context!!) }
+  private val repeatPassword by lazy { RoundInput(context!!) }
+  private val passwordHint by lazy { RoundInput(context!!) }
   val confirmButton by lazy { RoundButton(context!!) }
 
   override val presenter = PasswordSettingsPresenter(this)

@@ -9,6 +9,7 @@ import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -16,7 +17,6 @@ import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
@@ -24,8 +24,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vie
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.appcompat.v7.Appcompat
 
 /**
  * @date 22/03/2018 2:46 AM
@@ -49,7 +47,8 @@ class CreateWalletPresenter(
       nameInput.text.toString(),
       passwordInput.text.toString(),
       repeatPasswordInput.text.toString(),
-      isAgree
+      isAgree,
+      fragment.context
     ) { password, walletName ->
       fragment.context?.generateWalletWith(password, walletName)
     }
@@ -146,16 +145,17 @@ class CreateWalletPresenter(
       password: String,
       repeatPassword: String,
       isAgree: Boolean,
+      context: Context?,
       callback: (password: String, walletName: String) -> Unit
     ) {
 
       isAgree.isFalse {
-        GoldStoneAPI.context.alert(Appcompat, CreateWalletText.agreeRemind).show()
+        context?.alert(CreateWalletText.agreeRemind)
         return
       }
 
       if (password != repeatPassword) {
-        GoldStoneAPI.context.alert(Appcompat, CreateWalletText.repeatPasswordRemind).show()
+        context?.alert(CreateWalletText.repeatPassword)
         return
       }
 
@@ -165,7 +165,7 @@ class CreateWalletPresenter(
         if (reasons == UnsafeReasons.None) {
           callback(password, walletName)
         } else {
-          GoldStoneAPI.context.alert(Appcompat, reasons.info).show()
+          context?.alert(reasons.info)
         }
       }
     }

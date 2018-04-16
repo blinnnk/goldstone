@@ -12,6 +12,8 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.Token
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletDao
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
@@ -26,7 +28,8 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
   (MyTokenTable::class),
   (DefaultTokenTable::class),
   (TransactionTable::class),
-  (TokenBalanceTable::class)
+  (TokenBalanceTable::class),
+  (ContactTable::class)
 ], version = GoldStoneDataBase.databaseVersion, exportSchema = false)
 abstract class GoldStoneDataBase : RoomDatabase() {
   abstract fun walletDao(): WalletDao
@@ -34,6 +37,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
   abstract fun defaultTokenDao(): DefaultTokenDao
   abstract fun transactionDao(): TransactionDao
   abstract fun tokenBalanceDao(): TokenBalanceDao
+  abstract fun contactDao(): ContractDao
 
   companion object {
     const val databaseVersion = 1

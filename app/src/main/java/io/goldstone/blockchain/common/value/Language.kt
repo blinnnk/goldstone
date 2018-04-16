@@ -388,6 +388,11 @@ object ProfileText {
     else -> "通讯录"
   }
   @JvmField
+  val contactsInput = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Add Contract"
+    else -> "添加联系人"
+  }
+  @JvmField
   val currency = when (currentLanguage) {
     HoneyLanguage.English.code -> "Currency Settings"
     else -> "货币"
@@ -415,6 +420,16 @@ object EmptyText {
   }
   @JvmField
   val tokenDetailSubtitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "There isn't transaction in blockChain, so you haven't chart and records"
+    else -> ""
+  }
+  @JvmField
+  val contractTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "No Contact Found"
+    else -> ""
+  }
+  @JvmField
+  val contractSubtitle = when (currentLanguage) {
     HoneyLanguage.English.code -> "There isn't transaction in blockChain, so you haven't chart and records"
     else -> ""
   }

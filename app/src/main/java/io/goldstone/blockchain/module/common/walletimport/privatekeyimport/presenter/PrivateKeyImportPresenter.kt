@@ -36,7 +36,8 @@ class PrivateKeyImportPresenter(
       nameInput.text.toString(),
       passwordInput.text.toString(),
       repeatPasswordInput.text.toString(),
-      isAgree
+      isAgree,
+      fragment.context
     ) { passwordValue, walletName ->
       importWallet(privateKeyInput.text.toString(), passwordValue, walletName, fragment)
     }
