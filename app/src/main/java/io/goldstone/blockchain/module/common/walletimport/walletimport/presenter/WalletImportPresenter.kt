@@ -11,7 +11,5 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 class WalletImportPresenter(
   override val fragment: WalletImportFragment
   ) : BaseOverlayPresenter<WalletImportFragment>() {
-
-
-
+  //
 }
