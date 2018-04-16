@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
@@ -56,8 +56,7 @@ class TokenDetailPresenter(
     WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
       fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
         presenter.showTargetFragment<AddressSelectionFragment>(
-          TokenDetailText.address,
-          TokenDetailText.tokenDetail
+          TokenDetailText.address, TokenDetailText.tokenDetail
         )
       }
     }
@@ -69,9 +68,7 @@ class TokenDetailPresenter(
     }
     fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
       presenter.showTargetFragment<TransactionDetailFragment>(
-        TransactionText.detail,
-        TokenDetailText.tokenDetail,
-        argument
+        TransactionText.detail, TokenDetailText.tokenDetail, argument
       )
     }
   }
@@ -82,7 +79,7 @@ class TokenDetailPresenter(
     }
   }
 
-  private var singleRunMark: Boolean? = null
+  private var hasCalledChain: Boolean = false
   private fun prepareTokenDetailData(hold: ArrayList<TransactionTable>.() -> Unit) {
     TransactionTable.getTransactionsByAddressAndSymbol(
       WalletTable.current.address, fragment.symbol!!
@@ -90,23 +87,16 @@ class TokenDetailPresenter(
       transactions.isNotEmpty().isTrue {
         hold(transactions)
       } otherwise {
-        // 若更新了链上数据后还是没有筛选出交易记录返回空数组
-        if (singleRunMark == true) {
-          fragment.getMainActivity()?.removeLoadingView()
-          // 链上和本地都没有数据就更新一个空数组作为默认
-          hold(arrayListOf())
-        } else {
-          // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-          TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
-            it.isNotEmpty().isTrue {
-              singleRunMark.isNull {
-                prepareTokenDetailData(hold)
-                singleRunMark = true
-              }
-            } otherwise {
-              // 链上和本地都没有数据就更新一个空数组作为默认
-              hold(arrayListOf())
+        // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+        TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
+          it.isNotEmpty().isTrue {
+            hasCalledChain.isFalse {
+              prepareTokenDetailData(hold)
+              hasCalledChain = true
             }
+          } otherwise {
+            // 链上和本地都没有数据就更新一个空数组作为默认
+            hold(arrayListOf())
           }
         }
       }
@@ -159,10 +149,7 @@ class TokenDetailPresenter(
           coroutinesTask({
             history.forEach {
               TokenBalanceTable.insertOrUpdate(
-                symbol,
-                WalletTable.current.address,
-                it.date,
-                it.balance
+                symbol, WalletTable.current.address, it.date, it.balance
               )
             }
           }) {

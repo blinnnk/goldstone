@@ -20,17 +20,17 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * `View` 的便捷链式调用的方法
  * */
 
-fun <T: View> T.assignWidth(width: Int): T {
+fun <T : View> T.assignWidth(width: Int): T {
   layoutParams.width = width
   return this
 }
 
-fun <T: View> T.assignHeight(height: Int): T {
+fun <T : View> T.assignHeight(height: Int): T {
   layoutParams.height = height
   return this
 }
 
-fun <T: View> T.click(callback: (T) -> Unit): T {
+fun <T : View> T.click(callback: (T) -> Unit): T {
   onClick { callback(this@click) }
   return this
 }

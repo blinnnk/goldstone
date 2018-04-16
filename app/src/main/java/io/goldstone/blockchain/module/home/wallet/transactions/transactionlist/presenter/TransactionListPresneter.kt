@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import android.util.Log
 import com.blinnnk.extension.*
-import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TransactionText
@@ -25,7 +25,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
-import org.jetbrains.anko.doAsync
 
 /**
  * @date 24/03/2018 2:12 PM
@@ -109,8 +108,6 @@ class TransactionListPresenter(
     ) {
       // Show loading view
       showLoadingView()
-
-      System.out.println("startBlockNumber $startBlock")
       mergeNormalAndTokenIncomingTransactions(startBlock) {
         it.isNotEmpty().isTrue {
           // 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
@@ -136,12 +133,12 @@ class TransactionListPresenter(
 
     private fun mergeNormalAndTokenIncomingTransactions(
       startBlock: String, hold: (ArrayList<TransactionTable>) -> Unit
-    ): ConcurrentCombine {
-      return object : ConcurrentCombine() {
+    ): ConcurrentAsyncCombine {
+      return object : ConcurrentAsyncCombine() {
         override var asyncCount: Int = 2
         // Get transaction data from `etherScan`
         var chainData = ArrayList<TransactionTable>()
-        var localData = ArrayList<TransactionTable>()
+        var logData = ArrayList<TransactionTable>()
         override fun concurrentJobs() {
           GoldStoneAPI.getTransactionListByAddress(startBlock) {
             chainData = this
@@ -149,7 +146,7 @@ class TransactionListPresenter(
           }
           GoldStoneAPI.getERC20TokenIncomingTransaction(startBlock) {
             // 把请求回来的数据转换成 `TransactionTable` 格式
-            localData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
+            logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
             completeMark()
           }
         }
@@ -157,12 +154,14 @@ class TransactionListPresenter(
           coroutinesTask({
             arrayListOf<TransactionTable>().apply {
               addAll(chainData)
-              addAll(localData)
+              addAll(logData)
             }.filter {
               it.to.isNotEmpty() && it.value.toDouble() > 0.0
+            }.distinctBy {
+              it.hash
             }.sortedByDescending {
               it.timeStamp
-            }.distinctBy { it.hash }.toArrayList()
+            }.toArrayList()
           }) {
             hold(it)
           }
@@ -175,17 +174,19 @@ class TransactionListPresenter(
     ) {
       // 把拉取到的数据加工数据格式并插入本地数据库
       completeTransactionInfo(data) {
-        forEachOrEnd { it, isEnd ->
-          doAsync {
-            GoldStoneDataBase.database.transactionDao().insert(it)
-            runOnUiThread {
-              if (isEnd) {
-                removeLoadingView()
-                hold( map { TransactionListModel(it) }.toArrayList())
-              }
+        object : ConcurrentAsyncCombine() {
+          override var asyncCount: Int = size
+          override fun concurrentJobs() {
+            forEach {
+              GoldStoneDataBase.database.transactionDao().insert(it)
+              completeMark()
             }
           }
-        }
+          override fun mergeCallBack() {
+            removeLoadingView()
+            hold( map { TransactionListModel(it) }.toArrayList())
+          }
+        }.start()
       }
     }
 
@@ -196,7 +197,7 @@ class TransactionListPresenter(
     private fun completeTransactionInfo(
       data: ArrayList<TransactionTable>, hold: ArrayList<TransactionTable>.() -> Unit
     ) {
-      object : ConcurrentCombine() {
+      object : ConcurrentAsyncCombine() {
         override var asyncCount: Int = data.size
         override fun concurrentJobs() {
           data.forEach { transaction ->
