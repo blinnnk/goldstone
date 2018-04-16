@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import com.blinnnk.util.ConcurrentCombine
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -47,7 +47,7 @@ data class WalletDetailCellModel(
       hold: (ArrayList<WalletDetailCellModel>) -> Unit
     ) {
       MyTokenTable.getTokensWith(walletAddress) { allTokens ->
-        object : ConcurrentCombine() {
+        object : ConcurrentAsyncCombine() {
           val tokenList = ArrayList<WalletDetailCellModel>()
           override var asyncCount: Int = allTokens.size
           override fun concurrentJobs() {

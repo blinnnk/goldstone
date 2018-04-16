@@ -1,8 +1,12 @@
 package io.goldstone.blockchain.common.utils
 
+import com.blinnnk.util.observing
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 11/04/2018 3:28 AM
@@ -44,5 +48,27 @@ abstract class SequentialTask {
   }
 
   abstract fun thirdJob()
+
+}
+
+abstract class ConcurrentAsyncCombine {
+
+  abstract var asyncCount: Int
+
+  private var finishedCount: Int by observing(0) {
+    if (finishedCount == asyncCount) {
+      GoldStoneAPI.context.runOnUiThread { mergeCallBack() }
+    }
+  }
+
+  abstract fun concurrentJobs()
+
+  open fun completeMark() {
+    finishedCount += 1
+  }
+
+  fun start() { doAsync { concurrentJobs() } }
+
+  abstract fun mergeCallBack()
 
 }

@@ -8,6 +8,7 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -42,10 +43,7 @@ class CreateWalletPresenter(
   }
 
   fun generateWalletWith(
-    nameInput: EditText,
-    passwordInput: EditText,
-    repeatPasswordInput: EditText,
-    isAgree: Boolean
+    nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean
   ) {
     checkInputValue(
       nameInput.text.toString(),
@@ -91,29 +89,37 @@ class CreateWalletPresenter(
      * 手下拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
      */
     fun generateMyTokenInfo(ownerAddress: String, callback: () -> Unit = {}) {
-      DefaultTokenTable.getTokens { tokenList ->
-        tokenList.forEachOrEnd { tokenInfo, isEnd ->
-          // 显示我的 `Token` 后台要求强制显示 `force show` 的或 用户手动设置 `isUsed` 的
-          if (tokenInfo.forceShow == TinyNumber.True.value) {
-            // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-            if (tokenInfo.symbol == CryptoSymbol.eth) {
-              GoldStoneEthCall.getEthBalance(ownerAddress) {
-                MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
-              }
-            } else {
-              GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, ownerAddress) {
-                MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+      DefaultTokenTable.getTokens {
+        it.filter {
+          // 初始的时候显示后台要求标记为 `force show` 的 `Token`
+          it.forceShow == TinyNumber.True.value
+        }.apply {
+          object : ConcurrentAsyncCombine() {
+            override var asyncCount: Int = size
+            override fun concurrentJobs() {
+              forEach { tokenInfo ->
+                // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+                if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
+                  GoldStoneEthCall.getEthBalance(ownerAddress) {
+                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+                    completeMark()
+                  }
+                } else {
+                  GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, ownerAddress) {
+                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
+                    completeMark()
+                  }
+                }
               }
             }
-            if (isEnd) callback()
-          }
+            override fun mergeCallBack() = callback()
+          }.start()
         }
       }
     }
 
     fun updateMyTokensValue(
-      walletAddress: String = WalletTable.current.address,
-      callback: () -> Unit = {}
+      walletAddress: String = WalletTable.current.address, callback: () -> Unit = {}
     ) {
       DefaultTokenTable.getTokens { tokenInfo ->
         MyTokenTable.getTokensWith(walletAddress) { myTokens ->
@@ -164,5 +170,4 @@ class CreateWalletPresenter(
       }
     }
   }
-
 }
