@@ -183,7 +183,7 @@ class TokenDetailPresenter(
             it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
           }).let {
             balance = it
-            balances.add(DateBalance(minMillsLimit, balance))
+            balances.add(DateBalance(index.daysAgoInMills(), balance))
             completeMark()
           }
         }
