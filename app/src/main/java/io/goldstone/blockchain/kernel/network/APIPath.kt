@@ -119,22 +119,23 @@ private val etherScanKeys = arrayListOf(
 )
 
 object EtherScanApi {
-  @JvmStatic
+
   private val apikey: () -> String = { etherScanKeys.getRandom() }
+
   private const val header = "http://api-ropsten.etherscan.io"
   private const val logHeader = "http://ropsten.etherscan.io"
 
   @JvmStatic
   val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
-    "$header/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock=99999999&sort=desc&apikey=$apikey"
+    "$header/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock=99999999&sort=desc&apikey=${apikey()}"
   }
   @JvmStatic
   val transactionsByHash: (taxHash: String) -> String = {
-    "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=$apikey"
+    "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
   }
   @JvmStatic
   val singleTransactionHas: (hash: String) -> String = {
-    "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=$apikey"
+    "$header/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
   }
   @JvmStatic
   val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
