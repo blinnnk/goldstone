@@ -56,6 +56,8 @@ class GoldStoneApp : Application() {
       }
     }
 
+    var currentRate: Double? = null
+
     fun updateLocalDefaultTokens(context: Context) {
 
       // 准备默认的 `Token List`

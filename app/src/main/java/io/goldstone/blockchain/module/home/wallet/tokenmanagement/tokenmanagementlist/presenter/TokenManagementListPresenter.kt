@@ -5,9 +5,9 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.timeUpThen
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
@@ -32,34 +32,35 @@ class TokenManagementListPresenter(
       }
     }
   }
+  companion object {
 
-  private var needShowLoadingView = true
-
-  fun updateMyTokensInfoBy(cell: TokenManagementListCell) {
-    /**
-     * show `Loading View` at 100ms later to prevent too fast
-     * to response the result that make ui flash
-     */
-    100L timeUpThen {
-      if (needShowLoadingView) {
-        fragment.getMainActivity()?.showLoadingView()
-      }
-    }
-    cell.apply {
-      if (switch.isChecked) {
-        // once it is checked then insert this symbol into `MyTokenTable` database
-        MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
-          needShowLoadingView = false
-          fragment.getMainActivity()?.removeLoadingView()
+    private var needShowLoadingView = true
+    fun updateMyTokensInfoBy(cell: TokenManagementListCell, activity: MainActivity) {
+      /**
+       * show `Loading View` at 100ms later to prevent too fast
+       * to response the result that make ui flash
+       */
+      100L timeUpThen {
+        if (needShowLoadingView) {
+          activity.showLoadingView()
         }
-      } else {
-        needShowLoadingView = false
-        fragment.getMainActivity()?.removeLoadingView()
-        // once it is unchecked then delete this symbol from `MyTokenTable` database
-        MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
       }
-      // prevent duplicate clicks
-      cell.switch.preventDuplicateClicks()
+      cell.apply {
+        if (switch.isChecked) {
+          // once it is checked then insert this symbol into `MyTokenTable` database
+          MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
+            needShowLoadingView = false
+            activity.removeLoadingView()
+          }
+        } else {
+          needShowLoadingView = false
+          activity.removeLoadingView()
+          // once it is unchecked then delete this symbol from `MyTokenTable` database
+          MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
+        }
+        // prevent duplicate clicks
+        cell.switch.preventDuplicateClicks()
+      }
     }
   }
 }

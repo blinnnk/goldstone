@@ -48,7 +48,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
     /** 如果数据返回时空的显示占位图 */
     asyncData?.isEmpty()?.isTrue {
-      wrapper.showEmptyView()
+      showEmptyView()
     }
 
     /** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
@@ -187,8 +187,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
   private var emptyLayout: EmptyView? = null
 
-  open fun ViewGroup.showEmptyView() {
-    emptyLayout = EmptyView(context).apply {
+  open fun showEmptyView() {
+    emptyLayout = EmptyView(wrapper.context).apply {
       when (this@BaseRecyclerFragment) {
         is PaymentValueDetailFragment -> return
         is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
@@ -196,8 +196,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         else -> setStyle(EmptyType.TransactionDetail)
       }
     }
-    emptyLayout?.into(this)
+    emptyLayout?.into(wrapper)
     if (this@BaseRecyclerFragment !is TokenDetailFragment) emptyLayout?.setCenterInParent()
+  }
+
+  open fun removeEmptyView() {
+    emptyLayout.isNotNull {
+      wrapper.removeView(emptyLayout)
+    }
   }
 
 }

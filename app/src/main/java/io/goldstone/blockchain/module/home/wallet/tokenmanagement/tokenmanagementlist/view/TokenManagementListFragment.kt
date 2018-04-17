@@ -4,6 +4,7 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -23,7 +24,11 @@ class TokenManagementListFragment
     asyncData: ArrayList<DefaultTokenTable>?
   ) {
     recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { cell ->
-      cell.switch.onClick { presenter.updateMyTokensInfoBy(cell) }
+      cell.switch.onClick {
+        getMainActivity()?.apply {
+          TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
+        }
+      }
     }
   }
 

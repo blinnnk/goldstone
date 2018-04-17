@@ -1,9 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
@@ -85,11 +83,12 @@ class TokenDetailPresenter(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
-        hold( transactions.map { TransactionListModel(it) }.toArrayList())
+        hold(transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
         // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
         TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
-          it.isNotEmpty().isTrue {
+          // 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
+          it.find { it.symbol == fragment.symbol }.isNotNull {
             // 有数据后重新执行从数据库拉取数据
             prepareTokenDetailData(hold)
           } otherwise {

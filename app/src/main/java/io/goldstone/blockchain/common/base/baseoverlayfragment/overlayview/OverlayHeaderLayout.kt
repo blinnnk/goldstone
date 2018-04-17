@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.Gravity
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -107,10 +108,16 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     }
   }
 
+  fun setKeyboardConfirmEvent(action: EditText.() -> Unit) {
+    searchInput.onPressKeyboardEnterButton { action(searchInput.editText)  }
+  }
+
   fun showSearchButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
     if (isShow) {
       searchButton
-        .click { setClickEvent(searchButton) }
+        .click {
+          setClickEvent(searchButton)
+        }
         .into(this)
     } else findViewById<ImageView>(ElementID.searchButton)?.let {
       removeView(it)
@@ -119,29 +126,33 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
   fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit = {}) {
 
-    isShow.isTrue {
-      title.visibility = View.GONE
-      findViewById<EditTextWithButton>(ElementID.searchInput).let {
-        it.isNull().isTrue {
-          searchInput
-            .apply {
-              setCancelButton {
-                showSearchInput(false)
-                cancelEvent()
-              }
-            }
-            .into(this)
-        } otherwise {
-          it.visibility = View.VISIBLE
-        }
-      }
-    } otherwise {
-      title.visibility = View.VISIBLE
-      searchInput.visibility = View.GONE
-    }
-
     showCloseButton(!isShow)
 
+    isShow.isFalse {
+      title.visibility = View.VISIBLE
+      searchInput.visibility = View.GONE
+      return
+    }
+
+    // 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
+    title.visibility = View.GONE
+    findViewById<EditTextWithButton>(ElementID.searchInput).let {
+      it.isNull().isTrue {
+        searchInput
+          .apply {
+            requestFocus()
+            setCancelButton {
+              showSearchInput(false)
+              cancelEvent()
+              // 取消搜索后自动清空搜索框里面的内容
+              searchInput.editText.text.clear()
+            }
+          }
+          .into(this)
+      } otherwise {
+        it.visibility = View.VISIBLE
+      }
+    }
   }
 
   override fun onDraw(canvas: Canvas?) {

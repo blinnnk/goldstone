@@ -83,6 +83,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
       // Comparison the data, if they are different then update adapter
       diffDataSetChanged(dataSet, newData) {
         it.isFalse {
+          if(newData.isNotEmpty()) {
+            fragment.removeEmptyView()
+          } else {
+            fragment.showEmptyView()
+          }
           dataSet.clear()
           dataSet.addAll(newData)
           notifyDataSetChanged()
