@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
-import com.blinnnk.extension.reboot
+import com.blinnnk.extension.rebootApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -46,8 +46,9 @@ class LanguagePresenter(
     }
 
     WalletTable.updateLanguage(code) {
-      fragment.reboot<SplashActivity>()
+      fragment.context?.rebootApp<SplashActivity>()
     }
   }
 
 }
+

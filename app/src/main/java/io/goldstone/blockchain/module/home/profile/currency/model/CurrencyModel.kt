@@ -7,6 +7,5 @@ package io.goldstone.blockchain.module.home.profile.currency.model
 
 data class CurrencyModel(
   val symbol: String = "",
-  var isChecked: Boolean = false,
-  var currencyRate: Double = 0.0
+  var isChecked: Boolean = false
 )

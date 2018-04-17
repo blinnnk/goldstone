@@ -46,6 +46,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
       })
 
     radioButton.apply {
+      isClickable = false
       setAlignParentRight()
       setCenterInVertical()
     }

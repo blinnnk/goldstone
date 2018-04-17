@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.WalletSettingsText
-import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor

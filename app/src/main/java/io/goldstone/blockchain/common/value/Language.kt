@@ -254,16 +254,6 @@ object AlertText {
   }
 }
 
-object SymbolText {
-
-  @JvmField
-  val usd = when (currentLanguage) {
-    HoneyLanguage.English.code -> " (USD)"
-    else -> " (USD)"
-  }
-
-}
-
 object CurrentWalletText {
 
   @JvmField
@@ -421,6 +411,16 @@ object EmptyText {
   @JvmField
   val tokenDetailSubtitle = when (currentLanguage) {
     HoneyLanguage.English.code -> "There isn't transaction in blockChain, so you haven't chart and records"
+    else -> ""
+  }
+  @JvmField
+  val searchTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "No Token Found"
+    else -> ""
+  }
+  @JvmField
+  val searchSubtitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "There isn't token in blockChain, so you haven't chart and records"
     else -> ""
   }
   @JvmField

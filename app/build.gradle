@@ -43,7 +43,7 @@ dependencies {
     exclude group: 'com.google.android', module: 'android'
   }
   // 黑蜜动画及其他便捷工具依赖工程
-  implementation 'com.blinnnk:honeyui:0.2.8.7'
+  implementation 'com.blinnnk:honeyui:0.2.8.8'
   // Glide Image Loader
   implementation 'com.github.bumptech.glide:glide:4.6.1'
   // Crypto

@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -18,7 +19,6 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -82,7 +82,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
         }
         .into(this)
 
-      textView(WalletText.totalAssets + SymbolText.usd) {
+      textView(WalletText.totalAssets + " (${ GoldStoneApp.currencyCode })") {
         textSize = 4.uiPX().toFloat()
         typeface = GoldStoneFont.light(context)
         textColor = Spectrum.opacity5White

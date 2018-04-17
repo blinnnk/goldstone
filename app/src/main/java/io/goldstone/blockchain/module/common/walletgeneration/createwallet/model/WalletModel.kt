@@ -6,6 +6,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -15,6 +16,7 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import java.util.*
 
 /**
  * @date 29/03/2018 10:35 PM
@@ -25,14 +27,15 @@ import org.jetbrains.anko.runOnUiThread
 data class WalletTable(
   //@PrimaryKey autoGenerate 自增
   @PrimaryKey(autoGenerate = true)
-  var id: Int, var name: String,
+  var id: Int,
+  var name: String,
   var address: String,
   var isUsing: Boolean,
   var isWatchOnly: Boolean = false,
   var passwordHint: String? = null,
   var language: Int = HoneyLanguage.English.code,
+  var currencyCode: String = CountryCode.currentCurrency,
   var balance: Double? = 0.0
-//  var currencyType:String = "USD"
 ) {
   companion object {
 
@@ -89,6 +92,18 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let {
             update(it.apply { language = code })
+          }
+        }
+      }) {
+        callback()
+      }
+    }
+
+    fun updateCurrency(code: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let {
+            update(it.apply { currencyCode = code })
           }
         }
       }) {

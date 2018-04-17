@@ -6,18 +6,18 @@ import android.graphics.Color
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateColorAnimation
+import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletText
 import org.jetbrains.anko.matchParent
 
@@ -72,7 +72,7 @@ class WalletSlideHeader(context: Context) : RelativeLayout(context) {
         }
 
         subtitle.apply {
-          text = WalletText.totalAssets + SymbolText.usd
+          text = WalletText.totalAssets + GoldStoneApp.currencyCode
           textSize = 4.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
           y -= 3.uiPX()

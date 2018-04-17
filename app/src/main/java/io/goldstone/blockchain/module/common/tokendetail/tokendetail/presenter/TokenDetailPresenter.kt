@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
@@ -24,7 +27,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
-import kotlinx.android.synthetic.*
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -85,15 +87,17 @@ class TokenDetailPresenter(
       transactions.isNotEmpty().isTrue {
         hold(transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
-        // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-        TransactionListPresenter.updateTransactions(fragment.getMainActivity()) {
-          // 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-          it.find { it.symbol == fragment.symbol }.isNotNull {
-            // 有数据后重新执行从数据库拉取数据
-            prepareTokenDetailData(hold)
-          } otherwise {
-            // 链上和本地都没有数据就更新一个空数组作为默认
-            hold(arrayListOf())
+        TransactionTable.getMyLatestStartBlock { blockNumber ->
+          // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+          TransactionListPresenter.updateTransactions(fragment.getMainActivity(), blockNumber) {
+            // 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
+            it.find { it.symbol == fragment.symbol }.isNotNull {
+              // 有数据后重新执行从数据库拉取数据
+              prepareTokenDetailData(hold)
+            } otherwise {
+              // 链上和本地都没有数据就更新一个空数组作为默认
+              hold(arrayListOf())
+            }
           }
         }
       }
@@ -179,7 +183,7 @@ class TokenDetailPresenter(
             it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
           }).let {
             balance = it
-            balances.add(DateBalance(minMillsLimit, balance))
+            balances.add(DateBalance(index.daysAgoInMills(), balance))
             completeMark()
           }
         }

@@ -4,6 +4,7 @@ import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
+import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -47,7 +48,6 @@ class PaymentValueDetailPresenter(
 ) : BaseRecyclerPresenter<PaymentValueDetailFragment, PaymentValueDetailModel>() {
 
   private var currentNonce: BigInteger? = null
-  private var tokenInfo: WalletDetailCellModel? = null
   private var minerFeeType = MinerFeeType.Recommend.content
 
   private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
@@ -89,7 +89,6 @@ class PaymentValueDetailPresenter(
           updateTransactionAndAdapter(0.0)
         }
       }
-
     }
   }
 
@@ -120,11 +119,11 @@ class PaymentValueDetailPresenter(
           // 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
           taxHash.isValidTaxHash().isTrue {
             // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-            insertPendingDataToTransactionTable(raw!!, taxHash, tokenInfo!!)
+            insertPendingDataToTransactionTable(raw!!, taxHash, fragment.token!!)
           }
           // 主线程跳转到账目详情界面
           fragment.context?.runOnUiThread {
-            goToTransactionDetailFragment(fragment.address!!, raw!!, tokenInfo!!, taxHash)
+            goToTransactionDetailFragment(fragment.address!!, raw!!, fragment.token!!, taxHash)
           }
         }
       }
@@ -155,10 +154,10 @@ class PaymentValueDetailPresenter(
         val myLatestNonce =
           first { it.fromAddress.equals(WalletTable.current.address, true) }.nonce.toLong()
         currentNonce = BigInteger.valueOf(myLatestNonce + 1)
-        generateTransaction(fragment.address!!, value, tokenInfo, hold)
+        generateTransaction(fragment.address!!, value, hold)
       }
     } otherwise {
-      generateTransaction(fragment.address!!, value, tokenInfo!!, hold)
+      generateTransaction(fragment.address!!, value, hold)
     }
   }
 
@@ -168,10 +167,8 @@ class PaymentValueDetailPresenter(
   private fun generateTransaction(
     toAddress: String,
     value: Double,
-    token: WalletDetailCellModel?,
     hold: (ArrayList<RawTransaction>) -> Unit
   ) {
-
     val count: BigInteger
     val data: String
     val to: String
@@ -181,12 +178,11 @@ class PaymentValueDetailPresenter(
       data = ""
       count = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
     } else {
-      to = token!!.contract
-      count = BigInteger.valueOf((value * Math.pow(10.0, token.decimal)).toLong())
+      to = fragment.token!!.contract
+      count = BigInteger.valueOf((value * Math.pow(10.0, fragment.token!!.decimal)).toLong())
       data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() +
         count.toDataString()
     }
-
     // 这个 `Transaction` 是用来测量估算可能要用的 `gasLimit` 不是用来转账用的.
     val transaction = Transaction(
       WalletTable.current.address,
@@ -198,15 +194,17 @@ class PaymentValueDetailPresenter(
       data
     )
 
-    // 测量 `Transaction` 得出 `GasLimit`
-    val gasLimit = if (fragment.token?.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
-    else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
-
-    defaultGasPrices.map { price ->
-      // 生成 `RawTransaction` 对象
-      RawTransaction.createTransaction(currentNonce, price, gasLimit, to, count, data)
-    }.let {
-      hold(it.toArrayList())
+    coroutinesTask({
+      // 测量 `Transaction` 得出 `GasLimit`
+      if (fragment.token?.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
+      else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
+    }) {
+      defaultGasPrices.map { price ->
+        // 生成 `RawTransaction` 对象
+        RawTransaction.createTransaction(currentNonce, price, it, to, count, data)
+      }.let {
+        hold(it.toArrayList())
+      }
     }
   }
 
