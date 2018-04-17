@@ -31,9 +31,9 @@
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
                             <entry key="height" value="900" />
-                            <entry key="outputName" value="contract_empty_icon" />
+                            <entry key="outputName" value="search_empty_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/love.svg" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/placeholders (1)/No search results.svg" />
                             <entry key="width" value="900" />
                           </map>
                         </option>

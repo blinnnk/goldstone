@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.toArrayList
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import okhttp3.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
@@ -35,14 +37,17 @@ object GoldStoneAPI {
   fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
     requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list") {
       forEachOrEnd { token, isEnd ->
-        if(token.forceShow == TinyNumber.True.value) token.isUsed = true
+        if (token.forceShow == TinyNumber.True.value) token.isUsed = true
         if (isEnd) hold(toArrayList())
       }
     }
   }
 
   @JvmStatic
-  fun getCoinInfoBySymbolFromGoldStone(symbols: String, hold: (ArrayList<TokenSearchModel>) -> Unit) {
+  fun getCoinInfoBySymbolFromGoldStone(
+    symbols: String,
+    hold: (ArrayList<TokenSearchModel>) -> Unit
+  ) {
     requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
       hold(toArrayList())
     }
@@ -51,22 +56,45 @@ object GoldStoneAPI {
   @JvmStatic
   fun getCurrencyRate(symbols: String, hold: (Double) -> Unit) {
     requestData<String>(
-      APIPath.getCurrencyRate + symbols,
-      "rate",
-      true
+      APIPath.getCurrencyRate + symbols, "rate", true
     ) {
       this[0].isNotNull { hold(this[0].toDouble()) }
     }
   }
 
-  fun getERC20TokenTransaction(address: String, startBlock: String = "0", hold: (ArrayList<ERC20TransactionModel>) -> Unit) {
-    requestData<ERC20TransactionModel>(EtherScanApi.getAllTokenTransaction(address, startBlock), "result") {
+  @JvmStatic
+  fun getCountryList(hold: (ArrayList<String>) -> Unit) {
+    requestList<String>(
+      APIPath.getCountryList, "list"
+    ) {
+      hold(this.toArrayList())
+    }
+  }
+
+  fun getERC20TokenTransaction(
+    address: String,
+    startBlock: String = "0",
+    hold: (ArrayList<ERC20TransactionModel>) -> Unit
+  ) {
+    requestData<ERC20TransactionModel>(
+      EtherScanApi.getAllTokenTransaction(address, startBlock),
+      "result"
+    ) {
       hold(toArrayList())
     }
   }
 
-  fun getERC20TokenIncomingTransaction(startBlock: String = "0", address: String = WalletTable.current.address, hold: (ArrayList<ERC20TransactionModel>) -> Unit) {
-    requestData<ERC20TransactionModel>(EtherScanApi.getTokenIncomingTransaction(address, startBlock), "result") {
+  fun getERC20TokenIncomingTransaction(
+    startBlock: String = "0",
+    address: String = WalletTable.current.address,
+    hold: (ArrayList<ERC20TransactionModel>) -> Unit
+  ) {
+    requestData<ERC20TransactionModel>(
+      EtherScanApi.getTokenIncomingTransaction(
+        address,
+        startBlock
+      ), "result"
+    ) {
       hold(toArrayList())
     }
   }
@@ -75,26 +103,27 @@ object GoldStoneAPI {
    * 从 `EtherScan` 获取指定钱包地址的 `TransactionList`
    */
   @JvmStatic
-  fun getTransactionListByAddress(startBlock: String = "0", address: String = WalletTable.current.address, hold: ArrayList<TransactionTable>.() -> Unit) {
+  fun getTransactionListByAddress(
+    startBlock: String = "0",
+    address: String = WalletTable.current.address,
+    hold: ArrayList<TransactionTable>.() -> Unit
+  ) {
     requestData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
       hold(toArrayList())
     }
   }
 
-  @JvmStatic private inline fun<reified T> requestData(
-    api: String,
-    keyName: String,
-    justGetData: Boolean = false,
-    crossinline hold: List<T>.() -> Unit
+  @JvmStatic
+  private inline fun <reified T> requestData(
+    api: String, keyName: String, justGetData: Boolean = false, crossinline hold: List<T>.() -> Unit
   ) {
     val client = OkHttpClient()
-    val request = Request.Builder()
-      .url(api)
-      .build()
+    val request = Request.Builder().url(api).build()
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, error: IOException) {
         println("$error")
       }
+
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
         try {
@@ -106,6 +135,38 @@ object GoldStoneAPI {
             val gson = Gson()
             val collectionType = object : TypeToken<Collection<T>>() {}.type
             hold(gson.fromJson(jsonData, collectionType))
+          }
+        } catch (error: Exception) {
+          println("GoldStoneApi $error")
+        }
+      }
+    })
+  }
+
+  @JvmStatic
+  private inline fun <reified T> requestList(
+    api: String,
+    keyName: String,
+    crossinline hold: List<T>.() -> Unit
+  ) {
+    val client = OkHttpClient()
+    val request = Request.Builder().url(api).build()
+    client.newCall(request).enqueue(object : Callback {
+      override fun onFailure(call: Call, error: IOException) {
+        Log.e("ERROR", error.toString())
+      }
+      override fun onResponse(call: Call, response: Response) {
+        val data = response.body()?.string()
+        try {
+          val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+          val jsonArray = dataObject[keyName] as JSONArray
+
+          val dataArray = arrayListOf<T>()
+          (0 until jsonArray.length()).forEachOrEnd { index, isEnd ->
+            dataArray.add(jsonArray.get(index) as T)
+            if (isEnd) {
+              hold(dataArray)
+            }
           }
         } catch (error: Exception) {
           println("GoldStoneApi $error")

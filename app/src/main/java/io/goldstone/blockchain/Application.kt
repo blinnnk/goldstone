@@ -5,15 +5,14 @@ import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import org.jetbrains.anko.configuration
 import org.jetbrains.anko.doAsync
-import java.util.*
 
 @Suppress("DEPRECATION")
 /**
@@ -38,36 +37,41 @@ class GoldStoneApp : Application() {
     // update local `Tokens` info list
     updateLocalDefaultTokens(this)
 
-    // Querying the language type of the current account
-    // set and displaying the interface from the database.
-    initLaunchLanguage()
-
-    getCurrencyRate()
+    initAppParameters()
   }
 
   companion object {
-    var currentLanguage: Int? = null
-    private fun Application.initLaunchLanguage() {
+
+    var currentRate: Double = 1.0
+    var currencyCode: String = "USD"
+    var currentLanguage: Int? = HoneyLanguage.English.code
+
+    fun initAppParameters() {
+      // Querying the language type of the current account
+      // set and displaying the interface from the database.
       WalletTable.getCurrentWalletInfo {
-        it.isNull().isTrue {
-          currentLanguage = HoneyLanguage.getLanguageCode(configuration.locale.displayLanguage)
-        } otherwise {
-          currentLanguage = it?.language
-          WalletTable.current = it!!
+        it?.apply {
+          initLaunchLanguage(it)
+          getCurrencyRate(it)
         }
       }
     }
 
-    var currentRate: Double = 1.0
-    var currencyCode: String = "USD"
-    private fun Application.getCurrencyRate() {
-      currencyCode = Currency.getInstance(configuration.locale).currencyCode
-      val currencyCode = Currency.getInstance(configuration.locale).currencyCode
-      GoldStoneAPI.getCurrencyRate(currencyCode) {
-        currentRate = it
+    private fun initLaunchLanguage(wallet: WalletTable) {
+      wallet.isNull().isTrue {
+        currentLanguage = HoneyLanguage.getLanguageCode(CountryCode.currentLanguage)
+      } otherwise {
+        currentLanguage = wallet.language
+        WalletTable.current = wallet
       }
     }
 
+    private fun getCurrencyRate(wallet: WalletTable) {
+      currencyCode = wallet.currencyCode
+      GoldStoneAPI.getCurrencyRate(wallet.currencyCode) {
+        currentRate = it
+      }
+    }
 
     private fun updateLocalDefaultTokens(context: Context) {
 

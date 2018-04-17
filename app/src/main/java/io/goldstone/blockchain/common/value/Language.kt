@@ -414,6 +414,16 @@ object EmptyText {
     else -> ""
   }
   @JvmField
+  val searchTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "No Token Found"
+    else -> ""
+  }
+  @JvmField
+  val searchSubtitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "There isn't token in blockChain, so you haven't chart and records"
+    else -> ""
+  }
+  @JvmField
   val contractTitle = when (currentLanguage) {
     HoneyLanguage.English.code -> "No Contact Found"
     else -> ""

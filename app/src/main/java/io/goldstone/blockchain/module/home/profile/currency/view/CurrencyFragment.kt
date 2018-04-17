@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.currency.view
 
-import android.os.Bundle
-import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
@@ -24,7 +22,9 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, CurrencyModel>(
     recyclerView.adapter = CurrencyAdapter(asyncData.orEmptyArray()) { item, _ ->
       item.apply {
         onClick {
-          setSwitchStatus()
+          presenter.setCurrencyAlert(model.symbol) {
+            setSwitchStatusBy(this)
+          }
           preventDuplicateClicks()
         }
       }
@@ -32,26 +32,5 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, CurrencyModel>(
   }
 
   override fun setSlideUpWithCellHeight() = 50.uiPX()
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    asyncData = arrayListOf(
-      CurrencyModel("USD", true),
-      CurrencyModel("EUR", false),
-      CurrencyModel("RMB", false),
-      CurrencyModel("JPY", false),
-      CurrencyModel("HKD", false),
-      CurrencyModel("EUR", false),
-      CurrencyModel("RUB", false),
-      CurrencyModel("USD", false),
-      CurrencyModel("RMB", false),
-      CurrencyModel("JPY", false),
-      CurrencyModel("HKD", false),
-      CurrencyModel("EUR", false),
-      CurrencyModel("RUB", false)
-    )
-
-  }
 
 }
