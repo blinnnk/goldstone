@@ -5,6 +5,7 @@ import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -41,7 +42,7 @@ class TokenDetailOverlayPresenter(
           valueHeader
             ?.apply {
               title.text = "MY ${token?.symbol}"
-              subtitle.text = "${token?.count} ${token?.symbol} ≈(${token?.currency} USD)"
+              subtitle.text = "${token?.count} ${token?.symbol} ≈ (${token?.currency} + ${GoldStoneApp.currencyCode})"
               setBlackTitles()
               isCenter = true
             }

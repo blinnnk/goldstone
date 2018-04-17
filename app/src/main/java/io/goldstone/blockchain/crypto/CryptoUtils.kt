@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto
 import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.kethereum.extensions.toHexStringZeroPadded
@@ -128,6 +129,23 @@ fun Double.toGWeiValue(): String {
 }
 
 fun Double.formatCurrency(): String {
+  val rate = GoldStoneApp.currentRate
+  val formatEditor = DecimalFormat("#")
+  formatEditor.maximumFractionDigits = 3
+  val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同
+  val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
+  return prefix + formatEditor.format(this * rate)
+}
+
+fun Double.formatCount(): String {
+  val formatEditor = DecimalFormat("#")
+  formatEditor.maximumFractionDigits = 5
+  val value = formatEditor.format(this).toDouble()
+  val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
+  return prefix + formatEditor.format(this)
+}
+
+fun Double.formatHex(): String {
   val formatEditor = DecimalFormat("#")
   formatEditor.maximumFractionDigits = 3
   val value = formatEditor.format(this).toDouble()

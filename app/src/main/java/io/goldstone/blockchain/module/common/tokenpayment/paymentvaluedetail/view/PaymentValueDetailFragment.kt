@@ -53,6 +53,7 @@ class PaymentValueDetailFragment :
       inputTextListener {
         it.isNotEmpty().isTrue { transferCount = it.toDouble() }
       }
+      setHeaderSymbol(token?.symbol.orEmpty())
     }
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {

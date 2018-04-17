@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -43,7 +44,18 @@ object GoldStoneAPI {
   @JvmStatic
   fun getCoinInfoBySymbolFromGoldStone(symbols: String, hold: (ArrayList<TokenSearchModel>) -> Unit) {
     requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
-      hold(this.toArrayList())
+      hold(toArrayList())
+    }
+  }
+
+  @JvmStatic
+  fun getCurrencyRate(symbols: String, hold: (Double) -> Unit) {
+    requestData<String>(
+      APIPath.getCurrencyRate + symbols,
+      "rate",
+      true
+    ) {
+      this[0].isNotNull { hold(this[0].toDouble()) }
     }
   }
 
@@ -69,7 +81,12 @@ object GoldStoneAPI {
     }
   }
 
-  @JvmStatic private inline fun<reified T> requestData(api: String, keyName: String, crossinline hold: List<T>.() -> Unit) {
+  @JvmStatic private inline fun<reified T> requestData(
+    api: String,
+    keyName: String,
+    justGetData: Boolean = false,
+    crossinline hold: List<T>.() -> Unit
+  ) {
     val client = OkHttpClient()
     val request = Request.Builder()
       .url(api)
@@ -83,9 +100,13 @@ object GoldStoneAPI {
         try {
           val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
           val jsonData = dataObject[keyName].toString()
-          val gson = Gson()
-          val collectionType = object : TypeToken<Collection<T>>() {}.type
-          hold(gson.fromJson(jsonData, collectionType))
+          if (justGetData) {
+            hold(listOf(jsonData as T))
+          } else {
+            val gson = Gson()
+            val collectionType = object : TypeToken<Collection<T>>() {}.type
+            hold(gson.fromJson(jsonData, collectionType))
+          }
         } catch (error: Exception) {
           println("GoldStoneApi $error")
         }

@@ -8,13 +8,14 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.SymbolText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -35,7 +36,7 @@ class WalletSettingsListPresenter(
 ) : BaseRecyclerPresenter<WalletSettingsListFragment, WalletSettingsListModel>() {
 
   override fun updateData() {
-    val balanceText = WalletTable.current.balance.toString() + SymbolText.usd
+    val balanceText = WalletTable.current.balance?.formatCurrency() + " (${GoldStoneApp.currencyCode})"
     fragment.asyncData = arrayListOf(
       WalletSettingsListModel(WalletSettingsText.checkQRCode),
       WalletSettingsListModel(WalletSettingsText.balance, balanceText),

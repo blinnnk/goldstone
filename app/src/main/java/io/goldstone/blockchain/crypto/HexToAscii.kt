@@ -74,5 +74,5 @@ fun String.toDecimalFromHex():  String {
     .forEachIndexed { index, it ->
       value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toLong()
     }
-  return value.formatCurrency()
+  return value.formatHex()
 }

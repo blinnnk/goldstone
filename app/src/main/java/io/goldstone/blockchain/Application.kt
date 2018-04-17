@@ -13,6 +13,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.doAsync
+import java.util.*
 
 @Suppress("DEPRECATION")
 /**
@@ -41,11 +42,12 @@ class GoldStoneApp : Application() {
     // set and displaying the interface from the database.
     initLaunchLanguage()
 
+    getCurrencyRate()
   }
 
   companion object {
     var currentLanguage: Int? = null
-    fun Application.initLaunchLanguage() {
+    private fun Application.initLaunchLanguage() {
       WalletTable.getCurrentWalletInfo {
         it.isNull().isTrue {
           currentLanguage = HoneyLanguage.getLanguageCode(configuration.locale.displayLanguage)
@@ -56,9 +58,18 @@ class GoldStoneApp : Application() {
       }
     }
 
-    var currentRate: Double? = null
+    var currentRate: Double = 1.0
+    var currencyCode: String = "USD"
+    private fun Application.getCurrencyRate() {
+      currencyCode = Currency.getInstance(configuration.locale).currencyCode
+      val currencyCode = Currency.getInstance(configuration.locale).currencyCode
+      GoldStoneAPI.getCurrencyRate(currencyCode) {
+        currentRate = it
+      }
+    }
 
-    fun updateLocalDefaultTokens(context: Context) {
+
+    private fun updateLocalDefaultTokens(context: Context) {
 
       // 准备默认的 `Token List`
       GoldStoneAPI.getDefaultTokens { serverTokens ->

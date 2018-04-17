@@ -254,16 +254,6 @@ object AlertText {
   }
 }
 
-object SymbolText {
-
-  @JvmField
-  val usd = when (currentLanguage) {
-    HoneyLanguage.English.code -> " (USD)"
-    else -> " (USD)"
-  }
-
-}
-
 object CurrentWalletText {
 
   @JvmField

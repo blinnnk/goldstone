@@ -16,6 +16,7 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -40,7 +41,6 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
   private val valueInput by lazy { EditText(context) }
   private val priceInfo by lazy { TextView(context) }
   private val addressRemind by lazy { TransactionDetailCell(context) }
-
   private val gradientViewHeight = 170.uiPX()
 
   init {
@@ -62,7 +62,6 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
           layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
             topMargin = 15.uiPX()
           }
-          text = "Send ETH Count"
           textColor = Spectrum.opacity5White
           textSize = 5.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
@@ -90,7 +89,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
           layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
             topMargin = -(18.uiPX())
           }
-          text = "≈ 0.0 (USD)"
+          text = "≈ 0.0 (${ GoldStoneApp.currencyCode })"
           textColor = Spectrum.opacity5White
           textSize = 4.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
@@ -130,7 +129,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
   }
 
   fun updateCurrencyValue(value: Double?) {
-    priceInfo.text = "≈ ${ value.orElse(0.0).formatCurrency() } (USD)"
+    priceInfo.text = "≈ ${ value.orElse(0.0).formatCurrency() } (${ GoldStoneApp.currencyCode })"
   }
 
   fun inputTextListener(hold: (String) -> Unit) {
@@ -141,6 +140,10 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     })
+  }
+
+  fun setHeaderSymbol(symbol: String) {
+    description.text = "Send $symbol Count"
   }
 
 }

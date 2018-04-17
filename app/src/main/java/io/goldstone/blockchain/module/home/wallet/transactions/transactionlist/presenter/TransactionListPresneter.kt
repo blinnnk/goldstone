@@ -14,7 +14,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable.Companion.getTransactionListModelsByAddress
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -45,12 +44,13 @@ class TransactionListPresenter(
         // 更新显示数据后, 异步继续更新新的数据.并动态刷新到界面
         getMainActivity()?.updateTransactionInAsync(localTransactions!!)
       } otherwise {
-        getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
+        TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
           localData.isNotEmpty().isTrue {
             asyncData = localData
             localTransactions = localData
           } otherwise {
-            getMainActivity()?.getTransactionDataFromEtherScan {
+            // 如果本地一条数据都没有就从 `StartBlock 0` 的位置从 `EtherScan` 上查询
+            getMainActivity()?.getTransactionDataFromEtherScan("0") {
               asyncData = it
               localTransactions = it
             }
@@ -75,7 +75,7 @@ class TransactionListPresenter(
     // 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
     val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
     // 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-    getTransactionDataFromEtherScan (lastBlockNumber) { newData ->
+    getTransactionDataFromEtherScan(lastBlockNumber)  { newData ->
       // 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
       newData.forEachOrEnd { item, isEnd ->
         localData.find {
@@ -104,7 +104,7 @@ class TransactionListPresenter(
 
     // 默认拉取全部的 `EtherScan` 的交易数据
     private fun MainActivity.getTransactionDataFromEtherScan(
-      startBlock: String = "0", hold: (ArrayList<TransactionListModel>) -> Unit
+      startBlock: String, hold: (ArrayList<TransactionListModel>) -> Unit
     ) {
       // Show loading view
       showLoadingView()
@@ -125,7 +125,7 @@ class TransactionListPresenter(
 
     fun updateTransactions(
       activity: MainActivity?,
-      startBlock: String = "0",
+      startBlock: String,
       hold: (ArrayList<TransactionListModel>) -> Unit
     ) {
       activity?.getTransactionDataFromEtherScan(startBlock, hold)

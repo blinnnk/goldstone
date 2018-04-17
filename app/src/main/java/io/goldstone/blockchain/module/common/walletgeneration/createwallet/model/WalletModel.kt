@@ -25,14 +25,14 @@ import org.jetbrains.anko.runOnUiThread
 data class WalletTable(
   //@PrimaryKey autoGenerate 自增
   @PrimaryKey(autoGenerate = true)
-  var id: Int, var name: String,
+  var id: Int,
+  var name: String,
   var address: String,
   var isUsing: Boolean,
   var isWatchOnly: Boolean = false,
   var passwordHint: String? = null,
   var language: Int = HoneyLanguage.English.code,
   var balance: Double? = 0.0
-//  var currencyType:String = "USD"
 ) {
   companion object {
 
