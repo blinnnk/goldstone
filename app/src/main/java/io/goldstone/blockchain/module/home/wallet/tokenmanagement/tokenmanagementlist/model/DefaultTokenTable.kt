@@ -5,6 +5,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 
 /**
  * @date 25/03/2018 5:11 PM
@@ -43,6 +44,20 @@ data class DefaultTokenTable(
     0.0,
     "",
     true,
+    false
+  )
+
+  constructor(data: TokenSearchModel) : this(
+    0,
+    data.contract,
+    data.iconUrl,
+    data.symbol,
+    0,
+    data.price.toDouble(),
+    data.name,
+    data.decimal.toDouble(),
+    "",
+    false,
     false
   )
 
@@ -89,6 +104,14 @@ data class DefaultTokenTable(
         GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
       }) {
         hold(it.contract)
+      }
+    }
+
+    fun insertTokenInfo(token: DefaultTokenTable, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.defaultTokenDao().insert(token)
+      }) {
+        callback()
       }
     }
   }

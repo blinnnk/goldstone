@@ -2,6 +2,7 @@ package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import io.goldstone.blockchain.kernel.network.APIPath
 import okhttp3.*
 import org.json.JSONObject
@@ -52,7 +53,10 @@ object GoldStoneEthCall {
   }
 
   @JvmStatic
-  fun getTokenInfoByContractAddress(contractAddress: String, hold: (symbol: String, name: String, decimal: Double) -> Unit) {
+  fun getTokenInfoByContractAddress(
+    contractAddress: String,
+    hold: (symbol: String, name: String, decimal: Double) -> Unit
+  ) {
     getTokenSymbol(contractAddress) { symbol ->
       getTokenName(contractAddress) { name ->
         getTokenDecimal(contractAddress) { decimal ->
@@ -170,7 +174,7 @@ object GoldStoneEthCall {
         try {
           hold(dataObject["result"].toString())
         } catch (error: Exception) {
-          println(error)
+          Log.e("ERROR", error.toString())
         }
       }
     })

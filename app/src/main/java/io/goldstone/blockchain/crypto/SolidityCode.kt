@@ -22,6 +22,7 @@ object JsonRPCMethod {
 
 object CryptoValue {
   const val bip39AddressLength = 42 // 包含 `0x`
+  const val contractAddressLength = 42 // 包含 `0x`
   const val taxHashLength = 66
 }
 

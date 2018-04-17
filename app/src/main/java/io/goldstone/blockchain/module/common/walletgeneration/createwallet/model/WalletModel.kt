@@ -31,7 +31,8 @@ data class WalletTable(
   var isWatchOnly: Boolean = false,
   var passwordHint: String? = null,
   var language: Int = HoneyLanguage.English.code,
-  var balance: Double? = null
+  var balance: Double? = 0.0
+//  var currencyType:String = "USD"
 ) {
   companion object {
 
@@ -68,9 +69,7 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
           balance = current.balance
         }
-      }) {
-        hold(it)
-      }
+      }) { hold(it) }
     }
 
     fun updateName(newName: String, callback: () -> Unit) {

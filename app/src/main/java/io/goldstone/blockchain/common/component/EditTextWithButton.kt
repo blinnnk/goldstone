@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.view.Gravity
+import android.view.KeyEvent
+import android.view.View.OnKeyListener
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -27,7 +28,7 @@ import org.jetbrains.anko.*
 class EditTextWithButton(context: Context) : RelativeLayout(context) {
 
   private val button by lazy { TextView(context) }
-  private val editText = EditText(context)
+  val editText = EditText(context)
 
   init {
     id = ElementID.searchInput
@@ -40,6 +41,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
         layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 30.uiPX()).apply {
           leftMargin = PaddingSize.device
         }
+        singleLine = true
         leftPadding = 20.uiPX()
         setCursorColor(Spectrum.blue)
         backgroundTintMode = PorterDuff.Mode.CLEAR
@@ -68,7 +70,23 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
       setAlignParentRight()
       setCenterInVertical()
     }
+  }
 
+  fun onPressKeyboardEnterButton(action: () -> Unit) {
+    editText.setOnKeyListener(OnKeyListener { _, keyCode, event ->
+
+      if (event.action == KeyEvent.ACTION_DOWN) {
+        when (keyCode) {
+          KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
+            action()
+            return@OnKeyListener true
+          }
+
+          else -> { }
+        }
+      }
+      false
+    })
   }
 
 }
