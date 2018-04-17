@@ -26,7 +26,6 @@ class TokenDetailOverlayPresenter(
   fun showTokenDetailFragment(symbol: String?) {
     fragment.apply {
       addFragmentAndSetArgument<TokenDetailFragment>(ContainerID.content) {
-        // Send Arguments
         putString(ArgumentKey.tokenDetail, symbol)
       }
     }
