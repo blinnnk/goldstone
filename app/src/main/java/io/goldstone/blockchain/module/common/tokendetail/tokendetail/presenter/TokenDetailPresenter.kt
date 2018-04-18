@@ -157,32 +157,21 @@ class TokenDetailPresenter(
     symbol: String, callback: (ArrayList<TokenBalanceTable>) -> Unit
   ) {
     // 首先更新此刻最新的余额数据到今天的数据
-    TokenBalanceTable.updateTodayBalanceBySymbol(
+    TokenBalanceTable.getTodayBalance(
       WalletTable.current.address, symbol
     ) { todayBalance ->
-      TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) { balances ->
-        // 如果除今天以外的最近一条数据更新的时间是昨天的整体时间, 那么只更新今天的价格
-        balances.apply {
-          if (size > 2) {
-            if (this[lastIndex - 1].date == 1.daysAgoInMills()) {
-              callback(this)
-              return@getBalanceBySymbol
-            }
+      // 计算过去7天的所有余额
+      generateHistoryBalance(todayBalance) { history ->
+        coroutinesTask({
+          history.forEach {
+            TokenBalanceTable.insertOrUpdate(
+              symbol, WalletTable.current.address, it.date, it.balance
+            )
           }
-        }
-        // 计算过去7天的所有余额
-        generateHistoryBalance(todayBalance) { history ->
-          coroutinesTask({
-            history.forEach {
-              TokenBalanceTable.insertOrUpdate(
-                symbol, WalletTable.current.address, it.date, it.balance
-              )
-            }
-          }) {
-            // 更新数据完毕后在主线程从新从数据库获取数据
-            TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) {
-              callback(it)
-            }
+        }) {
+          // 更新数据完毕后在主线程从新从数据库获取数据
+          TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) {
+            callback(it)
           }
         }
       }
@@ -201,10 +190,10 @@ class TokenDetailPresenter(
       override var asyncCount: Int = maxCount
       override fun concurrentJobs() {
         (0 until maxCount).forEach { index ->
-          val minMillsLimit =
+          val currentMills =
             if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
           (balance - filter {
-            it.timeStamp.toMills() in index.daysAgoInMills() .. minMillsLimit
+            it.timeStamp.toMills() in index.daysAgoInMills() .. currentMills
           }.sumByDouble {
             it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
           }).let {

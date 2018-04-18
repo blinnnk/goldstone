@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.view
 
+import android.os.Bundle
+import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -22,8 +24,8 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
     recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray())
   }
 
-  override fun onResume() {
-    super.onResume()
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     showAddButton()
   }
 
