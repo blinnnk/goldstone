@@ -8,5 +8,5 @@ package io.goldstone.blockchain.module.home.profile.profile.model
 data class ProfileModel(
   val icon: Int = 0,
   val title: String = "",
-  val info: String = ""
+  var info: String = ""
 )

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.currency.presenter
 
 import com.blinnnk.extension.rebootApp
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -27,7 +28,7 @@ class CurrencyPresenter(
   ) : BaseRecyclerPresenter<CurrencyFragment, CurrencyModel>() {
 
   private val isCurrent: (String) -> Boolean = {
-    CountryCode.currentCountry == it
+    GoldStoneApp.currencyCode == it
   }
 
   private val getCurrencyByCountry: (String) -> String = {
@@ -76,7 +77,7 @@ class CurrencyPresenter(
       fragment.apply {
         context?.runOnUiThread {
           diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(it.map {
-            CurrencyModel(getCurrencyByCountry(it), isCurrent(it))
+            CurrencyModel(getCurrencyByCountry(it), isCurrent(getCurrencyByCountry(it)))
           }.toArrayList())
         }
       }

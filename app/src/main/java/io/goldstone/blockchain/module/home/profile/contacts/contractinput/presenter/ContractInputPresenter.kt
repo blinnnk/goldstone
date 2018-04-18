@@ -5,6 +5,7 @@ import android.text.TextWatcher
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orElse
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.alert
@@ -22,49 +23,67 @@ class ContractInputPresenter(
   override val fragment: ContractInputFragment
 ) : BasePresenter<ContractInputFragment>() {
   //
+  private var nameText = ""
+  private var addressText = ""
 
-  fun addContact(nameInput: EditText, addressInput: EditText, confirmButton: RoundButton) {
+  fun addContact() {
 
-    if (nameInput.text.isEmpty()) {
+    if (nameText.isEmpty()) {
       fragment.context?.alert("You must enter a contact name")
     }
 
-    if (addressInput.text.isEmpty()) {
+    if (addressText.isEmpty()) {
       fragment.context?.alert("You must enter a wallet address")
     }
 
-    var nameText = ""
+    if(WalletUtils.isValidAddress(addressText)) {
+      ContactTable.insertContact(
+        ContactTable(
+          0,
+          "",
+          nameText,
+          addressText)
+      ) {
+        fragment.getParentFragment<ProfileOverlayFragment> {
+          presenter.popFragmentFrom<ContractInputFragment>()
+        }
+      }
+    } else {
+      fragment.context?.alert("Wrong Address Format")
+    }
+  }
+
+  fun setConfirmButtonStyle(
+    nameInput: EditText,
+    addressInput: EditText,
+    confirmButton: RoundButton
+  ) {
     nameInput.addTextChangedListener(object: TextWatcher{
       override fun afterTextChanged(text: Editable?) {
         nameText = text.orElse("").toString()
+        setStyle(confirmButton)
       }
       override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
-      override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+      override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+
+      }
     })
 
-    var addressText = ""
     addressInput.addTextChangedListener(object: TextWatcher{
       override fun afterTextChanged(text: Editable?) {
         addressText = text.orElse("").toString()
+        setStyle(confirmButton)
       }
       override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
       override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
     })
+  }
 
-    if (nameText.count() * addressText.count() != 0 && WalletUtils.isValidAddress(addressText)) {
-      confirmButton.setBlueStyle()
-    }
-
-    ContactTable.insertContact(
-      ContactTable(
-      0,
-      "",
-      nameInput.text.toString(),
-      addressInput.text.toString())
-    ) {
-      fragment.getParentFragment<ProfileOverlayFragment> {
-        presenter.popFragmentFrom<ContractInputFragment>()
-      }
+  private fun setStyle(confirmButton: RoundButton) {
+    if (nameText.count() * addressText.count() != 0) {
+      confirmButton.setBlueStyle(20.uiPX())
+    } else {
+      confirmButton.setGrayStyle(20.uiPX())
     }
   }
 }

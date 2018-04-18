@@ -4,7 +4,6 @@ package io.goldstone.blockchain.crypto
 
 import android.content.Context
 import com.blinnnk.extension.isTrue
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Account
 import org.ethereum.geth.Geth
@@ -144,8 +143,8 @@ fun Context.deleteAccount(walletAddress: String, password: String, callback: (co
       it.equals(walletAddress, true).isTrue {
         try {
           keyStore.deleteAccount(keyStore.accounts.get(index), password)
+          callback(true)
         } catch (error: Exception) {
-          alert("Wrong Password")
           callback(false)
           println(error)
         }

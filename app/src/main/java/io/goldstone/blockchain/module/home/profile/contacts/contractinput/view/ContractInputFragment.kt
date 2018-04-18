@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contractinput.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
@@ -32,32 +34,30 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
       lparams(matchParent, matchParent)
-      nameInput
-        .apply {
-          text = "Contact Name"
-          setTextInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-        }
-        .into(this)
+      nameInput.apply {
+        text = "Contact Name"
+        setTextInput()
+        setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+      }.into(this)
 
-      addressInput
-        .apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-          hint = "Enter Address That You Want To Store"
-        }
-        .into(this)
+      addressInput.apply {
+        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+        hint = "Enter Address That You Want To Store"
+      }.into(this)
 
-      confirmButton
-        .apply {
-          text = CommonText.confirm
-          setGrayStyle()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-        }
-        .click {
-          presenter.addContact(nameInput, addressInput, confirmButton)
-        }
-        .into(this)
+      confirmButton.apply {
+        text = CommonText.confirm
+        marginTop = 20.uiPX()
+        setGrayStyle()
+      }.click {
+          presenter.addContact()
+        }.into(this)
     }
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
   }
 
 }

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orZero
@@ -42,6 +43,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 
       // 完成定制布局
       presenter.setCustomIntervalSize(item, position)
+
     }
   }
 
@@ -51,7 +53,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
     wrapper.addView(slideHeader)
 
     asyncData = arrayListOf(
-      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
+      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "0"),
       ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
       ProfileModel(R.drawable.language_icon, ProfileText.language, presenter.getCurrentLanguageSymbol()),
       ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),

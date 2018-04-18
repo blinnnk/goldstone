@@ -28,9 +28,7 @@ class RoundButton(context: Context) : View(context) {
     invalidate()
   }
 
-  var marginTop by observing(0) {
-    setWhiteStyle()
-  }
+  var marginTop = 0
 
   private val textPaint = Paint()
   private var textSize: Float by observing(0f) {
@@ -74,12 +72,12 @@ class RoundButton(context: Context) : View(context) {
     invalidate()
   }
 
-  fun setGrayStyle() {
+  fun setGrayStyle(top: Int? = null) {
 
     textSize = 14.uiPX().toFloat()
 
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
-      topMargin = marginTop
+      topMargin = top ?: marginTop
       leftMargin = PaddingSize.device
     }
 
@@ -88,12 +86,12 @@ class RoundButton(context: Context) : View(context) {
     invalidate()
   }
 
-  fun setBlueStyle() {
+  fun setBlueStyle(top: Int? = null) {
 
     textSize = 14.uiPX().toFloat()
 
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
-      topMargin = marginTop
+      topMargin = top ?: marginTop
       leftMargin = PaddingSize.device
     }
 
