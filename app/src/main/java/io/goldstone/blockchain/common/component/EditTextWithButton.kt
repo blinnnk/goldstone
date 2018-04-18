@@ -35,10 +35,10 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
     editText
       .apply {
         hint = "search contracts address or token name"
-        textSize = 4.uiPX() - 1.5f
+        textSize = 4.uiPX().toFloat()
         textColor = GrayScale.black
         hintTextColor = GrayScale.midGray
-        layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 30.uiPX()).apply {
+        layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 32.uiPX()).apply {
           leftMargin = PaddingSize.device
         }
         singleLine = true

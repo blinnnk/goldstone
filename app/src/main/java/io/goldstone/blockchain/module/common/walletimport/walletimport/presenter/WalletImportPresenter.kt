@@ -11,5 +11,15 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 class WalletImportPresenter(
   override val fragment: WalletImportFragment
   ) : BaseOverlayPresenter<WalletImportFragment>() {
-  //
+
+  fun onClickMenuBarItem() {
+    fragment.apply {
+      menuBar.clickEvent = Runnable {
+        menuBar.onClickItem {
+          viewPager.setSelectedStyle(id, menuBar)
+          viewPager.setCurrentItem(id, true)
+        }
+      }
+    }
+  }
 }

@@ -230,7 +230,7 @@ class PaymentValueDetailPresenter(
       timeStamp =
         (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
       fromAddress = WalletTable.current.address
-      value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal).formatCurrency()
+      value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal).formatCount()
       hash = taxHash
       gasPrice = raw.gasPrice.toString()
       gasUsed = raw.gasLimit.toString()

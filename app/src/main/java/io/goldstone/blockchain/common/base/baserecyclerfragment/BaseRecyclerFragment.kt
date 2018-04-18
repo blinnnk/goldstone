@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
+import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
@@ -176,9 +177,17 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
   override fun onHiddenChanged(hidden: Boolean) {
     super.onHiddenChanged(hidden)
+    // 如果键盘在显示那么销毁键盘
+    activity?.apply { SoftKeyboard.hide(this) }
     if (!hidden) {
       presenter.onFragmentShowFromHidden()
     }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    // 如果键盘在显示那么销毁键盘
+    activity?.apply { SoftKeyboard.hide(this) }
   }
 
   override fun onResume() {
