@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
-import com.blinnnk.extension.toArrayList
+import android.util.Log
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
@@ -19,6 +17,7 @@ import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -27,6 +26,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -37,20 +38,10 @@ class TokenDetailPresenter(
   override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
+  private var tokenDetailData: ArrayList<TransactionListModel>? = null
+
   override fun updateData() {
-    prepareTokenDetailData {
-      isNotEmpty().isTrue {
-        fragment.asyncData = this
-        prepareTokenHistoryBalance(fragment.symbol!!) {
-          it.updateChartAndHeaderData()
-        }
-      } otherwise {
-        fragment.asyncData = arrayListOf()
-        prepareTokenHistoryBalance(fragment.symbol!!) {
-          it.updateChartAndHeaderData()
-        }
-      }
-    }
+    prepareTokenDetailData()
   }
 
   fun showAddressSelectionFragment() {
@@ -80,27 +71,61 @@ class TokenDetailPresenter(
     }
   }
 
-  private fun prepareTokenDetailData(hold: ArrayList<TransactionListModel>.() -> Unit) {
+  private fun prepareTokenDetailData() {
+    // 优先检查内存里面是否有数据, 如果有直加载内存中的数据
+    tokenDetailData.isNull().isFalse {
+      fragment.updateDataByAsyncDataStatus(tokenDetailData!!)
+      // 在异步检查更新最新的数据
+      loadDataFromChain()
+    } otherwise {
+      loadDataFromDatabaseOrElse { loadDataFromChain() }
+    }
+  }
+
+  private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
+    // 内存里面没有数据首先从本地数据库查询数据
     TransactionTable.getTransactionsByAddressAndSymbol(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
       transactions.isNotEmpty().isTrue {
-        hold(transactions.map { TransactionListModel(it) }.toArrayList())
+        fragment.updateDataByAsyncDataStatus(transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
-        TransactionTable.getMyLatestStartBlock { blockNumber ->
-          // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-          TransactionListPresenter.updateTransactions(fragment.getMainActivity(), blockNumber) {
+        withoutLocalDataCallback()
+        Log.d("DEBUG", "Without Local Transaction Data")
+      }
+    }
+  }
+
+  private fun loadDataFromChain() {
+    doAsync {
+      TransactionTable.getMyLatestStartBlock { blockNumber ->
+        // 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+        TransactionListPresenter.updateTransactions(fragment.getMainActivity(), blockNumber) {
+          fragment.context?.runOnUiThread {
             // 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
             it.find { it.symbol == fragment.symbol }.isNotNull {
               // 有数据后重新执行从数据库拉取数据
-              prepareTokenDetailData(hold)
+              loadDataFromDatabaseOrElse()
             } otherwise {
               // 链上和本地都没有数据就更新一个空数组作为默认
-              hold(arrayListOf())
+              fragment.updateDataByAsyncDataStatus(arrayListOf())
             }
           }
         }
       }
+    }
+  }
+
+  private fun TokenDetailFragment.updateDataByAsyncDataStatus(data: ArrayList<TransactionListModel>) {
+    asyncData.isNull().isTrue {
+      asyncData = data
+    } otherwise {
+      diffAndUpdateAdapterData<TokenDetailAdapter>(data)
+    }
+    tokenDetailData = data
+    // 显示内存的数据后异步更新数据
+    data.prepareTokenHistoryBalance(fragment.symbol!!) {
+      it.updateChartAndHeaderData()
     }
   }
 
@@ -175,8 +200,9 @@ class TokenDetailPresenter(
     object : ConcurrentAsyncCombine() {
       override var asyncCount: Int = maxCount
       override fun concurrentJobs() {
-        (0 until  maxCount).forEach { index ->
-          val minMillsLimit = if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
+        (0 until maxCount).forEach { index ->
+          val minMillsLimit =
+            if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
           (balance - filter {
             it.timeStamp.toMills() in index.daysAgoInMills() .. minMillsLimit
           }.sumByDouble {
@@ -188,6 +214,7 @@ class TokenDetailPresenter(
           }
         }
       }
+
       override fun mergeCallBack() = callback(balances)
     }.start()
   }
