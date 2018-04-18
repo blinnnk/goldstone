@@ -41,7 +41,7 @@ class TokenDetailOverlayPresenter(
           valueHeader
             ?.apply {
               title.text = "MY ${token?.symbol}"
-              subtitle.text = "${token?.count} ${token?.symbol} ≈ (${token?.currency} + ${GoldStoneApp.currencyCode})"
+              subtitle.text = "${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.currencyCode})"
               setBlackTitles()
               isCenter = true
             }

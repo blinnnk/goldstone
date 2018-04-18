@@ -144,7 +144,6 @@ fun Context.deleteAccount(walletAddress: String, password: String, callback: (co
       it.equals(walletAddress, true).isTrue {
         try {
           keyStore.deleteAccount(keyStore.accounts.get(index), password)
-          callback(true)
         } catch (error: Exception) {
           alert("Wrong Password")
           callback(false)

@@ -7,23 +7,30 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.view.View
 import android.widget.LinearLayout
+import com.blinnnk.extension.into
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import com.blinnnk.extension.into
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.backgroundColor
-import com.blinnnk.uikit.ScreenSize
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 23/03/2018 1:00 AM
  * @author KaySaith
  */
 
-class MenuBar(context: Context) : LinearLayout(context) {
+open class MenuBar(context: Context) : LinearLayout(context) {
 
+  var clickEvent: Runnable? = null
   private val titles = arrayListOf("mnemonic", "keystore", "private key", "watch only")
   private var totalItemWidth = 0
+  private var clickItemID: Int? = null
 
   init {
     backgroundColor = Spectrum.white
@@ -36,11 +43,21 @@ class MenuBar(context: Context) : LinearLayout(context) {
             setMargins(PaddingSize.device, 20.uiPX(), 10.uiPX(), 0)
             totalItemWidth += getTextWidth(string) + 30.uiPX() // 计算总的 `Menu` 宽度
           }
+          onClick {
+            clickItemID = id
+            clickEvent?.run()
+          }
         }
         .into(this)
     }
-
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width + 50.uiPX(), 70.uiPX())
+  }
+
+  fun onClickItem(hold: Item.() -> Unit) {
+    clickItemID?.apply {
+      selectItem(this)
+      hold(findViewById(this))
+    }
   }
 
   fun selectItem(index: Int) {
@@ -77,7 +94,7 @@ class MenuBar(context: Context) : LinearLayout(context) {
 
 }
 
-private class Item(context: Context) : View(context) {
+class Item(context: Context) : View(context) {
 
   var text by observing("") {
     invalidate()

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.addressselection.view
 
 import com.blinnnk.extension.*
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -31,7 +30,6 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
     super.onDestroyView()
     getParentFragment<TokenDetailOverlayFragment> {
       showConfirmButton(false)
-      activity?.apply { SoftKeyboard.hide(this) }
     }
   }
 
@@ -44,7 +42,6 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
       } otherwise {
         showConfirmButton()
         setConfirmStatus(true)
-        activity?.apply { SoftKeyboard.hide(this) }
       }
     }
   }

@@ -5,11 +5,11 @@ import android.text.InputType
 import android.widget.EditText
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
-import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -102,16 +102,17 @@ class WalletSettingsListPresenter(
     // delete `keystore` file
     context?.deleteAccount(address, password) {
       it.isFalse {
+        fragment.context?.alert("Wrong Password")
         getMainActivity()?.removeLoadingView()
-      } otherwise {
-        // delete all records of this `address` in `myTokenTable`
-        MyTokenTable.deleteByAddress(address) {
-          TransactionTable.deleteByAddress(address) {
-            TokenBalanceTable.deleteByAddress(address) {
-              // delete wallet record in `walletTable`
-              WalletTable.deleteCurrentWallet {
-                activity?.jump<SplashActivity>()
-              }
+        return@deleteAccount
+      }
+      // delete all records of this `address` in `myTokenTable`
+      MyTokenTable.deleteByAddress(address) {
+        TransactionTable.deleteByAddress(address) {
+          TokenBalanceTable.deleteByAddress(address) {
+            // delete wallet record in `walletTable`
+            WalletTable.deleteCurrentWallet {
+              activity?.jump<SplashActivity>()
             }
           }
         }

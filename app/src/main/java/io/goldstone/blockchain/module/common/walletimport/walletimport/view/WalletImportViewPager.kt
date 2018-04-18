@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
+import io.goldstone.blockchain.common.component.MenuBar
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
@@ -43,19 +44,24 @@ class WalletImportViewPager(val fragment: Fragment) : ViewPager(fragment.context
     onPageChangeListener {
       onPageSelected {
         (fragment as WalletImportFragment).menuBar.apply {
-          selectItem(currentItem)
-          if (currentItem == 3 && !hasMovedToLeft) {
-            hasMovedToLeft = true
-            floatRight()
-          }
-          if (currentItem == 0 && hasMovedToLeft) {
-            hasMovedToLeft = false
-            floatLeft()
-          }
+          setSelectedStyle(currentItem, this)
         }
       }
     }
+  }
 
+  fun setSelectedStyle(index: Int, menuBar: MenuBar) {
+    menuBar.apply {
+      selectItem(index)
+      if (index == 3 && !hasMovedToLeft) {
+        hasMovedToLeft = true
+        floatRight()
+      }
+      if (index == 0 && hasMovedToLeft) {
+        hasMovedToLeft = false
+        floatLeft()
+      }
+    }
   }
 
   override fun onPageScrolled(position: Int, offset: Float, offsetPixels: Int) {

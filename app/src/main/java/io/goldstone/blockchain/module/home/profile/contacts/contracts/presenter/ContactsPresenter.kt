@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter
 
-import com.blinnnk.extension.isNullOrEmpty
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -32,7 +32,7 @@ class ContactPresenter(
       it.isEmpty().isTrue {
         fragment.asyncData = arrayListOf()
       } otherwise {
-        if (fragment.asyncData.isNullOrEmpty()) {
+        if (fragment.asyncData.isNull()) {
           fragment.asyncData = it
         } else {
           diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)

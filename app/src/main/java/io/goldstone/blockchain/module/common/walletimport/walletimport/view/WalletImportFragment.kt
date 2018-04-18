@@ -17,7 +17,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 
   val menuBar by lazy { MenuBar(context!!) }
-  private val viewPager by lazy { WalletImportViewPager(this) }
+  val viewPager by lazy { WalletImportViewPager(this) }
 
   override val presenter = WalletImportPresenter(this)
 
@@ -27,7 +27,7 @@ class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 
     addView(viewPager)
     menuBar.into(this)
-
+    presenter.onClickMenuBarItem()
     headerTitle = ImportWalletText.importWallet
   }
 
