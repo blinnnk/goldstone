@@ -62,8 +62,8 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
         }
       }
 
-      // 如果长时间没加载到 最长 `5s` 超时删除 `loading`
-      5000L timeUpThen {
+      // 如果长时间没加载到 最长 `8s` 超时删除 `loading`
+      8000L timeUpThen {
         context?.apply { removeView(loading)  }
       }
 

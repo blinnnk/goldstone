@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.value.TokenDetailSize
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
+import java.util.*
 
 /**
  * @date 27/03/2018 3:20 PM
@@ -32,6 +33,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
   private var maxY = 100f
   private var unitY = 10f
   private var chartData: ArrayList<Point>? by observing(null) {
+
     chartView
       .apply {
         layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), matchParent).apply {
@@ -71,7 +73,6 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
         }
 
         addData(dataSet)
-        show(0)
 
         setClickablePointRadius(30.uiPX().toFloat())
         setOnEntryClickListener { _, entryIndex, _ ->

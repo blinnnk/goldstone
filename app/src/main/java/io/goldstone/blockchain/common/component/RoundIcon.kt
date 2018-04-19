@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.Spectrum
@@ -18,7 +20,7 @@ import org.jetbrains.anko.imageResource
 class RoundIcon(context: Context) : ImageView(context) {
 
   var iconColor: Int by observing(Color.BLACK) {
-    addCorner(25.uiPX(), iconColor)
+    addTouchRippleAnimation(iconColor, Spectrum.blue, RippleMode.Square,iconSize / 2f)
   }
 
   var src: Int by observing(0) {

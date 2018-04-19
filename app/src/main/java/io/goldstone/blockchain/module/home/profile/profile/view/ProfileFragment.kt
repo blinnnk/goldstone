@@ -1,20 +1,12 @@
 package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -49,23 +41,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
     wrapper.addView(slideHeader)
-
-    asyncData = arrayListOf(
-      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "0"),
-      ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
-      ProfileModel(R.drawable.language_icon, ProfileText.language, presenter.getCurrentLanguageSymbol()),
-      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
-      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
-      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
-      ProfileModel(R.drawable.contacts_icon, ProfileText.aboutUs, "8"),
-      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
-      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
-      ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
-      ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
-      ProfileModel(R.drawable.language_icon, ProfileText.language, "EN")
-    )
   }
 
   private var isShow = false

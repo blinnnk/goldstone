@@ -2,15 +2,18 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.support.v4.app.Fragment
 import android.widget.EditText
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import org.web3j.crypto.WalletUtils
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -52,8 +55,12 @@ class PrivateKeyImportPresenter(
       fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
         WalletTable.getWalletByAddress(address!!) {
           it.isNull().isTrue {
-            WalletTable.insertAddressAndGenerateTokenInfo(address, name) {
-              fragment.activity?.jump<SplashActivity>()
+            // 在数据库记录钱包信息
+            WalletTable.insertAddress(address, name) {
+              // 创建钱包并获取默认的 `token` 信息
+              CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity()) {
+                fragment.activity?.jump<SplashActivity>()
+              }
             }
           } otherwise {
             fragment.context?.alert("There is already this account in gold stone")

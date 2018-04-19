@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.view
 
 import android.graphics.Color
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
@@ -101,14 +103,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
             topMargin = 20.uiPX()
           }
         }
-        .click {
-          presenter.generateWalletWith(
-            nameEditText,
-            passwordEditText,
-            repeatPasswordEditText,
-            agreementView.radioButton.isChecked
-          )
-        }
+        .click { presenter.generateWalletWith(agreementView.radioButton.isChecked) }
         .into(this)
 
       importButton
@@ -125,6 +120,11 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
         }
         .into(this)
     }
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    presenter.updateConfirmButtonStyle(nameEditText, passwordEditText, repeatPasswordEditText, createButton)
   }
 
 }

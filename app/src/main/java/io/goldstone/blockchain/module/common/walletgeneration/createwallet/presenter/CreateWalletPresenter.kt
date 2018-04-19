@@ -2,14 +2,19 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isFalse
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -22,6 +27,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 
@@ -34,19 +40,21 @@ class CreateWalletPresenter(
   override val fragment: CreateWalletFragment
 ) : BasePresenter<CreateWalletFragment>() {
 
+  private var nameText = ""
+  private var passwordText = ""
+  private var repeatPasswordText = ""
+
   fun showAgreementFragment() {
     showTargetFragment<AgreementFragment, WalletGenerationFragment>(
       CreateWalletText.agreement, CreateWalletText.mnemonicBackUp
     )
   }
 
-  fun generateWalletWith(
-    nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, isAgree: Boolean
-  ) {
+  fun generateWalletWith(isAgree: Boolean) {
     checkInputValue(
-      nameInput.text.toString(),
-      passwordInput.text.toString(),
-      repeatPasswordInput.text.toString(),
+      nameText,
+      passwordText,
+      repeatPasswordText,
       isAgree,
       fragment.context
     ) { password, walletName ->
@@ -54,10 +62,45 @@ class CreateWalletPresenter(
     }
   }
 
+  fun updateConfirmButtonStyle(nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, confirmButton: RoundButton) {
+    nameInput.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(string: Editable?) {
+        string?.apply { nameText = this.toString() }
+        setConfirmButtonStyle(confirmButton)
+      }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    })
+    passwordInput.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(string: Editable?) {
+        string?.apply { passwordText = this.toString() }
+        setConfirmButtonStyle(confirmButton)
+      }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    })
+    repeatPasswordInput.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(string: Editable?) {
+        string?.apply { repeatPasswordText = this.toString() }
+        setConfirmButtonStyle(confirmButton)
+      }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    })
+  }
+
+  private fun setConfirmButtonStyle(confirmButton: RoundButton) {
+    if(nameText.count() * passwordText.count() * repeatPasswordText.count() != 0) {
+      confirmButton.setBlueStyle(20.uiPX())
+    } else {
+      confirmButton.setGrayStyle(20.uiPX())
+    }
+  }
+
   private fun Context.generateWalletWith(password: String, name: String) {
     generateWallet(password) { mnemonicCode, address ->
 
-      generateMyTokenInfo(address) { hasCreatedWallet?.run() }
+      generateMyTokenInfo(address, fragment.getMainActivity()) { hasCreatedWallet?.run() }
 
       // 将基础的不存在安全问题的信息插入数据库
       WalletTable.insert(WalletTable(0, name, address, true)) {
@@ -87,7 +130,8 @@ class CreateWalletPresenter(
     /**
      * 手下拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
      */
-    fun generateMyTokenInfo(ownerAddress: String, callback: () -> Unit = {}) {
+    fun generateMyTokenInfo(ownerAddress: String, activity: MainActivity?, callback: () -> Unit = {}) {
+      activity?.showLoadingView()
       DefaultTokenTable.getTokens {
         it.filter {
           // 初始的时候显示后台要求标记为 `force show` 的 `Token`
@@ -111,7 +155,10 @@ class CreateWalletPresenter(
                 }
               }
             }
-            override fun mergeCallBack() = callback()
+            override fun mergeCallBack() {
+              activity?.removeLoadingView()
+              callback()
+            }
           }.start()
         }
       }

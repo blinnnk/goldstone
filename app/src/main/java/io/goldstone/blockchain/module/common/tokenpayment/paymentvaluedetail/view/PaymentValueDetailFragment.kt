@@ -1,24 +1,24 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.View
-import android.widget.EditText
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.showEditTextAlertView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter.PaymentValueDetailPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 28/03/2018 12:23 PM
@@ -70,30 +70,12 @@ class PaymentValueDetailFragment :
     }
   }
 
-  private val passwordInput by lazy { EditText(context!!) }
-
   private fun showConfirmAttentionView() {
-    context?.apply {
-      alert(
-        CommonText.enterPassword.toUpperCase(), TransactionText.confirmTransaction
-      ) {
-        WalletTable.current.isWatchOnly.isFalse {
-          customView {
-            verticalLayout {
-              lparams { padding = 20.uiPX() }
-              passwordInput.apply {
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                hint = CommonText.enterPassword
-                hintTextColor = Spectrum.opacity1White
-              }.into(this)
-            }
-          }
-        }
-        yesButton {
-          presenter.transfer(passwordInput.text.toString())
-        }
-        noButton { }
-      }.show()
+    context?.showEditTextAlertView(
+      TransactionText.confirmTransaction,
+      CommonText.enterPassword.toUpperCase()
+    ) {
+      presenter.transfer(it?.text.toString())
     }
   }
 

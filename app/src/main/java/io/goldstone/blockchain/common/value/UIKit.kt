@@ -71,13 +71,21 @@ object ScreenSize {
 }
 
 object CommonCellSize {
-  val rightPadding = 30.uiPX()
-  val iconPadding = 40.uiPX()
+  @JvmField val rightPadding = 30.uiPX()
+  @JvmField val iconPadding = 40.uiPX()
+}
+
+object BasicSize {
+  @JvmField val overlayMinHeight = 250.uiPX()
 }
 
 object TransactionSize {
   @JvmField val headerView = 220.uiPX()
   @JvmField val cellHeight = 65.uiPX()
+}
+
+object HomeSize {
+  @JvmField val tabBarHeight = 75.uiPX()
 }
 
 

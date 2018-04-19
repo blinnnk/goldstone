@@ -9,7 +9,6 @@ import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
-import io.goldstone.blockchain.module.home.wallet.currentwalletdetail.view.CurrentWalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -18,6 +17,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**
@@ -59,7 +59,7 @@ class WalletDetailPresenter(
   }
 
   fun showWalletListFragment() {
-    fragment.activity?.addFragment<CurrentWalletDetailFragment>(ContainerID.main)
+    fragment.activity?.addFragment<WalletManagementFragment>(ContainerID.main)
   }
 
   fun showNotificationListFragment() {

@@ -8,6 +8,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 
 /**
@@ -115,13 +116,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     val actualHeight = dataCount * cellHeight
     val targetHeight = when {
       dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-      actualHeight > 250.uiPX() -> actualHeight
-      else -> 250.uiPX()
+      actualHeight > BasicSize.overlayMinHeight -> actualHeight
+      else -> BasicSize.overlayMinHeight
     }
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-      overlayView.contentLayout.updateHeightAnimation(
-        targetHeight, maxHeight
-      )
+      overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight)
     }
   }
 
@@ -137,7 +136,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
         fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
       val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
       overlayView.contentLayout.updateHeightAnimation(
-        if (recoveryHeight == 0) maxHeight else recoveryHeight, maxHeight
+        if (recoveryHeight == 0) maxHeight else if (recoveryHeight > BasicSize.overlayMinHeight) recoveryHeight else BasicSize.overlayMinHeight, maxHeight
       )
     }
   }
