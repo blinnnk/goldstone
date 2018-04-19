@@ -6,7 +6,6 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.toast
 
 /**
@@ -20,18 +19,13 @@ class MnemonicConfirmationPresenter(
 
   fun clickConfirmationButton(correct: String, current: String) {
     compareMnemonicCode(correct, current).isTrue {
-      if (fragment.activity is SplashActivity) goToMainActivity()
-      else goToSplashActivity()
+      goToSplashActivity()
     } otherwise {
       fragment.context?.toast("incorrect mnemonic please re-enter")
     }
   }
 
   private fun compareMnemonicCode(correct: String, current: String) = correct == current
-
-  private fun goToMainActivity() {
-    fragment.activity?.jump<MainActivity>()
-  }
 
   private fun goToSplashActivity() {
     fragment.activity?.jump<SplashActivity>()
