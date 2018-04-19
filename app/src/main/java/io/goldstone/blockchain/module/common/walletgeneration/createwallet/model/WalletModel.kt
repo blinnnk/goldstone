@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.tokenDetailData
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.localTransactions
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
@@ -42,6 +42,7 @@ data class WalletTable(
     var current: WalletTable by observing(WalletTable(0, "", "", false)) {
       // 每次切换账户需要清空放在内存里面的当前账户的信息.
       localTransactions = null
+      tokenDetailData = null
     }
     var walletCount: Int? = null
 
@@ -163,14 +164,13 @@ data class WalletTable(
       }
     }
 
-    fun insertAddressAndGenerateTokenInfo(address: String, name: String, callback: () -> Unit) {
+    fun insertAddress(address: String, name: String, callback: () -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
           it.isNull().isFalse {
             GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
           }
           WalletTable.insert(WalletTable(0, name, address, true))
-          CreateWalletPresenter.generateMyTokenInfo(address)
         }
       }) {
         callback()

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.walletlist.view
+package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,9 +14,8 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.crypto.formatCurrency
-import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")
 /**

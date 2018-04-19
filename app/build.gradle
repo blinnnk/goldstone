@@ -28,7 +28,6 @@ android {
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-  // noinspection GradleCompatible
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation 'com.android.support.constraint:constraint-layout:1.1.0'
   testImplementation 'junit:junit:4.12'
@@ -44,8 +43,7 @@ dependencies {
   }
   // 黑蜜动画及其他便捷工具依赖工程
   implementation 'com.blinnnk:honeyui:0.2.8.8'
-  // Glide Image Loader
-  implementation 'com.github.bumptech.glide:glide:4.6.1'
+
   // Crypto
   implementation 'org.ethereum:geth:1.8.2'
   implementation 'com.github.walleth.kethereum:bip39:0.40'

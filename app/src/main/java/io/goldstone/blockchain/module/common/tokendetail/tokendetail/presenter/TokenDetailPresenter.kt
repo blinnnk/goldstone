@@ -34,11 +34,11 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
+var tokenDetailData: ArrayList<TransactionListModel>? = null
+
 class TokenDetailPresenter(
   override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
-
-  private var tokenDetailData: ArrayList<TransactionListModel>? = null
 
   override fun updateData() {
     prepareTokenDetailData()
@@ -72,12 +72,13 @@ class TokenDetailPresenter(
   }
 
   private fun prepareTokenDetailData() {
-    // 优先检查内存里面是否有数据, 如果有直加载内存中的数据
-    tokenDetailData.isNull().isFalse {
+    // 优先检查内存里面是否有符合的数据, 如果有直加载内存中的数据, 不同的 `TokenDetail` 会存储不同 `Symbol` 的账单
+    // 这里要判断当前的内存的交易账单是否是对应的 `Symbol`
+    if(!tokenDetailData.isNull() && tokenDetailData!!.any { it.symbol == fragment.symbol }) {
       fragment.updateDataByAsyncDataStatus(tokenDetailData!!)
       // 在异步检查更新最新的数据
       loadDataFromChain()
-    } otherwise {
+    } else {
       loadDataFromDatabaseOrElse { loadDataFromChain() }
     }
   }
@@ -108,7 +109,9 @@ class TokenDetailPresenter(
               loadDataFromDatabaseOrElse()
             } otherwise {
               // 链上和本地都没有数据就更新一个空数组作为默认
-              fragment.updateDataByAsyncDataStatus(arrayListOf())
+              fragment.asyncData.isNull().isTrue {
+                fragment.updateDataByAsyncDataStatus(arrayListOf())
+              }
             }
           }
         }
@@ -117,12 +120,12 @@ class TokenDetailPresenter(
   }
 
   private fun TokenDetailFragment.updateDataByAsyncDataStatus(data: ArrayList<TransactionListModel>) {
+    tokenDetailData = data
     asyncData.isNull().isTrue {
       asyncData = data
     } otherwise {
       diffAndUpdateAdapterData<TokenDetailAdapter>(data)
     }
-    tokenDetailData = data
     // 显示内存的数据后异步更新数据
     data.prepareTokenHistoryBalance(fragment.symbol!!) {
       it.updateChartAndHeaderData()

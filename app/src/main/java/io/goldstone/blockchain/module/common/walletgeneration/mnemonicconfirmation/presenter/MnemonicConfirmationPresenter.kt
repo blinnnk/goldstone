@@ -21,6 +21,7 @@ class MnemonicConfirmationPresenter(
   fun clickConfirmationButton(correct: String, current: String) {
     compareMnemonicCode(correct, current).isTrue {
       if (fragment.activity is SplashActivity) goToMainActivity()
+      else goToSplashActivity()
     } otherwise {
       fragment.context?.toast("incorrect mnemonic please re-enter")
     }
@@ -32,8 +33,9 @@ class MnemonicConfirmationPresenter(
     fragment.activity?.jump<MainActivity>()
   }
 
-  private fun getWalletAddressInfo() {
-
+  private fun goToSplashActivity() {
+    fragment.activity?.jump<SplashActivity>()
   }
+
 
 }

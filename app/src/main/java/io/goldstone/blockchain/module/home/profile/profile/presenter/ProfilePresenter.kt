@@ -2,15 +2,13 @@ package io.goldstone.blockchain.module.home.profile.profile.presenter
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileCell
@@ -26,6 +24,22 @@ class ProfilePresenter(
   override val fragment: ProfileFragment
   ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
 
+  override fun updateData() {
+    ContactTable.getAllContacts { contactCount ->
+      fragment.asyncData = arrayListOf(
+        ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, contactCount.size.toString()),
+        ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
+        ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
+        ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, "8"),
+        ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+        ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
+        ProfileModel(R.drawable.contacts_icon, ProfileText.aboutUs, "8"),
+        ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+        ProfileModel(R.drawable.language_icon, ProfileText.language, "EN")
+      )
+    }
+  }
+
   fun showContactsFragment(title: String) {
     fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
       putString(ArgumentKey.profileTitle, title)
@@ -36,28 +50,18 @@ class ProfilePresenter(
     item.apply {
       when(position) {
         3 -> setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-        fragment.asyncData?.lastIndex -> setMargins<LinearLayout.LayoutParams> { bottomMargin = 80.uiPX() }
+        fragment.asyncData?.lastIndex -> setMargins<LinearLayout.LayoutParams> {
+          bottomMargin = HomeSize.tabBarHeight
+        }
         0 -> {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 120.uiPX() }
+          setMargins<LinearLayout.LayoutParams> { topMargin = 100.uiPX() }
           fragment.recyclerView.scrollToPosition(0)
         }
       }
     }
   }
 
-  fun getCurrentLanguageSymbol() =
+  private fun getCurrentLanguageSymbol() =
     HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero())
 
-  override fun onFragmentResume() {
-    fragment.asyncData.isNotNull {
-      fragment.updateContactsCount()
-    }
-  }
-
-  private fun ProfileFragment.updateContactsCount() {
-    ContactTable.getAllContacts { data ->
-      asyncData?.get(0)?.info = data.size.toString()
-      recyclerView.adapter.notifyItemChanged(0)
-    }
-  }
 }

@@ -8,6 +8,7 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import org.jetbrains.anko.imageResource
 
 @SuppressLint("SetTextI18n")
 /**
@@ -27,7 +29,11 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
   var model: WalletDetailCellModel? by observing(null) {
     model?.apply {
-      icon.image.glideImage(iconUrl)
+      if(iconUrl.isBlank()) {
+        icon.image.imageResource = R.drawable.default_token
+      } else {
+        icon.image.glideImage(iconUrl)
+      }
       tokenInfo.title.text = symbol
       tokenInfo.subtitle.text = name
       valueInfo.title.text = count.formatCount()

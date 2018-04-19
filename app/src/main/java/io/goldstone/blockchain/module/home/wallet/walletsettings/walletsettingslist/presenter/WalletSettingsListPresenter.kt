@@ -1,18 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter
 
 import android.support.v4.app.Fragment
-import android.text.InputType
-import android.widget.EditText
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.utils.showEditTextAlertView
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -24,7 +20,6 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
-import org.jetbrains.anko.*
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -58,31 +53,13 @@ class WalletSettingsListPresenter(
 
   /** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
   fun deleteWallet() {
-
-    var input: EditText? = null
-
-    fragment.context?.apply {
-      alert(
-        WalletSettingsText.deleteInfoSubtitle,
-        WalletSettingsText.deleteInfoTitle
-      ) {
-        WalletTable.current.isWatchOnly.isFalse {
-          customView {
-            verticalLayout {
-              lparams {
-                padding = 20.uiPX()
-              }
-              input = editText {
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                hint = CommonText.enterPassword
-                hintTextColor = Spectrum.opacity1White
-              }
-            }
-          }
-        }
-        yesButton { deleteWalletData(input?.text.toString()) }
-        noButton { }
-      }.show()
+    System.out.println("hello")
+    fragment.context?.showEditTextAlertView(
+      WalletSettingsText.deleteInfoTitle,
+      WalletSettingsText.deleteInfoSubtitle,
+      !WalletTable.current.isWatchOnly
+    ) {
+      deleteWalletData(it?.text.toString())
     }
   }
 

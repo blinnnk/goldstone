@@ -5,6 +5,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -52,7 +53,7 @@ class MnemonicImportDetailPresenter(
               GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
             }
             WalletTable.insert(WalletTable(0, name, address!!, true))
-            CreateWalletPresenter.generateMyTokenInfo(address)
+            CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity())
           }
         }) { fragment.activity?.jump<SplashActivity>() }
       } otherwise {

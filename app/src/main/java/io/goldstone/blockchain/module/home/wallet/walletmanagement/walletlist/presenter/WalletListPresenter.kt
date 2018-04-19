@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.walletlist.presenter
+package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter
 
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
@@ -8,8 +8,8 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
-import io.goldstone.blockchain.module.home.wallet.walletlist.view.WalletListFragment
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 

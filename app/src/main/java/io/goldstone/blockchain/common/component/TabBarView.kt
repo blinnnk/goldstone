@@ -15,10 +15,7 @@ import com.blinnnk.util.HoneySvgPathConvert
 import com.blinnnk.util.observing
 import com.github.mmin18.widget.RealtimeBlurView
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.SvgPath
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.matchParent
 
 
@@ -34,14 +31,14 @@ class TabBarView(context: Context) : RelativeLayout(context) {
   val profileButton by lazy { TabItem(context) }
 
   init {
-    layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
+    layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
 
     // 添加动态玻璃蒙版
     RealtimeBlurView(context, null)
       .apply {
         setBlurRadius(20.uiPX().toFloat())
         setOverlayColor(Spectrum.opacity3White)
-        layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
+        layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
       }
       .into(this)
 
@@ -106,7 +103,7 @@ class TabItem(context: Context) : View(context) {
     color = Spectrum.white
   }
 
-  private val iconSize = 80.uiPX()
+  private val iconSize = HomeSize.tabBarHeight
 
   private val textPaint = Paint().apply {
     isAntiAlias = true

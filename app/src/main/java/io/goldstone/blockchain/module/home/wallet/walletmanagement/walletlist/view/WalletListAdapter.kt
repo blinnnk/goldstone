@@ -1,8 +1,8 @@
-package io.goldstone.blockchain.module.home.wallet.walletlist.view
+package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.module.home.wallet.walletlist.model.WalletListModel
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 
 /**
  * @date 24/03/2018 8:57 PM

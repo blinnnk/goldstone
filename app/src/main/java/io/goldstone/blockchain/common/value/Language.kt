@@ -109,6 +109,20 @@ object WalletText {
     HoneyLanguage.Chinese.code -> "添加更多令牌"
     else -> ""
   }
+
+  @JvmField
+  val addWallet = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Add Wallet"
+    HoneyLanguage.Chinese.code -> "添加钱包"
+    else -> ""
+  }
+
+  @JvmField
+  val importWallet = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Import Wallet"
+    HoneyLanguage.Chinese.code -> "导入钱包"
+    else -> ""
+  }
 }
 
 object TransactionText {

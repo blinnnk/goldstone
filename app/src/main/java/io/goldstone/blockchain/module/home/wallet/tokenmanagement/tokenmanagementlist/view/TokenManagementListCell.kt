@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 
 /**
@@ -27,7 +28,12 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
   var model: DefaultTokenTable? by observing(null) {
     model?.apply {
-      icon.image.glideImage(iconUrl)
+      // 显示默认图判断
+      if(iconUrl.isBlank()) {
+        icon.image.imageResource = R.drawable.default_token
+      } else {
+        icon.image.glideImage(iconUrl)
+      }
       tokenInfo.title.text = symbol
       tokenInfo.subtitle.text = name
       switch.isChecked = isUsed
@@ -46,7 +52,6 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
     this.addView(icon
       .apply {
         setGrayStyle()
-        src = R.drawable.etc_icon
         setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
       })
 

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.walletlist.model
+package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable

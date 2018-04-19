@@ -8,6 +8,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -40,7 +41,7 @@ class WatchOnlyImportPresenter(
         it.isNull().isTrue {
           coroutinesTask({
             WalletTable.insert(WalletTable(0, name, address, true, true))
-            CreateWalletPresenter.generateMyTokenInfo(address)
+            CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity())
           }) {
             fragment.activity?.jump<SplashActivity>()
           }
