@@ -30,6 +30,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 22/03/2018 2:46 AM
@@ -52,22 +54,24 @@ class CreateWalletPresenter(
 
   fun generateWalletWith(isAgree: Boolean) {
     checkInputValue(
-      nameText,
-      passwordText,
-      repeatPasswordText,
-      isAgree,
-      fragment.context
+      nameText, passwordText, repeatPasswordText, isAgree, fragment.context
     ) { password, walletName ->
       fragment.context?.generateWalletWith(password, walletName)
     }
   }
 
-  fun updateConfirmButtonStyle(nameInput: EditText, passwordInput: EditText, repeatPasswordInput: EditText, confirmButton: RoundButton) {
+  fun updateConfirmButtonStyle(
+    nameInput: EditText,
+    passwordInput: EditText,
+    repeatPasswordInput: EditText,
+    confirmButton: RoundButton
+  ) {
     nameInput.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(string: Editable?) {
         string?.apply { nameText = this.toString() }
         setConfirmButtonStyle(confirmButton)
       }
+
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     })
@@ -76,6 +80,7 @@ class CreateWalletPresenter(
         string?.apply { passwordText = this.toString() }
         setConfirmButtonStyle(confirmButton)
       }
+
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     })
@@ -84,13 +89,14 @@ class CreateWalletPresenter(
         string?.apply { repeatPasswordText = this.toString() }
         setConfirmButtonStyle(confirmButton)
       }
+
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     })
   }
 
   private fun setConfirmButtonStyle(confirmButton: RoundButton) {
-    if(nameText.count() * passwordText.count() * repeatPasswordText.count() != 0) {
+    if (nameText.count() * passwordText.count() * repeatPasswordText.count() != 0) {
       confirmButton.setBlueStyle(20.uiPX())
     } else {
       confirmButton.setGrayStyle(20.uiPX())
@@ -99,17 +105,15 @@ class CreateWalletPresenter(
 
   private fun Context.generateWalletWith(password: String, name: String) {
     generateWallet(password) { mnemonicCode, address ->
-
-      generateMyTokenInfo(address, fragment.getMainActivity()) { hasCreatedWallet?.run() }
-
       // 将基础的不存在安全问题的信息插入数据库
       WalletTable.insert(WalletTable(0, name, address, true)) {
-        // 传递数据到下一个 `Fragment`
-        val arguments = Bundle().apply {
-          putString(ArgumentKey.mnemonicCode, mnemonicCode)
-          putString(ArgumentKey.walletAddress, address)
+        generateMyTokenInfo(address, fragment.getMainActivity(), true) {
+          // 传递数据到下一个 `Fragment`
+          val arguments = Bundle().apply {
+            putString(ArgumentKey.mnemonicCode, mnemonicCode)
+          }
+          showMnemonicBackupFragment(arguments)
         }
-        showMnemonicBackupFragment(arguments)
       }
     }
   }
@@ -122,44 +126,26 @@ class CreateWalletPresenter(
 
   companion object {
     /**
-     * 创建钱包首先会从服务拉取默认显示的 `Tokens Type` 这一步需要经过
-     * 耗时的查询, 余额, 信息等. 所以在这里增加一个结束的回调判断.
-     */
-    var hasCreatedWallet: Runnable? = null
-
-    /**
      * 手下拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
      */
-    fun generateMyTokenInfo(ownerAddress: String, activity: MainActivity?, callback: () -> Unit = {}) {
+    fun generateMyTokenInfo(
+      ownerAddress: String,
+      activity: MainActivity?,
+      isNewAccount: Boolean = false,
+      callback: () -> Unit = {}
+    ) {
       activity?.showLoadingView()
       DefaultTokenTable.getTokens {
         it.filter {
           // 初始的时候显示后台要求标记为 `force show` 的 `Token`
           it.forceShow == TinyNumber.True.value
         }.apply {
-          object : ConcurrentAsyncCombine() {
-            override var asyncCount: Int = size
-            override fun concurrentJobs() {
-              forEach { tokenInfo ->
-                // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-                if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
-                  GoldStoneEthCall.getEthBalance(ownerAddress) {
-                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
-                    completeMark()
-                  }
-                } else {
-                  GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, ownerAddress) {
-                    MyTokenTable.insert(MyTokenTable(0, ownerAddress, tokenInfo.symbol, it))
-                    completeMark()
-                  }
-                }
-              }
-            }
-            override fun mergeCallBack() {
-              activity?.removeLoadingView()
-              callback()
-            }
-          }.start()
+          // 如果是新建账户就不用查账了直接是 `0.0`
+          if (isNewAccount) {
+            insertNewAccountTokenRecord(ownerAddress, callback)
+          } else {
+            checkAddressBalance(ownerAddress, activity, callback)
+          }
         }
       }
     }
@@ -195,7 +181,6 @@ class CreateWalletPresenter(
       context: Context?,
       callback: (password: String, walletName: String) -> Unit
     ) {
-
       isAgree.isFalse {
         context?.alert(CreateWalletText.agreeRemind)
         return
@@ -207,14 +192,68 @@ class CreateWalletPresenter(
       }
 
       val walletName = if (name.isEmpty()) "Wallet" else name
-
-      password.checkPasswordInRules { _, reasons ->
-        if (reasons == UnsafeReasons.None) {
-          callback(password, walletName)
-        } else {
-          context?.alert(reasons.info)
+      doAsync {
+        password.checkPasswordInRules { _, reasons ->
+          context?.apply {
+            runOnUiThread {
+              if (reasons == UnsafeReasons.None) {
+                callback(password, walletName)
+              } else {
+                alert(reasons.info)
+              }
+            }
+          }
         }
       }
     }
+
+    private fun List<DefaultTokenTable>.insertNewAccountTokenRecord(
+      address: String, callback: () -> Unit
+    ) {
+      object : ConcurrentAsyncCombine() {
+        override var asyncCount: Int = size
+        override fun concurrentJobs() {
+          forEach {
+            MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0))
+            completeMark()
+          }
+        }
+
+        override fun mergeCallBack() {
+          callback()
+        }
+      }.start()
+    }
+
+    private fun List<DefaultTokenTable>.checkAddressBalance(
+      address: String, activity: MainActivity?, callback: () -> Unit
+    ) {
+      // 不是新建账号就检查余额
+      object : ConcurrentAsyncCombine() {
+        override var asyncCount: Int = size
+        override fun concurrentJobs() {
+          forEach { tokenInfo ->
+            // 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+            if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
+              GoldStoneEthCall.getEthBalance(address) {
+                MyTokenTable.insert(MyTokenTable(0, address, tokenInfo.symbol, it))
+                completeMark()
+              }
+            } else {
+              GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, address) {
+                MyTokenTable.insert(MyTokenTable(0, address, tokenInfo.symbol, it))
+                completeMark()
+              }
+            }
+          }
+        }
+
+        override fun mergeCallBack() {
+          activity?.removeLoadingView()
+          callback()
+        }
+      }.start()
+    }
+
   }
 }

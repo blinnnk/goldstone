@@ -29,7 +29,6 @@ import org.jetbrains.anko.verticalLayout
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
   private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
-  private val walletAddress by lazy { arguments?.getString(ArgumentKey.walletAddress) }
 
   private val mnemonic by lazy { TextView(context) }
   private val confirmButton by lazy { RoundButton(context!!) }
