@@ -39,16 +39,13 @@ class LanguageFragment : BaseRecyclerFragment<LanguagePresenter, LanguageModel>(
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
     asyncData = arrayListOf(
       LanguageModel(HoneyLanguage.English.language),
       LanguageModel(HoneyLanguage.Chinese.language),
       LanguageModel(HoneyLanguage.Japanese.language),
       LanguageModel(HoneyLanguage.Russian.language),
-      LanguageModel(HoneyLanguage.Korean.language),
-      LanguageModel(HoneyLanguage.Japanese.language)
+      LanguageModel(HoneyLanguage.Korean.language)
     )
-
   }
 
 }

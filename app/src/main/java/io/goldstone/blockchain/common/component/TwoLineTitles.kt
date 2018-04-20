@@ -3,7 +3,6 @@ package io.goldstone.blockchain.common.component
 import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -53,6 +52,11 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
     subtitle.textColor = GrayScale.gray
   }
 
+  fun setColorStyle(color: Int) {
+    title.textColor = color
+    subtitle.textColor = color
+  }
+
   fun setNormalTitles() {
     title.apply {
       typeface = GoldStoneFont.book(context)
@@ -80,6 +84,21 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
   fun setWildStyle() {
     title.typeface = GoldStoneFont.heavy(context)
     subtitle.y += 5.uiPX()
+  }
+
+  fun setQuotationStyle() {
+    y += 10.uiPX()
+    title.apply {
+      textSize = 8.uiPX().toFloat()
+      typeface = GoldStoneFont.black(context)
+      textColor = GrayScale.black
+    }
+    subtitle.apply {
+      textSize = 5.uiPX().toFloat()
+      textColor = GrayScale.midGray
+      typeface = GoldStoneFont.medium(context)
+      y -= 8.uiPX()
+    }
   }
 
   fun getSubtitleValue() = subtitle.text.toString()

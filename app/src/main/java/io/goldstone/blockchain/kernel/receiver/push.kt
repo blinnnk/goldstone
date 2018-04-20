@@ -89,9 +89,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
   @SuppressLint("PrivateResource")
   override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
-    context.isNotNull {
-      showNotificationOnLockScreen(context!!, message.toString())
-    }
+    showNotificationOnLockScreen(context!!, message.toString())
   }
 
   override fun onNotifactionClickedResult(p0: Context?, p1: XGPushClickedResult?) {
@@ -109,8 +107,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
             // 注册钱包地址
             GoldStoneAPI.registerWalletAddress(stringArray, GoldStoneApp.deviceID.orEmpty()) {
               if (it.toJsonObject()["code"] == 0) {
-                println(it)
-                println("Register Address Worked")
+                println("Register Address Worked $it")
               }
             }
           }

@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_playlist_add_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_add_alarm_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -29,9 +29,9 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="080608" />
-                            <entry key="outputName" value="create_wallet_icon" />
+                            <entry key="outputName" value="alarm_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/default_token_icon.svg" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/if_The_Peoples_Republic_2361503.svg" />
                           </map>
                         </option>
                       </PersistentState>
