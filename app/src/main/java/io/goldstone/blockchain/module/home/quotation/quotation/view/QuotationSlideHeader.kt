@@ -6,9 +6,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -22,11 +27,40 @@ import org.jetbrains.anko.textColor
 
 class QuotationSlideHeader(context: Context) : RelativeLayout(context) {
 
+  val addTokenButton by lazy { CircleButton(context) }
+  val setAlertButton by lazy { CircleButton(context) }
   private val title = TextView(context)
 
   init {
 
     layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+
+    addTokenButton
+      .apply {
+        title = "token"
+        src = R.drawable.add_icon
+        x += PaddingSize.device
+        y += 15.uiPX()
+      }
+      .into(this)
+
+    addTokenButton.apply {
+      setCenterInVertical()
+    }
+
+    setAlertButton
+      .apply {
+        title = "alarm"
+        src = R.drawable.notifications_icon
+        x -= PaddingSize.device
+        y += 15.uiPX()
+      }
+      .into(this)
+
+    setAlertButton.apply {
+      setCenterInVertical()
+      setAlignParentRight()
+    }
 
     title
       .apply {

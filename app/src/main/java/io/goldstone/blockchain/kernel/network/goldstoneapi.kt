@@ -120,7 +120,7 @@ object GoldStoneAPI {
     val contentType = MediaType.parse("application/json; charset=utf-8")
     RequestBody.create(
       contentType,
-      "{\"language\":\"$language\",\"cid\":\"$pushToken\",\"device\":\"$deviceID\",\"push_type\":\"$isChina\",\"os\":\"$isAndroid\"}"
+      "{\"language\":\"$language\",\"cid\":\"$pushToken\",\"device\":\"$deviceID\",\"push_type\":$isChina,\"os\":$isAndroid}"
     ).let {
       postRequest(it, APIPath.registerDevice) {
         hold(it)

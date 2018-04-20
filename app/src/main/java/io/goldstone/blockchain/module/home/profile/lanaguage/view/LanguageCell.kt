@@ -5,7 +5,6 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRadioCell
 import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 
 /**

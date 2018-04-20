@@ -22,8 +22,8 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
   var checkedStatus: Boolean by observing(false) {
     radioButton.isChecked = checkedStatus
   }
-  protected val title = TextView(context)
 
+  protected val title = TextView(context)
   private val radioButton = HoneyRadioButton(context)
 
   init {
@@ -53,10 +53,6 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 
     layoutParams.height = 50.uiPX()
 
-  }
-
-  fun setSwitchStatus() {
-    radioButton.isChecked = !radioButton.isChecked
   }
 
   fun setSwitchStatusBy(isSelected: Boolean) {
