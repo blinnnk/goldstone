@@ -89,7 +89,7 @@ object ImportWalletText {
 object WalletText {
   @JvmField
   val totalAssets = when (currentLanguage) {
-    HoneyLanguage.English.code -> "Total Assets"
+    HoneyLanguage.English.code -> "total assets"
     else -> "钱包所有财产"
   }
   @JvmField
@@ -411,6 +411,12 @@ object ProfileText {
   val aboutUs = when (currentLanguage) {
     HoneyLanguage.English.code -> "About Us"
     else -> "关于我们"
+  }
+
+  @JvmField
+  val pinCode = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Pin Code"
+    else -> "Pin 密码"
   }
 
 }
