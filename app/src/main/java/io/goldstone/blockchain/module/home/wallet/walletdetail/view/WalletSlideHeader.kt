@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.view.View
-import android.widget.RelativeLayout
-import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
@@ -14,26 +11,26 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
+import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletText
-import org.jetbrains.anko.matchParent
+import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
  * @date 24/03/2018 12:50 AM
  * @author KaySaith
  */
 @SuppressLint("SetTextI18n")
-class WalletSlideHeader(context: Context) : RelativeLayout(context) {
+class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
   val historyButton by lazy { CircleButton(context) }
   val notifyButton by lazy { CircleButton(context) }
   private val balance by lazy { TwoLineTitles(context) }
 
   init {
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
 
     historyButton
       .apply {
@@ -66,27 +63,26 @@ class WalletSlideHeader(context: Context) : RelativeLayout(context) {
       .apply {
 
         title.apply {
-          text = "192456.82"
           typeface = GoldStoneFont.black(context)
-          textSize = 7.uiPX().toFloat()
+          textSize = 6.uiPX().toFloat()
         }
 
         subtitle.apply {
           text = WalletText.totalAssets + GoldStoneApp.currencyCode
           textSize = 4.uiPX().toFloat()
           typeface = GoldStoneFont.medium(context)
-          y -= 3.uiPX()
+          y -= 7.uiPX()
         }
 
         isCenter = true
         visibility = View.GONE
-        y += 10.uiPX()
+        y -= 8.uiPX()
       }
       .into(this)
   }
 
-  fun onHeaderShowedStyle() {
-    updateColorAnimation(Color.TRANSPARENT, Spectrum.green)
+  override fun onHeaderShowedStyle() {
+    super.onHeaderShowedStyle()
     historyButton.setUnTransparent()
     notifyButton.setUnTransparent()
 
@@ -94,13 +90,19 @@ class WalletSlideHeader(context: Context) : RelativeLayout(context) {
       setCenterInParent()
       visibility = View.VISIBLE
     }
+
+    setBalanceValue(WalletTable.current.balance?.formatCurrency().orEmpty())
   }
 
-  fun onHeaderHidesStyle() {
-    updateColorAnimation(Spectrum.green, Color.TRANSPARENT)
+  override fun onHeaderHidesStyle() {
+    super.onHeaderHidesStyle()
     historyButton.setDefaultStyle()
     notifyButton.setDefaultStyle()
     balance.visibility = View.GONE
+  }
+
+  private fun setBalanceValue(value: String) {
+    balance.title.text = value
   }
 
 }

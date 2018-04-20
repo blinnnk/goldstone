@@ -33,7 +33,6 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 
   override fun AnkoContext<Fragment>.initView() {
     relativeLayout {
-
       lparams(matchParent, matchParent)
 
       GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)

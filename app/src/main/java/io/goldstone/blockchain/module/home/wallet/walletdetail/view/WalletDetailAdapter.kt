@@ -24,7 +24,7 @@ class WalletDetailAdapter(
   override fun generateCell(context: Context) = WalletDetailCell(context)
 
   override fun generateFooter(context: Context) = LinearLayout(context).apply {
-    layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
+    layoutParams = LinearLayout.LayoutParams(matchParent, 10.uiPX())
   }
 
   override fun generateHeader(context: Context) = WalletDetailHeaderView(context).apply {

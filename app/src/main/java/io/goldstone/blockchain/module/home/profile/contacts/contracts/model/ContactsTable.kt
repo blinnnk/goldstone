@@ -18,6 +18,9 @@ data class ContactTable(
   var name: String = "",
   var address: String = ""
 ) {
+
+  @Ignore constructor() : this(0, "", "", "")
+
   companion object {
 
     fun insertContact(contact: ContactTable, callback: () -> Unit = {}) {

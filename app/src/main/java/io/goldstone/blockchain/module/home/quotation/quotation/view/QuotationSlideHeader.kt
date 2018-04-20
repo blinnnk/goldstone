@@ -1,10 +1,9 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.content.Context
-import android.graphics.Color
-import android.widget.RelativeLayout
+import android.view.View
 import android.widget.TextView
-import com.blinnnk.animation.updateColorAnimation
+import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
@@ -12,12 +11,11 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
+import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.Spectrum
-import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 
 /**
@@ -25,20 +23,18 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class QuotationSlideHeader(context: Context) : RelativeLayout(context) {
+class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 
-  val addTokenButton by lazy { CircleButton(context) }
-  val setAlertButton by lazy { CircleButton(context) }
+  private val addTokenButton by lazy { CircleButton(context) }
+  private val setAlertButton by lazy { CircleButton(context) }
   private val title = TextView(context)
 
   init {
 
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
-
     addTokenButton
       .apply {
         title = "token"
-        src = R.drawable.add_icon
+        src = R.drawable.add_token_icon
         x += PaddingSize.device
         y += 15.uiPX()
       }
@@ -51,7 +47,7 @@ class QuotationSlideHeader(context: Context) : RelativeLayout(context) {
     setAlertButton
       .apply {
         title = "alarm"
-        src = R.drawable.notifications_icon
+        src = R.drawable.alarm_icon
         x -= PaddingSize.device
         y += 15.uiPX()
       }
@@ -75,12 +71,18 @@ class QuotationSlideHeader(context: Context) : RelativeLayout(context) {
 
   }
 
-  fun onHeaderShowedStyle() {
-    updateColorAnimation(Color.TRANSPARENT, Spectrum.green)
+  override fun onHeaderShowedStyle() {
+    super.onHeaderShowedStyle()
+    addTokenButton.setUnTransparent()
+    setAlertButton.setUnTransparent()
+    title.updateOriginYAnimation(23.uiPX().toFloat())
   }
 
-  fun onHeaderHidesStyle() {
-    updateColorAnimation(Spectrum.green, Color.TRANSPARENT)
+  override fun onHeaderHidesStyle() {
+    super.onHeaderHidesStyle()
+    addTokenButton.setDefaultStyle()
+    setAlertButton.setDefaultStyle()
+    title.updateOriginYAnimation(34.uiPX().toFloat())
   }
 
 }

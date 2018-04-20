@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.RippleMode
@@ -73,17 +74,21 @@ class CircleButton(context: Context) : LinearLayout(context) {
     addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.yellow, RippleMode.Round)
   }
 
-  fun setIconViewColor(color: Int) {
+  private fun setIconViewColor(color: Int) {
     iconView.addCorner(18.uiPX(), color)
   }
 
   fun setUnTransparent() {
     buttonTitle.textColor = Spectrum.white
+    updateOriginYAnimation(17.uiPX().toFloat())
+    buttonTitle.updateOriginYAnimation(23.uiPX().toFloat())
     setIconViewColor(Color.TRANSPARENT)
   }
 
   fun setDefaultStyle() {
     buttonTitle.textColor = Spectrum.opacity5White
+    updateOriginYAnimation(33.uiPX().toFloat())
+    buttonTitle.updateOriginYAnimation(33.uiPX().toFloat())
     setIconViewColor(Spectrum.opacity2White)
   }
 

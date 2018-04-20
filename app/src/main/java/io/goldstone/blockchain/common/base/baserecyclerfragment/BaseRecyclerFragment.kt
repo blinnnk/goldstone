@@ -14,6 +14,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
+import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
@@ -145,7 +146,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
     presenter.onFragmentCreateView()
     return UI {
       wrapper = relativeLayout {
-        layoutParams = setRecyclerViewParams(matchParent, matchParent)
+        layoutParams = setRecyclerViewParams(matchParent, context.getRealScreenHeight() - HomeSize.tabBarHeight)
         recyclerView = BaseRecyclerView(context)
         setRecyclerViewLayoutManager(recyclerView)
         addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
