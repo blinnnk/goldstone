@@ -5,9 +5,11 @@ import android.graphics.Color
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateColorAnimation
+import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -19,13 +21,11 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class ProfileSlideHeader(context: Context) : RelativeLayout(context) {
+class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 
   private val title = TextView(context)
 
   init {
-
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
 
     title
       .apply {
@@ -40,12 +40,14 @@ class ProfileSlideHeader(context: Context) : RelativeLayout(context) {
 
   }
 
-  fun onHeaderShowedStyle() {
+  override fun onHeaderShowedStyle() {
     updateColorAnimation(Color.TRANSPARENT, Spectrum.green)
+    title.updateOriginYAnimation(23.uiPX().toFloat())
   }
 
-  fun onHeaderHidesStyle() {
+  override fun onHeaderHidesStyle() {
     updateColorAnimation(Spectrum.green, Color.TRANSPARENT)
+    title.updateOriginYAnimation(34.uiPX().toFloat())
   }
 
 }

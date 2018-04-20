@@ -16,6 +16,8 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
  * @date 24/03/2018 12:50 AM
@@ -61,9 +63,8 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
       .apply {
 
         title.apply {
-          text = "192456.82"
           typeface = GoldStoneFont.black(context)
-          textSize = 7.uiPX().toFloat()
+          textSize = 6.uiPX().toFloat()
         }
 
         subtitle.apply {
@@ -89,6 +90,8 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
       setCenterInParent()
       visibility = View.VISIBLE
     }
+
+    setBalanceValue(WalletTable.current.balance?.formatCurrency().orEmpty())
   }
 
   override fun onHeaderHidesStyle() {
@@ -96,6 +99,10 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
     historyButton.setDefaultStyle()
     notifyButton.setDefaultStyle()
     balance.visibility = View.GONE
+  }
+
+  private fun setBalanceValue(value: String) {
+    balance.title.text = value
   }
 
 }

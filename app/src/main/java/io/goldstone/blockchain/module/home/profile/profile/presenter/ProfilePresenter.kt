@@ -8,7 +8,10 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileCell
@@ -50,9 +53,6 @@ class ProfilePresenter(
     item.apply {
       when(position) {
         3 -> setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-        fragment.asyncData?.lastIndex -> setMargins<LinearLayout.LayoutParams> {
-          bottomMargin = HomeSize.tabBarHeight
-        }
         0 -> {
           setMargins<LinearLayout.LayoutParams> { topMargin = 100.uiPX() }
           fragment.recyclerView.scrollToPosition(0)
