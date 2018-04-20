@@ -6,7 +6,6 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInVertical
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
@@ -26,7 +25,6 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
   override val presenter = ProfileOverlayPresenter(this)
 
   override fun ViewGroup.initView() {
-
     headerTitle = title.orEmpty()
     presenter.showTargetFragmentByTitle(title.orEmpty())
 

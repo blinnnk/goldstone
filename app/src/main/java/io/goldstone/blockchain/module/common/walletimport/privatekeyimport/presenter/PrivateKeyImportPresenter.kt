@@ -8,7 +8,6 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -59,7 +58,7 @@ class PrivateKeyImportPresenter(
             // 在数据库记录钱包信息
             WalletTable.insertAddress(address, name) {
               // 创建钱包并获取默认的 `token` 信息
-              CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity()) {
+              CreateWalletPresenter.generateMyTokenInfo(address) {
                 fragment.activity?.jump<SplashActivity>()
               }
               // 注册钱包地址用于发送 `Push`

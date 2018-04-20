@@ -5,10 +5,8 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -27,23 +25,21 @@ class WatchOnlyImportPresenter(
   fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
     val address = addressInput.text.toString()
 
-    if(!WalletUtils.isValidAddress(address)) {
+    if (!WalletUtils.isValidAddress(address)) {
       fragment.context?.alert("address isn't valid")
       return
     }
 
     WalletUtils.isValidAddress(address).isTrue {
-      val name =
-        if  (nameInput.text.toString().isEmpty()) "Wallet"
-        else nameInput.text.toString()
+      val name = if (nameInput.text.toString().isEmpty()) "Wallet"
+      else nameInput.text.toString()
 
       WalletTable.getWalletByAddress(address) {
         it.isNull().isTrue {
-          coroutinesTask({
-            WalletTable.insert(WalletTable(0, name, address, true, true))
-            CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity())
-          }) {
-            fragment.activity?.jump<SplashActivity>()
+          WalletTable.insert(WalletTable(0, name, address, true, true)) {
+            CreateWalletPresenter.generateMyTokenInfo(address) {
+              fragment.activity?.jump<SplashActivity>()
+            }
           }
         } otherwise {
           fragment.context?.alert("There is already this account in gold stone")
