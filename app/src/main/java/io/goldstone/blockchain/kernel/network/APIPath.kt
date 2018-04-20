@@ -16,6 +16,8 @@ object APIPath {
   const val getCoinInfo = "$url/index/searchToken?symbolOrContract="
   const val getCurrencyRate = "$url/index/exchangeRate?currency="
   const val getCountryList = "$url/index/countryList"
+  const val registerDevice = "$url/account/registerDevice"
+  const val updateAddress = "$url/account/updateAddress"
   // ROPSTAN 节点请求地址
   const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
   const val ropstan = "http://118.89.147.176:8500"

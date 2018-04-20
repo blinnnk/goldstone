@@ -46,9 +46,7 @@ class TabBarView(context: Context) : RelativeLayout(context) {
       .apply {
         text = "wallet"
         type = TabItemType.Wallet
-        setMargins<LinearLayout.LayoutParams> {
-          leftMargin = PaddingSize.device
-        }
+        x += PaddingSize.device
       }
       .into(this)
 
@@ -56,9 +54,6 @@ class TabBarView(context: Context) : RelativeLayout(context) {
       .apply {
         text = "markets"
         type = TabItemType.Market
-        setMargins<LinearLayout.LayoutParams> {
-          leftMargin = PaddingSize.device
-        }
       }
       .into(this)
 
@@ -66,9 +61,7 @@ class TabBarView(context: Context) : RelativeLayout(context) {
       .apply {
         text = "profile"
         type = TabItemType.Profile
-        setMargins<LinearLayout.LayoutParams> {
-          rightMargin = PaddingSize.device
-        }
+        x -= PaddingSize.device
       }
       .into(this)
 

@@ -34,9 +34,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
     orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
 
-    layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), ScreenSize.Width).apply {
-      leftMargin = (ScreenSize.Width * 0.2).toInt()
-    }
+    layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), ScreenSize.Width)
 
     icon = imageView {
       scaleType = ImageView.ScaleType.FIT_XY
@@ -55,6 +53,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
   fun setStyle(type: EmptyType) {
     when(type) {
       EmptyType.TokenDetail -> {
+        x += (ScreenSize.Width * 0.2).toInt()
         y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - ScreenSize.Width) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
         icon.imageResource = R.drawable.token_detail_empty_icon
         introTitles.title.text = EmptyText.tokenDetailTitle
