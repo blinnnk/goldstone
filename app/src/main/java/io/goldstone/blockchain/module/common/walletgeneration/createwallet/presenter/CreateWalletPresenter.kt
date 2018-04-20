@@ -218,10 +218,7 @@ class CreateWalletPresenter(
             completeMark()
           }
         }
-
-        override fun mergeCallBack() {
-          callback()
-        }
+        override fun mergeCallBack() = callback()
       }.start()
     }
 
@@ -247,7 +244,6 @@ class CreateWalletPresenter(
             }
           }
         }
-
         override fun mergeCallBack() {
           activity?.removeLoadingView()
           callback()

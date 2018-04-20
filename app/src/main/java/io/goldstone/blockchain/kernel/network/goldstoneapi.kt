@@ -45,8 +45,7 @@ object GoldStoneAPI {
 
   @JvmStatic
   fun getCoinInfoBySymbolFromGoldStone(
-    symbols: String,
-    hold: (ArrayList<TokenSearchModel>) -> Unit
+    symbols: String, hold: (ArrayList<TokenSearchModel>) -> Unit
   ) {
     requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
       hold(toArrayList())
@@ -72,13 +71,10 @@ object GoldStoneAPI {
   }
 
   fun getERC20TokenTransaction(
-    address: String,
-    startBlock: String = "0",
-    hold: (ArrayList<ERC20TransactionModel>) -> Unit
+    address: String, startBlock: String = "0", hold: (ArrayList<ERC20TransactionModel>) -> Unit
   ) {
     requestData<ERC20TransactionModel>(
-      EtherScanApi.getAllTokenTransaction(address, startBlock),
-      "result"
+      EtherScanApi.getAllTokenTransaction(address, startBlock), "result"
     ) {
       hold(toArrayList())
     }
@@ -91,8 +87,7 @@ object GoldStoneAPI {
   ) {
     requestData<ERC20TransactionModel>(
       EtherScanApi.getTokenIncomingTransaction(
-        address,
-        startBlock
+        address, startBlock
       ), "result"
     ) {
       hold(toArrayList())
@@ -111,6 +106,45 @@ object GoldStoneAPI {
     requestData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
       hold(toArrayList())
     }
+  }
+
+  fun registerDevice(
+    language: String,
+    pushToken: String,
+    deviceID: String,
+    isChina: Int,
+    isAndroid: Int,
+    hold: (String) -> Unit
+    ) {
+    val contentType = MediaType.parse("application/json; charset=utf-8")
+    RequestBody.create(
+      contentType,
+      "{\"language\":\"$language\",\"cid\":\"$pushToken\",\"device\":\"$deviceID\",\"push_type\":\"$isChina\",\"os\":\"$isAndroid\"}"
+    ).let {
+      postRequest(it, APIPath.registerDevice) {
+        hold(it)
+      }
+    }
+  }
+
+  private fun postRequest(body: RequestBody, path: String, hold: (String) -> Unit) {
+    val client = OkHttpClient()
+    val request = Request.Builder().url(path).method("POST", body)
+      .header("Content-type", "application/json").build()
+    client.newCall(request).enqueue(object : Callback {
+      override fun onFailure(call: Call, error: IOException) {
+        println("$error")
+      }
+      @SuppressLint("SetTextI18n")
+      override fun onResponse(call: Call, response: Response) {
+        val data = response.body()?.string()
+        try {
+          hold(data.orEmpty())
+        } catch (error: Exception) {
+          Log.e("ERROR", error.toString())
+        }
+      }
+    })
   }
 
   @JvmStatic
@@ -137,7 +171,7 @@ object GoldStoneAPI {
             hold(gson.fromJson(jsonData, collectionType))
           }
         } catch (error: Exception) {
-          println("GoldStoneApi $error")
+          println("GoldStoneApi $error and $data")
         }
       }
     })
@@ -145,9 +179,7 @@ object GoldStoneAPI {
 
   @JvmStatic
   private inline fun <reified T> requestList(
-    api: String,
-    keyName: String,
-    crossinline hold: List<T>.() -> Unit
+    api: String, keyName: String, crossinline hold: List<T>.() -> Unit
   ) {
     val client = OkHttpClient()
     val request = Request.Builder().url(api).build()
@@ -155,6 +187,7 @@ object GoldStoneAPI {
       override fun onFailure(call: Call, error: IOException) {
         Log.e("ERROR", error.toString())
       }
+
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
         try {
@@ -169,7 +202,7 @@ object GoldStoneAPI {
             }
           }
         } catch (error: Exception) {
-          println("GoldStoneApi $error")
+          println("GoldStoneApi Multiple $error")
         }
       }
     })

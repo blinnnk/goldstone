@@ -37,10 +37,10 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 
   init {
     orientation = VERTICAL
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), matchParent).apply {
-      leftMargin = 50.uiPX()
-      topMargin = 25.uiPX()
-    }
+    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), matchParent)
+
+    x += 50.uiPX()
+    y += 20.uiPX()
 
     gravity = Gravity.CENTER_HORIZONTAL
 

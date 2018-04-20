@@ -18,3 +18,7 @@ object ArgumentKey {
   const val webViewUrl = "webViewUrl"
   const val fragmentTitle = "fragmentTitle"
 }
+
+object SharesPreference {
+  const val registerPush = "registerPush"
+}

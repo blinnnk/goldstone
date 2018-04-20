@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
+import android.util.Log
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Account
@@ -39,7 +40,11 @@ fun Context.generateWallet(
   val address = "0x" + publicKey.toLowerCase()
   holdAddress(mnemonicCode, address)
   /** Import Private Key to Keystore */
-  keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
+  try {
+    keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
+  } catch (error: Exception) {
+    Log.e("ERROR", error.toString())
+  }
 }
 
 fun Context.getWalletByMnemonic(mnemonicCode: String, password: String, hold: (address: String?) -> Unit) {

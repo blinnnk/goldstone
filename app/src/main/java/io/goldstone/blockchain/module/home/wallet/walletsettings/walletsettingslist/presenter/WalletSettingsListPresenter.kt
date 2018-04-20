@@ -53,7 +53,6 @@ class WalletSettingsListPresenter(
 
   /** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
   fun deleteWallet() {
-    System.out.println("hello")
     fragment.context?.showEditTextAlertView(
       WalletSettingsText.deleteInfoTitle,
       WalletSettingsText.deleteInfoSubtitle,
