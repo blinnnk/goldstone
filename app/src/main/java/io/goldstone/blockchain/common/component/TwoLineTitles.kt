@@ -89,12 +89,12 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
   fun setQuotationStyle() {
     y += 10.uiPX()
     title.apply {
-      textSize = 8.uiPX().toFloat()
+      textSize = 7.uiPX().toFloat()
       typeface = GoldStoneFont.black(context)
       textColor = GrayScale.black
     }
     subtitle.apply {
-      textSize = 5.uiPX().toFloat()
+      textSize = 4.uiPX().toFloat()
       textColor = GrayScale.midGray
       typeface = GoldStoneFont.medium(context)
       y -= 8.uiPX()

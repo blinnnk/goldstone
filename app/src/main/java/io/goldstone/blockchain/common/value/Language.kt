@@ -470,7 +470,7 @@ object QuotationText {
 
   @JvmField
   val market = when (currentLanguage) {
-    HoneyLanguage.English.code -> "Market"
+    HoneyLanguage.English.code -> "Quotation"
     else -> "市场行情"
   }
 }

@@ -17,7 +17,7 @@ class QuotationAdapter(
   ) : HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, LinearLayout>() {
 
   override fun generateFooter(context: Context) = LinearLayout(context).apply {
-    layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
+    layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
   }
 
   override fun generateHeader(context: Context) = LinearLayout(context).apply {

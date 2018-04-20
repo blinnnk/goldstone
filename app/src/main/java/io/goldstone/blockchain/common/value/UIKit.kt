@@ -16,6 +16,7 @@ object GrayScale {
   @JvmField val lightGray = Color.parseColor("#FFE5E5E5")
   @JvmField val whiteGray = Color.parseColor("#FFF1F1F1")
   @JvmField val gray = Color.parseColor("#FFAAAAAA")
+  @JvmField val darkGray = Color.parseColor("#FFA1A1A1")
   @JvmField val midGray = Color.parseColor("#FFCCCCCC")
   @JvmField val Opacity1Black = Color.parseColor("#1A000000")
   @JvmField val Opacity2Black = Color.parseColor("#33000000")
@@ -28,8 +29,11 @@ object Spectrum {
   @JvmField val white = Color.parseColor("#FFFFFFFF")
   @JvmField val blue = Color.parseColor("#FF00B1FF")
   @JvmField val green = Color.parseColor("#FF1CC881")
+  @JvmField val opacity5Green = Color.parseColor("#801CC881")
+  @JvmField val opacity8Green = Color.parseColor("#CC1CC881")
   @JvmField val lightGreen = Color.parseColor("#801CC881")
   @JvmField val darkBlue = Color.parseColor("#FF0863B8")
+  @JvmField val opacityDarkBlue = Color.parseColor("#800863B8")
   @JvmField val red = Color.parseColor("#FFFA0D0D")
   @JvmField val lightRed = Color.parseColor("#FFFF6464")
   @JvmField val yellow = Color.parseColor("#FFFFF53C")
@@ -85,7 +89,8 @@ object TransactionSize {
 }
 
 object HomeSize {
-  @JvmField val tabBarHeight = 75.uiPX()
+  @JvmField val tabBarHeight = 50.uiPX()
+  @JvmField val sliderHeaderHeight = 65.uiPX()
 }
 
 
