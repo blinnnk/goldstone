@@ -7,6 +7,7 @@ import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -115,7 +116,7 @@ object GoldStoneAPI {
     isChina: Int,
     isAndroid: Int,
     hold: (String) -> Unit
-    ) {
+  ) {
     val contentType = MediaType.parse("application/json; charset=utf-8")
     RequestBody.create(
       contentType,
@@ -127,14 +128,28 @@ object GoldStoneAPI {
     }
   }
 
+  fun registerWalletAddress(
+    addressList: JsonArray, deviceID: String, hold: (String) -> Unit
+  ) {
+    val contentType = MediaType.parse("application/json; charset=utf-8")
+    RequestBody.create(contentType, "{\"address_list\":$addressList,\"device\":\"$deviceID\"}")
+      .let {
+        postRequest(it, APIPath.updateAddress) {
+          hold(it)
+        }
+      }
+  }
+
   private fun postRequest(body: RequestBody, path: String, hold: (String) -> Unit) {
     val client = OkHttpClient()
-    val request = Request.Builder().url(path).method("POST", body)
-      .header("Content-type", "application/json").build()
+    val request =
+      Request.Builder().url(path).method("POST", body).header("Content-type", "application/json")
+        .build()
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, error: IOException) {
         println("$error")
       }
+
       @SuppressLint("SetTextI18n")
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()

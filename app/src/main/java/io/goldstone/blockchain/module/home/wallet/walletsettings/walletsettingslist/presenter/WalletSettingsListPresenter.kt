@@ -14,6 +14,7 @@ import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -88,6 +89,8 @@ class WalletSettingsListPresenter(
           TokenBalanceTable.deleteByAddress(address) {
             // delete wallet record in `walletTable`
             WalletTable.deleteCurrentWallet {
+              // 删除 `push` 监听包地址不再监听用户删除的钱包地址
+              XinGePushReceiver.registerWalletAddressForPush()
               activity?.jump<SplashActivity>()
             }
           }

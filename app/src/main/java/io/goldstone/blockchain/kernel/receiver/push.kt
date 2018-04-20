@@ -8,16 +8,21 @@ import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.media.RingtoneManager
 import android.os.PowerManager
-import android.provider.Settings
 import android.support.v4.app.NotificationCompat
+import android.util.Log
+import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
+import com.google.gson.JsonArray
 import com.tencent.android.tpush.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.configuration
 
@@ -44,10 +49,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
         PowerManager.FULL_WAKE_LOCK
           or PowerManager.ACQUIRE_CAUSES_WAKEUP
           or PowerManager.ON_AFTER_RELEASE,
-        "MH24_SCREENLOCK")
+        "weakScreen")
       wake.acquire(10000)
       val wakeLock
-        = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MH24_SCREENLOCK")
+        = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "weakScreen")
       wakeLock.acquire(10000)
     }
 
@@ -84,56 +89,72 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
   @SuppressLint("PrivateResource")
   override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
-    val localMessage = XGLocalMessage()
-    localMessage.title = "New Notification"
-    localMessage.content = message?.content
-
-    val build = XGCustomPushNotificationBuilder()
-    build.layoutId = R.layout.notification_template_lines_media
-    build.layoutTitleId = R.layout.abc_alert_dialog_title_material
-
-    XGPushManager.setDefaultNotificationBuilder(context, build)
-
-    XGPushManager.setPushNotificationBuilder(context, 1, build)
-    XGPushManager.addLocalNotification(context, localMessage)
-    XGPushManager.openNotification(context)
-
-    showNotificationOnLockScreen(context!!, message.toString())
+    context.isNotNull {
+      showNotificationOnLockScreen(context!!, message.toString())
+    }
   }
 
   override fun onNotifactionClickedResult(p0: Context?, p1: XGPushClickedResult?) {
     //
   }
 
+  companion object {
+    fun registerWalletAddressForPush() {
+      val stringArray = JsonArray()
+      // 获取本地的所有钱包
+      WalletTable.getAll {
+        forEachOrEnd { item, isEnd ->
+          stringArray.add(item.address)
+          if (isEnd) {
+            // 注册钱包地址
+            GoldStoneAPI.registerWalletAddress(stringArray, GoldStoneApp.deviceID.orEmpty()) {
+              if (it.toJsonObject()["code"] == 0) {
+                println(it)
+                println("Register Address Worked")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @SuppressLint("HardwareIds")
 fun Application.registerDeviceForPush() {
-  // 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
-  val deviceID = Settings.Secure.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
-  val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
-  else TinyNumber.False.value
   // 为测试方便设置，发布上线时设置为 `false`
   XGPushConfig.enableDebug(this, false)
   XGPushManager.registerPush(this, object : XGIOperateCallback {
     override fun onSuccess(token: Any?, p1: Int) {
       // 如果本地有注册成功的标记则不再注册
       getStringFromSharedPreferences(SharesPreference.registerPush).let {
-        System.out.println(it)
+        Log.d("DEBUG", it)
         if (it == token) return
       }
-      // 没有注册过就开始注册
-      GoldStoneAPI.registerDevice(
-        configuration.locale.language, token.toString(), deviceID, isChina, TinyNumber.True.value
-      ) {
-        // 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-        if (it.toJsonObject()["code"] == 0) {
-          saveDataToSharedPreferences(SharesPreference.registerPush, token)
-        }
-      }
+      // 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
+      registerDevice(token.toString())
+      XinGePushReceiver.registerWalletAddressForPush()
     }
-
     override fun onFail(p0: Any?, p1: Int, p2: String?) {}
   })
+}
 
+@SuppressLint("HardwareIds")
+private fun Application.registerDevice(token: String) {
+  // 没有注册过就开始注册
+  val isChina
+    = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
+  else TinyNumber.False.value
+  GoldStoneAPI.registerDevice(
+    configuration.locale.language,
+    token,
+    GoldStoneApp.deviceID.orEmpty(),
+    isChina,
+    TinyNumber.True.value
+  ) {
+    // 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+    if (it.toJsonObject()["code"] == 0) {
+      saveDataToSharedPreferences(SharesPreference.registerPush, token)
+    }
+  }
 }

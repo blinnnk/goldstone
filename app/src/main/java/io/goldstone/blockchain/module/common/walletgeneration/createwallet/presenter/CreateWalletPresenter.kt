@@ -22,6 +22,7 @@ import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
@@ -114,6 +115,8 @@ class CreateWalletPresenter(
           }
           showMnemonicBackupFragment(arguments)
         }
+
+        XinGePushReceiver.registerWalletAddressForPush()
       }
     }
   }

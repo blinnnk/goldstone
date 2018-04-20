@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
@@ -61,6 +62,8 @@ class PrivateKeyImportPresenter(
               CreateWalletPresenter.generateMyTokenInfo(address, fragment.getMainActivity()) {
                 fragment.activity?.jump<SplashActivity>()
               }
+              // 注册钱包地址用于发送 `Push`
+              XinGePushReceiver.registerWalletAddressForPush()
             }
           } otherwise {
             fragment.context?.alert("There is already this account in gold stone")
