@@ -31,28 +31,29 @@ class AddressSelectionPresenter(
     }
   }
 
-  fun showPaymentValueDetailFragment(address: String) {
-
-    WalletUtils.isValidAddress(address).isFalse {
-      fragment.context?.alert("address isn't valid")
-      return
-    }
-
-    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-      hideChildFragment(fragment)
-      addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
-        putString(ArgumentKey.paymentAddress, address)
-        putSerializable(ArgumentKey.paymentSymbol, token)
+  fun showPaymentValueDetailFragment(address: String): Runnable {
+    return Runnable {
+      WalletUtils.isValidAddress(address).isFalse {
+        fragment.context?.alert("address isn't valid")
+        return@Runnable
       }
-      overlayView.header.apply {
-        backButton.onClick {
-          headerTitle = TokenDetailText.address
-          presenter.popFragmentFrom<PaymentValueDetailFragment>()
-          setHeightMatchParent()
-          showCloseButton(false)
+
+      fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+        hideChildFragment(fragment)
+        addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
+          putString(ArgumentKey.paymentAddress, address)
+          putSerializable(ArgumentKey.paymentSymbol, token)
         }
+        overlayView.header.apply {
+          backButton.onClick {
+            headerTitle = TokenDetailText.address
+            presenter.popFragmentFrom<PaymentValueDetailFragment>()
+            setHeightMatchParent()
+            showCloseButton(false)
+          }
+        }
+        headerTitle = TokenDetailText.transferDetail
       }
-      headerTitle = TokenDetailText.transferDetail
     }
   }
 

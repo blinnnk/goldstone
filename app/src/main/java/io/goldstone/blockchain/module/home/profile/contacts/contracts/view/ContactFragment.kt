@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -21,7 +22,9 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
   override val presenter = ContactPresenter(this)
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<ContactTable>?) {
-    recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray())
+    recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray()) {
+      onClickDeleteButton { presenter.deleteContact(model.id) }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

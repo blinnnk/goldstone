@@ -7,10 +7,7 @@ import android.graphics.Paint
 import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import com.db.chart.animation.Animation
@@ -78,9 +75,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
     chartView
       .apply {
         id = ElementID.chartView
-        layoutParams = RelativeLayout.LayoutParams(com.blinnnk.uikit.ScreenSize.Width - 20.uiPX(), 130.uiPX()).apply {
-          margin = 10.uiPX()
-        }
+        layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+        setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
         y += 60.uiPX()
         // 设定背景的网格
         setGrid(5, 10, Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
@@ -122,10 +118,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 
   init {
 
-    layoutParams = LinearLayout.LayoutParams(matchParent, 220.uiPX())
+    layoutParams = LinearLayout.LayoutParams(matchParent, 180.uiPX())
 
     cellLayout = relativeLayout {
-      layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 210.uiPX())
+      layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 170.uiPX())
       addCorner(CornerSize.default.toInt(), Spectrum.white)
       x += PaddingSize.device
 
