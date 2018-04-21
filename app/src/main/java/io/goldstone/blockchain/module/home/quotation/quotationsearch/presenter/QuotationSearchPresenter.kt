@@ -16,10 +16,10 @@ class QuotationSearchPresenter(
 
   override fun updateData() {
     fragment.asyncData = arrayListOf(
-      DefaultTokenTable(TokenSearchModel("", "", "BTC", "563.23", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "EOS", "22.29", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "TRX", "1.15", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "QTM", "12.88", "ethereume", 18, 100), false)
+      DefaultTokenTable(TokenSearchModel("", "", "BTC / Bitffnex", "563.23", "ethereume", 18, 100), false),
+      DefaultTokenTable(TokenSearchModel("", "", "EOS / Huobi", "22.29", "ethereume", 18, 100), false),
+      DefaultTokenTable(TokenSearchModel("", "", "TRX / Liqui", "1.15", "ethereume", 18, 100), false),
+      DefaultTokenTable(TokenSearchModel("", "", "QTM / Bitffnex", "12.88", "ethereume", 18, 100), false)
     )
   }
 
