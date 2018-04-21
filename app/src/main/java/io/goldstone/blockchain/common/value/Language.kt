@@ -479,6 +479,17 @@ object QuotationText {
     HoneyLanguage.English.code -> "Quotation"
     else -> "市场行情"
   }
+  @JvmField
+  val management = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Quotation Management"
+    else -> "自选管理"
+  }
+
+  @JvmField
+  val search = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Selection Search"
+    else -> "自选管理"
+  }
 }
 
 enum class HoneyLanguage(val code: Int, val language: String) {

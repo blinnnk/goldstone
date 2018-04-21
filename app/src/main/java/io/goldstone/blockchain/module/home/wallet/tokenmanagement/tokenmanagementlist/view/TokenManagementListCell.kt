@@ -26,7 +26,7 @@ import org.jetbrains.anko.matchParent
 
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
-  var model: DefaultTokenTable? by observing(null) {
+  open var model: DefaultTokenTable? by observing(null) {
     model?.apply {
       // 显示默认图判断
       if(iconUrl.isBlank()) {

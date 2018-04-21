@@ -9,11 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
+import io.goldstone.blockchain.common.utils.isNavigationBarShow
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -145,8 +147,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   ): View? {
     presenter.onFragmentCreateView()
     return UI {
+      val wrapperHeight =
+        if(activity?.isNavigationBarShow() == true) {
+          ScreenSize.Height - ScreenSize.statusBarHeight
+        } else {
+          context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight
+        }
       wrapper = relativeLayout {
-        layoutParams = setRecyclerViewParams(matchParent, context.getRealScreenHeight() - HomeSize.tabBarHeight)
+        layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
         recyclerView = BaseRecyclerView(context)
         setRecyclerViewLayoutManager(recyclerView)
         addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))

@@ -3,11 +3,14 @@ package io.goldstone.blockchain.common.base
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.coroutinesTask
 import org.jetbrains.anko.matchParent
+import java.util.*
 
 /**
  * @date 23/03/2018 3:48 PM
@@ -24,25 +27,54 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
   }
 
   override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-
     if (event.action == MotionEvent.ACTION_DOWN && this.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
       this.stopScroll()
     }
     return super.onInterceptTouchEvent(event)
   }
 
-  fun getAllItemsHeight(block: (Int) -> Unit) {
-    coroutinesTask({
-      (0 until childCount).map { getChildAt(it) }
-    }) {
-      val visibleItemsHeight = it.map { it.measuredHeight }.sum()
-      val finalHeight =
-        if (computeVerticalScrollOffset() > visibleItemsHeight)
-          computeVerticalScrollOffset() + (computeVerticalScrollOffset() - visibleItemsHeight)
-        else visibleItemsHeight
-      block(finalHeight)
-    }
 
+  fun<T> addDragEventAndReordering(adapterDataSet: ArrayList<T>, hold: (fromPosition: Int?, toPosition: Int?) -> Unit) {
+    var fromPosition: Int? = null
+    var toPosition: Int? = null
+    val itemMove = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+      override fun getMovementFlags(recyclerView: RecyclerView?, viewHolder: ViewHolder?): Int {
+        fromPosition = viewHolder?.adapterPosition
+        return makeFlag(
+          ItemTouchHelper.ACTION_STATE_DRAG,
+          ItemTouchHelper.DOWN or ItemTouchHelper.UP or ItemTouchHelper.START or ItemTouchHelper.END
+        )
+      }
+      override fun onMove(
+        recyclerView: RecyclerView?, viewHolder: ViewHolder?, target: ViewHolder?
+      ): Boolean {
+        Collections.swap(adapterDataSet, viewHolder?.adapterPosition.orZero(), target?.adapterPosition.orZero())
+        // and notify the adapter that its dataset has changed
+        recyclerView?.adapter?.notifyItemMoved(viewHolder?.adapterPosition.orZero(), target?.adapterPosition.orZero())
+        return true
+      }
+      override fun onSwiped(viewHolder: ViewHolder?, direction: Int) { }
+
+      override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+        if (actionState == 0) {
+          hold(fromPosition, toPosition)
+        }
+      }
+      override fun onMoved(
+        recyclerView: RecyclerView?,
+        viewHolder: ViewHolder?,
+        fromPos: Int,
+        target: ViewHolder?,
+        toPos: Int,
+        x: Int,
+        y: Int
+      ) {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
+        toPosition = toPos
+      }
+    })
+    itemMove.attachToRecyclerView(this)
   }
 
   inline fun <reified T> getItemViewAtAdapterPosition(position: Int, crossinline block: T.() -> Unit) {
@@ -58,3 +90,4 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
   }
 
 }
+

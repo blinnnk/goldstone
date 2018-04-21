@@ -38,9 +38,8 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
         textSize = 4.uiPX().toFloat()
         textColor = GrayScale.black
         hintTextColor = GrayScale.midGray
-        layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 32.uiPX()).apply {
-          leftMargin = PaddingSize.device
-        }
+        layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 35.uiPX())
+        x += PaddingSize.device
         singleLine = true
         leftPadding = 20.uiPX()
         setCursorColor(Spectrum.blue)

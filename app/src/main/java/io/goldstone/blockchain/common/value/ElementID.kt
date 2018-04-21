@@ -20,6 +20,7 @@ object ElementID {
   const val searchButton = 20005
   const val searchInput = 2006
   const val addButton = 2007
+  const val chartView = 2008
 }
 
 object ViewPagerID {
