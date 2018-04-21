@@ -30,7 +30,7 @@ data class DefaultTokenTable(
   var totalSupply: String? = null,
   var isDefault: Boolean = true,
   @Ignore
-  var isUsed: Boolean
+  var isUsed: Boolean = false
   ) {
   /** 默认的 `constructor` */
   constructor() : this(
@@ -47,7 +47,7 @@ data class DefaultTokenTable(
     false
   )
 
-  constructor(data: TokenSearchModel) : this(
+  constructor(data: TokenSearchModel, isUsed: Boolean = false) : this(
     0,
     data.contract,
     data.iconUrl,
@@ -58,7 +58,7 @@ data class DefaultTokenTable(
     data.decimal.toDouble(),
     "",
     false,
-    false
+    isUsed
   )
 
   companion object {

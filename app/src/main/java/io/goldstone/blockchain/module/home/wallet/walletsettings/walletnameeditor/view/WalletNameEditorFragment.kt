@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter
 import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
 
 /**
@@ -31,6 +32,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 
   override fun AnkoContext<Fragment>.initView() {
     verticalLayout {
+      lparams(matchParent, matchParent)
       nameInput
         .apply {
           text = WalletSettingsText.walletNameSettings
@@ -52,7 +54,6 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
         .apply {
           text = CommonText.confirm
           setGrayStyle()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
         }
         .click {
           presenter.changeWalletName(nameInput)

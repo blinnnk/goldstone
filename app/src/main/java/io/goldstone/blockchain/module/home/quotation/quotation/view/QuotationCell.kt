@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -70,8 +71,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
   private var cellLayout: RelativeLayout? = null
 
   private var chartData: ArrayList<Point> by observing(arrayListOf()) {
+    // 在 `recycler` 复用的时候进行存在判断
+    findViewById<LineChartView>(ElementID.chartView).isNotNull {
+      return@observing
+    }
     chartView
       .apply {
+        id = ElementID.chartView
         layoutParams = RelativeLayout.LayoutParams(com.blinnnk.uikit.ScreenSize.Width - 20.uiPX(), 130.uiPX()).apply {
           margin = 10.uiPX()
         }
