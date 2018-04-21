@@ -51,9 +51,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
         getInputStatus { hasInput, address ->
           setConfirmStatus(hasInput)
           address?.apply {
-            confirmButtonClickEvent = Runnable {
+            confirmButtonClickEvent =
               this@AddressSelectionFragment.presenter.showPaymentValueDetailFragment(address)
-            }
           }
         }
       }
