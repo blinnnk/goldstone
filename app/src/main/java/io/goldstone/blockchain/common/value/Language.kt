@@ -258,6 +258,12 @@ object CommonText {
     else -> "输入你的密码"
   }
 
+  @JvmField
+  val delete = when (currentLanguage) {
+    HoneyLanguage.English.code -> "DELETE"
+    else -> "删除"
+  }
+
 }
 
 object AlertText {

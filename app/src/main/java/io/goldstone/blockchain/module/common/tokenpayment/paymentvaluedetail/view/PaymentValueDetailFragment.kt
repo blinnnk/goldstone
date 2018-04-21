@@ -9,7 +9,7 @@ import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showEditTextAlertView
+import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.TransactionText
@@ -71,7 +71,7 @@ class PaymentValueDetailFragment :
   }
 
   private fun showConfirmAttentionView() {
-    context?.showEditTextAlertView(
+    context?.showAlertView(
       TransactionText.confirmTransaction,
       CommonText.enterPassword.toUpperCase()
     ) {

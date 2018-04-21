@@ -10,13 +10,16 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
  */
 
 class ContactsAdapter(
-  override val dataSet: ArrayList<ContactTable>
+  override val dataSet: ArrayList<ContactTable>,
+  private val hold: ContactsCell.() -> Unit
   ) : HoneyBaseAdapter<ContactTable, ContactsCell>() {
 
   override fun generateCell(context: Context) = ContactsCell(context)
 
   override fun ContactsCell.bindCell(data: ContactTable, position: Int) {
+    setSlideCell(true)
     model = data
+    hold(this)
   }
 
 }

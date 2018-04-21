@@ -19,10 +19,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<ContactTable>?) {
     recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-      onClick {
-        presenter.showPaymentValueDetailFragment(model.address)
-        preventDuplicateClicks()
-      }
+      clickEvent = presenter.showPaymentValueDetailFragment(model.address)
     }
   }
 
@@ -54,9 +51,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
         getInputStatus { hasInput, address ->
           setConfirmStatus(hasInput)
           address?.apply {
-            confirmButtonClickEvent = Runnable {
+            confirmButtonClickEvent =
               this@AddressSelectionFragment.presenter.showPaymentValueDetailFragment(address)
-            }
           }
         }
       }

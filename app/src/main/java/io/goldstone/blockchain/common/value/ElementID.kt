@@ -21,6 +21,8 @@ object ElementID {
   const val searchInput = 2006
   const val addButton = 2007
   const val chartView = 2008
+  const val slideCell = 2009
+  const val slideCellContainer = 2010
 }
 
 object ViewPagerID {

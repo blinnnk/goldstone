@@ -39,6 +39,16 @@ data class ContactTable(
       }
     }
 
+    fun deleteContactByID(id: Int, callback: () -> Unit = {}) {
+      coroutinesTask({
+        GoldStoneDataBase.database.contactDao().apply {
+          getContacts(id)?.let { delete(it) }
+        }
+      }) {
+        callback()
+      }
+    }
+
   }
 }
 
@@ -47,6 +57,9 @@ interface ContractDao {
 
   @Query("SELECT * FROM contact ORDER BY id DESC")
   fun getAllContacts(): List<ContactTable>
+
+  @Query("SELECT * FROM contact WHERE id LIKE :id")
+  fun getContacts(id: Int): ContactTable?
 
   @Insert
   fun insert(contact: ContactTable)

@@ -26,8 +26,7 @@ class QuotationManagementFragment : BaseRecyclerFragment<QuotationManagementPres
     recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray())
   }
 
-  override fun setSlideUpWithCellHeight(): Int?
-    = QuotationSize.cellHeight + QuotationSize.attentionHeight / asyncData?.size.orZero()
+  override fun setSlideUpWithCellHeight() = QuotationSize.cellHeight
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

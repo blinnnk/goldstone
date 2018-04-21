@@ -8,7 +8,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showEditTextAlertView
+import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -54,7 +54,7 @@ class WalletSettingsListPresenter(
 
   /** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
   fun deleteWallet() {
-    fragment.context?.showEditTextAlertView(
+    fragment.context?.showAlertView(
       WalletSettingsText.deleteInfoTitle,
       WalletSettingsText.deleteInfoSubtitle,
       !WalletTable.current.isWatchOnly

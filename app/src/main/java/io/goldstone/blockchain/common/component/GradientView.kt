@@ -37,7 +37,12 @@ class GradientView(context: Context) : View(context) {
     shaderStyle = when(type) {
       GradientType.Blue ->
         LinearGradient(0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
-          intArrayOf(Color.parseColor("#FF0E2552"), Color.parseColor("#FF1B3F69"), Color.parseColor("#FF3A7DA1"), Color.parseColor("#FF4FA9C8")),
+          intArrayOf(
+            Color.parseColor("#FF122750"),
+            Color.parseColor("#FF204972"),
+            Color.parseColor("#FF0e6c8c"),
+            Color.parseColor("#FF0e6c8c")
+          ),
           floatArrayOf(0f, 0.35f, 0.6f, 1f), Shader.TileMode.MIRROR)
       GradientType.PinkToYellow ->
         setGradientColor(Color.parseColor("#FF00FF80"), Color.parseColor("#FF0076FF"))

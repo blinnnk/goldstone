@@ -20,7 +20,6 @@ import io.goldstone.blockchain.common.value.ScreenSize
 
 open class BaseValueCell(context: Context) : BaseCell(context) {
 
-
   protected val icon by lazy { RoundIcon(context) }
   protected val info by lazy { TwoLineTitles(context) }
   protected val count by lazy { TwoLineTitles(context) }

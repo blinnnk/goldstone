@@ -60,7 +60,7 @@ class RoundButton(context: Context) : View(context) {
 
   fun setWhiteStyle() {
 
-    textSize = 14.uiPX().toFloat()
+    textSize = 13.uiPX().toFloat()
 
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
       topMargin = marginTop

@@ -48,7 +48,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
         width = logoSize
         height = logoSize
         centerHorizontally()
-        topMargin = (ScreenSize.Height * 0.22).toInt()
+        topMargin = (ScreenSize.Height * 0.24).toInt()
       }
 
       // Intro
@@ -76,7 +76,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 
         createButton
           .apply {
-            text = "Create Wallet"
+            text = "Create Wallet".toUpperCase()
             marginTop = 0
             setWhiteStyle()
           }
@@ -85,7 +85,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 
         importButton
           .apply {
-            text = "Import Wallet"
+            text = "Import Wallet".toUpperCase()
             marginTop = PaddingSize.content
             setWhiteStyle()
           }
