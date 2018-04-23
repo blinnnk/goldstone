@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -57,10 +58,15 @@ class WalletDetailPresenter(
   }
 
   private fun showPinCodeFragment() {
-    AppConfigTable.getAppConfig {
-      it?.showPincode?.isTrue {
-        fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-          //
+    fragment.activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull() isTrue {
+      AppConfigTable.getAppConfig {
+        it?.showPincode?.isTrue {
+          fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
+            ContainerID.main,
+            FragmentTag.pinCode
+          ) {
+            //
+          }
         }
       }
     }

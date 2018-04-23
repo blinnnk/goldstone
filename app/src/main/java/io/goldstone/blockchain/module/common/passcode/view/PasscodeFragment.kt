@@ -12,9 +12,13 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.textColor
 
 /**
  * @date 23/04/2018 11:04 AM
@@ -103,5 +107,4 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
       }
     }
   }
-
 }

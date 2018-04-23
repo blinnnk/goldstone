@@ -39,6 +39,7 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
   private val centerLeft = (ScreenSize.Width -codeWidth) / 2f
 
   init {
+
     layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX())
 
     titles.apply {

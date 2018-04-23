@@ -24,6 +24,7 @@ class PasscodePresenter(
       var retryTimes = it?.retryTimes.orZero()
       checkPasscode(passcode) {
         it isTrue {
+          if (retryTimes < Count.retry) resetConfig()
           fragment.removePasscodeFragment()
         } otherwise {
           retryTimes -= 1
@@ -50,11 +51,10 @@ class PasscodePresenter(
       it?.frozenTime.isNull() isFalse {
         currentFrozenTime = it?.frozenTime.orElse(0L) - System.currentTimeMillis()
         if (currentFrozenTime > 0) {
-          fragment.resetHeaderStyle()
           refreshFrozenTime()
           callback(true)
         } else {
-          AppConfigTable.updateRetryTimes(Count.retry)
+          resetConfig()
           callback(false)
         }
       } otherwise {
@@ -67,14 +67,22 @@ class PasscodePresenter(
     currentFrozenTime -= 1000L
     fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
     if (currentFrozenTime > 0) {
-      1000L timeUpThen { refreshFrozenTime() }
-    } else {
-      AppConfigTable.apply {
-        updateRetryTimes(Count.retry)
-        setFrozenTime(null)
-        fragment.recoveryAfterFrezon()
+      1000L timeUpThen {
+        refreshFrozenTime()
+        System.out.println("hello curr$currentFrozenTime")
       }
+    } else {
+      resetConfig()
+      fragment.recoveryAfterFrezon()
     }
+  }
+
+  private fun resetConfig() {
+    AppConfigTable.apply {
+      updateRetryTimes(Count.retry)
+      setFrozenTime(null)
+    }
+    currentFrozenTime = 0L
   }
 
   @SuppressLint("SetTextI18n")
