@@ -134,7 +134,7 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let { delete(it) }
           getAllWallets().let {
-            it.isEmpty().isTrue {
+            it.isEmpty() isTrue {
               GoldStoneAPI.context.runOnUiThread { callback() }
             } otherwise {
               update(it.first().apply { isUsing = true })

@@ -35,7 +35,7 @@ class TokenDetailOverlayPresenter(
   fun setValueHeader(token: WalletDetailCellModel?) {
     fragment.apply {
       overlayView.header.title.isHidden()
-      valueHeader.isNull().isTrue {
+      valueHeader.isNull() isTrue {
         customHeader = {
           valueHeader = TwoLineTitles(context)
           valueHeader

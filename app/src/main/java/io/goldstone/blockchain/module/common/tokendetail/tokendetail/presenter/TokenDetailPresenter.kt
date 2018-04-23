@@ -88,7 +88,7 @@ class TokenDetailPresenter(
     TransactionTable.getTransactionsByAddressAndSymbol(
       WalletTable.current.address, fragment.symbol!!
     ) { transactions ->
-      transactions.isNotEmpty().isTrue {
+      transactions.isNotEmpty() isTrue {
         fragment.updateDataByAsyncDataStatus(transactions.map { TransactionListModel(it) }.toArrayList())
       } otherwise {
         withoutLocalDataCallback()
@@ -109,7 +109,7 @@ class TokenDetailPresenter(
               loadDataFromDatabaseOrElse()
             } otherwise {
               // 链上和本地都没有数据就更新一个空数组作为默认
-              fragment.asyncData.isNull().isTrue {
+              fragment.asyncData.isNull() isTrue {
                 fragment.updateDataByAsyncDataStatus(arrayListOf())
               }
             }
@@ -121,7 +121,7 @@ class TokenDetailPresenter(
 
   private fun TokenDetailFragment.updateDataByAsyncDataStatus(data: ArrayList<TransactionListModel>) {
     tokenDetailData = data
-    asyncData.isNull().isTrue {
+    asyncData.isNull() isTrue {
       asyncData = data
     } otherwise {
       diffAndUpdateAdapterData<TokenDetailAdapter>(data)

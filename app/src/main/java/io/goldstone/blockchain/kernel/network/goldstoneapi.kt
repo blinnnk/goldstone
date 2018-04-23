@@ -202,13 +202,11 @@ object GoldStoneAPI {
       override fun onFailure(call: Call, error: IOException) {
         Log.e("ERROR", error.toString())
       }
-
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
         try {
           val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
           val jsonArray = dataObject[keyName] as JSONArray
-
           val dataArray = arrayListOf<T>()
           (0 until jsonArray.length()).forEachOrEnd { index, isEnd ->
             dataArray.add(jsonArray.get(index) as T)
@@ -223,6 +221,15 @@ object GoldStoneAPI {
     })
   }
 }
+
+object GoldStoneCode {
+  fun isSuccess(code: Any, callback: () -> Unit) {
+    if (code == 0) callback()
+    else Log.e("ERROR", "Wrong Code")
+  }
+}
+
+
 
 
 

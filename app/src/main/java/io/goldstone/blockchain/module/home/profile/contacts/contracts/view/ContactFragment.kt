@@ -5,6 +5,7 @@ import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -32,6 +33,8 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
     showAddButton()
   }
 
+  override fun setSlideUpWithCellHeight() = 75.uiPX()
+
   override fun onHiddenChanged(hidden: Boolean) {
     super.onHiddenChanged(hidden)
     if (isHidden) {
@@ -43,8 +46,8 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 
   private fun showAddButton(status: Boolean = true) {
     getParentFragment<ProfileOverlayFragment> {
-      showAddContactButton(status) {
-        onClick { presenter.showContactInputFragment() }
+      overlayView.header.showAddButton(status) {
+        presenter.showContactInputFragment()
       }
     }
   }

@@ -61,7 +61,7 @@ fun Context.showAlertView(title: String, subtitle: String, showEditText: Boolean
     subtitle,
     title
   ) {
-    showEditText.isTrue {
+    showEditText isTrue {
       customView {
         verticalLayout {
           lparams {

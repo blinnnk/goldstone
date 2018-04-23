@@ -42,7 +42,7 @@ class ContactPresenter(
 
   private fun updateAddressList() {
     ContactTable.getAllContacts {
-      it.isEmpty().isTrue {
+      it.isEmpty() isTrue {
         if (fragment.asyncData.isNull()) fragment.asyncData = it
         else {
           diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)

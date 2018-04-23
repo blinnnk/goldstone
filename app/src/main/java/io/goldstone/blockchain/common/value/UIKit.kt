@@ -102,3 +102,7 @@ object QuotationSize {
   @JvmField val cellHeight = 60.uiPX()
   @JvmField val attentionHeight = 60.uiPX()
 }
+
+object Count {
+  const val pinCode = 4
+}

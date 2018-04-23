@@ -93,21 +93,21 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
   fun showCloseButton(isShow: Boolean) {
     findViewById<ImageView>(ElementID.closeButton).apply {
       if (isShow) {
-        isNull().isTrue { addView(closeButton) }
+        isNull() isTrue { addView(closeButton) }
       } else {
-        isNull().isFalse { removeView(this) }
+        isNull() isFalse { removeView(this) }
       }
     }
   }
 
   fun showBackButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
     findViewById<ImageView>(ElementID.backButton).let {
-      it.isNull().isTrue {
-        isShow.isTrue {
+      it.isNull() isTrue {
+        isShow isTrue {
           backButton.click { setClickEvent(backButton) }.into(this)
         }
       } otherwise {
-        isShow.isTrue {
+        isShow isTrue {
           backButton.click { setClickEvent(backButton) }
         } otherwise {
           removeView(it)
@@ -116,15 +116,21 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     }
   }
 
-  fun showAddButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+  fun showAddButton(isShow: Boolean, setClickEvent: () -> Unit = {}) {
     findViewById<ImageView>(ElementID.addButton).let {
-      it.isNull().isTrue {
-        isShow.isTrue {
-          addButton.click { setClickEvent(addButton) }.into(this)
+      it.isNull() isTrue {
+        isShow isTrue {
+          addButton.click {
+            setClickEvent()
+            it.preventDuplicateClicks()
+          }.into(this)
         }
       } otherwise {
-        isShow.isTrue {
-          addButton.click { setClickEvent(addButton) }
+        isShow isTrue {
+          addButton.click {
+            setClickEvent()
+            it.preventDuplicateClicks()
+          }
         } otherwise {
           removeView(it)
         }
@@ -136,11 +142,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     searchInput.onPressKeyboardEnterButton { action(searchInput.editText)  }
   }
 
-  fun showSearchButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+  fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit = {}) {
     if (isShow) {
       searchButton
         .click {
-          setClickEvent(searchButton)
+          setClickEvent()
+          it.preventDuplicateClicks()
         }
         .into(this)
     } else findViewById<ImageView>(ElementID.searchButton)?.let {
@@ -161,7 +168,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
     // 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
     title.visibility = View.GONE
     findViewById<EditTextWithButton>(ElementID.searchInput).let {
-      it.isNull().isTrue {
+      it.isNull() isTrue {
         searchInput
           .apply {
             requestFocus()

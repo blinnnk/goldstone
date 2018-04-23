@@ -71,7 +71,7 @@ class AddressSelectionPresenter(
 
   private fun updateAddressList(callback: () -> Unit) {
     ContactTable.getAllContacts {
-      it.isEmpty().isTrue {
+      it.isEmpty() isTrue {
         fragment.asyncData = arrayListOf()
       } otherwise {
         if (fragment.asyncData.isNullOrEmpty()) {

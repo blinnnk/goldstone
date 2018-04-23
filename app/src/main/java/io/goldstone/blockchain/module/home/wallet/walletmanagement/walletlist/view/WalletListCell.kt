@@ -39,8 +39,8 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 
     icon.apply { glideImage(model.avatar) }
 
-    model.isWatchOnly.isTrue { signalIcon.into(this) }
-    model.isUsing.isTrue { currentIcon.into(this) }
+    model.isWatchOnly isTrue { signalIcon.into(this) }
+    model.isUsing isTrue { currentIcon.into(this) }
 
     setValueStyle()
 

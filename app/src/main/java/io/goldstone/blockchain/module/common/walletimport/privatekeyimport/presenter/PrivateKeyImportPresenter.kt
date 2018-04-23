@@ -31,7 +31,7 @@ class PrivateKeyImportPresenter(
     isAgree: Boolean,
     nameInput: EditText
   ) {
-    privateKeyInput.text.isEmpty().isTrue {
+    privateKeyInput.text.isEmpty() isTrue {
       fragment.context?.alert("privateKey is not correct")
       return
     }
@@ -54,7 +54,7 @@ class PrivateKeyImportPresenter(
 
       fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
         WalletTable.getWalletByAddress(address!!) {
-          it.isNull().isTrue {
+          it.isNull() isTrue {
             // 在数据库记录钱包信息
             WalletTable.insertAddress(address, name) {
               // 创建钱包并获取默认的 `token` 信息

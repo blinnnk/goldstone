@@ -86,6 +86,19 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
     subtitle.y += 5.uiPX()
   }
 
+  fun setBigWhiteStyle() {
+    title.apply {
+      textSize = 7.uiPX().toFloat()
+      typeface = GoldStoneFont.heavy(context)
+      textColor = Spectrum.white
+    }
+    subtitle.apply {
+      textSize = 4.uiPX().toFloat()
+      textColor = Spectrum.opacity5White
+      typeface = GoldStoneFont.medium(context)
+    }
+  }
+
   fun setQuotationStyle() {
     y += 10.uiPX()
     title.apply {

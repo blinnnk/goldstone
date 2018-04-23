@@ -12,5 +12,6 @@ data class QuotationModel(
   val name: String = "",
   val price: String = "",
   val percent: String = "",
-  val chartData: ArrayList<Point> = arrayListOf()
+  val chartData: ArrayList<Point> = arrayListOf(),
+  val exchangeName: String = ""
 )

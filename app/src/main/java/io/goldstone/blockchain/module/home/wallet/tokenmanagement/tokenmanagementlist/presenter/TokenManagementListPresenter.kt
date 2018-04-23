@@ -44,7 +44,7 @@ class TokenManagementListPresenter(
             if (isEnd) {
               // 在主线程更新 `UI`
               context?.runOnUiThread {
-                asyncData.isNull().isTrue {
+                asyncData.isNull() isTrue {
                   asyncData = defaultTokens
                 } otherwise {
                   diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(defaultTokens)

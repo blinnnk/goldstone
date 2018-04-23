@@ -9,6 +9,7 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
@@ -46,6 +47,8 @@ class GoldStoneApp : Application() {
 
     registerDeviceForPush()
 
+    prepareAppConfig()
+
   }
 
   companion object {
@@ -67,7 +70,7 @@ class GoldStoneApp : Application() {
     }
 
     private fun initLaunchLanguage(wallet: WalletTable) {
-      wallet.isNull().isTrue {
+      wallet.isNull() isTrue {
         currentLanguage = HoneyLanguage.getLanguageCode(CountryCode.currentLanguage)
       } otherwise {
         currentLanguage = wallet.language
@@ -81,6 +84,10 @@ class GoldStoneApp : Application() {
       GoldStoneAPI.getCurrencyRate(wallet.currencyCode) {
         currentRate = it
       }
+    }
+
+    private fun prepareAppConfig() {
+      AppConfigTable.insertAppConfig()
     }
   }
 }

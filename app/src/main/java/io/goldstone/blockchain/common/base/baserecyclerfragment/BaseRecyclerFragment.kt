@@ -15,7 +15,6 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
-import io.goldstone.blockchain.common.utils.navigationBarIsHidden
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -44,7 +43,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
    */
   var asyncData: ArrayList<D>? by observing(null) {
     recyclerView.adapter.apply {
-      isNull().isTrue {
+      isNull() isTrue {
         setRecyclerViewAdapter(recyclerView, asyncData)
       } otherwise {
         notifyDataSetChanged()
@@ -101,7 +100,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
   open fun setSlideUpAnimation() {
     // 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
     setSlideUpWithCellHeight().let {
-      it.isNull().isTrue {
+      it.isNull() isTrue {
         presenter.updateParentContentLayoutHeight()
       } otherwise {
         presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), it.orZero())

@@ -30,50 +30,39 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
   override val presenter = PasswordSettingsPresenter(this)
 
   override fun AnkoContext<Fragment>.initView() {
-    
+
     verticalLayout {
 
-      oldPassword
-        .apply {
-          text = "Old Password"
-          setPasswordInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-        }
-        .into(this)
+      oldPassword.apply {
+        text = "Old Password"
+        setPasswordInput()
+        setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+      }.into(this)
 
-      newPassword
-        .apply {
-          text = "New Password"
-          setPasswordInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-        }
-        .into(this)
+      newPassword.apply {
+        text = "New Password"
+        setPasswordInput()
+        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+      }.into(this)
 
-      repeatPassword
-        .apply {
-          text = "Repeat Password"
-          setPasswordInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-        }
-        .into(this)
+      repeatPassword.apply {
+        text = "Repeat Password"
+        setPasswordInput()
+        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+      }.into(this)
 
-      passwordHint
-        .apply {
-          text = "Password Hint"
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-        }
-        .into(this)
+      passwordHint.apply {
+        text = "Password Hint"
+        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+      }.into(this)
 
-      confirmButton
-        .apply {
-          text = CommonText.confirm
-          setGrayStyle()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-        }
-        .click {
+      confirmButton.apply {
+        text = CommonText.confirm
+        setGrayStyle()
+        setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+      }.click {
           presenter.updatePassword(oldPassword, newPassword, repeatPassword)
-        }
-        .into(this)
+        }.into(this)
 
     }
 

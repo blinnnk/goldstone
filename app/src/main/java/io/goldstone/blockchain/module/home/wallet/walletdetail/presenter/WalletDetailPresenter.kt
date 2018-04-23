@@ -6,6 +6,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -36,7 +38,7 @@ class WalletDetailPresenter(
     WalletDetailCellModel.getModels { it ->
       val newData
         = it.sortedByDescending { it.currency }.toArrayList()
-      fragment.asyncData.isNull().isTrue {
+      fragment.asyncData.isNull() isTrue {
         fragment.asyncData = newData
       } otherwise {
         diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
@@ -51,6 +53,17 @@ class WalletDetailPresenter(
   override fun onFragmentResume() {
     CreateWalletPresenter.updateMyTokensValue {
       updateAllTokensInWalletBy()
+    }
+    showPinCodeFragment()
+  }
+
+  private fun showPinCodeFragment() {
+    AppConfigTable.getAppConfig {
+      it.showPincode.isTrue {
+        fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
+          //
+        }
+      }
     }
   }
 

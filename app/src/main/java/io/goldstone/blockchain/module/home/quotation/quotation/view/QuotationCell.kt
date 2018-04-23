@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.view.Gravity
 import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -21,6 +23,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.textColor
 
 @SuppressLint("SetTextI18n")
 /**
@@ -41,6 +44,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       chartLineColor = Spectrum.red
     }
     chartData = model.chartData
+    exchangeName.text = model.exchangeName
   }
 
   private val tokenInfo by lazy {
@@ -60,6 +64,18 @@ class QuotationCell(context: Context) : LinearLayout(context) {
     }
   }
 
+  private val exchangeName by lazy {
+    TextView(context).apply {
+      textSize = 4.uiPX().toFloat()
+      textColor = GrayScale.midGray
+      typeface = GoldStoneFont.medium(context)
+      gravity = Gravity.END
+      layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
+      x -= 20.uiPX()
+      y += 50.uiPX()
+    }
+  }
+
   private var chartColor = Spectrum.lightGreen
   private var chartLineColor = Spectrum.green
 
@@ -72,48 +88,49 @@ class QuotationCell(context: Context) : LinearLayout(context) {
     findViewById<LineChartView>(ElementID.chartView).isNotNull {
       return@observing
     }
-    chartView
-      .apply {
-        id = ElementID.chartView
-        layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
-        setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
-        y += 60.uiPX()
-        // 设定背景的网格
-        setGrid(5, 10, Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
-        // 设定便捷字体颜色
-        setLabelsColor(GrayScale.midGray)
-        // 设定 `Y` 周波段
-        setAxisBorderValues(0f, 100f, 25f)
-        // 设定外界 `Border` 颜色
-        setAxisColor(Color.argb(0, 0, 0, 0))
-        // 设定外边的 `Border` 的粗细
-        setAxisThickness(0f)
+    chartView.apply {
+      id = ElementID.chartView
+      layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+      setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+      y += 60.uiPX()
+      // 设定背景的网格
+      setGrid(
+        5,
+        10,
+        Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
+      // 设定便捷字体颜色
+      setLabelsColor(GrayScale.midGray)
+      // 设定 `Y` 周波段
+      setAxisBorderValues(0f, 100f, 25f)
+      // 设定外界 `Border` 颜色
+      setAxisColor(Color.argb(0, 0, 0, 0))
+      // 设定外边的 `Border` 的粗细
+      setAxisThickness(0f)
 
-        val dataSet = LineSet()
-        dataSet.apply {
-          chartData.forEach { addPoint(it) }
-          // 这个是线的颜色
-          color = chartLineColor
-          // 渐变色彩
-          setGradientFill(intArrayOf(chartColor, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
-          // 线条联动用贝塞尔曲线
-          isSmooth = true
-          // 线条的粗细
-          thickness = 3.uiPX().toFloat()
-          // 设定字体
-          setTypeface(GoldStoneFont.heavy(context))
-          setFontSize(9.uiPX())
-        }
-
-        addData(dataSet)
-
-        setClickablePointRadius(30.uiPX().toFloat())
-
-        val animation = Animation(1000)
-        animation.setInterpolator(OvershootInterpolator())
-        show(animation)
+      val dataSet = LineSet()
+      dataSet.apply {
+        chartData.forEach { addPoint(it) }
+        // 这个是线的颜色
+        color = chartLineColor
+        // 渐变色彩
+        setGradientFill(intArrayOf(chartColor, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
+        // 线条联动用贝塞尔曲线
+        isSmooth = true
+        // 线条的粗细
+        thickness = 3.uiPX().toFloat()
+        // 设定字体
+        setTypeface(GoldStoneFont.heavy(context))
+        setFontSize(9.uiPX())
       }
-      .into(cellLayout!!)
+
+      addData(dataSet)
+
+      setClickablePointRadius(30.uiPX().toFloat())
+
+      val animation = Animation(1000)
+      animation.setInterpolator(OvershootInterpolator())
+      show(animation)
+    }.into(cellLayout!!)
   }
 
   init {
@@ -127,7 +144,11 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 
       addView(tokenInfo)
       addView(tokenPrice)
+
+      addView(exchangeName)
+
       tokenPrice.setAlignParentRight()
+
     }
   }
 

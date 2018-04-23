@@ -51,7 +51,7 @@ class PaymentValueDetailFragment :
       address?.apply { showTargetAddress(this) }
       presenter.updateHeaderValue(this)
       inputTextListener {
-        it.isNotEmpty().isTrue { transferCount = it.toDouble() }
+        it.isNotEmpty() isTrue { transferCount = it.toDouble() }
       }
       setHeaderSymbol(token?.symbol.orEmpty())
     }

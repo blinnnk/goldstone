@@ -52,7 +52,7 @@ object CryptoUtils {
   fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
     var address: String
     var count: Double
-    isTransferInputCode(inputCode).isTrue {
+    isTransferInputCode(inputCode) isTrue {
       // analysis input code and get the received address
       address = inputCode.substring(
         SolidityCode.contractTransfer.length,

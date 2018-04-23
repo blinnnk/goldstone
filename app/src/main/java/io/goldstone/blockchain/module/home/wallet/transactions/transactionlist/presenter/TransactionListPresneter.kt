@@ -45,7 +45,7 @@ class TransactionListPresenter(
         getMainActivity()?.updateTransactionInAsync(localTransactions!!)
       } otherwise {
         TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
-          localData.isNotEmpty().isTrue {
+          localData.isNotEmpty() isTrue {
             asyncData = localData
             localTransactions = localData
           } otherwise {
@@ -109,7 +109,7 @@ class TransactionListPresenter(
       // Show loading view
       showLoadingView()
       mergeNormalAndTokenIncomingTransactions(startBlock) {
-        it.isNotEmpty().isTrue {
+        it.isNotEmpty() isTrue {
           // 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
           filterCompletedData(it, hold)
           Log.d("DEBUG", "update the new data from chain")
@@ -208,7 +208,7 @@ class TransactionListPresenter(
               var count = 0.0
               // 首先从本地数据库检索 `contract` 对应的 `symbol`
               DefaultTokenTable.getTokenByContractAddress(contract) { tokenInfo ->
-                transaction.logIndex.isNotEmpty().isTrue {
+                transaction.logIndex.isNotEmpty() isTrue {
                   count = CryptoUtils.toCountByDecimal(
                     transaction.value.toDouble(), tokenInfo?.decimals.orElse(0.0)
                   )
@@ -222,7 +222,7 @@ class TransactionListPresenter(
                   receiveAddress = transactionInfo?.address!!
                 }
 
-                tokenInfo.isNull().isTrue {
+                tokenInfo.isNull() isTrue {
                   // 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
                   GoldStoneEthCall.getTokenSymbol(contract) { tokenSymbol ->
                     TransactionTable.updateModelInfoFromChain(
