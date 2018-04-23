@@ -105,4 +105,5 @@ object QuotationSize {
 
 object Count {
   const val pinCode = 4
+  const val retry = 5
 }

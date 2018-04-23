@@ -21,4 +21,5 @@ object ArgumentKey {
 
 object SharesPreference {
   const val registerPush = "registerPush"
+  const val retryTimes = "retryTimes"
 }

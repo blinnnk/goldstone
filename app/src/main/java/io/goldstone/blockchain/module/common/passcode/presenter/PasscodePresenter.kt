@@ -1,10 +1,9 @@
 package io.goldstone.blockchain.module.common.passcode.presenter
 
+import android.annotation.SuppressLint
 import com.blinnnk.animation.updateAlphaAnimation
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
@@ -16,27 +15,71 @@ import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 
 class PasscodePresenter(
   override val fragment: PasscodeFragment
-  ) : BasePresenter<PasscodeFragment>() {
+) : BasePresenter<PasscodeFragment>() {
 
-  private var retryTimes = 5
+  private var currentFrozenTime = 0L
 
   fun unlockOrAlert(passcode: String, action: () -> Unit) {
-    if (retryTimes <= 0) {
-      fragment.context?.alert("Your have entered too many times please wait a momnet")
-      return
+    AppConfigTable.getAppConfig {
+      var retryTimes = it?.retryTimes.orZero()
+      checkPasscode(passcode) {
+        it isTrue {
+          fragment.removePasscodeFragment()
+        } otherwise {
+          retryTimes -= 1
+          AppConfigTable.updateRetryTimes(retryTimes)
+          if (retryTimes == 0) {
+            // 如果失败尝试超过 `Count.retry` 次, 那么将会存入冻结时间 `1` 分钟
+            val oneMinute = 60 * 1000L
+            AppConfigTable.setFrozenTime(System.currentTimeMillis() + oneMinute) {
+              currentFrozenTime = oneMinute
+              refreshFrozenTime()
+            }
+          } else {
+            fragment.resetHeaderStyle()
+            fragment.showFailedAttention("incorrect passcode $retryTimes retry times left")
+          }
+        }
+      }
+      action()
     }
-    checkPasscode(passcode) {
-      it isTrue {
-        // ToDo 在数据库存入超过次数的时间戳下次进行比对, 多次输错进行锁定
-        fragment.removePasscodeFragment()
+  }
 
+  fun isFrozenStatus(callback: (Boolean) -> Unit = {}) {
+    AppConfigTable.getAppConfig {
+      it?.frozenTime.isNull() isFalse {
+        currentFrozenTime = it?.frozenTime.orElse(0L) - System.currentTimeMillis()
+        if (currentFrozenTime > 0) {
+          fragment.resetHeaderStyle()
+          refreshFrozenTime()
+          callback(true)
+        } else {
+          AppConfigTable.updateRetryTimes(Count.retry)
+          callback(false)
+        }
       } otherwise {
-        retryTimes -= 1
-        fragment.showFailedAttention(retryTimes)
-        fragment.context?.alert("Wrong Passcode Please Retry")
+        callback(false)
       }
     }
-    action()
+  }
+
+  private fun refreshFrozenTime() {
+    currentFrozenTime -= 1000L
+    fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
+    if (currentFrozenTime > 0) {
+      1000L timeUpThen { refreshFrozenTime() }
+    } else {
+      AppConfigTable.apply {
+        updateRetryTimes(Count.retry)
+        setFrozenTime(null)
+        fragment.recoveryAfterFrezon()
+      }
+    }
+  }
+
+  @SuppressLint("SetTextI18n")
+  private fun setRemainingFrozenTime(currentFrozenTime: Long): String {
+    return "you have to wait ${currentFrozenTime / 1000} seconds"
   }
 
   private fun PasscodeFragment.removePasscodeFragment(callback: () -> Unit = {}) {
@@ -51,12 +94,12 @@ class PasscodePresenter(
   private fun checkPasscode(passcode: String, hold: (Boolean) -> Unit) {
     if (passcode.length >= Count.pinCode)
     // 从数据库获取本机的 `Passcode`
-    AppConfigTable.getAppConfig {
-      if (it.pincode == passcode.toInt()) {
-        hold(true)
-      } else {
-        hold(false)
+      AppConfigTable.getAppConfig {
+        if (it?.pincode == passcode.toInt()) {
+          hold(true)
+        } else {
+          hold(false)
+        }
       }
-    }
   }
 }

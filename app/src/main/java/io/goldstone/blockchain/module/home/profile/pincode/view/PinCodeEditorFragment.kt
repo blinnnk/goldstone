@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.pincode.view
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
@@ -31,6 +30,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
   private val newPinCode by lazy { RoundInput(context!!) }
   private val repeatPinCode by lazy { RoundInput(context!!) }
   val confirmButton by lazy { RoundButton(context!!) }
+  private val switch by lazy { HoneyBaseSwitch(context!!) }
 
   override val presenter = PinCodeEditorPresenter(this)
 
@@ -40,7 +40,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
     verticalLayout {
       lparams(matchParent, matchParent)
       AppConfigTable.getAppConfig {
-        it.pincode.isNotNull {
+        it?.pincode.isNotNull {
           presenter.showPinCodeFragment()
         }
 
@@ -73,7 +73,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
           setGrayStyle()
           setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
         }.click {
-          presenter.resetPinCode(newPinCode, repeatPinCode)
+          presenter.resetPinCode(newPinCode, repeatPinCode, switch)
         }.into(this)
       }
     }
@@ -97,16 +97,16 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
       }
 
       AppConfigTable.getAppConfig { config ->
-        HoneyBaseSwitch(context)
+        switch
           .apply {
             setAlignParentRight()
-            isChecked = config.showPincode
+            isChecked = config?.showPincode.orFalse()
           }
           .click { switch ->
             // 点击后根据更新的数据库情况显示开关状态
             presenter.setShowPinCodeStatus(switch.isChecked) {
               AppConfigTable.getAppConfig {
-                switch.isChecked = it.showPincode
+                switch.isChecked = it?.showPincode.orFalse()
               }
             }
           }

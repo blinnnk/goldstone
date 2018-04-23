@@ -87,7 +87,11 @@ class GoldStoneApp : Application() {
     }
 
     private fun prepareAppConfig() {
-      AppConfigTable.insertAppConfig()
+      AppConfigTable.getAppConfig { config ->
+        config.isNull().isTrue {
+          AppConfigTable.insertAppConfig()
+        }
+      }
     }
   }
 }

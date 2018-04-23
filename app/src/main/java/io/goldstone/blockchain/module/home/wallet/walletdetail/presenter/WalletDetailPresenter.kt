@@ -36,8 +36,7 @@ class WalletDetailPresenter(
     WalletTable.apply { getAll { walletCount = size } }
     // Check the info of wallet currency list
     WalletDetailCellModel.getModels { it ->
-      val newData
-        = it.sortedByDescending { it.currency }.toArrayList()
+      val newData = it.sortedByDescending { it.currency }.toArrayList()
       fragment.asyncData.isNull() isTrue {
         fragment.asyncData = newData
       } otherwise {
@@ -59,7 +58,7 @@ class WalletDetailPresenter(
 
   private fun showPinCodeFragment() {
     AppConfigTable.getAppConfig {
-      it.showPincode.isTrue {
+      it?.showPincode?.isTrue {
         fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
           //
         }

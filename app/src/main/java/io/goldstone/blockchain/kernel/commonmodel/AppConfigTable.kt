@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -15,18 +16,20 @@ import org.jetbrains.anko.runOnUiThread
 
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
-  @PrimaryKey(autoGenerate = true)
-  var id: Int,
-  var pincode: Int? = null,
-  var showPincode: Boolean = false
+  @PrimaryKey(autoGenerate = true) var id: Int, var pincode: Int? = null,
+  var showPincode: Boolean = false,
+  var frozenTime: Long? = null,
+  var retryTimes: Int = 5
 ) {
   companion object {
-    fun getAppConfig(hold: (AppConfigTable) -> Unit) {
+    fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.appConfigDao().getAppConfig()
       }) {
         it.isNotEmpty() isTrue {
           hold(it[0])
+        } otherwise {
+          hold(null)
         }
       }
     }
@@ -46,12 +49,42 @@ data class AppConfigTable(
       }
     }
 
+    fun updateRetryTimes(times: Int, callback: () -> Unit = {}) {
+      doAsync {
+        GoldStoneDataBase.database.appConfigDao().apply {
+          getAppConfig().let {
+            it.isNotEmpty() isTrue {
+              update(it[0].apply { it[0].retryTimes = times })
+              GoldStoneAPI.context.runOnUiThread {
+                callback()
+              }
+            }
+          }
+        }
+      }
+    }
+
+    fun setFrozenTime(frozenTime: Long?, callback: () -> Unit = {}) {
+      doAsync {
+        GoldStoneDataBase.database.appConfigDao().apply {
+          getAppConfig().let {
+            it.isNotEmpty() isTrue {
+              update(it[0].apply { this.frozenTime = frozenTime })
+              GoldStoneAPI.context.runOnUiThread { callback() }
+            }
+          }
+        }
+      }
+    }
+
     fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit) {
       AppConfigTable.getAppConfig {
-        doAsync {
-          GoldStoneDataBase.database.appConfigDao().update(it.apply { showPincode = status })
-          GoldStoneAPI.context.runOnUiThread {
-            callback()
+        it?.let {
+          doAsync {
+            GoldStoneDataBase.database.appConfigDao().update(it.apply { showPincode = status })
+            GoldStoneAPI.context.runOnUiThread {
+              callback()
+            }
           }
         }
       }
@@ -59,7 +92,7 @@ data class AppConfigTable(
 
     fun insertAppConfig() {
       doAsync {
-        GoldStoneDataBase.database.appConfigDao().insert(AppConfigTable(0, null))
+        GoldStoneDataBase.database.appConfigDao().insert(AppConfigTable(0, null, false, null))
       }
     }
   }

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
 import org.jetbrains.anko.AnkoContext
@@ -35,27 +36,66 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
   override fun AnkoContext<Fragment>.initView() {
     container = relativeLayout {
+      isClickable = true
+
       lparams(matchParent, matchParent)
 
-      GradientView(context)
-        .apply {
-          setStyle(GradientType.Blue)
-          lparams(matchParent, matchParent)
-        }
-        .into(this)
+      GradientView(context).apply {
+        setStyle(GradientType.Blue)
+        lparams(matchParent, matchParent)
+      }.into(this)
 
-      passcodeInput
-        .apply {
-          y += ScreenSize.Height * 0.18f
-        }
-        .into(this)
+      passcodeInput.apply {
+        y += ScreenSize.Height * 0.18f
+      }.into(this)
 
       keyboard.into(this)
       keyboard.apply {
         setCenterInHorizontal()
         setAlignParentBottom()
         y -= ScreenSize.Height * 0.12f
-        checkCode = Runnable {
+        setKeyboardClickEventByFrozenStatus()
+      }
+    }
+  }
+
+  fun resetHeaderStyle() {
+    keyboard.resetCode()
+    passcodeInput.swipe()
+  }
+
+  @SuppressLint("SetTextI18n")
+  fun showFailedAttention(content: String) {
+    failedAttention.isNull() isFalse {
+      failedAttention?.text = content
+    } otherwise {
+      failedAttention = TextView(context).apply {
+        y += 30.uiPX()
+        layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
+        textSize = 4.uiPX().toFloat()
+        textColor = Spectrum.red
+        typeface = GoldStoneFont.medium(context)
+        text = content
+        gravity = Gravity.CENTER_HORIZONTAL
+      }
+      failedAttention?.into(container)
+    }
+  }
+
+  fun recoveryAfterFrezon() {
+    container.removeView(failedAttention)
+    keyboard.setKeyboardClickEventByFrozenStatus()
+    failedAttention = null
+    resetHeaderStyle()
+  }
+
+  private fun NumberKeyboard.setKeyboardClickEventByFrozenStatus() {
+    // 检查是否处于冻结状态
+    presenter.isFrozenStatus { isFrozen ->
+      checkCode = Runnable {
+        isFrozen isTrue {
+          context?.alert("Not it is frozen, you have to wait")
+        } otherwise {
           presenter.unlockOrAlert(getEnteredCode()) {
             getEnteredCode().isEmpty() isTrue {
               passcodeInput.recoveryStyle()
@@ -65,26 +105,6 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
           }
         }
       }
-    }
-  }
-
-  @SuppressLint("SetTextI18n")
-  fun showFailedAttention(times: Int) {
-    keyboard.resetCode()
-    passcodeInput.swipe()
-    failedAttention.isNull() isFalse  {
-      failedAttention?.text = "incorrect passcode $times retry times left"
-    } otherwise {
-      failedAttention = TextView(context).apply {
-        y += 30.uiPX()
-        layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
-        textSize = 4.uiPX().toFloat()
-        textColor = Spectrum.red
-        typeface = GoldStoneFont.medium(context)
-        text = "incorrect passcode $times retry times left"
-        gravity = Gravity.CENTER_HORIZONTAL
-      }
-      failedAttention?.into(container)
     }
   }
 
