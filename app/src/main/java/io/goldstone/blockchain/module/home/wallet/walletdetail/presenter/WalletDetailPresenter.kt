@@ -62,10 +62,9 @@ class WalletDetailPresenter(
       AppConfigTable.getAppConfig {
         it?.showPincode?.isTrue {
           fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-            ContainerID.main,
-            FragmentTag.pinCode
+            ContainerID.main, FragmentTag.pinCode
           ) {
-            //
+            // Send Argument
           }
         }
       }

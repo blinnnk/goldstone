@@ -31,13 +31,13 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
   private val rowCount = 3
   private val totalCount = 11
   private var currentCode: String by observing("") {
-    // 最多 `4` 位如输入码
     if (currentCode.length <= Count.pinCode) checkCode?.run()
   }
 
   init {
     val keyboardWidth = (buttonSize + itemSpace) * rowCount - itemSpace
-    val keyboardHeight = ((buttonSize + lineSpace) * (Math.ceil(totalCount / rowCount.toDouble())) - lineSpace).toInt()
+    val keyboardHeight =
+      ((buttonSize + lineSpace) * (Math.ceil(totalCount / rowCount.toDouble())) - lineSpace).toInt()
     layoutParams = LinearLayout.LayoutParams(keyboardWidth, keyboardHeight)
     (0 until totalCount).forEach {
       textView {
@@ -47,9 +47,12 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
         textColor = Spectrum.white
         gravity = Gravity.CENTER
         layoutParams = LinearLayout.LayoutParams(buttonSize, buttonSize)
-        x = (it % rowCount * (buttonSize + itemSpace)).toFloat() + if (it >= 9) buttonSize + itemSpace else 0
+        x = (it % rowCount * (buttonSize + itemSpace)).toFloat() +
+          if (it >= 9) buttonSize + itemSpace else 0
         y = (Math.floor(it / rowCount.toDouble()) * (buttonSize + lineSpace)).toFloat()
-        addTouchRippleAnimation(Spectrum.opacity1White, Spectrum.yellow, RippleMode.Square, buttonSize.toFloat())
+        addTouchRippleAnimation(
+          Spectrum.opacity1White, Spectrum.yellow, RippleMode.Square, buttonSize.toFloat()
+        )
         // 输入密码
         // 第 `10` 位是 `cancel` 键
         if (it < 10) {
@@ -63,8 +66,7 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
         // 删除已经输入的部分
         if (it == 10) {
           onClick {
-            if (currentCode.isNotEmpty())
-              currentCode = currentCode.substring(0, currentCode.length - 1)
+            currentCode.apply { if (isNotEmpty()) currentCode = substring(0, lastIndex) }
           }
         }
       }
@@ -72,6 +74,8 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
   }
 
   fun getEnteredCode() = currentCode
-  fun resetCode() { currentCode = "" }
+  fun resetCode() {
+    currentCode = ""
+  }
 
 }

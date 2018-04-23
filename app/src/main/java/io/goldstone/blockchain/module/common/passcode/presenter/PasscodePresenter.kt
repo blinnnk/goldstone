@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.passcode.presenter
 
 import android.annotation.SuppressLint
+import android.os.Handler
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -15,9 +16,10 @@ import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 
 class PasscodePresenter(
   override val fragment: PasscodeFragment
-) : BasePresenter<PasscodeFragment>() {
+  ) : BasePresenter<PasscodeFragment>() {
 
   private var currentFrozenTime = 0L
+  private val handler = Handler()
 
   fun unlockOrAlert(passcode: String, action: () -> Unit) {
     AppConfigTable.getAppConfig {
@@ -34,7 +36,7 @@ class PasscodePresenter(
             val oneMinute = 60 * 1000L
             AppConfigTable.setFrozenTime(System.currentTimeMillis() + oneMinute) {
               currentFrozenTime = oneMinute
-              refreshFrozenTime()
+              refreshRunnable.run()
             }
           } else {
             fragment.resetHeaderStyle()
@@ -51,30 +53,34 @@ class PasscodePresenter(
       it?.frozenTime.isNull() isFalse {
         currentFrozenTime = it?.frozenTime.orElse(0L) - System.currentTimeMillis()
         if (currentFrozenTime > 0) {
-          refreshFrozenTime()
+          refreshRunnable.run()
           callback(true)
         } else {
           resetConfig()
           callback(false)
         }
       } otherwise {
+        resetConfig()
         callback(false)
       }
     }
   }
 
-  private fun refreshFrozenTime() {
-    currentFrozenTime -= 1000L
-    fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
-    if (currentFrozenTime > 0) {
-      1000L timeUpThen {
-        refreshFrozenTime()
-        System.out.println("hello curr$currentFrozenTime")
+  private val refreshRunnable: Runnable by lazy {
+    Runnable {
+      currentFrozenTime -= 1000L
+      fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
+      if (currentFrozenTime > 0) {
+        handler.postDelayed(refreshRunnable, 1000L)
+      } else {
+        resetConfig()
+        fragment.recoveryAfterFrezon()
       }
-    } else {
-      resetConfig()
-      fragment.recoveryAfterFrezon()
     }
+  }
+
+  override fun onFragmentDetach() {
+    handler.removeCallbacks(refreshRunnable)
   }
 
   private fun resetConfig() {

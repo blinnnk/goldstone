@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
 import org.jetbrains.anko.AnkoContext
@@ -84,7 +83,6 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
   fun recoveryAfterFrezon() {
     failedAttention?.let { container.removeView(it) }
-    keyboard.setKeyboardClickEventByFrozenStatus()
     failedAttention = null
     resetHeaderStyle()
   }
@@ -93,15 +91,12 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
     // 检查是否处于冻结状态
     presenter.isFrozenStatus { isFrozen ->
       checkCode = Runnable {
-        isFrozen isTrue {
-          context?.alert("Now it is frozen, you have to wait")
-        } otherwise {
-          presenter.unlockOrAlert(getEnteredCode()) {
-            getEnteredCode().isEmpty() isTrue {
-              passcodeInput.recoveryStyle()
-            } otherwise {
-              passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
-            }
+        if (isFrozen) return@Runnable
+        presenter.unlockOrAlert(getEnteredCode()) {
+          getEnteredCode().isEmpty() isTrue {
+            passcodeInput.recoveryStyle()
+          } otherwise {
+            passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
           }
         }
       }
