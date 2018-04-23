@@ -83,6 +83,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
   fun recoveryAfterFrezon() {
     failedAttention?.let { container.removeView(it) }
+    keyboard.setKeyboardClickEventByFrozenStatus()
     failedAttention = null
     resetHeaderStyle()
   }
