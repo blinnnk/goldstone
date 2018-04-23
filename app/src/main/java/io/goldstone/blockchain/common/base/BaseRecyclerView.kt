@@ -86,7 +86,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
   }
 
   inline fun <reified T : RecyclerView.LayoutManager> getManager(block: T.() -> Unit) {
-    (this.layoutManager is T).isTrue { block(this.layoutManager as T) }
+    (this.layoutManager is T) isTrue { block(this.layoutManager as T) }
   }
 
 }

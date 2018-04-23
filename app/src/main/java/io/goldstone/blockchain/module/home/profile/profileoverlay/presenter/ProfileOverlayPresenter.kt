@@ -10,6 +10,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
+import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
 /**
@@ -31,6 +32,13 @@ class ProfileOverlayPresenter(
       ProfileText.currency -> showCurrencyFragment()
       ProfileText.language -> showLanguageFragment()
       ProfileText.aboutUs -> showAboutUsFragment()
+      ProfileText.pinCode -> showPinCodeEditorFragment()
+    }
+  }
+
+  private fun showPinCodeEditorFragment() {
+    fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content) {
+      // Send Arguments
     }
   }
 

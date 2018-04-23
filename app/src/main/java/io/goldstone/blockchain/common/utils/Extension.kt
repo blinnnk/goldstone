@@ -55,13 +55,17 @@ fun Context.alert(message: String) {
   alert(Appcompat, message).show()
 }
 
-fun Context.showAlertView(title: String, subtitle: String, showEditText: Boolean = true, action: (EditText?) -> Unit) {
+fun Context.showAlertView(
+  title: String,
+  subtitle: String,
+  showEditText: Boolean = true,
+  action: (EditText?) -> Unit
+) {
   var input: EditText? = null
   alert(
-    subtitle,
-    title
+    subtitle, title
   ) {
-    showEditText.isTrue {
+    showEditText isTrue {
       customView {
         verticalLayout {
           lparams {

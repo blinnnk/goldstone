@@ -41,7 +41,7 @@ class HomePresenter(
     childFragmentManager.fragments?.forEach { hideChildFragment(it) }
     // 加载目标 `Fragment`
     childFragmentManager.findFragmentByTag(fragmentTag).let {
-      it.isNull().isTrue {
+      it.isNull() isTrue {
         addFragmentAndSetArgument<T>(ContainerID.home, fragmentTag) {
           setArgument(this)
         }

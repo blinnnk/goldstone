@@ -50,7 +50,7 @@ class WalletSettingsPresenter(
 
       customHeader = {
         layoutParams.height = 200.uiPX()
-        header.isNull().isTrue {
+        header.isNull() isTrue {
           header = WalletSettingsHeader(context)
           addView(header)
         } otherwise {

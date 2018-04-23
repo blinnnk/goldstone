@@ -69,11 +69,10 @@ data class MyTokenTable(
     }
 
     fun insertBySymbol(symbol: String, ownerAddress: String, callback: () -> Unit = {}) {
-
       coroutinesTask({
         GoldStoneDataBase.database.apply {
           // 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-          myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull().isTrue {
+          myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull() isTrue {
             getBalanceAndInsertWithSymbol(symbol, ownerAddress)
           }
         }

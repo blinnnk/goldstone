@@ -46,6 +46,10 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
     // Do Something
   }
 
+  open fun onFragmentDestroy() {
+
+  }
+
   fun recoveryFragmentHeight() {
     fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
       overlayView.contentLayout

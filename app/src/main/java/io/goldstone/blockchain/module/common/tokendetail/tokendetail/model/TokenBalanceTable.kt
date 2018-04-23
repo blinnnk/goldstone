@@ -65,7 +65,7 @@ data class TokenBalanceTable(
       val addTime = System.currentTimeMillis()
       GoldStoneDataBase.database.tokenBalanceDao().apply {
         getBalanceByDate(date, address, symbol).let {
-          it.isNull().isTrue {
+          it.isNull() isTrue {
             insert(TokenBalanceTable(0, symbol, date, addTime, balance, address))
           } otherwise {
             it?.apply {

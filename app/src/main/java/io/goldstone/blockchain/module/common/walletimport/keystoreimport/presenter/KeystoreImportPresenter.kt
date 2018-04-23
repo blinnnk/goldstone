@@ -22,7 +22,7 @@ class KeystoreImportPresenter(
   ) : BasePresenter<KeystoreImportFragment>() {
 
   fun importKeystoreWallet(keystore: String, password: EditText, nameInput: EditText, isAgree: Boolean) {
-    isAgree.isTrue {
+    isAgree isTrue {
       try {
         Wallet.decrypt(
           password.text.toString(),

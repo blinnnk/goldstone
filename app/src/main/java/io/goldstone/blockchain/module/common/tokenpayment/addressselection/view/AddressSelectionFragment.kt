@@ -34,7 +34,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
     super.onHiddenChanged(hidden)
     // 通过自己的显示状态管理父级头部的 `ConfirmButton` 显示状态
     getParentFragment<TokenDetailOverlayFragment> {
-      hidden.isTrue {
+      hidden isTrue {
         showConfirmButton(false)
       } otherwise {
         showConfirmButton()

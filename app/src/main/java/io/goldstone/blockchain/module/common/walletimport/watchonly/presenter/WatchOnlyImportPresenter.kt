@@ -30,12 +30,12 @@ class WatchOnlyImportPresenter(
       return
     }
 
-    WalletUtils.isValidAddress(address).isTrue {
+    WalletUtils.isValidAddress(address) isTrue {
       val name = if (nameInput.text.toString().isEmpty()) "Wallet"
       else nameInput.text.toString()
 
       WalletTable.getWalletByAddress(address) {
-        it.isNull().isTrue {
+        it.isNull() isTrue {
           WalletTable.insert(WalletTable(0, name, address, true, true)) {
             CreateWalletPresenter.generateMyTokenInfo(address) {
               fragment.activity?.jump<SplashActivity>()

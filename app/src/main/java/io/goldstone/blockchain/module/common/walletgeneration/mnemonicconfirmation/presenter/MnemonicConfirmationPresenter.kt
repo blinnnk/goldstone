@@ -18,7 +18,7 @@ class MnemonicConfirmationPresenter(
   ) : BasePresenter<MnemonicConfirmationFragment>() {
 
   fun clickConfirmationButton(correct: String, current: String) {
-    compareMnemonicCode(correct, current).isTrue {
+    compareMnemonicCode(correct, current) isTrue {
       goToSplashActivity()
     } otherwise {
       fragment.context?.toast("incorrect mnemonic please re-enter")

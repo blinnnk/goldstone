@@ -21,7 +21,7 @@ class WalletNameEditorPresenter(
 
   fun changeWalletName(nameInput: EditText) {
     nameInput.text.toString().let {
-      it.isEmpty().isTrue {
+      it.isEmpty() isTrue {
         fragment.context?.toast("The wallet name is empty")
       } otherwise {
         WalletTable.updateName(nameInput.text.toString()) {

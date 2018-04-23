@@ -103,7 +103,7 @@ fun Context.getCurrentAccount(walletAddress: String, hold: (currentAccount: Acco
   val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
-      it.equals(walletAddress, true).isTrue {
+      it.equals(walletAddress, true) isTrue {
         hold(keyStore.accounts.get(index), keyStore)
       }
     }
@@ -115,7 +115,7 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
   val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
-      it.equals(walletAddress, true).isTrue {
+      it.equals(walletAddress, true) isTrue {
         try {
           hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
         } catch (error: Exception) {
@@ -145,7 +145,7 @@ fun Context.deleteAccount(walletAddress: String, password: String, callback: (co
   if (keyStore.accounts.size() == 0L) return
   (0 until keyStore.accounts.size()).forEach { index ->
     keyStore.accounts.get(index).address.hex.let {
-      it.equals(walletAddress, true).isTrue {
+      it.equals(walletAddress, true) isTrue {
         try {
           keyStore.deleteAccount(keyStore.accounts.get(index), password)
           callback(true)

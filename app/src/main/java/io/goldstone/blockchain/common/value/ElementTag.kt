@@ -18,6 +18,7 @@ object FragmentTag {
   const val keystoreImport = "keystoreImport"
   const val privateKeyImport = "privateKeyImport"
   const val watchOnlyImport = "watchOnlyImport"
+  const val pinCode = "pincode"
 }
 
 object ViewTag {

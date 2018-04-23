@@ -4,8 +4,11 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -34,9 +37,8 @@ class WalletDetailPresenter(
     WalletTable.apply { getAll { walletCount = size } }
     // Check the info of wallet currency list
     WalletDetailCellModel.getModels { it ->
-      val newData
-        = it.sortedByDescending { it.currency }.toArrayList()
-      fragment.asyncData.isNull().isTrue {
+      val newData = it.sortedByDescending { it.currency }.toArrayList()
+      fragment.asyncData.isNull() isTrue {
         fragment.asyncData = newData
       } otherwise {
         diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
@@ -51,6 +53,21 @@ class WalletDetailPresenter(
   override fun onFragmentResume() {
     CreateWalletPresenter.updateMyTokensValue {
       updateAllTokensInWalletBy()
+    }
+    showPinCodeFragment()
+  }
+
+  private fun showPinCodeFragment() {
+    fragment.activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull() isTrue {
+      AppConfigTable.getAppConfig {
+        it?.showPincode?.isTrue {
+          fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
+            ContainerID.main, FragmentTag.pinCode
+          ) {
+            // Send Argument
+          }
+        }
+      }
     }
   }
 

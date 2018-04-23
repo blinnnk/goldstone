@@ -117,4 +117,8 @@ class RoundInput(context: Context) : EditText(context) {
       else InputType.TYPE_CLASS_TEXT
   }
 
+  fun setPinCodeInput() {
+    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+  }
+
 }

@@ -36,7 +36,7 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
       GoldStoneAPI.getDefaultTokens { serverTokens ->
         DefaultTokenTable.getTokens { localTokens ->
           /** 如果本地的 `Tokens` 是空的则直接插入全部服务端获取的 `Default Tokens` */
-          localTokens.isEmpty().isTrue {
+          localTokens.isEmpty() isTrue {
             context.doAsync {
               serverTokens.forEach {
                 GoldStoneDataBase.database.defaultTokenDao().insert(it)

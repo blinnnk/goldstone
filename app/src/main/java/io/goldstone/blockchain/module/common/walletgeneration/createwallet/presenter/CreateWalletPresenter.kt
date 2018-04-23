@@ -139,7 +139,7 @@ class CreateWalletPresenter(
     ) {
       // 首先从本地查找数据
       DefaultTokenTable.getTokens { localTokens ->
-        localTokens.isEmpty().isTrue {
+        localTokens.isEmpty() isTrue {
           // 本地没有数据从服务器获取数据
           GoldStoneAPI.getDefaultTokens { serverTokens ->
             serverTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)

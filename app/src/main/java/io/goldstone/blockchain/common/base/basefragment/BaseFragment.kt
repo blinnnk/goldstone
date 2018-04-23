@@ -54,4 +54,9 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
     presenter.onFragmentResume()
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    presenter.onFragmentDestroy()
+  }
+
 }

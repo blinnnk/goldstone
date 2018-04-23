@@ -28,7 +28,7 @@ class MnemonicImportDetailPresenter(
     isAgree: Boolean,
     nameInput: EditText
     ) {
-    mnemonicInput.text.isEmpty().isTrue {
+    mnemonicInput.text.isEmpty() isTrue {
       fragment.context?.alert("mnemonic is not correct")
       return
     }

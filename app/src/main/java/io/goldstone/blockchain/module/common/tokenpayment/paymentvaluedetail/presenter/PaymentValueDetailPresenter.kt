@@ -80,7 +80,7 @@ class PaymentValueDetailPresenter(
   fun updateHeaderValue(header: PaymentValueDetailHeaderView) {
     header.apply {
       inputTextListener { count ->
-        count.isNotEmpty().isTrue {
+        count.isNotEmpty() isTrue {
           updateCurrencyValue(count.toDouble() * fragment.token?.price.orElse(0.0))
           // 根据数量更新 `Transaction`
           updateTransactionAndAdapter(count.toDouble())
@@ -117,7 +117,7 @@ class PaymentValueDetailPresenter(
         GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
           Log.d("DEBUG", "taxHash $taxHash")
           // 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-          taxHash.isValidTaxHash().isTrue {
+          taxHash.isValidTaxHash() isTrue {
             // 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
             insertPendingDataToTransactionTable(raw!!, taxHash, fragment.token!!)
           }
@@ -149,7 +149,7 @@ class PaymentValueDetailPresenter(
     value: Double, hold: (ArrayList<RawTransaction>) -> Unit
   ) {
     // 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
-    currentNonce.isNull().isTrue {
+    currentNonce.isNull() isTrue {
       GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
         val myLatestNonce =
           first { it.fromAddress.equals(WalletTable.current.address, true) }.nonce.toLong()

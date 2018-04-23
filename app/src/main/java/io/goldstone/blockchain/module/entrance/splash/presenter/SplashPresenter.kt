@@ -16,7 +16,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
   fun hasAccountThenLogin() {
     WalletTable.getAll {
-      isNotEmpty().isTrue {
+      isNotEmpty() isTrue {
         WalletTable.getCurrentWalletInfo {
           it?.apply {
             WalletTable.current =

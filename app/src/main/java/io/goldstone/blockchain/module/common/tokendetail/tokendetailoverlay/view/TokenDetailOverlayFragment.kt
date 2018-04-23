@@ -58,7 +58,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 
   fun setConfirmStatus(canClick: Boolean = false) {
     confirmButton?.apply {
-      canClick.isTrue {
+      canClick isTrue {
         updateColor(Spectrum.green, Spectrum.white)
         onClick { confirmButtonClickEvent?.run()  }
       } otherwise {
