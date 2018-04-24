@@ -2,7 +2,6 @@ package io.goldstone.blockchain
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.provider.Settings
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -28,9 +27,6 @@ class GoldStoneApp : Application() {
   override fun onCreate() {
     super.onCreate()
 
-    // get Device ID
-    deviceID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-
     // create and init database
     GoldStoneDataBase.initDatabase(this)
 
@@ -45,9 +41,7 @@ class GoldStoneApp : Application() {
 
     initAppParameters()
 
-    registerDeviceForPush()
-
-    prepareAppConfig()
+    prepareAppConfig { registerDeviceForPush()  }
 
   }
 
@@ -56,7 +50,6 @@ class GoldStoneApp : Application() {
     var currentRate: Double = 1.0
     var currencyCode: String = CountryCode.currentCurrency
     var currentLanguage: Int? = HoneyLanguage.English.code
-    var deviceID: String? = null
 
     fun initAppParameters() {
       // Querying the language type of the current account
@@ -86,10 +79,12 @@ class GoldStoneApp : Application() {
       }
     }
 
-    private fun prepareAppConfig() {
+    private fun prepareAppConfig(callback: () -> Unit) {
       AppConfigTable.getAppConfig { config ->
         config.isNull().isTrue {
-          AppConfigTable.insertAppConfig()
+          AppConfigTable.insertAppConfig(callback)
+        } otherwise {
+          callback()
         }
       }
     }

@@ -3,15 +3,19 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import android.content.Context
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseCell
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationListModel
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationType
 import org.jetbrains.anko.textColor
 
 /**
@@ -19,31 +23,32 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class NotificationListCell(context: Context) : BaseCell(context) {
+class NotificationListCell(context: Context) : BaseValueCell(context) {
 
-  var model: NotificationListModel by observing(NotificationListModel()) {
+  var model: NotificationTable? by observing(null) {
 
     info.apply {
-      title.text = model.info
-      subtitle.text = model.fromAddress
+      title.text = CryptoUtils.scaleTo28(model?.title.orEmpty())
+      subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
     }
 
-    date.text = model.date
+    date.text = model?.timeDescription
 
+    when (model?.type.orZero()) {
+      NotificationType.Transaction.code -> {
+        setIconColor(Spectrum.green)
+        setIconResource(R.drawable.transaction_icon)
+      }
+      NotificationType.System.code -> {
+        setIconColor(GrayScale.midGray)
+        setIconResource(R.drawable.system_message_icon)
+      }
+    }
   }
 
-  private val info by lazy { TwoLineTitles(context) }
   private val date by lazy { TextView(context) }
 
   init {
-
-    info
-      .apply {
-        setNormalTitles()
-      }
-      .into(this)
-    info.setCenterInVertical()
-
     date
       .apply {
         textColor = GrayScale.midGray
