@@ -34,7 +34,7 @@ class ProfilePresenter(
         ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
         ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
         ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
-        ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),
+        ProfileModel(R.drawable.hint_icon, ProfileText.hint, ""),
         ProfileModel(R.drawable.language_icon, ProfileText.language, "EN"),
         ProfileModel(R.drawable.contacts_icon, ProfileText.aboutUs, "8"),
         ProfileModel(R.drawable.currency_icon, ProfileText.currency, "USD"),

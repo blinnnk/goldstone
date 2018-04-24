@@ -25,6 +25,7 @@ class MnemonicImportDetailPresenter(
     mnemonicInput: EditText,
     passwordInput: EditText,
     repeatPasswordInput: EditText,
+    hintInput: EditText,
     isAgree: Boolean,
     nameInput: EditText
     ) {
@@ -39,11 +40,11 @@ class MnemonicImportDetailPresenter(
       isAgree,
       fragment.context
       ) { passwordValue, walletName ->
-      importWallet(mnemonicInput.text.toString(), passwordValue, walletName)
+      importWallet(mnemonicInput.text.toString(), passwordValue, walletName, hintInput.text?.toString())
     }
   }
 
-  private fun importWallet(mnemonic: String, password: String, name: String) {
+  private fun importWallet(mnemonic: String, password: String, name: String, hint: String? = null) {
     fragment.context?.getWalletByMnemonic(mnemonic, password) { address ->
       address.isNull().isFalse {
         coroutinesTask({
@@ -51,7 +52,7 @@ class MnemonicImportDetailPresenter(
             it.isNull().isFalse {
               GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
             }
-            WalletTable.insert(WalletTable(0, name, address!!, true))
+            WalletTable.insert(WalletTable(0, name, address!!, true, hint))
             CreateWalletPresenter.generateMyTokenInfo(address)
           }
         }) { fragment.activity?.jump<SplashActivity>() }

@@ -77,7 +77,7 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
   }
 
   fun recoveryStyle() {
-    (0 until 4).forEach {
+    (0 until Count.pinCode).forEach {
       findViewById<View>(it)?.apply {
         addCorner(codeSize, Color.TRANSPARENT)
         addCircleBorder(codeSize, BorderSize.bold.toInt(), Spectrum.white)

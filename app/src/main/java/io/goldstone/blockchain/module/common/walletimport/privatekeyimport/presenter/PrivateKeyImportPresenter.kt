@@ -29,7 +29,8 @@ class PrivateKeyImportPresenter(
     passwordInput: EditText,
     repeatPasswordInput: EditText,
     isAgree: Boolean,
-    nameInput: EditText
+    nameInput: EditText,
+    hintInput: EditText
   ) {
     privateKeyInput.text.isEmpty() isTrue {
       fragment.context?.alert("privateKey is not correct")
@@ -42,7 +43,7 @@ class PrivateKeyImportPresenter(
       isAgree,
       fragment.context
     ) { passwordValue, walletName ->
-      importWallet(privateKeyInput.text.toString(), passwordValue, walletName, fragment)
+      importWallet(privateKeyInput.text.toString(), passwordValue, walletName, fragment, hintInput.text?.toString())
     }
   }
   companion object {
@@ -50,13 +51,13 @@ class PrivateKeyImportPresenter(
     /**
      * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
      */
-    fun importWallet(privateKey: String, password: String, name: String, fragment: Fragment) {
+    fun importWallet(privateKey: String, password: String, name: String, fragment: Fragment, hint: String? = null) {
 
       fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
         WalletTable.getWalletByAddress(address!!) {
           it.isNull() isTrue {
             // 在数据库记录钱包信息
-            WalletTable.insertAddress(address, name) {
+            WalletTable.insertAddress(address, name, hint) {
               // 创建钱包并获取默认的 `token` 信息
               CreateWalletPresenter.generateMyTokenInfo(address) {
                 fragment.activity?.jump<SplashActivity>()

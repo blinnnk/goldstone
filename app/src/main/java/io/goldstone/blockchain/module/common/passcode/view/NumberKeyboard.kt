@@ -30,6 +30,8 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
   private val lineSpace = 20.uiPX()
   private val rowCount = 3
   private val totalCount = 11
+  private val deleteButtonIndex = 10
+
   private var currentCode: String by observing("") {
     if (currentCode.length <= Count.pinCode) checkCode?.run()
   }
@@ -55,7 +57,7 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
         )
         // 输入密码
         // 第 `10` 位是 `cancel` 键
-        if (it < 10) {
+        if (it < deleteButtonIndex) {
           onClick {
             // 超过 `4` 位就不在记录新输入的密码
             if (currentCode.length < Count.pinCode) {
@@ -64,9 +66,11 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
           }
         }
         // 删除已经输入的部分
-        if (it == 10) {
+        if (it == deleteButtonIndex) {
           onClick {
-            currentCode.apply { if (isNotEmpty()) currentCode = substring(0, lastIndex) }
+            currentCode.apply {
+              if (isNotEmpty()) currentCode = substring(0, lastIndex)
+            }
           }
         }
       }
@@ -74,8 +78,6 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
   }
 
   fun getEnteredCode() = currentCode
-  fun resetCode() {
-    currentCode = ""
-  }
+  fun resetCode() { currentCode = "" }
 
 }

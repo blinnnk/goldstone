@@ -3,7 +3,9 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
@@ -11,12 +13,11 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import com.blinnnk.extension.into
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
-import com.blinnnk.uikit.ScreenSize
-import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import org.jetbrains.anko.*
 
@@ -42,60 +43,48 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
     scrollView {
       verticalLayout {
 
-        privateKeyInput
-          .apply {
-            setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-          }
-          .into(this)
+        privateKeyInput.apply {
+          setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+        }.into(this)
 
-        nameInput
-          .apply {
-            setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-            text = CreateWalletText.name
-          }
-          .into(this)
+        nameInput.apply {
+          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+          text = CreateWalletText.name
+        }.into(this)
 
-        passwordInput
-          .apply {
-            setPasswordInput()
-            setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.password
-          }
-          .into(this)
+        passwordInput.apply {
+          setPasswordInput()
+          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+          text = CreateWalletText.password
+        }.into(this)
 
-        repeatPassword
-          .apply {
-            setPasswordInput()
-            setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.repeatPassword
-          }
-          .into(this)
+        repeatPassword.apply {
+          setPasswordInput()
+          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+          text = CreateWalletText.repeatPassword
+        }.into(this)
 
-        passwordHintInput
-          .apply {
-            text = "Password Hint (Optional)"
-            setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-          }
-          .into(this)
+        passwordHintInput.apply {
+          text = CreateWalletText.hint
+          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+        }.into(this)
 
         agreementView.into(this)
 
-        confirmButton
-          .apply {
-            text = CommonText.confirm.toUpperCase()
-            setBlueStyle()
-            y += 10.uiPX()
-          }
-          .click {
+        confirmButton.apply {
+          text = CommonText.confirm.toUpperCase()
+          setBlueStyle()
+          y += 10.uiPX()
+        }.click {
             presenter.importWalletByPrivateKey(
               privateKeyInput,
               passwordInput,
               repeatPassword,
               agreementView.radioButton.isChecked,
-              nameInput
+              nameInput,
+              passwordHintInput
             )
-          }
-          .into(this)
+          }.into(this)
 
 
         textView("What is private key?") {
