@@ -61,6 +61,8 @@ class TransactionDetailPresenter(
   private var currentHash = ""
 
   override fun updateData() {
+
+    // 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail`
     dataFromList?.apply {
       updateHeaderValue(count, targetAddress, symbol, isPending, isReceived)
       fragment.asyncData = generateModels(this)
@@ -74,7 +76,7 @@ class TransactionDetailPresenter(
         }
       }
     }
-
+    // 这个是转账完毕后进入的界面初始
     data?.apply {
       currentHash = taxHash
       count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal)
@@ -83,6 +85,7 @@ class TransactionDetailPresenter(
       updateHeaderValue(count, address, token.symbol, true)
     }
 
+    // 这个是从通知中心进入的, 通知中心的显示是现查账.
     notificationTransaction?.let { transaction ->
       fragment.apply {
         getMainActivity()?.showLoadingView()
@@ -269,6 +272,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  
   private fun TransactionDetailFragment.updateTransactionByNotificationHash(
     info: NotificationTransactionInfo,
     callback: () -> Unit
@@ -292,6 +296,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  // 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
   private fun prepareHeaderValueFromNotification(receipt: Transaction, transaction: InputCodeData, isReceive: Boolean) {
     DefaultTokenTable.getTokenByContractAddress(receipt.to) {
       val address = if (isReceive) receipt.from else transaction.address
@@ -307,6 +312,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  // 从通知中心进入的, 使用 `web3` 获取的 `Transaction` 转换成标准的使用格式
   private fun Transaction.toAsyncData(): ArrayList<TransactionDetailModel> {
     web3j.ethGetBlockByHash(blockHash, true).sendAsync().get().result.let { block ->
       val receiptData = arrayListOf(
