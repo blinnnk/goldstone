@@ -1,20 +1,28 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.NotificationText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import java.io.Serializable
 
 /**
  * @date 25/03/2018 1:49 AM
  * @author KaySaith
  */
+
+data class NotificationTransactionInfo(val hash: String, val isReceived: Boolean) : Serializable
 
 class NotificationListPresenter(
   override val fragment: NotificationListFragment
@@ -52,8 +60,14 @@ class NotificationListPresenter(
     }
   }
 
-  fun showTransactionListDetailFragment() {
-    fragment.getParentFragment<NotificationFragment>()?.presenter?.showTargetFragment(true)
+  fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
+    fragment.getParentFragment<NotificationFragment>()?.apply {
+      presenter.showTargetFragment<TransactionDetailFragment>(
+        TransactionText.detail,
+        NotificationText.notification,
+        Bundle().apply { putSerializable(ArgumentKey.notificationTransaction, transactionInfo) }
+      )
+    }
   }
 
 }

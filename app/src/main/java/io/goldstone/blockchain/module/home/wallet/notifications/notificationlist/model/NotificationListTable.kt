@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import java.text.DateFormat
 
 /**
@@ -26,7 +27,9 @@ data class NotificationTable(
   val timeDescription: String = "",
   @SerializedName("create_on") val createTIme: Long = 0L,
   @SerializedName("hash") val transactionHash: String  = "",
-  @SerializedName("type") val type: Int  = 0
+  @SerializedName("type") val type: Int  = 0,
+  @SerializedName("from_or_to") val isTo: Int  = 1,
+  val isReceived: Boolean = false
 ) {
 
   constructor(data: NotificationTable) : this(
@@ -36,7 +39,9 @@ data class NotificationTable(
     DateUtils.formatDateTime(GoldStoneAPI.context, data.createTIme, DateFormat.DAY_OF_YEAR_FIELD),
     data.createTIme,
     data.transactionHash,
-    data.type
+    data.type,
+    data.isTo,
+    data.isTo == TinyNumber.True.value // `to` 是我收到
   )
 
   companion object {

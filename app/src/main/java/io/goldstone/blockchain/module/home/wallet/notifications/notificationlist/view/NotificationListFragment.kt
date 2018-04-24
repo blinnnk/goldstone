@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationListPresenter
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -21,12 +22,14 @@ class NotificationListFragment : BaseRecyclerFragment<NotificationListPresenter,
   override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<NotificationTable>?) {
     recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
       onClick {
-        presenter.showTransactionListDetailFragment()
+        model?.apply {
+          presenter.showTransactionListDetailFragment(NotificationTransactionInfo(transactionHash, isReceived))
+        }
         preventDuplicateClicks()
       }
     }
   }
 
-  override fun setSlideUpWithCellHeight() = 60.uiPX()
+  override fun setSlideUpWithCellHeight() = 75.uiPX()
 
 }
