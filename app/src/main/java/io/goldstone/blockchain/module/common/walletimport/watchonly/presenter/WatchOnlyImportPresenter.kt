@@ -36,7 +36,7 @@ class WatchOnlyImportPresenter(
 
       WalletTable.getWalletByAddress(address) {
         it.isNull() isTrue {
-          WalletTable.insert(WalletTable(0, name, address, true, true)) {
+          WalletTable.insert(WalletTable(0, name, address, true, null,true)) {
             CreateWalletPresenter.generateMyTokenInfo(address) {
               fragment.activity?.jump<SplashActivity>()
             }

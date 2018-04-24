@@ -54,11 +54,11 @@ class CreateWalletPresenter(
     )
   }
 
-  fun generateWalletWith(isAgree: Boolean) {
+  fun generateWalletWith(isAgree: Boolean, hintInput: EditText) {
     checkInputValue(
       nameText, passwordText, repeatPasswordText, isAgree, fragment.context
     ) { password, walletName ->
-      fragment.context?.generateWalletWith(password, walletName)
+      fragment.context?.generateWalletWith(password, walletName, hintInput.text?.toString())
     }
   }
 
@@ -105,10 +105,10 @@ class CreateWalletPresenter(
     }
   }
 
-  private fun Context.generateWalletWith(password: String, name: String) {
+  private fun Context.generateWalletWith(password: String, name: String, hint: String? = null) {
     generateWallet(password) { mnemonicCode, address ->
       // 将基础的不存在安全问题的信息插入数据库
-      WalletTable.insert(WalletTable(0, name, address, true)) {
+      WalletTable.insert(WalletTable(0, name, address, true, hint)) {
         generateMyTokenInfo(address, true) {
           // 传递数据到下一个 `Fragment`
           val arguments = Bundle().apply {

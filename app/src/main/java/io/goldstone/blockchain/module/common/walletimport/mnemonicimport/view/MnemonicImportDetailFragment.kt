@@ -33,6 +33,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
   private val walletNameInput by lazy { RoundInput(context!!) }
   private val passwordInput by lazy { RoundInput(context!!) }
   private val repeatPassword by lazy { RoundInput(context!!) }
+  private val hintInput by lazy { RoundInput(context!!) }
   private val agreementView by lazy { AgreementView(context!!) }
 
   override val presenter = MnemonicImportDetailPresenter(this)
@@ -78,6 +79,14 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
           }
           .into(this)
 
+        hintInput
+          .apply {
+            setTextInput()
+            setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+            text = CreateWalletText.hint
+          }
+          .into(this)
+
         agreementView.into(this)
 
         confirmButton
@@ -91,6 +100,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
               mnemonicInput,
               passwordInput,
               repeatPassword,
+              hintInput,
               agreementView.radioButton.isChecked,
               walletNameInput
             )

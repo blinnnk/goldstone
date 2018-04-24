@@ -55,6 +55,13 @@ object CreateWalletText {
     HoneyLanguage.English.code -> "Password"
     else -> "钱包密码"
   }
+
+  @JvmField
+  val hint = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Password Hint (Optional)"
+    else -> "Hint"
+  }
+
   @JvmField
   val repeatPassword = when (currentLanguage) {
     HoneyLanguage.English.code -> "Repeat Password"
@@ -406,6 +413,11 @@ object ProfileText {
   val currency = when (currentLanguage) {
     HoneyLanguage.English.code -> "Currency Settings"
     else -> "货币"
+  }
+  @JvmField
+  val hint = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Modify Hint"
+    else -> "Hint"
   }
   @JvmField
   val language = when (currentLanguage) {

@@ -36,9 +36,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
   override fun AnkoContext<Fragment>.initView() {
     container = relativeLayout {
       isClickable = true
-
       lparams(matchParent, matchParent)
-
       GradientView(context).apply {
         setStyle(GradientType.Blue)
         lparams(matchParent, matchParent)

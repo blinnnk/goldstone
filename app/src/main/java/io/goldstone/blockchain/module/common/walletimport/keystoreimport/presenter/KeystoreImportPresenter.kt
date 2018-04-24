@@ -21,7 +21,7 @@ class KeystoreImportPresenter(
   override val fragment: KeystoreImportFragment
   ) : BasePresenter<KeystoreImportFragment>() {
 
-  fun importKeystoreWallet(keystore: String, password: EditText, nameInput: EditText, isAgree: Boolean) {
+  fun importKeystoreWallet(keystore: String, password: EditText, nameInput: EditText, isAgree: Boolean, hintInput: EditText) {
     isAgree isTrue {
       try {
         Wallet.decrypt(
@@ -32,7 +32,8 @@ class KeystoreImportPresenter(
             it.privateKey.toString(16),
             password.text.toString(),
             nameInput.text.toString(),
-            fragment
+            fragment,
+            hintInput.text?.toString()
           )
         }
       } catch (error: Exception) {

@@ -39,6 +39,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
   private val nameEditText by lazy { RoundInput(context!!) }
   private val passwordEditText by lazy { RoundInput(context!!) }
   private val repeatPasswordEditText by lazy { RoundInput(context!!) }
+  private val hintInput by lazy { RoundInput(context!!) }
   private val agreementView by lazy { AgreementView(context!!) }
   private val createButton by lazy { RoundButton(context!!) }
   private val importButton by lazy { TextView(context!!) }
@@ -88,6 +89,16 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
         }
         .into(this)
 
+      hintInput
+        .apply {
+          text = CreateWalletText.hint
+          setPasswordInput()
+          setMargins<LinearLayout.LayoutParams> {
+            topMargin = 10.uiPX()
+          }
+        }
+        .into(this)
+
       agreementView
         .apply {
           radioButton.onClick { setRadioStatus() }
@@ -103,7 +114,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
             topMargin = 20.uiPX()
           }
         }
-        .click { presenter.generateWalletWith(agreementView.radioButton.isChecked) }
+        .click { presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) }
         .into(this)
 
       importButton

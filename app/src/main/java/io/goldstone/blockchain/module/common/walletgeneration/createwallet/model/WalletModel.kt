@@ -31,6 +31,7 @@ data class WalletTable(
   var name: String,
   var address: String,
   var isUsing: Boolean,
+  var hint: String? = null,
   var isWatchOnly: Boolean = false,
   var passwordHint: String? = null,
   var language: Int = HoneyLanguage.English.code,
@@ -81,6 +82,18 @@ data class WalletTable(
         GoldStoneDataBase.database.walletDao().apply {
           findWhichIsUsing(true)?.let {
             update(it.apply { name = newName })
+          }
+        }
+      }) {
+        callback()
+      }
+    }
+
+    fun updateHint(newHint: String, callback: () -> Unit) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().apply {
+          findWhichIsUsing(true)?.let {
+            update(it.apply { hint = newHint })
           }
         }
       }) {
@@ -164,13 +177,13 @@ data class WalletTable(
       }
     }
 
-    fun insertAddress(address: String, name: String, callback: () -> Unit) {
+    fun insertAddress(address: String, name: String, hint: String? = null, callback: () -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
           it.isNull().isFalse {
             GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
           }
-          WalletTable.insert(WalletTable(0, name, address, true))
+          WalletTable.insert(WalletTable(0, name, address, true, hint))
         }
       }) {
         callback()
