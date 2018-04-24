@@ -69,6 +69,14 @@ data class WalletTable(
       }
     }
 
+    fun getAllAddresses(callback: ArrayList<String>.() -> Unit = {}) {
+      coroutinesTask({
+        GoldStoneDataBase.database.walletDao().getAllWallets()
+      }) {
+        callback(it.map { it.address }.toArrayList())
+      }
+    }
+
     fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
       coroutinesTask({
         GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {

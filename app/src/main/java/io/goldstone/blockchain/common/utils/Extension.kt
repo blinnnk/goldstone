@@ -8,8 +8,10 @@ import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -82,4 +84,12 @@ fun Context.showAlertView(
     yesButton { if (showEditText) input?.apply(action) else action(input) }
     noButton { }
   }.show()
+}
+
+fun ArrayList<String>.toJsonArray(callback: (JsonArray) -> Unit) {
+  val stringArray = JsonArray()
+  forEachOrEnd { item, isEnd ->
+    stringArray.add(item)
+    if (isEnd) callback(stringArray)
+  }
 }

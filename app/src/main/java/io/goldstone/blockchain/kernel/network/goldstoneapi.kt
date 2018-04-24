@@ -11,11 +11,13 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import okhttp3.*
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -140,6 +142,47 @@ object GoldStoneAPI {
       }
   }
 
+  fun getNotificationList(
+    goldSonteID: String, time: Long, hold: (ArrayList<NotificationTable>) -> Unit
+  ) {
+    val contentType = MediaType.parse("application/json; charset=utf-8")
+    RequestBody.create(contentType, "{\"device\":\"$goldSonteID\",\"time\":$time}").let {
+      postRequestGetJsonObject<NotificationTable>(it, "message_list", APIPath.getNotification) {
+        GoldStoneAPI.context.runOnUiThread {
+          hold(it.toArrayList())
+        }
+      }
+    }
+  }
+
+  private inline fun <reified T> postRequestGetJsonObject(
+    body: RequestBody, keyName: String, path: String, crossinline hold: (List<T>) -> Unit
+  ) {
+    val client = OkHttpClient()
+    val request =
+      Request.Builder().url(path).method("POST", body).header("Content-type", "application/json")
+        .build()
+    client.newCall(request).enqueue(object : Callback {
+      override fun onFailure(call: Call, error: IOException) {
+        println("$error")
+      }
+
+      @SuppressLint("SetTextI18n")
+      override fun onResponse(call: Call, response: Response) {
+        val data = response.body()?.string()
+        try {
+          val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+          val jsonData = dataObject[keyName].toString()
+          val gson = Gson()
+          val collectionType = object : TypeToken<Collection<T>>() {}.type
+          hold(gson.fromJson(jsonData, collectionType))
+        } catch (error: Exception) {
+          println("GoldStoneApi $error and $data")
+        }
+      }
+    })
+  }
+
   private fun postRequest(body: RequestBody, path: String, hold: (String) -> Unit) {
     val client = OkHttpClient()
     val request =
@@ -202,6 +245,7 @@ object GoldStoneAPI {
       override fun onFailure(call: Call, error: IOException) {
         Log.e("ERROR", error.toString())
       }
+
       override fun onResponse(call: Call, response: Response) {
         val data = response.body()?.string()
         try {

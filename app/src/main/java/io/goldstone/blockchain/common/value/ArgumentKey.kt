@@ -17,6 +17,7 @@ object ArgumentKey {
   const val paymentSymbol = "paymentSymbol"
   const val webViewUrl = "webViewUrl"
   const val fragmentTitle = "fragmentTitle"
+  const val notificationTransaction = "notificationTransaction"
 }
 
 object SharesPreference {

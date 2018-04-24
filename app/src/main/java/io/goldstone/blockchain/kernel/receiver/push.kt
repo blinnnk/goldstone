@@ -10,16 +10,15 @@ import android.media.RingtoneManager
 import android.os.PowerManager
 import android.support.v4.app.NotificationCompat
 import android.util.Log
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
-import com.google.gson.JsonArray
 import com.tencent.android.tpush.*
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.toJsonObject
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -57,38 +56,39 @@ class XinGePushReceiver : XGPushBaseReceiver() {
       .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
   }
 
-  override fun onSetTagResult(p0: Context?, p1: Int, p2: String?) { }
+  override fun onSetTagResult(p0: Context?, p1: Int, p2: String?) {}
   override fun onNotifactionShowedResult(context: Context?, notifiShowedRlt: XGPushShowedResult?) {
     if (context == null || notifiShowedRlt == null) return
     showNotificationOnLockScreen(context, notifiShowedRlt.toString())
   }
+
   override fun onUnregisterResult(context: Context?, p1: Int) {
     if (context == null) {
       return
     }
   }
-  override fun onDeleteTagResult(p0: Context?, p1: Int, p2: String?) { }
-  override fun onRegisterResult(p0: Context?, p1: Int, p2: XGPushRegisterResult?) { }
+
+  override fun onDeleteTagResult(p0: Context?, p1: Int, p2: String?) {}
+  override fun onRegisterResult(p0: Context?, p1: Int, p2: XGPushRegisterResult?) {}
   @SuppressLint("PrivateResource")
   override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
     showNotificationOnLockScreen(context!!, message.toString())
   }
+
   override fun onNotifactionClickedResult(p0: Context?, p1: XGPushClickedResult?) {}
 
   companion object {
     fun registerWalletAddressForPush() {
-      val stringArray = JsonArray()
-      // 获取本地的所有钱包
-      WalletTable.getAll {
-        forEachOrEnd { item, isEnd ->
-          stringArray.add(item.address)
-          // 注册钱包地址
-          if (isEnd) GoldStoneAPI.registerWalletAddress(
-            stringArray,
-            GoldStoneApp.deviceID.orEmpty()
-          ) {
-            GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-              println("Register Address Worked $it")
+      WalletTable.getAllAddresses {
+        AppConfigTable.getAppConfig { config ->
+          // 把地址转换成 `JsonArray` 格式
+          toJsonArray {
+            GoldStoneAPI.registerWalletAddress(
+              it, config?.goldStoneID.orEmpty()
+            ) {
+              GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
+                println("Register Address Worked $it")
+              }
             }
           }
         }
@@ -112,6 +112,7 @@ fun Application.registerDeviceForPush() {
       registerDevice(token.toString())
       XinGePushReceiver.registerWalletAddressForPush()
     }
+
     override fun onFail(p0: Any?, p1: Int, p2: String?) {}
   })
 }
@@ -121,16 +122,18 @@ private fun Application.registerDevice(token: String) {
   // 没有注册过就开始注册
   val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
   else TinyNumber.False.value
-  GoldStoneAPI.registerDevice(
-    configuration.locale.language,
-    token,
-    GoldStoneApp.deviceID.orEmpty(),
-    isChina,
-    TinyNumber.True.value
-  ) {
-    // 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-    GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-      saveDataToSharedPreferences(SharesPreference.registerPush, token)
+  AppConfigTable.getAppConfig { config ->
+    GoldStoneAPI.registerDevice(
+      configuration.locale.language,
+      token,
+      config?.goldStoneID.orEmpty(),
+      isChina,
+      TinyNumber.True.value
+    ) {
+      // 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+      GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
+        saveDataToSharedPreferences(SharesPreference.registerPush, token)
+      }
     }
   }
 }

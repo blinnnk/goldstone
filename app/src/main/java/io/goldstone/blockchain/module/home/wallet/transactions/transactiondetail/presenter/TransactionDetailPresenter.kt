@@ -3,20 +3,21 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Log
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.toEthValue
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -27,6 +28,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.web3j.protocol.Web3jFactory
+import org.web3j.protocol.core.methods.response.Transaction
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import rx.Subscription
@@ -49,6 +51,12 @@ class TransactionDetailPresenter(
   private val dataFromList by lazy {
     fragment.arguments?.get(ArgumentKey.transactionFromList) as? TransactionListModel
   }
+
+  private val notificationTransaction
+    by lazy {
+      fragment.arguments?.get(ArgumentKey.notificationTransaction) as? NotificationTransactionInfo
+    }
+
   private var count = 0.0
   private var currentHash = ""
 
@@ -74,13 +82,22 @@ class TransactionDetailPresenter(
       observerTransaction()
       updateHeaderValue(count, address, token.symbol, true)
     }
+
+    notificationTransaction?.let { transaction ->
+      fragment.apply {
+        getMainActivity()?.showLoadingView()
+        updateTransactionByNotificationHash(transaction) {
+          getMainActivity()?.removeLoadingView()
+        }
+      }
+    }
   }
 
   override fun onFragmentShowFromHidden() {
     super.onFragmentShowFromHidden()
 
     fragment.parentFragment.apply {
-      when(this) {
+      when (this) {
         is TransactionFragment -> {
           overlayView.header.backButton.onClick {
             headerTitle = TransactionText.detail
@@ -101,17 +118,39 @@ class TransactionDetailPresenter(
   }
 
   fun showEtherScanTransactionFragment() {
-    val argument = Bundle().apply { putString(ArgumentKey.webViewUrl, "https://ropsten.etherscan.io/tx/$currentHash") }
+    val argument = Bundle().apply {
+      putString(
+        ArgumentKey.webViewUrl,
+        "https://ropsten.etherscan.io/tx/$currentHash"
+      )
+    }
     fragment.parentFragment.apply {
-      when(this) {
+      when (this) {
         is TransactionFragment -> {
-          presenter.showTargetFragment<WebViewFragment>(TransactionText.etherScanTransaction, TransactionText.detail, argument)
+          presenter.showTargetFragment<WebViewFragment>(
+            TransactionText.etherScanTransaction,
+            TransactionText.detail,
+            argument
+          )
         }
+
         is TokenDetailOverlayFragment -> {
-          presenter.showTargetFragment<WebViewFragment>(TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument)
+          presenter.showTargetFragment<WebViewFragment>(
+            TransactionText.etherScanTransaction,
+            TokenDetailText.tokenDetail,
+            argument
+          )
         }
       }
     }
+  }
+
+  private fun formatDate(timeStamp: Long): String {
+    return DateUtils.formatDateTime(
+      GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_YEAR
+    ) + " " + DateUtils.formatDateTime(
+      GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
+    )
   }
 
   private fun generateModels(
@@ -121,12 +160,7 @@ class TransactionDetailPresenter(
     val minerFee = if (data.isNull()) dataFromList?.minerFee
     else (data!!.raw.gasLimit * data!!.raw.gasPrice).toDouble().toEthValue()
 
-    val date = if (data.isNull()) dataFromList?.date
-    else DateUtils.formatDateTime(
-      GoldStoneAPI.context, data!!.timestamp, DateUtils.FORMAT_SHOW_YEAR
-    ) + " " + DateUtils.formatDateTime(
-      GoldStoneAPI.context, data!!.timestamp * 1000, DateUtils.FORMAT_SHOW_TIME
-    )
+    val date = if (data.isNull()) dataFromList?.date else formatDate(data!!.timestamp)
 
     val receiptData = when (receipt) {
       is TransactionListModel -> {
@@ -218,7 +252,10 @@ class TransactionDetailPresenter(
     }
   }
 
-  private fun TransactionDetailFragment.getTransactionFromChain(taxHash: String, callback: () -> Unit = {}) {
+  private fun TransactionDetailFragment.getTransactionFromChain(
+    taxHash: String,
+    callback: () -> Unit = {}
+  ) {
     web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
       context?.runOnUiThread {
         println(it)
@@ -229,6 +266,69 @@ class TransactionDetailPresenter(
       }
       // 成功获取数据后在异步线程更新数据库记录
       updateDataInDatabase(it)
+    }
+  }
+
+  private fun TransactionDetailFragment.updateTransactionByNotificationHash(
+    info: NotificationTransactionInfo,
+    callback: () -> Unit
+  ) {
+    web3j.ethGetTransactionByHash(info.hash).sendAsync().get().transaction?.let { receipt ->
+      context?.runOnUiThread {
+        // 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
+        val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
+        CryptoUtils.isERC20TransferByInputCode(receipt.input) {
+          transactionInfo?.let { prepareHeaderValueFromNotification(receipt, it, info.isReceived) }
+        } isFalse {
+          val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
+          updateHeaderValue(count, receipt.from, CryptoSymbol.eth, false, info.isReceived)
+        }
+
+        if (asyncData.isNull()) {
+          receipt.toAsyncData().let { asyncData = it.toArrayList() }
+        }
+        callback()
+      }
+    }
+  }
+
+  private fun prepareHeaderValueFromNotification(receipt: Transaction, transaction: InputCodeData, isReceive: Boolean) {
+    DefaultTokenTable.getTokenByContractAddress(receipt.to) {
+      val address = if (isReceive) receipt.from else transaction.address
+      it.isNull() isTrue {
+        GoldStoneEthCall.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
+          val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
+          updateHeaderValue(count, address, symbol, false, isReceive)
+        }
+      } otherwise {
+        val count = CryptoUtils.toCountByDecimal(transaction.count, it?.decimals.orElse(0.0))
+        updateHeaderValue(count, address, it?.symbol.orEmpty(), false, isReceive)
+      }
+    }
+  }
+
+  private fun Transaction.toAsyncData(): ArrayList<TransactionDetailModel> {
+    web3j.ethGetBlockByHash(blockHash, true).sendAsync().get().result.let { block ->
+      val receiptData = arrayListOf(
+        (gas * gasPrice).toDouble().toEthValue(),
+        "There isn't a memo",
+        hash,
+        blockNumber,
+        formatDate(block.timestamp.toLong()),
+        EtherScanApi.transactionsByHash(hash)
+      )
+      arrayListOf(
+        TransactionText.minerFee,
+        TransactionText.memo,
+        TransactionText.transactionHash,
+        TransactionText.blockNumber,
+        TransactionText.transactionDate,
+        TransactionText.url
+      ).mapIndexed { index, it ->
+        TransactionDetailModel(receiptData[index].toString(), it)
+      }.let {
+        return it.toArrayList()
+      }
     }
   }
 

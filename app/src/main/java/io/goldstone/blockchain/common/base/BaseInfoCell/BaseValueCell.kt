@@ -12,6 +12,8 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.imageResource
 
 /**
  * @date 24/03/2018 8:41 PM
@@ -26,11 +28,10 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 
   init {
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX()).apply {
-      leftMargin = PaddingSize.device
-    }
+    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX())
+    x += PaddingSize.device
 
-    icon.iconColor = GrayScale.lightGray
+    setIconColor()
     this.addView(icon)
 
     this.addView(info
@@ -42,6 +43,15 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
     icon.setCenterInVertical()
     info.setCenterInVertical()
 
+  }
+
+  fun setIconColor(color: Int = GrayScale.lightGray) {
+    icon.iconColor = color
+  }
+
+  fun setIconResource(resource: Int, color: Int = Spectrum.white) {
+    icon.imageResource = resource
+    icon.setColorFilter(color)
   }
 
   fun setValueStyle(isScaleIcon: Boolean = false) {

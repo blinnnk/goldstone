@@ -82,6 +82,18 @@ object CryptoUtils {
     }
   }
 
+  fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit): Boolean {
+    return if (
+      inputCode.length >= 138
+      && isTransferInputCode(inputCode)
+    ) {
+      hold()
+      true
+    } else {
+      false
+    }
+  }
+
   fun getTargetDayInMills(distanceSinceToday: Int = 0): Long {
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)

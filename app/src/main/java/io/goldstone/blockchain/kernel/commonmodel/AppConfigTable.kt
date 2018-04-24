@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
+import android.annotation.SuppressLint
 import android.arch.persistence.room.*
+import android.provider.Settings
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
@@ -12,6 +14,9 @@ import org.jetbrains.anko.runOnUiThread
 /**
  * @date 23/04/2018 2:42 PM
  * @author KaySaith
+ * @important
+ * [deviceID] 这个 ID 是自身业务服务器和客户端用来做
+ * 唯一校验的值, 不是常规意义的 `Device ID`
  */
 
 @Entity(tableName = "appConfig")
@@ -19,7 +24,8 @@ data class AppConfigTable(
   @PrimaryKey(autoGenerate = true) var id: Int, var pincode: Int? = null,
   var showPincode: Boolean = false,
   var frozenTime: Long? = null,
-  var retryTimes: Int = 5
+  var retryTimes: Int = 5,
+  var goldStoneID: String = ""
 ) {
   companion object {
     fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
@@ -90,9 +96,14 @@ data class AppConfigTable(
       }
     }
 
-    fun insertAppConfig() {
+    @SuppressLint("HardwareIds")
+    fun insertAppConfig(callback: () -> Unit) {
       doAsync {
-        GoldStoneDataBase.database.appConfigDao().insert(AppConfigTable(0, null, false, null))
+        val goldStoneID = Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
+        GoldStoneDataBase.database.appConfigDao().insert(
+          AppConfigTable(0, null, false, null, 5, goldStoneID)
+        )
+        GoldStoneAPI.context.runOnUiThread { callback() }
       }
     }
   }
