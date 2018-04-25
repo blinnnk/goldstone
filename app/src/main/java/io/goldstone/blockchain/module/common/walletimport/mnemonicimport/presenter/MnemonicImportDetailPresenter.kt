@@ -46,14 +46,14 @@ class MnemonicImportDetailPresenter(
 
   private fun importWallet(mnemonic: String, password: String, name: String, hint: String? = null) {
     fragment.context?.getWalletByMnemonic(mnemonic, password) { address ->
-      address.isNull().isFalse {
+      address.isNull() isFalse {
         coroutinesTask({
           GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-            it.isNull().isFalse {
+            it.isNotNull {
               GoldStoneDataBase.database.walletDao().update(it!!.apply{ isUsing = false } )
             }
             WalletTable.insert(WalletTable(0, name, address!!, true, hint))
-            CreateWalletPresenter.generateMyTokenInfo(address)
+            CreateWalletPresenter.generateMyTokenInfo(address, true)
           }
         }) { fragment.activity?.jump<SplashActivity>() }
       } otherwise {
