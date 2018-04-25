@@ -3,7 +3,9 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -30,7 +32,13 @@ class QuotationPresenter(
 
   fun showQuotationManagement() {
     fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-      //
+      putString(ArgumentKey.quotationOverlayTitle, QuotationText.management)
+    }
+  }
+
+  fun showMarketTokenDetailFragment(symbol: String) {
+    fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+      putString(ArgumentKey.quotationOverlayTitle, symbol)
     }
   }
 

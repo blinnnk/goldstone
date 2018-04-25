@@ -50,7 +50,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
       }
     }
 
-    /** 如果数据返回时空的显示占位图 */
+    /** 如果数据返回空的显示占位图 */
     asyncData?.isEmpty()?.isTrue {
       showEmptyView()
     }

@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
 import android.widget.LinearLayout
-import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.coroutinesTask
 import org.jetbrains.anko.matchParent
@@ -32,7 +31,6 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
     }
     return super.onInterceptTouchEvent(event)
   }
-
 
   fun<T> addDragEventAndReordering(adapterDataSet: ArrayList<T>, hold: (fromPosition: Int?, toPosition: Int?) -> Unit) {
     var fromPosition: Int? = null
@@ -84,10 +82,5 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
       block(it as T)
     }
   }
-
-  inline fun <reified T : RecyclerView.LayoutManager> getManager(block: T.() -> Unit) {
-    (this.layoutManager is T) isTrue { block(this.layoutManager as T) }
-  }
-
 }
 

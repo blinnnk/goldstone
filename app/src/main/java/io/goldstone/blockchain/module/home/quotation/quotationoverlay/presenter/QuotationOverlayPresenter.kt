@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
 
 /**
  * @date 21/04/2018 4:14 PM
@@ -19,6 +20,12 @@ class QuotationOverlayPresenter(
 
   fun showQutationManagementFragment() {
     fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content) {
+      //
+    }
+  }
+
+  fun showMarketTokenDetailFragment() {
+    fragment.addFragmentAndSetArgument<MarketTokenDetailFragment>(ContainerID.content) {
       //
     }
   }

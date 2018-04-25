@@ -57,6 +57,12 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
     }
   }
 
+  fun updateHeight(height: Int) {
+    fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
+      overlayView.contentLayout.updateHeightAnimation(height)
+    }
+  }
+
   // 当 `BaseFragment` 加载在 `BaseOverlayFragment` 的时候提供支持回退的加载卸载方法
   inline fun<reified T: Fragment, reified Parent: BaseOverlayFragment<*>>
     showTargetFragment(title: String, popTitle: String, arguments: Bundle? = null) {

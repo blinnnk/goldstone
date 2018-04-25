@@ -504,6 +504,12 @@ object QuotationText {
   }
 
   @JvmField
+  val tokenDetail = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Market Token"
+    else -> ""
+  }
+
+  @JvmField
   val search = when (currentLanguage) {
     HoneyLanguage.English.code -> "Selection Search"
     else -> "自选管理"

@@ -16,11 +16,10 @@ object ArgumentKey {
   const val paymentAddress = "paymentAddress"
   const val paymentSymbol = "paymentSymbol"
   const val webViewUrl = "webViewUrl"
-  const val fragmentTitle = "fragmentTitle"
   const val notificationTransaction = "notificationTransaction"
+  const val quotationOverlayTitle = "quotationOverlay"
 }
 
 object SharesPreference {
   const val registerPush = "registerPush"
-  const val retryTimes = "retryTimes"
 }
