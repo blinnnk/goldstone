@@ -13,7 +13,8 @@ import org.jetbrains.anko.matchParent
  */
 
 class QuotationAdapter(
-  override val dataSet: ArrayList<QuotationModel>
+  override val dataSet: ArrayList<QuotationModel>,
+  private val hold: QuotationCell.() -> Unit
   ) : HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, LinearLayout>() {
 
   override fun generateFooter(context: Context) = LinearLayout(context).apply {
@@ -28,6 +29,7 @@ class QuotationAdapter(
 
   override fun QuotationCell.bindCell(data: QuotationModel, position: Int) {
     model = data
+    hold(this)
   }
 
 }

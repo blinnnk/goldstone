@@ -26,7 +26,12 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
     recyclerView: BaseRecyclerView,
     asyncData: ArrayList<QuotationModel>?
   ) {
-    recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray())
+    recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
+      onClick {
+        presenter.showMarketTokenDetailFragment("EOS/USDT Huobi.pro")
+        preventDuplicateClicks()
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

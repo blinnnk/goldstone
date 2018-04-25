@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.hint.presenter
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -26,5 +27,11 @@ class HintPresenter(
         fragment.context?.alert("It is empty please enter some word")
       }
     }
+  }
+
+  override fun onFragmentViewCreated() {
+    super.onFragmentViewCreated()
+    // 初始化高度
+    updateHeight(250.uiPX())
   }
 }

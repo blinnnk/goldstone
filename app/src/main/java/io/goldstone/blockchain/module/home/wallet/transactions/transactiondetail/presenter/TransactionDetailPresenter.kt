@@ -148,6 +148,8 @@ class TransactionDetailPresenter(
     }
   }
 
+
+  // 将时间戳转化为界面显示的时间格式的工具
   private fun formatDate(timeStamp: Long): String {
     return DateUtils.formatDateTime(
       GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_YEAR
@@ -156,6 +158,7 @@ class TransactionDetailPresenter(
     )
   }
 
+  // 根据传入转账信息类型, 来生成对应的更新界面的数据
   private fun generateModels(
     receipt: Any? = null
   ): ArrayList<TransactionDetailModel> {
@@ -213,6 +216,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  // 更新头部数字的工具
   private fun updateHeaderValue(
     count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false
   ) {
@@ -255,6 +259,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
   private fun TransactionDetailFragment.getTransactionFromChain(
     taxHash: String,
     callback: () -> Unit = {}
@@ -272,7 +277,7 @@ class TransactionDetailPresenter(
     }
   }
 
-  
+
   private fun TransactionDetailFragment.updateTransactionByNotificationHash(
     info: NotificationTransactionInfo,
     callback: () -> Unit
@@ -338,6 +343,7 @@ class TransactionDetailPresenter(
     }
   }
 
+  // 自动监听交易完成后, 将转账信息插入数据库
   private fun updateDataInDatabase(data: TransactionReceipt) {
     GoldStoneDataBase.database.transactionDao().apply {
       getTransactionsByTaxHash(data.transactionHash)?.let {
