@@ -24,6 +24,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     // Do Something
   }
 
+  open fun afterUpdateAdapterDataset() {
+
+  }
+
   /**
    * @description
    * 在依赖的 `Fragment` 的对应的生命周期提供的依赖方法

@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
@@ -27,7 +28,7 @@ import org.jetbrains.anko.matchParent
 
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
-  open var model: DefaultTokenTable? by observing(null) {
+  var model: DefaultTokenTable? by observing(null) {
     model?.apply {
       // 显示默认图判断
       if(iconUrl.isBlank()) {
@@ -41,9 +42,16 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
     }
   }
 
+  var searchModel: QuotationSelectionTable? by observing(null) {
+    searchModel?.apply {
+      tokenInfo.title.text = infoTitle
+      tokenInfo.subtitle.text = name
+    }
+  }
+
   val switch by lazy { HoneyBaseSwitch(context) }
 
-  protected val tokenInfo by lazy { TwoLineTitles(context) }
+  private val tokenInfo by lazy { TwoLineTitles(context) }
   protected val icon by lazy { SquareIcon(context) }
 
   init {

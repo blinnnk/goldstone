@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationmanagement.view
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -10,13 +10,15 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  */
 
 class QuotationManagementAdapter(
-  override val dataSet: ArrayList<DefaultTokenTable>
-  ) : HoneyBaseAdapter<DefaultTokenTable, QuotationManagementCell>() {
+  override val dataSet: ArrayList<QuotationSelectionTable>,
+  private val hold: (QuotationManagementCell) -> Unit
+  ) : HoneyBaseAdapter<QuotationSelectionTable, QuotationManagementCell>() {
 
   override fun generateCell(context: Context) = QuotationManagementCell(context)
 
-  override fun QuotationManagementCell.bindCell(data: DefaultTokenTable, position: Int) {
-    model = data
+  override fun QuotationManagementCell.bindCell(data: QuotationSelectionTable, position: Int) {
+    searchModel = data
+    hold(this)
   }
 
 }

@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -12,15 +13,44 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class QuotationManagementPresenter(
   override val fragment: QuotationManagementFragment
-  ) : BaseRecyclerPresenter<QuotationManagementFragment, DefaultTokenTable>() {
+) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
 
   override fun updateData() {
-    fragment.asyncData = arrayListOf(
-      DefaultTokenTable(TokenSearchModel("", "", "ETH", "563.23", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "EOS", "22.29", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "TRX", "1.15", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "GS", "12.88", "ethereume", 18, 100), true)
-    )
+    QuotationSelectionTable.getMySelections {
+      it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
+        fragment.apply {
+          asyncData.isNull() isTrue {
+            asyncData = orderedData
+          } otherwise {
+            diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+          }
+        }
+      }
+    }
+  }
+
+  override fun afterUpdateAdapterDataset() {
+    fragment.recyclerView.addDragEventAndReordering(fragment.asyncData.orEmptyArray()) { fromPosition, toPosition ->
+      if (fromPosition != null && toPosition != null) {
+        updateSelectionsOrderID(fromPosition, toPosition) {
+          updateSelectionsOrderID(toPosition, fromPosition)
+        }
+      }
+    }
+  }
+
+  private fun updateSelectionsOrderID(firstID: Int, secondID: Int, callback: () -> Unit = {}) {
+    fragment.asyncData?.let {
+      QuotationSelectionTable.updateSelectionOrderIDBy(it[firstID].pair, secondID) {
+        QuotationSelectionTable.updateSelectionOrderIDBy(it[secondID].pair, firstID) {
+          callback()
+        }
+      }
+    }
+  }
+
+  override fun onFragmentShowFromHidden() {
+    updateData()
   }
 
 }

@@ -11,7 +11,7 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSearchModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -85,8 +85,8 @@ object GoldStoneAPI {
   }
 
   @JvmStatic
-  fun getMarketSearchList(pair: String, hold: (ArrayList<QuotationSearchModel>) -> Unit) {
-    requestData<QuotationSearchModel>(APIPath.marketSearch + pair, "pair_list") {
+  fun getMarketSearchList(pair: String, hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
+    requestData<QuotationSelectionTable>(APIPath.marketSearch + pair, "pair_list") {
       hold(toArrayList())
     }
   }
