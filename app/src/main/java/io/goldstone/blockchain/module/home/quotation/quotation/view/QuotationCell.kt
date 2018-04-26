@@ -72,7 +72,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       gravity = Gravity.END
       layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
       x -= 20.uiPX()
-      y += 50.uiPX()
+      y += 52.uiPX()
     }
   }
 

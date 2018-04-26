@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
@@ -17,18 +17,12 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 @Entity(tableName = "quotationSelection")
-data class QuotationSelectionTable (
-  @PrimaryKey(autoGenerate = true)
-  var id: Int,
-  @SerializedName("market_id") var marketID: Int,
-  @SerializedName("pair_display") var pairDisplay: String,
-  @SerializedName("base") var baseSymnbol: String,
-  @SerializedName("quote") var quoteSymbol: String,
-  @SerializedName("pair") var pair: String,
-  @SerializedName("market") var market: String,
-  @SerializedName("name") var name: String,
-  var infoTitle: String,
-  var orderID: Int = 0
+data class QuotationSelectionTable(
+  @PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("market_id") var marketID: Int,
+  @SerializedName("pair_display") var pairDisplay: String, @SerializedName("base")
+  var baseSymnbol: String, @SerializedName("quote") var quoteSymbol: String, @SerializedName("pair")
+  var pair: String, @SerializedName("market") var market: String, @SerializedName("name")
+  var name: String, var infoTitle: String, var orderID: Double = 0.0
 ) {
 
   constructor(data: QuotationSelectionTable) : this(
@@ -51,7 +45,7 @@ data class QuotationSelectionTable (
           // 添加的时候赋予新的最大的 `orderID`
           getQuotationSelfSelections().let {
             val currentID = it.maxBy { it.orderID }?.orderID
-            val newOrderID = if (currentID.isNull()) 0 else currentID.orZero() + 1
+            val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
             insert(table.apply { orderID = newOrderID })
             GoldStoneAPI.context.runOnUiThread { callback() }
           }
@@ -78,12 +72,14 @@ data class QuotationSelectionTable (
       }
     }
 
-    fun updateSelectionOrderIDBy(pair: String, newOrderID: Int, callback: () -> Unit = {}) {
+    fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit = {}) {
       doAsync {
         GoldStoneDataBase.database.quotationSelectionDao().apply {
-          getSelectionByPair(pair)?.let {
-            update(it.apply { orderID = newOrderID })
-            GoldStoneAPI.context.runOnUiThread { callback() }
+          getSelectionByPair(fromPair)?.let {
+            update(it.apply { this.orderID = newOrderID })
+            GoldStoneAPI.context.runOnUiThread {
+              callback()
+            }
           }
         }
       }
@@ -99,6 +95,9 @@ interface QuotationSelectionDao {
 
   @Query("SELECT * FROM quotationSelection WHERE pair LIKE :pair")
   fun getSelectionByPair(pair: String): QuotationSelectionTable?
+
+  @Query("SELECT * FROM quotationSelection WHERE orderID LIKE :orderID")
+  fun getSelectionByOrderID(orderID: Int): QuotationSelectionTable?
 
   @Insert
   fun insert(table: QuotationSelectionTable)

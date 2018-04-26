@@ -5,7 +5,7 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.BasicSize
@@ -24,7 +24,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
     // Do Something
   }
 
-  open fun afterUpdateAdapterDataset() {
+  open fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
 
   }
 

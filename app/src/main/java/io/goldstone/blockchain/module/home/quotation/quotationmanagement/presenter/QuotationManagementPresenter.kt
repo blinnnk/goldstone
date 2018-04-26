@@ -1,6 +1,10 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
@@ -29,21 +33,17 @@ class QuotationManagementPresenter(
     }
   }
 
-  override fun afterUpdateAdapterDataset() {
-    fragment.recyclerView.addDragEventAndReordering(fragment.asyncData.orEmptyArray()) { fromPosition, toPosition ->
-      if (fromPosition != null && toPosition != null) {
-        updateSelectionsOrderID(fromPosition, toPosition) {
-          updateSelectionsOrderID(toPosition, fromPosition)
-        }
-      }
-    }
-  }
-
-  private fun updateSelectionsOrderID(firstID: Int, secondID: Int, callback: () -> Unit = {}) {
+  override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
     fragment.asyncData?.let {
-      QuotationSelectionTable.updateSelectionOrderIDBy(it[firstID].pair, secondID) {
-        QuotationSelectionTable.updateSelectionOrderIDBy(it[secondID].pair, firstID) {
-          callback()
+      recyclerView.addDragEventAndReordering(it) { fromPosition, toPosition ->
+        if (fromPosition != null && toPosition != null) {
+          // 通过权重判断简单的实现了排序效果
+          val newOrderID = when (toPosition) {
+            0 -> it[toPosition + 1].orderID + 0.1
+            it.lastIndex -> it[toPosition - 1].orderID - 0.1
+            else -> (it[toPosition - 1].orderID + it[toPosition + 1].orderID) / 2.0
+          }
+          QuotationSelectionTable.updateSelectionOrderIDBy(it[toPosition].pair, newOrderID)
         }
       }
     }
