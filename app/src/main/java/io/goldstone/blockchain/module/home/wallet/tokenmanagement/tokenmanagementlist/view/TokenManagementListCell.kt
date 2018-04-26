@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view
 
 import android.content.Context
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
@@ -42,8 +43,8 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
   val switch by lazy { HoneyBaseSwitch(context) }
 
-  private val tokenInfo by lazy { TwoLineTitles(context) }
-  private val icon by lazy { SquareIcon(context) }
+  protected val tokenInfo by lazy { TwoLineTitles(context) }
+  protected val icon by lazy { SquareIcon(context) }
 
   init {
 
@@ -80,4 +81,8 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
   fun getSymbol(): String = tokenInfo.title.text.toString()
 
+  fun hideIcon() {
+    icon.visibility = View.GONE
+    tokenInfo.x = 0f
+  }
 }

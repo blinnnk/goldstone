@@ -19,6 +19,7 @@ object APIPath {
   const val registerDevice = "$url/account/registerDevice"
   const val updateAddress = "$url/account/updateAddress"
   const val getNotification = "$url/account/unreadMessageList"
+  const val marketSearch = "$url/account/searchPair?pair="
   // ROPSTAN 节点请求地址
   const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
   const val ropstan = "http://118.89.147.176:8500"

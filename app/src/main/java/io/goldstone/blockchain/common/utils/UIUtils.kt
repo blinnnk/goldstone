@@ -2,6 +2,8 @@ package io.goldstone.blockchain.common.utils
 
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.R.drawable.*
 
@@ -35,5 +37,14 @@ object UIUtils {
       avatar_10
     )
     return avatars[id % 10]
+  }
+}
+
+fun String.toUpperCaseFirstLetter(): String {
+  isNotEmpty() isTrue {
+    if (length == 1) return substring(0, 1).toUpperCase()
+    return substring(0, 1).toUpperCase() + substring(1, length)
+  } otherwise {
+    return ""
   }
 }
