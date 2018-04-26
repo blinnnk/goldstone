@@ -1,9 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSearchModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -12,15 +18,32 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class QuotationSearchPresenter(
   override val fragment: QuotationSearchFragment
-) : BaseRecyclerPresenter<QuotationSearchFragment, DefaultTokenTable>() {
+) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSearchModel>() {
 
   override fun updateData() {
-    fragment.asyncData = arrayListOf(
-      DefaultTokenTable(TokenSearchModel("", "", "BTC / Bitffnex", "563.23", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "EOS / Huobi", "22.29", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "TRX / Liqui", "1.15", "ethereume", 18, 100), false),
-      DefaultTokenTable(TokenSearchModel("", "", "QTM / Bitffnex", "12.88", "ethereume", 18, 100), false)
-    )
+    fragment.asyncData = arrayListOf()
+  }
+
+  override fun onFragmentViewCreated() {
+    super.onFragmentViewCreated()
+    setHeightMatchParent()
+    fragment.getParentFragment<QuotationOverlayFragment> {
+      overlayView.header.setKeyboardConfirmEvent {
+        getMainActivity()?.showLoadingView()
+        searchTokenBy(text.toString())
+      }
+    }
+  }
+
+  private fun searchTokenBy(symbol: String) {
+    GoldStoneAPI.getMarketSearchList(symbol) {
+      fragment.apply {
+        context?.runOnUiThread {
+          getMainActivity()?.removeLoadingView()
+          diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(it.map { QuotationSearchModel(it) }.toArrayList())
+        }
+      }
+    }
   }
 
 }

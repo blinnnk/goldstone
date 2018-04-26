@@ -25,16 +25,18 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
     asyncData: ArrayList<DefaultTokenTable>?
   ) {
     recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { cell ->
-      cell.switch.onClick {
-        cell.model?.apply {
-          DefaultTokenTable.getTokenByContractAddress(contract) { localToken ->
-            localToken.isNotNull {
-              insertTokenToDataBase(cell)
-            } otherwise {
-              DefaultTokenTable.insertTokenInfo(this) {
-                insertTokenToDataBase(cell)
-              }
-            }
+      cell.switch.onClick { cell.setMyTokenStatus() }
+    }
+  }
+
+  private fun TokenSearchCell.setMyTokenStatus() {
+    model?.let {
+      DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
+        localToken.isNotNull {
+          insertTokenToDataBase(this)
+        } otherwise {
+          DefaultTokenTable.insertTokenInfo(it) {
+            insertTokenToDataBase(this)
           }
         }
       }
