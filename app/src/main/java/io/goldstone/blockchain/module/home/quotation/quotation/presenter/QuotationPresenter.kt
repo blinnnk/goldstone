@@ -33,6 +33,7 @@ class QuotationPresenter(
         fragment.asyncData.isNull() isTrue {
           fragment.asyncData = it
         } otherwise {
+          if (fragment.asyncData.orEmptyArray().isEmpty()) fragment.removeEmptyView()
           diffAndUpdateAdapterData<QuotationAdapter>(it)
         }
       }

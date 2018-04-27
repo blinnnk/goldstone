@@ -95,7 +95,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       val maxValue = chartData.max()?.value ?: 0f
       val minValue = chartData.min()?.value ?: 0f
       // 设定 `Y` 周波段
-      setAxisBorderValues(minValue, (maxValue - minValue) * 0.1f + maxValue, maxValue / 10)
+      val stepDistance = generateStepDistance(minValue.toDouble(), maxValue.toDouble())
+      val max = Math.ceil(maxValue.toDouble() / stepDistance).toFloat() * stepDistance
+      val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
+      setAxisBorderValues( min, max, stepDistance)
       // 设定外界 `Border` 颜色
       setAxisColor(Color.argb(0, 0, 0, 0))
       // 设定外边的 `Border` 的粗细
@@ -131,12 +134,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       animation.setInterpolator(OvershootInterpolator())
       show(animation)
     }
+  }
 
-    // 在 `recycler` 复用的时候进行存在判断
-    findViewById<LineChartView>(ElementID.chartView).isNotNull {
-      return@observing
-    }
-
+  private fun generateStepDistance(minValue: Double,  maxValue: Double): Float {
+    val stepsCount = 5   //代表希望分成几个阶段
+    val roughStep = (maxValue - minValue) / stepsCount
+    val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
+    return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
   }
 
   init {
