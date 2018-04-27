@@ -1,12 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSearchModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
 import org.jetbrains.anko.runOnUiThread
@@ -18,7 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 
 class QuotationSearchPresenter(
   override val fragment: QuotationSearchFragment
-) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSearchModel>() {
+) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
 
   override fun updateData() {
     fragment.asyncData = arrayListOf()
@@ -35,12 +38,41 @@ class QuotationSearchPresenter(
     }
   }
 
+  fun setQuotationSelfSelection(
+    model: QuotationSelectionTable,
+    isSelect: Boolean = true,
+    callback: () -> Unit = {}
+  ) {
+    isSelect isTrue {
+      getLineChartDataByPair(model.pair) { chartData ->
+        QuotationSelectionTable.insertSelection(model.apply {
+          lineChart = chartData
+        }) { callback() }
+      }
+    } otherwise {
+      QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
+    }
+  }
+
+  private fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+    val parameter = JsonArray().apply { add(pair) }
+    GoldStoneAPI.getCurrencyLineChartData(parameter) {
+      it.isNotEmpty() isTrue {
+        hold(it[0].pairList.toString())
+      } otherwise {
+        hold("")
+      }
+    }
+  }
+
   private fun searchTokenBy(symbol: String) {
     GoldStoneAPI.getMarketSearchList(symbol) {
       fragment.apply {
         context?.runOnUiThread {
           getMainActivity()?.removeLoadingView()
-          diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(it.map { QuotationSearchModel(it) }.toArrayList())
+          diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(it.map {
+            QuotationSelectionTable(it, "")
+          }.toArrayList())
         }
       }
     }

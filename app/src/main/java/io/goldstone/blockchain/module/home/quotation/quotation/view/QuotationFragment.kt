@@ -28,7 +28,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
   ) {
     recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
       onClick {
-        presenter.showMarketTokenDetailFragment("EOS/USDT Huobi.pro")
+        presenter.showMarketTokenDetailFragment(model.pairDisplay)
         preventDuplicateClicks()
       }
     }

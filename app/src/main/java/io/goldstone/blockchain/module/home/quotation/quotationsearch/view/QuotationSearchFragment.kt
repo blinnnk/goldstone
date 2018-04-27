@@ -3,9 +3,10 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSearchModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.support.v4.toast
 import java.util.*
 
 /**
@@ -13,12 +14,18 @@ import java.util.*
  * @author KaySaith
  */
 
-class QuotationSearchFragment : BaseRecyclerFragment<QuotationSearchPresenter, QuotationSearchModel>() {
+class QuotationSearchFragment : BaseRecyclerFragment<QuotationSearchPresenter, QuotationSelectionTable>() {
 
   override val presenter = QuotationSearchPresenter(this)
   override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView, asyncData: ArrayList<QuotationSearchModel>?
+    recyclerView: BaseRecyclerView, asyncData: ArrayList<QuotationSelectionTable>?
   ) {
-    recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray())
+    recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { cell ->
+      cell.searchModel?.let { model ->
+        cell.switch.onClick {
+          presenter.setQuotationSelfSelection(model, cell.switch.isChecked)
+        }
+      }
+    }
   }
 }

@@ -1,9 +1,14 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -12,15 +17,44 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class QuotationManagementPresenter(
   override val fragment: QuotationManagementFragment
-  ) : BaseRecyclerPresenter<QuotationManagementFragment, DefaultTokenTable>() {
+) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
 
   override fun updateData() {
-    fragment.asyncData = arrayListOf(
-      DefaultTokenTable(TokenSearchModel("", "", "ETH", "563.23", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "EOS", "22.29", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "TRX", "1.15", "ethereume", 18, 100), true),
-      DefaultTokenTable(TokenSearchModel("", "", "GS", "12.88", "ethereume", 18, 100), true)
-    )
+    QuotationSelectionTable.getMySelections {
+      it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
+        fragment.apply {
+          asyncData.isNull() isTrue {
+            asyncData = orderedData
+          } otherwise {
+            diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+          }
+        }
+      }
+    }
+  }
+
+  override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+    fragment.updateSelectionOrderID()
+  }
+
+  private fun QuotationManagementFragment.updateSelectionOrderID() {
+    fragment.asyncData?.let {
+      recyclerView.addDragEventAndReordering(it) { fromPosition, toPosition ->
+        if (fromPosition != null && toPosition != null) {
+          // 通过权重判断简单的实现了排序效果
+          val newOrderID = when (toPosition) {
+            0 -> it[toPosition + 1].orderID + 0.1
+            it.lastIndex -> it[toPosition - 1].orderID - 0.1
+            else -> (it[toPosition - 1].orderID + it[toPosition + 1].orderID) / 2.0
+          }
+          QuotationSelectionTable.updateSelectionOrderIDBy(it[toPosition].pair, newOrderID)
+        }
+      }
+    }
+  }
+
+  override fun onFragmentShowFromHidden() {
+    updateData()
   }
 
 }

@@ -31,6 +31,8 @@ class QuotationManagementCell(context: Context) : TokenManagementListCell(contex
 
     dragIcon.setCenterInVertical()
     dragIcon.setAlignParentRight()
+    switch.isChecked = true
+    hideIcon()
   }
 
 }

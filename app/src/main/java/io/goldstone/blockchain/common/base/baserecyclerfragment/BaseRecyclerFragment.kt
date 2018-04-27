@@ -49,7 +49,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
         notifyDataSetChanged()
       }
     }
-
+    presenter.afterUpdateAdapterDataset(recyclerView)
     /** 如果数据返回空的显示占位图 */
     asyncData?.isEmpty()?.isTrue {
       showEmptyView()

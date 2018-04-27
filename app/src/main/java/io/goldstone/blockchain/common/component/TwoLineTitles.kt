@@ -110,7 +110,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
       textSize = 4.uiPX().toFloat()
       textColor = GrayScale.midGray
       typeface = GoldStoneFont.medium(context)
-      y -= 8.uiPX()
+      y -= 7.uiPX()
     }
   }
 

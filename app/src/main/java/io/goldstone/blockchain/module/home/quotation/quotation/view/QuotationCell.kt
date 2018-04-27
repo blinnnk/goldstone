@@ -72,7 +72,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       gravity = Gravity.END
       layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
       x -= 20.uiPX()
-      y += 50.uiPX()
+      y += 52.uiPX()
     }
   }
 
@@ -84,15 +84,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
   private var cellLayout: RelativeLayout? = null
 
   private var chartData: ArrayList<Point> by observing(arrayListOf()) {
-    // 在 `recycler` 复用的时候进行存在判断
-    findViewById<LineChartView>(ElementID.chartView).isNotNull {
-      return@observing
-    }
     chartView.apply {
-      id = ElementID.chartView
-      layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
-      setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
-      y += 60.uiPX()
       // 设定背景的网格
       setGrid(
         5,
@@ -100,8 +92,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
         Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
       // 设定便捷字体颜色
       setLabelsColor(GrayScale.midGray)
+      val maxValue = chartData.max()?.value ?: 0f
+      val minValue = chartData.min()?.value ?: 0f
       // 设定 `Y` 周波段
-      setAxisBorderValues(0f, 100f, 25f)
+      setAxisBorderValues(minValue, (maxValue - minValue) * 0.1f + maxValue, maxValue / 10)
       // 设定外界 `Border` 颜色
       setAxisColor(Color.argb(0, 0, 0, 0))
       // 设定外边的 `Border` 的粗细
@@ -123,14 +117,26 @@ class QuotationCell(context: Context) : LinearLayout(context) {
         setFontSize(9.uiPX())
       }
 
-      addData(dataSet)
+      data.isEmpty() isTrue {
+        addData(dataSet)
+        notifyDataUpdate()
+      } otherwise {
+        data.clear()
+        addData(dataSet)
+        notifyDataUpdate()
+      }
 
       setClickablePointRadius(30.uiPX().toFloat())
-
       val animation = Animation(1000)
       animation.setInterpolator(OvershootInterpolator())
       show(animation)
-    }.into(cellLayout!!)
+    }
+
+    // 在 `recycler` 复用的时候进行存在判断
+    findViewById<LineChartView>(ElementID.chartView).isNotNull {
+      return@observing
+    }
+
   }
 
   init {
@@ -148,6 +154,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       addView(exchangeName)
 
       tokenPrice.setAlignParentRight()
+
+      chartView.apply {
+        id = ElementID.chartView
+        layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+        setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+        y = 60.uiPX().toFloat()
+      }.into(this)
 
     }
   }
