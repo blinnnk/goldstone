@@ -11,6 +11,7 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
@@ -134,6 +135,19 @@ object GoldStoneAPI {
     ).let {
       postRequest(it, APIPath.registerDevice) {
         hold(it)
+      }
+    }
+  }
+
+  fun getCurrencyLineChartData(
+    pairList: JsonArray,
+    hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
+  ) {
+    val contentType = MediaType.parse("application/json; charset=utf-8")
+    RequestBody.create(
+      contentType, "{\"pair_list\":$pairList}").let {
+      postRequestGetJsonObject<QuotationSelectionLineChartModel>(it, "data_list", APIPath.getCurrencyLineChartData) {
+        hold(it.toArrayList())
       }
     }
   }

@@ -34,6 +34,10 @@ class QuotationManagementPresenter(
   }
 
   override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+    fragment.updateSelectionOrderID()
+  }
+
+  private fun QuotationManagementFragment.updateSelectionOrderID() {
     fragment.asyncData?.let {
       recyclerView.addDragEventAndReordering(it) { fromPosition, toPosition ->
         if (fromPosition != null && toPosition != null) {

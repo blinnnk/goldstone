@@ -18,14 +18,20 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "quotationSelection")
 data class QuotationSelectionTable(
-  @PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("market_id") var marketID: Int,
-  @SerializedName("pair_display") var pairDisplay: String, @SerializedName("base")
-  var baseSymnbol: String, @SerializedName("quote") var quoteSymbol: String, @SerializedName("pair")
-  var pair: String, @SerializedName("market") var market: String, @SerializedName("name")
-  var name: String, var infoTitle: String, var orderID: Double = 0.0
+  @PrimaryKey(autoGenerate = true)
+  var id: Int,
+  @SerializedName("market_id") var marketID: Int,
+  @SerializedName("pair_display") var pairDisplay: String,
+  @SerializedName("base") var baseSymnbol: String,
+  @SerializedName("quote") var quoteSymbol: String,
+  @SerializedName("pair") var pair: String,
+  @SerializedName("market") var market: String,
+  @SerializedName("name") var name: String,
+  var infoTitle: String,
+  var orderID: Double = 0.0,
+  var lineChart: String
 ) {
-
-  constructor(data: QuotationSelectionTable) : this(
+  constructor(data: QuotationSelectionTable, lineChart: String) : this(
     0,
     data.marketID,
     data.pairDisplay,
@@ -35,7 +41,8 @@ data class QuotationSelectionTable(
     data.market,
     data.name,
     data.pairDisplay + " " + data.market.toUpperCaseFirstLetter(),
-    data.orderID
+    data.orderID,
+    lineChart
   )
 
   companion object {
