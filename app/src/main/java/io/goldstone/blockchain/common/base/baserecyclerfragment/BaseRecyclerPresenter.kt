@@ -113,11 +113,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
    * 状态而决定是否执行.
    */
   open fun updateParentContentLayoutHeight(
-    dataCount: Int = 0,
+    dataCount: Int? = 0,
     cellHeight: Int = 0,
     maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
   ) {
-    val actualHeight = dataCount * cellHeight
+    val actualHeight = dataCount.orZero() * cellHeight
     val targetHeight = when {
       dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
       actualHeight > BasicSize.overlayMinHeight -> actualHeight

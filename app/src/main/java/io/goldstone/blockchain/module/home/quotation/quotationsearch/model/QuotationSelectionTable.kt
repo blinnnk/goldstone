@@ -29,7 +29,8 @@ data class QuotationSelectionTable(
   @SerializedName("name") var name: String,
   var infoTitle: String,
   var orderID: Double = 0.0,
-  var lineChart: String
+  var lineChart: String,
+  var isSelecting: Boolean = false
 ) {
   constructor(data: QuotationSelectionTable, lineChart: String) : this(
     0,
@@ -42,7 +43,8 @@ data class QuotationSelectionTable(
     data.name,
     data.pairDisplay + " " + data.market.toUpperCaseFirstLetter(),
     data.orderID,
-    lineChart
+    lineChart,
+    data.isSelecting
   )
 
   companion object {

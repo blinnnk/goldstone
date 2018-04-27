@@ -21,7 +21,7 @@ import org.jetbrains.anko.matchParent
  */
 
 enum class EmptyType {
-  TokenDetail, TransactionDetail, Contact, Search
+  TokenDetail, TransactionDetail, Contact, Search, QuotationSearch
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -71,6 +71,11 @@ class EmptyView(context: Context) : LinearLayout(context) {
       }
       EmptyType.Search -> {
         icon.imageResource = R.drawable.search_empty_icon
+        introTitles.title.text = EmptyText.searchTitle
+        introTitles.subtitle.text = EmptyText.searchSubtitle
+      }
+      EmptyType.QuotationSearch -> {
+        icon.imageResource = R.drawable.nopair_icon
         introTitles.title.text = EmptyText.searchTitle
         introTitles.subtitle.text = EmptyText.searchSubtitle
       }

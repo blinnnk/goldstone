@@ -28,69 +28,67 @@ import org.jetbrains.anko.matchParent
 
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
-  var model: DefaultTokenTable? by observing(null) {
-    model?.apply {
-      // 显示默认图判断
-      if(iconUrl.isBlank()) {
-        icon.image.imageResource = R.drawable.default_token
-      } else {
-        icon.image.glideImage(iconUrl)
-      }
-      tokenInfo.title.text = symbol
-      tokenInfo.subtitle.text = name
-      switch.isChecked = isUsed
-    }
-  }
+	var model: DefaultTokenTable? by observing(null) {
+		model?.apply {
+			// 显示默认图判断
+			if (iconUrl.isBlank()) {
+				icon.image.imageResource = R.drawable.default_token
+			} else {
+				icon.image.glideImage(iconUrl)
+			}
+			tokenInfo.title.text = symbol
+			tokenInfo.subtitle.text = name
+			switch.isChecked = isUsed
+		}
+	}
 
-  var searchModel: QuotationSelectionTable? by observing(null) {
-    searchModel?.apply {
-      tokenInfo.title.text = infoTitle
-      tokenInfo.subtitle.text = name
-    }
-  }
+	var searchModel: QuotationSelectionTable? by observing(null) {
+		searchModel?.apply {
+			tokenInfo.title.text = infoTitle
+			tokenInfo.subtitle.text = name
+			switch.isChecked = isSelecting
+		}
+	}
 
-  val switch by lazy { HoneyBaseSwitch(context) }
+	val switch by lazy { HoneyBaseSwitch(context) }
 
-  private val tokenInfo by lazy { TwoLineTitles(context) }
-  protected val icon by lazy { SquareIcon(context) }
+	private val tokenInfo by lazy { TwoLineTitles(context) }
+	protected val icon by lazy { SquareIcon(context) }
 
-  init {
+	init {
 
-    hasArrow = false
+		hasArrow = false
 
-    this.addView(icon
-      .apply {
-        setGrayStyle()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
-      })
+		this.addView(icon.apply {
+			setGrayStyle()
+			setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
+		})
 
-    this.addView(tokenInfo
-      .apply { setBlackTitles() })
+		this.addView(tokenInfo.apply { setBlackTitles() })
 
-    this.addView(switch
-      .apply {
-        layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
-        setThemColor(Spectrum.green, Spectrum.lightGreen)
-      })
+		this.addView(switch.apply {
+			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
+			setThemColor(Spectrum.green, Spectrum.lightGreen)
+		})
 
-    tokenInfo.apply {
-      setCenterInVertical()
-      x += 40.uiPX()
-    }
+		tokenInfo.apply {
+			setCenterInVertical()
+			x += 40.uiPX()
+		}
 
-    switch.apply {
-      setCenterInVertical()
-      setAlignParentRight()
-    }
+		switch.apply {
+			setCenterInVertical()
+			setAlignParentRight()
+		}
 
-    setGrayStyle()
+		setGrayStyle()
 
-  }
+	}
 
-  fun getSymbol(): String = tokenInfo.title.text.toString()
+	fun getSymbol(): String = tokenInfo.title.text.toString()
 
-  fun hideIcon() {
-    icon.visibility = View.GONE
-    tokenInfo.x = 0f
-  }
+	fun hideIcon() {
+		icon.visibility = View.GONE
+		tokenInfo.x = 0f
+	}
 }

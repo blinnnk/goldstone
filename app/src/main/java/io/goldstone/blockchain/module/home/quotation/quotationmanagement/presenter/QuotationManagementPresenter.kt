@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
@@ -53,8 +50,18 @@ class QuotationManagementPresenter(
     }
   }
 
+	override fun updateParentContentLayoutHeight(dataCount: Int?, cellHeight: Int, maxHeight: Int) {
+		super.updateParentContentLayoutHeight(
+			if(fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size,
+			cellHeight,
+			maxHeight
+		)
+	}
+
   override fun onFragmentShowFromHidden() {
+    // 更新数据
     updateData()
+    updateParentContentLayoutHeight(if(fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size)
   }
 
 }
