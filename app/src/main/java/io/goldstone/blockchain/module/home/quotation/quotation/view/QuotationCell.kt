@@ -40,6 +40,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       tokenPrice.setColorStyle(Spectrum.red)
       chartColor = Spectrum.lightRed
       chartLineColor = Spectrum.red
+    } else {
+      tokenPrice.setColorStyle(Spectrum.green)
+      chartColor = Spectrum.lightGreen
+      chartLineColor = Spectrum.green
     }
     chartData = model.chartData
     exchangeName.text = model.exchangeName
