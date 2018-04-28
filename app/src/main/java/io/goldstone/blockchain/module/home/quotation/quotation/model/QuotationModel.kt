@@ -9,23 +9,30 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
  */
 
 data class QuotationModel(
-  val symbol: String = "",
-  val name: String = "",
-  val price: String = "",
-  val percent: String = "",
-  val chartData: ArrayList<Point> = arrayListOf(),
-  val exchangeName: String = "",
-  val orderID: Double = 0.0,
-  val pairDisplay: String = ""
+	val symbol: String = "",
+	val name: String = "",
+	var price: String = "",
+	var percent: String = "",
+	val chartData: ArrayList<Point> = arrayListOf(),
+	val exchangeName: String = "",
+	val orderID: Double = 0.0,
+	val pairDisplay: String = "",
+	val pair: String = ""
 ) {
-  constructor(data: QuotationSelectionTable, price: String, percent: String, chartData: ArrayList<Point>) : this(
-    data.baseSymnbol.toUpperCase(),
-    data.name.toLowerCase(),
-    price,
-    percent,
-    chartData,
-    data.market.toLowerCase(),
-    data.orderID,
-    data.infoTitle
-  )
+	constructor(
+		data: QuotationSelectionTable,
+		price: String,
+		percent: String,
+		chartData: ArrayList<Point>
+	) : this(
+		data.baseSymnbol.toUpperCase(),
+		data.name.toLowerCase(),
+		price,
+		percent,
+		chartData,
+		data.market.toLowerCase(),
+		data.orderID,
+		data.infoTitle,
+		data.pair
+	)
 }

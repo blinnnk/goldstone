@@ -64,6 +64,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
   }
 
+  open fun onFragmentHiddenChanged(isHidden: Boolean) {
+
+  }
+
   /** 获取依赖的 `Adapter` */
   inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
     fragment.recyclerView.adapter as? T
