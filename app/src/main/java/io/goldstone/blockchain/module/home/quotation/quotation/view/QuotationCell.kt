@@ -5,14 +5,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.Gravity
-import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import com.db.chart.animation.Animation
 import com.db.chart.model.LineSet
 import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
@@ -82,7 +80,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
   private val chartView = LineChartView(context)
 
   private var cellLayout: RelativeLayout? = null
-
   private var chartData: ArrayList<Point> by observing(arrayListOf()) {
     chartView.apply {
       // 设定背景的网格
@@ -96,7 +93,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       val minValue = chartData.min()?.value ?: 0f
       // 设定 `Y` 周波段
       val stepDistance = generateStepDistance(minValue.toDouble(), maxValue.toDouble())
-      val max = Math.ceil(maxValue.toDouble() / stepDistance).toFloat() * stepDistance
+      val max =  (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
       val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
       setAxisBorderValues( min, max, stepDistance)
       // 设定外界 `Border` 颜色
@@ -130,9 +127,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
       }
 
       setClickablePointRadius(30.uiPX().toFloat())
-      val animation = Animation(1000)
-      animation.setInterpolator(OvershootInterpolator())
-      show(animation)
+      show()
     }
   }
 
@@ -165,7 +160,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
         setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
         y = 60.uiPX().toFloat()
       }.into(this)
-
     }
   }
 

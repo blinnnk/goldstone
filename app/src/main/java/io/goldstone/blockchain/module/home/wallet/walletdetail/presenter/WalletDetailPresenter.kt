@@ -22,8 +22,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import okhttp3.*
-import java.util.concurrent.TimeUnit
 
 /**
  * @date 23/03/2018 3:45 PM
@@ -117,40 +115,5 @@ class WalletDetailPresenter(
 	}
 }
 
-fun getSocket(hold: WebSocket.() -> Unit) {
-	val path = "ws://118.25.40.163:8088" // "ws://118.89.147.176:8001/ws"
-	//创建WebSocket链接
-	val client = OkHttpClient.Builder().retryOnConnectionFailure(true) // 允许失败重试
-		.connectTimeout(8, TimeUnit.SECONDS).readTimeout(5, TimeUnit.SECONDS)
-		.writeTimeout(5, TimeUnit.SECONDS).build()
 
-	val request = Request.Builder().url(path).build()
-
-	client.newWebSocket(request, object : WebSocketListener() {
-		override fun onOpen(webSocket: WebSocket, response: Response) {
-			super.onOpen(webSocket, response)
-			hold(webSocket)
-		}
-
-		override fun onMessage(webSocket: WebSocket, text: String) {
-			super.onMessage(webSocket, text)
-			System.out.println("______ $text")
-		}
-
-		override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-			super.onClosing(webSocket, code, reason)
-			webSocket.close(1000, null)
-		}
-
-		override fun onClosed(webSocket: WebSocket?, code: Int, reason: String?) {
-			super.onClosed(webSocket!!, code, reason!!)
-		}
-
-		override fun onFailure(webSocket: WebSocket?, t: Throwable?, response: Response?) {
-			super.onFailure(webSocket!!, t!!, response!!)
-			webSocket.close(1000, null)
-		}
-	})
-	client.dispatcher().executorService().shutdown()
-}
 
