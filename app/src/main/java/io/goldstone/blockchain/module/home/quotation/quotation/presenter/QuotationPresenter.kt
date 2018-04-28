@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import com.db.chart.model.Point
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
@@ -33,7 +32,7 @@ class QuotationPresenter(
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
 			selections.map {
-				QuotationModel(it, "--", "+2.56", convertDataToChartData(it.lineChart))
+				QuotationModel(it, "--", "0", convertDataToChartData(it.lineChart))
 			}.sortedByDescending {
 				it.orderID
 			}.toArrayList().let {
@@ -43,6 +42,7 @@ class QuotationPresenter(
 					if (fragment.asyncData.orEmptyArray().isEmpty()) fragment.removeEmptyView()
 					diffAndUpdateAdapterData<QuotationAdapter>(it)
 				}
+				currentSocket.runSocket()
 			}
 		}
 	}
@@ -62,12 +62,6 @@ class QuotationPresenter(
 		override fun getServerBack(content: JSONObject) {
 			fragment.updateAdapterDataset(CurrencyPriceInfoModel(content))
 		}
-	}
-
-	/** 在界面的 `Adapter` 准备完毕后, 并且有数据的情况下建立长连接 */
-	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
-		super.afterUpdateAdapterDataset(recyclerView)
-		currentSocket.runSocket()
 	}
 
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {

@@ -126,6 +126,8 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 
 	fun closeSocket() {
 		webSocket?.let {
+			// 取消订阅
+			webSocket?.send("{\"t\": \"unsub_tick\"}")
 			it.close(normalCloseCode, null)
 			webSocket = null
 		}
