@@ -17,7 +17,8 @@ data class QuotationModel(
 	val exchangeName: String = "",
 	val orderID: Double = 0.0,
 	val pairDisplay: String = "",
-	val pair: String = ""
+	val pair: String = "",
+	val quoteSymbol: String = ""
 ) {
 	constructor(
 		data: QuotationSelectionTable,
@@ -33,6 +34,7 @@ data class QuotationModel(
 		data.market.toLowerCase(),
 		data.orderID,
 		data.infoTitle,
-		data.pair
+		data.pair,
+		data.quoteSymbol
 	)
 }
