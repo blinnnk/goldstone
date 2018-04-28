@@ -34,7 +34,15 @@ class QuotationCell(context: Context) : LinearLayout(context) {
   var model: QuotationModel by observing(QuotationModel()) {
     tokenInfo.title.text = model.symbol
     tokenInfo.subtitle.text = model.name
-    tokenPrice.title.text = model.price
+    tokenPrice.title.text =
+      CustomTargetTextStyle(
+        model.quoteSymbol.toUpperCase(),
+        model.quoteSymbol.toUpperCase() + " " + model.price,
+        GrayScale.midGray,
+        13.uiPX(),
+        false,
+        false
+      )
     tokenPrice.subtitle.text = model.percent + "%"
     if (model.percent.toDouble() < 0) {
       tokenPrice.setColorStyle(Spectrum.red)
