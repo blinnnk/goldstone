@@ -32,6 +32,10 @@ class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
+	override fun onFragmentShowFromHidden() {
+		updateAllTokensInWalletBy()
+	}
+
 	fun updateAllTokensInWalletBy() {
 		// Check the count of local wallets
 		WalletTable.apply { getAll { walletCount = size } }

@@ -8,7 +8,6 @@ import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.text.Editable
 import android.text.InputType
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -43,7 +42,6 @@ class RoundInput(context: Context) : EditText(context) {
 	private val paint = Paint()
 	private val textPaint = Paint()
 	private val backgroundPaint = Paint()
-
 	private val titleSize = 16.uiPX().toFloat()
 
 	init {
@@ -91,6 +89,7 @@ class RoundInput(context: Context) : EditText(context) {
 					context.alert("content is to long")
 				}
 			}
+
 			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
