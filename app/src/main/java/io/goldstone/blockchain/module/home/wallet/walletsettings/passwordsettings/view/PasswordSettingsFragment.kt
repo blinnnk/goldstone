@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
 
 /**
@@ -32,7 +33,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
   override fun AnkoContext<Fragment>.initView() {
 
     verticalLayout {
-
+      lparams(matchParent, matchParent)
       oldPassword.apply {
         text = "Old Password"
         setPasswordInput()
