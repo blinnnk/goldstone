@@ -7,6 +7,7 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -19,32 +20,34 @@ import org.web3j.crypto.WalletUtils
  */
 
 class WatchOnlyImportPresenter(
-  override val fragment: WatchOnlyImportFragment
+	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
 
-  fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
-    val address = addressInput.text.toString()
+	fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
+		val address = addressInput.text.toString()
 
-    if (!WalletUtils.isValidAddress(address)) {
-      fragment.context?.alert("address isn't valid")
-      return
-    }
+		if (!WalletUtils.isValidAddress(address)) {
+			fragment.context?.alert("address isn't valid")
+			return
+		}
 
-    WalletUtils.isValidAddress(address) isTrue {
-      val name = if (nameInput.text.toString().isEmpty()) "Wallet"
-      else nameInput.text.toString()
+		WalletUtils.isValidAddress(address) isTrue {
+			val name = if (nameInput.text.toString().isEmpty()) "Wallet"
+			else nameInput.text.toString()
 
-      WalletTable.getWalletByAddress(address) {
-        it.isNull() isTrue {
-          WalletTable.insert(WalletTable(0, name, address, true, null,true)) {
-            CreateWalletPresenter.generateMyTokenInfo(address) {
-              fragment.activity?.jump<SplashActivity>()
-            }
-          }
-        } otherwise {
-          fragment.context?.alert("There is already this account in gold stone")
-        }
-      }
-    }
-  }
+			WalletTable.getWalletByAddress(address) {
+				it.isNull() isTrue {
+					WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
+						CreateWalletPresenter.generateMyTokenInfo(address) {
+							fragment.activity?.jump<SplashActivity>()
+						}
+						// 注册钱包地址用于发送 `Push`
+						XinGePushReceiver.registerWalletAddressForPush()
+					}
+				} otherwise {
+					fragment.context?.alert("There is already this account in gold stone")
+				}
+			}
+		}
+	}
 }
