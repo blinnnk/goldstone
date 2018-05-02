@@ -110,7 +110,7 @@ class WalletDetailPresenter(
 		recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
 			model = WalletDetailHeaderModel(
 				null,
-				WalletTable.current.name,
+				CryptoUtils.scaleTo9(WalletTable.current.name),
 				CryptoUtils.scaleAddress(WalletTable.current.address),
 				totalBalance.toString(),
 				WalletTable.walletCount.orZero()
