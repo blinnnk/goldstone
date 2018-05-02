@@ -68,7 +68,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 
 				confirmButton.apply {
 					text = CommonText.confirm
-					setGrayStyle()
+					setBlueStyle()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 				}.click {
 					presenter.resetPinCode(newPinCode, repeatPinCode, switch)
