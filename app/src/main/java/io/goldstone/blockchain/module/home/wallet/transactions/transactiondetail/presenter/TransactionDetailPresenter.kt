@@ -92,7 +92,6 @@ class TransactionDetailPresenter(
 				getMainActivity()?.showLoadingView()
 				updateTransactionByNotificationHash(transaction) {
 					getMainActivity()?.removeLoadingView()
-					updateParentContentLayoutHeight(fragment.asyncData?.size)
 				}
 			}
 		}
