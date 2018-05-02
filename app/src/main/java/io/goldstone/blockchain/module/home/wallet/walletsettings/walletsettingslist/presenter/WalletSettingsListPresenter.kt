@@ -104,6 +104,8 @@ class WalletSettingsListPresenter(
       TransactionTable.deleteByAddress(address) {
         TokenBalanceTable.deleteByAddress(address) {
           WalletTable.deleteCurrentWallet {
+            // 删除 `push` 监听包地址不再监听用户删除的钱包地址
+            XinGePushReceiver.registerWalletAddressForPush()
             fragment.getMainActivity()?.removeLoadingView()
             fragment.activity?.jump<SplashActivity>()
           }

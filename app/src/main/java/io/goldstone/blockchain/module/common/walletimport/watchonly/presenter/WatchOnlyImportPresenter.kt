@@ -31,22 +31,20 @@ class WatchOnlyImportPresenter(
 			return
 		}
 
-		WalletUtils.isValidAddress(address) isTrue {
-			val name = if (nameInput.text.toString().isEmpty()) "Wallet"
-			else nameInput.text.toString()
+		val name = if (nameInput.text.toString().isEmpty()) "Wallet"
+		else nameInput.text.toString()
 
-			WalletTable.getWalletByAddress(address) {
-				it.isNull() isTrue {
-					WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
-						CreateWalletPresenter.generateMyTokenInfo(address) {
-							fragment.activity?.jump<SplashActivity>()
-						}
-						// 注册钱包地址用于发送 `Push`
-						XinGePushReceiver.registerWalletAddressForPush()
+		WalletTable.getWalletByAddress(address) {
+			it.isNull() isTrue {
+				WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
+					CreateWalletPresenter.generateMyTokenInfo(address) {
+						fragment.activity?.jump<SplashActivity>()
 					}
-				} otherwise {
-					fragment.context?.alert("There is already this account in gold stone")
+					// 注册钱包地址用于发送 `Push`
+					XinGePushReceiver.registerWalletAddressForPush()
 				}
+			} otherwise {
+				fragment.context?.alert("There is already this account in gold stone")
 			}
 		}
 	}
