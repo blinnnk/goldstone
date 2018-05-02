@@ -5,7 +5,6 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
@@ -30,140 +29,140 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
  */
 
 class WalletSettingsPresenter(
-  override val fragment: WalletSettingsFragment
+	override val fragment: WalletSettingsFragment
 ) : BaseOverlayPresenter<WalletSettingsFragment>() {
 
-  override fun onFragmentViewCreated() {
-    showCurrentWalletInfo()
-  }
+	override fun onFragmentViewCreated() {
+		showCurrentWalletInfo()
+	}
 
-  fun showTargetFragmentByTitle(title: String) {
-    when (title) {
-      WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
-      WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
-      WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
-      WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
-      WalletSettingsText.checkQRCode -> showQRCodeFragment()
-      WalletSettingsText.hint -> showHintEditorFragment()
-      WalletSettingsText.walletSettings -> showWalletSettingListFragment()
-    }
-  }
+	fun showTargetFragmentByTitle(title: String) {
+		when (title) {
+			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
+			WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
+			WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
+			WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
+			WalletSettingsText.checkQRCode -> showQRCodeFragment()
+			WalletSettingsText.hint -> showHintEditorFragment()
+			WalletSettingsText.walletSettings -> showWalletSettingListFragment()
+		}
+	}
 
-  private fun showWalletSettingListFragment() {
-    fragment.apply {
-      customHeader = {
-        layoutParams.height = 200.uiPX()
-        header.isNull() isTrue {
-          header = WalletSettingsHeader(context)
-          addView(header)
-        } otherwise {
-          overlayView.header.apply {
-            showBackButton(false)
-            showCloseButton(true)
-          }
-          header?.visibility = View.VISIBLE
-        }
-      }
-      replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content) {
-        // Send Arguments
-      }
-    }
-  }
+	private fun showWalletSettingListFragment() {
+		fragment.apply {
+			customHeader = {
+				layoutParams.height = 200.uiPX()
+				header.isNull() isTrue {
+					header = WalletSettingsHeader(context)
+					addView(header)
+				} otherwise {
+					overlayView.header.apply {
+						showBackButton(false)
+						showCloseButton(true)
+					}
+					header?.visibility = View.VISIBLE
+				}
+			}
+			replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content) {
+				// Send Arguments
+			}
+		}
+	}
 
-  private fun showHintEditorFragment() {
-    fragment.apply {
-      // 判断是否是只读钱包
-      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-        // 恢复 `Header` 样式
-        setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-        // 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
-        AppConfigTable.getAppConfig {
-          it?.apply {
-            // 如果有私密验证首先要通过 `Pin Code`
-            showPincode.isTrue {
-              activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-                // Send Argument
-              }
-              // 加载 `Hint` 编辑界面
-              replaceFragmentAndSetArgument<HintFragment>(ContainerID.content) {
-                // Send Arguments
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	private fun showHintEditorFragment() {
+		fragment.apply {
+			// 判断是否是只读钱包
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				// 恢复 `Header` 样式
+				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
+				AppConfigTable.getAppConfig {
+					it?.apply {
+						// 如果有私密验证首先要通过 `Pin Code`
+						showPincode.isTrue {
+							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
+								// Send Argument
+							}
+						}
+						// 加载 `Hint` 编辑界面
+						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content) {
+							// Send Arguments
+						}
+					}
+				}
+			}
+		}
+	}
 
-  private fun showPrivateKeyExportFragment() {
-    fragment.apply {
-      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-        setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-        replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
-          // Send Arguments
-        }
-      }
-    }
-  }
+	private fun showPrivateKeyExportFragment() {
+		fragment.apply {
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+				replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
+					// Send Arguments
+				}
+			}
+		}
+	}
 
-  private fun showKeystoreExportFragment() {
-    fragment.apply {
-      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-        setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-        replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
-          // Send Arguments
-        }
-      }
-    }
-  }
+	private fun showKeystoreExportFragment() {
+		fragment.apply {
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+				replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
+					// Send Arguments
+				}
+			}
+		}
+	}
 
-  private fun showQRCodeFragment() {
-    fragment.apply {
-      setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
-      replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content) {
-        // Send Arguments
-      }
-    }
-  }
+	private fun showQRCodeFragment() {
+		fragment.apply {
+			setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
+			replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content) {
+				// Send Arguments
+			}
+		}
+	}
 
-  private fun showWalletNameEditorFragment() {
-    fragment.apply {
-      setNormalHeaderWithHeight(300.uiPX())
-      replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content) {
-        // Send Arguments
-      }
-    }
-  }
+	private fun showWalletNameEditorFragment() {
+		fragment.apply {
+			setNormalHeaderWithHeight(300.uiPX())
+			replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content) {
+				// Send Arguments
+			}
+		}
+	}
 
-  private fun showPasswordSettingsFragment() {
-    fragment.apply {
-      WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-        setNormalHeaderWithHeight(420.uiPX())
-        replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content) {
-          // Send Arguments
-        }
-      }
-    }
-  }
+	private fun showPasswordSettingsFragment() {
+		fragment.apply {
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				setNormalHeaderWithHeight(420.uiPX())
+				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content) {
+					// Send Arguments
+				}
+			}
+		}
+	}
 
-  private fun WalletSettingsFragment.setNormalHeaderWithHeight(contentHeight: Int) {
-    recoveryOverlayHeader()
-    header?.visibility = View.GONE
-    overlayView.apply {
-      header.showBackButton(true) { showWalletSettingListFragment() }
-      header.showCloseButton(false)
-      contentLayout.updateHeightAnimation(contentHeight)
-    }
-  }
+	private fun WalletSettingsFragment.setNormalHeaderWithHeight(contentHeight: Int) {
+		recoveryOverlayHeader()
+		header?.visibility = View.GONE
+		overlayView.apply {
+			header.showBackButton(true) { showWalletSettingListFragment() }
+			header.showCloseButton(false)
+			contentLayout.updateHeightAnimation(contentHeight)
+		}
+	}
 
-  private fun showCurrentWalletInfo() {
-    fragment.header?.apply {
-      walletInfo.apply {
-        title.text = WalletTable.current.name
-        subtitle.text = WalletTable.current.address
-      }
-      avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
-    }
-  }
+	private fun showCurrentWalletInfo() {
+		fragment.header?.apply {
+			walletInfo.apply {
+				title.text = WalletTable.current.name
+				subtitle.text = WalletTable.current.address
+			}
+			avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
+		}
+	}
 
 }
