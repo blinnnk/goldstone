@@ -29,7 +29,8 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 		recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
 			// 分配点击事件
 			item.apply {
-				if (position == 3) {
+				// 调整布局
+				if (position == 4) {
 					item.layoutParams.height += 30.uiPX()
 					isCenterInVertical = false
 				} else {

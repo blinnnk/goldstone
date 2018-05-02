@@ -22,55 +22,60 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
  */
 
 class PinCodeEditorPresenter(
-  override val fragment: PinCodeEditorFragment
+	override val fragment: PinCodeEditorFragment
 ) : BasePresenter<PinCodeEditorFragment>() {
 
-  fun setShowPinCodeStatus(status: Boolean, callback: (Boolean) -> Unit = {}) {
-    AppConfigTable.apply {
-      getAppConfig {
-        if (it?.pincode.isNull()) {
-          fragment.context?.alert("please set your pin code on below")
-          callback(false)
-          return@getAppConfig
-        }
-        setShowPinCodeStatus(status) {
-          callback(true)
-        }
-      }
-    }
-  }
+	fun setShowPinCodeStatus(status: Boolean, callback: (Boolean) -> Unit = {}) {
+		AppConfigTable.apply {
+			getAppConfig {
+				if (it?.pincode.isNull()) {
+					fragment.context?.alert("please set your pin code on below")
+					callback(false)
+					return@getAppConfig
+				}
+				setShowPinCodeStatus(status) {
+					callback(true)
+				}
+			}
+		}
+	}
 
-  fun resetPinCode(
-    newPinCode: EditText, repeatPinCode: EditText, switch: HoneyBaseSwitch
-  ) {
+	fun resetPinCode(
+		newPinCode: EditText, repeatPinCode: EditText, switch: HoneyBaseSwitch
+	) {
 
-    if (newPinCode.text.length > Count.pinCode || repeatPinCode.text.length > Count.pinCode) {
-      fragment.context?.alert("Please Enter four bit ciphers")
-      return
-    }
+		if (newPinCode.text.isEmpty()) {
+			fragment.context?.alert("Please Enter four bit ciphers")
+			return
+		}
 
-    if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
-      fragment.context?.alert("New pin code with repeat pin code isn't same, please check")
-      return
-    }
+		if (newPinCode.text.length > Count.pinCode || repeatPinCode.text.length > Count.pinCode) {
+			fragment.context?.alert("Please Enter four bit ciphers")
+			return
+		}
 
-    AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
-      fragment.context?.alert("Succeed")
-      setShowPinCodeStatus(true)
-      switch.isChecked = true
-    }
-  }
+		if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
+			fragment.context?.alert("New pin code with repeat pin code isn't same, please check")
+			return
+		}
 
-  override fun onFragmentViewCreated() {
-    super.onFragmentViewCreated()
-    fragment.getParentFragment<ProfileOverlayFragment> {
-      overlayView.contentLayout.updateHeightAnimation(380.uiPX())
-    }
-  }
+		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
+			fragment.context?.alert("Succeed")
+			setShowPinCodeStatus(true)
+			switch.isChecked = true
+		}
+	}
 
-  fun showPinCodeFragment() {
-    fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-      //
-    }
-  }
+	override fun onFragmentViewCreated() {
+		super.onFragmentViewCreated()
+		fragment.getParentFragment<ProfileOverlayFragment> {
+			overlayView.contentLayout.updateHeightAnimation(380.uiPX())
+		}
+	}
+
+	fun showPinCodeFragment() {
+		fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
+			//
+		}
+	}
 }
