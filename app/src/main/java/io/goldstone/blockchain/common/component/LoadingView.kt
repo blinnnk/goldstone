@@ -14,6 +14,7 @@ import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.*
@@ -25,61 +26,62 @@ import org.jetbrains.anko.*
 @SuppressLint("SetTextI18n")
 class LoadingView(context: Context) : RelativeLayout(context) {
 
-  private val introView by lazy { TextView(context) }
+	private val introView by lazy { TextView(context) }
 
-  init {
+	init {
+		id = ElementID.loadingView
+		isClickable = true
 
-    isClickable = true
+		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 
-    layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		updateColorAnimation(GrayScale.Opacity1Black, GrayScale.Opacity5Black)
 
-    updateColorAnimation(GrayScale.Opacity1Black, GrayScale.Opacity5Black)
+		val size = (ScreenSize.Width * 0.7).toInt()
 
-    val size = (ScreenSize.Width * 0.7).toInt()
+		relativeLayout {
 
-    relativeLayout {
+			addCorner(CornerSize.default.toInt(), Spectrum.white)
 
-      addCorner(CornerSize.default.toInt(), Spectrum.white)
+			val loading = ProgressBar(this.context, null, R.attr.progressBarStyleInverse).apply {
+				indeterminateDrawable.setColorFilter(
+					HoneyColor.Red,
+					android.graphics.PorterDuff.Mode.MULTIPLY
+				)
+				lparams {
+					width = 80.uiPX()
+					height = 80.uiPX()
+					centerInParent()
+					y -= 30.uiPX()
+				}
+			}
+			addView(loading)
 
-      val loading = ProgressBar(this.context, null, R.attr.progressBarStyleInverse).apply {
-        indeterminateDrawable.setColorFilter(HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY)
-        lparams {
-          width = 80.uiPX()
-          height = 80.uiPX()
-          centerInParent()
-          y -= 30.uiPX()
-        }
-      }
-      addView(loading)
+			introView.apply {
+				textSize = 4.uiPX().toFloat() + 1f
+				textColor = GrayScale.gray
+				gravity = Gravity.CENTER_HORIZONTAL
+				leftPadding = 30.uiPX()
+				rightPadding = 30.uiPX()
+				lparams {
+					width = matchParent
+					height = 50.uiPX()
+					centerInParent()
+					y += 50.uiPX()
+				}
+			}.into(this)
 
-      introView
-        .apply {
-          textSize = 4.uiPX().toFloat() + 1f
-          textColor = GrayScale.gray
-          gravity = Gravity.CENTER_HORIZONTAL
-          leftPadding = 30.uiPX()
-          rightPadding = 30.uiPX()
-          lparams {
-            width = matchParent
-            height = 50.uiPX()
-            centerInParent()
-            y += 50.uiPX()
-          }
-        }
-        .into(this)
+			lparams {
+				centerInParent()
+				width = size
+				height = size
+			}
+		}
 
-      lparams {
-        centerInParent()
-        width = size
-        height = size
-      }
-    }
+		setIntroText("obtaining token information from ethereum now just wait a moment")
+	}
 
-    setIntroText("obtaining token information from ethereum now just wait a moment")
-  }
-
-  fun setIntroText(intro: String) {
-    introView.text = intro
-  }
+	fun setIntroText(intro: String) {
+		introView.text = intro
+	}
 
 }
