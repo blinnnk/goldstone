@@ -1,20 +1,22 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
-import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
@@ -31,8 +33,10 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
-			selections.map {
-				QuotationModel(it, "--", "0", convertDataToChartData(it.lineChart))
+			selections.map { selection ->
+				val linechart = convertDataToChartData(selection.lineChart)
+				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
+				QuotationModel(selection, "--", "0", linechart)
 			}.sortedByDescending {
 				it.orderID
 			}.toArrayList().let {
@@ -43,6 +47,24 @@ class QuotationPresenter(
 					diffAndUpdateAdapterData<QuotationAdapter>(it)
 				}
 				currentSocket.runSocket()
+			}
+		}
+	}
+
+	private fun ArrayList<Point>.checkTimeStampIfNeedUpdateBy(pair: String) {
+		sortedByDescending {
+			it.label.toLong()
+		}.let {
+			// 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件.
+			// 本地的当天 `lineChart` 的值是通过长连接实时更新的.
+			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
+				fragment.getMainActivity()?.showLoadingView()
+				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
+					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
+						updateData()
+						fragment.getMainActivity()?.removeLoadingView()
+					}
+				}
 			}
 		}
 	}
@@ -110,8 +132,7 @@ class QuotationPresenter(
 		val jsonarray = JSONArray(data)
 		(0 until jsonarray.length()).map {
 			val timeStamp = jsonarray.getJSONObject(it)["time"].toString().toLong()
-			val date = DateUtils.formatDateTime(fragment.context, timeStamp, DateUtils.FORMAT_NO_YEAR)
-			Point(date, jsonarray.getJSONObject(it)["price"].toString().toFloat())
+			Point(timeStamp.toString(), jsonarray.getJSONObject(it)["price"].toString().toFloat())
 		}.reversed().let {
 			return it.toArrayList()
 		}

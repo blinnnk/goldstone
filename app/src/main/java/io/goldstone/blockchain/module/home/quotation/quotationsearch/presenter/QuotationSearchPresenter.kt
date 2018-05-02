@@ -51,17 +51,6 @@ class QuotationSearchPresenter(
 		}
 	}
 
-	private fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
-		val parameter = JsonArray().apply { add(pair) }
-		GoldStoneAPI.getCurrencyLineChartData(parameter) {
-			it.isNotEmpty() isTrue {
-				hold(it[0].pairList.toString())
-			} otherwise {
-				hold("")
-			}
-		}
-	}
-
 	private fun searchTokenBy(symbol: String) {
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol) { searchList ->
@@ -92,4 +81,16 @@ class QuotationSearchPresenter(
 		}
 	}
 
+	companion object {
+		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+			val parameter = JsonArray().apply { add(pair) }
+			GoldStoneAPI.getCurrencyLineChartData(parameter) {
+				it.isNotEmpty() isTrue {
+					hold(it[0].pairList.toString())
+				} otherwise {
+					hold("")
+				}
+			}
+		}
+	}
 }
