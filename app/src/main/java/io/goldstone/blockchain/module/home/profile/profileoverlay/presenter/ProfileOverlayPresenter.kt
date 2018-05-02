@@ -1,9 +1,12 @@
 package io.goldstone.blockchain.module.home.profile.profileoverlay.presenter
 
+import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
@@ -11,6 +14,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.Conta
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
+import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
 /**
@@ -19,51 +23,62 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
  */
 
 class ProfileOverlayPresenter(
-  override val fragment: ProfileOverlayFragment
+	override val fragment: ProfileOverlayFragment
 ) : BaseOverlayPresenter<ProfileOverlayFragment>() {
 
-  fun showContactInputFragment() {
-    showTargetFragment<ContractInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
-  }
+	override fun removeSelfFromActivity() {
+		super.removeSelfFromActivity()
+		fragment.getMainActivity()?.apply {
+			supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
+				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.let {
+					it.presenter.updateData()
+				}
+			}
+		}
+	}
 
-  fun showTargetFragmentByTitle(title: String) {
-    when(title) {
-      ProfileText.contacts -> showContactsFragment()
-      ProfileText.currency -> showCurrencyFragment()
-      ProfileText.language -> showLanguageFragment()
-      ProfileText.aboutUs -> showAboutUsFragment()
-      ProfileText.pinCode -> showPinCodeEditorFragment()
-    }
-  }
+	fun showContactInputFragment() {
+		showTargetFragment<ContractInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
+	}
 
-  private fun showPinCodeEditorFragment() {
-    fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content) {
-      // Send Arguments
-    }
-  }
+	fun showTargetFragmentByTitle(title: String) {
+		when (title) {
+			ProfileText.contacts -> showContactsFragment()
+			ProfileText.currency -> showCurrencyFragment()
+			ProfileText.language -> showLanguageFragment()
+			ProfileText.aboutUs -> showAboutUsFragment()
+			ProfileText.pinCode -> showPinCodeEditorFragment()
+		}
+	}
 
-  private fun showContactsFragment() {
-    fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content) {
-      // Send Arguments
-    }
-  }
+	private fun showPinCodeEditorFragment() {
+		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content) {
+			// Send Arguments
+		}
+	}
 
-  private fun showCurrencyFragment() {
-    fragment.addFragmentAndSetArgument<CurrencyFragment>(ContainerID.content) {
-      // Send Arguments
-    }
-  }
+	private fun showContactsFragment() {
+		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content) {
+			// Send Arguments
+		}
+	}
 
-  private fun showLanguageFragment() {
-    fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content) {
-      // Send Arguments
-    }
-  }
+	private fun showCurrencyFragment() {
+		fragment.addFragmentAndSetArgument<CurrencyFragment>(ContainerID.content) {
+			// Send Arguments
+		}
+	}
 
-  private fun showAboutUsFragment() {
-    fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-      putString(ArgumentKey.webViewUrl, "https://www.ethereum.org/")
-    }
-  }
+	private fun showLanguageFragment() {
+		fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content) {
+			// Send Arguments
+		}
+	}
+
+	private fun showAboutUsFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, "https://www.ethereum.org/")
+		}
+	}
 
 }
