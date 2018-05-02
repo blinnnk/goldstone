@@ -20,75 +20,75 @@ import org.web3j.crypto.WalletUtils
  */
 
 class ContractInputPresenter(
-  override val fragment: ContractInputFragment
+	override val fragment: ContractInputFragment
 ) : BasePresenter<ContractInputFragment>() {
-  //
-  private var nameText = ""
-  private var addressText = ""
+	//
+	private var nameText = ""
+	private var addressText = ""
 
-  override fun onFragmentViewCreated() {
-    super.onFragmentViewCreated()
-    recoveryFragmentHeight()
-  }
+	override fun onFragmentViewCreated() {
+		super.onFragmentViewCreated()
+		recoveryFragmentHeight()
+	}
 
-  fun addContact() {
+	fun addContact() {
 
-    if (nameText.isEmpty()) {
-      fragment.context?.alert("You must enter a contact name")
-    }
+		if (nameText.isEmpty()) {
+			fragment.context?.alert("You must enter a contact name")
+		}
 
-    if (addressText.isEmpty()) {
-      fragment.context?.alert("You must enter a wallet address")
-    }
+		if (addressText.isEmpty()) {
+			fragment.context?.alert("You must enter a wallet address")
+		}
 
-    if(WalletUtils.isValidAddress(addressText)) {
-      ContactTable.insertContact(
-        ContactTable(
-          0,
-          "",
-          nameText,
-          addressText)
-      ) {
-        fragment.getParentFragment<ProfileOverlayFragment> {
-          presenter.popFragmentFrom<ContractInputFragment>()
-        }
-      }
-    } else {
-      fragment.context?.alert("Wrong Address Format")
-    }
-  }
+		if (WalletUtils.isValidAddress(addressText) && nameText.isNotEmpty()) {
+			ContactTable.insertContact(
+				ContactTable(
+					0, "", nameText, addressText
+				)
+			) {
+				fragment.getParentFragment<ProfileOverlayFragment> {
+					presenter.popFragmentFrom<ContractInputFragment>()
+				}
+			}
+		} else {
+			if (nameText.isNotEmpty()) {
+				fragment.context?.alert("Wrong Address Format")
+			}
+		}
+	}
 
-  fun setConfirmButtonStyle(
-    nameInput: EditText,
-    addressInput: EditText,
-    confirmButton: RoundButton
-  ) {
-    nameInput.addTextChangedListener(object: TextWatcher{
-      override fun afterTextChanged(text: Editable?) {
-        nameText = text.orElse("").toString()
-        setStyle(confirmButton)
-      }
-      override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
-      override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+	fun setConfirmButtonStyle(
+		nameInput: EditText, addressInput: EditText, confirmButton: RoundButton
+	) {
+		nameInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				nameText = text.orElse("").toString()
+				setStyle(confirmButton)
+			}
 
-      }
-    })
+			override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
 
-    addressInput.addTextChangedListener(object: TextWatcher{
-      override fun afterTextChanged(text: Editable?) {
-        addressText = text.orElse("").toString()
-        setStyle(confirmButton)
-      }
-      override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
-      override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
-    })
-  }
+			}
+		})
 
-  private fun setStyle(confirmButton: RoundButton) {
-    if (nameText.count() * addressText.count() != 0) {
-      confirmButton.setBlueStyle(20.uiPX())
-    } else {
-      confirmButton.setGrayStyle(20.uiPX())
-    }
-  }
+		addressInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				addressText = text.orElse("").toString()
+				setStyle(confirmButton)
+			}
+
+			override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+		})
+	}
+
+	private fun setStyle(confirmButton: RoundButton) {
+		if (nameText.count() * addressText.count() != 0) {
+			confirmButton.setBlueStyle(20.uiPX())
+		} else {
+			confirmButton.setGrayStyle(20.uiPX())
+		}
+	}
 }
