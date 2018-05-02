@@ -64,6 +64,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
         passwordHintInput.apply {
           text = CreateWalletText.hint
+          setTextInput()
           setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
         }.into(this)
 

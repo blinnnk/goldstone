@@ -12,6 +12,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -25,48 +26,46 @@ import org.jetbrains.anko.textColor
 @SuppressLint("SetTextI18n")
 class AgreementView(context: Context) : RelativeLayout(context) {
 
-  val radioButton = HoneyRadioButton(context)
-  val textView = TextView(context)
+	val radioButton = HoneyRadioButton(context)
+	val textView = TextView(context)
 
-  private var isChecked = false
+	private var isChecked = false
 
-  init {
+	init {
 
-    setWillNotDraw(false)
+		setWillNotDraw(false)
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-      topMargin = 20.uiPX()
-    }
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+			topMargin = 20.uiPX()
+		}
 
-    val terms = "Service and privacy policy"
-    textView
-      .apply {
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
-        text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 10.uiPX())
-        textSize = 3.uiPX().toFloat() + 2f
-        textColor = GrayScale.midGray
-        typeface = GoldStoneFont.medium(context)
-        gravity = Gravity.CENTER
-        x += 15.uiPX()
-      }
-      .into(this)
+		val terms = "Service and privacy policy"
+		textView.apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
+			text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 10.uiPX())
+			textSize = 3.uiPX().toFloat() + 2f
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.medium(context)
+			gravity = Gravity.CENTER
+			x += 15.uiPX()
+		}.into(this)
 
-    radioButton
-      .apply {
-        scaleX = 0.7f
-        scaleY = 0.7f
-        setColorStyle(GrayScale.midGray, Spectrum.green)
-      }
-      .into(this)
+		radioButton.apply {
+			scaleX = 0.7f
+			scaleY = 0.7f
+			setColorStyle(GrayScale.midGray, Spectrum.green)
+		}.click { setRadioStatus() }.into(this)
 
-    radioButton.x =
-      (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 25.uiPX()
+		// 增大点击区域
+		radioButton.layoutParams.width += 80.uiPX()
+		radioButton.x = (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f -
+			40.uiPX()
 
-  }
+	}
 
-  fun setRadioStatus() {
-    isChecked = !isChecked
-    radioButton.isChecked = isChecked
-  }
+	fun setRadioStatus() {
+		isChecked = !isChecked
+		radioButton.isChecked = isChecked
+	}
 
 }

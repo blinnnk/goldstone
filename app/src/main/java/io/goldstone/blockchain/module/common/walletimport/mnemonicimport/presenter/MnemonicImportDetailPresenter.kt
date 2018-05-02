@@ -45,32 +45,38 @@ class MnemonicImportDetailPresenter(
 			fragment.context
 		) { passwordValue, walletName ->
 			importWallet(
-				mnemonicInput.text.toString(),
-				passwordValue,
-				walletName,
-				hintInput.text?.toString()
+				mnemonicInput.text.toString(), passwordValue, walletName, hintInput.text?.toString()
 			)
 		}
 	}
 
 	private fun importWallet(mnemonic: String, password: String, name: String, hint: String? = null) {
 		fragment.context?.getWalletByMnemonic(mnemonic, password) { address ->
-			address.isNotNull {
-				coroutinesTask({
-					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-						it.isNotNull {
-							GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
+
+			WalletTable.getAllAddresses {
+				// 查找本地是否已经存在这个钱包
+				if (any { it == address }) {
+					fragment.context?.alert("The address has already existed")
+					return@getAllAddresses
+				} else {
+					address.isNotNull {
+						coroutinesTask({
+							GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
+								it.isNotNull {
+									GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
+								}
+								WalletTable.insert(WalletTable(0, name, address!!, true, hint))
+								CreateWalletPresenter.generateMyTokenInfo(address, true)
+								// 注册钱包地址用于发送 `Push`
+								XinGePushReceiver.registerWalletAddressForPush()
+							}
+						}) {
+							fragment.activity?.jump<SplashActivity>()
 						}
-						WalletTable.insert(WalletTable(0, name, address!!, true, hint))
-						CreateWalletPresenter.generateMyTokenInfo(address, true)
-						// 注册钱包地址用于发送 `Push`
-						XinGePushReceiver.registerWalletAddressForPush()
+					} otherwise {
+						println("import failed $address")
 					}
-				}) {
-					fragment.activity?.jump<SplashActivity>()
 				}
-			} otherwise {
-				println("import failed $address")
 			}
 		}
 	}

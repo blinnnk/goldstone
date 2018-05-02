@@ -92,7 +92,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
       hintInput
         .apply {
           text = CreateWalletText.hint
-          setPasswordInput()
+          setTextInput()
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 10.uiPX()
           }
