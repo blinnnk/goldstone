@@ -55,7 +55,7 @@ class PinCodeEditorPresenter(
 		}
 
 		if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
-			fragment.context?.alert("New pin code with repeat pin code isn't same, please check")
+			fragment.context?.alert("New pin decode with repeat pin code isn't same, please check")
 			return
 		}
 
