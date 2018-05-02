@@ -22,55 +22,53 @@ import org.jetbrains.anko.imageResource
 
 open class BaseValueCell(context: Context) : BaseCell(context) {
 
-  protected val icon by lazy { RoundIcon(context) }
-  protected val info by lazy { TwoLineTitles(context) }
-  protected val count by lazy { TwoLineTitles(context) }
+	protected val icon by lazy { RoundIcon(context) }
+	protected val info by lazy { TwoLineTitles(context) }
+	protected val count by lazy { TwoLineTitles(context) }
 
-  init {
+	init {
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX())
-    x += PaddingSize.device
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX())
+		x += PaddingSize.device
 
-    setIconColor()
-    this.addView(icon)
+		setIconColor()
+		this.addView(icon)
 
-    this.addView(info
-      .apply {
-        setBlackTitles()
-        x += 60.uiPX()
-      })
+		this.addView(info.apply {
+			setBlackTitles()
+			x += 60.uiPX()
+		})
 
-    icon.setCenterInVertical()
-    info.setCenterInVertical()
+		icon.setCenterInVertical()
+		info.setCenterInVertical()
 
-  }
+	}
 
-  fun setIconColor(color: Int = GrayScale.lightGray) {
-    icon.iconColor = color
-  }
+	fun setIconColor(color: Int = GrayScale.lightGray) {
+		icon.iconColor = color
+	}
 
-  fun setIconResource(resource: Int, color: Int = Spectrum.white) {
-    icon.imageResource = resource
-    icon.setColorFilter(color)
-  }
+	fun setIconResource(resource: Int, color: Int = Spectrum.white) {
+		icon.imageResource = resource
+		icon.setColorFilter(color)
+	}
 
-  fun setValueStyle(isScaleIcon: Boolean = false) {
+	fun setValueStyle(isScaleIcon: Boolean = false) {
 
-    if (isScaleIcon) icon.scaleType = ImageView.ScaleType.CENTER_INSIDE
-    else icon.scaleType = ImageView.ScaleType.CENTER_CROP
+		if (isScaleIcon) icon.scaleType = ImageView.ScaleType.CENTER_INSIDE
+		else icon.scaleType = ImageView.ScaleType.CENTER_CROP
 
-    this.addView(count
-      .apply {
-        isFloatRight = true
-        x -= 30.uiPX()
-        setBlackTitles()
-      })
+		this.addView(count.apply {
+			isFloatRight = true
+			x -= 30.uiPX()
+			setBlackTitles()
+		})
 
-    count.apply {
-      setCenterInVertical()
-      setAlignParentRight()
-    }
+		count.apply {
+			setCenterInVertical()
+			setAlignParentRight()
+		}
 
-  }
+	}
 
 }
