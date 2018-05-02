@@ -6,14 +6,19 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.RectF
+import android.text.Editable
 import android.text.InputType
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
+import com.blinnnk.extension.orZero
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -30,95 +35,108 @@ import org.jetbrains.anko.textColor
 
 class RoundInput(context: Context) : EditText(context) {
 
-  var text by observing("") {
-    invalidate()
-  }
+	var text by observing("") {
+		invalidate()
+	}
 
-  private val paint = Paint()
-  private val textPaint = Paint()
-  private val backgroundPaint = Paint()
+	private val maxCount = 22
+	private val paint = Paint()
+	private val textPaint = Paint()
+	private val backgroundPaint = Paint()
 
-  private val titleSize = 16.uiPX().toFloat()
+	private val titleSize = 16.uiPX().toFloat()
 
-  init {
+	init {
 
-    paint.isAntiAlias = true
-    paint.style = Paint.Style.STROKE
-    paint.color = GrayScale.lightGray
-    paint.strokeWidth = BorderSize.bold
+		paint.isAntiAlias = true
+		paint.style = Paint.Style.STROKE
+		paint.color = GrayScale.lightGray
+		paint.strokeWidth = BorderSize.bold
 
-    backgroundPaint.isAntiAlias = true
-    backgroundPaint.style = Paint.Style.FILL
-    backgroundPaint.color = Spectrum.white
+		backgroundPaint.isAntiAlias = true
+		backgroundPaint.style = Paint.Style.FILL
+		backgroundPaint.color = Spectrum.white
 
-    textPaint.isAntiAlias = true
-    textPaint.style = Paint.Style.FILL
-    textPaint.color = GrayScale.midGray
-    textPaint.typeface = GoldStoneFont.heavy(context)
-    textPaint.textSize = titleSize
+		textPaint.isAntiAlias = true
+		textPaint.style = Paint.Style.FILL
+		textPaint.color = GrayScale.midGray
+		textPaint.typeface = GoldStoneFont.heavy(context)
+		textPaint.textSize = titleSize
 
-    singleLine = true
+		singleLine = true
 
-    hintTextColor = GrayScale.lightGray
+		hintTextColor = GrayScale.lightGray
 
-    setWillNotDraw(false)
+		setWillNotDraw(false)
 
-    layoutParams = LinearLayout.LayoutParams(
-      ScreenSize.Width - PaddingSize.device * 2,
-      65.uiPX()
-    ).apply {
-      leftMargin = PaddingSize.device
-    }
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.Width - PaddingSize.device * 2, 65.uiPX()
+		).apply {
+			leftMargin = PaddingSize.device
+		}
 
-    leftPadding = 35.uiPX()
-    backgroundTintMode = PorterDuff.Mode.CLEAR
-    textColor = GrayScale.black
-    typeface = GoldStoneFont.heavy(context)
-    setCursorColor(Spectrum.blue)
-  }
+		leftPadding = 35.uiPX()
+		backgroundTintMode = PorterDuff.Mode.CLEAR
+		textColor = GrayScale.black
+		typeface = GoldStoneFont.heavy(context)
+		setCursorColor(Spectrum.blue)
 
-  private val paddingSize = 5.uiPX()
+		// `RoundInput` 主要用于输入用户名或密码, 防止输入太长内容做了长度限制
+		addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(content: Editable?) {
+				if (content?.length.orZero() > maxCount) {
+					val newContent = content?.substring(0, maxCount) ?: ""
+					getText().clear()
+					setText(newContent)
+					context.alert("content is to long")
+				}
+			}
+			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-  @SuppressLint("DrawAllocation")
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+		})
 
-    val rectF = RectF(
-      BorderSize.bold + paddingSize,
-      BorderSize.bold + paddingSize,
-      width - BorderSize.bold * 2 - paddingSize,
-      height - BorderSize.bold * 2 - paddingSize
-    )
+	}
 
-    canvas?.drawRoundRect(rectF, height / 2f, height / 2f, paint)
+	private val paddingSize = 5.uiPX()
 
-    val textBackground = RectF(
-      25.uiPX().toFloat(),
-      0f,
-      textPaint.measureText(text) + 50.uiPX(),
-      titleSize
-    )
-    canvas?.drawRect(textBackground, backgroundPaint)
+	@SuppressLint("DrawAllocation")
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-    canvas?.drawText(text, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
-  }
+		val rectF = RectF(
+			BorderSize.bold + paddingSize,
+			BorderSize.bold + paddingSize,
+			width - BorderSize.bold * 2 - paddingSize,
+			height - BorderSize.bold * 2 - paddingSize
+		)
 
-  fun setNumberInput() {
-    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-  }
+		canvas?.drawRoundRect(rectF, height / 2f, height / 2f, paint)
 
-  fun setTextInput() {
-    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-  }
+		val textBackground = RectF(
+			25.uiPX().toFloat(), 0f, textPaint.measureText(text) + 50.uiPX(), titleSize
+		)
+		canvas?.drawRect(textBackground, backgroundPaint)
 
-  fun setPasswordInput(show: Boolean = false) {
-    inputType =
-      if (show == false) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-      else InputType.TYPE_CLASS_TEXT
-  }
+		canvas?.drawText(text, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
+	}
 
-  fun setPinCodeInput() {
-    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-  }
+	fun setNumberInput() {
+		inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+	}
+
+	fun setTextInput() {
+		inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+	}
+
+	fun setPasswordInput(show: Boolean = false) {
+		inputType =
+			if (show == false) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+			else InputType.TYPE_CLASS_TEXT
+	}
+
+	fun setPinCodeInput() {
+		inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+	}
 
 }
