@@ -18,27 +18,26 @@ import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
  */
 
-
 class SplashActivity : AppCompatActivity() {
 
-  private val container by lazy { SplashContainer(this) }
+	private val container by lazy { SplashContainer(this) }
 
-  private val presenter = SplashPresenter(this)
+	private val presenter = SplashPresenter(this)
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
 
-    hideStatusBar()
+		hideStatusBar()
 
-    presenter.hasAccountThenLogin()
-    container.apply {
-      savedInstanceState.isNull {
-        // 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-        addFragment<StartingFragment>(container.id)
-      }
-    }.let {
-      setContentView(it)
-    }
+		presenter.hasAccountThenLogin()
+		container.apply {
+			savedInstanceState.isNull {
+				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+				addFragment<StartingFragment>(container.id)
+			}
+		}.let {
+			setContentView(it)
+		}
 
-  }
+	}
 }

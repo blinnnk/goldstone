@@ -4,6 +4,7 @@ import com.blinnnk.extension.rebootApp
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.Alert
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -24,63 +25,76 @@ import java.util.*
  */
 
 class CurrencyPresenter(
-  override val fragment: CurrencyFragment
-  ) : BaseRecyclerPresenter<CurrencyFragment, CurrencyModel>() {
+	override val fragment: CurrencyFragment
+) : BaseRecyclerPresenter<CurrencyFragment, CurrencyModel>() {
 
-  private val isCurrent: (String) -> Boolean = {
-    GoldStoneApp.currencyCode == it
-  }
+	private val isCurrent: (String) -> Boolean = {
+		GoldStoneApp.currencyCode == it
+	}
 
-  private val getCurrencyByCountry: (String) -> String = {
-    Currency.getInstance(Locale(it.toLowerCase(), it)).currencyCode
-  }
+	private val getCurrencyByCountry: (String) -> String = {
+		Currency.getInstance(Locale(it.toLowerCase(), it)).currencyCode
+	}
 
-  override fun updateData() {
-    fragment.asyncData = arrayListOf(
-      CurrencyModel(Currency.getInstance(CountryCode.america).currencyCode, isCurrent(CountryCode.america.country)),
-      CurrencyModel(Currency.getInstance(CountryCode.china).currencyCode, isCurrent(Locale.CHINA.country)),
-      CurrencyModel(Currency.getInstance(CountryCode.korean).currencyCode, isCurrent(Locale.KOREA.country)),
-      CurrencyModel(Currency.getInstance(CountryCode.japan).currencyCode, isCurrent(Locale.JAPAN.country)),
-      CurrencyModel(Currency.getInstance(CountryCode.russia).currencyCode, isCurrent(CountryCode.russia.country))
-    )
-  }
+	override fun updateData() {
+		fragment.asyncData = arrayListOf(
+			CurrencyModel(
+				Currency.getInstance(CountryCode.america).currencyCode,
+				isCurrent(CountryCode.america.country)
+			),
+			CurrencyModel(
+				Currency.getInstance(CountryCode.china).currencyCode,
+				isCurrent(Locale.CHINA.country)
+			),
+			CurrencyModel(
+				Currency.getInstance(CountryCode.korean).currencyCode,
+				isCurrent(Locale.KOREA.country)
+			),
+			CurrencyModel(
+				Currency.getInstance(CountryCode.japan).currencyCode,
+				isCurrent(Locale.JAPAN.country)
+			),
+			CurrencyModel(
+				Currency.getInstance(CountryCode.russia).currencyCode,
+				isCurrent(CountryCode.russia.country)
+			)
+		)
+	}
 
-  fun setCurrencyAlert(code: String, hold: Boolean.() -> Unit) {
-    fragment.context?.apply {
-      alert(
-        "Once you selected it, application will be rebooted and just wait several seconds.",
-        "Are You Sure To Switch Currency Settings?") {
-        yesButton {
-          updateData(code)
-          hold(true)
-        }
-        noButton {
-          hold(false)
-        }
-      }.show()
-    }
-  }
+	fun setCurrencyAlert(code: String, hold: Boolean.() -> Unit) {
+		fragment.context?.apply {
+			alert(Alert.selectCurrency) {
+				yesButton {
+					updateData(code)
+					hold(true)
+				}
+				noButton {
+					hold(false)
+				}
+			}.show()
+		}
+	}
 
-  private fun updateData(code: String) {
-    WalletTable.updateCurrency(code) {
-      fragment.context?.rebootApp<SplashActivity>()
-    }
-  }
+	private fun updateData(code: String) {
+		WalletTable.updateCurrency(code) {
+			fragment.context?.rebootApp<SplashActivity>()
+		}
+	}
 
-  override fun onFragmentViewCreated() {
-    super.onFragmentViewCreated()
-    getCountryList()
-  }
+	override fun onFragmentViewCreated() {
+		super.onFragmentViewCreated()
+		getCountryList()
+	}
 
-  private fun getCountryList() {
-    GoldStoneAPI.getCountryList {
-      fragment.apply {
-        context?.runOnUiThread {
-          diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(it.map {
-            CurrencyModel(getCurrencyByCountry(it), isCurrent(getCurrencyByCountry(it)))
-          }.toArrayList())
-        }
-      }
-    }
-  }
+	private fun getCountryList() {
+		GoldStoneAPI.getCountryList {
+			fragment.apply {
+				context?.runOnUiThread {
+					diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(it.map {
+						CurrencyModel(getCurrencyByCountry(it), isCurrent(getCurrencyByCountry(it)))
+					}.toArrayList())
+				}
+			}
+		}
+	}
 }
