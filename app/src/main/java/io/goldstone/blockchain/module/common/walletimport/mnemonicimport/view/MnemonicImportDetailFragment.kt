@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import org.jetbrains.anko.*
@@ -44,6 +45,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
         lparams(matchParent, matchParent)
         mnemonicInput
           .apply {
+            hint = ImportWalletText.mnemonicHint
             setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
           }
           .into(this)

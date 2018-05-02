@@ -14,10 +14,7 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import org.jetbrains.anko.*
 
@@ -44,6 +41,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
       verticalLayout {
 
         privateKeyInput.apply {
+          hint = ImportWalletText.privateKeyHint
           setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
         }.into(this)
 
