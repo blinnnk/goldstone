@@ -83,13 +83,19 @@ object ImportWalletText {
 
 	@JvmField
 	val mnemonicHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter your mnemonic with space split"
+		HoneyLanguage.English.code -> " Enter your mnemonic with space split"
+		else -> ""
+	}
+
+	@JvmField
+	val keystoreHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> " Enter your keystore here"
 		else -> ""
 	}
 
 	@JvmField
 	val privateKeyHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter your private key here"
+		HoneyLanguage.English.code -> " Enter your private key here"
 		else -> ""
 	}
 
