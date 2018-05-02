@@ -20,7 +20,3 @@ object FragmentTag {
   const val watchOnlyImport = "watchOnlyImport"
   const val pinCode = "pincode"
 }
-
-object ViewTag {
-  const val paymentCell = "paymentCell"
-}

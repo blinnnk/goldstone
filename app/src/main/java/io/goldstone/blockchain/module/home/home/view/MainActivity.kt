@@ -6,41 +6,46 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import org.jetbrains.anko.relativeLayout
 
 class MainActivity : AppCompatActivity() {
 
-  private val loadingView by lazy { LoadingView(this) }
+	private var loadingView: LoadingView? = null
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
 
-    hideStatusBar()
+		hideStatusBar()
 
-    relativeLayout {
-      id = ContainerID.main
-      savedInstanceState.isNull {
-        // 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-        addFragment<HomeFragment>(this.id, FragmentTag.home)
-      }
-    }.let {
-      setContentView(it)
-    }
-  }
+		relativeLayout {
+			id = ContainerID.main
+			savedInstanceState.isNull {
+				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+				addFragment<HomeFragment>(this.id, FragmentTag.home)
+			}
+		}.let {
+			setContentView(it)
+		}
+	}
 
-  fun showLoadingView() {
-    findViewById<RelativeLayout>(ContainerID.main)?.apply {
-      addView(loadingView)
-    }
-  }
+	fun showLoadingView() {
+		findViewById<RelativeLayout>(ContainerID.main)?.let { layout ->
+			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
+				loadingView = LoadingView(layout.context)
+				layout.addView(loadingView)
+			}
+		}
+	}
 
-  fun removeLoadingView() {
-    findViewById<RelativeLayout>(ContainerID.main)?.apply {
-      removeView(loadingView)
-    }
-  }
+	fun removeLoadingView() {
+		findViewById<RelativeLayout>(ContainerID.main)?.apply {
+			loadingView?.let { removeView(it) }
+		}
+	}
 
 }

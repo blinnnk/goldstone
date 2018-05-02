@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.daysAgoInMills
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
@@ -27,12 +28,20 @@ import org.json.JSONObject
  * @author KaySaith
  */
 
+private var latestSelectionMD5: String? = null
+
 class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
 
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
+			// 如果新旧数据一样就不再执行更新逻辑
+			if (latestSelectionMD5 == selections.getObjectMD5HexString()) {
+				return@getMySelections
+			}
+			// 把最近一次数据的 MD5 值存入内存, 任何需要更新数据的逻辑会先行比对是否需要更新
+			latestSelectionMD5 = selections.getObjectMD5HexString()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)

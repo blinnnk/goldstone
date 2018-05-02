@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.pincode.view
 
-import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
@@ -27,102 +26,98 @@ import org.jetbrains.anko.*
 
 class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 
-  private val newPinCode by lazy { RoundInput(context!!) }
-  private val repeatPinCode by lazy { RoundInput(context!!) }
-  val confirmButton by lazy { RoundButton(context!!) }
-  private val switch by lazy { HoneyBaseSwitch(context!!) }
+	private val newPinCode by lazy { RoundInput(context!!) }
+	private val repeatPinCode by lazy { RoundInput(context!!) }
+	val confirmButton by lazy { RoundButton(context!!) }
+	private val switch by lazy { HoneyBaseSwitch(context!!) }
 
-  override val presenter = PinCodeEditorPresenter(this)
+	override val presenter = PinCodeEditorPresenter(this)
 
-  @SuppressLint("SetTextI18n")
-  override fun AnkoContext<Fragment>.initView() {
+	override fun AnkoContext<Fragment>.initView() {
 
-    verticalLayout {
-      lparams(matchParent, matchParent)
-      AppConfigTable.getAppConfig {
-        it?.pincode.isNotNull {
-          presenter.showPinCodeFragment()
-        }
+		verticalLayout {
+			lparams(matchParent, matchParent)
+			AppConfigTable.getAppConfig {
+				it?.pincode.isNotNull {
+					presenter.showPinCodeFragment()
+				}
 
-        initSwitchCell()
+				initSwitchCell()
 
-        textView {
-          text = "enter four bit pin-code ciphers"
-          textSize = 5.uiPX().toFloat()
-          textColor = GrayScale.midGray
-          typeface = GoldStoneFont.medium(context)
-          gravity = Gravity.CENTER
-          layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
-          y += 20.uiPX()
-        }
+				textView {
+					text = PincodeText.description
+					textSize = 5.uiPX().toFloat()
+					textColor = GrayScale.midGray
+					typeface = GoldStoneFont.medium(context)
+					gravity = Gravity.CENTER
+					layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
+					y += 20.uiPX()
+				}
 
-        newPinCode.apply {
-          text = "Pin Code"
-          setPinCodeInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-        }.into(this)
+				newPinCode.apply {
+					text = PincodeText.pincode
+					setPinCodeInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+				}.into(this)
 
-        repeatPinCode.apply {
-          text = "Repeat Pin Code"
-          setPinCodeInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-        }.into(this)
+				repeatPinCode.apply {
+					text = PincodeText.repeat
+					setPinCodeInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				}.into(this)
 
-        confirmButton.apply {
-          text = CommonText.confirm
-          setGrayStyle()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-        }.click {
-          presenter.resetPinCode(newPinCode, repeatPinCode, switch)
-        }.into(this)
-      }
-    }
-  }
+				confirmButton.apply {
+					text = CommonText.confirm
+					setGrayStyle()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+				}.click {
+					presenter.resetPinCode(newPinCode, repeatPinCode, switch)
+				}.into(this)
+			}
+		}
+	}
 
-  private fun ViewGroup.initSwitchCell() {
-    relativeLayout {
+	private fun ViewGroup.initSwitchCell() {
+		relativeLayout {
 
-      lparams {
-        width = ScreenSize.widthWithPadding
-        height = 80.uiPX()
-        leftMargin = PaddingSize.device
-      }
+			lparams {
+				width = ScreenSize.widthWithPadding
+				height = 80.uiPX()
+				leftMargin = PaddingSize.device
+			}
 
-      textView("Show Pin Code").apply {
-        textSize = 5.uiPX().toFloat()
-        textColor = GrayScale.midGray
-        typeface = GoldStoneFont.heavy(context)
-        gravity = Gravity.CENTER_VERTICAL
-        lparams(matchParent, matchParent)
-      }
+			textView(PincodeText.show).apply {
+				textSize = 5.uiPX().toFloat()
+				textColor = GrayScale.midGray
+				typeface = GoldStoneFont.heavy(context)
+				gravity = Gravity.CENTER_VERTICAL
+				lparams(matchParent, matchParent)
+			}
 
-      AppConfigTable.getAppConfig { config ->
-        switch
-          .apply {
-            setAlignParentRight()
-            isChecked = config?.showPincode.orFalse()
-          }
-          .click { switch ->
-            // 点击后根据更新的数据库情况显示开关状态
-            presenter.setShowPinCodeStatus(switch.isChecked) {
-              AppConfigTable.getAppConfig {
-                switch.isChecked = it?.showPincode.orFalse()
-              }
-            }
-          }
-          .into(this)
-      }
+			AppConfigTable.getAppConfig { config ->
+				switch.apply {
+					setAlignParentRight()
+					isChecked = config?.showPincode.orFalse()
+				}.click { switch ->
+					// 点击后根据更新的数据库情况显示开关状态
+					presenter.setShowPinCodeStatus(switch.isChecked) {
+						AppConfigTable.getAppConfig {
+							switch.isChecked = it?.showPincode.orFalse()
+						}
+					}
+				}.into(this)
+			}
 
-      // 分割线
-      View(context).apply {
-        lparams {
-          width = matchParent
-          height = BorderSize.default.toInt()
-          alignParentBottom()
-        }
-        backgroundColor = GrayScale.lightGray
-      }.into(this)
-    }
-  }
+			// 分割线
+			View(context).apply {
+				lparams {
+					width = matchParent
+					height = BorderSize.default.toInt()
+					alignParentBottom()
+				}
+				backgroundColor = GrayScale.lightGray
+			}.into(this)
+		}
+	}
 
 }

@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
 import org.jetbrains.anko.*
@@ -25,75 +26,76 @@ import org.jetbrains.anko.*
 
 class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
-  private val attentionView by lazy { AttentionTextView(context!!) }
-  private val keystoreEditText by lazy { WalletEditText(context!!) }
-  private val nameInput by lazy { RoundInput(context!!) }
-  private val passwordInput by lazy { RoundInput(context!!) }
-  private val hintInput by lazy { RoundInput(context!!) }
-  private val agreementView by lazy { AgreementView(context!!) }
-  private val confirmButton by lazy { RoundButton(context!!) }
+	private val attentionView by lazy { AttentionTextView(context!!) }
+	private val keystoreEditText by lazy { WalletEditText(context!!) }
+	private val nameInput by lazy { RoundInput(context!!) }
+	private val passwordInput by lazy { RoundInput(context!!) }
+	private val hintInput by lazy { RoundInput(context!!) }
+	private val agreementView by lazy { AgreementView(context!!) }
+	private val confirmButton by lazy { RoundButton(context!!) }
 
-  override val presenter = KeystoreImportPresenter(this)
+	override val presenter = KeystoreImportPresenter(this)
 
-  @SuppressLint("SetTextI18n")
-  override fun AnkoContext<Fragment>.initView() {
-    scrollView {
-      verticalLayout {
-        attentionView.apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-          text =
-            "Kevin Federline has two kids with Britney Spears and four more with other women -- and if he's not spending his child support checks properly, that could pose some new problems for him in court."
-        }.into(this)
+	@SuppressLint("SetTextI18n")
+	override fun AnkoContext<Fragment>.initView() {
+		scrollView {
+			verticalLayout {
+				attentionView.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+					text =
+						"Kevin Federline has two kids with Britney Spears and four more with other women -- and if he's not spending his child support checks properly, that could pose some new problems for him in court."
+				}.into(this)
 
-        keystoreEditText.apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-        }.into(this)
+				keystoreEditText.apply {
+					hint = ImportWalletText.keystoreHint
+					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				}.into(this)
 
-        nameInput.apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-          text = CreateWalletText.name
-        }.into(this)
+				nameInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+					text = CreateWalletText.name
+				}.into(this)
 
-        passwordInput.apply {
-          setPasswordInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-          text = CreateWalletText.password
-        }.into(this)
+				passwordInput.apply {
+					setPasswordInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					text = CreateWalletText.password
+				}.into(this)
 
-        hintInput.apply {
-          setPasswordInput()
-          setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-          text = CreateWalletText.hint
-        }.into(this)
+				hintInput.apply {
+					setPasswordInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					text = CreateWalletText.hint
+				}.into(this)
 
-        agreementView.apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-        }.into(this)
+				agreementView.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
+				}.into(this)
 
-        confirmButton.apply {
-          setBlueStyle()
-          text = CommonText.confirm.toUpperCase()
-          y += 10.uiPX()
-        }.click {
-          presenter.importKeystoreWallet(
-            keystoreEditText.text.toString(),
-            passwordInput,
-            nameInput,
-            agreementView.radioButton.isChecked,
-            hintInput
-          )
-        }.into(this)
+				confirmButton.apply {
+					setBlueStyle()
+					text = CommonText.confirm.toUpperCase()
+					y += 10.uiPX()
+				}.click {
+					presenter.importKeystoreWallet(
+						keystoreEditText.text.toString(),
+						passwordInput,
+						nameInput,
+						agreementView.radioButton.isChecked,
+						hintInput
+					)
+				}.into(this)
 
-        textView("What is keystore?") {
-          textSize = 5.uiPX().toFloat()
-          typeface = GoldStoneFont.heavy(context)
-          layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-            topMargin = 20.uiPX()
-          }
-          textColor = Spectrum.blue
-          gravity = Gravity.CENTER
-        }
-      }
-    }
-  }
+				textView("What is keystore?") {
+					textSize = 5.uiPX().toFloat()
+					typeface = GoldStoneFont.heavy(context)
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+						topMargin = 20.uiPX()
+					}
+					textColor = Spectrum.blue
+					gravity = Gravity.CENTER
+				}
+			}
+		}
+	}
 }

@@ -23,6 +23,7 @@ object ElementID {
   const val chartView = 2008
   const val slideCell = 2009
   const val slideCellContainer = 2010
+  const val loadingView = 2011
 }
 
 object ViewPagerID {

@@ -22,19 +22,18 @@ import org.jetbrains.anko.textColor
 
 class WalletEditText(context: Context) : EditText(context) {
 
-  init {
-    addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 120.uiPX()).apply {
-      leftMargin = PaddingSize.device
-      topMargin = 40.uiPX()
-      padding = 20.uiPX()
-    }
-    hint = "mnemonics split with space"
-    hintTextColor = GrayScale.midGray
-    textSize = 5.uiPX().toFloat()
-    textColor = GrayScale.black
-    typeface = GoldStoneFont.heavy(context)
-    gravity = Gravity.START
-  }
+	init {
+		addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 120.uiPX()).apply {
+			leftMargin = PaddingSize.device
+			topMargin = 40.uiPX()
+			padding = 20.uiPX()
+		}
+		hintTextColor = GrayScale.midGray
+		textSize = 5.uiPX().toFloat()
+		textColor = GrayScale.black
+		typeface = GoldStoneFont.heavy(context)
+		gravity = Gravity.START
+	}
 
 }
