@@ -18,31 +18,36 @@ import org.web3j.crypto.Wallet
  */
 
 class KeystoreImportPresenter(
-  override val fragment: KeystoreImportFragment
-  ) : BasePresenter<KeystoreImportFragment>() {
+	override val fragment: KeystoreImportFragment
+) : BasePresenter<KeystoreImportFragment>() {
 
-  fun importKeystoreWallet(keystore: String, password: EditText, nameInput: EditText, isAgree: Boolean, hintInput: EditText) {
-    isAgree isTrue {
-      try {
-        Wallet.decrypt(
-          password.text.toString(),
-          DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
-        )?.let {
-          PrivateKeyImportPresenter.importWallet(
-            it.privateKey.toString(16),
-            password.text.toString(),
-            nameInput.text.toString(),
-            fragment,
-            hintInput.text?.toString()
-          )
-        }
-      } catch (error: Exception) {
-        fragment.context?.alert("Error, Please check your keystore format or password")
-        Log.e("ERROR", "import keystore")
-      }
-    } otherwise {
-      fragment.context?.alert("You must agree terms")
-    }
+	fun importKeystoreWallet(
+		keystore: String,
+		password: EditText,
+		nameInput: EditText,
+		isAgree: Boolean,
+		hintInput: EditText
+	) {
+		isAgree isTrue {
+			try {
+				Wallet.decrypt(
+					password.text.toString(), DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
+				)?.let {
+					PrivateKeyImportPresenter.importWallet(
+						it.privateKey.toString(16),
+						password.text.toString(),
+						nameInput.text.toString(),
+						fragment,
+						hintInput.text?.toString()
+					)
+				}
+			} catch (error: Exception) {
+				fragment.context?.alert("Error, Please check your keystore format or password")
+				Log.e("ERROR", "import keystore")
+			}
+		} otherwise {
+			fragment.context?.alert("You must agree terms")
+		}
 
-  }
+	}
 }

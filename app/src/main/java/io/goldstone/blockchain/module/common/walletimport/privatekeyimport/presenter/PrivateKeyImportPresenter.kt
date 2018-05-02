@@ -8,6 +8,7 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.CurrentWalletText
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -61,10 +62,16 @@ class PrivateKeyImportPresenter(
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
 		 */
 		fun importWallet(
-			privateKey: String, password: String, name: String, fragment: Fragment, hint: String? = null
+			privateKey: String,
+			password: String,
+			name: String,
+			fragment: Fragment,
+			hint: String? = null
 		) {
+			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
+			val currentPrivateKey = if (privateKey.length == 63) "0$privateKey" else privateKey
 			// 首先检查私钥地址是否合规
-			if (!WalletUtils.isValidPrivateKey(privateKey)) {
+			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
 				return
 			}

@@ -51,18 +51,26 @@ class PaymentValueDetailFragment :
       address?.apply { showTargetAddress(this) }
       presenter.updateHeaderValue(this)
       inputTextListener {
-        it.isNotEmpty() isTrue { transferCount = it.toDouble() }
+        it.isNotEmpty() isTrue {
+          transferCount = it.toDouble()
+        }
       }
       setHeaderSymbol(token?.symbol.orEmpty())
     }
 
     recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
-      MyTokenTable.getBalanceWithSymbol(token?.symbol!!, WalletTable.current.address, true) {
+      MyTokenTable.getBalanceWithSymbol(token?.symbol!!, WalletTable.current.address, true) { balance ->
         confirmClickEvent = Runnable {
-          if (it > transferCount) showConfirmAttentionView()
-          else {
+          if (transferCount <= 0) {
             context?.runOnUiThread {
-              alert("You haven't enough currency to transfer")
+              alert("Please Enter Your Transfer Value")
+            }
+          } else {
+            if (balance > transferCount) showConfirmAttentionView()
+            else {
+              context?.runOnUiThread {
+                alert("You haven't enough currency to transfer")
+              }
             }
           }
         }
