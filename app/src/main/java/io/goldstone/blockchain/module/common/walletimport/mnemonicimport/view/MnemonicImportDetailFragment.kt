@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -106,6 +107,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
               agreementView.radioButton.isChecked,
               walletNameInput
             )
+            it.preventDuplicateClicks()
           }
           .into(this)
 

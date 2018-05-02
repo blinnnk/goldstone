@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -79,6 +80,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
         }
         .click {
           presenter.importWatchOnlyWallet(addressInput, nameInput)
+          it.preventDuplicateClicks()
         }
         .into(this)
 

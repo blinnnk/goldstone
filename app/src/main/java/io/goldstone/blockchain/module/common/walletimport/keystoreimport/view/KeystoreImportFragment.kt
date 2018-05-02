@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -84,6 +85,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						agreementView.radioButton.isChecked,
 						hintInput
 					)
+					it.preventDuplicateClicks()
 				}.into(this)
 
 				textView("What is keystore?") {
