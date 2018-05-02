@@ -61,12 +61,10 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
     balance
       .apply {
-
         title.apply {
           typeface = GoldStoneFont.heavy(context)
           textSize = 6.uiPX().toFloat()
         }
-
         subtitle.apply {
           text = WalletText.totalAssets + GoldStoneApp.currencyCode
           textSize = 4.uiPX().toFloat()
