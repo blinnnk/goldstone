@@ -16,6 +16,7 @@ import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -116,6 +117,14 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
+
+				is NotificationFragment -> {
+					overlayView.header.backButton.onClick {
+						headerTitle = TokenDetailText.tokenDetail
+						presenter.popFragmentFrom<TransactionDetailFragment>()
+						updateParentContentLayoutHeight(fragment.asyncData?.size)
+					}
+				}
 			}
 		}
 	}
@@ -135,6 +144,12 @@ class TransactionDetailPresenter(
 				}
 
 				is TokenDetailOverlayFragment -> {
+					presenter.showTargetFragment<WebViewFragment>(
+						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
+					)
+				}
+
+				is NotificationFragment -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
 					)
@@ -294,9 +309,7 @@ class TransactionDetailPresenter(
 
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
-		receipt: Transaction,
-		transaction: InputCodeData,
-		isReceive: Boolean
+		receipt: Transaction, transaction: InputCodeData, isReceive: Boolean
 	) {
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
 			val address = if (isReceive) receipt.from else transaction.address
