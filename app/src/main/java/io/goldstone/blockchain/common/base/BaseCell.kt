@@ -25,6 +25,10 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
     invalidate()
   }
 
+  protected var arrowY: Float by observing(0f) {
+    invalidate()
+  }
+
   private val paint = Paint().apply {
     isAntiAlias = true
     style = Paint.Style.FILL
@@ -54,7 +58,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 
     if (hasArrow) {
       canvas?.save()
-      canvas?.translate(width - 16.uiPX().toFloat(), height / 2f - 7.uiPX())
+      canvas?.translate(width - 16.uiPX().toFloat(), height / 2f - 7.uiPX() + arrowY)
       canvas?.drawPath(arrow, iconPaint)
       canvas?.restore()
     }

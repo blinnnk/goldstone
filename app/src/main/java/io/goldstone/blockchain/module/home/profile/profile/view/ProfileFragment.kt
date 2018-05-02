@@ -18,45 +18,49 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 
-  private val slideHeader by lazy { ProfileSlideHeader(context!!) }
+	private val slideHeader by lazy { ProfileSlideHeader(context!!) }
 
-  override val presenter = ProfilePresenter(this)
+	override val presenter = ProfilePresenter(this)
 
-  override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<ProfileModel>?) {
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<ProfileModel>?
+	) {
 
-    recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
-      // 分配点击事件
-      item.apply {
-        onClick {
-          presenter.showContactsFragment(model.title)
-          preventDuplicateClicks()
-        }
-      }
+		recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
+			// 分配点击事件
+			item.apply {
+				if (position == 3) {
+					item.layoutParams.height += 30.uiPX()
+					isCenterInVertical = false
+				} else {
+					isCenterInVertical = true
+				}
+				onClick {
+					presenter.showContactsFragment(model.title)
+					preventDuplicateClicks()
+				}
+			}
+		}
+	}
 
-      // 完成定制布局
-      presenter.setCustomIntervalSize(item, position)
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		wrapper.addView(slideHeader)
+	}
 
-    }
-  }
+	private var isShow = false
+	private val headerHeight = 50.uiPX()
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    wrapper.addView(slideHeader)
-  }
+	override fun observingRecyclerViewVerticalOffset(offset: Int) {
+		if (offset >= headerHeight && !isShow) {
+			slideHeader.onHeaderShowedStyle()
+			isShow = true
+		}
 
-  private var isShow = false
-  private val headerHeight = 50.uiPX()
-
-  override fun observingRecyclerViewVerticalOffset(offset: Int) {
-    if (offset >= headerHeight && !isShow) {
-      slideHeader.onHeaderShowedStyle()
-      isShow = true
-    }
-
-    if (offset < headerHeight && isShow) {
-      slideHeader.onHeaderHidesStyle()
-      isShow = false
-    }
-  }
+		if (offset < headerHeight && isShow) {
+			slideHeader.onHeaderHidesStyle()
+			isShow = false
+		}
+	}
 
 }

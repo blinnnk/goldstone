@@ -2,9 +2,7 @@ package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.content.Context
 import android.widget.TextView
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseCell
@@ -22,47 +20,55 @@ import org.jetbrains.anko.textColor
 
 class ProfileCell(context: Context) : BaseCell(context) {
 
-  var model: ProfileModel by observing(ProfileModel()) {
-    icon.src = model.icon
-    title.text = model.title
-    info.text = model.info
-  }
+	var model: ProfileModel by observing(ProfileModel()) {
+		icon.src = model.icon
+		title.text = model.title
+		info.text = model.info
+	}
 
-  private val icon by lazy { SquareIcon(context) }
+	var isCenterInVertical: Boolean by observing(false) {
+		if(isCenterInVertical) {
+			title.setCenterInVertical()
+			icon.setCenterInVertical()
+			info.apply {
+				setCenterInVertical()
+				setAlignParentRight()
+			}
+		} else {
+			title.setAlignParentBottom()
+			icon.setAlignParentBottom()
+			info.apply {
+				setAlignParentBottom()
+				setAlignParentRight()
+			}
 
-  private val title by lazy { TextView(context) }
-  private val info by lazy { TextView(context) }
+			title.y -= 19.uiPX().toFloat()
+			icon.y -= 17.uiPX()
+			arrowY = 16.uiPX().toFloat()
+		}
+	}
 
-  init {
+	private val icon by lazy { SquareIcon(context) }
+	private val title by lazy { TextView(context) }
+	private val info by lazy { TextView(context) }
 
-    icon.into(this)
-    icon.setCenterInVertical()
+	init {
 
-    title
-      .apply {
-        textColor = Spectrum.white
-        textSize = 5.uiPX().toFloat()
-        typeface = GoldStoneFont.medium(context)
-        x += CommonCellSize.iconPadding
-      }
-      .into(this)
+		icon.into(this)
+		title.apply {
+			textColor = Spectrum.white
+			textSize = 5.uiPX().toFloat()
+			typeface = GoldStoneFont.medium(context)
+			x += CommonCellSize.iconPadding
+		}.into(this)
 
-    info
-      .apply {
-        textColor = Spectrum.opacity5White
-        textSize = 4.uiPX().toFloat()
-        typeface = GoldStoneFont.medium(context)
-        x -= CommonCellSize.rightPadding
-      }
-      .into(this)
+		info.apply {
+			textColor = Spectrum.opacity5White
+			textSize = 4.uiPX().toFloat()
+			typeface = GoldStoneFont.medium(context)
+			x -= CommonCellSize.rightPadding
+		}.into(this)
 
-    title.setCenterInVertical()
-
-    info.apply {
-      setCenterInVertical()
-      setAlignParentRight()
-    }
-
-  }
+	}
 
 }
