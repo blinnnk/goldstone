@@ -21,12 +21,11 @@ class WalletSettingsListFragment :
 	override val presenter = WalletSettingsListPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<WalletSettingsListModel>?
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?
 	) {
 		recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray()) {
 			// 余额的 `Cell` 不显示箭头
-			if(model.title == WalletSettingsText.balance) {
+			if (model.title == WalletSettingsText.balance) {
 				hasArrow = false
 			}
 			onClick {
@@ -41,6 +40,5 @@ class WalletSettingsListFragment :
 	}
 
 	override fun setSlideUpWithCellHeight() = 50.uiPX()
-
 
 }
