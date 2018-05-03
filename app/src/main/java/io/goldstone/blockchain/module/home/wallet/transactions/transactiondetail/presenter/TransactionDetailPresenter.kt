@@ -115,7 +115,6 @@ class TransactionDetailPresenter(
 
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
-
 		fragment.parentFragment.apply {
 			when (this) {
 				is TransactionFragment -> {
@@ -125,7 +124,6 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
-
 				is TokenDetailOverlayFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -133,7 +131,6 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
-
 				is NotificationFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -204,7 +201,6 @@ class TransactionDetailPresenter(
 					receipt.url
 				)
 			}
-
 			is TransactionReceipt -> {
 				arrayListOf(
 					minerFee,
@@ -215,7 +211,6 @@ class TransactionDetailPresenter(
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
-
 			else -> {
 				arrayListOf(
 					minerFee,
@@ -254,7 +249,6 @@ class TransactionDetailPresenter(
 
 	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
 	private var transactionObserver: Subscription? = null
-
 	private fun observerTransaction() {
 		doAsync {
 			try {

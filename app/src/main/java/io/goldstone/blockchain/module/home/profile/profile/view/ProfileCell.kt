@@ -41,9 +41,9 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				setAlignParentBottom()
 				setAlignParentRight()
 			}
-
 			title.y -= 19.uiPX().toFloat()
 			icon.y -= 17.uiPX()
+			info.y -= 20.uiPX()
 			arrowY = 16.uiPX().toFloat()
 		}
 	}
