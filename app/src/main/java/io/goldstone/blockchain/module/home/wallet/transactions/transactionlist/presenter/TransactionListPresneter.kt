@@ -55,7 +55,6 @@ class TransactionListPresenter(
 							localTransactions = it
 						}
 					}
-					updateParentContentLayoutHeight(fragment.asyncData?.size)
 				}
 			}
 		}
