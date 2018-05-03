@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view
 
+import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
@@ -14,24 +16,25 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class TokenManagementListFragment
-  : BaseRecyclerFragment<TokenManagementListPresenter, DefaultTokenTable>() {
+class TokenManagementListFragment :
+	BaseRecyclerFragment<TokenManagementListPresenter, DefaultTokenTable>() {
 
-  override val presenter = TokenManagementListPresenter(this)
+	override val presenter = TokenManagementListPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<DefaultTokenTable>?
-  ) {
-    recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { cell ->
-      cell.switch.onClick {
-        getMainActivity()?.apply {
-          TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
-        }
-      }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?
+	) {
+		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { cell ->
+			cell.switch.onClick {
+				NetworkUtil.hasNetwork(this@TokenManagementListFragment.context) isTrue {
+					getMainActivity()?.apply {
+						TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
+					}
+				}
+			}
+		}
+	}
 
-  override fun setSlideUpWithCellHeight() = 60.uiPX()
+	override fun setSlideUpWithCellHeight() = 60.uiPX()
 
 }

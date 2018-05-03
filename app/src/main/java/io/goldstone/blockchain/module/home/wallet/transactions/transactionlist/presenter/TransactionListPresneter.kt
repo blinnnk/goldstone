@@ -7,6 +7,7 @@ import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TransactionText
@@ -42,17 +43,21 @@ class TransactionListPresenter(
 			localTransactions.isNotNull {
 				asyncData = localTransactions
 				// 更新显示数据后, 异步继续更新新的数据.并动态刷新到界面
-				getMainActivity()?.updateTransactionInAsync(localTransactions!!)
+				NetworkUtil.hasNetwork(context).isTrue {
+					getMainActivity()?.updateTransactionInAsync(localTransactions!!)
+				}
 			} otherwise {
 				TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
 					localData.isNotEmpty() isTrue {
 						asyncData = localData
 						localTransactions = localData
 					} otherwise {
-						// 如果本地一条数据都没有就从 `StartBlock 0` 的位置从 `EtherScan` 上查询
-						getMainActivity()?.getTransactionDataFromEtherScan("0") {
-							asyncData = it
-							localTransactions = it
+						NetworkUtil.hasNetwork(context).isTrue {
+							// 如果本地一条数据都没有就从 `StartBlock 0` 的位置从 `EtherScan` 上查询
+							getMainActivity()?.getTransactionDataFromEtherScan("0") {
+								asyncData = it
+								localTransactions = it
+							}
 						}
 					}
 				}

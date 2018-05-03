@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -29,8 +30,10 @@ class QuotationSearchPresenter(
 		setHeightMatchParent()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.setKeyboardConfirmEvent {
-				getMainActivity()?.showLoadingView()
-				searchTokenBy(text.toString())
+				NetworkUtil.hasNetwork(context) isTrue {
+					getMainActivity()?.showLoadingView()
+					searchTokenBy(text.toString())
+				}
 			}
 		}
 	}

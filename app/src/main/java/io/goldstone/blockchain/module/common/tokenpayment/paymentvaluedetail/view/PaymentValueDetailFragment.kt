@@ -26,65 +26,68 @@ import org.jetbrains.anko.runOnUiThread
  */
 
 class PaymentValueDetailFragment :
-  BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
+	BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
 
-  val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
-  val token by lazy { arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel }
+	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
+	val token by lazy { arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel }
 
-  private var transferCount = 0.0
-  override val presenter = PaymentValueDetailPresenter(this)
+	private var transferCount = 0.0
+	override val presenter = PaymentValueDetailPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView, asyncData: ArrayList<PaymentValueDetailModel>?
-  ) {
-    recyclerView.adapter = PaymentValueDetailAdapter(asyncData.orEmptyArray()) {
-      presenter.setCellClickEvent(this)
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<PaymentValueDetailModel>?
+	) {
+		recyclerView.adapter = PaymentValueDetailAdapter(asyncData.orEmptyArray()) {
+			presenter.setCellClickEvent(this)
+		}
+	}
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 
 
-    recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
-      setInputFocus()
-      address?.apply { showTargetAddress(this) }
-      presenter.updateHeaderValue(this)
-      inputTextListener {
-        it.isNotEmpty() isTrue {
-          transferCount = it.toDouble()
-        }
-      }
-      setHeaderSymbol(token?.symbol.orEmpty())
-    }
+		recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
+			it?.let { header ->
+				header.setInputFocus()
+				address?.apply { header.showTargetAddress(this) }
+				presenter.updateHeaderValue(header)
+				header.inputTextListener {
+					it.isNotEmpty() isTrue {
+						transferCount = it.toDouble()
+					}
+				}
+				header.setHeaderSymbol(token?.symbol.orEmpty())
+			}
+		}
 
-    recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) {
-      MyTokenTable.getBalanceWithSymbol(token?.symbol!!, WalletTable.current.address, true) { balance ->
-        confirmClickEvent = Runnable {
-          if (transferCount <= 0) {
-            context?.runOnUiThread {
-              alert("Please Enter Your Transfer Value")
-            }
-          } else {
-            if (balance > transferCount) showConfirmAttentionView()
-            else {
-              context?.runOnUiThread {
-                alert("You haven't enough currency to transfer")
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+		recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
+			MyTokenTable.getBalanceWithSymbol(
+				token?.symbol!!, WalletTable.current.address, true
+			) { balance ->
+				footer?.confirmClickEvent = Runnable {
+					if (transferCount <= 0) {
+						context?.runOnUiThread {
+							alert("Please Enter Your Transfer Value")
+						}
+					} else {
+						if (balance > transferCount) showConfirmAttentionView()
+						else {
+							context?.runOnUiThread {
+								alert("You haven't enough currency to transfer")
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-  private fun showConfirmAttentionView() {
-    context?.showAlertView(
-      TransactionText.confirmTransaction,
-      CommonText.enterPassword.toUpperCase()
-    ) {
-      presenter.transfer(it?.text.toString())
-    }
-  }
+	private fun showConfirmAttentionView() {
+		context?.showAlertView(
+			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase()
+		) {
+			presenter.transfer(it?.text.toString())
+		}
+	}
 
 }

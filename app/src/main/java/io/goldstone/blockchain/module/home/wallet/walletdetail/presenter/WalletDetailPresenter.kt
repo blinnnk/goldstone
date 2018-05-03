@@ -108,7 +108,7 @@ class WalletDetailPresenter(
 		// Once the calculation is finished then update `WalletTable`
 		WalletTable.current.balance = totalBalance
 		recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
-			model = WalletDetailHeaderModel(
+			it?.model = WalletDetailHeaderModel(
 				null,
 				CryptoUtils.scaleTo9(WalletTable.current.name),
 				CryptoUtils.scaleAddress(WalletTable.current.address),
