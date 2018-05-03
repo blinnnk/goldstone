@@ -33,10 +33,10 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
 	override fun onFragmentShowFromHidden() {
-		updateAllTokensInWalletBy()
+		updateAllTokensInWallet()
 	}
 
-	fun updateAllTokensInWalletBy() {
+	fun updateAllTokensInWallet() {
 		// Check the count of local wallets
 		WalletTable.apply { getAll { walletCount = size } }
 		// Check the info of wallet currency list
@@ -56,7 +56,7 @@ class WalletDetailPresenter(
 	 */
 	override fun onFragmentResume() {
 		CreateWalletPresenter.updateMyTokensValue {
-			updateAllTokensInWalletBy()
+			updateAllTokensInWallet()
 		}
 		showPinCodeFragment()
 	}
