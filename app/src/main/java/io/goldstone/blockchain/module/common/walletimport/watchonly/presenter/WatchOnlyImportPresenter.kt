@@ -24,8 +24,8 @@ class WatchOnlyImportPresenter(
 ) : BasePresenter<WatchOnlyImportFragment>() {
 
 	fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
-		val address = addressInput.text.toString()
-
+		// 默认去除所有的空格
+		val address = addressInput.text.toString().replace(" ", "")
 		if (!WalletUtils.isValidAddress(address)) {
 			fragment.context?.alert("address isn't valid")
 			return

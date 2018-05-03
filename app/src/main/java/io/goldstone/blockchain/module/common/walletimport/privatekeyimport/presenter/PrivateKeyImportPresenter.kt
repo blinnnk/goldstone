@@ -64,7 +64,8 @@ class PrivateKeyImportPresenter(
 			privateKey: String, password: String, name: String, fragment: Fragment, hint: String? = null
 		) {
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
-			val currentPrivateKey = if (privateKey.length == 63) "0$privateKey" else privateKey
+			// 默认去除多余的空格
+			val currentPrivateKey = (if (privateKey.length == 63) "0$privateKey" else privateKey).replace(" ", "")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
