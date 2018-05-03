@@ -190,7 +190,7 @@ class TransactionDetailPresenter(
 		val minerFee = if (data.isNull()) dataFromList?.minerFee
 		else (data!!.raw.gasLimit * data!!.raw.gasPrice).toDouble().toEthValue()
 
-		val date = if (data.isNull()) dataFromList?.date else formatDate(data!!.timestamp)
+		val date = if (data.isNull()) dataFromList?.date else formatDate(data!!.timestamp / 1000)
 
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
