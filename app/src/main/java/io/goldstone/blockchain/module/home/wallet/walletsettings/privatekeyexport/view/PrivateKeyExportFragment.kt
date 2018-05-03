@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -76,6 +77,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					presenter.getPrivateKeyByAddress(passwordInput) {
 						privateKeyTextView.text = this
 					}
+				it.preventDuplicateClicks()
 				}.into(this)
 
 		}
