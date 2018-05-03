@@ -192,6 +192,7 @@ class TokenDetailPresenter(
 							symbol,
 							WalletTable.current.address,
 							data.date,
+							// 插入今日的余额数据
 							if (index == 0) todayBalance else data.balance
 						)
 					}

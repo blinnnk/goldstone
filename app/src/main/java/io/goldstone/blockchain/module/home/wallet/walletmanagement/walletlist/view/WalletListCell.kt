@@ -31,7 +31,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 	var model: WalletListModel by observing(WalletListModel()) {
 
 		info.apply {
-			title.text = model.addressName
+			title.text = CryptoUtils.scaleTo16(model.addressName)
 			subtitle.text = CryptoUtils.scaleTo16(model.address)
 		}
 
