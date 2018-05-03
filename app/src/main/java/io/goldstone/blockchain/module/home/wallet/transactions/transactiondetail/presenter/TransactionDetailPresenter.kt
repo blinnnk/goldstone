@@ -124,6 +124,7 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
+
 				is TokenDetailOverlayFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -131,6 +132,7 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
+
 				is NotificationFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -201,6 +203,7 @@ class TransactionDetailPresenter(
 					receipt.url
 				)
 			}
+
 			is TransactionReceipt -> {
 				arrayListOf(
 					minerFee,
@@ -211,6 +214,7 @@ class TransactionDetailPresenter(
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
+
 			else -> {
 				arrayListOf(
 					minerFee,
@@ -241,7 +245,7 @@ class TransactionDetailPresenter(
 		count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false
 	) {
 		fragment.recyclerView.getItemViewAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			setIconStyle(count, address, symbol, isReceive, isPending)
+			it?.setIconStyle(count, address, symbol, isReceive, isPending)
 		}
 	}
 
