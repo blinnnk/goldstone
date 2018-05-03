@@ -47,7 +47,7 @@ object CryptoUtils {
   }
 
   fun formatDouble(value: Double): Double {
-    return DecimalFormat("0.00").format(value).toDouble()
+    return DecimalFormat("0.000").format(value).toDouble()
   }
 
   fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {

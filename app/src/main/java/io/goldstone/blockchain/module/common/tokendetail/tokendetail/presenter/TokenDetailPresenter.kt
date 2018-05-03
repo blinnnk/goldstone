@@ -160,9 +160,7 @@ class TokenDetailPresenter(
 			val charCount = if (size > maxChartCount) maxChartCount else size
 			forEach {
 				chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
-				System.out.println("hello111 $charCount and ${chartArray.size}")
 				if (chartArray.size == charCount) {
-					System.out.println("hello")
 					var maxY = maxYValue(chartArray)
 					var unitY = Math.ceil((maxY / 10)).toFloat()
 					if (maxY == 0.0) maxY = 10.0
