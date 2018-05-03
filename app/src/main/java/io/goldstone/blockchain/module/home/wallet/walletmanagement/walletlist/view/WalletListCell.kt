@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -34,7 +35,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 			subtitle.text = CryptoUtils.scaleTo16(model.address)
 		}
 
-		count.apply {
+		count?.apply {
 			title.text = model.count.formatCurrency()
 			subtitle.text = WalletText.totalAssets + " (${GoldStoneApp.currencyCode})"
 		}
@@ -43,36 +44,42 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 			glideImage(model.avatar)
 		}
 
-		model.isWatchOnly isTrue { signalIcon.into(this) }
-		model.isUsing isTrue { currentIcon.into(this) }
+		model.isWatchOnly isTrue {
+			if (signalIcon.isNull()) {
+				signalIcon = RoundIcon(context).apply {
+					src = R.drawable.watch_only_icon
+					iconColor = Spectrum.darkBlue
+					iconSize = 20.uiPX()
+					y += 12.uiPX()
+				}
+				signalIcon?.into(this)
+			}
+		}
 
-		setValueStyle()
+		model.isUsing isTrue {
+			if(currentIcon.isNull()) {
+				currentIcon = RoundIcon(context).apply {
+					src = R.drawable.current_icon
+					iconColor = Spectrum.green
+					iconSize = 20.uiPX()
+					y += 45.uiPX()
+					x += 32.uiPX()
+				}
+				currentIcon?.into(this)
+			}
+		}
+
 		// 圆角 `icon`
 		icon.addCorner(icon.layoutParams.height / 2, GrayScale.midGray)
 
 	}
 
-	private val signalIcon by lazy {
-		RoundIcon(context).apply {
-			src = R.drawable.watch_only_icon
-			iconColor = Spectrum.darkBlue
-			iconSize = 20.uiPX()
-			y += 12.uiPX()
-		}
-	}
-
-	private val currentIcon by lazy {
-		RoundIcon(context).apply {
-			src = R.drawable.current_icon
-			iconColor = Spectrum.green
-			iconSize = 20.uiPX()
-			y += 45.uiPX()
-			x += 32.uiPX()
-		}
-	}
+	private var signalIcon: RoundIcon? = null
+	private var currentIcon: RoundIcon? = null
 
 	init {
 		setGrayStyle()
+		setValueStyle()
 	}
 
 

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.base.baseInfocell
 import android.content.Context
 import android.widget.ImageView
 import android.widget.LinearLayout
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
@@ -24,7 +25,7 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 
 	protected val icon by lazy { RoundIcon(context) }
 	protected val info by lazy { TwoLineTitles(context) }
-	protected val count by lazy { TwoLineTitles(context) }
+	protected var count: TwoLineTitles? = null
 
 	init {
 
@@ -54,21 +55,18 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 	}
 
 	fun setValueStyle(isScaleIcon: Boolean = false) {
-
 		if (isScaleIcon) icon.scaleType = ImageView.ScaleType.CENTER_INSIDE
 		else icon.scaleType = ImageView.ScaleType.CENTER_CROP
-
-		this.addView(count.apply {
+		if (count.isNull()) {
+			count = TwoLineTitles(context)
+			this.addView(count)
+		}
+		count?.apply {
 			isFloatRight = true
 			x -= 30.uiPX()
 			setBlackTitles()
-		})
-
-		count.apply {
 			setCenterInVertical()
 			setAlignParentRight()
 		}
-
 	}
-
 }
