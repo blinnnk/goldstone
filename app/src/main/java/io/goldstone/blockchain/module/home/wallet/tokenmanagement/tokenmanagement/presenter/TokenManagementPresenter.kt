@@ -8,8 +8,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
@@ -21,44 +19,44 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
  */
 
 class TokenManagementPresenter(
-  override val fragment: TokenManagementFragment
+	override val fragment: TokenManagementFragment
 ) : BaseOverlayPresenter<TokenManagementFragment>() {
 
-  override fun onFragmentDestroy() {
-    fragment.getMainActivity()?.apply {
-      supportFragmentManager.findFragmentByTag(FragmentTag.home)
-        .findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-          presenter.updateAllTokensInWalletBy()
-        }
-    }
-  }
+	override fun onFragmentDestroy() {
+		fragment.getMainActivity()?.apply {
+			supportFragmentManager.findFragmentByTag(FragmentTag.home)
+				.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
+					presenter.updateAllTokensInWallet()
+				}
+		}
+	}
 
-  fun showTokenManagementFragment() {
-    fragment.apply {
+	fun showTokenManagementFragment() {
+		fragment.apply {
 
-      addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content) {
-        // Send Arguments
-      }
+			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content) {
+				// Send Arguments
+			}
 
-      overlayView.header.apply {
-        showSearchButton(true) {
-          showTokenSearchFragment()
-          showSearchInput {
-            popFragmentFrom<TokenSearchFragment>()
-            activity?.apply { SoftKeyboard.hide(this) }
-          }
-        }
-      }
-    }
-  }
+			overlayView.header.apply {
+				showSearchButton(true) {
+					showTokenSearchFragment()
+					showSearchInput {
+						popFragmentFrom<TokenSearchFragment>()
+						activity?.apply { SoftKeyboard.hide(this) }
+					}
+				}
+			}
+		}
+	}
 
-  private fun TokenManagementFragment.showTokenSearchFragment() {
-    childFragmentManager.fragments.apply {
-      if (last() is TokenManagementListFragment) hideChildFragment(last())
-      addFragmentAndSetArgument<TokenSearchFragment>(ContainerID.content) {
-        // Send Arguments
-      }
-    }
-  }
+	private fun TokenManagementFragment.showTokenSearchFragment() {
+		childFragmentManager.fragments.apply {
+			if (last() is TokenManagementListFragment) hideChildFragment(last())
+			addFragmentAndSetArgument<TokenSearchFragment>(ContainerID.content) {
+				// Send Arguments
+			}
+		}
+	}
 
 }

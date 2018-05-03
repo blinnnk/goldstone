@@ -18,7 +18,6 @@ import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -128,11 +127,7 @@ class TokenDetailPresenter(
 
 	private fun TokenDetailFragment.updateDataByAsyncDataStatus(data: ArrayList<TransactionListModel>) {
 		tokenDetailData = data
-		asyncData.isNull() isTrue {
-			asyncData = data
-		} otherwise {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
-		}
+		asyncData = data
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetwork(context) isTrue {
 			data.prepareTokenHistoryBalance(fragment.symbol!!) {
@@ -189,9 +184,8 @@ class TokenDetailPresenter(
 				coroutinesTask({
 					history.forEachIndexed { index, data ->
 						TokenBalanceTable.insertOrUpdate(
-							symbol,
-							WalletTable.current.address,
-							data.date,
+							symbol, WalletTable.current.address, data.date,
+							// 插入今日的余额数据
 							if (index == 0) todayBalance else data.balance
 						)
 					}
