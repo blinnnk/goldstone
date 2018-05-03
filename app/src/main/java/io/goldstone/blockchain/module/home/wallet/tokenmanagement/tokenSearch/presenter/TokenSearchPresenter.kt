@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 
 import android.widget.EditText
 import com.blinnnk.extension.*
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
