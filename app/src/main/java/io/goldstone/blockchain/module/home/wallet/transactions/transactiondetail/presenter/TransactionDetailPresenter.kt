@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -88,10 +89,25 @@ class TransactionDetailPresenter(
 		// 这个是从通知中心进入的, 通知中心的显示是现查账.
 		notificationTransaction?.let { transaction ->
 			currentHash = transaction.hash
-			fragment.apply {
-				getMainActivity()?.showLoadingView()
-				updateTransactionByNotificationHash(transaction) {
-					getMainActivity()?.removeLoadingView()
+			// 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
+			// 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+			TransactionTable.getTransactionByHashAndReceivedStatus(
+				transaction.hash, transaction.isReceived
+			) { localTransaction ->
+				if (localTransaction.isNull()) {
+					// 如果本地没有数据从链上查询所有需要的数据
+					fragment.apply {
+						getMainActivity()?.showLoadingView()
+						updateTransactionByNotificationHash(transaction) {
+							getMainActivity()?.removeLoadingView()
+						}
+					}
+				} else {
+					// 本地有数据直接展示本地数据
+					localTransaction?.apply {
+						fragment.asyncData = generateModels(TransactionListModel(localTransaction))
+						updateHeaderValue(value.toDouble(), fromAddress, symbol, false, isReceive)
+					}
 				}
 			}
 		}
@@ -354,7 +370,7 @@ class TransactionDetailPresenter(
 	// 自动监听交易完成后, 将转账信息插入数据库
 	private fun updateDataInDatabase(data: TransactionReceipt) {
 		GoldStoneDataBase.database.transactionDao().apply {
-			getTransactionsByTaxHash(data.transactionHash)?.let {
+			getTransactionByTaxHash(data.transactionHash)?.let {
 				update(it.apply {
 					blockNumber = data.blockNumber.toString()
 					isPending = false

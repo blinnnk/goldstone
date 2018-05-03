@@ -14,16 +14,19 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
  */
 
 class WalletGenerationPresenter(
-  override val fragment: WalletGenerationFragment
+	override val fragment: WalletGenerationFragment
 ) : BaseOverlayPresenter<WalletGenerationFragment>() {
 
-  fun showCreateWalletFragment() {
-    fragment.apply {
-      addFragmentAndSetArgument<CreateWalletFragment>(ContainerID.content, FragmentTag.walletCreation) {
-        // Send Argument
-      }
-      headerTitle = CreateWalletText.create
-    }
-  }
+	fun showCreateWalletFragment() {
+		fragment.apply {
+			addFragmentAndSetArgument<CreateWalletFragment>(
+				ContainerID.content,
+				FragmentTag.walletCreation
+			) {
+				// Send Argument
+			}
+			headerTitle = CreateWalletText.create
+		}
+	}
 
 }

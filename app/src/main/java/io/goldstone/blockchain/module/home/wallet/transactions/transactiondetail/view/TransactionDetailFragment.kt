@@ -15,24 +15,24 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class TransactionDetailFragment : BaseRecyclerFragment<TransactionDetailPresenter, TransactionDetailModel>() {
+class TransactionDetailFragment :
+	BaseRecyclerFragment<TransactionDetailPresenter, TransactionDetailModel>() {
 
-  override val presenter = TransactionDetailPresenter(this)
+	override val presenter = TransactionDetailPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<TransactionDetailModel>?
-  ) {
-    recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) {
-      onClick {
-        if(model.description == TransactionText.url) {
-          presenter.showEtherScanTransactionFragment()
-        } else {
-          this@TransactionDetailFragment.context?.clickToCopy(model.info)
-        }
-        preventDuplicateClicks()
-      }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionDetailModel>?
+	) {
+		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) {
+			onClick {
+				if (model.description == TransactionText.url) {
+					presenter.showEtherScanTransactionFragment()
+				} else {
+					this@TransactionDetailFragment.context?.clickToCopy(model.info)
+				}
+				preventDuplicateClicks()
+			}
+		}
+	}
 
 }
