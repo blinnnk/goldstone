@@ -79,6 +79,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	open fun observingRecyclerViewScrollState(state: Int) {
 		// Do Something
+		if (state == 1) {
+			activity?.apply {  SoftKeyboard.hide(this) }
+		}
 	}
 
 	open fun observingRecyclerViewScrolled(dx: Int, dy: Int) {
