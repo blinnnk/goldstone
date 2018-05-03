@@ -15,24 +15,32 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class WalletSettingsListFragment : BaseRecyclerFragment<WalletSettingsListPresenter, WalletSettingsListModel>() {
+class WalletSettingsListFragment :
+	BaseRecyclerFragment<WalletSettingsListPresenter, WalletSettingsListModel>() {
 
-  override val presenter = WalletSettingsListPresenter(this)
+	override val presenter = WalletSettingsListPresenter(this)
 
-  override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?) {
-    recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray()) {
-      onClick {
-        if(model.title == WalletSettingsText.delete) {
-          presenter.deleteWallet()
-        } else {
-          presenter.showTargetFragment(model.title)
-        }
-        preventDuplicateClicks()
-      }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<WalletSettingsListModel>?
+	) {
+		recyclerView.adapter = WalletSettingsListAdapter(asyncData.orEmptyArray()) {
+			// 余额的 `Cell` 不显示箭头
+			if(model.title == WalletSettingsText.balance) {
+				hasArrow = false
+			}
+			onClick {
+				if (model.title == WalletSettingsText.delete) {
+					presenter.deleteWallet()
+				} else {
+					presenter.showTargetFragment(model.title)
+				}
+				preventDuplicateClicks()
+			}
+		}
+	}
 
-  override fun setSlideUpWithCellHeight() = 50.uiPX()
+	override fun setSlideUpWithCellHeight() = 50.uiPX()
 
 
 }

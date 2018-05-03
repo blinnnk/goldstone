@@ -2,14 +2,17 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 
 import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
+import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -18,11 +21,9 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter.KeystoreExportPresenter
 import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
-import android.text.method.ScrollingMovementMethod
-import com.blinnnk.util.clickToCopy
-import org.jetbrains.anko.matchParent
 
 /**
  * @date 06/04/2018 1:46 AM
@@ -58,8 +59,8 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				typeface = GoldStoneFont.heavy(context)
 				text = "Enter password and then click confirm button to get private key"
 			}.click {
-					context.clickToCopy(privateKeyTextView.text.toString())
-				}.into(this)
+				context.clickToCopy(privateKeyTextView.text.toString())
+			}.into(this)
 
 			passwordInput.apply {
 				setPasswordInput()
@@ -76,10 +77,11 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 					topMargin = 15.uiPX()
 				}
 			}.click {
-					presenter.getPrivateKeyByAddress(passwordInput) {
-						privateKeyTextView.text = this
-					}
-				}.into(this)
+				presenter.getPrivateKeyByAddress(passwordInput) {
+					privateKeyTextView.text = this
+				}
+				it.preventDuplicateClicks()
+			}.into(this)
 		}
 	}
 
