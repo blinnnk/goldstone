@@ -48,9 +48,7 @@ fun Context.generateWallet(
 }
 
 fun Context.getWalletByMnemonic(
-	mnemonicCode: String,
-	password: String,
-	hold: (address: String?) -> Unit
+	mnemonicCode: String, password: String, hold: (address: String?) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val path = "m/44'/60'/0'/0/0"
@@ -100,8 +98,7 @@ fun Context.getWalletByPrivateKey(
 }
 
 fun Context.getCurrentAccount(
-	walletAddress: String,
-	hold: (currentAccount: Account, keystore: KeyStore) -> Unit
+	walletAddress: String, hold: (currentAccount: Account, keystore: KeyStore) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -144,9 +141,7 @@ fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String
 }
 
 fun Context.deleteAccount(
-	walletAddress: String,
-	password: String,
-	callback: (correctPassword: Boolean) -> Unit
+	walletAddress: String, password: String, callback: (correctPassword: Boolean) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -155,12 +150,20 @@ fun Context.deleteAccount(
 	(0 until keyStore.accounts.size()).forEach { index ->
 		keyStore.accounts.get(index).address.hex.let {
 			it.equals(walletAddress, true) isTrue {
+				// 先通过解锁来严重密码的正确性, 在通过结果执行删除钱包操作
+				var isCorrect: Boolean
 				try {
-					keyStore.deleteAccount(keyStore.accounts.get(index), password)
-					callback(true)
+					keyStore.unlock(keyStore.accounts.get(index), password)
+					isCorrect = true
 				} catch (error: Exception) {
 					callback(false)
+					isCorrect = false
 					println(error)
+				}
+
+				if (isCorrect == true) {
+					keyStore.deleteAccount(keyStore.accounts.get(index), password)
+					callback(true)
 				}
 			}
 		}
@@ -168,10 +171,7 @@ fun Context.deleteAccount(
 }
 
 fun Context.updatePassword(
-	walletAddress: String,
-	oldPassword: String,
-	newPassword: String,
-	callback: () -> Unit
+	walletAddress: String, oldPassword: String, newPassword: String, callback: () -> Unit
 ) {
 	getPrivateKey(walletAddress, oldPassword) { privateKey ->
 		deleteAccount(walletAddress, oldPassword) {

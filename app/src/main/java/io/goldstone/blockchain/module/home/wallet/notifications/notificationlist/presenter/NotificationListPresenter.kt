@@ -5,7 +5,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.NotificationText
@@ -50,6 +49,7 @@ class NotificationListPresenter(
 			} otherwise {
 				fragment.getMainActivity()?.removeLoadingView()
 			}
+			setHeightMatchParent()
 		}
 	}
 
