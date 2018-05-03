@@ -5,10 +5,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.component.HoneyRadioButton
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -71,6 +68,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
     if (icon.isNull()) {
       icon = ImageView(context).apply {
         layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+        addCorner(17.uiPX(), GrayScale.whiteGray)
       }
       icon?.into(this)
       icon?.setCenterInVertical()
