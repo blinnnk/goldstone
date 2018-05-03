@@ -34,6 +34,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				setCenterInVertical()
 				setAlignParentRight()
 			}
+			arrowY = 0f
 		} else {
 			title.setAlignParentBottom()
 			icon.setAlignParentBottom()
@@ -44,7 +45,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			title.y -= 19.uiPX().toFloat()
 			icon.y -= 17.uiPX()
 			info.y -= 20.uiPX()
-			arrowY = 16.uiPX().toFloat()
+			arrowY += 16.uiPX().toFloat()
 		}
 	}
 
@@ -53,7 +54,6 @@ class ProfileCell(context: Context) : BaseCell(context) {
 	private val info by lazy { TextView(context) }
 
 	init {
-
 		icon.into(this)
 		title.apply {
 			textColor = Spectrum.white
