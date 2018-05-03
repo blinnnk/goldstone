@@ -1,28 +1,24 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view
 
+import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.widget.LinearLayout
-import com.blinnnk.extension.getRealScreenHeight
+import android.widget.EditText
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.blinnnk.extension.into
-import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.WalletEditText
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.util.HoneyUIUtils
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 22/03/2018 11:40 PM
@@ -31,46 +27,95 @@ import org.jetbrains.anko.verticalLayout
 
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
 
-  private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
-  private val confirmButton by lazy { RoundButton(context!!) }
-  private val mnemonicInput by lazy { WalletEditText(context!!) }
-  private val attentionTextView by lazy { AttentionTextView(context!!) }
+	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
+	private val confirmButton by lazy { RoundButton(context!!) }
+	private val mnemonicInput by lazy { WalletEditText(context!!) }
+	private val attentionTextView by lazy { AttentionTextView(context!!) }
 
-  override val presenter = MnemonicConfirmationPresenter(this)
+	override val presenter = MnemonicConfirmationPresenter(this)
 
-  override fun AnkoContext<Fragment>.initView() {
-    verticalLayout {
-      attentionTextView
-        .apply { text = CreateWalletText.mnemonicConfirmationDescription }
-        .into(this)
+	override fun AnkoContext<Fragment>.initView() {
+		verticalLayout {
+			attentionTextView.apply { text = CreateWalletText.mnemonicConfirmationDescription }.into(this)
 
-      mnemonicInput
-        .apply {
-          hint = "confirm mnemonic which you got before"
-        }
-        .into(this)
+			mnemonicInput.apply {
+				hint = "confirm mnemonic which you got before"
+			}.into(this)
 
-      confirmButton
-        .apply {
-          text = CommonText.confirm.toUpperCase()
-          marginTop = 20.uiPX()
-          setBlueStyle()
-        }
-        .click {
-          presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
-        }
-        .into(this)
+			// 根据助记词生成勾选助记词的按钮集合
+			relativeLayout {
 
-      textView("What is mnemonic?") {
-        textSize = 5.uiPX().toFloat()
-        typeface = GoldStoneFont.heavy(context)
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-          topMargin = activity?.getRealScreenHeight().orZero() - 460.uiPX() - HoneyUIUtils.getHeight(attentionTextView)
-        }
-        textColor = Spectrum.blue
-        gravity = Gravity.CENTER
-      }
-    }
-  }
+				lparams {
+					width = ScreenSize.widthWithPadding
+					height = 180.uiPX()
+					leftMargin = PaddingSize.device
+					topMargin = 20.uiPX()
+				}
+
+				var contentWidth = 0
+				var contentTopMargin = 0
+				var modulus = 0
+
+				mnemonicCode?.split(" ".toRegex())?.shuffled()?.forEachIndexed { index, content ->
+					val wordWidth = content.count() * 12.uiPX() + 10.uiPX()
+					var isSelected = false
+					textView {
+						id = index
+						text = content
+						textColor = Spectrum.blue
+						textSize = 5.uiPX().toFloat()
+						backgroundColor = GrayScale.whiteGray
+						layoutParams = RelativeLayout.LayoutParams(wordWidth, 30.uiPX())
+						gravity = Gravity.CENTER
+
+						onClick {
+							selectMnemonic(mnemonicInput, isSelected)
+							isSelected = !isSelected
+						}
+
+						if (contentWidth > ScreenSize.widthWithPadding - 100.uiPX()) {
+							contentWidth = 0
+							modulus = index
+							contentTopMargin += 35.uiPX()
+						}
+						x = contentWidth.toFloat() + (index - modulus) * 10.uiPX()
+						y = contentTopMargin.toFloat()
+						contentWidth += wordWidth
+					}
+				}
+			}
+
+			confirmButton.apply {
+				text = CommonText.confirm.toUpperCase()
+				marginTop = 20.uiPX()
+				setBlueStyle()
+			}.click {
+				presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
+			}.into(this)
+
+			textView("What is mnemonic?") {
+				textSize = 5.uiPX().toFloat()
+				typeface = GoldStoneFont.heavy(context)
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())
+				x = PaddingSize.device.toFloat()
+				textColor = Spectrum.blue
+				gravity = Gravity.CENTER
+			}
+		}
+	}
+
+	@SuppressLint("SetTextI18n")
+	private fun TextView.selectMnemonic(input: EditText, isSelected: Boolean) {
+		if (isSelected) {
+			backgroundColor = GrayScale.whiteGray
+			textColor = Spectrum.blue
+			input.setText(input.text.toString().replace((" " + text.toString()), ""))
+		} else {
+			backgroundColor = Spectrum.blue
+			textColor = Spectrum.white
+			val newContent = if(input.text.isEmpty()) text.toString() else " " + text.toString()
+			input.setText(input.text.toString() + newContent)
+		}
+	}
 
 }

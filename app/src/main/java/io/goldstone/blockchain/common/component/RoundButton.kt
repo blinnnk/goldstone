@@ -15,6 +15,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
 
 /**
@@ -24,100 +25,121 @@ import io.goldstone.blockchain.common.value.Spectrum
 
 class RoundButton(context: Context) : View(context) {
 
-  var text by observing("") {
-    invalidate()
-  }
+	var text by observing("") {
+		invalidate()
+	}
 
-  var marginTop = 0
+	var marginTop = 0
 
-  private val textPaint = Paint()
-  private var textSize: Float by observing(0f) {
-    textPaint.textSize = textSize
-    invalidate()
-  }
+	private val textPaint = Paint()
+	private var textSize: Float by observing(0f) {
+		textPaint.textSize = textSize
+		invalidate()
+	}
 
-  init {
+	init {
 
-    textPaint.isAntiAlias = true
-    textPaint.style = Paint.Style.FILL
-    textPaint.typeface = GoldStoneFont.heavy(context)
+		textPaint.isAntiAlias = true
+		textPaint.style = Paint.Style.FILL
+		textPaint.typeface = GoldStoneFont.heavy(context)
 
-    // 视觉垂直居中的微调
-    y += 2.uiPX()
+		// 视觉垂直居中的微调
+		y += 2.uiPX()
 
-  }
+	}
 
-  @SuppressLint("DrawAllocation")
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+	@SuppressLint("DrawAllocation")
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-    val textX = (width - textPaint.measureText(text)) / 2
-    val textY = (height + textSize) / 2 - 2.uiPX()
-    canvas?.drawText(text, textX, textY, textPaint)
+		val textX = (width - textPaint.measureText(text)) / 2
+		val textY = (height + textSize) / 2 - 2.uiPX()
+		canvas?.drawText(text, textX, textY, textPaint)
 
-    canvas?.save()
-  }
+		canvas?.save()
+	}
 
-  fun setWhiteStyle() {
+	fun setWhiteStyle() {
+		textSize = 13.uiPX().toFloat()
 
-    textSize = 13.uiPX().toFloat()
+		layoutParams =
+			LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
+				topMargin = marginTop
+				leftMargin = PaddingSize.device
+			}
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
-      topMargin = marginTop
-      leftMargin = PaddingSize.device
-    }
+		addTouchRippleAnimation(
+			Spectrum.white,
+			Spectrum.yellow,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = Spectrum.blue
+		elevation = 10f
+		invalidate()
+	}
 
-    addTouchRippleAnimation(Spectrum.white, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = Spectrum.blue
-    invalidate()
-  }
+	fun setGrayStyle(top: Int? = null) {
 
-  fun setGrayStyle(top: Int? = null) {
+		textSize = 14.uiPX().toFloat()
 
-    textSize = 14.uiPX().toFloat()
+		layoutParams =
+			LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
+				topMargin = top ?: marginTop
+				leftMargin = PaddingSize.device
+			}
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
-      topMargin = top ?: marginTop
-      leftMargin = PaddingSize.device
-    }
+		addTouchRippleAnimation(
+			GrayScale.lightGray,
+			Spectrum.yellow,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = GrayScale.midGray
+		elevation = 10f
+		invalidate()
+	}
 
-    addTouchRippleAnimation(GrayScale.lightGray, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = GrayScale.midGray
-    invalidate()
-  }
+	fun setBlueStyle(top: Int? = null) {
 
-  fun setBlueStyle(top: Int? = null) {
+		textSize = 14.uiPX().toFloat()
 
-    textSize = 14.uiPX().toFloat()
+		layoutParams =
+			LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
+				topMargin = top ?: marginTop
+				leftMargin = PaddingSize.device
+			}
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 45.uiPX()).apply {
-      topMargin = top ?: marginTop
-      leftMargin = PaddingSize.device
-    }
+		addTouchRippleAnimation(
+			Spectrum.blue,
+			Spectrum.white,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = Spectrum.white
+		elevation = 10f
+		invalidate()
+	}
 
-    addTouchRippleAnimation(Spectrum.blue, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = Spectrum.white
-    invalidate()
-  }
+	fun setSmallButton(color: Int, textColor: Int = Spectrum.white) {
 
-  fun setSmallButton(color: Int, textColor: Int = Spectrum.white) {
+		textSize = 11.uiPX().toFloat()
 
-    textSize = 11.uiPX().toFloat()
+		layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
+			topMargin = marginTop
+			leftMargin = PaddingSize.device
+		}
 
-    layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
-      topMargin = marginTop
-      leftMargin = PaddingSize.device
-    }
+		addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
+		textPaint.color = textColor
+		elevation = 10f
+		invalidate()
+	}
 
-    addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = textColor
-    invalidate()
-  }
-
-  fun updateColor(color: Int, textColor: Int = Spectrum.white) {
-    addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
-    textPaint.color = textColor
-    invalidate()
-  }
+	fun updateColor(color: Int, textColor: Int = Spectrum.white) {
+		addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
+		textPaint.color = textColor
+		invalidate()
+	}
 
 }
