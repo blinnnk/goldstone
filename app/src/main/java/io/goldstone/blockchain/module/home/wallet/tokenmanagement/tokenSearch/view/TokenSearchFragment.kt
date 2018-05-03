@@ -18,35 +18,34 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTokenTable>() {
 
-  override val presenter = TokenSearchPresenter(this)
+	override val presenter = TokenSearchPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<DefaultTokenTable>?
-  ) {
-    recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { cell ->
-      cell.switch.onClick { cell.setMyTokenStatus() }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?
+	) {
+		recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { cell ->
+			cell.switch.onClick { cell.setMyTokenStatus() }
+		}
+	}
 
-  private fun TokenSearchCell.setMyTokenStatus() {
-    model?.let {
-      DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
-        localToken.isNotNull {
-          insertTokenToDataBase(this)
-        } otherwise {
-          DefaultTokenTable.insertTokenInfo(it) {
-            insertTokenToDataBase(this)
-          }
-        }
-      }
-    }
-  }
+	private fun TokenSearchCell.setMyTokenStatus() {
+		model?.let {
+			DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
+				localToken.isNotNull {
+					insertTokenToDataBase(this)
+				} otherwise {
+					DefaultTokenTable.insertTokenInfo(it) {
+						insertTokenToDataBase(this)
+					}
+				}
+			}
+		}
+	}
 
-  private fun insertTokenToDataBase(cell: TokenSearchCell) {
-    getMainActivity()?.apply {
-      TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
-    }
-  }
+	private fun insertTokenToDataBase(cell: TokenSearchCell) {
+		getMainActivity()?.apply {
+			TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
+		}
+	}
 
 }
