@@ -18,49 +18,52 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationModel>() {
 
-  private val slideHeader by lazy { QuotationSlideHeader(context!!) }
+	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
 
-  override val presenter = QuotationPresenter(this)
+	override val presenter = QuotationPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<QuotationModel>?
-  ) {
-    recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
-      onClick {
-        presenter.showMarketTokenDetailFragment(model.pairDisplay)
-        preventDuplicateClicks()
-      }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<QuotationModel>?
+	) {
+		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
+			onClick {
+				presenter.showMarketTokenDetailFragment(model.pairDisplay)
+				preventDuplicateClicks()
+			}
+		}
+	}
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    wrapper.addView(slideHeader)
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		wrapper.addView(slideHeader)
 
-    slideHeader.apply {
-      addTokenButton.apply {
-        onClick {
-          presenter.showQuotationManagement()
-          preventDuplicateClicks()
-        }
-      }
-    }
-  }
+		slideHeader.apply {
+			addTokenButton.apply {
+				onClick {
+					presenter.showQuotationManagement()
+					preventDuplicateClicks()
+				}
+			}
+		}
+	}
 
-  private var isShow = false
-  private val headerHeight = 50.uiPX()
+	private var isShow = false
+	private val headerHeight = 50.uiPX()
+	private var totalRange = 0
 
-  override fun observingRecyclerViewVerticalOffset(offset: Int) {
-    if (offset >= headerHeight && !isShow) {
-      slideHeader.onHeaderShowedStyle()
-      isShow = true
-    }
+	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 
-    if (offset < headerHeight && isShow) {
-      slideHeader.onHeaderHidesStyle()
-      isShow = false
-    }
-  }
+		if (totalRange == 0) totalRange = range
+
+		if (offset >= headerHeight && !isShow) {
+			slideHeader.onHeaderShowedStyle()
+			isShow = true
+		}
+
+		if (range > totalRange - headerHeight && isShow) {
+			slideHeader.onHeaderHidesStyle()
+			isShow = false
+		}
+	}
 
 }

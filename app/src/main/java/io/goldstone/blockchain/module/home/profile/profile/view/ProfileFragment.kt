@@ -52,7 +52,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
 
-	override fun observingRecyclerViewVerticalOffset(offset: Int) {
+	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
