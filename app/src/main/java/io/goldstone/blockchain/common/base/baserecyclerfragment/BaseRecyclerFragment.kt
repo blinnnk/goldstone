@@ -80,7 +80,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	open fun observingRecyclerViewScrollState(state: Int) {
 		// Do Something
 		if (state == 1) {
-			activity?.apply {  SoftKeyboard.hide(this) }
+			activity?.apply { SoftKeyboard.hide(this) }
 		}
 	}
 
@@ -88,7 +88,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		// Do Something
 	}
 
-	open fun observingRecyclerViewVerticalOffset(offset: Int) {
+	open fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 		// Do Something
 	}
 
@@ -182,7 +182,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
 				super.onScrolled(recyclerView, dx, dy)
 				observingRecyclerViewScrolled(dx, dy)
-				observingRecyclerViewVerticalOffset(recyclerView?.computeVerticalScrollOffset().orZero())
+				observingRecyclerViewVerticalOffset(
+					recyclerView?.computeVerticalScrollOffset().orZero(),
+					recyclerView?.computeVerticalScrollRange().orZero()
+				)
 				observingRecyclerViewHorizontalOffset(recyclerView?.computeHorizontalScrollOffset().orZero())
 			}
 		})
