@@ -17,11 +17,11 @@ class CurrencyCell(context: Context) : BaseRadioCell(context) {
     title.text = model.symbol
     checkedStatus = model.isChecked
     val image = when(model.symbol) {
-      "CNY" -> R.drawable.ic_china
-      "JPY" -> R.drawable.ic_japan
-      "KRW" -> R.drawable.ic_korea
-      "RUB" -> R.drawable.ic_russia
-      else -> R.drawable.ic_usa
+      "CNY" -> R.drawable.china_icon
+      "JPY" -> R.drawable.japan_icon
+      "KRW" -> R.drawable.korea_icon
+      "RUB" -> R.drawable.russia_icon
+      else -> R.drawable.amercia_icon
     }
     showIcon(image)
   }
