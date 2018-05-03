@@ -37,9 +37,10 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
-			// 如果新旧数据一样就不再执行更新逻辑
+			// 判断是否更新数据或直接从内存读取数据显示
 			if (latestSelectionMD5 == selections.getObjectMD5HexString() && !memoryData.isNull()) {
 				fragment.asyncData = memoryData
+				if (!currentSocket.isSocketConnected()) currentSocket.runSocket()
 				return@getMySelections
 			}
 			// 把最近一次数据的 MD5 值存入内存, 任何需要更新数据的逻辑会先行比对是否需要更新
