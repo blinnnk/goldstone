@@ -19,7 +19,6 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 
 	private val slideHeader by lazy { ProfileSlideHeader(context!!) }
-
 	override val presenter = ProfilePresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -31,9 +30,10 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			item.apply {
 				// 调整布局
 				if (position == 4) {
-					item.layoutParams.height += 30.uiPX()
+					item.layoutParams.height = 90.uiPX()
 					isCenterInVertical = false
 				} else {
+					item.layoutParams.height = 60.uiPX()
 					isCenterInVertical = true
 				}
 				onClick {

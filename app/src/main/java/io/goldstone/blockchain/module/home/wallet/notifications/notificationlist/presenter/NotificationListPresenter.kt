@@ -25,49 +25,47 @@ import java.io.Serializable
 data class NotificationTransactionInfo(val hash: String, val isReceived: Boolean) : Serializable
 
 class NotificationListPresenter(
-  override val fragment: NotificationListFragment
+	override val fragment: NotificationListFragment
 ) : BaseRecyclerPresenter<NotificationListFragment, NotificationTable>() {
 
-  override fun updateData() {
-    super.updateData()
-    getDataFromDatabase()
-  }
+	override fun updateData() {
+		super.updateData()
+		getDataFromDatabase()
+	}
 
-  private fun getDataFromDatabase() {
-    fragment.getMainActivity()?.showLoadingView()
-    NotificationTable.getAllNotifications { localData ->
-      val latestTime =localData.maxBy { it.createTIme }?.createTIme
-      val requestTime = if (latestTime.isNull()) 0 else latestTime!!
-      fragment.asyncData.isNull() isFalse {
-        diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
-      } otherwise {
-        fragment.asyncData = localData
-      }
-      updateDataFromServer(requestTime)
-    }
-  }
+	private fun getDataFromDatabase() {
+		fragment.getMainActivity()?.showLoadingView()
+		NotificationTable.getAllNotifications { localData ->
+			val latestTime = localData.maxBy { it.createTIme }?.createTIme
+			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
+			fragment.asyncData.isNull() isFalse {
+				diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
+			} otherwise {
+				fragment.asyncData = localData
+			}
+			updateDataFromServer(requestTime)
+		}
+	}
 
-  private fun updateDataFromServer(requestTime: Long) {
-    AppConfigTable.getAppConfig { config ->
-      GoldStoneAPI.getNotificationList(config?.goldStoneID.orEmpty(), requestTime) {
-        fragment.getMainActivity()?.removeLoadingView()
-        it.isNotEmpty() isTrue {
-          NotificationTable.insertData(it.map { NotificationTable(it) }.toArrayList()) {
-            getDataFromDatabase()
-          }
-        }
-      }
-    }
-  }
+	private fun updateDataFromServer(requestTime: Long) {
+		AppConfigTable.getAppConfig { config ->
+			GoldStoneAPI.getNotificationList(config?.goldStoneID.orEmpty(), requestTime) {
+				fragment.getMainActivity()?.removeLoadingView()
+				it.isNotEmpty() isTrue {
+					NotificationTable.insertData(it.map { NotificationTable(it) }.toArrayList()) {
+						getDataFromDatabase()
+					}
+				}
+			}
+		}
+	}
 
-  fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
-    fragment.getParentFragment<NotificationFragment>()?.apply {
-      presenter.showTargetFragment<TransactionDetailFragment>(
-        TransactionText.detail,
-        NotificationText.notification,
-        Bundle().apply { putSerializable(ArgumentKey.notificationTransaction, transactionInfo) }
-      )
-    }
-  }
+	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
+		fragment.getParentFragment<NotificationFragment>()?.apply {
+			presenter.showTargetFragment<TransactionDetailFragment>(TransactionText.detail,
+				NotificationText.notification,
+				Bundle().apply { putSerializable(ArgumentKey.notificationTransaction, transactionInfo) })
+		}
+	}
 
 }

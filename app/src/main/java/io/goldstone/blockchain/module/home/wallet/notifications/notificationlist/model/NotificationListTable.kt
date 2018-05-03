@@ -49,7 +49,7 @@ data class NotificationTable(
       coroutinesTask({
         GoldStoneDataBase.database.notificationDao().getAllNotifications()
       }) {
-        hold(it.toArrayList())
+        hold(it.sortedByDescending { it.createTIme }.toArrayList())
       }
     }
 
