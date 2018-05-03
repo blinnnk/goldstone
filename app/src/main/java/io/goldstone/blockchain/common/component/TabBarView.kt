@@ -93,7 +93,7 @@ class TabItem(context: Context) : View(context) {
     style = Paint.Style.FILL
     color = GrayScale.midGray
     textSize = 12.uiPX().toFloat()
-    typeface = GoldStoneFont.medium(context)
+    typeface = GoldStoneFont.heavy(context)
   }
 
   private val path = HoneySvgPathConvert()

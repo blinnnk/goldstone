@@ -16,167 +16,180 @@ import java.io.IOException
 
 object GoldStoneEthCall {
 
-  lateinit var context: Context
+	lateinit var context: Context
 
-  private enum class Method(val method: String, val code: String = "") {
-    GetSymbol("eth_call", SolidityCode.ethCall),
-    GetTokenBalance("eth_call", SolidityCode.getTokenBalance),
-    GetBalance("eth_getBalance"),
-    GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
-    GetTokenDecimal("eth_call", SolidityCode.getDecimal),
-    GetTokenName("eth_call", SolidityCode.getTokenName),
-    SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
-  }
+	private enum class Method(val method: String, val code: String = "") {
+		GetSymbol("eth_call", SolidityCode.ethCall),
+		GetTokenBalance("eth_call", SolidityCode.getTokenBalance), GetBalance("eth_getBalance"),
+		GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
+		GetTokenDecimal("eth_call", SolidityCode.getDecimal),
+		GetTokenName("eth_call", SolidityCode.getTokenName),
+		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
+	}
 
-  @JvmStatic private val contentType = MediaType.parse("application/json; charset=utf-8")
-  @JvmStatic private infix fun String.withAddress(address: String) = this + address.checkAddressInRules()
-  @JvmStatic private fun String.checkAddressInRules() =
-    if (substring(0, 2) == "0x") substring(2 until length) else this
+	@JvmStatic
+	private val contentType = MediaType.parse("application/json; charset=utf-8")
 
-  /**
-   * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
-   */
-  @JvmStatic
-  fun getAddressInfoInToken(contractAddress: String, walletAddress: String) {
-    getTokenSymbol(contractAddress) { symbol ->
-      getTokenName(contractAddress) { name ->
-        getTokenDecimal(contractAddress) { decimal ->
-          getTokenTotalSupply(contractAddress) { totalSupply ->
-            getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
-              // 用的时候再完善这里
-              println(symbol + name + decimal + totalSupply + tokenBalance)
-            }
-          }
-        }
-      }
-    }
-  }
+	@JvmStatic
+	private infix fun String.withAddress(address: String) = this + address.checkAddressInRules()
 
-  @JvmStatic
-  fun getTokenInfoByContractAddress(
-    contractAddress: String,
-    hold: (symbol: String, name: String, decimal: Double) -> Unit
-  ) {
-    getTokenSymbol(contractAddress) { symbol ->
-      getTokenName(contractAddress) { name ->
-        getTokenDecimal(contractAddress) { decimal ->
-          hold(symbol, name, decimal)
-        }
-      }
-    }
-  }
+	@JvmStatic
+	private fun String.checkAddressInRules() =
+		if (substring(0, 2) == "0x") substring(2 until length) else this
 
-  /**
-   * @description 查询某一个 [walletAddress] 在 [contractAddress] 下是否存有余额
-   */
-  @JvmStatic
-  fun getAddressInfoWithTokenBalance(contractAddress: String, walletAddress: String) {
-    getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
-      getTokenSymbol(contractAddress) { symbol ->
-        getTokenName(contractAddress) { name ->
-          getTokenDecimal(contractAddress) { decimal ->
-            getTokenTotalSupply(contractAddress) { totalSupply ->
-              // 用的时候再完善这里
-              println(symbol + name + decimal + totalSupply + tokenBalance)
-            }
-          }
-        }
-      }
-    }
-  }
+	/**
+	 * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
+	 */
+	@JvmStatic
+	fun getAddressInfoInToken(contractAddress: String, walletAddress: String) {
+		getTokenSymbol(contractAddress) { symbol ->
+			getTokenName(contractAddress) { name ->
+				getTokenDecimal(contractAddress) { decimal ->
+					getTokenTotalSupply(contractAddress) { totalSupply ->
+						getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
+							// 用的时候再完善这里
+							println(symbol + name + decimal + totalSupply + tokenBalance)
+						}
+					}
+				}
+			}
+		}
+	}
 
-  fun getTokenCountWithDecimalByContract(contractAddress: String, walletAddress: String, hold: (Double) -> Unit) {
-    getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
-      getTokenDecimal(contractAddress) {
-        hold(tokenBalance / Math.pow(10.0, it))
-      }
-    }
-  }
+	@JvmStatic
+	fun getTokenInfoByContractAddress(
+		contractAddress: String, hold: (symbol: String, name: String, decimal: Double) -> Unit
+	) {
+		getTokenSymbol(contractAddress) { symbol ->
+			getTokenName(contractAddress) { name ->
+				getTokenDecimal(contractAddress) { decimal ->
+					hold(symbol, name, decimal)
+				}
+			}
+		}
+	}
 
-  @JvmStatic
-  fun sendRawTransaction(signTransactions: String, holdValue: (String) -> Unit) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it) }
-    }
-  }
+	/**
+	 * @description 查询某一个 [walletAddress] 在 [contractAddress] 下是否存有余额
+	 */
+	@JvmStatic
+	fun getAddressInfoWithTokenBalance(contractAddress: String, walletAddress: String) {
+		getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
+			getTokenSymbol(contractAddress) { symbol ->
+				getTokenName(contractAddress) { name ->
+					getTokenDecimal(contractAddress) { decimal ->
+						getTokenTotalSupply(contractAddress) { totalSupply ->
+							// 用的时候再完善这里
+							println(symbol + name + decimal + totalSupply + tokenBalance)
+						}
+					}
+				}
+			}
+		}
+	}
 
-  @JvmStatic
-  fun getTokenBalanceWithContract(contractAddress: String, address: String, holdValue: (Double) -> Unit) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.hexToDecimal()) }
-    }
-  }
+	fun getTokenCountWithDecimalByContract(
+		contractAddress: String, walletAddress: String, hold: (Double) -> Unit
+	) {
+		getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
+			getTokenDecimal(contractAddress) {
+				hold(tokenBalance / Math.pow(10.0, it))
+			}
+		}
+	}
 
-  @JvmStatic
-  fun getTokenSymbol(contractAddress: String, holdValue: (String) -> Unit = {}) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.toAscii()) }
-    }
-  }
+	@JvmStatic
+	fun sendRawTransaction(signTransactions: String, holdValue: (String) -> Unit) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it) }
+		}
+	}
 
-  @JvmStatic
-  private fun getTokenDecimal(contractAddress: String, holdValue: (Double) -> Unit = {}) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.hexToDecimal()) }
-    }
-  }
+	@JvmStatic
+	fun getTokenBalanceWithContract(
+		contractAddress: String, address: String, holdValue: (Double) -> Unit
+	) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it.hexToDecimal()) }
+		}
+	}
 
-  @JvmStatic
-  private fun getTokenName(contractAddress: String, holdValue: (String) -> Unit = {}) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.toAscii()) }
-    }
-  }
+	@JvmStatic
+	fun getTokenSymbol(contractAddress: String, holdValue: (String) -> Unit = {}) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it.toAscii()) }
+		}
+	}
 
-  fun getEthBalance(address: String, holdValue: (Double) -> Unit = {}) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.hexToDecimal()) }
-    }
-  }
+	@JvmStatic
+	private fun getTokenDecimal(contractAddress: String, holdValue: (Double) -> Unit = {}) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it.hexToDecimal()) }
+		}
+	}
 
-  private fun getTokenTotalSupply(contractAddress: String, holdValue: (Double) -> Unit = {}) {
-    RequestBody.create(contentType,
-      "{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
-    ).let {
-      callEthBy(it) { holdValue(it.hexToDecimal()) }
-    }
-  }
+	@JvmStatic
+	private fun getTokenName(contractAddress: String, holdValue: (String) -> Unit = {}) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it.toAscii()) }
+		}
+	}
 
-  private fun callEthBy(body: RequestBody, hold: (String) -> Unit) {
-    val client = OkHttpClient()
-    val request = Request.Builder()
-      .url(APIPath.ropstan)
-      .method("POST", body)
-      .header("Content-type", "application/json")
-      .build()
+	fun getEthBalance(address: String, holdValue: (Double) -> Unit = {}) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}"
+		).let {
+			callEthBy(it) {
+				holdValue(it.hexToDecimal())
+			}
+		}
+	}
 
-    client.newCall(request).enqueue(object : Callback {
-      override fun onFailure(call: Call, error: IOException) {
-        println("$error")
-      }
+	private fun getTokenTotalSupply(contractAddress: String, holdValue: (Double) -> Unit = {}) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
+		).let {
+			callEthBy(it) { holdValue(it.hexToDecimal()) }
+		}
+	}
 
-      @SuppressLint("SetTextI18n")
-      override fun onResponse(call: Call, response: Response) {
-        val data = response.body()?.string()
-        val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
-        try {
-          hold(dataObject["result"].toString())
-        } catch (error: Exception) {
-          Log.e("ERROR", error.toString())
-        }
-      }
-    })
-  }
+	private fun callEthBy(body: RequestBody, hold: (String) -> Unit) {
+		val client = OkHttpClient()
+		val request = Request.Builder().url(APIPath.ropstan).method("POST", body)
+			.header("Content-type", "application/json").build()
+
+		client.newCall(request).enqueue(object : Callback {
+			override fun onFailure(call: Call, error: IOException) {
+				println("$error")
+			}
+
+			@SuppressLint("SetTextI18n")
+			override fun onResponse(call: Call, response: Response) {
+				val data = response.body()?.string()
+				val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+				try {
+					hold(dataObject["result"].toString())
+				} catch (error: Exception) {
+					Log.e("ERROR", error.toString())
+				}
+			}
+		})
+	}
 }
