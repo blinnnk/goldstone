@@ -2,11 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 
 import android.content.Context
 import android.widget.TextView
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
@@ -28,11 +26,11 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
   var model: NotificationTable? by observing(null) {
 
     info.apply {
-      title.text = CryptoUtils.scaleTo28(model?.title.orEmpty())
+      title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
       subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
     }
 
-    date.text = model?.timeDescription
+    date.text = HoneyDateUtil.getSinceTime((model?.createTIme.orElse(0) / 1000).toString())
 
     when (model?.type.orZero()) {
       NotificationType.Transaction.code -> {
