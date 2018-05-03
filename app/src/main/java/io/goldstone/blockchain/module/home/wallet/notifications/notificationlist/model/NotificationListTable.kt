@@ -1,15 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model
 
 import android.arch.persistence.room.*
-import android.text.format.DateUtils
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
-import java.text.DateFormat
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -24,7 +21,6 @@ data class NotificationTable(
   @PrimaryKey(autoGenerate = true) var id: Int,
   @SerializedName("content") val content: String = "",
   @SerializedName("title") val title: String = "",
-  val timeDescription: String = "",
   @SerializedName("create_on") val createTIme: Long = 0L,
   @SerializedName("hash") val transactionHash: String  = "",
   @SerializedName("type") val type: Int  = 0,
@@ -36,7 +32,6 @@ data class NotificationTable(
     0,
     data.content,
     data.title,
-    DateUtils.formatDateTime(GoldStoneAPI.context, data.createTIme, DateFormat.DAY_OF_YEAR_FIELD),
     data.createTIme,
     data.transactionHash,
     data.type,

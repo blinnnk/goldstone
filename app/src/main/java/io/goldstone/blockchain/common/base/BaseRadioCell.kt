@@ -21,59 +21,57 @@ import org.jetbrains.anko.textColor
 
 open class BaseRadioCell(context: Context) : BaseCell(context) {
 
-  var checkedStatus: Boolean by observing(false) {
-    radioButton.isChecked = checkedStatus
-  }
+	var checkedStatus: Boolean by observing(false) {
+		radioButton.isChecked = checkedStatus
+	}
 
-  protected val title = TextView(context)
-  private val radioButton = HoneyRadioButton(context)
+	protected val title = TextView(context)
+	private val radioButton = HoneyRadioButton(context)
 
-  protected var icon: ImageView? = null
+	protected var icon: ImageView? = null
 
-  init {
+	init {
 
-    hasArrow = false
-    setGrayStyle()
+		hasArrow = false
+		setGrayStyle()
 
-    this.addView(title
-      .apply {
-        textSize = 5.uiPX().toFloat()
-        textColor = GrayScale.black
-        typeface = GoldStoneFont.medium(context)
-      })
+		this.addView(title.apply {
+			textSize = 5.uiPX().toFloat()
+			textColor = GrayScale.black
+			typeface = GoldStoneFont.medium(context)
+		})
 
-    title.setCenterInVertical()
+		title.setCenterInVertical()
 
-    this.addView(radioButton
-      .apply {
-        setColorStyle(GrayScale.midGray, Spectrum.green)
-      })
+		this.addView(radioButton.apply {
+			setColorStyle(GrayScale.midGray, Spectrum.green)
+		})
 
-    radioButton.apply {
-      isClickable = false
-      setAlignParentRight()
-      setCenterInVertical()
-    }
+		radioButton.apply {
+			isClickable = false
+			setAlignParentRight()
+			setCenterInVertical()
+		}
 
-    layoutParams.height = 50.uiPX()
+		layoutParams.height = 50.uiPX()
 
-  }
+	}
 
-  fun setSwitchStatusBy(isSelected: Boolean) {
-    radioButton.isChecked = isSelected
-  }
+	fun setSwitchStatusBy(isSelected: Boolean) {
+		radioButton.isChecked = isSelected
+	}
 
-  fun showIcon(image: Int) {
-    title.x = 50.uiPX().toFloat()
-    if (icon.isNull()) {
-      icon = ImageView(context).apply {
-        layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-        addCorner(17.uiPX(), GrayScale.whiteGray)
-      }
-      icon?.into(this)
-      icon?.setCenterInVertical()
-    }
-    icon?.imageResource = image
-  }
+	fun showIcon(image: Int) {
+		title.x = 50.uiPX().toFloat()
+		if (icon.isNull()) {
+			icon = ImageView(context).apply {
+				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+				addCorner(17.uiPX(), GrayScale.whiteGray)
+			}
+			icon?.into(this)
+			icon?.setCenterInVertical()
+		}
+		icon?.imageResource = image
+	}
 
 }
