@@ -187,9 +187,12 @@ class TokenDetailPresenter(
 			// 计算过去7天的所有余额
 			generateHistoryBalance(todayBalance) { history ->
 				coroutinesTask({
-					history.forEach {
+					history.forEachIndexed { index, data ->
 						TokenBalanceTable.insertOrUpdate(
-							symbol, WalletTable.current.address, it.date, it.balance
+							symbol,
+							WalletTable.current.address,
+							data.date,
+							if (index == 0) todayBalance else data.balance
 						)
 					}
 				}) {
