@@ -117,6 +117,18 @@ object ImportWalletText {
 		HoneyLanguage.English.code -> "There is already this account in gold stone"
 		else -> ""
 	}
+
+	@JvmField
+	val exportKeystore = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter password and then click confirm button to get private key"
+		else -> ""
+	}
+
+	@JvmField
+	val exportPrivateKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter password and then click confirm button to get private key"
+		else -> ""
+	}
 }
 
 object WalletText {
