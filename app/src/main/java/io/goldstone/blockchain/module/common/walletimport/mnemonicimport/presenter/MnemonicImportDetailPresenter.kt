@@ -4,7 +4,6 @@ import android.widget.EditText
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
@@ -55,26 +54,22 @@ class MnemonicImportDetailPresenter(
 
 			WalletTable.getAllAddresses {
 				// 查找本地是否已经存在这个钱包
-				if (any { it == address }) {
+				if (any { it.equals(address, true) }) {
 					fragment.context?.alert("The address has already existed")
 					return@getAllAddresses
 				} else {
-					address.isNotNull {
-						coroutinesTask({
-							GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-								it.isNotNull {
-									GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
-								}
-								WalletTable.insert(WalletTable(0, name, address!!, true, hint))
-								CreateWalletPresenter.generateMyTokenInfo(address, true)
-								// 注册钱包地址用于发送 `Push`
-								XinGePushReceiver.registerWalletAddressForPush()
+					coroutinesTask({
+						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
+							it.isNotNull {
+								GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
 							}
-						}) {
-							fragment.activity?.jump<SplashActivity>()
+							WalletTable.insert(WalletTable(0, name, address!!, true, hint))
+							CreateWalletPresenter.generateMyTokenInfo(address, true)
+							// 注册钱包地址用于发送 `Push`
+							XinGePushReceiver.registerWalletAddressForPush()
 						}
-					} otherwise {
-						println("import failed $address")
+					}) {
+						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 			}
