@@ -27,7 +27,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	) {
 		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
 			onClick {
-				presenter.showMarketTokenDetailFragment(model.pairDisplay)
+				presenter.showMarketTokenDetailFragment(model)
 				preventDuplicateClicks()
 			}
 		}
@@ -49,7 +49,6 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
-	private var totalRange = 0
 
 	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 

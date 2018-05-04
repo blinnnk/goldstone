@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.text.format.DateUtils
+import android.util.Log
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -95,6 +96,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private var cellLayout: RelativeLayout? = null
 	private var chartData: ArrayList<Point> by observing(arrayListOf()) {
 		chartView.apply {
+			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
 			setGrid(5,
 				10,
@@ -137,25 +139,17 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				setFontSize(9.uiPX())
 			}
 
-			data.isEmpty() isTrue {
-				addData(dataSet)
+			addData(dataSet)
+
+			try {
 				notifyDataUpdate()
-			} otherwise {
-				data.clear()
-				addData(dataSet)
-				notifyDataUpdate()
+			} catch (error: Exception) {
+				Log.e("ERROR", error.toString())
 			}
 
 			setClickablePointRadius(30.uiPX().toFloat())
 			show()
 		}
-	}
-
-	private fun generateStepDistance(minValue: Double, maxValue: Double): Float {
-		val stepsCount = 5   //代表希望分成几个阶段
-		val roughStep = (maxValue - minValue) / stepsCount
-		val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
-		return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
 	}
 
 	init {
@@ -183,4 +177,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		}
 	}
 
+	companion object {
+		fun generateStepDistance(minValue: Double, maxValue: Double): Float {
+			val stepsCount = 5   //代表希望分成几个阶段
+			val roughStep = (maxValue - minValue) / stepsCount
+			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
+			return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
+		}
+	}
 }

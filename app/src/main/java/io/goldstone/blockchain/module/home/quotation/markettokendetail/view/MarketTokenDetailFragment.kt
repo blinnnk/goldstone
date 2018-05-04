@@ -6,12 +6,13 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -23,72 +24,73 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 
-enum class MarketTokenDetailChartType(val code: Int) {
-  Hour(0), DAY(1), WEEK(2), MONTH(3)
+enum class MarketTokenDetailChartType(
+	val code: Int,
+	val info: String
+) {
+	Hour(0, "1hour"),
+	DAY(1, "1day"),
+	WEEK(2, "1week"),
+	MONTH(3, "1month")
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 
-  private val menu by lazy { ButtonMenu(context!!) }
-  private val chartView by lazy { MarketTokenChart(context!!) }
-  private val currentPriceInfo by lazy { CurrentPriceView(context!!) }
-  private val priceHistroy by lazy { PriceHistoryView(context!!) }
-  private val tokenInfo by lazy { TokenInfoView(context!!) }
-  private val tokenInfomation by lazy { TokenInfomation(context!!) }
+	val currencyInfo by lazy {
+		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
+	}
 
-  override val presenter = MarketTokenDetailPresenter(this)
-  override fun AnkoContext<Fragment>.initView() {
-    scrollView {
-      verticalLayout {
+	private val menu by lazy { ButtonMenu(context!!) }
+	private val chartView by lazy { MarketTokenChart(context!!) }
+	private val currentPriceInfo by lazy { CurrentPriceView(context!!) }
+	private val priceHistroy by lazy { PriceHistoryView(context!!) }
+	private val tokenInfo by lazy { TokenInfoView(context!!) }
+	private val tokenInfomation by lazy { TokenInfomation(context!!) }
 
-        lparams {
-          width = ScreenSize.widthWithPadding
-          height = matchParent
-          leftMargin = PaddingSize.device
-        }
+	override val presenter = MarketTokenDetailPresenter(this)
+	override fun AnkoContext<Fragment>.initView() {
+		scrollView {
+			verticalLayout {
+				lparams {
+					width = ScreenSize.widthWithPadding
+					height = matchParent
+					leftMargin = PaddingSize.device
+				}
+				menu.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+				}.into(this)
+				menu.titles = arrayListOf(
+					MarketTokenDetailChartType.Hour.info,
+					MarketTokenDetailChartType.DAY.info,
+					MarketTokenDetailChartType.WEEK.info,
+					MarketTokenDetailChartType.MONTH.info
+				)
+				menu.getButton { button ->
+					button.onClick {
+						presenter.updateChartByMenu(chartView, button.id)
+						menu.selected(button.id)
+						button.preventDuplicateClicks()
+					}
+				}
+				menu.selected(MarketTokenDetailChartType.Hour.code)
+				chartView.into(this)
+				// 默认加载小时的图标数据
+				presenter.updateChartByMenu(chartView, MarketTokenDetailChartType.Hour.code)
 
-        menu.apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-        }.into(this)
-        menu.titles = arrayListOf("HOUR", "DAY", "WEEK", "MONTH")
-        menu.getButton { button ->
-          button.onClick {
-            presenter.updateChartByMenu(chartView, button.id)
-            menu.selected(button.id)
-            button.preventDuplicateClicks()
-          }
-        }
-        menu.selected(MarketTokenDetailChartType.Hour.code)
+				currentPriceInfo.apply {
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 20.uiPX()
+					}
+				}.into(this)
+				currentPriceInfo.model = CurrentPriceModel(15.872, "USDT", "+13.56%")
 
-        chartView.into(this)
-        chartView.chartData = arrayListOf(
-          Point("11", 10f),
-          Point("12", 30f),
-          Point("13", 50f),
-          Point("14", 20f),
-          Point("15", 70f),
-          Point("16", 10f),
-          Point("17", 30f),
-          Point("18", 50f),
-          Point("19", 20f),
-          Point("20", 70f)
-        )
-
-        currentPriceInfo.apply {
-          setMargins<LinearLayout.LayoutParams> {
-            topMargin = 20.uiPX()
-          }
-        }.into(this)
-        currentPriceInfo.model = CurrentPriceModel(15.872, "USDT", "+13.56%")
-
-        priceHistroy.into(this)
-        tokenInfo.into(this)
-        tokenInfomation.into(this)
-
-        tokenInfomation.model = TokenInfomationModel("5", "128,189,290,238", "$ 289,321,289,291")
-      }
-    }
-  }
+				priceHistroy.into(this)
+				tokenInfo.into(this)
+				tokenInfomation.into(this)
+				tokenInfomation.model = TokenInfomationModel("5", "128,189,290,238", "$ 289,321,289,291")
+			}
+		}
+	}
 
 
 }

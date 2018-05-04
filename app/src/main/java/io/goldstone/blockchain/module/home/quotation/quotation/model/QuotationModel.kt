@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.model
 
 import com.db.chart.model.Point
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import java.io.Serializable
 
 /**
  * @date 26/03/2018 8:57 PM
@@ -19,7 +20,7 @@ data class QuotationModel(
 	val pairDisplay: String = "",
 	val pair: String = "",
 	val quoteSymbol: String = ""
-) {
+): Serializable {
 	constructor(
 		data: QuotationSelectionTable,
 		price: String,
