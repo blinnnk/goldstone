@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view
 
-import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
@@ -38,7 +37,6 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 
 	override val presenter = KeystoreExportPresenter(this)
 
-	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			lparams(matchParent, matchParent)
@@ -57,9 +55,12 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				textSize = 5.uiPX().toFloat()
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.heavy(context)
-				text = "Enter password and then click confirm button to get private key"
+				text = ImportWalletText.exportKeystore
 			}.click {
-				context.clickToCopy(privateKeyTextView.text.toString())
+				// 如果 `textview` 的内容不是默认的 `placeholder` 就可以支持点击复制
+				if (it.text.toString() != ImportWalletText.exportKeystore) {
+					context.clickToCopy(privateKeyTextView.text.toString())
+				}
 			}.into(this)
 
 			passwordInput.apply {

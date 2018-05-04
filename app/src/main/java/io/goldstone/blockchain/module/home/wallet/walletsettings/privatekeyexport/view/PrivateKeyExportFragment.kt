@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view
 
-import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -37,7 +36,6 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
 	override val presenter = PrivateKeyExportPresenter(this)
 
-	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			lparams(matchParent, matchParent)
@@ -54,10 +52,13 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				textSize = 5.uiPX().toFloat()
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.heavy(context)
-				text = "Enter password and then click confirm button to get private key"
+				text = ImportWalletText.exportPrivateKey
 			}.click {
+				// 如果 `textview` 的内容不是默认的 `placeholder` 就可以支持点击复制
+				if (it.text.toString() != ImportWalletText.exportPrivateKey) {
 					context.clickToCopy(privateKeyTextView.text.toString())
-				}.into(this)
+				}
+			}.into(this)
 
 			passwordInput.apply {
 				setPasswordInput()
@@ -74,11 +75,11 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					topMargin = 15.uiPX()
 				}
 			}.click {
-					presenter.getPrivateKeyByAddress(passwordInput) {
-						privateKeyTextView.text = this
-					}
+				presenter.getPrivateKeyByAddress(passwordInput) {
+					privateKeyTextView.text = this
+				}
 				it.preventDuplicateClicks()
-				}.into(this)
+			}.into(this)
 
 		}
 	}
