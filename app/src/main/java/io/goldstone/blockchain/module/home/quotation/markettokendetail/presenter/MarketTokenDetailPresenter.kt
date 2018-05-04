@@ -9,9 +9,13 @@ import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.CurrentPriceModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenChart
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
+import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
+import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import org.jetbrains.anko.runOnUiThread
 
@@ -29,6 +33,14 @@ class MarketTokenDetailPresenter(
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
+		}
+	}
+
+	fun MarketTokenDetailFragment.updateCurrentPriceInfo(data: CurrencyPriceInfoModel) {
+		currencyInfo?.apply {
+			if (data.pair == pair) {
+				currentPriceInfo.model = CurrentPriceModel(data, quoteSymbol)
+			}
 		}
 	}
 
@@ -58,12 +70,26 @@ class MarketTokenDetailPresenter(
 							it.timestamp
 						}.map {
 							Point(
-								DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType),
-								it.price.toFloat()
+								DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType), it.price.toFloat()
 							)
 						}.toArrayList()
 					}
 				}
+			}
+			// 开启长连接更新实时价格
+			updateCurrencyPriceInfo()
+		}
+	}
+
+	private fun QuotationModel.updateCurrencyPriceInfo() {
+		// 传默认值
+		fragment.currentPriceInfo.model = CurrentPriceModel()
+		// 长连接获取数据
+		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair), {
+			it.runSocket()
+		}) {
+			if (it.pair == pair) {
+				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
 			}
 		}
 	}

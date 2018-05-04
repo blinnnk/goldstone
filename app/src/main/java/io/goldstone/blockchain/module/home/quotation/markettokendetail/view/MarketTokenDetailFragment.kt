@@ -11,13 +11,11 @@ import io.goldstone.blockchain.common.component.ButtonMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -25,13 +23,9 @@ import org.jetbrains.anko.verticalLayout
  */
 
 enum class MarketTokenDetailChartType(
-	val code: Int,
-	val info: String
+	val code: Int, val info: String
 ) {
-	Hour(0, "1hour"),
-	DAY(1, "1day"),
-	WEEK(2, "1week"),
-	MONTH(3, "1month")
+	Hour(0, "1hour"), DAY(1, "1day"), WEEK(2, "1week"), MONTH(3, "1month")
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
@@ -40,9 +34,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
 	}
 
+	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
+
 	private val menu by lazy { ButtonMenu(context!!) }
 	private val chartView by lazy { MarketTokenChart(context!!) }
-	private val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val priceHistroy by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInfomation by lazy { TokenInfomation(context!!) }
@@ -82,15 +77,24 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 						topMargin = 20.uiPX()
 					}
 				}.into(this)
-				currentPriceInfo.model = CurrentPriceModel(15.872, "USDT", "+13.56%")
 
 				priceHistroy.into(this)
 				tokenInfo.into(this)
 				tokenInfomation.into(this)
-				tokenInfomation.model = TokenInfomationModel("5", "128,189,290,238", "$ 289,321,289,291")
+
+				setCurrencyInf()
 			}
 		}
 	}
 
-
+	private fun setCurrencyInf() {
+		currencyInfo?.let { info ->
+			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
+				context?.runOnUiThread {
+					tokenInfomation.model = TokenInfomationModel(it)
+					priceHistroy.model = PriceHistoryModel(it, info.quoteSymbol)
+				}
+			}
+		}
+	}
 }

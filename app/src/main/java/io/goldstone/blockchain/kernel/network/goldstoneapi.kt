@@ -181,14 +181,16 @@ object GoldStoneAPI {
 	}
 
 	fun getQuotationCurrencyChart(
-		pair: String,
-		period: String,
-		size: Int,
-		hold: (ArrayList<ChartModel>) -> Unit
+		pair: String, period: String, size: Int, hold: (ArrayList<ChartModel>) -> Unit
 	) {
-
 		requestData<ChartModel>(APIPath.getQuotationCurrencyChart(pair, period, size), "point_list") {
 			hold(this.toArrayList())
+		}
+	}
+
+	fun getQuotationCurrencyInfo(pair: String, hold: (JSONObject) -> Unit) {
+		requestData<String>(APIPath.getQuotationCurrencyInfo(pair), "", true) {
+			hold(JSONObject(this[0]))
 		}
 	}
 
@@ -257,7 +259,7 @@ object GoldStoneAPI {
 				val data = response.body()?.string()
 				try {
 					val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
-					val jsonData = dataObject[keyName].toString()
+					val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 					if (justGetData) {
 						hold(listOf(jsonData as T))
 					} else {

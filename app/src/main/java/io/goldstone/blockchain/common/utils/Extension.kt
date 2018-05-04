@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Paint
 import android.support.v4.app.Fragment
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.json.JSONObject
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -29,67 +31,73 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * */
 
 fun <T : View> T.assignWidth(width: Int): T {
-  layoutParams.width = width
-  return this
+	layoutParams.width = width
+	return this
 }
 
 fun <T : View> T.assignHeight(height: Int): T {
-  layoutParams.height = height
-  return this
+	layoutParams.height = height
+	return this
 }
 
 fun <T : View> T.click(callback: (T) -> Unit): T {
-  onClick { callback(this@click) }
-  return this
+	onClick { callback(this@click) }
+	return this
 }
 
 fun CharSequence.measureTextWidth(fontSize: Float): Float {
-  val textPaint = Paint().apply {
-    textSize = fontSize
-  }
-  return textPaint.measureText(this.toString())
+	val textPaint = Paint().apply {
+		textSize = fontSize
+	}
+	return textPaint.measureText(this.toString())
 }
 
 fun Fragment.getMainActivity() = activity as? MainActivity
 fun Context.getMainActivity() = this as? MainActivity
 
 fun Context.alert(message: String) {
-  alert(Appcompat, message).show()
+	alert(Appcompat, message).show()
 }
 
 fun Context.showAlertView(
-  title: String,
-  subtitle: String,
-  showEditText: Boolean = true,
-  action: (EditText?) -> Unit
+	title: String, subtitle: String, showEditText: Boolean = true, action: (EditText?) -> Unit
 ) {
-  var input: EditText? = null
-  alert(
-    subtitle, title
-  ) {
-    showEditText isTrue {
-      customView {
-        verticalLayout {
-          lparams {
-            padding = 20.uiPX()
-          }
-          input = editText {
-            hintTextColor = Spectrum.opacity1White
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            hint = CommonText.enterPassword
-          }
-        }
-      }
-    }
-    yesButton { if (showEditText) input?.apply(action) else action(input) }
-    noButton { }
-  }.show()
+	var input: EditText? = null
+	alert(
+		subtitle, title
+	) {
+		showEditText isTrue {
+			customView {
+				verticalLayout {
+					lparams {
+						padding = 20.uiPX()
+					}
+					input = editText {
+						hintTextColor = Spectrum.opacity1White
+						inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+						hint = CommonText.enterPassword
+					}
+				}
+			}
+		}
+		yesButton { if (showEditText) input?.apply(action) else action(input) }
+		noButton { }
+	}.show()
 }
 
 fun ArrayList<String>.toJsonArray(callback: (JsonArray) -> Unit) {
-  val stringArray = JsonArray()
-  forEachOrEnd { item, isEnd ->
-    stringArray.add(item)
-    if (isEnd) callback(stringArray)
-  }
+	val stringArray = JsonArray()
+	forEachOrEnd { item, isEnd ->
+		stringArray.add(item)
+		if (isEnd) callback(stringArray)
+	}
+}
+
+fun JSONObject.safeGet(key: String): String {
+	return try {
+		get(key).toString()
+	} catch (error: Exception) {
+		Log.e("ERROR", error.toString())
+		""
+	}
 }
