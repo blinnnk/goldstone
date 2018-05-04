@@ -13,7 +13,6 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.Curr
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenChart
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
-import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -34,14 +33,8 @@ class MarketTokenDetailPresenter(
 		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
 		}
-	}
 
-	fun MarketTokenDetailFragment.updateCurrentPriceInfo(data: CurrencyPriceInfoModel) {
-		currencyInfo?.apply {
-			if (data.pair == pair) {
-				currentPriceInfo.model = CurrentPriceModel(data, quoteSymbol)
-			}
-		}
+		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
 
 	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
@@ -76,8 +69,6 @@ class MarketTokenDetailPresenter(
 					}
 				}
 			}
-			// 开启长连接更新实时价格
-			updateCurrencyPriceInfo()
 		}
 	}
 

@@ -87,6 +87,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		}
 	}
 
+
 	private fun setCurrencyInf() {
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
