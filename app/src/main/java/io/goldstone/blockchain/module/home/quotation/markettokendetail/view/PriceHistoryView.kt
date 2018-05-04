@@ -5,34 +5,58 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.utils.safeGet
+import io.goldstone.blockchain.common.value.QuotationText
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
+import org.json.JSONObject
 
 /**
  * @date 25/04/2018 9:04 AM
  * @author KaySaith
  */
 
+data class PriceHistoryModel(
+	val dayHighest: String,
+	val dayLow: String,
+	val totalHighest: String,
+	val totalLow: String,
+	val baseSymbol: String
+) {
+	constructor(data: JSONObject, symbol: String) : this(
+		data.safeGet("high_24"),
+		data.safeGet("low_24"),
+		data.safeGet("high_total"),
+		data.safeGet("low_total"),
+		symbol
+	)
+}
+
 class PriceHistoryView(context: Context) : MarketTokenDetailBaseCell(context) {
 
-  private val dayPrice = MarketTokenDetailBaseInfoCell(context)
-  private val totalPrice = MarketTokenDetailBaseInfoCell(context)
+	var model: PriceHistoryModel? by observing(null) {
+		model?.apply {
+			dayPrice.setPricesubtitle("$dayHighest / $dayLow", baseSymbol)
+			totalPrice.setPricesubtitle("$totalHighest / $totalLow", baseSymbol)
+		}
+	}
 
-  init {
-    title.text = "Price History"
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
+	private val dayPrice = MarketTokenDetailBaseInfoCell(context)
+	private val totalPrice = MarketTokenDetailBaseInfoCell(context)
 
-    verticalLayout {
-      dayPrice.into(this)
-      totalPrice.into(this)
+	init {
+		title.text = QuotationText.priceHistory
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
 
-      dayPrice.setPriceTitle("24 Hours")
-      totalPrice.setPriceTitle("Total")
+		dayPrice.setPriceTitle("24 Hours")
+		totalPrice.setPriceTitle("Total")
 
-      dayPrice.setPricesubtitle("13.56 / 12.78", "USDT")
-      totalPrice.setPricesubtitle("17.56 / 3.65", "USDT")
-      y -= 10.uiPX()
-    }.setAlignParentBottom()
-  }
+		verticalLayout {
+			dayPrice.into(this)
+			totalPrice.into(this)
+			y -= 10.uiPX()
+		}.setAlignParentBottom()
+	}
 
 }

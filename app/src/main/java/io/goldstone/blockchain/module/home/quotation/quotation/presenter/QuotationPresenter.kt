@@ -37,12 +37,15 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
+			// 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行
+			currentSocket?.runSocket()
+
 			// 判断是否更新数据或直接从内存读取数据显示
 			if (latestSelectionMD5 == selections.getObjectMD5HexString() && !memoryData.isNull()) {
 				fragment.asyncData = memoryData
-				if (!currentSocket.isSocketConnected()) currentSocket.runSocket()
 				return@getMySelections
 			}
+
 			// 把最近一次数据的 MD5 值存入内存, 任何需要更新数据的逻辑会先行比对是否需要更新
 			latestSelectionMD5 = selections.getObjectMD5HexString()
 			selections.map { selection ->
@@ -60,7 +63,8 @@ class QuotationPresenter(
 					diffAndUpdateAdapterData<QuotationAdapter>(it)
 					fragment.setEmptyViewBy(it)
 				}
-				currentSocket.runSocket()
+				// 设定 `Socket` 并执行
+				setSocket { currentSocket?.runSocket() }
 			}
 		}
 	}
@@ -83,31 +87,25 @@ class QuotationPresenter(
 		}
 	}
 
-	/**
-	 * 准备长连接, 发送参数. 并且在返回结果的地方异步更新界面上的 `UI`.
-	 */
-	private val currentSocket: GoldStoneWebSocket = object : GoldStoneWebSocket() {
-		override fun onOpened() {
-			// 如果没有订阅的数据直接退出逻辑
-			if (fragment.asyncData?.isEmpty() == true) return
-			fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
-				sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
-			}
-		}
-
-		override fun getServerBack(content: JSONObject) {
-			fragment.updateAdapterDataset(CurrencyPriceInfoModel(content))
+	private var currentSocket: GoldStoneWebSocket? = null
+	private fun setSocket(callback: () -> Unit) {
+		fragment.asyncData?.isEmpty()?.isTrue { return }
+		getPriceInfoBySocket(fragment.asyncData?.map { it.pair }?.toArrayList(), {
+			currentSocket = it
+			callback()
+		}) {
+			fragment.updateAdapterDataset(it)
 		}
 	}
 
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		if (isHidden) {
-			currentSocket.isSocketConnected() isTrue {
-				currentSocket.closeSocket()
+			currentSocket?.isSocketConnected()?.isTrue {
+				currentSocket?.closeSocket()
 			}
 		} else {
-			currentSocket.isSocketConnected() isFalse {
-				currentSocket.runSocket()
+			currentSocket?.isSocketConnected()?.isFalse {
+				currentSocket?.runSocket()
 			}
 		}
 	}
@@ -149,6 +147,28 @@ class QuotationPresenter(
 			Point(timeStamp.toString(), jsonarray.getJSONObject(it)["price"].toString().toFloat())
 		}.reversed().let {
 			return it.toArrayList()
+		}
+	}
+
+	companion object {
+		fun getPriceInfoBySocket(
+			pairList: ArrayList<String>? = null,
+			holdSocket: (GoldStoneWebSocket) -> Unit = {},
+			hold: (CurrencyPriceInfoModel) -> Unit
+		) {
+			/**
+			 * 准备长连接, 发送参数. 并且在返回结果的地方异步更新界面上的 `UI`.
+			 */
+			object : GoldStoneWebSocket() {
+				override fun onOpened() {
+					pairList?.toJsonArray {
+						sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
+					}
+				}
+				override fun getServerBack(content: JSONObject) {
+					hold(CurrencyPriceInfoModel(content))
+				}
+			}.apply(holdSocket)
 		}
 	}
 }

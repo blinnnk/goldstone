@@ -572,6 +572,18 @@ object QuotationText {
 		HoneyLanguage.English.code -> "alarm"
 		else -> ""
 	}
+
+	@JvmField
+	val currentPrice = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Current Price"
+		else -> ""
+	}
+
+	@JvmField
+	val priceHistory = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Price History"
+		else -> ""
+	}
 }
 
 object PincodeText {
