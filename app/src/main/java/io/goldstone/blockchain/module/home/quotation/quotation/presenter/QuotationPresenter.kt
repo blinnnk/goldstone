@@ -55,9 +55,10 @@ class QuotationPresenter(
 				memoryData = it
 				fragment.asyncData.isNull() isTrue {
 					fragment.asyncData = it
+					fragment.setEmptyViewBy(it)
 				} otherwise {
-					if (fragment.asyncData.orEmptyArray().isEmpty()) fragment.removeEmptyView()
 					diffAndUpdateAdapterData<QuotationAdapter>(it)
+					fragment.setEmptyViewBy(it)
 				}
 				currentSocket.runSocket()
 			}
@@ -135,9 +136,9 @@ class QuotationPresenter(
 		}
 	}
 
-	fun showMarketTokenDetailFragment(symbol: String) {
+	fun showMarketTokenDetailFragment(model: QuotationModel) {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-			putString(ArgumentKey.quotationOverlayTitle, symbol)
+			putSerializable(ArgumentKey.quotationOverlayInfo, model)
 		}
 	}
 

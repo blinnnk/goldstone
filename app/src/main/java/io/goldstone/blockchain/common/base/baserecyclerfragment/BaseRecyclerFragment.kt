@@ -236,4 +236,12 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 
+	fun setEmptyViewBy(data: ArrayList<D>) {
+		if (data.isEmpty()) {
+			showEmptyView()
+		} else {
+			removeEmptyView()
+		}
+	}
+
 }
