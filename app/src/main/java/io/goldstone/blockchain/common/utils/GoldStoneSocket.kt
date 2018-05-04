@@ -20,7 +20,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	private val tag: String = "GoldStoneWebSocket"
 	private val timeout = 30000L
 	private val normalCloseCode = 1000
-	private val serverURL = "ws://118.89.147.176:8001/ws"
+	private val serverURL = "ws://150.109.49.242:8001/ws"
 	private var isConnected = false
 	private val handler = Handler(Looper.getMainLooper())
 	private val handlerPing = Handler(Looper.getMainLooper())
@@ -41,7 +41,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 		webSocket?.send("{\"t\": \"ping\", \"time\": ${System.currentTimeMillis()}}")
 	}
 
-	fun reportStatus() {
+	private fun reportStatus() {
 		// 每 `5s` 像服务器汇报一下链接状态
 		handlerPing.removeCallbacks(pingRunnable)
 		handlerPing.postDelayed(pingRunnable, 5000L)

@@ -116,11 +116,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			val dataSet = LineSet()
 			dataSet.apply {
 				chartData.forEach {
-					addPoint(Point(DateUtils.formatDateTime(
-						context,
-						it.label.toLong(),
-						DateUtils.FORMAT_NO_YEAR
-					), it.value))
+					addPoint(
+						Point(
+							DateUtils.formatDateTime(
+								context, it.label.toLong(), DateUtils.FORMAT_NO_YEAR
+							), it.value
+						)
+					)
 				}
 				// 这个是线的颜色
 				color = chartLineColor

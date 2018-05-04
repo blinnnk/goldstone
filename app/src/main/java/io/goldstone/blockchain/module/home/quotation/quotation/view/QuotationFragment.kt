@@ -53,14 +53,11 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 
 	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 
-		if (totalRange == 0) totalRange = range
-
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
 		}
-
-		if (range > totalRange - headerHeight && isShow) {
+		if (offset < headerHeight && isShow) {
 			slideHeader.onHeaderHidesStyle()
 			isShow = false
 		}

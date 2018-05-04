@@ -57,13 +57,13 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	private var totalRange = 0
 
 	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
-
+		if (offset == 0) totalRange = 0
 		if (totalRange == 0) totalRange = range
+
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
 		}
-
 		if (range > totalRange - headerHeight && isShow) {
 			slideHeader.onHeaderHidesStyle()
 			isShow = false
