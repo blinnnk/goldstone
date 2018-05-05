@@ -29,6 +29,12 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	}
 
 	private fun TokenSearchCell.setMyTokenStatus() {
+		// 更新缓存中的数据, 防止 `Recycler` 复用的时候 `switch` `UI` 样式变化
+		asyncData?.find {
+			it.symbol == model?.symbol
+		}?.let {
+			it.isUsed = switch.isChecked
+		}
 		model?.let {
 			DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
 				localToken.isNotNull {

@@ -2,13 +2,14 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 
 import android.widget.EditText
 import com.blinnnk.extension.*
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -58,10 +59,18 @@ class TokenSearchPresenter(
 		val isSearchSymbol = inputValue.length != CryptoValue.contractAddressLength
 
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(inputValue) { result ->
-			// 从服务器请求目标结果
-
-			isNotNull {
-				hold(result.map { DefaultTokenTable(it) }.toArrayList())
+			result.isNotNull {
+				// 从服务器请求目标结果
+				MyTokenTable.getTokensWith(WalletTable.current.address) { localTokens ->
+					result.map { serverToken ->
+						// 更新使用中的按钮状态
+						DefaultTokenTable(serverToken).apply {
+							isUsed = localTokens.any { it.symbol == serverToken.symbol }
+						}
+					}.let {
+						hold(it.toArrayList())
+					}
+				}
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 				isSearchSymbol.isFalse {
