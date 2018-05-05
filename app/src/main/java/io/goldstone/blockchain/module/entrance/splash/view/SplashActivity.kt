@@ -38,6 +38,5 @@ class SplashActivity : AppCompatActivity() {
 		}.let {
 			setContentView(it)
 		}
-
 	}
 }

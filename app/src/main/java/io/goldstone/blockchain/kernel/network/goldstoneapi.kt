@@ -156,12 +156,12 @@ object GoldStoneAPI {
 	}
 
 	fun registerWalletAddress(
-		addressList: JsonArray, deviceID: String, hold: (String) -> Unit
+		addressList: JsonArray, deviceID: String, netWorkError: () -> Unit = {}, hold: (String) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		RequestBody.create(contentType, "{\"address_list\":$addressList,\"device\":\"$deviceID\"}")
 			.let {
-				postRequest(it, APIPath.updateAddress) {
+				postRequest(it, APIPath.updateAddress, netWorkError) {
 					hold(it)
 				}
 			}
@@ -222,14 +222,17 @@ object GoldStoneAPI {
 		})
 	}
 
-	private fun postRequest(body: RequestBody, path: String, hold: (String) -> Unit) {
+	private fun postRequest(
+		body: RequestBody, path: String, netWorkError: () -> Unit = {}, hold: (String) -> Unit
+	) {
 		val client = OkHttpClient()
 		val request =
 			Request.Builder().url(path).method("POST", body).header("Content-type", "application/json")
 				.build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
-				println("$error")
+				Log.e("ERROR", error.toString())
+				netWorkError()
 			}
 
 			@SuppressLint("SetTextI18n")
@@ -306,9 +309,12 @@ object GoldStoneAPI {
 }
 
 object GoldStoneCode {
-	fun isSuccess(code: Any, callback: () -> Unit) {
-		if (code == 0) callback()
-		else Log.e("ERROR", "Wrong Code")
+	fun isSuccess(code: Any, callback: (isSuccessful: Boolean) -> Unit) {
+		if (code == 0) callback(true)
+		else {
+			callback(false)
+			Log.e("ERROR", "Wrong Code")
+		}
 	}
 }
 
