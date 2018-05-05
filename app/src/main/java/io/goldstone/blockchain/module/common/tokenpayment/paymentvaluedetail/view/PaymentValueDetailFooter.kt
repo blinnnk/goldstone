@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.vi
 import android.content.Context
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseCell
@@ -54,7 +53,6 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
       }
       .click {
         confirmClickEvent?.run()
-        it.preventDuplicateClicks()
       }
       .into(this)
   }

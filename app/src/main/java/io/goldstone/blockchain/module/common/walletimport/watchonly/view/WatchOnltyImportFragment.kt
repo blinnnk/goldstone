@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -18,7 +17,10 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import org.jetbrains.anko.*
 
@@ -61,7 +63,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
       nameInput
         .apply {
           setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-          text = CreateWalletText.name
+          title = CreateWalletText.name
         }
         .into(this)
 
@@ -80,7 +82,6 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
         }
         .click {
           presenter.importWatchOnlyWallet(addressInput, nameInput)
-          it.preventDuplicateClicks()
         }
         .into(this)
 

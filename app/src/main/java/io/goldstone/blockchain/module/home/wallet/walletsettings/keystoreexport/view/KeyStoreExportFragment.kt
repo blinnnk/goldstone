@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -68,7 +67,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 30.uiPX()
 				}
-				text = CreateWalletText.password
+				title = CreateWalletText.password
 			}.into(this)
 
 			confirmButton.apply {
@@ -81,7 +80,6 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				presenter.getPrivateKeyByAddress(passwordInput) {
 					privateKeyTextView.text = this
 				}
-				it.preventDuplicateClicks()
 			}.into(this)
 		}
 	}

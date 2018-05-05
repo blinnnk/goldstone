@@ -63,7 +63,8 @@ class MarketTokenDetailPresenter(
 							it.timestamp
 						}.map {
 							Point(
-								DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType), it.price.toFloat()
+								DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType),
+								it.price.toFloat()
 							)
 						}.toArrayList()
 					}

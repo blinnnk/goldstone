@@ -55,13 +55,13 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 				}
 
 				newPinCode.apply {
-					text = PincodeText.pincode
+					title = PincodeText.pincode
 					setPinCodeInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 				}.into(this)
 
 				repeatPinCode.apply {
-					text = PincodeText.repeat
+					title = PincodeText.repeat
 					setPinCodeInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 				}.into(this)

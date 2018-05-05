@@ -35,7 +35,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
       lparams(matchParent, matchParent)
       nameInput
         .apply {
-          text = WalletSettingsText.walletNameSettings
+          title = WalletSettingsText.walletNameSettings
           setMargins<LinearLayout.LayoutParams> {
             topMargin = 40.uiPX()
             bottomMargin = 30.uiPX()

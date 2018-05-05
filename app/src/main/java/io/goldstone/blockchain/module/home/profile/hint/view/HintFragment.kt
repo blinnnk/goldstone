@@ -37,7 +37,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		verticalLayout {
 			lparams(matchParent, matchParent)
 			hintInput.apply {
-				text = CreateWalletText.hint
+				title = CreateWalletText.hint
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 30.uiPX()
 				}

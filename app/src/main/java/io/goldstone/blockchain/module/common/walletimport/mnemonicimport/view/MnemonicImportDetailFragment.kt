@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -53,7 +52,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
         pathInput
           .apply {
-            text = "Path"
+            title = "Path"
             hint = "m/44'/60'/0'/0/0"
             setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
           }
@@ -62,7 +61,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
         walletNameInput
           .apply {
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.name
+            title = CreateWalletText.name
           }
           .into(this)
 
@@ -70,7 +69,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
           .apply {
             setPasswordInput()
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.password
+            title = CreateWalletText.password
           }
           .into(this)
 
@@ -78,7 +77,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
           .apply {
             setPasswordInput()
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.repeatPassword
+            title = CreateWalletText.repeatPassword
           }
           .into(this)
 
@@ -86,7 +85,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
           .apply {
             setTextInput()
             setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-            text = CreateWalletText.hint
+            title = CreateWalletText.hint
           }
           .into(this)
 
@@ -107,7 +106,6 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
               agreementView.radioButton.isChecked,
               walletNameInput
             )
-            it.preventDuplicateClicks()
           }
           .into(this)
 

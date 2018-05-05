@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -50,23 +49,23 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
 				nameInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-					text = CreateWalletText.name
+					title = CreateWalletText.name
 				}.into(this)
 
 				passwordInput.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					text = CreateWalletText.password
+					title = CreateWalletText.password
 				}.into(this)
 
 				repeatPassword.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					text = CreateWalletText.repeatPassword
+					title = CreateWalletText.repeatPassword
 				}.into(this)
 
 				passwordHintInput.apply {
-					text = CreateWalletText.hint
+					title = CreateWalletText.hint
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 				}.into(this)
@@ -86,7 +85,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						nameInput,
 						passwordHintInput
 					)
-					it.preventDuplicateClicks()
 				}.into(this)
 
 
