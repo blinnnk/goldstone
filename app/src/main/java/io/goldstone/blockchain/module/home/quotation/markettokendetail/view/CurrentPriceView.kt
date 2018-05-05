@@ -42,6 +42,7 @@ class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
 
 		percent.text = model.percent + "%"
 
+		// 增减显示不同的颜色
 		if (model.percent.toDouble() < 0.0) {
 			percent.textColor = Spectrum.red
 		} else {

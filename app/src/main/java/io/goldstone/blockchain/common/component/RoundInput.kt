@@ -32,13 +32,13 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class RoundInput(context: Context) : EditText(context) {
+open class RoundInput(context: Context) : EditText(context) {
 
-	var text by observing("") {
+	var title by observing("") {
 		invalidate()
 	}
 
-	private val maxCount = 22
+	private val maxCount = 20
 	private val paint = Paint()
 	private val textPaint = Paint()
 	private val backgroundPaint = Paint()
@@ -65,7 +65,7 @@ class RoundInput(context: Context) : EditText(context) {
 
 		hintTextColor = GrayScale.lightGray
 
-		setWillNotDraw(false)
+		this.setWillNotDraw(false)
 
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.Width - PaddingSize.device * 2, 65.uiPX()
@@ -80,21 +80,46 @@ class RoundInput(context: Context) : EditText(context) {
 		setCursorColor(Spectrum.blue)
 
 		// `RoundInput` 主要用于输入用户名或密码, 防止输入太长内容做了长度限制
-		addTextChangedListener(object : TextWatcher {
+		this.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(content: Editable?) {
-				if (content?.length.orZero() > maxCount) {
-					val newContent = content?.substring(0, maxCount) ?: ""
-					getText().clear()
-					setText(newContent)
-					context.alert("content is to long")
-				}
+				afterContentChanged(content)
+				afterTextChanged?.run()
 			}
 
 			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
+			override fun onTextChanged(content: CharSequence?, start: Int, before: Int, count: Int) {
+			}
 		})
 
+	}
+
+	private var textContent: String = ""
+	fun getContent(hold: (String) -> Unit) {
+		hold(textContent)
+	}
+
+	override fun onTextContextMenuItem(id: Int): Boolean {
+		when (id) {
+			android.R.id.cut -> onTextCut?.run()
+			android.R.id.paste -> onTextPaste?.run()
+			android.R.id.copy -> onTextCopy?.run()
+		}
+		return super.onTextContextMenuItem(id)
+	}
+
+	var onTextPaste: Runnable? = null
+	var onTextCut: Runnable? = null
+	var onTextCopy: Runnable? = null
+
+	var afterTextChanged: Runnable? = null
+
+	open fun afterContentChanged(content: CharSequence?) {
+		if (content?.length.orZero() > maxCount) {
+			val newContent = content?.substring(0, maxCount) ?: ""
+			setText(newContent)
+			textContent = newContent
+			context.alert("content is to long")
+		}
 	}
 
 	private val paddingSize = 5.uiPX()
@@ -113,11 +138,11 @@ class RoundInput(context: Context) : EditText(context) {
 		canvas?.drawRoundRect(rectF, height / 2f, height / 2f, paint)
 
 		val textBackground = RectF(
-			25.uiPX().toFloat(), 0f, textPaint.measureText(text) + 50.uiPX(), titleSize
+			25.uiPX().toFloat(), 0f, textPaint.measureText(title) + 50.uiPX(), titleSize
 		)
 		canvas?.drawRect(textBackground, backgroundPaint)
 
-		canvas?.drawText(text, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
+		canvas?.drawText(title, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
 	}
 
 	fun setNumberInput() {

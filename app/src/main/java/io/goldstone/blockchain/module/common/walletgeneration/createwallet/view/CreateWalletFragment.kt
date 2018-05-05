@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -43,6 +42,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			lparams(matchParent, matchParent)
+
 			attentionView.apply {
 				text = CreateWalletText.attention
 				textSize = 4.uiPX().toFloat()
@@ -53,14 +53,14 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 			}.into(this)
 
 			nameEditText.apply {
-				text = CreateWalletText.name
+				title = CreateWalletText.name
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 30.uiPX()
 				}
 			}.into(this)
 
 			passwordEditText.apply {
-				text = CreateWalletText.password
+				title = CreateWalletText.password
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 30.uiPX()
@@ -68,7 +68,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 			}.into(this)
 
 			repeatPasswordEditText.apply {
-				text = CreateWalletText.repeatPassword
+				title = CreateWalletText.repeatPassword
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 10.uiPX()
@@ -76,7 +76,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 			}.into(this)
 
 			hintInput.apply {
-				text = CreateWalletText.hint
+				title = CreateWalletText.hint
 				setTextInput()
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 10.uiPX()
@@ -96,7 +96,6 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 				}
 			}.click {
 				presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput)
-				it.preventDuplicateClicks()
 			}.into(this)
 		}
 	}

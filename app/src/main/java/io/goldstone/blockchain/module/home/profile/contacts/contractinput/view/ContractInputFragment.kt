@@ -35,7 +35,7 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
     verticalLayout {
       lparams(matchParent, matchParent)
       nameInput.apply {
-        text = "Contact Name"
+        title = "Contact Name"
         setTextInput()
         setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
       }.into(this)

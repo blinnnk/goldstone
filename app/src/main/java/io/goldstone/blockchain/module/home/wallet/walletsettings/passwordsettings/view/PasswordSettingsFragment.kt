@@ -35,25 +35,25 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
     verticalLayout {
       lparams(matchParent, matchParent)
       oldPassword.apply {
-        text = "Old Password"
+        title = "Old Password"
         setPasswordInput()
         setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
       }.into(this)
 
       newPassword.apply {
-        text = "New Password"
+        title = "New Password"
         setPasswordInput()
         setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
       }.into(this)
 
       repeatPassword.apply {
-        text = "Repeat Password"
+        title = "Repeat Password"
         setPasswordInput()
         setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
       }.into(this)
 
       passwordHint.apply {
-        text = "Password Hint"
+        title = "Password Hint"
         setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
       }.into(this)
 

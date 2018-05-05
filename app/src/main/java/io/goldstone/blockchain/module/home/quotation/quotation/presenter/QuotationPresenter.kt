@@ -152,8 +152,8 @@ class QuotationPresenter(
 
 	companion object {
 		fun getPriceInfoBySocket(
-			pairList: ArrayList<String>? = null,
-			holdSocket: (GoldStoneWebSocket) -> Unit = {},
+			pairList: ArrayList<String>?,
+			holdSocket: (GoldStoneWebSocket) -> Unit,
 			hold: (CurrencyPriceInfoModel) -> Unit
 		) {
 			/**
@@ -165,6 +165,7 @@ class QuotationPresenter(
 						sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 					}
 				}
+
 				override fun getServerBack(content: JSONObject) {
 					hold(CurrencyPriceInfoModel(content))
 				}

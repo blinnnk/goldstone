@@ -7,25 +7,23 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.Gravity
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.util.SoftKeyboard
 
 /**
  * @date 22/03/2018 2:37 AM
@@ -127,7 +125,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				isShow isTrue {
 					addButton.click {
 						setClickEvent()
-						it.preventDuplicateClicks()
 					}.into(this)
 				}
 			} otherwise {
@@ -151,7 +148,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		if (isShow) {
 			searchButton.click {
 				setClickEvent()
-				it.preventDuplicateClicks()
 			}.into(this)
 		} else findViewById<ImageView>(ElementID.searchButton)?.let {
 			removeView(it)

@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -54,19 +53,19 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
 				nameInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-					text = CreateWalletText.name
+					title = CreateWalletText.name
 				}.into(this)
 
 				passwordInput.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					text = CreateWalletText.password
+					title = CreateWalletText.password
 				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					text = CreateWalletText.hint
+					title = CreateWalletText.hint
 				}.into(this)
 
 				agreementView.apply {
@@ -85,7 +84,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						agreementView.radioButton.isChecked,
 						hintInput
 					)
-					it.preventDuplicateClicks()
 				}.into(this)
 
 				textView("What is keystore?") {

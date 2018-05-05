@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.value.CommonText
@@ -41,7 +42,10 @@ fun <T : View> T.assignHeight(height: Int): T {
 }
 
 fun <T : View> T.click(callback: (T) -> Unit): T {
-	onClick { callback(this@click) }
+	onClick {
+		callback(this@click)
+		preventDuplicateClicks()
+	}
 	return this
 }
 
