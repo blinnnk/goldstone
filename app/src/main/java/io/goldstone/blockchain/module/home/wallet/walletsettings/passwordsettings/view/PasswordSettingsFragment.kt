@@ -59,7 +59,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
       confirmButton.apply {
         text = CommonText.confirm
-        setGrayStyle()
+        setBlueStyle()
         setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
       }.click {
           presenter.updatePassword(oldPassword, newPassword, repeatPassword)
