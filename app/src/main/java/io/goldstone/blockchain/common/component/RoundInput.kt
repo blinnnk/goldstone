@@ -119,6 +119,8 @@ open class RoundInput(context: Context) : EditText(context) {
 			setText(newContent)
 			textContent = newContent
 			context.alert("content is to long")
+		} else {
+			textContent = content.toString()
 		}
 	}
 
