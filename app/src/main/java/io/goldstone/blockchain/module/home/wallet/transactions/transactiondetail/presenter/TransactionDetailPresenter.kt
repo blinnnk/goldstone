@@ -259,6 +259,7 @@ class TransactionDetailPresenter(
 	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
 	private var transactionObserver: Subscription? = null
 	private fun observerTransaction() {
+		// 在页面销毁后需要用到, `activity` 所以提前存储起来
 		val activity = fragment.getMainActivity()
 		doAsync {
 			try {
