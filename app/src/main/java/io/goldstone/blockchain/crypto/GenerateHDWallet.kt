@@ -10,6 +10,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeyst
 import org.ethereum.geth.Account
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
+import org.jetbrains.anko.runOnUiThread
 import org.kethereum.bip39.Mnemonic
 import org.kethereum.crypto.Keys
 import org.kethereum.crypto.publicKeyFromPrivate
@@ -120,7 +121,7 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
 				try {
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
-					alert("Wrong Password")
+					runOnUiThread { alert("Wrong Password") }
 					println(error)
 				}
 			}
