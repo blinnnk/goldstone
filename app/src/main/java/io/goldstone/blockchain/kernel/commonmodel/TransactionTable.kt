@@ -91,14 +91,6 @@ data class TransactionTable(
 			}
 		}
 
-		fun getAllTransactionsByAddress(address: String, hold: (ArrayList<TransactionTable>) -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			}) {
-				hold(it.toArrayList())
-			}
-		}
-
 		fun getTransactionListModelsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit

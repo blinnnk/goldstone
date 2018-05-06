@@ -60,8 +60,8 @@ class QuotationPresenter(
 					fragment.asyncData = it
 					fragment.setEmptyViewBy(it)
 				} otherwise {
-					diffAndUpdateAdapterData<QuotationAdapter>(it)
 					fragment.setEmptyViewBy(it)
+					diffAndUpdateAdapterData<QuotationAdapter>(it)
 				}
 				// 设定 `Socket` 并执行
 				setSocket { currentSocket?.runSocket() }

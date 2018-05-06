@@ -8,14 +8,11 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**ø
  * @date 27/03/2018 3:41 PM
@@ -25,16 +22,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 class TokenDetailOverlayPresenter(
 	override val fragment: TokenDetailOverlayFragment
 ) : BaseOverlayPresenter<TokenDetailOverlayFragment>() {
-
-	override fun removeSelfFromActivity() {
-		super.removeSelfFromActivity()
-		fragment.getMainActivity()?.apply {
-			supportFragmentManager.findFragmentByTag(FragmentTag.home)
-				.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-					presenter.updateAllTokensInWallet()
-				}
-		}
-	}
 
 	fun showTokenDetailFragment(symbol: String?) {
 		fragment.apply {
