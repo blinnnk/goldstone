@@ -231,9 +231,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	open fun removeEmptyView() {
-		emptyLayout.isNotNull {
-			wrapper.removeView(emptyLayout)
-		}
+		emptyLayout?.let { wrapper.removeView(it) }
 	}
 
 	fun setEmptyViewBy(data: ArrayList<D>) {

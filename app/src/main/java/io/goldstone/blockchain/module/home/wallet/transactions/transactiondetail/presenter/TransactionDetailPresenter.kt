@@ -7,15 +7,18 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
@@ -26,6 +29,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -262,10 +266,43 @@ class TransactionDetailPresenter(
 					it.hash == currentHash
 				}.subscribe {
 					println("succeed")
+					updateWalletDetailValue()
 					onTransactionSucceed()
 				}
 			} catch (error: Exception) {
-				println(error)
+				Log.e("ERROR", error.toString())
+			}
+		}
+	}
+
+	private fun updateWalletDetailValue() {
+		updateMyTokenBalanceByTransaction {
+			fragment.getMainActivity()?.apply {
+				supportFragmentManager.findFragmentByTag(FragmentTag.home)
+					.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
+						presenter.updateAllTokensInWallet()
+					}
+			}
+		}
+	}
+
+	private fun updateMyTokenBalanceByTransaction(callback: () -> Unit) {
+		web3j.ethGetTransactionByHash(currentHash).sendAsync().get()?.let {
+			CryptoUtils.isERC20TransferByInputCode(it.transaction.input) {
+				val contract = it.transaction.to
+				GoldStoneEthCall.getTokenBalanceWithContract(
+					contract, WalletTable.current.address
+				) { balance ->
+					GoldStoneEthCall.getTokenSymbol(contract) { symbol ->
+						MyTokenTable.updateCurrentWalletBalanceWithSymbol(balance, symbol)
+						callback()
+					}
+				}
+			} isFalse {
+				GoldStoneEthCall.getEthBalance(WalletTable.current.address) {
+					MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, CryptoSymbol.eth)
+					callback()
+				}
 			}
 		}
 	}

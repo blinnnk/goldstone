@@ -42,12 +42,7 @@ data class WalletDetailCellModel(
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			completeTokensInfo(walletAddress, hold)
-		}
-
-		private fun completeTokensInfo(
-			walletAddress: String, hold: (ArrayList<WalletDetailCellModel>) -> Unit
-		) {
+			// 获取我的钱包的 `Token` 列表
 			MyTokenTable.getTokensWith(walletAddress) { allTokens ->
 				object : ConcurrentAsyncCombine() {
 					val tokenList = ArrayList<WalletDetailCellModel>()
@@ -55,13 +50,14 @@ data class WalletDetailCellModel(
 					override fun concurrentJobs() {
 						DefaultTokenTable.getTokens { localTokens ->
 							allTokens.forEach { token ->
-								localTokens.find { it.symbol == token.symbol }?.let {
-									tokenList.add(WalletDetailCellModel(it, token.balance))
+								localTokens.find { it.symbol == token.symbol }?.let { targetToken ->
+									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
 									completeMark()
 								}
 							}
 						}
 					}
+
 					override fun mergeCallBack() = hold(tokenList)
 				}.start()
 			}
