@@ -209,7 +209,7 @@ class PaymentValueDetailPresenter(
 	private fun generateModels(
 		rawTransaction: ArrayList<RawTransaction>, gasPrice: ArrayList<BigInteger>
 	) = rawTransaction.mapIndexed { index, it ->
-		PaymentValueDetailModel(gasPrice[index].toDouble(), it)
+		PaymentValueDetailModel(gasPrice[index].toDouble(), it, minerFeeType)
 	}.toArrayList()
 
 	private fun generateEmptyData() {
