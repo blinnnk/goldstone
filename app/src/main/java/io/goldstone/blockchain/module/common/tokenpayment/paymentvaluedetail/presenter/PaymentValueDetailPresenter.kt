@@ -259,12 +259,7 @@ class PaymentValueDetailPresenter(
 			}
 
 			overlayView.header.apply {
-				backButton.onClick {
-					headerTitle = TokenDetailText.transferDetail
-					presenter.popFragmentFrom<TransactionDetailFragment>()
-					setHeightMatchParent()
-					showCloseButton(false)
-				}
+				showBackButton(false)
 				showCloseButton(true)
 			}
 			headerTitle = TokenDetailText.transferDetail
