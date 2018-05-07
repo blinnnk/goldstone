@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.currency.presenter
 
+import com.blinnnk.extension.jump
 import com.blinnnk.extension.rebootApp
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.GoldStoneApp
@@ -15,6 +16,7 @@ import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragmen
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.yesButton
 import java.util.*
 
@@ -77,7 +79,10 @@ class CurrencyPresenter(
 
 	private fun updateData(code: String) {
 		WalletTable.updateCurrency(code) {
-			fragment.context?.rebootApp<SplashActivity>()
+			fragment.activity?.jump<SplashActivity>()
+			// 杀掉进程
+			android.os.Process.killProcess(android.os.Process.myPid())
+			System.exit(0)
 		}
 	}
 

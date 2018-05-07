@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
@@ -28,6 +29,7 @@ class SplashActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 
 		hideStatusBar()
+		GoldStoneApp.initAppParameters()
 
 		presenter.hasAccountThenLogin()
 		container.apply {

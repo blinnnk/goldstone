@@ -42,8 +42,6 @@ class GoldStoneApp : Application() {
 		// update local `Tokens` info list
 		StartingPresenter.updateLocalDefaultTokens(this)
 
-		initAppParameters()
-
 		prepareAppConfig { registerDeviceForPush() }
 
 	}
@@ -54,9 +52,11 @@ class GoldStoneApp : Application() {
 		var currencyCode: String = CountryCode.currentCurrency
 		var currentLanguage: Int? = HoneyLanguage.English.code
 
+		/**
+		 * Querying the language type of the current account
+		 * set and displaying the interface from the database.
+		 */
 		fun initAppParameters() {
-			// Querying the language type of the current account
-			// set and displaying the interface from the database.
 			WalletTable.getCurrentWalletInfo {
 				it?.apply {
 					initLaunchLanguage(it)
