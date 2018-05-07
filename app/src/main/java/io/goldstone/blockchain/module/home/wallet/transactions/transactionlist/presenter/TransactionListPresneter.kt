@@ -109,16 +109,19 @@ class TransactionListPresenter(
 
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun MainActivity.getTransactionDataFromEtherScan(
-			startBlock: String, hold: (ArrayList<TransactionListModel>) -> Unit
+			startBlock: String,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// Show loading view
 			showLoadingView()
 			mergeNormalAndTokenIncomingTransactions(startBlock) {
 				it.isNotEmpty() isTrue {
+					System.out.println("hello babby 888")
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					filterCompletedData(it, hold)
 					Log.d("DEBUG", "update the new data from chain")
 				} otherwise {
+					System.out.println("hello babby 999")
 					runOnUiThread {
 						removeLoadingView()
 						// 没有数据返回空数组
@@ -129,7 +132,9 @@ class TransactionListPresenter(
 		}
 
 		fun updateTransactions(
-			activity: MainActivity?, startBlock: String, hold: (ArrayList<TransactionListModel>) -> Unit
+			activity: MainActivity?,
+			startBlock: String,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			activity?.getTransactionDataFromEtherScan(startBlock, hold)
 		}
@@ -174,8 +179,10 @@ class TransactionListPresenter(
 		}
 
 		private fun MainActivity.filterCompletedData(
-			data: ArrayList<TransactionTable>, hold: (ArrayList<TransactionListModel>) -> Unit
+			data: ArrayList<TransactionTable>,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
+			System.out.println("shit 111")
 			// 把拉取到的数据加工数据格式并插入本地数据库
 			completeTransactionInfo(data) {
 				object : ConcurrentAsyncCombine() {
@@ -243,6 +250,7 @@ class TransactionListPresenter(
 								}
 							}
 						}.isFalse {
+							System.out.println("what happened")
 							TransactionTable.updateModelInfoFromChain(
 								transaction,
 								false,
