@@ -19,5 +19,4 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 		}
 	}
-
 }

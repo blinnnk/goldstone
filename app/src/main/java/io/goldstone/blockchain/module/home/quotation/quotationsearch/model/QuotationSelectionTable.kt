@@ -18,11 +18,23 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "quotationSelection")
 data class QuotationSelectionTable(
-	@PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("market_id") var marketID: Int,
-	@SerializedName("pair_display") var pairDisplay: String, @SerializedName("base")
-	var baseSymnbol: String, @SerializedName("quote") var quoteSymbol: String, @SerializedName("pair")
-	var pair: String, @SerializedName("market") var market: String, @SerializedName("name")
-	var name: String, var infoTitle: String,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	@SerializedName("market_id")
+	var marketID: Int,
+	@SerializedName("pair_display")
+	var pairDisplay: String,
+	@SerializedName("base")
+	var baseSymnbol: String,
+	@SerializedName("quote")
+	var quoteSymbol: String,
+	@SerializedName("pair")
+	var pair: String,
+	@SerializedName("market")
+	var market: String,
+	@SerializedName("name")
+	var name: String,
+	var infoTitle: String,
 	var orderID: Double = 0.0,
 	var lineChart: String,
 	var isSelecting: Boolean = false

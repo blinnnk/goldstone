@@ -18,102 +18,103 @@ import org.jetbrains.anko.textView
 
 class TwoLineTitles(context: Context) : LinearLayout(context) {
 
-  val title = textView {
-    textSize = 5.uiPX().toFloat()
-    textColor = Spectrum.white
-  }
+	val title = textView {
+		textSize = 5.uiPX().toFloat()
+		textColor = Spectrum.white
+		typeface = GoldStoneFont.heavy(context)
+	}
 
-  val subtitle = textView {
-    textSize = 4.uiPX().toFloat()
-    typeface = GoldStoneFont.medium(context)
-    textColor = Spectrum.opacity5White
-    y -= 2.uiPX()
-  }
+	val subtitle = textView {
+		textSize = 4.uiPX().toFloat()
+		typeface = GoldStoneFont.medium(context)
+		textColor = Spectrum.opacity5White
+		y -= 5.uiPX()
+	}
 
-  var isFloatRight by observing(false) {
-    gravity = Gravity.END
-  }
+	var isFloatRight by observing(false) {
+		gravity = Gravity.END
+	}
 
-  var isCenter by observing(false) {
-    gravity = Gravity.CENTER_HORIZONTAL
-    subtitle.gravity = Gravity.CENTER_HORIZONTAL
-    title.gravity = Gravity.CENTER_HORIZONTAL
-  }
+	var isCenter by observing(false) {
+		gravity = Gravity.CENTER_HORIZONTAL
+		subtitle.gravity = Gravity.CENTER_HORIZONTAL
+		title.gravity = Gravity.CENTER_HORIZONTAL
+	}
 
-  init {
-    orientation = VERTICAL
-  }
+	init {
+		orientation = VERTICAL
+	}
 
-  fun setBlackTitles() {
-    title.apply {
-      typeface = GoldStoneFont.heavy(context)
-      textColor = GrayScale.black
-    }
-    subtitle.textColor = GrayScale.gray
-  }
+	fun setBlackTitles() {
+		title.apply {
+			typeface = GoldStoneFont.heavy(context)
+			textColor = GrayScale.black
+		}
+		subtitle.textColor = GrayScale.gray
+	}
 
-  fun setColorStyle(color: Int) {
-    title.textColor = color
-    subtitle.textColor = color
-  }
+	fun setColorStyle(color: Int) {
+		title.textColor = color
+		subtitle.textColor = color
+	}
 
-  fun setNormalTitles() {
-    title.apply {
-      typeface = GoldStoneFont.book(context)
-      textColor = GrayScale.black
-    }
-    subtitle.textColor = GrayScale.gray
-  }
+	fun setNormalTitles() {
+		title.apply {
+			typeface = GoldStoneFont.book(context)
+			textColor = GrayScale.black
+		}
+		subtitle.textColor = GrayScale.gray
+	}
 
-  fun setGrayTitles() {
-    title.apply {
-      typeface = GoldStoneFont.book(context)
-      textColor = GrayScale.black
-    }
-    title.textColor = GrayScale.gray
-    subtitle.y += 3.uiPX()
-    subtitle.textColor = GrayScale.midGray
-  }
+	fun setGrayTitles() {
+		title.apply {
+			typeface = GoldStoneFont.book(context)
+			textColor = GrayScale.black
+		}
+		title.textColor = GrayScale.gray
+		subtitle.y += 3.uiPX()
+		subtitle.textColor = GrayScale.midGray
+	}
 
-  fun setSmallStyle() {
-    title.textSize = 4.uiPX() + 1f
-    subtitle.textSize = 3.uiPX() + 1f
-    title.y += 1.uiPX()
-  }
+	fun setSmallStyle() {
+		title.textSize = 4.uiPX() + 1f
+		subtitle.textSize = 3.uiPX() + 1f
+		title.y += 1.uiPX()
+	}
 
-  fun setWildStyle() {
-    title.typeface = GoldStoneFont.heavy(context)
-    subtitle.y += 5.uiPX()
-  }
+	fun setWildStyle() {
+		title.typeface = GoldStoneFont.heavy(context)
+		subtitle.y += 5.uiPX()
+	}
 
-  fun setBigWhiteStyle() {
-    title.apply {
-      textSize = 7.uiPX().toFloat()
-      typeface = GoldStoneFont.heavy(context)
-      textColor = Spectrum.white
-    }
-    subtitle.apply {
-      textSize = 4.uiPX().toFloat()
-      textColor = Spectrum.opacity5White
-      typeface = GoldStoneFont.medium(context)
-    }
-  }
+	fun setBigWhiteStyle() {
+		title.apply {
+			textSize = 7.uiPX().toFloat()
+			typeface = GoldStoneFont.heavy(context)
+			textColor = Spectrum.white
+		}
+		subtitle.apply {
+			textSize = 4.uiPX().toFloat()
+			textColor = Spectrum.opacity5White
+			typeface = GoldStoneFont.medium(context)
+		}
+	}
 
-  fun setQuotationStyle() {
-    y += 10.uiPX()
-    title.apply {
-      textSize = 7.uiPX().toFloat()
-      typeface = GoldStoneFont.black(context)
-      textColor = GrayScale.black
-    }
-    subtitle.apply {
-      textSize = 4.uiPX().toFloat()
-      textColor = GrayScale.midGray
-      typeface = GoldStoneFont.medium(context)
-      y -= 7.uiPX()
-    }
-  }
+	fun setQuotationStyle() {
+		y += 10.uiPX()
+		title.apply {
+			textSize = 7.uiPX().toFloat()
+			typeface = GoldStoneFont.black(context)
+			textColor = GrayScale.black
+		}
+		subtitle.apply {
+			textSize = 4.uiPX().toFloat()
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.medium(context)
+			y -= 7.uiPX()
+		}
+	}
 
-  fun getSubtitleValue() = subtitle.text.toString()
+	fun getSubtitleValue() = subtitle.text.toString()
 
 }

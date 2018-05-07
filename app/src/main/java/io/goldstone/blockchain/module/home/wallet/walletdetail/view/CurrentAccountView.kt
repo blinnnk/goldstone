@@ -23,51 +23,45 @@ import org.jetbrains.anko.imageResource
 
 class CurrentAccountView(context: Context) : RelativeLayout(context) {
 
-  val avatar by lazy { ImageView(context) }
-  val info by lazy { TwoLineTitles(context) }
-  private val qrIcon by lazy { ImageView(context) }
+	val avatar by lazy { ImageView(context) }
+	val info by lazy { TwoLineTitles(context) }
+	private val qrIcon by lazy { ImageView(context) }
 
-  init {
-    layoutParams = RelativeLayout.LayoutParams(160.uiPX(), 40.uiPX())
-    addTouchRippleAnimation(Spectrum.white, Spectrum.blue, RippleMode.Square, 20.uiPX().toFloat())
-    elevation = ShadowSize.Overlay
+	init {
+		layoutParams = RelativeLayout.LayoutParams(160.uiPX(), 40.uiPX())
+		addTouchRippleAnimation(Spectrum.white, Spectrum.blue, RippleMode.Square, 20.uiPX().toFloat())
+		elevation = ShadowSize.Overlay
 
-    avatar
-      .apply {
-        layoutParams = RelativeLayout.LayoutParams(34.uiPX(), 34.uiPX()).apply {
-          leftMargin = 3.uiPX()
-          topMargin = 3.uiPX()
-          scaleType = ImageView.ScaleType.CENTER_INSIDE
-        }
-        addCorner(17.uiPX(), Spectrum.blue)
-      }
-      .into(this)
+		avatar.apply {
+			layoutParams = RelativeLayout.LayoutParams(34.uiPX(), 34.uiPX()).apply {
+				leftMargin = 3.uiPX()
+				topMargin = 3.uiPX()
+				scaleType = ImageView.ScaleType.CENTER_INSIDE
+			}
+			addCorner(17.uiPX(), Spectrum.blue)
+		}.into(this)
 
-    info
-      .apply {
-        setBlackTitles()
-        setSmallStyle()
-        x += 45.uiPX()
-        y += 2.uiPX()
-      }
-      .into(this)
+		info.apply {
+			setBlackTitles()
+			setSmallStyle()
+			x += 45.uiPX()
+			y += 3.uiPX()
+		}.into(this)
 
-    info.setCenterInVertical()
+		info.setCenterInVertical()
 
-    qrIcon
-      .apply {
-        scaleType = ImageView.ScaleType.CENTER_INSIDE
-        imageResource = R.drawable.qrcode_icon
-        layoutParams = RelativeLayout.LayoutParams(20.uiPX(), 20.uiPX())
-        x -= 15.uiPX()
-      }
-      .into(this)
+		qrIcon.apply {
+			scaleType = ImageView.ScaleType.CENTER_INSIDE
+			imageResource = R.drawable.qrcode_icon
+			layoutParams = RelativeLayout.LayoutParams(20.uiPX(), 20.uiPX())
+			x -= 15.uiPX()
+		}.into(this)
 
-    qrIcon.apply {
-      setAlignParentRight()
-      setCenterInVertical()
-    }
+		qrIcon.apply {
+			setAlignParentRight()
+			setCenterInVertical()
+		}
 
-  }
+	}
 
 }

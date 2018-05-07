@@ -30,6 +30,14 @@ class TokenSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		setHeightMatchParent()
+	}
+
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {

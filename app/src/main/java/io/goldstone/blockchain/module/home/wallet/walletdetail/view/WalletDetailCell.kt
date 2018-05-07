@@ -27,53 +27,51 @@ import org.jetbrains.anko.imageResource
 
 class WalletDetailCell(context: Context) : BaseCell(context) {
 
-  var model: WalletDetailCellModel? by observing(null) {
-    model?.apply {
-      if(iconUrl.isBlank()) {
-        icon.image.imageResource = R.drawable.default_token
-      } else {
-        icon.image.glideImage(iconUrl)
-      }
-      tokenInfo.title.text = symbol
-      tokenInfo.subtitle.text = name
-      valueInfo.title.text = count.formatCount()
-      valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${GoldStoneApp.currencyCode})"
-    }
-  }
+	var model: WalletDetailCellModel? by observing(null) {
+		model?.apply {
+			if (iconUrl.isBlank()) {
+				icon.image.imageResource = R.drawable.default_token
+			} else {
+				icon.image.glideImage(iconUrl)
+			}
+			tokenInfo.title.text = symbol
+			tokenInfo.subtitle.text = name
+			valueInfo.title.text = count.formatCount()
+			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${GoldStoneApp.currencyCode})"
+		}
+	}
 
-  private val icon by lazy { SquareIcon(context) }
-  private val tokenInfo by lazy { TwoLineTitles(context) }
-  private val valueInfo by lazy { TwoLineTitles(context) }
+	private val icon by lazy { SquareIcon(context) }
+	private val tokenInfo by lazy { TwoLineTitles(context) }
+	private val valueInfo by lazy { TwoLineTitles(context) }
 
-  init {
+	init {
 
-    icon.into(this)
+		icon.into(this)
+		tokenInfo.into(this)
+		valueInfo.apply {
+			isFloatRight = true
+			y += 2.uiPX()
+		}.into(this)
 
-    tokenInfo.into(this)
+		tokenInfo.apply {
+			setCenterInVertical()
+			x += CommonCellSize.iconPadding
+			y += 2.uiPX()
+		}
 
-    valueInfo
-      .apply {
-        isFloatRight = true
-      }
-      .into(this)
+		icon.setCenterInVertical()
 
-    tokenInfo.apply {
-      setCenterInVertical()
-      x += CommonCellSize.iconPadding
-    }
+		valueInfo.apply {
+			setAlignParentRight()
+			setCenterInVertical()
+			x -= 30.uiPX()
+		}
 
-    icon.setCenterInVertical()
+	}
 
-    valueInfo.apply {
-      setAlignParentRight()
-      setCenterInVertical()
-      x -= 30.uiPX()
-    }
-
-  }
-
-  fun getTokenInfo(): WalletDetailCellModel? {
-    return model
-  }
+	fun getTokenInfo(): WalletDetailCellModel? {
+		return model
+	}
 
 }

@@ -64,10 +64,10 @@ class CircleButton(context: Context) : LinearLayout(context) {
       .apply {
         layoutParams = LinearLayout.LayoutParams(matchParent, 25.uiPX())
         textSize = 3.uiPX().toFloat()
-        typeface = GoldStoneFont.medium(context)
+        typeface = GoldStoneFont.aleoRegular(context)
         textColor = Spectrum.opacity5White
         gravity = Gravity.CENTER_HORIZONTAL
-        y += 3.uiPX()
+        y += 5.uiPX()
       }
       .into(this)
 
@@ -81,7 +81,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
   fun setUnTransparent() {
     buttonTitle.textColor = Spectrum.white
     updateOriginYAnimation(17.uiPX().toFloat())
-    buttonTitle.updateOriginYAnimation(23.uiPX().toFloat())
+    buttonTitle.updateOriginYAnimation(25.uiPX().toFloat())
     setIconViewColor(Color.TRANSPARENT)
   }
 

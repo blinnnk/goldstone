@@ -4,7 +4,6 @@ import com.blinnnk.extension.*
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -31,12 +30,19 @@ class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
 
+	private var updateChartTimes: Int? = null
+
 	override fun updateData() {
 		QuotationSelectionTable.getMySelections { selections ->
-			// 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行
+
+			/** 记录可能需要更新的 `Line Chart` 最大个数 */
+			if (updateChartTimes.isNull()) updateChartTimes = selections.size
+
+			/** 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行 */
 			currentSocket?.runSocket()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
+				// TODO 拉不到最新的数据了需要排查, 导致一直拉取
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
 				QuotationModel(selection, "--", "0", linechart)
 			}.sortedByDescending {
@@ -61,11 +67,13 @@ class QuotationPresenter(
 			// 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件.
 			// 本地的当天 `lineChart` 的值是通过长连接实时更新的.
 			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
-				fragment.getMainActivity()?.showLoadingView()
 				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
-						updateData()
-						fragment.getMainActivity()?.removeLoadingView()
+						/** 防止服务器数据出错, 可能导致的死循环 */
+						if (updateChartTimes!! > 0) {
+							updateData()
+							updateChartTimes = updateChartTimes!! - 1
+						}
 					}
 				}
 			}
