@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -24,9 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 
 @Entity(tableName = "myTokens")
 data class MyTokenTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
-	var ownerAddress: String,
+	@PrimaryKey(autoGenerate = true) var id: Int, var ownerAddress: String,
 	var symbol: String,
 	var balance: Double
 ) {
@@ -41,6 +36,23 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao().getTokensBy(walletAddress)
 			}) {
 				callback(it.toArrayList())
+			}
+		}
+
+		fun forEachMyTokens(
+			walletAddress: String,
+			holdToken: (token: MyTokenTable, contract: String, isEnd: Boolean) -> Unit
+		) {
+			DefaultTokenTable.getTokens { tokenInfo ->
+				getTokensWith(walletAddress) { myTokens ->
+					myTokens.forEachOrEnd { myToken, isEnd ->
+						holdToken(
+							myToken,
+							tokenInfo.find { it.symbol == myToken.symbol }?.contract.orEmpty(),
+							isEnd
+						)
+					}
+				}
 			}
 		}
 

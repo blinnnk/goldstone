@@ -34,8 +34,6 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-var tokenDetailData: ArrayList<TransactionListModel>? = null
-
 class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
@@ -72,19 +70,9 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
-		// 优先检查内存里面是否有符合的数据, 如果有直加载内存中的数据, 不同的 `TokenDetail` 会存储不同 `Symbol` 的账单
-		// 这里要判断当前的内存的交易账单是否是对应的 `Symbol`
-		if (!tokenDetailData.isNull() && tokenDetailData!!.any { it.symbol == fragment.symbol }) {
-			fragment.updateDataByAsyncDataStatus(tokenDetailData!!)
-			// 在异步检查更新最新的数据
+		loadDataFromDatabaseOrElse {
 			NetworkUtil.hasNetwork(fragment.context) isTrue {
-				loadDataFromChain()
-			}
-		} else {
-			loadDataFromDatabaseOrElse {
-				NetworkUtil.hasNetwork(fragment.context) isTrue {
-					loadDataFromChain()
-				}
+				fragment.loadDataFromChain()
 			}
 		}
 	}
@@ -95,7 +83,7 @@ class TokenDetailPresenter(
 			WalletTable.current.address, fragment.symbol!!
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
-				fragment.updateDataByAsyncDataStatus(transactions.map { TransactionListModel(it) }.toArrayList())
+				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
 			} otherwise {
 				withoutLocalDataCallback()
 				Log.d("DEBUG", "Without Local Transaction Data")
@@ -103,20 +91,20 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun loadDataFromChain() {
+	private fun TokenDetailFragment.loadDataFromChain() {
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-				TransactionListPresenter.updateTransactions(fragment.getMainActivity(), blockNumber) {
-					fragment.context?.runOnUiThread {
+				TransactionListPresenter.updateTransactions(getMainActivity(), blockNumber) {
+					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-						it.find { it.symbol == fragment.symbol }.isNotNull {
+						it.find { it.symbol == symbol }.isNotNull {
 							// 有数据后重新执行从数据库拉取数据
 							loadDataFromDatabaseOrElse()
 						} otherwise {
 							// 链上和本地都没有数据就更新一个空数组作为默认
-							fragment.asyncData.isNull() isTrue {
-								fragment.updateDataByAsyncDataStatus(arrayListOf())
+							asyncData.isNull() isTrue {
+								updateChartBy(arrayListOf())
 							}
 						}
 					}
@@ -125,8 +113,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun TokenDetailFragment.updateDataByAsyncDataStatus(data: ArrayList<TransactionListModel>) {
-		tokenDetailData = data
+	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
 		asyncData = data
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetwork(context) isTrue {

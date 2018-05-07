@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -136,23 +135,18 @@ class CreateWalletPresenter(
 		fun updateMyTokensValue(
 			walletAddress: String = WalletTable.current.address, callback: () -> Unit = {}
 		) {
-			DefaultTokenTable.getTokens { tokenInfo ->
-				MyTokenTable.getTokensWith(walletAddress) { myTokens ->
-					myTokens.forEachOrEnd { token, isEnd ->
-						val tokenContract = tokenInfo.find { it.symbol == token.symbol }?.contract
-						// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-						if (token.symbol == CryptoSymbol.eth) {
-							GoldStoneEthCall.getEthBalance(walletAddress) {
-								GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
-							}
-						} else {
-							GoldStoneEthCall.getTokenBalanceWithContract(tokenContract!!, walletAddress) {
-								GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
-							}
-						}
-						if (isEnd) callback()
+			MyTokenTable.forEachMyTokens(walletAddress) { token, contract, isEnd ->
+				// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
+				if (token.symbol == CryptoSymbol.eth) {
+					GoldStoneEthCall.getEthBalance(walletAddress) {
+						GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
+					}
+				} else {
+					GoldStoneEthCall.getTokenBalanceWithContract(contract, walletAddress) {
+						GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
 					}
 				}
+				if (isEnd) callback()
 			}
 		}
 

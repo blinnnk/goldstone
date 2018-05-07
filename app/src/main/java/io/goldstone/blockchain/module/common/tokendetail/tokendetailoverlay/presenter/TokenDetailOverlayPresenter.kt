@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -41,7 +42,7 @@ class TokenDetailOverlayPresenter(
 					valueHeader?.apply {
 						title.text = "MY ${token?.symbol}"
 						subtitle.text =
-							"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.currencyCode})"
+							 CryptoUtils.scaleTo28("${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.currencyCode})")
 						setBlackTitles()
 						isCenter = true
 					}?.into(this)

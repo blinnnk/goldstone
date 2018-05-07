@@ -20,6 +20,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -258,6 +259,8 @@ class TransactionDetailPresenter(
 	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
 	private var transactionObserver: Subscription? = null
 	private fun observerTransaction() {
+		// 在页面销毁后需要用到, `activity` 所以提前存储起来
+		val activity = fragment.getMainActivity()
 		doAsync {
 			try {
 				// 开启监听交易是否完成
@@ -266,7 +269,7 @@ class TransactionDetailPresenter(
 					it.hash == currentHash
 				}.subscribe {
 					println("succeed")
-					updateWalletDetailValue()
+					updateWalletDetailValue(activity)
 					onTransactionSucceed()
 				}
 			} catch (error: Exception) {
@@ -275,9 +278,9 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	private fun updateWalletDetailValue() {
+	private fun updateWalletDetailValue(activity: MainActivity?) {
 		updateMyTokenBalanceByTransaction {
-			fragment.getMainActivity()?.apply {
+			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)
 					.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
 						presenter.updateAllTokensInWallet()

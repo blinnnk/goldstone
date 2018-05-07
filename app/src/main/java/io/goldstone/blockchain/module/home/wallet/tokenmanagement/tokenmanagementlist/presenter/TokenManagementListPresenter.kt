@@ -21,72 +21,72 @@ import org.jetbrains.anko.runOnUiThread
 private var defaultTokenList: ArrayList<DefaultTokenTable>? = null
 
 class TokenManagementListPresenter(
-  override val fragment: TokenManagementListFragment
+	override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 
-  override fun updateData() {
-    defaultTokenList.isNull().isFalse {
-      fragment.asyncData = defaultTokenList
-      fragment.prepareMyDefaultTokens()
-    } otherwise {
-      fragment.prepareMyDefaultTokens()
-    }
-  }
+	override fun updateData() {
+		defaultTokenList.isNull().isFalse {
+			fragment.asyncData = defaultTokenList
+			fragment.prepareMyDefaultTokens()
+		} otherwise {
+			fragment.prepareMyDefaultTokens()
+		}
+	}
 
-  private fun TokenManagementListFragment.prepareMyDefaultTokens() {
-    doAsync {
-      // 在异步线程更新数据
-      DefaultTokenTable.getTokens { defaultTokens ->
-        defaultTokens.forEachOrEnd { defaultToken, isEnd ->
-          val address = WalletTable.current.address
-          MyTokenTable.getTokensWith(address) { myTokens ->
-            defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
-            if (isEnd) {
-              // 在主线程更新 `UI`
-              context?.runOnUiThread {
-                asyncData.isNull() isTrue {
-                  asyncData = defaultTokens
-                } otherwise {
-                  diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(defaultTokens)
-                }
-                defaultTokenList = defaultTokens
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	private fun TokenManagementListFragment.prepareMyDefaultTokens() {
+		doAsync {
+			// 在异步线程更新数据
+			DefaultTokenTable.getTokens { defaultTokens ->
+				defaultTokens.forEachOrEnd { defaultToken, isEnd ->
+					val address = WalletTable.current.address
+					MyTokenTable.getTokensWith(address) { myTokens ->
+						defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
+						if (isEnd) {
+							// 在主线程更新 `UI`
+							context?.runOnUiThread {
+								asyncData.isNull() isTrue {
+									asyncData = defaultTokens
+								} otherwise {
+									diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(defaultTokens)
+								}
+								defaultTokenList = defaultTokens
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-  companion object {
+	companion object {
 
-    private var needShowLoadingView = true
-    fun updateMyTokensInfoBy(cell: TokenManagementListCell, activity: MainActivity) {
-      /**
-       * show `Loading View` at 100ms later to prevent too fast
-       * to response the result that make ui flash
-       */
-      100L timeUpThen {
-        if (needShowLoadingView) {
-          activity.showLoadingView()
-        }
-      }
-      cell.apply {
-        if (switch.isChecked) {
-          // once it is checked then insert this symbol into `MyTokenTable` database
-          MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
-            needShowLoadingView = false
-            activity.removeLoadingView()
-          }
-        } else {
-          needShowLoadingView = false
-          activity.removeLoadingView()
-          // once it is unchecked then delete this symbol from `MyTokenTable` database
-          MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
-        }
-        // prevent duplicate clicks
-        cell.switch.preventDuplicateClicks()
-      }
-    }
-  }
+		private var needShowLoadingView = true
+		fun updateMyTokensInfoBy(cell: TokenManagementListCell, activity: MainActivity) {
+			/**
+			 * show `Loading View` at 100ms later to prevent too fast
+			 * to response the result that make ui flash
+			 */
+			100L timeUpThen {
+				if (needShowLoadingView) {
+					activity.showLoadingView()
+				}
+			}
+			cell.apply {
+				if (switch.isChecked) {
+					// once it is checked then insert this symbol into `MyTokenTable` database
+					MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
+						needShowLoadingView = false
+						activity.removeLoadingView()
+					}
+				} else {
+					needShowLoadingView = false
+					activity.removeLoadingView()
+					// once it is unchecked then delete this symbol from `MyTokenTable` database
+					MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
+				}
+				// prevent duplicate clicks
+				cell.switch.preventDuplicateClicks()
+			}
+		}
+	}
 }
