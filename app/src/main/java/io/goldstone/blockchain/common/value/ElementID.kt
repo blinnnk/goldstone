@@ -6,26 +6,27 @@ package io.goldstone.blockchain.common.value
  */
 
 object ContainerID {
-  const val splash = 10001
-  const val overlay = 10002
-  const val content = 10003
-  const val main = 10005
-  const val home = 10006
+	const val splash = 10001
+	const val overlay = 10002
+	const val content = 10003
+	const val main = 10005
+	const val home = 10006
 }
 
 object ElementID {
-  const val backButton = 20001
-  const val closeButton = 20002
-  const val attentionText = 20003
-  const val searchButton = 20005
-  const val searchInput = 2006
-  const val addButton = 2007
-  const val chartView = 2008
-  const val slideCell = 2009
-  const val slideCellContainer = 2010
-  const val loadingView = 2011
+	const val backButton = 20001
+	const val closeButton = 20002
+	const val attentionText = 20003
+	const val searchButton = 20005
+	const val searchInput = 2006
+	const val addButton = 2007
+	const val chartView = 2008
+	const val slideCell = 2009
+	const val slideCellContainer = 2010
+	const val loadingView = 2011
+	const val emptyView = 2012
 }
 
 object ViewPagerID {
-  const val walletImport = 30001
+	const val walletImport = 30001
 }

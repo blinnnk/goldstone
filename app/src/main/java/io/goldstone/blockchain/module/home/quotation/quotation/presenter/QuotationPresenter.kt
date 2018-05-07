@@ -44,10 +44,9 @@ class QuotationPresenter(
 			}.toArrayList().let {
 				fragment.asyncData.isNull() isTrue {
 					fragment.asyncData = it
-					fragment.setEmptyViewBy(it)
 				} otherwise {
-					fragment.setEmptyViewBy(it)
 					diffAndUpdateAdapterData<QuotationAdapter>(it)
+					fragment.setEmptyViewBy(it)
 				}
 				// 设定 `Socket` 并执行
 				setSocket { currentSocket?.runSocket() }
