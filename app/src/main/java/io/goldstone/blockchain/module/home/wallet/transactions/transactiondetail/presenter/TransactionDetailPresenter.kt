@@ -68,7 +68,7 @@ class TransactionDetailPresenter(
 
 	override fun updateData() {
 
-		// 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail`
+		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
 		dataFromList?.apply {
 			updateHeaderValue(count, targetAddress, symbol, isPending, isReceived)
 			fragment.asyncData = generateModels(this)
@@ -82,7 +82,8 @@ class TransactionDetailPresenter(
 				}
 			}
 		}
-		// 这个是转账完毕后进入的界面初始
+
+		/** 这个是转账完毕后进入的初始数据 */
 		data?.apply {
 			currentHash = taxHash
 			count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal)
@@ -91,11 +92,13 @@ class TransactionDetailPresenter(
 			updateHeaderValue(count, address, token.symbol, true)
 		}
 
-		// 这个是从通知中心进入的, 通知中心的显示是现查账.
+		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 		notificationTransaction?.let { transaction ->
 			currentHash = transaction.hash
-			// 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
-			// 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+			/**
+			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
+			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+			 */
 			TransactionTable.getTransactionByHashAndReceivedStatus(
 				transaction.hash, transaction.isReceived
 			) { localTransaction ->
@@ -122,7 +125,7 @@ class TransactionDetailPresenter(
 		super.onFragmentShowFromHidden()
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment -> {
+				is TransactionFragment        -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TransactionText.detail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -138,7 +141,7 @@ class TransactionDetailPresenter(
 					}
 				}
 
-				is NotificationFragment -> {
+				is NotificationFragment       -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -157,7 +160,7 @@ class TransactionDetailPresenter(
 		}
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment -> {
+				is TransactionFragment        -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TransactionText.detail, argument
 					)
@@ -169,7 +172,7 @@ class TransactionDetailPresenter(
 					)
 				}
 
-				is NotificationFragment -> {
+				is NotificationFragment       -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
 					)
@@ -209,7 +212,7 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			is TransactionReceipt -> {
+			is TransactionReceipt   -> {
 				arrayListOf(
 					minerFee,
 					"There isn't a memo",
@@ -220,7 +223,7 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			else -> {
+			else                    -> {
 				arrayListOf(
 					minerFee,
 					"There isn't a memo",
@@ -363,7 +366,9 @@ class TransactionDetailPresenter(
 
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
-		receipt: Transaction, transaction: InputCodeData, isReceive: Boolean
+		receipt: Transaction,
+		transaction: InputCodeData,
+		isReceive: Boolean
 	) {
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
 			val address = if (isReceive) receipt.from else transaction.address

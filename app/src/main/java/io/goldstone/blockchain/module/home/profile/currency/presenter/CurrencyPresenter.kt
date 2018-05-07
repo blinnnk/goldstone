@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.currency.presenter
 
-import com.blinnnk.extension.rebootApp
+import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -77,7 +77,10 @@ class CurrencyPresenter(
 
 	private fun updateData(code: String) {
 		WalletTable.updateCurrency(code) {
-			fragment.context?.rebootApp<SplashActivity>()
+			fragment.activity?.jump<SplashActivity>()
+			// 杀掉进程
+			android.os.Process.killProcess(android.os.Process.myPid())
+			System.exit(0)
 		}
 	}
 

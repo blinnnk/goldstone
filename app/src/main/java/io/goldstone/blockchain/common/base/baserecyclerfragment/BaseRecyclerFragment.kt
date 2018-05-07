@@ -25,7 +25,9 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.Quotat
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.support.v4.toast
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -216,22 +218,27 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	open fun showEmptyView() {
 		emptyLayout = EmptyView(wrapper.context).apply {
+			onClick { toast("hello") }
 			when (this@BaseRecyclerFragment) {
-				is PaymentValueDetailFragment -> return
-				is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
+				is PaymentValueDetailFragment                   -> return
+				is TokenDetailFragment                          -> setStyle(EmptyType.TokenDetail)
 				is ContactFragment, is AddressSelectionFragment -> setStyle(EmptyType.Contact)
-				is TokenSearchFragment -> setStyle(EmptyType.Search)
-				is QuotationSearchFragment -> setStyle(EmptyType.QuotationSearch)
-				is QuotationFragment -> setStyle(EmptyType.Quotation)
-				else -> setStyle(EmptyType.TransactionDetail)
+				is TokenSearchFragment                          -> setStyle(EmptyType.Search)
+				is QuotationSearchFragment                      -> setStyle(EmptyType.QuotationSearch)
+				is QuotationFragment                            -> setStyle(EmptyType.Quotation)
+				else                                            -> setStyle(EmptyType.TransactionDetail)
 			}
 		}
-		emptyLayout?.into(wrapper)
+		wrapper.addView(emptyLayout)
 		if (this@BaseRecyclerFragment !is TokenDetailFragment) emptyLayout?.setCenterInParent()
 	}
 
 	open fun removeEmptyView() {
-		emptyLayout?.let { wrapper.removeView(it) }
+		emptyLayout?.apply {
+			wrapper.removeView(this)
+			wrapper.requestLayout()
+			wrapper.invalidate()
+		}
 	}
 
 	fun setEmptyViewBy(data: ArrayList<D>) {

@@ -125,9 +125,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	) {
 		val actualHeight = dataCount.orZero() * cellHeight
 		val targetHeight = when {
-			dataCount == 0 -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+			dataCount == 0                            -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
 			actualHeight > BasicSize.overlayMinHeight -> actualHeight
-			else -> BasicSize.overlayMinHeight
+			else                                      -> BasicSize.overlayMinHeight
 		}
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight)
@@ -142,14 +142,13 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
 	fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			val recoveryHeight =
-				fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
+			val recoveryHeight = fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
 			val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
 			overlayView.contentLayout.updateHeightAnimation(
 				when {
-					recoveryHeight == 0 -> maxHeight
+					recoveryHeight == 0                         -> maxHeight
 					recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
-					else -> BasicSize.overlayMinHeight
+					else                                        -> BasicSize.overlayMinHeight
 				}, maxHeight
 			)
 		}

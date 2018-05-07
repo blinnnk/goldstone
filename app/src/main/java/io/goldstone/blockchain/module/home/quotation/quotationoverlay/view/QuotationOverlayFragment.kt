@@ -23,14 +23,10 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 		when (title) {
 			QuotationText.management -> {
 				presenter.showQutationManagementFragment()
-				overlayView.header.apply {
-					showSearchButton(true) {
-						presenter.showQutationSearchFragment()
-					}
-				}
+				overlayView.header.showSearchButton(true) { presenter.showQutationSearchFragment() }
 			}
 
-			else -> presenter.showMarketTokenDetailFragment(currencyInfo)
+			else                     -> presenter.showMarketTokenDetailFragment(currencyInfo)
 		}
 
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()
