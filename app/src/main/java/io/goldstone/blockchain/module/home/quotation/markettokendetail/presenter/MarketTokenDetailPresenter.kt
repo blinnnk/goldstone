@@ -38,7 +38,6 @@ class MarketTokenDetailPresenter(
 	}
 
 	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
-
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
 			MarketTokenDetailChartType.DAY.code -> MarketTokenDetailChartType.DAY.info

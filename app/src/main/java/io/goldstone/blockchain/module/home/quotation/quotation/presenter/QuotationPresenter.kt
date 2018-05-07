@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.daysAgoInMills
-import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
@@ -28,9 +27,6 @@ import org.json.JSONObject
  * @author KaySaith
  */
 
-private var latestSelectionMD5: String? = null
-private var memoryData: ArrayList<QuotationModel>? = null
-
 class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
@@ -39,15 +35,6 @@ class QuotationPresenter(
 		QuotationSelectionTable.getMySelections { selections ->
 			// 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行
 			currentSocket?.runSocket()
-
-			// 判断是否更新数据或直接从内存读取数据显示
-			if (latestSelectionMD5 == selections.getObjectMD5HexString() && !memoryData.isNull()) {
-				fragment.asyncData = memoryData
-				return@getMySelections
-			}
-
-			// 把最近一次数据的 MD5 值存入内存, 任何需要更新数据的逻辑会先行比对是否需要更新
-			latestSelectionMD5 = selections.getObjectMD5HexString()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
@@ -55,7 +42,6 @@ class QuotationPresenter(
 			}.sortedByDescending {
 				it.orderID
 			}.toArrayList().let {
-				memoryData = it
 				fragment.asyncData.isNull() isTrue {
 					fragment.asyncData = it
 					fragment.setEmptyViewBy(it)

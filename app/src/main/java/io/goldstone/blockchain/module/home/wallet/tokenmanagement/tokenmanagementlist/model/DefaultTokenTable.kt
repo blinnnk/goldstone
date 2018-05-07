@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
@@ -13,127 +14,118 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.mo
  */
 
 enum class TinyNumber(val value: Int) {
-  True(1), False(0)
+	True(1), False(0)
 }
 
 @Entity(tableName = "defaultTokens")
 data class DefaultTokenTable(
-  @PrimaryKey(autoGenerate = true)
-  var id: Int,
-  @SerializedName("address") var contract: String,
-  @SerializedName("url") var iconUrl: String,
-  @SerializedName("symbol") var symbol: String,
-  @SerializedName("force_show") var forceShow: Int,
-  @SerializedName("price") var price: Double,
-  @SerializedName("name") var name: String,
-  @SerializedName("decimals") var decimals: Double,
-  var totalSupply: String? = null,
-  var isDefault: Boolean = true,
-  @Ignore
-  var isUsed: Boolean = false
-  ) {
-  /** 默认的 `constructor` */
-  constructor() : this(
-    0,
-    "",
-    "",
-    "",
-    0,
-    0.0,
-    "",
-    0.0,
-    "",
-    true,
-    false
-  )
+	@PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("address") var contract: String,
+	@SerializedName("url") var iconUrl: String, @SerializedName("symbol") var symbol: String,
+	@SerializedName("force_show") var forceShow: Int, @SerializedName("price") var price: Double,
+	@SerializedName("name") var name: String, @SerializedName("decimals")
+	var decimals: Double, var totalSupply: String? = null, var isDefault: Boolean = true, @Ignore
+	var isUsed: Boolean = false
+) {
+	/** 默认的 `constructor` */
+	constructor() : this(
+		0, "", "", "", 0, 0.0, "", 0.0, "", true, false
+	)
 
-  constructor(data: TokenSearchModel, isUsed: Boolean = false) : this(
-    0,
-    data.contract,
-    data.iconUrl,
-    data.symbol,
-    0,
-    data.price.toDouble(),
-    data.name,
-    data.decimal.toDouble(),
-    "",
-    false,
-    isUsed
-  )
+	constructor(data: TokenSearchModel, isUsed: Boolean = false) : this(
+		0,
+		data.contract,
+		data.iconUrl,
+		data.symbol,
+		0,
+		data.price.toDouble(),
+		data.name,
+		data.decimal.toDouble(),
+		"",
+		false,
+		isUsed
+	)
 
-  companion object {
+	companion object {
 
-    fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-      }) {
-        hold(it.toArrayList())
-      }
-    }
+		fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+			}) {
+				hold(it.toArrayList())
+			}
+		}
 
-    fun getTokenBySymbol(symbol: String, hold: (DefaultTokenTable) -> Unit) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
-      }) {
-        hold(it)
-      }
-    }
+		fun forEachDefaultTokensToEnd(hold: (token: DefaultTokenTable, isEnd: Boolean) -> Unit) {
+			getTokens {
+				it.forEachOrEnd { item, isEnd ->
+					hold(item, isEnd)
+				}
+			}
+		}
 
-    fun getTokenByContractAddress(contractAddress: String, hold: (DefaultTokenTable?) -> Unit) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().getSymbolByContractAddress(contractAddress)
-      }) {
-        hold(it)
-      }
-    }
+		fun getTokenBySymbol(symbol: String, hold: (DefaultTokenTable) -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
+			}) {
+				hold(it)
+			}
+		}
 
-    fun updateUsedStatusBySymbol(symbol: String, status: Boolean, callback: () -> Unit = {}) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().apply {
-          getTokenBySymbol(symbol).let {
-            update(it.apply { isUsed = status })
-          }
-        }
-      }) {
-        callback()
-      }
-    }
+		fun getTokenByContractAddress(contractAddress: String, hold: (DefaultTokenTable?) -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().getSymbolByContractAddress(contractAddress)
+			}) {
+				hold(it)
+			}
+		}
 
-    fun getContractAddressBySymbol(symbol: String, hold: (String) -> Unit) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
-      }) {
-        hold(it.contract)
-      }
-    }
+		fun updateUsedStatusBySymbol(symbol: String, status: Boolean, callback: () -> Unit = {}) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().apply {
+					getTokenBySymbol(symbol).let {
+						update(it.apply { isUsed = status })
+					}
+				}
+			}) {
+				callback()
+			}
+		}
 
-    fun insertTokenInfo(token: DefaultTokenTable, callback: () -> Unit) {
-      coroutinesTask({
-        GoldStoneDataBase.database.defaultTokenDao().insert(token)
-      }) {
-        callback()
-      }
-    }
-  }
+		fun getContractAddressBySymbol(symbol: String, hold: (String) -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().getTokenBySymbol(symbol)
+			}) {
+				hold(it.contract)
+			}
+		}
+
+		fun insertTokenInfo(token: DefaultTokenTable, callback: () -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.defaultTokenDao().insert(token)
+			}) {
+				callback()
+			}
+		}
+	}
 }
 
 @Dao
 interface DefaultTokenDao {
-  @Query("SELECT * FROM defaultTokens")
-  fun getAllTokens(): List<DefaultTokenTable>
+	@Query("SELECT * FROM defaultTokens")
+	fun getAllTokens(): List<DefaultTokenTable>
 
-  @Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol")
-  fun getTokenBySymbol(symbol: String): DefaultTokenTable
+	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol")
+	fun getTokenBySymbol(symbol: String): DefaultTokenTable
 
-  @Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-  fun getSymbolByContractAddress(contract: String): DefaultTokenTable?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
+	fun getSymbolByContractAddress(contract: String): DefaultTokenTable?
 
-  @Insert
-  fun insert(token: DefaultTokenTable)
+	@Insert
+	fun insert(token: DefaultTokenTable)
 
-  @Update
-  fun update(token: DefaultTokenTable)
+	@Update
+	fun update(token: DefaultTokenTable)
 
-  @Delete
-  fun delete(token: DefaultTokenTable)
+	@Delete
+	fun delete(token: DefaultTokenTable)
 }

@@ -13,55 +13,61 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
  */
 
 class QuotationManagementPresenter(
-  override val fragment: QuotationManagementFragment
+	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
 
-  override fun updateData() {
-    QuotationSelectionTable.getMySelections {
-      it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
-        fragment.apply {
-          asyncData.isNull() isTrue {
-            asyncData = orderedData
-          } otherwise {
-            diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
-          }
-        }
-      }
-    }
-  }
+	override fun updateData() {
+		QuotationSelectionTable.getMySelections {
+			it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
+				fragment.apply {
+					asyncData.isNull() isTrue {
+						asyncData = orderedData
+					} otherwise {
+						diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+					}
+				}
+			}
+		}
+	}
 
-  override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
-    fragment.updateSelectionOrderID()
-  }
+	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+		fragment.updateSelectionOrderID()
+	}
 
-  private fun QuotationManagementFragment.updateSelectionOrderID() {
-    fragment.asyncData?.let {
-      recyclerView.addDragEventAndReordering(it) { fromPosition, toPosition ->
-        if (fromPosition != null && toPosition != null) {
-          // 通过权重判断简单的实现了排序效果
-          val newOrderID = when (toPosition) {
-            0 -> it[toPosition + 1].orderID + 0.1
-            it.lastIndex -> it[toPosition - 1].orderID - 0.1
-            else -> (it[toPosition - 1].orderID + it[toPosition + 1].orderID) / 2.0
-          }
-          QuotationSelectionTable.updateSelectionOrderIDBy(it[toPosition].pair, newOrderID)
-        }
-      }
-    }
-  }
+	private fun getCurrentAsyncData() = fragment.asyncData.orEmptyArray()
+
+	private fun QuotationManagementFragment.updateSelectionOrderID() {
+		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { fromPosition, toPosition ->
+			val data = getCurrentAsyncData()
+			if (fromPosition != null && toPosition != null) {
+				// 通过权重判断简单的实现了排序效果
+				val newOrderID = when (toPosition) {
+					0 -> data[toPosition + 1].orderID + 0.1
+					data.lastIndex -> data[toPosition - 1].orderID - 0.1
+					else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
+				}
+				QuotationSelectionTable.updateSelectionOrderIDBy(data[toPosition].pair, newOrderID) {
+					// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
+					fragment.asyncData?.find {
+						it.baseSymnbol == data[toPosition].baseSymnbol
+					}?.orderID = newOrderID
+				}
+			}
+		}
+	}
 
 	override fun updateParentContentLayoutHeight(dataCount: Int?, cellHeight: Int, maxHeight: Int) {
 		super.updateParentContentLayoutHeight(
-			if(fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size,
+			if (fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size,
 			cellHeight,
 			maxHeight
 		)
 	}
 
-  override fun onFragmentShowFromHidden() {
-    // 更新数据
-    updateData()
-    updateParentContentLayoutHeight(if(fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size)
-  }
+	override fun onFragmentShowFromHidden() {
+		// 更新数据
+		updateData()
+		updateParentContentLayoutHeight(if (fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size)
+	}
 
 }
