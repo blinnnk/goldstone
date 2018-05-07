@@ -66,6 +66,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 			}.into(this)
 
 			valueInput.apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 				hint = "0.0"
 				hintTextColor = Spectrum.opacity5White
 				textColor = Spectrum.white
@@ -127,8 +128,13 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 	fun inputTextListener(hold: (String) -> Unit) {
 		valueInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				valueInput.textSize = 16.uiPX().toFloat()
-				text?.apply { hold(toString()) }
+				// 文字自适应宽度调整字号大小
+				if (text?.length.orElse(0) > 8) {
+					valueInput.textSize = (16 - Math.ceil(text!!.length / 3.0).toInt()).uiPX().toFloat()
+				} else {
+					valueInput.textSize = 16.uiPX().toFloat()
+				}
+				text.apply { hold(toString()) }
 			}
 
 			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
