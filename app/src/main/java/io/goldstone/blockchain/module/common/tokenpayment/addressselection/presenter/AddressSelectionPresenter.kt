@@ -22,66 +22,73 @@ import org.web3j.crypto.WalletUtils
  */
 
 class AddressSelectionPresenter(
-  override val fragment: AddressSelectionFragment
+	override val fragment: AddressSelectionFragment
 ) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
 
-  override fun updateData() {
-    updateAddressList {
-      fragment.updateHeaderViewStatus()
-    }
-  }
+	override fun updateData() {
+		updateAddressList {
+			fragment.updateHeaderViewStatus()
+		}
+	}
 
-  fun showPaymentValueDetailFragment(address: String): Runnable {
-    return Runnable {
-      WalletUtils.isValidAddress(address).isFalse {
-        fragment.context?.alert("address isn't valid")
-        return@Runnable
-      }
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?, cellHeight: Int, maxHeight: Int
+	) {
+		// 详情页面直接全屏高度
+		setHeightMatchParent()
+	}
 
-      fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-        hideChildFragment(fragment)
-        addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
-          putString(ArgumentKey.paymentAddress, address)
-          putSerializable(ArgumentKey.paymentSymbol, token)
-        }
-        overlayView.header.apply {
-          backButton.onClick {
-            headerTitle = TokenDetailText.address
-            presenter.popFragmentFrom<PaymentValueDetailFragment>()
-            setHeightMatchParent()
-            showCloseButton(false)
-          }
-        }
-        headerTitle = TokenDetailText.transferDetail
-      }
-    }
-  }
+	fun showPaymentValueDetailFragment(address: String): Runnable {
+		return Runnable {
+			WalletUtils.isValidAddress(address).isFalse {
+				fragment.context?.alert("address isn't valid")
+				return@Runnable
+			}
 
-  override fun onFragmentShowFromHidden() {
-    super.onFragmentShowFromHidden()
-    /** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
-    fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-      overlayView.header.showBackButton(true) {
-        presenter.setValueHeader(token)
-        presenter.popFragmentFrom<AddressSelectionFragment>()
-        setHeightMatchParent()
-      }
-    }
-  }
+			fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+				hideChildFragment(fragment)
+				addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
+					putString(ArgumentKey.paymentAddress, address)
+					putSerializable(ArgumentKey.paymentSymbol, token)
+				}
+				overlayView.header.apply {
+					backButton.onClick {
+						headerTitle = TokenDetailText.address
+						presenter.popFragmentFrom<PaymentValueDetailFragment>()
+						setHeightMatchParent()
+						showCloseButton(false)
+					}
+				}
+				headerTitle = TokenDetailText.transferDetail
+			}
+		}
+	}
 
-  private fun updateAddressList(callback: () -> Unit) {
-    ContactTable.getAllContacts {
-      it.isEmpty() isTrue {
-        fragment.asyncData = arrayListOf()
-      } otherwise {
-        if (fragment.asyncData.isNullOrEmpty()) {
-          fragment.asyncData = it
-        } else {
-          diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)
-        }
-      }
-      callback()
-    }
-  }
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			overlayView.header.showBackButton(true) {
+				presenter.setValueHeader(token)
+				presenter.popFragmentFrom<AddressSelectionFragment>()
+				setHeightMatchParent()
+			}
+		}
+	}
+
+	private fun updateAddressList(callback: () -> Unit) {
+		ContactTable.getAllContacts {
+			it.isEmpty() isTrue {
+				fragment.asyncData = arrayListOf()
+			} otherwise {
+				if (fragment.asyncData.isNullOrEmpty()) {
+					fragment.asyncData = it
+				} else {
+					diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)
+				}
+			}
+			callback()
+		}
+	}
 
 }

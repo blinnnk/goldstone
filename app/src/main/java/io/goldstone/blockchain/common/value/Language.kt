@@ -240,6 +240,12 @@ object TokenDetailText {
 	}
 
 	@JvmField
+	val deposit = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Deposit"
+		else                       -> ""
+	}
+
+	@JvmField
 	val transferDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer Detail"
 		else                       -> ""

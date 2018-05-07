@@ -125,7 +125,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	) {
 		val actualHeight = dataCount.orZero() * cellHeight
 		val targetHeight = when {
-			dataCount == 0                            -> fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+			dataCount == 0                            -> BasicSize.overlayMinHeight
 			actualHeight > BasicSize.overlayMinHeight -> actualHeight
 			else                                      -> BasicSize.overlayMinHeight
 		}
