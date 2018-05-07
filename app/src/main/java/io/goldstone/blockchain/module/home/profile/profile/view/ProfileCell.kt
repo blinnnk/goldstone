@@ -58,14 +58,14 @@ class ProfileCell(context: Context) : BaseCell(context) {
 		title.apply {
 			textColor = Spectrum.white
 			textSize = 5.uiPX().toFloat()
-			typeface = GoldStoneFont.medium(context)
+			typeface = GoldStoneFont.heavy(context)
 			x += CommonCellSize.iconPadding
 		}.into(this)
 
 		info.apply {
 			textColor = Spectrum.opacity5White
 			textSize = 4.uiPX().toFloat()
-			typeface = GoldStoneFont.medium(context)
+			typeface = GoldStoneFont.heavy(context)
 			x -= CommonCellSize.rightPadding
 		}.into(this)
 
