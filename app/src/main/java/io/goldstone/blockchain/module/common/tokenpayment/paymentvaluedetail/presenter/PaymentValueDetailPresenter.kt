@@ -69,6 +69,7 @@ class PaymentValueDetailPresenter(
 					fragment.asyncData?.clear()
 					fragment.asyncData?.addAll(generateModels(it, defaultGasPrices))
 					fragment.recyclerView.adapter.notifyItemRangeChanged(1, 3)
+					hasCalculated = true
 				}
 			}
 		}
@@ -134,11 +135,14 @@ class PaymentValueDetailPresenter(
 	 * 业务实现的是随着用户没更新一个 `input` 信息重新测算 `gasLimit` 所以这个函数式用来
 	 * 实时更新界面的数值的.
 	 */
+	var hasCalculated = false
+
 	private fun updateTransactionAndAdapter(value: Double) {
 		prepareRawTransactionByGasPrices(value) {
 			fragment.asyncData?.clear()
 			fragment.asyncData?.addAll(generateModels(it, defaultGasPrices))
 			fragment.recyclerView.adapter.notifyItemRangeChanged(1, 3)
+			hasCalculated = true
 		}
 	}
 
@@ -153,8 +157,7 @@ class PaymentValueDetailPresenter(
 			GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
 				val myLatestNonce = first {
 					it.fromAddress.equals(
-						WalletTable.current.address,
-						true
+						WalletTable.current.address, true
 					)
 				}.nonce.toLong()
 				currentNonce = BigInteger.valueOf(myLatestNonce + 1)
@@ -216,11 +219,9 @@ class PaymentValueDetailPresenter(
 	}.toArrayList()
 
 	private fun generateEmptyData() {
-		fragment.asyncData = arrayListOf(
-			PaymentValueDetailModel().apply { type = MinerFeeType.Cheap.content },
+		fragment.asyncData = arrayListOf(PaymentValueDetailModel().apply { type = MinerFeeType.Cheap.content },
 			PaymentValueDetailModel().apply { type = MinerFeeType.Fast.content },
-			PaymentValueDetailModel().apply { type = MinerFeeType.Recommend.content }
-		)
+			PaymentValueDetailModel().apply { type = MinerFeeType.Recommend.content })
 	}
 
 	private fun insertPendingDataToTransactionTable(

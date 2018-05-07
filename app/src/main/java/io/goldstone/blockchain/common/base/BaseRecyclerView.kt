@@ -75,7 +75,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
     itemMove.attachToRecyclerView(this)
   }
 
-  inline fun <reified T> getItemViewAtAdapterPosition(position: Int, crossinline block: (T?) -> Unit) {
+  inline fun <reified T> getItemAtAdapterPosition(position: Int, crossinline block: (T?) -> Unit) {
     coroutinesTask({
       findViewHolderForAdapterPosition(position)?.itemView
     }) {

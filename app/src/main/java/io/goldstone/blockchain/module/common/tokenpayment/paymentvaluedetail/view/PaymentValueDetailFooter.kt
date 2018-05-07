@@ -21,40 +21,39 @@ import org.jetbrains.anko.textView
 
 class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 
-  var confirmClickEvent: Runnable? = null
-  private val customButton by lazy { BaseCell(context) }
-  private val confirmButton by lazy { RoundButton(context) }
+	var confirmClickEvent: Runnable? = null
+	private val customButton by lazy { BaseCell(context) }
+	private val confirmButton by lazy { RoundButton(context) }
 
-  init {
+	init {
 
-    orientation = VERTICAL
-    layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
+		orientation = VERTICAL
+		layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
 
-    customButton
-      .apply {
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX()).apply {
-          leftMargin = PaddingSize.device
-        }
-        textView {
-          setGrayStyle()
-          text = TokenDetailText.customMiner
-          textColor = GrayScale.gray
-          textSize = 5.uiPX().toFloat()
-          typeface = GoldStoneFont.book(context)
-        }.setCenterInVertical()
-      }
-      .into(this)
+		customButton.apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX()).apply {
+				leftMargin = PaddingSize.device
+			}
+			textView {
+				setGrayStyle()
+				text = TokenDetailText.customMiner
+				textColor = GrayScale.gray
+				textSize = 5.uiPX().toFloat()
+				typeface = GoldStoneFont.book(context)
+			}.setCenterInVertical()
+		}.into(this)
 
-    confirmButton
-      .apply {
-        y += 20.uiPX()
-        setBlueStyle()
-        text = CommonText.next.toUpperCase()
-      }
-      .click {
-        confirmClickEvent?.run()
-      }
-      .into(this)
-  }
+		confirmButton.apply {
+			setGrayStyle(20.uiPX())
+			text = CommonText.next.toUpperCase()
+		}.click {
+				confirmClickEvent?.run()
+			}.into(this)
+	}
+
+	fun setCanUseStyle(isSelected: Boolean) {
+		if (isSelected) confirmButton.setBlueStyle()
+		else confirmButton.setGrayStyle()
+	}
 
 }

@@ -107,7 +107,7 @@ class WalletDetailPresenter(
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
 		WalletTable.current.balance = totalBalance
-		recyclerView.getItemViewAtAdapterPosition<WalletDetailHeaderView>(0) {
+		recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
 			it?.model = WalletDetailHeaderModel(
 				null,
 				CryptoUtils.scaleTo9(WalletTable.current.name),

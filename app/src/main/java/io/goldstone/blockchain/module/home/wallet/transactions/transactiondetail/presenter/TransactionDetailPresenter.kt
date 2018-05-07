@@ -252,7 +252,7 @@ class TransactionDetailPresenter(
 	private fun updateHeaderValue(
 		count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false
 	) {
-		fragment.recyclerView.getItemViewAtAdapterPosition<TransactionDetailHeaderView>(0) {
+		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
 			it?.setIconStyle(count, address, symbol, isReceive, isPending)
 		}
 	}
@@ -366,9 +366,7 @@ class TransactionDetailPresenter(
 
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
-		receipt: Transaction,
-		transaction: InputCodeData,
-		isReceive: Boolean
+		receipt: Transaction, transaction: InputCodeData, isReceive: Boolean
 	) {
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
 			val address = if (isReceive) receipt.from else transaction.address

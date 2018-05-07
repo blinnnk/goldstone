@@ -1,13 +1,12 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -29,9 +28,13 @@ class PaymentValueDetailFragment :
 	BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
 
 	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
-	val token by lazy { arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel }
+	val token by lazy {
+		arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel
+	}
 
 	private var transferCount = 0.0
+	private var footer: PaymentValueDetailFooter? = null
+
 	override val presenter = PaymentValueDetailPresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -46,39 +49,53 @@ class PaymentValueDetailFragment :
 		super.onViewCreated(view, savedInstanceState)
 
 
-		recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
+		recyclerView.getItemAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
 			it?.let { header ->
 				header.setInputFocus()
 				address?.apply { header.showTargetAddress(this) }
 				presenter.updateHeaderValue(header)
 				header.inputTextListener {
 					it.isNotEmpty() isTrue {
+						presenter.hasCalculated = false
 						transferCount = it.toDouble()
+						footer?.setCanUseStyle(true)
+					} otherwise {
+						transferCount = 0.0
+						footer?.setCanUseStyle(false)
 					}
 				}
 				header.setHeaderSymbol(token?.symbol.orEmpty())
 			}
 		}
 
-		recyclerView.getItemViewAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
-			MyTokenTable.getBalanceWithSymbol(
-				token?.symbol!!, WalletTable.current.address, true
-			) { balance ->
-				footer?.confirmClickEvent = Runnable {
-					if (transferCount <= 0) {
+		recyclerView.getItemAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
+			this.footer = footer
+			footer?.confirmClickEvent = Runnable {
+				NetworkUtil.hasNetwork(context) isTrue {
+					MyTokenTable.getBalanceWithSymbol(
+						token?.symbol!!, WalletTable.current.address, true
+					) { balance ->
 						context?.runOnUiThread {
-							alert("Please Enter Your Transfer Value")
-						}
-					} else {
-						if (balance > transferCount) showConfirmAttentionView()
-						else {
-							context?.runOnUiThread {
-								alert("You haven't enough currency to transfer")
-							}
+							showAlertOrTransfer(balance)
 						}
 					}
 				}
 			}
+		}
+	}
+
+	private fun Context.showAlertOrTransfer(balance: Double) {
+		if (presenter.hasCalculated) {
+			if (transferCount <= 0) {
+				alert("Please Enter Your Transfer Value")
+			} else {
+				if (balance > transferCount) {
+					footer?.setCanUseStyle(true)
+					showConfirmAttentionView()
+				} else alert("You haven't enough currency to transfer")
+			}
+		} else {
+			alert("Calculating Now Please Wait")
 		}
 	}
 
