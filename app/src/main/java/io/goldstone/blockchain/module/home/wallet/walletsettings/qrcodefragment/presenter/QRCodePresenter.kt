@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.checkPermissionThen
@@ -56,7 +57,8 @@ class QRCodePresenter(
       val size = (ScreenSize.Width * 0.8).toInt()
       val barcodeEncoder = BarcodeEncoder()
       val bitmap = barcodeEncoder.encodeBitmap(address, BarcodeFormat.QR_CODE, size, size)
-      saveImage(bitmap)
+      // 防止生成 bitmap 有一定概率太慢, 这里延时保存一下
+      300L timeUpThen { saveImage(bitmap) }
       fragment.toast("QR code image has saved to album")
     }
   }
@@ -85,7 +87,6 @@ class QRCodePresenter(
     } catch (e: Exception) {
       e.printStackTrace()
     }
-
   }
 
 }

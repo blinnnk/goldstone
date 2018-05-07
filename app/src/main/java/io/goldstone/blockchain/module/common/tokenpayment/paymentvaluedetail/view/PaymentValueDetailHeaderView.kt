@@ -36,114 +36,108 @@ import org.jetbrains.anko.*
 @SuppressLint("SetTextI18n")
 class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-  private val gradientView by lazy { GradientView(context) }
-  private val description by lazy { TextView(context) }
-  private val valueInput by lazy { EditText(context) }
-  private val priceInfo by lazy { TextView(context) }
-  private val addressRemind by lazy { TransactionDetailCell(context) }
-  private val gradientViewHeight = 170.uiPX()
+	private val gradientView by lazy { GradientView(context) }
+	private val description by lazy { TextView(context) }
+	private val valueInput by lazy { EditText(context) }
+	private val priceInfo by lazy { TextView(context) }
+	private val addressRemind by lazy { TransactionDetailCell(context) }
+	private val gradientViewHeight = 170.uiPX()
 
-  init {
+	init {
 
-    layoutParams = LinearLayout.LayoutParams(matchParent, 260.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 260.uiPX())
 
-    gradientView
-      .apply {
-        layoutParams = LinearLayout.LayoutParams(matchParent, gradientViewHeight)
-        setStyle(GradientType.DarkGreenYellow, gradientViewHeight)
-      }
-      .into(this)
+		gradientView.apply {
+			layoutParams = LinearLayout.LayoutParams(matchParent, gradientViewHeight)
+			setStyle(GradientType.DarkGreenYellow, gradientViewHeight)
+		}.into(this)
 
-    verticalLayout {
-      layoutParams = RelativeLayout.LayoutParams(matchParent, gradientViewHeight)
-      gravity = Gravity.CENTER
-      description
-        .apply {
-          layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
-            topMargin = 15.uiPX()
-          }
-          textColor = Spectrum.opacity5White
-          textSize = 5.uiPX().toFloat()
-          typeface = GoldStoneFont.medium(context)
-          gravity = Gravity.CENTER
-        }
-        .into(this)
+		verticalLayout {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, gradientViewHeight)
+			gravity = Gravity.CENTER
+			description.apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
+					topMargin = 15.uiPX()
+				}
+				textColor = Spectrum.opacity5White
+				textSize = 5.uiPX().toFloat()
+				typeface = GoldStoneFont.medium(context)
+				gravity = Gravity.CENTER
+			}.into(this)
 
-      valueInput
-        .apply {
-          hint = "0.0"
-          hintTextColor = Spectrum.opacity5White
-          textColor = Spectrum.white
-          textSize = 16.uiPX().toFloat()
-          typeface = GoldStoneFont.heavy(context)
-          gravity = Gravity.CENTER
-          inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-          setCursorColor(Spectrum.blue)
-          backgroundTintMode = PorterDuff.Mode.CLEAR
-          y -= 3.uiPX()
-        }
-        .into(this)
+			valueInput.apply {
+				hint = "0.0"
+				hintTextColor = Spectrum.opacity5White
+				textColor = Spectrum.white
+				textSize = 16.uiPX().toFloat()
+				typeface = GoldStoneFont.heavy(context)
+				gravity = Gravity.CENTER
+				inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+				setCursorColor(Spectrum.blue)
+				backgroundTintMode = PorterDuff.Mode.CLEAR
+				y -= 3.uiPX()
+			}.into(this)
 
-      priceInfo
-        .apply {
-          layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
-            topMargin = -(18.uiPX())
-          }
-          text = "≈ 0.0 (${ GoldStoneApp.currencyCode })"
-          textColor = Spectrum.opacity5White
-          textSize = 4.uiPX().toFloat()
-          typeface = GoldStoneFont.medium(context)
-          gravity = Gravity.CENTER
-        }
-        .into(this)
-    }
+			priceInfo.apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
+					topMargin = -(18.uiPX())
+				}
+				text = "≈ 0.0 (${GoldStoneApp.currencyCode})"
+				textColor = Spectrum.opacity5White
+				textSize = 4.uiPX().toFloat()
+				typeface = GoldStoneFont.medium(context)
+				gravity = Gravity.CENTER
+			}.into(this)
+		}
 
-    verticalLayout {
-      layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
-      addressRemind.into(this)
-      addressRemind.apply {
-        setGrayInfoStyle()
-      }
+		verticalLayout {
+			layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
+			addressRemind.into(this)
+			addressRemind.apply {
+				setGrayInfoStyle()
+			}
 
-      textView {
-        text = "Miner Fee"
-        textSize = 4.uiPX().toFloat()
-        textColor = GrayScale.gray
-        typeface = GoldStoneFont.book(context)
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX()).apply {
-          leftMargin = PaddingSize.device
-          topMargin = 10.uiPX()
-        }
-      }
-    }.setAlignParentBottom()
+			textView {
+				text = "Miner Fee"
+				textSize = 4.uiPX().toFloat()
+				textColor = GrayScale.gray
+				typeface = GoldStoneFont.book(context)
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX()).apply {
+					leftMargin = PaddingSize.device
+					topMargin = 10.uiPX()
+				}
+			}
+		}.setAlignParentBottom()
 
-  }
+	}
 
-  fun setInputFocus() {
-    valueInput.hintTextColor = Spectrum.opacity1White
-    valueInput.requestFocus()
-  }
+	fun setInputFocus() {
+		valueInput.hintTextColor = Spectrum.opacity1White
+		valueInput.requestFocus()
+	}
 
-  fun showTargetAddress(address: String) {
-    addressRemind.model = TransactionDetailModel(address, "Target Address")
-  }
+	fun showTargetAddress(address: String) {
+		addressRemind.model = TransactionDetailModel(address, "Target Address")
+	}
 
-  fun updateCurrencyValue(value: Double?) {
-    priceInfo.text = "≈ ${ value.orElse(0.0).formatCurrency() } (${ GoldStoneApp.currencyCode })"
-  }
+	fun updateCurrencyValue(value: Double?) {
+		priceInfo.text = "≈ ${value.orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"
+	}
 
-  fun inputTextListener(hold: (String) -> Unit) {
-    valueInput.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(text: Editable?) {
-        text?.apply { hold(toString()) }
-      }
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-    })
-  }
+	fun inputTextListener(hold: (String) -> Unit) {
+		valueInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				valueInput.textSize = 16.uiPX().toFloat()
+				text?.apply { hold(toString()) }
+			}
 
-  fun setHeaderSymbol(symbol: String) {
-    description.text = "Send $symbol Count"
-  }
+			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+		})
+	}
+
+	fun setHeaderSymbol(symbol: String) {
+		description.text = "Send $symbol Count"
+	}
 
 }
