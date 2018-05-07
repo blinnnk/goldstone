@@ -2,21 +2,47 @@ package io.goldstone.blockchain.module.entrance.splash.view
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.hideStatusBar
-import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.GoldStoneApp
+import com.blinnnk.extension.*
+import io.goldstone.blockchain.GoldStoneApp.Companion.currencyCode
+import io.goldstone.blockchain.GoldStoneApp.Companion.currentLanguage
+import io.goldstone.blockchain.GoldStoneApp.Companion.currentRate
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
 /**
-——————————————————————————————————————————————————————————
-▒█▀▀█ ▒█▀▀▀█ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀█ ▀▀█▀▀ ▒█▀▀▀█ ▒█▄░▒█ ▒█▀▀▀
-▒█░▄▄ ▒█░░▒█ ▒█░░░ ▒█░▒█ ░▀▀▀▄▄ ░▒█░░ ▒█░░▒█ ▒█▒█▒█ ▒█▀▀▀
-▒█▄▄█ ▒█▄▄▄█ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄█ ░▒█░░ ▒█▄▄▄█ ▒█░░▀█ ▒█▄▄▄
-——————————————————————————————————————————————————————————
+─────────────────────────────────────────────────────────────
+─██████████████─██████████████─██████─────────████████████───
+─██░░░░░░░░░░██─██░░░░░░░░░░██─██░░██─────────██░░░░░░░░████─
+─██░░██████████─██░░██████░░██─██░░██─────────██░░████░░░░██─
+─██░░██─────────██░░██──██░░██─██░░██─────────██░░██──██░░██─
+─██░░██─────────██░░██──██░░██─██░░██─────────██░░██──██░░██─
+─██░░██──██████─██░░██──██░░██─██░░██─────────██░░██──██░░██─
+─██░░██──██░░██─██░░██──██░░██─██░░██─────────██░░██──██░░██─
+─██░░██──██░░██─██░░██──██░░██─██░░██─────────██░░██──██░░██─
+─██░░██████░░██─██░░██████░░██─██░░██████████─██░░████░░░░██─
+─██░░░░░░░░░░██─██░░░░░░░░░░██─██░░░░░░░░░░██─██░░░░░░░░████─
+─██████████████─██████████████─██████████████─████████████───
+─────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────────────────
+─██████████████─██████████████─██████████████─██████──────────██████─██████████████─
+─██░░░░░░░░░░██─██░░░░░░░░░░██─██░░░░░░░░░░██─██░░██████████──██░░██─██░░░░░░░░░░██─
+─██░░██████████─██████░░██████─██░░██████░░██─██░░░░░░░░░░██──██░░██─██░░██████████─
+─██░░██─────────────██░░██─────██░░██──██░░██─██░░██████░░██──██░░██─██░░██─────────
+─██░░██████████─────██░░██─────██░░██──██░░██─██░░██──██░░██──██░░██─██░░██████████─
+─██░░░░░░░░░░██─────██░░██─────██░░██──██░░██─██░░██──██░░██──██░░██─██░░░░░░░░░░██─
+─██████████░░██─────██░░██─────██░░██──██░░██─██░░██──██░░██──██░░██─██░░██████████─
+─────────██░░██─────██░░██─────██░░██──██░░██─██░░██──██░░██████░░██─██░░██─────────
+─██████████░░██─────██░░██─────██░░██████░░██─██░░██──██░░░░░░░░░░██─██░░██████████─
+─██░░░░░░░░░░██─────██░░██─────██░░░░░░░░░░██─██░░██──██████████░░██─██░░░░░░░░░░██─
+─██████████████─────██████─────██████████████─██████──────────██████─██████████████─
+────────────────────────────────────────────────────────────────────────────────────
 Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
+────────────────────────────────────────────────────────────────────────────────────
  */
 
 class SplashActivity : AppCompatActivity() {
@@ -29,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 
 		hideStatusBar()
-		GoldStoneApp.initAppParameters()
+		initAppParameters()
 
 		presenter.hasAccountThenLogin()
 		container.apply {
@@ -41,4 +67,35 @@ class SplashActivity : AppCompatActivity() {
 			setContentView(it)
 		}
 	}
+
+	/**
+	 * Querying the language type of the current account
+	 * set and displaying the interface from the database.
+	 */
+	private fun initAppParameters() {
+		WalletTable.getCurrentWalletInfo {
+			it?.apply {
+				initLaunchLanguage(it)
+				getCurrencyRate(it)
+			}
+		}
+	}
+
+	private fun initLaunchLanguage(wallet: WalletTable) {
+		wallet.isNull() isTrue {
+			currentLanguage = HoneyLanguage.getLanguageCode(CountryCode.currentLanguage)
+		} otherwise {
+			currentLanguage = wallet.language
+			WalletTable.current = wallet
+		}
+	}
+
+	// 获取当前的汇率
+	private fun getCurrencyRate(wallet: WalletTable) {
+		currencyCode = wallet.currencyCode
+		GoldStoneAPI.getCurrencyRate(wallet.currencyCode) {
+			currentRate = it
+		}
+	}
+
 }

@@ -14,8 +14,6 @@ import org.jetbrains.anko.yesButton
 import android.support.v4.content.ContextCompat.startActivity
 import android.content.Intent
 
-
-
 @Suppress("DEPRECATION")
 /**
  * @date 26/03/2018 6:42 PM
@@ -45,10 +43,10 @@ class LanguagePresenter(
 
 	private fun updateData(language: String) {
 		val code = when (language) {
-			HoneyLanguage.English.language -> HoneyLanguage.English.code
-			HoneyLanguage.Chinese.language -> HoneyLanguage.Chinese.code
+			HoneyLanguage.English.language  -> HoneyLanguage.English.code
+			HoneyLanguage.Chinese.language  -> HoneyLanguage.Chinese.code
 			HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
-			else -> HoneyLanguage.English.code
+			else                            -> HoneyLanguage.English.code
 		}
 
 		WalletTable.updateLanguage(code) {

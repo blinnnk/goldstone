@@ -10,6 +10,8 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -22,51 +24,48 @@ import org.jetbrains.anko.verticalLayout
 
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
-  private val oldPassword by lazy { RoundInput(context!!) }
-  private val newPassword by lazy { RoundInput(context!!) }
-  private val repeatPassword by lazy { RoundInput(context!!) }
-  private val passwordHint by lazy { RoundInput(context!!) }
-  val confirmButton by lazy { RoundButton(context!!) }
+	private val oldPassword by lazy { RoundInput(context!!) }
+	private val newPassword by lazy { RoundInput(context!!) }
+	private val repeatPassword by lazy { RoundInput(context!!) }
+	private val passwordHint by lazy { RoundInput(context!!) }
+	val confirmButton by lazy { RoundButton(context!!) }
 
-  override val presenter = PasswordSettingsPresenter(this)
+	override val presenter = PasswordSettingsPresenter(this)
 
-  override fun AnkoContext<Fragment>.initView() {
+	override fun AnkoContext<Fragment>.initView() {
 
-    verticalLayout {
-      lparams(matchParent, matchParent)
-      oldPassword.apply {
-        title = "Old Password"
-        setPasswordInput()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-      }.into(this)
+		verticalLayout {
+			lparams(matchParent, matchParent)
+			oldPassword.apply {
+				title = WalletSettingsText.oldPassword
+				setPasswordInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+			}.into(this)
 
-      newPassword.apply {
-        title = "New Password"
-        setPasswordInput()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-      }.into(this)
+			newPassword.apply {
+				title = WalletSettingsText.newPassword
+				setPasswordInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+			}.into(this)
 
-      repeatPassword.apply {
-        title = "Repeat Password"
-        setPasswordInput()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-      }.into(this)
+			repeatPassword.apply {
+				title = CreateWalletText.repeatPassword
+				setPasswordInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+			}.into(this)
 
-      passwordHint.apply {
-        title = "Password Hint"
-        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-      }.into(this)
+			passwordHint.apply {
+				title = CreateWalletText.hint
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+			}.into(this)
 
-      confirmButton.apply {
-        text = CommonText.confirm
-        setBlueStyle()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-      }.click {
-          presenter.updatePassword(oldPassword, newPassword, repeatPassword)
-        }.into(this)
-
-    }
-
-  }
-
+			confirmButton.apply {
+				text = CommonText.confirm
+				setBlueStyle()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+			}.click {
+				presenter.updatePassword(oldPassword, newPassword, repeatPassword)
+			}.into(this)
+		}
+	}
 }

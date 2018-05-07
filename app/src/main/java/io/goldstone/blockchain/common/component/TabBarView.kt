@@ -26,120 +26,119 @@ import org.jetbrains.anko.matchParent
 
 class TabBarView(context: Context) : RelativeLayout(context) {
 
-  val walletButton by lazy { TabItem(context) }
-  val marketButton by lazy { TabItem(context) }
-  val profileButton by lazy { TabItem(context) }
+	val walletButton by lazy { TabItem(context) }
+	val marketButton by lazy { TabItem(context) }
+	val profileButton by lazy { TabItem(context) }
 
+	init {
+		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
 
-  init {
-    layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
+		walletButton.apply {
+			text = "wallet"
+			type = TabItemType.Wallet
+			x += PaddingSize.device
+		}.into(this)
 
-    walletButton.apply {
-      text = "wallet"
-      type = TabItemType.Wallet
-      x += PaddingSize.device
-    }.into(this)
+		marketButton.apply {
+			text = "markets"
+			type = TabItemType.Market
+		}.into(this)
 
-    marketButton.apply {
-      text = "markets"
-      type = TabItemType.Market
-    }.into(this)
+		profileButton.apply {
+			text = "profile"
+			type = TabItemType.Profile
+			x -= PaddingSize.device
+		}.into(this)
 
-    profileButton.apply {
-      text = "profile"
-      type = TabItemType.Profile
-      x -= PaddingSize.device
-    }.into(this)
+		// 修改位置
+		marketButton.setCenterInHorizontal()
+		profileButton.setAlignParentRight()
 
-    // 修改位置
-    marketButton.setCenterInHorizontal()
-    profileButton.setAlignParentRight()
+		// 默认选中
+		walletButton.setSelectedStyle()
 
-    // 默认选中
-    walletButton.setSelectedStyle()
+		outlineProvider = ViewOutlineProvider.BOUNDS
+		backgroundColor = Spectrum.white
 
-    outlineProvider = ViewOutlineProvider.BOUNDS
-    backgroundColor = Spectrum.white
-
-    elevation = 50.uiPX().toFloat()
-  }
+		elevation = 50.uiPX().toFloat()
+	}
 
 }
 
 enum class TabItemType {
-  Market, Wallet, Profile
+	Market, Wallet, Profile
 }
 
 class TabItem(context: Context) : View(context) {
 
-  var text by observing("") {
-    invalidate()
-  }
+	var text by observing("") {
+		invalidate()
+	}
 
-  var type by observing(TabItemType.Market) {
-    invalidate()
-  }
+	var type by observing(TabItemType.Market) {
+		invalidate()
+	}
 
-  private val iconPaint = Paint().apply {
-    isAntiAlias = true
-    style = Paint.Style.FILL
-    color = GrayScale.midGray
-  }
+	private val iconPaint = Paint().apply {
+		isAntiAlias = true
+		style = Paint.Style.FILL
+		color = GrayScale.midGray
+	}
 
-  private val iconSize = HomeSize.tabBarHeight
+	private val iconSize = HomeSize.tabBarHeight
 
-  private val textPaint = Paint().apply {
-    isAntiAlias = true
-    style = Paint.Style.FILL
-    color = GrayScale.midGray
-    textSize = 12.uiPX().toFloat()
-    typeface = GoldStoneFont.heavy(context)
-  }
+	private val textPaint = Paint().apply {
+		isAntiAlias = true
+		style = Paint.Style.FILL
+		color = GrayScale.midGray
+		textSize = 12.uiPX().toFloat()
+		typeface = GoldStoneFont.heavy(context)
+	}
 
-  private val path = HoneySvgPathConvert()
+	private val path = HoneySvgPathConvert()
 
-  init {
-    layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
-    isClickable = true
-    scaleX = 0.75f
-    scaleY = 0.75f
-  }
+	init {
+		layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+		isClickable = true
+		scaleX = 0.75f
+		scaleY = 0.75f
+	}
 
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-    // `Wallet` 的 `Path` 尺寸不同这里的位置也相对调整
-    val iconLeft = if (type == TabItemType.Wallet) (width - 30.uiPX()) / 2f
-    else (width - 34.uiPX()) / 2f
-    val textX = if (type == TabItemType.Wallet) (textPaint.measureText(text) - 26.uiPX()) / 2f
-    else (textPaint.measureText(text) - 34.uiPX()) / 2f
+		// `Wallet` 的 `Path` 尺寸不同这里的位置也相对调整
+		val iconLeft = if (type == TabItemType.Wallet) (width - 30.uiPX()) / 2f
+		else (width - 34.uiPX()) / 2f
+		val textX = if (type == TabItemType.Wallet) (textPaint.measureText(text) - 26.uiPX()) / 2f
+		else (textPaint.measureText(text) - 34.uiPX()) / 2f
 
-    canvas?.translate(iconLeft, 2.uiPX().toFloat())
+		canvas?.translate(iconLeft, 2.uiPX().toFloat())
 
-    val drawPath = when (type) {
-      TabItemType.Market -> path.parser(SvgPath.market)
-      TabItemType.Profile -> path.parser(SvgPath.profile)
-      TabItemType.Wallet -> path.parser(SvgPath.wallet)
-    }
+		val drawPath = when (type) {
+			TabItemType.Market  -> path.parser(SvgPath.market)
+			TabItemType.Profile -> path.parser(SvgPath.profile)
+			TabItemType.Wallet  -> path.parser(SvgPath.wallet)
+		}
 
-    canvas?.drawPath(drawPath, iconPaint)
-    canvas?.save()
+		canvas?.drawPath(drawPath, iconPaint)
+		canvas?.save()
 
 
-    canvas?.drawText(text, -textX, 45.uiPX().toFloat(), textPaint)
+		canvas?.drawText(text, -textX, 45.uiPX().toFloat(), textPaint)
 
-  }
+	}
 
-  fun setSelectedStyle() {
-    iconPaint.color = GrayScale.Opacity8Black
-    textPaint.color = GrayScale.Opacity8Black
-    invalidate()
-  }
+	fun setSelectedStyle() {
+		iconPaint.color = GrayScale.Opacity8Black
+		textPaint.color = GrayScale.Opacity8Black
+		invalidate()
+	}
 
-  fun resetStyle() {
-    iconPaint.color = GrayScale.midGray
-    textPaint.color = GrayScale.midGray
-    invalidate()
-  }
+	fun resetStyle() {
+		iconPaint.color = GrayScale.midGray
+		textPaint.color = GrayScale.midGray
+		invalidate()
+	}
 
 }

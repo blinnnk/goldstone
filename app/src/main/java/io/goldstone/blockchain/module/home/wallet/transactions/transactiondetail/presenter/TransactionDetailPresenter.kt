@@ -122,7 +122,7 @@ class TransactionDetailPresenter(
 		super.onFragmentShowFromHidden()
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment -> {
+				is TransactionFragment        -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TransactionText.detail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -138,7 +138,7 @@ class TransactionDetailPresenter(
 					}
 				}
 
-				is NotificationFragment -> {
+				is NotificationFragment       -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -157,7 +157,7 @@ class TransactionDetailPresenter(
 		}
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment -> {
+				is TransactionFragment        -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TransactionText.detail, argument
 					)
@@ -169,7 +169,7 @@ class TransactionDetailPresenter(
 					)
 				}
 
-				is NotificationFragment -> {
+				is NotificationFragment       -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
 					)
@@ -209,7 +209,7 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			is TransactionReceipt -> {
+			is TransactionReceipt   -> {
 				arrayListOf(
 					minerFee,
 					"There isn't a memo",
@@ -220,7 +220,7 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			else -> {
+			else                    -> {
 				arrayListOf(
 					minerFee,
 					"There isn't a memo",

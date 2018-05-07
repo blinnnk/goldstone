@@ -13,18 +13,18 @@ import io.goldstone.blockchain.module.home.profile.currency.model.CurrencyModel
 
 class CurrencyCell(context: Context) : BaseRadioCell(context) {
 
-  var model: CurrencyModel by observing(CurrencyModel()) {
-    title.text = model.symbol
-    checkedStatus = model.isChecked
-    val image = when(model.symbol) {
-      "CNY" -> R.drawable.china_icon
-      "JPY" -> R.drawable.japan_icon
-      "KRW" -> R.drawable.korea_icon
-      "RUB" -> R.drawable.russia_icon
-      else -> R.drawable.amercia_icon
-    }
-    showIcon(image)
-  }
+	var model: CurrencyModel by observing(CurrencyModel()) {
+		title.text = model.symbol
+		checkedStatus = model.isChecked
+		val image = when (model.symbol) {
+			"CNY" -> R.drawable.china_icon
+			"JPY" -> R.drawable.japan_icon
+			"KRW" -> R.drawable.korea_icon
+			"RUB" -> R.drawable.russia_icon
+			else  -> R.drawable.amercia_icon
+		}
+		showIcon(image)
+	}
 
 }
 
