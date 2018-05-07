@@ -64,7 +64,7 @@ class MnemonicImportDetailPresenter(
 								GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
 							}
 							WalletTable.insert(WalletTable(0, name, address!!, true, hint))
-							CreateWalletPresenter.generateMyTokenInfo(address, true)
+							CreateWalletPresenter.generateMyTokenInfo(address, false)
 							// 注册钱包地址用于发送 `Push`
 							XinGePushReceiver.registerWalletAddressForPush()
 						}
