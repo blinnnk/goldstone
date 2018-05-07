@@ -136,7 +136,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
-		fragment.recyclerView.getItemViewAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
+		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 6
 			val chartArray = arrayListOf<Point>()
 			val charCount = if (size > maxChartCount) maxChartCount else size
@@ -198,8 +198,7 @@ class TokenDetailPresenter(
 			override var asyncCount: Int = maxCount
 			override fun concurrentJobs() {
 				(0 until maxCount).forEach { index ->
-					val currentMills =
-						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
+					val currentMills = if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
 						it.timeStamp.toMills() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {

@@ -18,7 +18,7 @@ enum class MinerFeeType(val content: String, val value: Double) {
 data class PaymentValueDetailModel(
 	val count: String = "0.000 ETH",
 	val info: String = "≈ 0.00 Gwei (Gas Price) * 0.000 (Gas Limit)",
-	val type: String = "calculating",
+	var type: String = "calculating",
 	var isSelected: Boolean = false,
 	var rawTransaction: RawTransaction? = null
 ) {
