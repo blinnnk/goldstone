@@ -52,8 +52,8 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 	}
 
 	fun setCanUseStyle(isSelected: Boolean) {
-		if (isSelected) confirmButton.setBlueStyle()
-		else confirmButton.setGrayStyle()
+		if (isSelected) confirmButton.setBlueStyle(20.uiPX())
+		else confirmButton.setGrayStyle(20.uiPX())
 	}
 
 }

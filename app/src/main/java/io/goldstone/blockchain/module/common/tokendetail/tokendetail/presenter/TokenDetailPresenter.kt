@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
+import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -40,6 +41,15 @@ class TokenDetailPresenter(
 
 	override fun updateData() {
 		prepareTokenDetailData()
+	}
+
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		// 详情页面直接全屏高度
+		setHeightMatchParent()
 	}
 
 	fun showAddressSelectionFragment() {
@@ -65,7 +75,11 @@ class TokenDetailPresenter(
 
 	fun showDepositFragment() {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			//
+			fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+				presenter.showTargetFragment<DepositFragment>(
+					TokenDetailText.deposit, TokenDetailText.tokenDetail
+				)
+			}
 		}
 	}
 
