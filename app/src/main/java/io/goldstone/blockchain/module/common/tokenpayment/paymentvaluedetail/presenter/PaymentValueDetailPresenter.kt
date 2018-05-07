@@ -259,7 +259,15 @@ class PaymentValueDetailPresenter(
 			// 如果有键盘收起键盘
 			activity?.apply { SoftKeyboard.hide(this) }
 			removeChildFragment(fragment)
-			val model = ReceiptModel(address, raw, token, taxHash, System.currentTimeMillis())
+			val model = ReceiptModel(
+				address,
+				raw.gasLimit,
+				raw.gasPrice,
+				raw.value,
+				token,
+				taxHash,
+				System.currentTimeMillis()
+			)
 			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.transactionDetail, model)
 			}
