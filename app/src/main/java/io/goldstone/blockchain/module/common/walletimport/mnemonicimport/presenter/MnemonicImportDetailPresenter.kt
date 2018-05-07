@@ -1,19 +1,13 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
 import android.widget.EditText
-import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -51,27 +45,8 @@ class MnemonicImportDetailPresenter(
 
 	private fun importWallet(mnemonic: String, password: String, name: String, hint: String? = null) {
 		fragment.context?.getWalletByMnemonic(mnemonic, password) { address ->
-
-			WalletTable.getAllAddresses {
-				// 查找本地是否已经存在这个钱包
-				if (any { it.equals(address, true) }) {
-					fragment.context?.alert("The address has already existed")
-					return@getAllAddresses
-				} else {
-					coroutinesTask({
-						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-							it.isNotNull {
-								GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
-							}
-							WalletTable.insert(WalletTable(0, name, address!!, true, hint))
-							CreateWalletPresenter.generateMyTokenInfo(address, false)
-							// 注册钱包地址用于发送 `Push`
-							XinGePushReceiver.registerWalletAddressForPush()
-						}
-					}) {
-						fragment.activity?.jump<SplashActivity>()
-					}
-				}
+			address?.let {
+				WalletImportPresenter.insertWalletToDatabase(fragment, it, name, hint)
 			}
 		}
 	}
