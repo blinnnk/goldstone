@@ -86,7 +86,7 @@ class TransactionDetailPresenter(
 		/** 这个是转账完毕后进入的初始数据 */
 		data?.apply {
 			currentHash = taxHash
-			count = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal)
+			count = CryptoUtils.toCountByDecimal(value.toDouble(), token.decimal)
 			fragment.asyncData = generateModels()
 			observerTransaction()
 			updateHeaderValue(count, address, token.symbol, true)
@@ -196,7 +196,7 @@ class TransactionDetailPresenter(
 	): ArrayList<TransactionDetailModel> {
 
 		val minerFee = if (data.isNull()) dataFromList?.minerFee
-		else (data!!.raw.gasLimit * data!!.raw.gasPrice).toDouble().toEthValue()
+		else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
 
 		val date = if (data.isNull()) dataFromList?.date else formatDate(data!!.timestamp / 1000)
 
