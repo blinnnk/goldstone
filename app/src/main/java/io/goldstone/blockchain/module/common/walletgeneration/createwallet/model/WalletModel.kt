@@ -81,6 +81,12 @@ data class WalletTable(
 			}) { hold(it) }
 		}
 
+		fun getCurrentWalletAddress(hold: String.() -> Unit) {
+			WalletTable.getCurrentWalletInfo {
+				hold(it!!.address)
+			}
+		}
+
 		fun updateName(newName: String, callback: () -> Unit) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().apply {
