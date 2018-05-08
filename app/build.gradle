@@ -46,7 +46,7 @@ dependencies {
     exclude group: 'com.google.android', module: 'android'
   }
   // 黑蜜动画及其他便捷工具依赖工程
-  implementation 'com.blinnnk:honeyui:0.2.9.0'
+  implementation 'com.blinnnk:honeyui:0.2.9.1'
 
   // Crypto
   implementation 'org.ethereum:geth:1.8.2'

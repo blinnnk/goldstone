@@ -11,8 +11,11 @@ import org.web3j.crypto.RawTransaction
  * @author KaySaith
  */
 
-enum class MinerFeeType(val content: String, val value: Double) {
-	Recommend("recommend", 30.0), Cheap("cheap", 1.0), Fast("fast", 100.0)
+enum class MinerFeeType(val content: String, var value: Long) {
+	Recommend("recommend", 30),
+	Cheap("cheap", 1),
+	Fast("fast", 100),
+	Custom("custom", 0)
 }
 
 data class PaymentValueDetailModel(
@@ -27,14 +30,16 @@ data class PaymentValueDetailModel(
 		(gWei * raw.gasLimit.toDouble()).toEthValue(), // count 转换过的
 		"≈ ${gWei.toGWeiValue()} Gwei (Gas Price) * ${raw.gasLimit.toDouble().toGasValue()} (Gas Limit)",
 		when (gWei.toGwei()) {
-			MinerFeeType.Cheap.value -> MinerFeeType.Cheap.content
-			MinerFeeType.Fast.value -> MinerFeeType.Fast.content
-			else -> MinerFeeType.Recommend.content
+			MinerFeeType.Cheap.value     -> MinerFeeType.Cheap.content
+			MinerFeeType.Fast.value      -> MinerFeeType.Fast.content
+			MinerFeeType.Recommend.value -> MinerFeeType.Recommend.content
+			else                         -> MinerFeeType.Custom.content
 		},
 		gWei.toGwei() == when (currentType) {
+			MinerFeeType.Fast.content      -> MinerFeeType.Fast.value
+			MinerFeeType.Cheap.content     -> MinerFeeType.Cheap.value
 			MinerFeeType.Recommend.content -> MinerFeeType.Recommend.value
-			MinerFeeType.Fast.content -> MinerFeeType.Fast.value
-			else -> MinerFeeType.Cheap.value
+			else                           -> MinerFeeType.Custom.value
 		},
 		raw
 	)

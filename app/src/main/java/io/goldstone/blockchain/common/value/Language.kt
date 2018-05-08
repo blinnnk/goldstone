@@ -229,6 +229,18 @@ object TransactionText {
 		HoneyLanguage.English.code -> "Transaction Date"
 		else                       -> ""
 	}
+
+	@JvmField
+	val gasLimit = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Gas Limit"
+		else                       -> ""
+	}
+
+	@JvmField
+	val gasPrice = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Gas Price"
+		else                       -> ""
+	}
 }
 
 object TokenDetailText {
@@ -242,6 +254,18 @@ object TokenDetailText {
 	@JvmField
 	val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Deposit"
+		else                       -> ""
+	}
+
+	@JvmField
+	val customGas = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Gas Editor"
+		else                       -> ""
+	}
+
+	@JvmField
+	val paymentValue = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Payment Value"
 		else                       -> ""
 	}
 
@@ -262,6 +286,7 @@ object TokenDetailText {
 		HoneyLanguage.English.code -> "Token Detail"
 		else                       -> ""
 	}
+
 }
 
 object CommonText {
@@ -314,12 +339,30 @@ object CommonText {
 		else                       -> "删除"
 	}
 
+	@JvmField
+	val slow = when (currentLanguage) {
+		HoneyLanguage.English.code -> "SLOW"
+		else                       -> "慢"
+	}
+
+	@JvmField
+	val fast = when (currentLanguage) {
+		HoneyLanguage.English.code -> "FAST"
+		else                       -> "快"
+	}
+
 }
 
 object AlertText {
 	@JvmField
 	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current wallet is watch only type, This kind of operation is not allowed."
+		else                       -> ""
+	}
+
+	@JvmField
+	val modifyCountAfoterCustomGas = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Modifying transfer count will lead to a recalculation and you need to reset the custom gas settings"
 		else                       -> ""
 	}
 }
