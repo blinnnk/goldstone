@@ -44,12 +44,11 @@ class NotificationListPresenter(
 			} otherwise {
 				fragment.asyncData = localData
 			}
-			NetworkUtil.hasNetwork(fragment.context) isTrue  {
+			NetworkUtil.hasNetwork(fragment.context) isTrue {
 				updateDataFromServer(requestTime)
 			} otherwise {
 				fragment.getMainActivity()?.removeLoadingView()
 			}
-			setHeightMatchParent()
 		}
 	}
 
