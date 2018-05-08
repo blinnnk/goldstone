@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.presenter
 
+import android.os.Bundle
 import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
@@ -7,6 +8,9 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.TokenDetailText
@@ -16,6 +20,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailCell
@@ -36,6 +41,7 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
+import java.io.Serializable
 import java.math.BigInteger
 
 /**
@@ -43,19 +49,25 @@ import java.math.BigInteger
  * @author KaySaith
  */
 
+data class GasFee(var gasLimit: Long, val gasPrice: Long) : Serializable
+
 class PaymentValueDetailPresenter(
 	override val fragment: PaymentValueDetailFragment
 ) : BaseRecyclerPresenter<PaymentValueDetailFragment, PaymentValueDetailModel>() {
 
-	private var currentNonce: BigInteger? = null
 	private var minerFeeType = MinerFeeType.Recommend.content
+
+	private var currentNonce: BigInteger? = null
+	private var gasFeeFromCustom: () -> GasFee? = {
+		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
+	}
 
 	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
 	private val defaultGasPrices by lazy {
 		arrayListOf(
-			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei().toLong()), // cheap
-			BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei().toLong()), // fast
-			BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei().toLong()) // recommend
+			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei()), // cheap
+			BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei()), // fast
+			BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei()) // recommend
 		)
 	}
 
@@ -68,11 +80,17 @@ class PaymentValueDetailPresenter(
 				context?.runOnUiThread {
 					fragment.asyncData?.clear()
 					fragment.asyncData?.addAll(generateModels(it, defaultGasPrices))
-					fragment.recyclerView.adapter.notifyItemRangeChanged(1, 3)
+					fragment.recyclerView.adapter.notifyItemRangeChanged(1, it.size)
 					hasCalculated = true
 				}
 			}
 		}
+	}
+
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?, cellHeight: Int, maxHeight: Int
+	) {
+		setHeightMatchParent()
 	}
 
 	/**
@@ -84,12 +102,30 @@ class PaymentValueDetailPresenter(
 				count.isNotEmpty() isTrue {
 					updateCurrencyValue(count.toDouble() * fragment.token?.price.orElse(0.0))
 					// 根据数量更新 `Transaction`
-					updateTransactionAndAdapter(count.toDouble())
+					if (defaultGasPrices.size > 3) {
+						minerFeeType = MinerFeeType.Recommend.content
+					}
+					updateTransactionAndAdapter(count.toDouble()) {
+						fragment.recoveryWhenModifyCount()
+					}
 				} otherwise {
 					updateCurrencyValue(0.0)
 					updateTransactionAndAdapter(0.0)
 				}
 			}
+		}
+	}
+
+	/**
+	 * 自定义燃气费的 `gasLimit` 会根据 `inputCode` 的值变化实时变化, 如果用户先修改 `gas custom`
+	 * 再修改 `count` 需要抚慰 `custom settings` 不然会转账失败
+	 */
+	private fun PaymentValueDetailFragment.recoveryWhenModifyCount() {
+		if (defaultGasPrices.size > 3) {
+			context?.alert(AlertText.modifyCountAfoterCustomGas)
+			asyncData?.remove(fragment.asyncData?.last())
+			minerFeeType = MinerFeeType.Recommend.content
+			recyclerView.adapter.notifyItemRemoved(4)
 		}
 	}
 
@@ -101,13 +137,8 @@ class PaymentValueDetailPresenter(
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
-				val priceAscRaw = fragment.asyncData!!.sortedBy { it.rawTransaction?.gasPrice }
 
-				val raw = when (minerFeeType) {
-					MinerFeeType.Cheap.content -> priceAscRaw[0].rawTransaction
-					MinerFeeType.Fast.content  -> priceAscRaw[2].rawTransaction
-					else                       -> priceAscRaw[1].rawTransaction
-				}
+				val raw = fragment.asyncData?.getRawTransactionByMinerType(minerFeeType)
 				// 准备秘钥格式
 				val credentials = Credentials.create(privateKey)
 				// 生成签名文件
@@ -131,18 +162,38 @@ class PaymentValueDetailPresenter(
 		}
 	}
 
+	private fun ArrayList<PaymentValueDetailModel>.getRawTransactionByMinerType(type: String): RawTransaction? {
+		return find { it.type == type }?.rawTransaction
+	}
+
 	/**
-	 * 业务实现的是随着用户没更新一个 `input` 信息重新测算 `gasLimit` 所以这个函数式用来
+	 * 业务实现的是随着用户每更新一个 `input` 信息重新测算 `gasLimit` 所以这个函数式用来
 	 * 实时更新界面的数值的.
 	 */
 	var hasCalculated = false
+	private var isItemCountChanged = true
 
-	private fun updateTransactionAndAdapter(value: Double) {
+	fun updateTransactionAndAdapter(value: Double, callback: () -> Unit = {}) {
+		gasFeeFromCustom().isNull() isFalse {
+			fragment.getMainActivity()?.showLoadingView()
+			minerFeeType = MinerFeeType.Custom.content
+		}
 		prepareRawTransactionByGasPrices(value) {
 			fragment.asyncData?.clear()
 			fragment.asyncData?.addAll(generateModels(it, defaultGasPrices))
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, 3)
+			// 根据数据的变化决定采用不同的更新 `item` 的方式
+			if (it.size == 4 && isItemCountChanged) {
+				fragment.recyclerView.adapter.notifyDataSetChanged()
+				isItemCountChanged = false
+			} else {
+				fragment.recyclerView.adapter.notifyItemRangeChanged(1, it.size)
+			}
+
+			gasFeeFromCustom().isNull() isFalse {
+				fragment.getMainActivity()?.removeLoadingView()
+			}
 			hasCalculated = true
+			callback()
 		}
 	}
 
@@ -169,8 +220,11 @@ class PaymentValueDetailPresenter(
 	}
 
 	/**
-	 * 测量 `input` 测量 `gasLimit` 以及生成对应的 `RawTransaction`
+	 * 测量 `input` 测量 `gasLimit` 以及生成对应的 `RawTransaction`, [minGasLimit] 是
+	 * 在做自定义 `Gas` 的时候传入的最小 `limit` 值
 	 */
+	private var minGasLimit = BigInteger.valueOf(0)
+
 	private fun generateTransaction(
 		toAddress: String, value: Double, hold: (ArrayList<RawTransaction>) -> Unit
 	) {
@@ -202,10 +256,33 @@ class PaymentValueDetailPresenter(
 			// 测量 `Transaction` 得出 `GasLimit`
 			if (fragment.token?.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
 			else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
-		}) {
+		}) { limit ->
+			minGasLimit = limit
+			/** 如果有过自定义设置, 那么增加自定义设置的选项 */
+			if (minerFeeType == MinerFeeType.Custom.content) {
+				if (defaultGasPrices.size <= 3) {
+					defaultGasPrices.add(BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei()))
+				} else {
+					defaultGasPrices.remove(defaultGasPrices.last())
+					defaultGasPrices.add(BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei()))
+				}
+			}
+
 			defaultGasPrices.map { price ->
-				// 生成 `RawTransaction` 对象
-				RawTransaction.createTransaction(currentNonce, price, it, to, count, data)
+				if (price == BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())) {
+					RawTransaction.createTransaction(
+						currentNonce,
+						price,
+						BigInteger.valueOf(gasFeeFromCustom()?.gasLimit.orElse(0)),
+						to,
+						count,
+						data
+					)
+				} else {
+					RawTransaction.createTransaction(
+						currentNonce, price, limit, to, count, data
+					)
+				}
 			}.let {
 				hold(it.toArrayList())
 			}
@@ -213,9 +290,9 @@ class PaymentValueDetailPresenter(
 	}
 
 	private fun generateModels(
-		rawTransaction: ArrayList<RawTransaction>, gasPrice: ArrayList<BigInteger>
-	) = rawTransaction.mapIndexed { index, it ->
-		PaymentValueDetailModel(gasPrice[index].toDouble(), it, minerFeeType)
+		rawTransactions: ArrayList<RawTransaction>, gasPrices: ArrayList<BigInteger>
+	) = rawTransactions.mapIndexed { index, it ->
+		PaymentValueDetailModel(gasPrices[index].toDouble(), it, minerFeeType)
 	}.toArrayList()
 
 	private fun generateEmptyData() {
@@ -229,7 +306,7 @@ class PaymentValueDetailPresenter(
 	) {
 		TransactionTable().apply {
 			isReceive = false
-			symbol = fragment.token?.symbol!!
+			symbol = token.symbol
 			timeStamp = (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 			fromAddress = WalletTable.current.address
 			value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal).formatCount()
@@ -239,7 +316,7 @@ class PaymentValueDetailPresenter(
 			isPending = true
 			recordOwnerAddress = WalletTable.current.address
 			tokenReceiveAddress = fragment.address
-			isERC20 = fragment.token?.symbol == CryptoSymbol.eth
+			isERC20 = token.symbol == CryptoSymbol.eth
 			nonce = currentNonce.toString()
 			to = raw.to
 			input = raw.data
@@ -260,23 +337,26 @@ class PaymentValueDetailPresenter(
 			activity?.apply { SoftKeyboard.hide(this) }
 			removeChildFragment(fragment)
 			val model = ReceiptModel(
-				address,
-				raw.gasLimit,
-				raw.gasPrice,
-				raw.value,
-				token,
-				taxHash,
-				System.currentTimeMillis()
+				address, raw.gasLimit, raw.gasPrice, raw.value, token, taxHash, System.currentTimeMillis()
 			)
 			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.transactionDetail, model)
 			}
-
 			overlayView.header.apply {
 				showBackButton(false)
 				showCloseButton(true)
 			}
 			headerTitle = TokenDetailText.transferDetail
+		}
+	}
+
+	fun goToGasEditorFragment() {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
+				TokenDetailText.paymentValue,
+				Bundle().apply {
+					putLong(ArgumentKey.gasLimit, minGasLimit.toLong())
+				})
 		}
 	}
 
@@ -307,4 +387,14 @@ class PaymentValueDetailPresenter(
 		}
 	}
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			overlayView.header.backButton.onClick {
+				headerTitle = TokenDetailText.address
+				presenter.popFragmentFrom<PaymentValueDetailFragment>()
+				setHeightMatchParent()
+			}
+		}
+	}
 }

@@ -43,8 +43,7 @@ object CryptoUtils {
 
 	fun scaleMiddleAddress(address: String): String {
 		return if (address.length == CryptoValue.bip39AddressLength) address.substring(
-			0,
-			14
+			0, 14
 		) + " ··· " + address.substring(address.length - 14, address.length)
 		else "wrong address"
 	}
@@ -115,8 +114,7 @@ object CryptoUtils {
 	}
 
 	private fun isTransferInputCode(inputCode: String) = inputCode.length > 10 && inputCode.substring(
-		0,
-		SolidityCode.contractTransfer.length
+		0, SolidityCode.contractTransfer.length
 	) == SolidityCode.contractTransfer
 }
 
@@ -172,21 +170,25 @@ fun Double.formatHex(): String {
 fun Int.daysAgoInMills(): Long = CryptoUtils.getTargetDayInMills(-this)
 
 enum class TimeType {
-	Second, Minute, Hour, Day
+	Second,
+	Minute,
+	Hour,
+	Day
 }
 
 fun String.toMills(timeType: TimeType = TimeType.Second): Long {
 	return when (timeType) {
 		TimeType.Second -> this.toLong() * 1000L
 		TimeType.Minute -> this.toLong() * 1000L * 60L
-		TimeType.Hour -> this.toLong() * 1000L * 60L * 60L
-		TimeType.Day -> this.toLong() * 1000L * 60L * 60L * 12L
+		TimeType.Hour   -> this.toLong() * 1000L * 60L * 60L
+		TimeType.Day    -> this.toLong() * 1000L * 60L * 60L * 12L
 	}
 }
 
-fun Double.toGwei() = this / 1000000000.0
+fun Double.toGwei() = (this / 1000000000.0).toLong()
 
 fun Double.scaleToGwei() = this * 1000000000.0
+fun Long.scaleToGwei() = this * 1000000000
 
 /**
  * 把常规的 `Double` 个数转换成合约要用的 `hex` 类型,

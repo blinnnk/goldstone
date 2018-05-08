@@ -22,6 +22,7 @@ import org.jetbrains.anko.textView
 class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 
 	var confirmClickEvent: Runnable? = null
+	var customGasEvent: Runnable? = null
 	private val customButton by lazy { BaseCell(context) }
 	private val confirmButton by lazy { RoundButton(context) }
 
@@ -41,6 +42,8 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 				textSize = 5.uiPX().toFloat()
 				typeface = GoldStoneFont.book(context)
 			}.setCenterInVertical()
+		}.click {
+			customGasEvent?.run()
 		}.into(this)
 
 		confirmButton.apply {

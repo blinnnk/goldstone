@@ -31,7 +31,6 @@ class PaymentValueDetailFragment :
 	val token by lazy {
 		arguments?.get(ArgumentKey.paymentSymbol) as? WalletDetailCellModel
 	}
-
 	private var transferCount = 0.0
 	private var footer: PaymentValueDetailFooter? = null
 
@@ -48,11 +47,12 @@ class PaymentValueDetailFragment :
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 
-
 		recyclerView.getItemAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
 			it?.let { header ->
 				header.setInputFocus()
-				address?.apply { header.showTargetAddress(this) }
+				address?.apply {
+					header.showTargetAddress(this)
+				}
 				presenter.updateHeaderValue(header)
 				header.inputTextListener {
 					it.isNotEmpty() isTrue {
@@ -70,14 +70,29 @@ class PaymentValueDetailFragment :
 
 		recyclerView.getItemAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
 			this.footer = footer
-			footer?.confirmClickEvent = Runnable {
-				NetworkUtil.hasNetwork(context) isTrue {
-					MyTokenTable.getBalanceWithSymbol(
-						token?.symbol!!, WalletTable.current.address, true
-					) { balance ->
-						context?.runOnUiThread {
-							showAlertOrTransfer(balance)
-						}
+			footer?.confirmClickEvent = confirmTransfer()
+			footer?.customGasEvent = showCustomGasFragment()
+		}
+	}
+
+	fun getTransferCount(): Double {
+		return transferCount
+	}
+
+	private fun showCustomGasFragment(): Runnable {
+		return Runnable {
+			presenter.goToGasEditorFragment()
+		}
+	}
+
+	private fun confirmTransfer(): Runnable {
+		return Runnable {
+			NetworkUtil.hasNetwork(context) isTrue {
+				MyTokenTable.getBalanceWithSymbol(
+					token?.symbol!!, WalletTable.current.address, true
+				) { balance ->
+					context?.runOnUiThread {
+						showAlertOrTransfer(balance)
 					}
 				}
 			}

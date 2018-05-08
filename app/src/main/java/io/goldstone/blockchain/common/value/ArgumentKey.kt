@@ -20,6 +20,8 @@ object ArgumentKey {
 	const val quotationOverlayTitle = "quotationOverlay"
 	const val quotationOverlayInfo = "quotationCurrencyInfo"
 	const val quotationCurrencyDetail = "quotationCurrencyDetail"
+	const val gasEditor = "gasEditor"
+	const val gasLimit = "gasLimit"
 }
 
 object SharesPreference {

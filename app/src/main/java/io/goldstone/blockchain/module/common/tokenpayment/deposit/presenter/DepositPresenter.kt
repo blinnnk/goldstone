@@ -35,7 +35,6 @@ class DepositPresenter(
 					else             -> "$this?amount=$amount?token=${token?.contract}"
 				}
 				qrContent = content
-				System.out.println(content)
 				QRCodePresenter.generateQRCode(content).let {
 					fragment.setQRImage(it)
 				}
