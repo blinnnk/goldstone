@@ -38,6 +38,8 @@ class QuotationPresenter(
 
 	override fun updateData() {
 
+		currentSocket?.runSocket()
+
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let { diffAndUpdateData(it) }
 
@@ -51,8 +53,6 @@ class QuotationPresenter(
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 
-			/** 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行 */
-			currentSocket?.runSocket()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
@@ -65,7 +65,9 @@ class QuotationPresenter(
 				// 更新 `UI`
 				diffAndUpdateData(it)
 				// 设定 `Socket` 并执行
-				setSocket { currentSocket?.runSocket() }
+				currentSocket.isNull() isTrue {
+					setSocket { currentSocket?.runSocket() }
+				}
 			}
 		}
 	}
