@@ -64,7 +64,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
       .apply {
         layoutParams = LinearLayout.LayoutParams(matchParent, 25.uiPX())
         textSize = 3.uiPX().toFloat()
-        typeface = GoldStoneFont.aleoRegular(context)
+        typeface = GoldStoneFont.medium(context)
         textColor = Spectrum.opacity5White
         gravity = Gravity.CENTER_HORIZONTAL
         y += 5.uiPX()
