@@ -43,14 +43,14 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
       .apply {
         textColor = titleColor
         textSize = 4.uiPX().toFloat() + 1f
-        typeface = GoldStoneFont.heavy(context)
+        typeface = GoldStoneFont.medium(context)
       }
       .into(this)
 
     description
       .apply {
         textSize = 4.uiPX().toFloat() + 1f
-        typeface = GoldStoneFont.heavy(context)
+        typeface = GoldStoneFont.medium(context)
         textColor = GrayScale.gray
         x -= 30.uiPX()
       }

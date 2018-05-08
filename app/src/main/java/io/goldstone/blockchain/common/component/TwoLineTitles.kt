@@ -21,7 +21,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	val title = textView {
 		textSize = 5.uiPX().toFloat()
 		textColor = Spectrum.white
-		typeface = GoldStoneFont.heavy(context)
 	}
 
 	val subtitle = textView {

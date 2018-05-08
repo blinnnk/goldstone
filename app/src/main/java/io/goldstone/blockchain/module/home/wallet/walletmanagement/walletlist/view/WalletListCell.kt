@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.v
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
