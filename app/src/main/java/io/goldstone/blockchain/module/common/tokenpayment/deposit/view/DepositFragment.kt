@@ -9,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRView
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -37,11 +38,17 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 					topMargin = 170.uiPX()
 				}
 				setAddressText()
-
+				setConfirmButtonEvent()
 				inputView.inputTextListener {
 					presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
 				}
 			}
+		}
+	}
+
+	private fun setConfirmButtonEvent() {
+		qrView.saveQRImageEvent = Runnable {
+			QRCodePresenter.saveQRCodeImageToAlbum(presenter.qrContent, this)
 		}
 	}
 

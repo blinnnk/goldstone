@@ -48,11 +48,11 @@ class QRCodePresenter(
 			}
 		}
 
-		fun saveQRCodeImageToAlbum(address: String, fragment: Fragment) {
+		fun saveQRCodeImageToAlbum(content: String, fragment: Fragment) {
 			fragment.activity?.checkPermissionThen(PermissionCategory.Write) {
 				val size = (ScreenSize.Width * 0.8).toInt()
 				val barcodeEncoder = BarcodeEncoder()
-				val bitmap = barcodeEncoder.encodeBitmap(address, BarcodeFormat.QR_CODE, size, size)
+				val bitmap = barcodeEncoder.encodeBitmap(content, BarcodeFormat.QR_CODE, size, size)
 				// 防止生成 bitmap 有一定概率太慢, 这里延时保存一下
 				300L timeUpThen { saveImage(bitmap, fragment) }
 				fragment.toast("QR code image has saved to album")
