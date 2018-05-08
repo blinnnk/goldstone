@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.daysAgoInMills
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
@@ -26,6 +27,9 @@ import org.json.JSONObject
  * @author KaySaith
  */
 
+var selectionMD5: String? = null
+var memoryData: ArrayList<QuotationModel>? = null
+
 class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
@@ -33,7 +37,16 @@ class QuotationPresenter(
 	private var updateChartTimes: Int? = null
 
 	override fun updateData() {
+
+		// 如果内存有数据直接更新内存的数据
+		memoryData?.let { diffAndUpdateData(it) }
+
 		QuotationSelectionTable.getMySelections { selections ->
+			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
+			if (selectionMD5 == selections.getObjectMD5HexString()) {
+				return@getMySelections
+			}
+			selectionMD5 = selections.getObjectMD5HexString()
 
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
@@ -42,21 +55,27 @@ class QuotationPresenter(
 			currentSocket?.runSocket()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
-				// TODO 拉不到最新的数据了需要排查, 导致一直拉取
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
 				QuotationModel(selection, "--", "0", linechart)
 			}.sortedByDescending {
 				it.orderID
 			}.toArrayList().let {
-				fragment.asyncData.isNull() isTrue {
-					fragment.asyncData = it
-				} otherwise {
-					diffAndUpdateAdapterData<QuotationAdapter>(it)
-					fragment.setEmptyViewBy(it)
-				}
+				// 把数据存在内存里面方便下次打开使用
+				memoryData = it
+				// 更新 `UI`
+				diffAndUpdateData(it)
 				// 设定 `Socket` 并执行
 				setSocket { currentSocket?.runSocket() }
 			}
+		}
+	}
+
+	private fun diffAndUpdateData(data: ArrayList<QuotationModel>) {
+		fragment.asyncData.isNull() isTrue {
+			fragment.asyncData = data
+		} otherwise {
+			diffAndUpdateAdapterData<QuotationAdapter>(data)
+			fragment.setEmptyViewBy(data)
 		}
 	}
 
