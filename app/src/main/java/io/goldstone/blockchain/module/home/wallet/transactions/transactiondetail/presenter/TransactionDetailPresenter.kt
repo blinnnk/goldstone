@@ -122,9 +122,7 @@ class TransactionDetailPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?,
-		cellHeight: Int,
-		maxHeight: Int
+		dataCount: Int?, cellHeight: Int, maxHeight: Int
 	) {
 		setHeightMatchParent()
 	}

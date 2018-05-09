@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
@@ -43,8 +42,10 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
 
-		// this `slideHeader` will show or hide depends on the distance that user sliding the
-		// recyclerView, and not in the same layer with `RecyclerView's headerView`
+		/**
+		 * this `slideHeader` will show or hide depends on the distance that user sliding the
+		 * recyclerView, and not in the same layer with `RecyclerView's headerView`
+		 */
 
 		slideHeader.apply {
 			historyButton.onClick { presenter.showTransactionsFragment() }

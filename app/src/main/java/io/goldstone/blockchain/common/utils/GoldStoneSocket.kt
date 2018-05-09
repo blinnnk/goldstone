@@ -4,7 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import okhttp3.*
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +42,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 
 	// 定时向服务器汇报状态的 `runnable`
 	private val pingRunnable = Runnable {
-		webSocket?.send("{\"t\": \"ping\", \"time\": ${System.currentTimeMillis()}}")
+		webSocket?.send(AesCrypto.encrypt("{\"t\": \"ping\", \"time\": ${System.currentTimeMillis()}}").orEmpty())
 	}
 
 	private fun reportStatus() {
@@ -73,7 +77,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 
 	override fun onMessage(webSocket: WebSocket?, text: String?) {
 		super.onMessage(webSocket!!, text!!)
-		val jsonObject = JSONObject(text)
+		val jsonObject = JSONObject(AesCrypto.decrypt(text))
 		if (jsonObject["t"] != "pong") {
 			getServerBack(jsonObject)
 		} else {
@@ -96,12 +100,17 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 		closeSocket()
 		AppConfigTable.getAppConfig {
 			it?.let {
-				val client = OkHttpClient.Builder().readTimeout(timeout, TimeUnit.MILLISECONDS)
+				val client =
+					OkHttpClient.Builder()
+						.readTimeout(timeout, TimeUnit.MILLISECONDS)
 					.writeTimeout(timeout, TimeUnit.MILLISECONDS)
-					.connectTimeout(timeout, TimeUnit.MILLISECONDS).retryOnConnectionFailure(true).build()
-				val request = Request.Builder().url(serverURL).addHeader("device", it.goldStoneID).build()
-				client?.newWebSocket(request, this)
-				client?.dispatcher()?.executorService()?.shutdown()
+					.connectTimeout(timeout, TimeUnit.MILLISECONDS)
+					.retryOnConnectionFailure(true)
+					.build()
+				GoldStoneAPI.getcryptoGetRequest(serverURL) {
+					client?.newWebSocket(it, this)
+					client?.dispatcher()?.executorService()?.shutdown()
+				}
 			}
 		}
 	}
@@ -127,14 +136,14 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	fun closeSocket() {
 		webSocket?.let {
 			// 取消订阅
-			webSocket?.send("{\"t\": \"unsub_tick\"}")
+			webSocket?.send(AesCrypto.encrypt("{\"t\": \"unsub_tick\"}").orEmpty())
 			it.close(normalCloseCode, null)
 			webSocket = null
 		}
 	}
 
 	fun sendMessage(message: String) {
-		webSocket?.send(message)
+		webSocket?.send(AesCrypto.encrypt(message).orEmpty())
 	}
 
 }

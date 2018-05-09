@@ -232,3 +232,14 @@ fun <T : List<*>> T.getObjectMD5HexString(): String {
 		"error"
 	}
 }
+
+fun String.getObjectMD5HexString(): String {
+	return try {
+		val byteArray = this.toByteArray()
+		val md = MessageDigest.getInstance("MD5")
+		md.digest(byteArray).toHexString()
+	} catch (error: Exception) {
+		println(error)
+		"error"
+	}
+}
