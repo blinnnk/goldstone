@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -122,8 +123,7 @@ object GoldStoneAPI {
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUncryptoData<TransactionTable>(
-			EtherScanApi.transactions(address, startBlock),
-			"result"
+			EtherScanApi.transactions(address, startBlock), "result"
 		) {
 			hold(toArrayList())
 		}
@@ -218,6 +218,16 @@ object GoldStoneAPI {
 	fun getQuotationCurrencyInfo(pair: String, hold: (JSONObject) -> Unit) {
 		requestData<String>(APIPath.getQuotationCurrencyInfo(pair), "", true) {
 			hold(JSONObject(this[0]))
+		}
+	}
+
+	fun getQuotationCurrencyDescription(symbol: String, hold: (String) -> Unit) {
+		requestData<String>(
+			APIPath.getTokenDescription + symbol, "", true
+		) {
+			this[0].let {
+				hold(JSONObject(it).safeGet("description"))
+			}
 		}
 	}
 
@@ -412,15 +422,19 @@ object GoldStoneCode {
 
 	fun showErrorCodeReason(data: String?) {
 		data?.apply {
-			when (JSONObject(this).get("code")?.toString()?.toInt()) {
-				-1 -> {
-					Log.e("ERROR", "Server Error")
-				}
-				-4 -> {
-					Log.e("ERROR", "Url Error")
-					/**
-					 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误
-					 */
+			val code = JSONObject(this).safeGet("code")
+			if (code.isNotEmpty()) {
+				when (code.toInt()) {
+					-1 -> {
+						Log.e("ERROR", "Server Error")
+					}
+
+					-4 -> {
+						Log.e("ERROR", "Url Error")
+						/**
+						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误
+						 */
+					}
 				}
 			}
 		}

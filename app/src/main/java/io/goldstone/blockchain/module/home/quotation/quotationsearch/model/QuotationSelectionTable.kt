@@ -3,10 +3,13 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.toUpperCaseFirstLetter
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -18,26 +21,15 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "quotationSelection")
 data class QuotationSelectionTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
-	@SerializedName("market_id")
-	var marketID: Int,
-	@SerializedName("pair_display")
-	var pairDisplay: String,
-	@SerializedName("base")
-	var baseSymnbol: String,
-	@SerializedName("quote")
-	var quoteSymbol: String,
-	@SerializedName("pair")
-	var pair: String,
-	@SerializedName("market")
-	var market: String,
-	@SerializedName("name")
-	var name: String,
-	var infoTitle: String,
+	@PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("market_id") var marketID: Int,
+	@SerializedName("pair_display") var pairDisplay: String, @SerializedName("base")
+	var baseSymnbol: String, @SerializedName("quote") var quoteSymbol: String, @SerializedName("pair")
+	var pair: String, @SerializedName("market") var market: String, @SerializedName("name")
+	var name: String, var infoTitle: String,
 	var orderID: Double = 0.0,
 	var lineChart: String,
-	var isSelecting: Boolean = false
+	var isSelecting: Boolean = false,
+	var description: String? = null
 ) {
 	constructor(data: QuotationSelectionTable, lineChart: String) : this(
 		0,
@@ -51,7 +43,8 @@ data class QuotationSelectionTable(
 		data.pairDisplay + " " + data.market.toUpperCaseFirstLetter(),
 		data.orderID,
 		lineChart,
-		data.isSelecting
+		data.isSelecting,
+		data.description
 	)
 
 	companion object {
@@ -62,10 +55,35 @@ data class QuotationSelectionTable(
 					getQuotationSelfSelections().let {
 						val currentID = it.maxBy { it.orderID }?.orderID
 						val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
-						insert(table.apply { orderID = newOrderID })
+						GoldStoneAPI.getQuotationCurrencyDescription(table.baseSymnbol) { description ->
+							insert(table.apply {
+								orderID = newOrderID
+								this.description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) + description
+							})
+						}
 						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
+			}
+		}
+
+		fun updateDescription(pair: String, content: String) {
+			doAsync {
+				GoldStoneDataBase.database.quotationSelectionDao().apply {
+					getSelectionByPair(pair)?.let {
+						update(it.apply {
+							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) + content
+						})
+					}
+				}
+			}
+		}
+
+		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable?) -> Unit) {
+			coroutinesTask({
+				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
+			}) {
+				hold(it)
 			}
 		}
 
@@ -113,7 +131,6 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
 	}
 }
 

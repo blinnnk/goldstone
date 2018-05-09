@@ -103,13 +103,13 @@ object CreateWalletText {
 	}
 	@JvmField
 	val repeatPassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "repeat password must be the same as password"
-		HoneyLanguage.Chinese.code -> "两次输入的密码不一致"
-		HoneyLanguage.Japanese.code -> "パスワードの繰り返しはパスワードと同じでなければなりません"
-		HoneyLanguage.Korean.code -> "반복 암호는 암호와 동일해야합니다"
-		HoneyLanguage.Russian.code -> "Повторить пароль должен быть таким же, как пароль"
-		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致"
-		else -> "repeat password must be the same as password"
+		HoneyLanguage.English.code -> "Repeat Password"
+		HoneyLanguage.Chinese.code -> "确认密码"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
 	}
 	@JvmField
 	val name = when (currentLanguage) {
@@ -1107,6 +1107,29 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "價格歷史"
 		else -> "Price History"
 	}
+
+	@JvmField
+	val tokenDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Info"
+		HoneyLanguage.Chinese.code -> "货币信息"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+
+	@JvmField
+	val tokenDescriptionPlaceHolder = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Description Content"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+
 }
 
 object PincodeText {

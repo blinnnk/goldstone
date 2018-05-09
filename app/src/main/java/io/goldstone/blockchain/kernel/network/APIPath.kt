@@ -22,6 +22,8 @@ object APIPath {
 	const val marketSearch = "$url/account/searchPair?pair="
 	const val getCurrencyLineChartData = "$url/account/lineDataByDay"
 	const val getPriceByAddress = "$url/index/priceByAddress"
+	const val getTokenDescription = "$url/market/coinDescription?symbol="
+
 	@JvmField
 	val getQuotationCurrencyChart: (pair: String, period: String, size: Int) -> String =
 		{ pair, period, size ->
