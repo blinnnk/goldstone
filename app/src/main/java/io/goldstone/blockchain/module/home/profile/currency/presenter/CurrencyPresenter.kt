@@ -39,20 +39,20 @@ class CurrencyPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf(
 			CurrencyModel(
-				Currency.getInstance(CountryCode.america).currencyCode,
-				isCurrent(CountryCode.america.country)
-			),
-			CurrencyModel(
 				Currency.getInstance(CountryCode.china).currencyCode,
 				isCurrent(Locale.CHINA.country)
+			),
+			CurrencyModel(
+				Currency.getInstance(CountryCode.japan).currencyCode,
+				isCurrent(Locale.JAPAN.country)
 			),
 			CurrencyModel(
 				Currency.getInstance(CountryCode.korean).currencyCode,
 				isCurrent(Locale.KOREA.country)
 			),
 			CurrencyModel(
-				Currency.getInstance(CountryCode.japan).currencyCode,
-				isCurrent(Locale.JAPAN.country)
+				Currency.getInstance(CountryCode.america).currencyCode,
+				isCurrent(CountryCode.america.country)
 			),
 			CurrencyModel(
 				Currency.getInstance(CountryCode.russia).currencyCode,

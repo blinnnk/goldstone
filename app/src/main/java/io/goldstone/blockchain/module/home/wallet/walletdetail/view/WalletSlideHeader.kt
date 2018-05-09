@@ -13,6 +13,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -56,6 +57,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
 		balance.apply {
 			title.textSize = 6.uiPX().toFloat()
+			title.typeface = GoldStoneFont.black(context)
 			subtitle.apply {
 				text = WalletText.totalAssets + " " + GoldStoneApp.currencyCode
 				textSize = 4.uiPX().toFloat()
