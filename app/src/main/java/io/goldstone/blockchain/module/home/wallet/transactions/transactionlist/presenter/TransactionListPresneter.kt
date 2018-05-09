@@ -207,8 +207,7 @@ class TransactionListPresenter(
 				override fun concurrentJobs() {
 					data.forEach { transaction ->
 						CryptoUtils.isERC20Transfer(transaction) {
-							val contract =
-								if (transaction.logIndex.isNotEmpty()) transaction.contractAddress else transaction.to
+							val contract = if (transaction.logIndex.isNotEmpty()) transaction.contractAddress else transaction.to
 							var receiveAddress = ""
 							var count = 0.0
 							// 首先从本地数据库检索 `contract` 对应的 `symbol`

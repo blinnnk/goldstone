@@ -25,9 +25,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.Quotat
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
-import org.jetbrains.anko.support.v4.toast
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -53,11 +51,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				notifyDataSetChanged()
 			}
 		}
+
 		presenter.afterUpdateAdapterDataset(recyclerView)
 		/** 如果数据返回空的显示占位图 */
-		asyncData?.isEmpty()?.isTrue {
-			showEmptyView()
-		}
+		asyncData?.let { setEmptyViewBy(it) }
 
 		/** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
 		setSlideUpAnimation()
@@ -217,8 +214,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	private var emptyLayout: EmptyView? = null
 
 	open fun showEmptyView() {
+		// 如果已经存在 `emptyLayout` 跳出
+		emptyLayout.isNotNull { return }
 		emptyLayout = EmptyView(wrapper.context).apply {
-			onClick { toast("hello") }
 			when (this@BaseRecyclerFragment) {
 				is PaymentValueDetailFragment                   -> return
 				is TokenDetailFragment                          -> setStyle(EmptyType.TokenDetail)
@@ -238,6 +236,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			wrapper.removeView(this)
 			wrapper.requestLayout()
 			wrapper.invalidate()
+			emptyLayout = null
 		}
 	}
 

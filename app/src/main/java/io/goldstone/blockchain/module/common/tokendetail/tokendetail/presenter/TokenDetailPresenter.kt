@@ -44,9 +44,7 @@ class TokenDetailPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?,
-		cellHeight: Int,
-		maxHeight: Int
+		dataCount: Int?, cellHeight: Int, maxHeight: Int
 	) {
 		// 详情页面直接全屏高度
 		setHeightMatchParent()
