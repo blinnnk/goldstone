@@ -2,15 +2,15 @@ package io.goldstone.blockchain.module.entrance.splash.view
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.hideStatusBar
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.GoldStoneApp.Companion.currencyCode
 import io.goldstone.blockchain.GoldStoneApp.Companion.currentLanguage
 import io.goldstone.blockchain.GoldStoneApp.Companion.currentRate
 import io.goldstone.blockchain.common.component.SplashContainer
-import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
@@ -73,7 +73,7 @@ class SplashActivity : AppCompatActivity() {
 	 * set and displaying the interface from the database.
 	 */
 	private fun initAppParameters() {
-		WalletTable.getCurrentWalletInfo {
+		AppConfigTable.getAppConfig {
 			it?.apply {
 				initLaunchLanguage(it)
 				getCurrencyRate(it)
@@ -81,19 +81,14 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun initLaunchLanguage(wallet: WalletTable) {
-		wallet.isNull() isTrue {
-			currentLanguage = HoneyLanguage.getLanguageCode(CountryCode.currentLanguage)
-		} otherwise {
-			currentLanguage = wallet.language
-			WalletTable.current = wallet
-		}
+	private fun initLaunchLanguage(config: AppConfigTable) {
+		currentLanguage = config.language
 	}
 
 	// 获取当前的汇率
-	private fun getCurrencyRate(wallet: WalletTable) {
-		currencyCode = wallet.currencyCode
-		GoldStoneAPI.getCurrencyRate(wallet.currencyCode) {
+	private fun getCurrencyRate(config: AppConfigTable) {
+		currencyCode = config.currencyCode
+		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
 			currentRate = it
 		}
 	}

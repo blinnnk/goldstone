@@ -18,6 +18,7 @@ import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -25,7 +26,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
-import org.jetbrains.anko.configuration
 
 /**
  * @date 19/04/2018 4:33 PM
@@ -118,6 +118,8 @@ fun Application.registerDeviceForPush() {
 				Log.d("DEBUG", it)
 				if (it == token) return
 			}
+			// 在本地数据库记录 `Push Token`
+			AppConfigTable.updatePushToken(token.toString())
 			// 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
 			registerDevice(token.toString())
 			XinGePushReceiver.registerWalletAddressForPush()
@@ -128,21 +130,24 @@ fun Application.registerDeviceForPush() {
 }
 
 @SuppressLint("HardwareIds")
-private fun Application.registerDevice(token: String) {
+fun Context.registerDevice(token: String, callback: () -> Unit = {}) {
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value
 	AppConfigTable.getAppConfig { config ->
-		GoldStoneAPI.registerDevice(
-			configuration.locale.language,
-			token,
-			config?.goldStoneID.orEmpty(),
-			isChina,
-			TinyNumber.True.value
-		) {
-			// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-			GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-				saveDataToSharedPreferences(SharesPreference.registerPush, token)
+		config?.apply {
+			GoldStoneAPI.registerDevice(
+				HoneyLanguage.getLanguageSymbol(language).toLowerCase(),
+				token,
+				goldStoneID,
+				isChina,
+				TinyNumber.True.value
+			) {
+				// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+				GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
+					saveDataToSharedPreferences(SharesPreference.registerPush, token)
+					callback()
+				}
 			}
 		}
 	}

@@ -1,18 +1,16 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
-import android.content.Context
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.receiver.registerDevice
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.yesButton
-import android.support.v4.content.ContextCompat.startActivity
-import android.content.Intent
 
 @Suppress("DEPRECATION")
 /**
@@ -49,11 +47,18 @@ class LanguagePresenter(
 			else                            -> HoneyLanguage.English.code
 		}
 
-		WalletTable.updateLanguage(code) {
-			fragment.activity?.jump<SplashActivity>()
-			// 杀掉进程
-			android.os.Process.killProcess(android.os.Process.myPid())
-			System.exit(0)
+		AppConfigTable.updateLanguage(code) {
+			AppConfigTable.getAppConfig {
+				// 更换语言后重新注册设备, 更新语言状态
+				it?.apply {
+					fragment.context?.registerDevice(pushToken) {
+						fragment.activity?.jump<SplashActivity>()
+						// 杀掉进程
+						android.os.Process.killProcess(android.os.Process.myPid())
+						System.exit(0)
+					}
+				}
+			}
 		}
 	}
 

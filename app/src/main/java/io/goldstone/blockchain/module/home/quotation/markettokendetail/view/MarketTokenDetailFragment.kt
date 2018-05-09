@@ -11,11 +11,13 @@ import io.goldstone.blockchain.common.component.ButtonMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -25,7 +27,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 enum class MarketTokenDetailChartType(
 	val code: Int, val info: String
 ) {
-	Hour(0, "1hour"), DAY(1, "1day"), WEEK(2, "1week"), MONTH(3, "1month")
+	Hour(0, "1hour"),
+	DAY(1, "1day"),
+	WEEK(2, "1week"),
+	MONTH(3, "1month")
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
@@ -82,19 +87,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				tokenInfo.into(this)
 				tokenInfomation.into(this)
 
-				setCurrencyInf()
-			}
-		}
-	}
-
-
-	private fun setCurrencyInf() {
-		currencyInfo?.let { info ->
-			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
-				context?.runOnUiThread {
-					tokenInfomation.model = TokenInfomationModel(it)
-					priceHistroy.model = PriceHistoryModel(it, info.quoteSymbol)
-				}
+				presenter.setCurrencyInf(currencyInfo, tokenInfomation, priceHistroy, tokenInfo)
 			}
 		}
 	}

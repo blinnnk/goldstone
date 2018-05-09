@@ -6,8 +6,8 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.Alert
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.currency.model.CurrencyModel
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyAdapter
@@ -39,24 +39,16 @@ class CurrencyPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf(
 			CurrencyModel(
-				Currency.getInstance(CountryCode.china).currencyCode,
-				isCurrent(Locale.CHINA.country)
-			),
-			CurrencyModel(
-				Currency.getInstance(CountryCode.japan).currencyCode,
-				isCurrent(Locale.JAPAN.country)
-			),
-			CurrencyModel(
-				Currency.getInstance(CountryCode.korean).currencyCode,
-				isCurrent(Locale.KOREA.country)
-			),
-			CurrencyModel(
+				Currency.getInstance(CountryCode.china).currencyCode, isCurrent(Locale.CHINA.country)
+			), CurrencyModel(
+				Currency.getInstance(CountryCode.japan).currencyCode, isCurrent(Locale.JAPAN.country)
+			), CurrencyModel(
+				Currency.getInstance(CountryCode.korean).currencyCode, isCurrent(Locale.KOREA.country)
+			), CurrencyModel(
 				Currency.getInstance(CountryCode.america).currencyCode,
 				isCurrent(CountryCode.america.country)
-			),
-			CurrencyModel(
-				Currency.getInstance(CountryCode.russia).currencyCode,
-				isCurrent(CountryCode.russia.country)
+			), CurrencyModel(
+				Currency.getInstance(CountryCode.russia).currencyCode, isCurrent(CountryCode.russia.country)
 			)
 		)
 	}
@@ -76,7 +68,7 @@ class CurrencyPresenter(
 	}
 
 	private fun updateData(code: String) {
-		WalletTable.updateCurrency(code) {
+		AppConfigTable.updateCurrency(code) {
 			fragment.activity?.jump<SplashActivity>()
 			// 杀掉进程
 			android.os.Process.killProcess(android.os.Process.myPid())
