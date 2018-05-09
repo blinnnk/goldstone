@@ -43,7 +43,7 @@ class TransactionListPresenter(
 			localTransactions.isNotNull {
 				asyncData = localTransactions
 				// 更新显示数据后, 异步继续更新新的数据.并动态刷新到界面
-				NetworkUtil.hasNetwork(context).isTrue {
+				NetworkUtil.hasNetworkWithAlert(context).isTrue {
 					getMainActivity()?.updateTransactionInAsync(localTransactions!!)
 				}
 			} otherwise {
@@ -52,7 +52,7 @@ class TransactionListPresenter(
 						asyncData = localData
 						localTransactions = localData
 					} otherwise {
-						NetworkUtil.hasNetwork(context).isTrue {
+						NetworkUtil.hasNetworkWithAlert(context).isTrue {
 							// 如果本地一条数据都没有就从 `StartBlock 0` 的位置从 `EtherScan` 上查询
 							getMainActivity()?.getTransactionDataFromEtherScan("0") {
 								asyncData = it

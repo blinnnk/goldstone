@@ -16,20 +16,31 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
  */
 
 object NetworkUtil {
-	fun hasNetwork(context: Context? = null): Boolean {
+
+	fun hasNetworkWithAlert(
+		context: Context? = null,
+		alertText: String = "thiere isn't network found"
+	): Boolean {
 		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 		val activeNetwork = cm?.activeNetworkInfo
 		val status = activeNetwork != null && activeNetwork.isConnectedOrConnecting
-		if (!status) context?.alert("thiere isn't network found")
+		if (!status) context?.alert(alertText)
 		return status
 	}
+
+	fun hasNetwork(context: Context? = null): Boolean {
+		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+		val activeNetwork = cm?.activeNetworkInfo
+		return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+	}
+
 }
 
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(context: Context, intent: Intent) {
-		NetworkUtil.hasNetwork(context) isTrue {
+		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			AppConfigTable.getAppConfig {
 				it?.isRegisteredAddresses?.isFalse {
 					XinGePushReceiver.registerWalletAddressForPush()

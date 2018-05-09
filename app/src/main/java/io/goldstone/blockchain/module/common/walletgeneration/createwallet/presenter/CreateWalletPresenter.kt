@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
@@ -113,7 +114,7 @@ class CreateWalletPresenter(
 
 	companion object {
 		/**
-		 * 手下拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
+		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
 		fun generateMyTokenInfo(
 			ownerAddress: String, isNewAccount: Boolean = false, callback: () -> Unit = {}
@@ -128,7 +129,6 @@ class CreateWalletPresenter(
 				} otherwise {
 					localTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
 				}
-
 			}
 		}
 
@@ -192,8 +192,10 @@ class CreateWalletPresenter(
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
 				it.forceShow == TinyNumber.True.value
 			}.apply {
-				// 如果是新建账户就不用查账了直接是 `0.0`
-				if (isNewAccount) {
+				/**
+				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
+				 **/
+				if (isNewAccount || !NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
 					insertNewAccount(ownerAddress, callback)
 				} else {
 					checkAddressBalanceThenInsert(ownerAddress, this, callback)

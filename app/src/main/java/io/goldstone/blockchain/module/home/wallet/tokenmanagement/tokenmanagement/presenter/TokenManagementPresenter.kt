@@ -26,7 +26,7 @@ class TokenManagementPresenter(
 		fragment.getMainActivity()?.apply {
 			supportFragmentManager.findFragmentByTag(FragmentTag.home)
 				.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-					presenter.updateAllTokensInWallet()
+					presenter.updateMyTokensPrice()
 				}
 		}
 	}

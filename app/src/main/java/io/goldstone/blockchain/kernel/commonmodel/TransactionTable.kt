@@ -17,19 +17,45 @@ import org.jetbrains.anko.doAsync
 
 @Entity(tableName = "transactionList")
 data class TransactionTable(
-	@PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("blockNumber")
-	var blockNumber: String, @SerializedName("timeStamp") var timeStamp: String,
-	@SerializedName("hash") var hash: String, @SerializedName("nonce") var nonce: String,
-	@SerializedName("blockHash") var blockHash: String, @Ignore @SerializedName("transactionIndex")
-	private var transactionIndex: String, @SerializedName("from") var fromAddress: String,
-	@SerializedName("to") var to: String, @SerializedName("value") var value: String,
-	@SerializedName("gas") var gas: String, @SerializedName("gasPrice") var gasPrice: String,
-	@SerializedName("isError") var hasError: String, @SerializedName("txreceipt_status")
-	var txreceipt_status: String, @Ignore @SerializedName("input") var input: String,
-	@SerializedName("contractAddress") var contractAddress: String, @Ignore
-	@SerializedName("cumulativeGasUsed") private var cumulativeGasUsed: String,
-	@SerializedName("gasUsed") var gasUsed: String, @Ignore @SerializedName("confirmations")
-	private var confirmations: String, var isReceive: Boolean,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	@SerializedName("blockNumber")
+	var blockNumber: String,
+	@SerializedName("timeStamp")
+	var timeStamp: String,
+	@SerializedName("hash")
+	var hash: String,
+	@SerializedName("nonce")
+	var nonce: String,
+	@SerializedName("blockHash")
+	var blockHash: String,
+	@Ignore @SerializedName("transactionIndex")
+	private var transactionIndex: String,
+	@SerializedName("from")
+	var fromAddress: String,
+	@SerializedName("to")
+	var to: String,
+	@SerializedName("value")
+	var value: String,
+	@SerializedName("gas")
+	var gas: String,
+	@SerializedName("gasPrice")
+	var gasPrice: String,
+	@SerializedName("isError")
+	var hasError: String,
+	@SerializedName("txreceipt_status")
+	var txreceipt_status: String,
+	@Ignore @SerializedName("input")
+	var input: String,
+	@SerializedName("contractAddress")
+	var contractAddress: String,
+	@Ignore @SerializedName("cumulativeGasUsed")
+	private var cumulativeGasUsed: String,
+	@SerializedName("gasUsed")
+	var gasUsed: String,
+	@Ignore @SerializedName("confirmations")
+	private var confirmations: String,
+	var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -39,7 +65,29 @@ data class TransactionTable(
 ) {
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, "", ""
+		0,
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		false,
+		false,
+		"",
+		""
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的

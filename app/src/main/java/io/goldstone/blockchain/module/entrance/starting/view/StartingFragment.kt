@@ -12,12 +12,10 @@ import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
 
@@ -86,7 +84,10 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					text = ImportWalletText.importWallet.toUpperCase()
 					marginTop = PaddingSize.content
 					setWhiteStyle()
-				}.click { presenter.showImportWalletFragment() }.into(this)
+				}.click {
+					NetworkUtil.hasNetworkWithAlert(context, AlertText.importWalletNetwork)
+					presenter.showImportWalletFragment()
+				}.into(this)
 
 			}.lparams {
 				height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2

@@ -79,7 +79,7 @@ fun Context.showAlertView(
 	}.show()
 }
 
-fun ArrayList<String>.toJsonArray(callback: (JsonArray) -> Unit) {
+fun<T: List<String>> T.toJsonArray(callback: (JsonArray) -> Unit) {
 	val stringArray = JsonArray()
 	forEachOrEnd { item, isEnd ->
 		stringArray.add(item)

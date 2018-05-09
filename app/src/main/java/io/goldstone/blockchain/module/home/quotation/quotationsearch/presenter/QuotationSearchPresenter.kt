@@ -30,7 +30,7 @@ class QuotationSearchPresenter(
 		setHeightMatchParent()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.setKeyboardConfirmEvent {
-				NetworkUtil.hasNetwork(context) isTrue {
+				NetworkUtil.hasNetworkWithAlert(context) isTrue {
 					getMainActivity()?.showLoadingView()
 					searchTokenBy(text.toString())
 				}

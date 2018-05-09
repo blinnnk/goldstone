@@ -42,7 +42,7 @@ class TokenSearchPresenter(
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
 			overlayView.header.setKeyboardConfirmEvent {
-				NetworkUtil.hasNetwork(context) isTrue {
+				NetworkUtil.hasNetworkWithAlert(context) isTrue {
 					searchTokenByContractOrSymbol(this) {
 						fragment.context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)

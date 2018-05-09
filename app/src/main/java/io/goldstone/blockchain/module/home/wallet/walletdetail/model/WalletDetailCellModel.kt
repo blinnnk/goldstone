@@ -1,8 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import java.io.Serializable
@@ -51,8 +57,24 @@ data class WalletDetailCellModel(
 						DefaultTokenTable.getTokens { localTokens ->
 							allTokens.forEach { token ->
 								localTokens.find { it.symbol == token.symbol }?.let { targetToken ->
-									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
-									completeMark()
+									/** 有网络的时候从链上更新 `Balance` */
+									NetworkUtil.hasNetwork(GoldStoneAPI.context) isTrue {
+										if (targetToken.symbol == CryptoSymbol.eth) {
+											GoldStoneEthCall.getEthBalance(walletAddress) {
+												tokenList.add(WalletDetailCellModel(targetToken, it))
+												completeMark()
+											}
+										} else {
+											GoldStoneEthCall.getTokenBalanceWithContract(targetToken.contract, walletAddress) {
+												tokenList.add(WalletDetailCellModel(targetToken, it))
+												completeMark()
+											}
+										}
+									} otherwise {
+										/** 没网的时候显示数据库的 `Balance` */
+										tokenList.add(WalletDetailCellModel(targetToken, token.balance))
+										completeMark()
+									}
 								}
 							}
 						}
