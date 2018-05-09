@@ -59,7 +59,7 @@ class GoldStoneApp : Application() {
 
 		var currentRate: Double = 1.0
 		var currencyCode: String = CountryCode.currentCurrency
-		var currentLanguage: Int? = HoneyLanguage.English.code
+		var currentLanguage: Int? = HoneyLanguage.getLanguageCode(CountryCode.currentLanguage)
 
 		private fun prepareAppConfig(callback: () -> Unit) {
 			AppConfigTable.getAppConfig { config ->
