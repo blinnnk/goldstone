@@ -679,7 +679,10 @@ object PincodeText {
 }
 
 enum class HoneyLanguage(val code: Int, val language: String) {
-	English(0, "English"), Chinese(1, "Chinese"), Japanese(2, "Japanese"), Russian(3, "Russian"),
+	English(0, "English"),
+	Chinese(1, "Chinese"),
+	Japanese(2, "Japanese"),
+	Russian(3, "Russian"),
 	Korean(4, "Korean");
 
 	companion object {
