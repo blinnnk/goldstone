@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import com.blinnnk.extension.*
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey

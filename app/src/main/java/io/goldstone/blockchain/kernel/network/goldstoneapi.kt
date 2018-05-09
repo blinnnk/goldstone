@@ -11,6 +11,7 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
+import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -101,7 +102,7 @@ object GoldStoneAPI {
 		address: String = WalletTable.current.address,
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
-		requestData<ERC20TransactionModel>(
+		requestUncryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenIncomingTransaction(
 				address, startBlock
 			), "result"
@@ -119,7 +120,7 @@ object GoldStoneAPI {
 		address: String = WalletTable.current.address,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
-		requestData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
+		requestUncryptoData<TransactionTable>(EtherScanApi.transactions(address, startBlock), "result") {
 			hold(toArrayList())
 		}
 	}
@@ -282,6 +283,37 @@ object GoldStoneAPI {
 				}
 			})
 		}
+	}
+
+	/** 请求 ehterScan 的数据是明文请求不需要加密 */
+	@JvmStatic
+	private inline fun <reified T> requestUncryptoData(
+		api: String, keyName: String, justGetData: Boolean = false, crossinline hold: List<T>.() -> Unit
+	) {
+		val client = OkHttpClient()
+		val request = Request.Builder().url(api).build()
+		client.newCall(request).enqueue(object : Callback {
+			override fun onFailure(call: Call, error: IOException) {
+				println("$error")
+			}
+
+			override fun onResponse(call: Call, response: Response) {
+				val data = response.body()?.string()
+				try {
+					val dataObject = data?.toJsonObject() ?: JSONObject("")
+					val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
+					if (justGetData) {
+						hold(listOf(jsonData as T))
+					} else {
+						val gson = Gson()
+						val collectionType = object : TypeToken<Collection<T>>() {}.type
+						hold(gson.fromJson(jsonData, collectionType))
+					}
+				} catch (error: Exception) {
+					Log.e("ERROR", "GoldStoneApi $error and $data")
+				}
+			}
+		})
 	}
 
 	@JvmStatic

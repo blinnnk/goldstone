@@ -25,7 +25,10 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
   private val footer by lazy { TokenDetailFooter(context!!) }
   override val presenter = TokenDetailPresenter(this)
 
-  override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionListModel>?) {
+  override fun setRecyclerViewAdapter(
+    recyclerView: BaseRecyclerView,
+    asyncData: ArrayList<TransactionListModel>?
+  ) {
     recyclerView.adapter = TokenDetailAdapter(asyncData.orEmptyArray()) {
       onClick {
         model?.let {
