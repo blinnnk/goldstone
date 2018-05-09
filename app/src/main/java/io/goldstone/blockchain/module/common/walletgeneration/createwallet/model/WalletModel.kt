@@ -6,8 +6,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.AlertText
-import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.localTransactions
@@ -31,8 +29,6 @@ data class WalletTable(
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
 	var passwordHint: String? = null,
-	var language: Int = HoneyLanguage.English.code,
-	var currencyCode: String = CountryCode.currentCurrency,
 	var balance: Double? = 0.0
 ) {
 	companion object {
@@ -104,30 +100,6 @@ data class WalletTable(
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
 						update(it.apply { hint = newHint })
-					}
-				}
-			}) {
-				callback()
-			}
-		}
-
-		fun updateLanguage(code: Int, callback: () -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { language = code })
-					}
-				}
-			}) {
-				callback()
-			}
-		}
-
-		fun updateCurrency(code: String, callback: () -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { currencyCode = code })
 					}
 				}
 			}) {

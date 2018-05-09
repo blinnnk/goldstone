@@ -8,6 +8,7 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
+import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -25,7 +26,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 enum class MarketTokenDetailChartType(
 	val code: Int, val info: String
 ) {
-	Hour(0, "1hour"), DAY(1, "1day"), WEEK(2, "1week"), MONTH(3, "1month")
+	Hour(0, "1hour"),
+	DAY(1, "1day"),
+	WEEK(2, "1week"),
+	MONTH(3, "1month")
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
@@ -87,12 +91,12 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		}
 	}
 
-
 	private fun setCurrencyInf() {
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
 				context?.runOnUiThread {
-					tokenInfomation.model = TokenInfomationModel(it)
+					tokenInfomation.model = TokenInfomationModel(it, info.symbol)
+					tokenInfo.setTokenDescription(it.safeGet("description").substring(0, 300) + "...")
 					priceHistroy.model = PriceHistoryModel(it, info.quoteSymbol)
 				}
 			}

@@ -6,6 +6,8 @@ import android.provider.Settings
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -26,7 +28,10 @@ data class AppConfigTable(
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
-	var isRegisteredAddresses: Boolean = false
+	var isRegisteredAddresses: Boolean = false,
+	var language: Int = HoneyLanguage.English.code,
+	var currencyCode: String = CountryCode.currentCurrency,
+	var pushToken: String = ""
 ) {
 
 	companion object {
@@ -52,6 +57,16 @@ data class AppConfigTable(
 								callback()
 							}
 						}
+					}
+				}
+			}
+		}
+
+		fun updatePushToken(token: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it[0].pushToken = token
 					}
 				}
 			}
@@ -108,6 +123,28 @@ data class AppConfigTable(
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
+					}
+				}
+			}
+		}
+
+		fun updateLanguage(code: Int, callback: () -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply { language = code })
+						GoldStoneAPI.context.runOnUiThread { callback() }
+					}
+				}
+			}
+		}
+
+		fun updateCurrency(code: String, callback: () -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply { currencyCode = code })
+						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
 			}

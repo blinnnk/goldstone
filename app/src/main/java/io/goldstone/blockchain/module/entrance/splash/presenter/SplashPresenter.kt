@@ -19,8 +19,7 @@ class SplashPresenter(val activity: SplashActivity) {
       isNotEmpty() isTrue {
         WalletTable.getCurrentWalletInfo {
           it?.apply {
-            WalletTable.current =
-              it.apply { language = GoldStoneApp.currentLanguage!! }
+            WalletTable.current = it
             activity.jump<MainActivity>()
           }
         }

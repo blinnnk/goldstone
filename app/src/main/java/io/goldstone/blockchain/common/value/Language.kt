@@ -700,7 +700,7 @@ enum class HoneyLanguage(val code: Int, val language: String) {
 		fun getLanguageSymbol(code: Int): String {
 			return when (code) {
 				HoneyLanguage.English.code  -> "EN"
-				HoneyLanguage.Chinese.code  -> "CN"
+				HoneyLanguage.Chinese.code  -> "ZH"
 				HoneyLanguage.Japanese.code -> "JP"
 				HoneyLanguage.Russian.code  -> "RU"
 				HoneyLanguage.Korean.code   -> "KR"

@@ -18,19 +18,23 @@ import org.jetbrains.anko.textColor
 
 class TokenInfoView(context: Context) : MarketTokenDetailBaseCell(context) {
 
-  private val contentView = TextView(context).apply {
-    text = "Science Wildlife photographer captures osprey carrying shark, carrying fish in 'one-in-a-trillion photograph'Fox News 3 hours ago messy up-do in a new series of photos and videos for Instagram Stories...."
-    textSize = 4.uiPX().toFloat()
-    textColor = GrayScale.black
-    typeface = GoldStoneFont.medium(context)
-  }
+	private val contentView = TextView(context).apply {
+		text = "Currency Description"
+		textSize = 4.uiPX().toFloat()
+		textColor = GrayScale.black
+		typeface = GoldStoneFont.medium(context)
+	}
 
-  init {
-    title.text = "Token Info"
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 115.uiPX())
-    contentView.into(this)
-    contentView.y -= 10.uiPX()
-    contentView.setAlignParentBottom()
-  }
+	init {
+		title.text = "Token Info"
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 145.uiPX())
+		contentView.into(this)
+		contentView.y -= 10.uiPX()
+		contentView.setAlignParentBottom()
+	}
+
+	fun setTokenDescription(content: String) {
+		contentView.text = content
+	}
 
 }
