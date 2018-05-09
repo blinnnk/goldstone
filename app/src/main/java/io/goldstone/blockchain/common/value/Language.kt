@@ -625,6 +625,16 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "修轉賬金額將導致重新計算燃氣花費，您需要重置自定燃氣費設置"
 		else -> "Modifying transfer count will lead to a recalculation and you need to reset the custom gas settings"
 	}
+	@JvmField
+	val importWalletNetwork = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There isn't network found, Importing Wallet need network to check the value of it"
+		HoneyLanguage.Chinese.code -> "没有检测到网络，导入钱包时需要网络环境查询您的货币余额"
+		HoneyLanguage.Japanese.code -> "ネットワークが見つかりません。ウォレットをインポートするとネットワークの価値を確認する必要があります"
+		HoneyLanguage.Korean.code -> "네트워크를 찾을 수 없습니다. 지갑을 가져 와서 값을 확인해야합니다."
+		HoneyLanguage.Russian.code -> "Сеть не найдена, Импорт сети для кошелька, чтобы проверить ее значение"
+		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額\n"
+		else -> "There isn't network found, Importing Wallet need network to check the value of it"
+	}
 }
 
 object CurrentWalletText {
