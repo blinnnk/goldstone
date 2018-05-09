@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setBold
 import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneySvgPathConvert

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import com.blinnnk.extension.*
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -38,6 +39,8 @@ class QuotationPresenter(
 
 	override fun updateData() {
 
+		currentSocket?.runSocket()
+
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let { diffAndUpdateData(it) }
 
@@ -51,8 +54,6 @@ class QuotationPresenter(
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 
-			/** 每次更新数据的时候重新执行长连接, 因为是 `?` 驱动初始化的时候这个不会执行 */
-			currentSocket?.runSocket()
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChart)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
@@ -65,7 +66,9 @@ class QuotationPresenter(
 				// 更新 `UI`
 				diffAndUpdateData(it)
 				// 设定 `Socket` 并执行
-				setSocket { currentSocket?.runSocket() }
+				currentSocket.isNull() isTrue {
+					setSocket { currentSocket?.runSocket() }
+				}
 			}
 		}
 	}
