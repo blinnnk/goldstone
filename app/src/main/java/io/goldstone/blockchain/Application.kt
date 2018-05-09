@@ -6,6 +6,7 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
@@ -15,6 +16,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 @Suppress("DEPRECATION")
 /**
@@ -37,8 +39,17 @@ class GoldStoneApp : Application() {
 		// init `Api` context
 		GoldStoneAPI.context = this
 
-		// update local `Tokens` info list
-		StartingPresenter.updateLocalDefaultTokens(this)
+		NetworkUtil.hasNetwork(this) isTrue {
+			// update local `Tokens` info list
+			StartingPresenter.updateLocalDefaultTokens(this)
+		} otherwise {
+			/** 没有网络且本地数据为空的时候插入本地事先准备好的 `Token Json` */
+			DefaultTokenTable.getTokens {
+				it.isEmpty() isTrue {
+					StartingPresenter.insertLocalTokens(this)
+				}
+			}
+		}
 
 		prepareAppConfig { registerDeviceForPush() }
 

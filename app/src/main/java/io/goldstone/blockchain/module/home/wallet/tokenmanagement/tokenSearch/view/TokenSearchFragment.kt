@@ -40,7 +40,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 				localToken.isNotNull {
 					insertTokenToDataBase(this)
 				} otherwise {
-					DefaultTokenTable.insertTokenInfo(it) {
+					DefaultTokenTable.insertToken(it) {
 						insertTokenToDataBase(this)
 					}
 				}

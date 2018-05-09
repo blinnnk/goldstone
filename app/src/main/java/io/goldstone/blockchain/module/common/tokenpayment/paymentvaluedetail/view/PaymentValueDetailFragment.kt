@@ -87,7 +87,7 @@ class PaymentValueDetailFragment :
 
 	private fun confirmTransfer(): Runnable {
 		return Runnable {
-			NetworkUtil.hasNetwork(context) isTrue {
+			NetworkUtil.hasNetworkWithAlert(context) isTrue {
 				MyTokenTable.getBalanceWithSymbol(
 					token?.symbol!!, WalletTable.current.address, true
 				) { balance ->

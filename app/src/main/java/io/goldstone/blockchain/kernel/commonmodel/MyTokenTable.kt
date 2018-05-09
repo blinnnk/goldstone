@@ -21,7 +21,9 @@ import org.jetbrains.anko.runOnUiThread
 
 @Entity(tableName = "myTokens")
 data class MyTokenTable(
-	@PrimaryKey(autoGenerate = true) var id: Int, var ownerAddress: String,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	var ownerAddress: String,
 	var symbol: String,
 	var balance: Double
 ) {

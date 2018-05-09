@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Ethereum",
+    "weight": 100,
+    "address": "0x0",
+    "url": "http://hunger.blinnnk.com/6791ec0329cc496098c38f85843945e2",
+    "decimals": 18,
+    "symbol": "ETH",
+    "type": 0,
+    "price": "0.0",
+    "force_show": 1,
+    "total_supply": 1902938
+  }
+]

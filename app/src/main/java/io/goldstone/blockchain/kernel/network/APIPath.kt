@@ -21,6 +21,7 @@ object APIPath {
 	const val getNotification = "$url/account/unreadMessageList"
 	const val marketSearch = "$url/account/searchPair?pair="
 	const val getCurrencyLineChartData = "$url/account/lineDataByDay"
+	const val getPriceByAddress = "$url/index/priceByAddress"
 	@JvmField
 	val getQuotationCurrencyChart: (pair: String, period: String, size: Int) -> String =
 		{ pair, period, size ->

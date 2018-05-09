@@ -292,7 +292,7 @@ class TransactionDetailPresenter(
 			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)
 					.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-						presenter.updateAllTokensInWallet()
+						presenter.updateMyTokensPrice()
 					}
 			}
 		}

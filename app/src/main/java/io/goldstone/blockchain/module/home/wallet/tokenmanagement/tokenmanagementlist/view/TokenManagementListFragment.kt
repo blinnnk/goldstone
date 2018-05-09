@@ -26,7 +26,7 @@ class TokenManagementListFragment :
 	) {
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { cell ->
 			cell.switch.onClick {
-				NetworkUtil.hasNetwork(this@TokenManagementListFragment.context) isTrue {
+				NetworkUtil.hasNetworkWithAlert(this@TokenManagementListFragment.context) isTrue {
 					getMainActivity()?.apply {
 						TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
 					}

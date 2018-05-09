@@ -2,18 +2,21 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
@@ -33,10 +36,27 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
 	override fun onFragmentShowFromHidden() {
-		updateAllTokensInWallet()
+		updateMyTokensPrice()
 	}
 
-	fun updateAllTokensInWallet() {
+	fun updateMyTokensPrice() {
+		fragment.asyncData?.let { asyncData ->
+			asyncData.map { it.contract }.toJsonArray {
+				GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
+					newPrices.forEachOrEnd { item, isEnd ->
+						// 同时更新缓存里面的数据
+						DefaultTokenTable.updateTokenPrice(item.contract, item.price) {
+							if (isEnd) {
+								updateAllTokensInWallet()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private fun updateAllTokensInWallet() {
 		// Check the count of local wallets
 		WalletTable.apply { getAll { walletCount = size } }
 		// Check the info of wallet currency list
@@ -56,7 +76,11 @@ class WalletDetailPresenter(
 	 */
 	override fun onFragmentResume() {
 		CreateWalletPresenter.updateMyTokensValue {
-			updateAllTokensInWallet()
+			if (fragment.asyncData.isNull()) {
+				updateAllTokensInWallet()
+			} else {
+				updateMyTokensPrice()
+			}
 		}
 		showPinCodeFragment()
 	}

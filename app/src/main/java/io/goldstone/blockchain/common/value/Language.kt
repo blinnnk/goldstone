@@ -365,6 +365,12 @@ object AlertText {
 		HoneyLanguage.English.code -> "Modifying transfer count will lead to a recalculation and you need to reset the custom gas settings"
 		else                       -> ""
 	}
+
+	@JvmField
+	val importWalletNetwork = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There isn't network found, Importing Wallet need network to check the value of it"
+		else                       -> ""
+	}
 }
 
 object CurrentWalletText {

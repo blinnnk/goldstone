@@ -83,7 +83,7 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		loadDataFromDatabaseOrElse {
-			NetworkUtil.hasNetwork(fragment.context) isTrue {
+			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				fragment.loadDataFromChain()
 			}
 		}
@@ -128,7 +128,7 @@ class TokenDetailPresenter(
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
 		asyncData = data
 		// 显示内存的数据后异步更新数据
-		NetworkUtil.hasNetwork(context) isTrue {
+		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			data.prepareTokenHistoryBalance(fragment.symbol!!) {
 				it.updateChartAndHeaderData()
 			}
