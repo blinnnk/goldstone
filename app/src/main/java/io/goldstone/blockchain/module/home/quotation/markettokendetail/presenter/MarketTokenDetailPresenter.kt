@@ -8,6 +8,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.CurrentPriceModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenChart
@@ -72,16 +73,23 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
+	private var currentSocket: GoldStoneWebSocket? = null
 	private fun QuotationModel.updateCurrencyPriceInfo() {
 		// 传默认值
 		fragment.currentPriceInfo.model = CurrentPriceModel()
 		// 长连接获取数据
 		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair), {
-			it.runSocket()
+			currentSocket = it
+			currentSocket?.runSocket()
 		}) {
 			if (it.pair == pair) {
 				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
 			}
 		}
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		currentSocket?.closeSocket()
 	}
 }
