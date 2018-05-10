@@ -25,7 +25,10 @@ class LanguagePresenter(
 	override val fragment: LanguageFragment
 ) : BaseRecyclerPresenter<LanguageFragment, LanguageModel>() {
 
-	fun setLanguage(language: String, hold: Boolean.() -> Unit) {
+	fun setLanguage(
+		language: String,
+		hold: Boolean.() -> Unit
+	) {
 		fragment.context?.apply {
 			alert(
 				"Once you selected it, application will be rebooted and just wait several seconds.",
@@ -44,10 +47,10 @@ class LanguagePresenter(
 
 	private fun updateData(language: String) {
 		val code = when (language) {
-			HoneyLanguage.English.language  -> HoneyLanguage.English.code
-			HoneyLanguage.Chinese.language  -> HoneyLanguage.Chinese.code
+			HoneyLanguage.English.language -> HoneyLanguage.English.code
+			HoneyLanguage.Chinese.language -> HoneyLanguage.Chinese.code
 			HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
-			else                            -> HoneyLanguage.English.code
+			else -> HoneyLanguage.English.code
 		}
 
 		AppConfigTable.updateLanguage(code) {

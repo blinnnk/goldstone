@@ -11,13 +11,36 @@ import java.util.*
  */
 
 object CountryCode {
-  val china = Locale("cn","CN")
-  val korean = Locale("kr","KR")
-  val japan = Locale("jp","JP")
-  val russia = Locale("ru","RU")
-  val america = Locale("en","US")
+	val china =
+		Locale(
+			"cn",
+			"CN"
+		)
+	val korean =
+		Locale(
+			"kr",
+			"KR"
+		)
+	val japan =
+		Locale(
+			"jp",
+			"JP"
+		)
+	val russia =
+		Locale(
+			"ru",
+			"RU"
+		)
+	val america =
+		Locale(
+			"en",
+			"US"
+		)
 
-  val currentCurrency = Currency.getInstance(Resources.getSystem().configuration.locale).currencyCode!!
-  val currentCountry = Resources.getSystem().configuration.locale.country!!
-  val currentLanguage = Resources.getSystem().configuration.locale.displayLanguage!!
+	val currentCurrency =
+		Currency.getInstance(Resources.getSystem().configuration.locale).currencyCode!!
+	val currentCountry = Resources.getSystem().configuration.locale.country!!
+	val currentLanguage = Resources.getSystem().configuration.locale.displayLanguage!!
+	val currentLanguageSymbol = Resources.getSystem().configuration.locale.language!!
+
 }

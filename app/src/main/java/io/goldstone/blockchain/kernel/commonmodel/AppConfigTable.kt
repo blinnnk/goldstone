@@ -23,13 +23,14 @@ import org.jetbrains.anko.runOnUiThread
 
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
-	@PrimaryKey(autoGenerate = true) var id: Int, var pincode: Int? = null,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int, var pincode: Int? = null,
 	var showPincode: Boolean = false,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
 	var isRegisteredAddresses: Boolean = false,
-	var language: Int = HoneyLanguage.English.code,
+	var language: Int = HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = ""
 ) {
@@ -37,7 +38,8 @@ data class AppConfigTable(
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.appConfigDao().getAppConfig()
+				GoldStoneDataBase.database.appConfigDao()
+					.getAppConfig()
 			}) {
 				it.isNotEmpty() isTrue {
 					hold(it[0])
@@ -47,79 +49,100 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
+		fun updatePinCode(
+			newPinCode: Int,
+			callback: () -> Unit
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].pincode = newPinCode })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							it.isNotEmpty() isTrue {
+								update(it[0].apply { it[0].pincode = newPinCode })
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
 							}
 						}
 					}
-				}
 			}
 		}
 
 		fun updatePushToken(token: String) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it[0].pushToken = token
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							it[0].pushToken = token
+						}
 					}
-				}
 			}
 		}
 
-		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
+		fun updateRegisterAddressesStatus(
+			isRegistered: Boolean,
+			callback: () -> Unit = {}
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].isRegisteredAddresses = isRegistered })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							it.isNotEmpty() isTrue {
+								update(it[0].apply { it[0].isRegisteredAddresses = isRegistered })
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
 							}
 						}
 					}
-				}
 			}
 		}
 
-		fun updateRetryTimes(times: Int, callback: () -> Unit = {}) {
+		fun updateRetryTimes(
+			times: Int,
+			callback: () -> Unit = {}
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].retryTimes = times })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							it.isNotEmpty() isTrue {
+								update(it[0].apply { it[0].retryTimes = times })
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
 							}
 						}
 					}
-				}
 			}
 		}
 
-		fun setFrozenTime(frozenTime: Long?, callback: () -> Unit = {}) {
+		fun setFrozenTime(
+			frozenTime: Long?,
+			callback: () -> Unit = {}
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.frozenTime = frozenTime })
-							GoldStoneAPI.context.runOnUiThread { callback() }
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							it.isNotEmpty() isTrue {
+								update(it[0].apply { this.frozenTime = frozenTime })
+								GoldStoneAPI.context.runOnUiThread { callback() }
+							}
 						}
 					}
-				}
 			}
 		}
 
-		fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit) {
+		fun setShowPinCodeStatus(
+			status: Boolean,
+			callback: () -> Unit
+		) {
 			AppConfigTable.getAppConfig {
 				it?.let {
 					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply { showPincode = status })
+						GoldStoneDataBase.database.appConfigDao()
+							.update(it.apply { showPincode = status })
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -128,25 +151,33 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateLanguage(code: Int, callback: () -> Unit) {
+		fun updateLanguage(
+			code: Int,
+			callback: () -> Unit
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { language = code })
-						GoldStoneAPI.context.runOnUiThread { callback() }
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							update(it[0].apply { language = code })
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
 					}
-				}
 			}
 		}
 
-		fun updateCurrency(code: String, callback: () -> Unit) {
+		fun updateCurrency(
+			code: String,
+			callback: () -> Unit
+		) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { currencyCode = code })
-						GoldStoneAPI.context.runOnUiThread { callback() }
+				GoldStoneDataBase.database.appConfigDao()
+					.apply {
+						getAppConfig().let {
+							update(it[0].apply { currencyCode = code })
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
 					}
-				}
 			}
 		}
 
@@ -154,11 +185,20 @@ data class AppConfigTable(
 		fun insertAppConfig(callback: () -> Unit) {
 			doAsync {
 				val goldStoneID = Settings.Secure.getString(
-					GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID
+					GoldStoneAPI.context.contentResolver,
+					Settings.Secure.ANDROID_ID
 				) + System.currentTimeMillis()
-				GoldStoneDataBase.database.appConfigDao().insert(
-					AppConfigTable(0, null, false, null, 5, goldStoneID)
-				)
+				GoldStoneDataBase.database.appConfigDao()
+					.insert(
+						AppConfigTable(
+							0,
+							null,
+							false,
+							null,
+							5,
+							goldStoneID
+						)
+					)
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}

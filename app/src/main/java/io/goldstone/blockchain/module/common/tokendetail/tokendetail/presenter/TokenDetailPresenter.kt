@@ -41,6 +41,8 @@ class TokenDetailPresenter(
 
 	override fun updateData() {
 		prepareTokenDetailData()
+		// 详情页面直接全屏高度
+		setHeightMatchParent()
 	}
 
 	override fun updateParentContentLayoutHeight(
