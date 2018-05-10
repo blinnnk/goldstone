@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
@@ -45,11 +46,11 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			// 根据助记词生成勾选助记词的按钮集合
 			relativeLayout {
 
-				lparams {
-					width = ScreenSize.widthWithPadding
-					height = 180.uiPX()
-					leftMargin = PaddingSize.device
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 180.uiPX())
+
+				setMargins<RelativeLayout.LayoutParams> {
 					topMargin = 20.uiPX()
+					leftMargin = PaddingSize.device
 				}
 
 				var contentWidth = 0
@@ -113,7 +114,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		} else {
 			backgroundColor = Spectrum.blue
 			textColor = Spectrum.white
-			val newContent = if(input.text.isEmpty()) text.toString() else " " + text.toString()
+			val newContent = if (input.text.isEmpty()) text.toString() else " " + text.toString()
 			input.setText(input.text.toString() + newContent)
 		}
 	}
