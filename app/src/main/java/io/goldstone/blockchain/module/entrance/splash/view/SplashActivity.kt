@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 
@@ -51,16 +54,40 @@ class SplashActivity : AppCompatActivity() {
 
 		hideStatusBar()
 
-		presenter.hasAccountThenLogin()
-		container.apply {
-			savedInstanceState.isNull {
-				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-				addFragment<StartingFragment>(container.id)
+		AppConfigTable.getAppConfig {
+			initLaunchLanguage(it?.language)
+			it?.let {
+				getCurrencyRate(it)
 			}
+
+			presenter.hasAccountThenLogin()
+			container.apply {
+				savedInstanceState.isNull {
+					// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+					addFragment<StartingFragment>(container.id)
+				}
+			}
+				.let {
+					setContentView(it)
+				}
+
 		}
-			.let {
-				setContentView(it)
-			}
+	}
+
+	/**
+	 * Querying the language type of the current account
+	 * set and displaying the interface from the database.
+	 */
+	private fun initLaunchLanguage(code: Int?) {
+		GoldStoneApp.currentLanguage = code ?: GoldStoneApp.currentLanguage
+	}
+
+	// 获取当前的汇率
+	private fun getCurrencyRate(config: AppConfigTable) {
+		GoldStoneApp.currencyCode = config.currencyCode
+		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
+			GoldStoneApp.currentRate = it
+		}
 	}
 
 }
