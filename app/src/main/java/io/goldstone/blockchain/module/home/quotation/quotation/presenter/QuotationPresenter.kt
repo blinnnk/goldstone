@@ -60,7 +60,7 @@ class QuotationPresenter(
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 
 			selections.map { selection ->
-				val linechart = convertDataToChartData(selection.lineChart)
+				val linechart = convertDataToChartData(selection.lineChartDay)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
 				QuotationModel(selection, "--", "0", linechart)
 			}.sortedByDescending {

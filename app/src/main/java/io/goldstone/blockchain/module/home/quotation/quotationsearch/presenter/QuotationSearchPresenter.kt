@@ -45,7 +45,7 @@ class QuotationSearchPresenter(
 			// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
 			getLineChartDataByPair(model.pair) { chartData ->
 				QuotationSelectionTable.insertSelection(model.apply {
-					lineChart = chartData
+					lineChartDay = chartData
 					isSelecting = isSelect
 				}) { callback() }
 			}
@@ -89,7 +89,7 @@ class QuotationSearchPresenter(
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(parameter) {
 				it.isNotEmpty() isTrue {
-					hold(it[0].pairList.toString())
+					hold(it[0].pointList.toString())
 				} otherwise {
 					hold("")
 				}

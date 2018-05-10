@@ -27,7 +27,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		textSize = 4.uiPX().toFloat()
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
-		y -= 5.uiPX()
+		y -= 3.uiPX()
 	}
 
 	var isFloatRight by observing(false) {
@@ -55,14 +55,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	fun setColorStyle(color: Int) {
 		title.textColor = color
 		subtitle.textColor = color
-	}
-
-	fun setNormalTitles() {
-		title.apply {
-			typeface = GoldStoneFont.book(context)
-			textColor = GrayScale.black
-		}
-		subtitle.textColor = GrayScale.gray
 	}
 
 	fun setGrayTitles() {
@@ -109,7 +101,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			textSize = 4.uiPX().toFloat()
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
-			y -= 7.uiPX()
+			y -= 5.uiPX()
 		}
 	}
 
