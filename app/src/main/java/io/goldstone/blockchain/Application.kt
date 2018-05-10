@@ -53,8 +53,6 @@ class GoldStoneApp : Application() {
 
 		prepareAppConfig { registerDeviceForPush() }
 
-		initAppParameters()
-
 	}
 
 	companion object {
@@ -62,31 +60,6 @@ class GoldStoneApp : Application() {
 		var currentRate: Double = 1.0
 		var currencyCode: String = CountryCode.currentCurrency
 		var currentLanguage: Int? = HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol)
-
-		/**
-		 * Querying the language type of the current account
-		 * set and displaying the interface from the database.
-		 */
-		private fun initAppParameters() {
-			AppConfigTable.getAppConfig {
-				initLaunchLanguage(it?.language)
-				it?.let {
-					getCurrencyRate(it)
-				}
-			}
-		}
-
-		private fun initLaunchLanguage(code: Int?) {
-			currentLanguage = code ?: currentLanguage
-		}
-
-		// 获取当前的汇率
-		private fun getCurrencyRate(config: AppConfigTable) {
-			currencyCode = config.currencyCode
-			GoldStoneAPI.getCurrencyRate(config.currencyCode) {
-				currentRate = it
-			}
-		}
 
 		private fun prepareAppConfig(callback: () -> Unit) {
 			AppConfigTable.getAppConfig { config ->
