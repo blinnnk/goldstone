@@ -4,6 +4,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
@@ -37,16 +38,33 @@ class MnemonicImportDetailPresenter(
 			isAgree,
 			fragment.context
 		) { passwordValue, walletName ->
+			val mnemonicContent = mnemonicInput.text.toString().replaceWithPattern()
 			importWallet(
-				mnemonicInput.text.toString(), passwordValue, walletName, hintInput.text?.toString()
+				mnemonicContent,
+				passwordValue,
+				walletName,
+				hintInput.text?.toString()
 			)
 		}
 	}
 
-	private fun importWallet(mnemonic: String, password: String, name: String, hint: String? = null) {
-		fragment.context?.getWalletByMnemonic(mnemonic, password) { address ->
+	private fun importWallet(
+		mnemonic: String,
+		password: String,
+		name: String,
+		hint: String? = null
+	) {
+		fragment.context?.getWalletByMnemonic(
+			mnemonic,
+			password
+		) { address ->
 			address?.let {
-				WalletImportPresenter.insertWalletToDatabase(fragment, it, name, hint)
+				WalletImportPresenter.insertWalletToDatabase(
+					fragment,
+					it,
+					name,
+					hint
+				)
 			}
 		}
 	}

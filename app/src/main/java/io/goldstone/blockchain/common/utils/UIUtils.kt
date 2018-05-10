@@ -6,6 +6,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.R.drawable.*
+import java.util.regex.Pattern
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -52,4 +53,10 @@ fun String.toUpperCaseFirstLetter(): String {
 	} otherwise {
 		return ""
 	}
+}
+
+fun String.replaceWithPattern(
+	replace: String = " "
+): String {
+	return Pattern.compile("\\s+").matcher(this).replaceAll(replace)
 }
