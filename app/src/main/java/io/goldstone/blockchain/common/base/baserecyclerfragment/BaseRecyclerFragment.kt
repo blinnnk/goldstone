@@ -23,6 +23,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.Conta
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.support.v4.UI
@@ -224,6 +225,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				is TokenSearchFragment                          -> setStyle(EmptyType.Search)
 				is QuotationSearchFragment                      -> setStyle(EmptyType.QuotationSearch)
 				is QuotationFragment                            -> setStyle(EmptyType.Quotation)
+				is WalletDetailFragment                         -> setStyle(EmptyType.WalletDetail)
 				else                                            -> setStyle(EmptyType.TransactionDetail)
 			}
 		}

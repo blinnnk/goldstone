@@ -39,6 +39,10 @@ class WalletDetailPresenter(
 		updateMyTokensPrice()
 	}
 
+	override fun updateData() {
+		updateAllTokensInWallet()
+	}
+
 	fun updateMyTokensPrice() {
 		fragment.asyncData?.let { asyncData ->
 			asyncData.map { it.contract }.toJsonArray {
@@ -46,9 +50,7 @@ class WalletDetailPresenter(
 					newPrices.forEachOrEnd { item, isEnd ->
 						// 同时更新缓存里面的数据
 						DefaultTokenTable.updateTokenPrice(item.contract, item.price) {
-							if (isEnd) {
-								updateAllTokensInWallet()
-							}
+							if (isEnd) { updateAllTokensInWallet() }
 						}
 					}
 				}
@@ -57,17 +59,19 @@ class WalletDetailPresenter(
 	}
 
 	private fun updateAllTokensInWallet() {
+		// 先初始化空数组再更新列表
+		fragment.asyncData.isNull() isTrue {
+			fragment.asyncData = arrayListOf()
+		}
 		// Check the count of local wallets
 		WalletTable.apply { getAll { walletCount = size } }
 		// Check the info of wallet currency list
 		WalletDetailCellModel.getModels { it ->
-			val newData = it.sortedByDescending { it.currency }.toArrayList()
-			fragment.asyncData.isNull() isTrue {
-				fragment.asyncData = newData
-			} otherwise {
-				diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
-			}
+			val newData =
+				it.sortedByDescending { it.currency }.toArrayList()
+			diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
 			fragment.updateHeaderValue()
+			fragment.setEmptyViewBy(it)
 		}
 	}
 
