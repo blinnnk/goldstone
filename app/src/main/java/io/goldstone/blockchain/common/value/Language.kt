@@ -965,13 +965,13 @@ object EmptyText {
 	}
 	@JvmField
 	val searchSubtitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "No Token Found"
+		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time"
 		HoneyLanguage.Chinese.code -> "没有找到对应的代币"
 		HoneyLanguage.Japanese.code -> "トークントランザクションが見つかりません"
 		HoneyLanguage.Korean.code -> "아직 거래 내역이 없습니다"
 		HoneyLanguage.Russian.code -> "Соответствующий токен не найден"
 		HoneyLanguage.TraditionalChinese.code -> "没有找到对应的代币"
-		else -> "No Token Found"
+		else -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time Token prices for the exchanges you want to follow"
 	}
 	@JvmField
 	val contractTitle = when (currentLanguage) {

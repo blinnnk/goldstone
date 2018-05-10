@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.EmptyText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.textColor
@@ -103,6 +104,13 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			typeface = GoldStoneFont.medium(context)
 			y -= 5.uiPX()
 		}
+	}
+
+	fun setOpacityWhiteStyle() {
+		title.typeface = GoldStoneFont.heavy(context)
+		title.textColor = Spectrum.opacity3White
+		title.textSize = 6.uiPX().toFloat()
+		subtitle.textColor = Spectrum.opacity3White
 	}
 
 	fun getSubtitleValue() = subtitle.text.toString()

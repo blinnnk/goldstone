@@ -45,31 +45,40 @@ class WalletDetailPresenter(
 
 	fun updateMyTokensPrice() {
 		fragment.asyncData?.let { asyncData ->
-			asyncData.map { it.contract }.toJsonArray {
-				GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
-					newPrices.forEachOrEnd { item, isEnd ->
-						// 同时更新缓存里面的数据
-						DefaultTokenTable.updateTokenPrice(item.contract, item.price) {
-							if (isEnd) { updateAllTokensInWallet() }
+			asyncData.map { it.contract }
+				.toJsonArray {
+					GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
+						newPrices.forEachOrEnd { item, isEnd ->
+							// 同时更新缓存里面的数据
+							DefaultTokenTable.updateTokenPrice(
+								item.contract,
+								item.price
+							) {
+								if (isEnd) {
+									updateAllTokensInWallet()
+								}
+							}
 						}
 					}
 				}
-			}
 		}
 	}
 
 	private fun updateAllTokensInWallet() {
+
+		// Check the count of local wallets
+		WalletTable.apply { getAll { walletCount = size } }
+
 		// 先初始化空数组再更新列表
-		fragment.asyncData.isNull() isTrue {
+		if (fragment.asyncData.isNull()) {
 			fragment.asyncData = arrayListOf()
 			fragment.updateHeaderValue()
 		}
-		// Check the count of local wallets
-		WalletTable.apply { getAll { walletCount = size } }
 		// Check the info of wallet currency list
 		WalletDetailCellModel.getModels { it ->
 			val newData =
-				it.sortedByDescending { it.currency }.toArrayList()
+				it.sortedByDescending { it.currency }
+					.toArrayList()
 			diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
 			fragment.updateHeaderValue()
 			fragment.setEmptyViewBy(it)
@@ -95,7 +104,8 @@ class WalletDetailPresenter(
 			AppConfigTable.getAppConfig {
 				it?.showPincode?.isTrue {
 					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main, FragmentTag.pinCode
+						ContainerID.main,
+						FragmentTag.pinCode
 					) {
 						// Send Argument
 					}
@@ -122,13 +132,19 @@ class WalletDetailPresenter(
 
 	fun showWalletSettingsFragment() {
 		fragment.activity?.addFragmentAndSetArguments<WalletSettingsFragment>(ContainerID.main) {
-			putString(ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings)
+			putString(
+				ArgumentKey.walletSettingsTitle,
+				WalletSettingsText.walletSettings
+			)
 		}
 	}
 
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main) {
-			putSerializable(ArgumentKey.tokenDetail, model)
+			putSerializable(
+				ArgumentKey.tokenDetail,
+				model
+			)
 		}
 	}
 

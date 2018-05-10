@@ -50,6 +50,11 @@ data class WalletDetailCellModel(
 		) {
 			// 获取我的钱包的 `Token` 列表
 			MyTokenTable.getTokensWith(walletAddress) { allTokens ->
+				// 当前钱包没有指定 `Token` 直接返回
+				if (allTokens.isEmpty()) {
+					hold(arrayListOf())
+					return@getTokensWith
+				}
 				object : ConcurrentAsyncCombine() {
 					val tokenList = ArrayList<WalletDetailCellModel>()
 					override var asyncCount: Int = allTokens.size
