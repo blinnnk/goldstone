@@ -27,10 +27,12 @@ class PrivateKeyImportPresenter(
 		repeatPasswordInput: EditText,
 		isAgree: Boolean,
 		nameInput: EditText,
-		hintInput: EditText
+		hintInput: EditText,
+		callback: () -> Unit
 	) {
 		privateKeyInput.text.isEmpty() isTrue {
 			fragment.context?.alert("privateKey is not correct")
+			callback()
 			return
 		}
 		CreateWalletPresenter.checkInputValue(
@@ -45,7 +47,8 @@ class PrivateKeyImportPresenter(
 				passwordValue,
 				walletName,
 				fragment,
-				hintInput.text?.toString()
+				hintInput.text?.toString(),
+				callback
 			)
 		}
 	}
@@ -56,7 +59,12 @@ class PrivateKeyImportPresenter(
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
 		 */
 		fun importWallet(
-			privateKey: String, password: String, name: String, fragment: Fragment, hint: String? = null
+			privateKey: String,
+			password: String,
+			name: String,
+			fragment: Fragment,
+			hint: String? = null,
+			callback: () -> Unit
 		) {
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			// 默认去除多余的空格
@@ -72,7 +80,7 @@ class PrivateKeyImportPresenter(
 			// 解析私钥并导入钱包
 			fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
 				address?.let {
-					WalletImportPresenter.insertWalletToDatabase(fragment, it, name, hint)
+					WalletImportPresenter.insertWalletToDatabase(fragment, it, name, hint, callback)
 				}
 			}
 		}

@@ -25,7 +25,8 @@ class MnemonicImportDetailPresenter(
 		repeatPasswordInput: EditText,
 		hintInput: EditText,
 		isAgree: Boolean,
-		nameInput: EditText
+		nameInput: EditText,
+		callback: () -> Unit
 	) {
 		mnemonicInput.text.isEmpty() isTrue {
 			fragment.context?.alert("mnemonic is not correct")
@@ -43,7 +44,8 @@ class MnemonicImportDetailPresenter(
 				mnemonicContent,
 				passwordValue,
 				walletName,
-				hintInput.text?.toString()
+				hintInput.text?.toString(),
+				callback
 			)
 		}
 	}
@@ -52,7 +54,8 @@ class MnemonicImportDetailPresenter(
 		mnemonic: String,
 		password: String,
 		name: String,
-		hint: String? = null
+		hint: String? = null,
+		callback: () -> Unit
 	) {
 		fragment.context?.getWalletByMnemonic(
 			mnemonic,
@@ -63,7 +66,8 @@ class MnemonicImportDetailPresenter(
 					fragment,
 					it,
 					name,
-					hint
+					hint,
+					callback
 				)
 			}
 		}
