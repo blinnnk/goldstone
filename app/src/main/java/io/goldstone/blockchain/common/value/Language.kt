@@ -955,13 +955,13 @@ object EmptyText {
 	}
 	@JvmField
 	val searchTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time Token prices for the exchanges you want to follow"
-		HoneyLanguage.Chinese.code -> "您还没有添加任何交易对。请点击左上方按钮，搜索并添加想要关注的交易所的Token实时价格"
-		HoneyLanguage.Japanese.code -> "まだ取引ペアを追加していません。 左上のボタンをクリックして、追跡したい取引所のリアルタイムのトークン価格を検索して追加してください。\n"
-		HoneyLanguage.Korean.code -> "거래 쌍을 아직 추가하지 않았습니다. 왼쪽 위 버튼을 클릭하여 따라하고 싶은 거래에 대한 실시간 토큰 가격을 검색하고 추가하십시오."
-		HoneyLanguage.Russian.code -> "Вы еще не добавили торговых пар. Нажмите на верхнюю левую кнопку, чтобы найти и добавить цены токена в реальном времени на биржи, которые вы хотите отслеживать."
-		HoneyLanguage.TraditionalChinese.code -> "您還沒有添加任何交易對。請點擊左上方按鈕，搜索並添加想要關注的交易所的令牌實時價格"
-		else -> "No Result"
+		HoneyLanguage.English.code -> "No Token Selected"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "No Token Selected"
 	}
 	@JvmField
 	val searchSubtitle = when (currentLanguage) {
@@ -1176,13 +1176,41 @@ object PincodeText {
 	}
 }
 
-enum class HoneyLanguage(val code: Int, val language: String) {
-	English(0, "English"),
-	Chinese(1, "Chinese"),
-	Japanese(2, "Japanese"),
-	Russian(3, "Russian"),
-	Korean(4, "Korean"),
-	TraditionalChinese(5, "TraditionalChinese");
+enum class HoneyLanguage(
+	val code: Int,
+	val language: String,
+	val symbol: String
+) {
+	English(
+		       0,
+		       "English",
+		       "EN"
+	       ),
+	Chinese(
+		       1,
+		       "Chinese",
+		       "ZH"
+	       ),
+	Japanese(
+		        2,
+		        "Japanese",
+		        "JP"
+	        ),
+	Russian(
+		       3,
+		       "Russian",
+		       "RU"
+	       ),
+	Korean(
+		      4,
+		      "Korean",
+		      "KR"
+	      ),
+	TraditionalChinese(
+		                  5,
+		                  "TraditionalChinese",
+		                  "TC"
+	                  );
 
 	companion object {
 		fun getLanguageCode(language: String): Int {
@@ -1199,13 +1227,25 @@ enum class HoneyLanguage(val code: Int, val language: String) {
 
 		fun getLanguageSymbol(code: Int): String {
 			return when (code) {
-				HoneyLanguage.English.code  -> "EN"
-				HoneyLanguage.Chinese.code  -> "ZH"
-				HoneyLanguage.Japanese.code -> "JP"
-				HoneyLanguage.Russian.code -> "RU"
-				HoneyLanguage.Korean.code -> "KR"
-				HoneyLanguage.TraditionalChinese.code -> "TC"
+				HoneyLanguage.English.code -> HoneyLanguage.English.symbol
+				HoneyLanguage.Chinese.code -> HoneyLanguage.Chinese.symbol
+				HoneyLanguage.Japanese.code -> HoneyLanguage.Japanese.symbol
+				HoneyLanguage.Russian.code -> HoneyLanguage.Russian.symbol
+				HoneyLanguage.Korean.code -> HoneyLanguage.Korean.symbol
+				HoneyLanguage.TraditionalChinese.code -> HoneyLanguage.TraditionalChinese.symbol
 				else -> ""
+			}
+		}
+
+		fun getLanguageCodeBySymbol(symbol: String): Int {
+			return when (symbol.toUpperCase()) {
+				HoneyLanguage.English.symbol -> HoneyLanguage.English.code
+				HoneyLanguage.Chinese.symbol -> HoneyLanguage.Chinese.code
+				HoneyLanguage.Japanese.symbol -> HoneyLanguage.Japanese.code
+				HoneyLanguage.Russian.symbol -> HoneyLanguage.Russian.code
+				HoneyLanguage.Korean.symbol -> HoneyLanguage.Korean.code
+				HoneyLanguage.TraditionalChinese.symbol -> HoneyLanguage.TraditionalChinese.code
+				else -> 100
 			}
 		}
 	}
