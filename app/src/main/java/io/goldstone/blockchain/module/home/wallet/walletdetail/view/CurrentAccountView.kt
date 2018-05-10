@@ -45,7 +45,7 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
 			setBlackTitles()
 			setSmallStyle()
 			x += 45.uiPX()
-			y += 3.uiPX()
+			y += 1.uiPX()
 		}.into(this)
 
 		info.setCenterInVertical()

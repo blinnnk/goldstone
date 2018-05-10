@@ -21,17 +21,33 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "quotationSelection")
 data class QuotationSelectionTable(
-	@PrimaryKey(autoGenerate = true) var id: Int, @SerializedName("market_id") var marketID: Int,
-	@SerializedName("pair_display") var pairDisplay: String, @SerializedName("base")
-	var baseSymnbol: String, @SerializedName("quote") var quoteSymbol: String, @SerializedName("pair")
-	var pair: String, @SerializedName("market") var market: String, @SerializedName("name")
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	@SerializedName("market_id")
+	var marketID: Int,
+	@SerializedName("pair_display")
+	var pairDisplay: String,
+	@SerializedName("base")
+	var baseSymnbol: String,
+	@SerializedName("quote")
+	var quoteSymbol: String,
+	@SerializedName("pair")
+	var pair: String,
+	@SerializedName("market")
+	var market: String,
+	@SerializedName("name")
 	var name: String, var infoTitle: String,
 	var orderID: Double = 0.0,
-	var lineChart: String,
+	var lineChartDay: String,
 	var isSelecting: Boolean = false,
-	var description: String? = null
+	var description: String? = null,
+	var lineChartWeek: String? = "",
+	var lineChartMonth: String? = "",
+	var lineChartHour: String? = ""
 ) {
-	constructor(data: QuotationSelectionTable, lineChart: String) : this(
+	constructor(
+		data: QuotationSelectionTable, lineChart: String
+	) : this(
 		0,
 		data.marketID,
 		data.pairDisplay,
@@ -44,11 +60,16 @@ data class QuotationSelectionTable(
 		data.orderID,
 		lineChart,
 		data.isSelecting,
-		data.description
+		data.description,
+		data.lineChartWeek,
+		data.lineChartMonth,
+		data.lineChartHour
 	)
 
 	companion object {
-		fun insertSelection(table: QuotationSelectionTable, callback: () -> Unit) {
+		fun insertSelection(
+			table: QuotationSelectionTable, callback: () -> Unit
+		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					// 添加的时候赋予新的最大的 `orderID`
@@ -58,7 +79,9 @@ data class QuotationSelectionTable(
 						GoldStoneAPI.getQuotationCurrencyDescription(table.baseSymnbol) { description ->
 							insert(table.apply {
 								orderID = newOrderID
-								this.description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) + description
+								this.description = HoneyLanguage.getLanguageSymbol(
+									GoldStoneApp.currentLanguage.orZero()
+								) + description
 							})
 						}
 						GoldStoneAPI.context.runOnUiThread { callback() }
@@ -67,19 +90,24 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun updateDescription(pair: String, content: String) {
+		fun updateDescription(
+			pair: String, content: String
+		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(pair)?.let {
 						update(it.apply {
-							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) + content
+							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) +
+								content
 						})
 					}
 				}
 			}
 		}
 
-		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable?) -> Unit) {
+		fun getSelectionByPair(
+			pair: String, hold: (QuotationSelectionTable?) -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
 			}) {
@@ -87,7 +115,9 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun removeSelectionBy(pair: String, callback: () -> Unit = {}) {
+		fun removeSelectionBy(
+			pair: String, callback: () -> Unit = {}
+		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(pair)?.let {
@@ -106,11 +136,15 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit = {}) {
+		fun updateSelectionOrderIDBy(
+			fromPair: String, newOrderID: Double, callback: () -> Unit = {}
+		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(fromPair)?.let {
-						update(it.apply { this.orderID = newOrderID })
+						update(it.apply {
+							this.orderID = newOrderID
+						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -119,11 +153,15 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun updateLineChartDataBy(pair: String, lineChart: String, callback: () -> Unit = {}) {
+		fun updateLineChartDataBy(
+			pair: String, lineChart: String, callback: () -> Unit = {}
+		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(pair)?.let {
-						update(it.apply { this.lineChart = lineChart })
+						update(it.apply {
+							this.lineChartDay = lineChart
+						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -131,6 +169,58 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
+
+		fun updateLineChartWeekBy(
+			pair: String, chartData: String, callback: () -> Unit = {}
+		) {
+			doAsync {
+				GoldStoneDataBase.database.quotationSelectionDao().apply {
+					getSelectionByPair(pair)?.let {
+						update(it.apply {
+							this.lineChartWeek = chartData
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
+		fun updateLineChartMontyBy(
+			pair: String, chartData: String, callback: () -> Unit = {}
+		) {
+			doAsync {
+				GoldStoneDataBase.database.quotationSelectionDao().apply {
+					getSelectionByPair(pair)?.let {
+						update(it.apply {
+							this.lineChartMonth = chartData
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
+		fun updateLineChartHourBy(
+			pair: String, chartData: String, callback: () -> Unit = {}
+		) {
+			doAsync {
+				GoldStoneDataBase.database.quotationSelectionDao().apply {
+					getSelectionByPair(pair)?.let {
+						update(it.apply {
+							this.lineChartHour = chartData
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
 

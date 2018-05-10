@@ -10,5 +10,5 @@ import com.google.gson.annotations.SerializedName
 
 data class QuotationSelectionLineChartModel(
   @SerializedName("pair") val pair: String,
-  @SerializedName("point_list") val pairList: ArrayList<JsonObject>
+  @SerializedName("point_list") val pointList: ArrayList<JsonObject>
 )

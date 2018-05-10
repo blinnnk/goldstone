@@ -121,7 +121,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 					addPoint(
 						Point(
 							DateUtils.formatDateTime(
-								context, it.label.toLong(), DateUtils.FORMAT_NO_YEAR
+								context, it.label.toLong(), DateUtils.FORMAT_NUMERIC_DATE
 							), it.value
 						)
 					)

@@ -9,6 +9,7 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import java.util.*
 
 /**
  * @date 2018/5/3 3:33 PM
@@ -47,5 +48,34 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 				}
 			}
 		}
+	}
+}
+
+object TimeUtils {
+
+	const val oneHourInMills = 3600000L
+	const val ondDayInMills = 86400000L
+
+	fun timeIntervalFromUTC(): Long {
+		val offsetFromUtc = TimeZone.getDefault().getOffset(Date().time)
+		return Integer.toString(offsetFromUtc).toLongOrNull() ?: 0
+	}
+
+	fun getNatureMondayTimeInMill(): Long {
+		val calendar = Calendar.getInstance()
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+		return calendar.timeInMillis
+	}
+
+	fun getNatureSundayTimeInMill(): Long {
+		val calendar = Calendar.getInstance()
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+		return calendar.timeInMillis
+	}
+
+	fun getNatureMonthFirstTimeInMill(): Long {
+		val calendar = Calendar.getInstance()
+		calendar.set(Calendar.DAY_OF_MONTH, 1)
+		return calendar.timeInMillis
 	}
 }
