@@ -26,7 +26,8 @@ class KeystoreImportPresenter(
 		password: EditText,
 		nameInput: EditText,
 		isAgree: Boolean,
-		hintInput: EditText
+		hintInput: EditText,
+		callback: () -> Unit
 	) {
 		isAgree isTrue {
 			try {
@@ -38,7 +39,8 @@ class KeystoreImportPresenter(
 						password.text.toString(),
 						nameInput.text.toString(),
 						fragment,
-						hintInput.text?.toString()
+						hintInput.text?.toString(),
+						callback
 					)
 				}
 			} catch (error: Exception) {
