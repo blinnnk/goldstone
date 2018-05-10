@@ -882,7 +882,7 @@ object ProfileText {
 	@JvmField
 	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Currency Settings"
-		HoneyLanguage.Chinese.code -> "通貨の設定"
+		HoneyLanguage.Chinese.code -> "货币设置"
 		HoneyLanguage.Japanese.code -> "自国通貨"
 		HoneyLanguage.Korean.code -> "통화 설정"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
