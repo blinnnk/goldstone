@@ -64,7 +64,7 @@ class WalletDetailPresenter(
 
 	private fun updateAllTokensInWallet() {
 
-		// Check the count of local wallets
+		// 查询钱包总数更新数字
 		WalletTable.apply { getAll { walletCount = size } }
 
 		// 先初始化空数组再更新列表
