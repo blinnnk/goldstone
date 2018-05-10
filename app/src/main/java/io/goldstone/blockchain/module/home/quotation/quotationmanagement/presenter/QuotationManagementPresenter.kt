@@ -58,8 +58,8 @@ class QuotationManagementPresenter(
 
 	override fun updateParentContentLayoutHeight(dataCount: Int?, cellHeight: Int, maxHeight: Int) {
 		super.updateParentContentLayoutHeight(
-			if (fragment.asyncData.isNullOrEmpty()) null else fragment.asyncData?.size,
-			cellHeight,
+			fragment.asyncData?.size.orZero(),
+			fragment.setSlideUpWithCellHeight(),
 			maxHeight
 		)
 	}

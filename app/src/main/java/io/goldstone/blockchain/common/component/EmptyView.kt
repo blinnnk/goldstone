@@ -25,7 +25,8 @@ enum class EmptyType {
 	Contact,
 	Search,
 	QuotationSearch,
-	Quotation
+	Quotation,
+	WalletDetail
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -33,13 +34,14 @@ class EmptyView(context: Context) : LinearLayout(context) {
 	private val imageSize = (ScreenSize.Width * 0.5).toInt()
 	private val introTitles = TwoLineTitles(context)
 	private var icon: ImageView
+	private val emptyViewHeight = ScreenSize.Width
 
 	init {
 		id = ElementID.emptyView
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 
-		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), ScreenSize.Width)
+		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), emptyViewHeight)
 
 		icon = imageView {
 			scaleType = ImageView.ScaleType.FIT_XY
@@ -57,8 +59,15 @@ class EmptyView(context: Context) : LinearLayout(context) {
 		when (type) {
 			EmptyType.TokenDetail       -> {
 				x += (ScreenSize.Width * 0.2).toInt()
-				y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - ScreenSize.Width) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
+				y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - emptyViewHeight) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
 				icon.imageResource = R.drawable.token_detail_empty_icon
+				introTitles.title.text = EmptyText.tokenDetailTitle
+				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
+			}
+
+			EmptyType.WalletDetail       -> {
+				y = (context.getRealScreenHeight() - WalletDetailSize.heightHeight - emptyViewHeight) / 2 + WalletDetailSize.heightHeight - 140.uiPX() * 1f
+					icon.imageResource = R.drawable.token_detail_empty_icon
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
 			}

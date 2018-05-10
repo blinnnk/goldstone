@@ -33,6 +33,19 @@ class TokenManagementListPresenter(
 		}
 	}
 
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		setHeightMatchParent()
+	}
+
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	private fun TokenManagementListFragment.prepareMyDefaultTokens() {
 		doAsync {
 			// 在异步线程更新数据

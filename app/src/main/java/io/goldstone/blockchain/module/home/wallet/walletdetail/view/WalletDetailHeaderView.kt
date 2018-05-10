@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.WalletDetailSize
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -64,7 +65,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
     setWillNotDraw(false)
 
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 365.uiPX())
+    layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.heightHeight)
 
     currentAccount.into(this)
     currentAccount.apply {
