@@ -62,6 +62,7 @@ class WalletDetailPresenter(
 		// 先初始化空数组再更新列表
 		fragment.asyncData.isNull() isTrue {
 			fragment.asyncData = arrayListOf()
+			fragment.updateHeaderValue()
 		}
 		// Check the count of local wallets
 		WalletTable.apply { getAll { walletCount = size } }
