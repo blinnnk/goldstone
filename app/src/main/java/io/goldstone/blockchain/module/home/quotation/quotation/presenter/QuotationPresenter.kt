@@ -37,9 +37,15 @@ class QuotationPresenter(
 	private var updateChartTimes: Int? = null
 
 	override fun updateData() {
+		fragment.asyncData.isNotNull {
+			setSocket {
+				currentSocket?.runSocket()
+			}
+		}
+		updateQuotationData()
+	}
 
-		currentSocket?.runSocket()
-
+	private fun updateQuotationData() {
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let { diffAndUpdateData(it) }
 
@@ -66,7 +72,9 @@ class QuotationPresenter(
 				diffAndUpdateData(it)
 				// 设定 `Socket` 并执行
 				currentSocket.isNull() isTrue {
-					setSocket { currentSocket?.runSocket() }
+					setSocket {
+						currentSocket?.runSocket()
+					}
 				}
 			}
 		}
@@ -92,7 +100,7 @@ class QuotationPresenter(
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
 						/** 防止服务器数据出错, 可能导致的死循环 */
 						if (updateChartTimes!! > 0) {
-							updateData()
+							updateQuotationData()
 							updateChartTimes = updateChartTimes!! - 1
 						}
 					}
