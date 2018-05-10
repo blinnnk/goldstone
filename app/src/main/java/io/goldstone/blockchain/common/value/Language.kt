@@ -105,11 +105,11 @@ object CreateWalletText {
 	val repeatPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Repeat Password"
 		HoneyLanguage.Chinese.code -> "确认密码"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.Japanese.code -> "繰り返しパスワード"
+		HoneyLanguage.Korean.code -> "비밀번호를 입력하십시오"
+		HoneyLanguage.Russian.code -> "Реальный пароль"
+		HoneyLanguage.TraditionalChinese.code -> "再次輸入密碼"
+		else -> "Repeat Password"
 	}
 	@JvmField
 	val name = when (currentLanguage) {
@@ -882,7 +882,7 @@ object ProfileText {
 	@JvmField
 	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Currency Settings"
-		HoneyLanguage.Chinese.code -> "通貨の設定"
+		HoneyLanguage.Chinese.code -> "货币设置"
 		HoneyLanguage.Japanese.code -> "自国通貨"
 		HoneyLanguage.Korean.code -> "통화 설정"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
@@ -955,12 +955,12 @@ object EmptyText {
 	}
 	@JvmField
 	val searchTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "No Result"
-		HoneyLanguage.Chinese.code -> "没有您要检索的结果"
-		HoneyLanguage.Japanese.code -> "取得したい結果がありません"
-		HoneyLanguage.Korean.code -> "검색 할 결과가 없습니다"
-		HoneyLanguage.Russian.code -> "Нет результатов, которые вы хотите получить"
-		HoneyLanguage.TraditionalChinese.code -> "没有找到对应的代币"
+		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time Token prices for the exchanges you want to follow"
+		HoneyLanguage.Chinese.code -> "您还没有添加任何交易对。请点击左上方按钮，搜索并添加想要关注的交易所的Token实时价格"
+		HoneyLanguage.Japanese.code -> "まだ取引ペアを追加していません。 左上のボタンをクリックして、追跡したい取引所のリアルタイムのトークン価格を検索して追加してください。\n"
+		HoneyLanguage.Korean.code -> "거래 쌍을 아직 추가하지 않았습니다. 왼쪽 위 버튼을 클릭하여 따라하고 싶은 거래에 대한 실시간 토큰 가격을 검색하고 추가하십시오."
+		HoneyLanguage.Russian.code -> "Вы еще не добавили торговых пар. Нажмите на верхнюю левую кнопку, чтобы найти и добавить цены токена в реальном времени на биржи, которые вы хотите отслеживать."
+		HoneyLanguage.TraditionalChinese.code -> "您還沒有添加任何交易對。請點擊左上方按鈕，搜索並添加想要關注的交易所的令牌實時價格"
 		else -> "No Result"
 	}
 	@JvmField
