@@ -78,7 +78,8 @@ class TransactionListPresenter(
 
 	private fun MainActivity.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
-		val lastBlockNumber = localData.first { it.blockNumber.isNotEmpty() }.blockNumber + 1
+		val currentBlockNumber = localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
+		val lastBlockNumber = if(currentBlockNumber.isNull()) "0" else currentBlockNumber + 1
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
 			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
