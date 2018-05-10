@@ -30,12 +30,17 @@ data class MyTokenTable(
 	companion object {
 
 		fun insert(model: MyTokenTable) {
-			GoldStoneDataBase.database.myTokenDao().insert(model)
+			GoldStoneDataBase.database.myTokenDao()
+				.insert(model)
 		}
 
-		fun getTokensWith(walletAddress: String, callback: (ArrayList<MyTokenTable>) -> Unit = {}) {
+		fun getTokensWith(
+			walletAddress: String = WalletTable.current.address,
+			callback: (ArrayList<MyTokenTable>) -> Unit = {}
+		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.myTokenDao().getTokensBy(walletAddress)
+				GoldStoneDataBase.database.myTokenDao()
+					.getTokensBy(walletAddress)
 			}) {
 				callback(it.toArrayList())
 			}
@@ -58,37 +63,57 @@ data class MyTokenTable(
 			}
 		}
 
-		fun deleteBySymbol(symbol: String, address: String, callback: () -> Unit = {}) {
+		fun deleteBySymbol(
+			symbol: String,
+			address: String,
+			callback: () -> Unit = {}
+		) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(symbol, address).let {
-						it.isNull().isFalse {
-							delete(it)
-						}
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
+				GoldStoneDataBase.database.myTokenDao()
+					.apply {
+						getTokenBySymbolAndAddress(
+							symbol,
+							address
+						).let {
+							it.isNull()
+								.isFalse {
+									delete(it)
+								}
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
 						}
 					}
-				}
 			}
 		}
 
-		fun deleteByAddress(address: String, callback: () -> Unit = {}) {
+		fun deleteByAddress(
+			address: String,
+			callback: () -> Unit = {}
+		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokensBy(address).forEach { delete(it) }
-				}
+				GoldStoneDataBase.database.myTokenDao()
+					.apply {
+						getTokensBy(address).forEach { delete(it) }
+					}
 			}) {
 				callback()
 			}
 		}
 
-		fun insertBySymbol(symbol: String, ownerAddress: String, callback: () -> Unit = {}) {
+		fun insertBySymbol(
+			symbol: String,
+			ownerAddress: String,
+			callback: () -> Unit = {}
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.apply {
 					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 					myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull() isTrue {
-						getBalanceAndInsertWithSymbol(symbol, ownerAddress)
+						getBalanceAndInsertWithSymbol(
+							symbol,
+							ownerAddress
+						)
 					}
 				}
 			}) {
@@ -97,18 +122,37 @@ data class MyTokenTable(
 		}
 
 		private fun getBalanceAndInsertWithSymbol(
-			symbol: String, ownerAddress: String, callback: (balance: Double) -> Unit = {}
+			symbol: String,
+			ownerAddress: String,
+			callback: (balance: Double) -> Unit = {}
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (symbol == CryptoSymbol.eth) {
 				GoldStoneEthCall.getEthBalance(ownerAddress) {
-					insert(MyTokenTable(0, ownerAddress, symbol, it))
+					insert(
+						MyTokenTable(
+							0,
+							ownerAddress,
+							symbol,
+							it
+						)
+					)
 					callback(it)
 				}
 			} else {
 				DefaultTokenTable.getTokenBySymbol(symbol) {
-					GoldStoneEthCall.getTokenBalanceWithContract(it.contract, ownerAddress) {
-						insert(MyTokenTable(0, ownerAddress, symbol, it))
+					GoldStoneEthCall.getTokenBalanceWithContract(
+						it.contract,
+						ownerAddress
+					) {
+						insert(
+							MyTokenTable(
+								0,
+								ownerAddress,
+								symbol,
+								it
+							)
+						)
 						callback(it)
 					}
 				}
@@ -129,22 +173,35 @@ data class MyTokenTable(
 				}
 			} else {
 				DefaultTokenTable.getTokenBySymbol(symbol) { token ->
-					GoldStoneEthCall.getTokenBalanceWithContract(token.contract, ownerAddress) {
+					GoldStoneEthCall.getTokenBalanceWithContract(
+						token.contract,
+						ownerAddress
+					) {
 						val balance =
-							if (convertByDecimal) CryptoUtils.toCountByDecimal(it, token.decimals) else it
+							if (convertByDecimal) CryptoUtils.toCountByDecimal(
+								it,
+								token.decimals
+							) else it
 						callback(balance)
 					}
 				}
 			}
 		}
 
-		fun updateCurrentWalletBalanceWithSymbol(balance: Double, symbol: String) {
+		fun updateCurrentWalletBalanceWithSymbol(
+			balance: Double,
+			symbol: String
+		) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(symbol, WalletTable.current.address).let {
-						update(it.apply { this.balance = balance })
+				GoldStoneDataBase.database.myTokenDao()
+					.apply {
+						getTokenBySymbolAndAddress(
+							symbol,
+							WalletTable.current.address
+						).let {
+							update(it.apply { this.balance = balance })
+						}
 					}
-				}
 			}
 		}
 	}
@@ -154,7 +211,10 @@ data class MyTokenTable(
 interface MyTokenDao {
 
 	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND ownerAddress LIKE :walletAddress")
-	fun getTokenBySymbolAndAddress(symbol: String, walletAddress: String): MyTokenTable
+	fun getTokenBySymbolAndAddress(
+		symbol: String,
+		walletAddress: String
+	): MyTokenTable
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getTokensBy(walletAddress: String): List<MyTokenTable>

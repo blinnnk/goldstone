@@ -64,7 +64,6 @@ class MarketTokenDetailPresenter(
 
 		fragment.currencyInfo?.apply {
 			fragment.getMainActivity()?.showLoadingView()
-
 			QuotationSelectionTable.getSelectionByPair(pair) {
 				it?.apply {
 					val data: String? = when (period) {
