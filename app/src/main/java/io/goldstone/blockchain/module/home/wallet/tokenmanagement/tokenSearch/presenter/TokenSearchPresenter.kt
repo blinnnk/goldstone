@@ -96,7 +96,8 @@ class TokenSearchPresenter(
 									decimal,
 									null,
 									false,
-									false
+									false,
+									0
 								)
 							)
 						)
