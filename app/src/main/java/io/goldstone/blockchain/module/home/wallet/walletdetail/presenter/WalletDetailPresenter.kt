@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
+import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -74,17 +75,18 @@ class WalletDetailPresenter(
 		}
 		// Check the info of wallet currency list
 		WalletDetailCellModel.getModels { it ->
-			/** 先按照资产情况排序, 资产为零的按照权重排序 */
-			val currencyList = it.filter { it.currency > 0.0 }
-			val weightList = it.filter { it.currency == 0.0 }
-			val newData =
-				currencyList.sortedByDescending { it.currency }
-					.plus(weightList.sortedByDescending { it.weight })
-					.toArrayList()
-
-			diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
-			fragment.updateHeaderValue()
-			fragment.setEmptyViewBy(it)
+			coroutinesTask({
+				/** 先按照资产情况排序, 资产为零的按照权重排序 */
+				val currencyList = it.filter { it.currency > 0.0 }
+				val weightList = it.filter { it.currency == 0.0 }
+					currencyList.sortedByDescending { it.currency }
+						.plus(weightList.sortedByDescending { it.weight })
+						.toArrayList()
+			}) {
+				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+				fragment.updateHeaderValue()
+				fragment.setEmptyViewBy(it)
+			}
 		}
 	}
 
