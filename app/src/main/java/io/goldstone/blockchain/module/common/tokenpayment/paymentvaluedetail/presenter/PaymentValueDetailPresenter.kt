@@ -126,6 +126,7 @@ class PaymentValueDetailPresenter(
 			asyncData?.remove(fragment.asyncData?.last())
 			minerFeeType = MinerFeeType.Recommend.content
 			recyclerView.adapter.notifyItemRemoved(4)
+			defaultGasPrices.remove(defaultGasPrices.last())
 		}
 	}
 
@@ -352,7 +353,8 @@ class PaymentValueDetailPresenter(
 
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
+			presenter.showTargetFragment<GasEditorFragment>(
+				TokenDetailText.customGas,
 				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putLong(ArgumentKey.gasLimit, minGasLimit.toLong())
