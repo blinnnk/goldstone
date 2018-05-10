@@ -40,7 +40,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 				.into(this)
 
 			mnemonicInput.apply {
-				hint = "confirm mnemonic which you got before"
+				hint = "confirm mnemonic which you got before."
 			}
 				.into(this)
 

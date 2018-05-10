@@ -54,9 +54,7 @@ class WalletDetailPresenter(
 								item.contract,
 								item.price
 							) {
-								if (isEnd) {
-									updateAllTokensInWallet()
-								}
+								if (isEnd) updateAllTokensInWallet()
 							}
 						}
 					}
@@ -66,7 +64,7 @@ class WalletDetailPresenter(
 
 	private fun updateAllTokensInWallet() {
 
-		// Check the count of local wallets
+		// 查询钱包总数更新数字
 		WalletTable.apply { getAll { walletCount = size } }
 
 		// 先初始化空数组再更新列表
@@ -76,7 +74,7 @@ class WalletDetailPresenter(
 		}
 		// Check the info of wallet currency list
 		WalletDetailCellModel.getModels { it ->
-			
+
 			/** 先按照资产情况排序, 资产为零的按照权重排序 */
 			val currencyList = it.filter { it.currency > 0.0 }
 			val weightList = it.filter { it.currency == 0.0 }
@@ -169,6 +167,5 @@ class WalletDetailPresenter(
 		}
 	}
 }
-
 
 
