@@ -103,7 +103,7 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 			override fun afterTextChanged(text: Editable?) {
 				// 文字自适应宽度调整字号大小
 				if (text?.length.orElse(0) > 8) {
-					valueInput.textSize = (16 - Math.ceil(text!!.length / 3.0).toInt()).uiPX().toFloat()
+					valueInput.textSize = (16 - Math.ceil(text?.length.orElse(0) / 3.0).toInt()).uiPX().toFloat()
 				} else {
 					valueInput.textSize = 16.uiPX().toFloat()
 				}
