@@ -25,7 +25,7 @@ class TokenManagementListPresenter(
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 
 	override fun updateData() {
-		defaultTokenList.isNull().isFalse {
+		defaultTokenList.isNull() isFalse {
 			fragment.asyncData = defaultTokenList
 			fragment.prepareMyDefaultTokens()
 		} otherwise {

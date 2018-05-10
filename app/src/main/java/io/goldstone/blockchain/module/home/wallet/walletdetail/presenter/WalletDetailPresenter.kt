@@ -76,9 +76,15 @@ class WalletDetailPresenter(
 		}
 		// Check the info of wallet currency list
 		WalletDetailCellModel.getModels { it ->
+			
+			/** 先按照资产情况排序, 资产为零的按照权重排序 */
+			val currencyList = it.filter { it.currency > 0.0 }
+			val weightList = it.filter { it.currency == 0.0 }
 			val newData =
-				it.sortedByDescending { it.currency }
+				currencyList.sortedByDescending { it.currency }
+					.plus(weightList.sortedByDescending { it.weight })
 					.toArrayList()
+
 			diffAndUpdateAdapterData<WalletDetailAdapter>(newData)
 			fragment.updateHeaderValue()
 			fragment.setEmptyViewBy(it)

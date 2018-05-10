@@ -26,7 +26,8 @@ data class WalletDetailCellModel(
 	var count: Double = 0.0,
 	var price: Double = 0.0,
 	var currency: Double = 0.0,
-	var contract: String = ""
+	var contract: String = "",
+	var weight: Int = 0
 ) : Serializable {
 
 	constructor(data: DefaultTokenTable, balance: Double) : this(
@@ -37,7 +38,8 @@ data class WalletDetailCellModel(
 		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
 		data.price,
 		0.0,
-		data.contract
+		data.contract,
+		data.weight
 	) {
 		currency = CryptoUtils.formatDouble(count * data.price)
 	}
