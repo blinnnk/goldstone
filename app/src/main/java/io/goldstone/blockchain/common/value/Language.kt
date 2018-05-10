@@ -405,7 +405,7 @@ object TransactionText {
 	}
 	@JvmField
 	val gasPrice = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Gas Price"
+		HoneyLanguage.English.code -> "Gas Price (GWei)"
 		HoneyLanguage.Chinese.code -> "燃气单价"
 		HoneyLanguage.Japanese.code -> "ガス単価"
 		HoneyLanguage.Korean.code -> "가스 단가"

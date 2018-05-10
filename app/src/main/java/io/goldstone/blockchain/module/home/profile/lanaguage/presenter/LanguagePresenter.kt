@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
+import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.registerDevice
@@ -51,15 +54,23 @@ class LanguagePresenter(
 			AppConfigTable.getAppConfig {
 				// 更换语言后重新注册设备, 更新语言状态
 				it?.apply {
-					fragment.context?.registerDevice(pushToken) {
-						fragment.activity?.jump<SplashActivity>()
-						// 杀掉进程
-						android.os.Process.killProcess(android.os.Process.myPid())
-						System.exit(0)
+					NetworkUtil.hasNetwork(fragment.context) isTrue {
+						fragment.context?.registerDevice(pushToken) {
+							jumpAndReset()
+						}
+					} otherwise {
+						jumpAndReset()
 					}
 				}
 			}
 		}
+	}
+
+	private fun jumpAndReset() {
+		fragment.activity?.jump<SplashActivity>()
+		// 杀掉进程
+		android.os.Process.killProcess(android.os.Process.myPid())
+		System.exit(0)
 	}
 
 }
