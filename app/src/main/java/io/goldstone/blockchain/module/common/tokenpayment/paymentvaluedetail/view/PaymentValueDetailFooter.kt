@@ -29,34 +29,50 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 	init {
 
 		orientation = VERTICAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
+		layoutParams =
+			LinearLayout.LayoutParams(
+				matchParent,
+				120.uiPX()
+			)
 
 		customButton.apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX()).apply {
-				leftMargin = PaddingSize.device
-			}
+			layoutParams =
+				LinearLayout.LayoutParams(
+					ScreenSize.widthWithPadding,
+					40.uiPX()
+				)
+					.apply {
+						leftMargin = PaddingSize.device
+					}
 			textView {
 				setGrayStyle()
 				text = TokenDetailText.customMiner
 				textColor = GrayScale.gray
-				textSize = 5.uiPX().toFloat()
+				textSize =
+					5.uiPX()
+						.toFloat()
 				typeface = GoldStoneFont.book(context)
 			}.setCenterInVertical()
-		}.click {
-			customGasEvent?.run()
-		}.into(this)
+		}
+			.click {
+				customGasEvent?.run()
+			}
+			.into(this)
 
 		confirmButton.apply {
 			setGrayStyle(20.uiPX())
 			text = CommonText.next.toUpperCase()
-		}.click {
-				confirmClickEvent?.run()
-			}.into(this)
+		}
+			.into(this)
 	}
 
 	fun setCanUseStyle(isSelected: Boolean) {
 		if (isSelected) confirmButton.setBlueStyle(20.uiPX())
 		else confirmButton.setGrayStyle(20.uiPX())
+	}
+
+	fun getConfirmButton(action: RoundButton.() -> Unit) {
+		action(confirmButton)
 	}
 
 }

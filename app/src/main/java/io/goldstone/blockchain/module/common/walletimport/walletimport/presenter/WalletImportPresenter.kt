@@ -35,7 +35,7 @@ class WalletImportPresenter(
 	}
 
 	companion object {
-		fun insertWalletToDatabase(fragment: Fragment, address: String, name: String, hint: String?) {
+		fun insertWalletToDatabase(fragment: Fragment, address: String, name: String, hint: String?, callback: () -> Unit) {
 			WalletTable.getWalletByAddress(address) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
@@ -46,8 +46,10 @@ class WalletImportPresenter(
 						}
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerWalletAddressForPush()
+						callback()
 					}
 				} otherwise {
+					callback()
 					fragment.context?.alert(ImportWalletText.existAddress)
 				}
 			}

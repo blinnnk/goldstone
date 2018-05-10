@@ -77,13 +77,16 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					text = CommonText.confirm.toUpperCase()
 					y += 10.uiPX()
 				}.click {
+					it.isClickable = false
 					presenter.importKeystoreWallet(
 						keystoreEditText.text.toString(),
 						passwordInput,
 						nameInput,
 						agreementView.radioButton.isChecked,
 						hintInput
-					)
+					) {
+						it.isClickable = true
+					}
 				}.into(this)
 
 				textView("What is keystore?") {

@@ -1079,13 +1079,13 @@ object QuotationText {
 	}
 	@JvmField
 	val alarm = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Reminder"
+		HoneyLanguage.English.code -> "Alarm"
 		HoneyLanguage.Chinese.code -> "价格提醒"
 		HoneyLanguage.Japanese.code -> "価格リマインダー"
 		HoneyLanguage.Korean.code -> "가격 알림"
 		HoneyLanguage.Russian.code -> "сигнал тревоги"
 		HoneyLanguage.TraditionalChinese.code -> "價格提醒"
-		else -> "Reminder"
+		else -> "Alarm"
 	}
 	@JvmField
 	val currentPrice = when (currentLanguage) {

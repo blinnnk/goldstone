@@ -18,14 +18,14 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.pre
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 28/03/2018 12:23 PM
  * @author KaySaith
  */
 
-class PaymentValueDetailFragment :
-	BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
+class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
 
 	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
 	val token by lazy {
@@ -37,15 +37,22 @@ class PaymentValueDetailFragment :
 	override val presenter = PaymentValueDetailPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<PaymentValueDetailModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<PaymentValueDetailModel>?
 	) {
 		recyclerView.adapter = PaymentValueDetailAdapter(asyncData.orEmptyArray()) {
 			presenter.setCellClickEvent(this)
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 
 		recyclerView.getItemAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
 			it?.let { header ->
@@ -70,7 +77,14 @@ class PaymentValueDetailFragment :
 
 		recyclerView.getItemAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
 			this.footer = footer
-			footer?.confirmClickEvent = confirmTransfer()
+			footer?.getConfirmButton {
+				onClick {
+					isClickable = false
+					confirmTransfer {
+						isClickable = true
+					}
+				}
+			}
 			footer?.customGasEvent = showCustomGasFragment()
 		}
 	}
@@ -85,28 +99,31 @@ class PaymentValueDetailFragment :
 		}
 	}
 
-	private fun confirmTransfer(): Runnable {
-		return Runnable {
-			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				MyTokenTable.getBalanceWithSymbol(
-					token?.symbol!!, WalletTable.current.address, true
-				) { balance ->
-					context?.runOnUiThread {
-						showAlertOrTransfer(balance)
-					}
+	private fun confirmTransfer(callback: () -> Unit) {
+		NetworkUtil.hasNetworkWithAlert(context) isTrue {
+			MyTokenTable.getBalanceWithSymbol(
+				token?.symbol!!,
+				WalletTable.current.address,
+				true
+			) { balance ->
+				context?.runOnUiThread {
+					showAlertOrTransfer(balance, callback)
 				}
 			}
 		}
 	}
 
-	private fun Context.showAlertOrTransfer(balance: Double) {
+	private fun Context.showAlertOrTransfer(
+		balance: Double,
+		callback: () -> Unit
+	) {
 		if (presenter.hasCalculated) {
 			if (transferCount <= 0) {
 				alert("Please Enter Your Transfer Value")
 			} else {
 				if (balance > transferCount) {
 					footer?.setCanUseStyle(true)
-					showConfirmAttentionView()
+					showConfirmAttentionView(callback)
 				} else alert("You haven't enough currency to transfer")
 			}
 		} else {
@@ -114,11 +131,12 @@ class PaymentValueDetailFragment :
 		}
 	}
 
-	private fun showConfirmAttentionView() {
+	private fun showConfirmAttentionView(callback: () -> Unit) {
 		context?.showAlertView(
-			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase()
+			TransactionText.confirmTransaction,
+			CommonText.enterPassword.toUpperCase()
 		) {
-			presenter.transfer(it?.text.toString())
+			presenter.transfer(it?.text.toString(), callback)
 		}
 	}
 
