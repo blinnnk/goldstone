@@ -134,7 +134,7 @@ class PaymentValueDetailPresenter(
 	 * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
 	 * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
 	 */
-	fun transfer(password: String) {
+	fun transfer(password: String, callback: () -> Unit) {
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
@@ -156,6 +156,7 @@ class PaymentValueDetailPresenter(
 					}
 					// 主线程跳转到账目详情界面
 					fragment.context?.runOnUiThread {
+						callback()
 						goToTransactionDetailFragment(fragment.address!!, raw!!, fragment.token!!, taxHash)
 					}
 				}
