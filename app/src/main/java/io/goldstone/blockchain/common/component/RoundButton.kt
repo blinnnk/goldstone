@@ -15,6 +15,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
@@ -68,11 +69,12 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun showLoadingStatus(
-		needToShow: Boolean = true,
-		color: Int = Spectrum.red
+		needToShow: Boolean = true, color: Int = Spectrum.white,
+		recoveryText: String = CommonText.confirm
 	) {
 		if (needToShow && loadingView.isNull()) {
 			isEnabled = false
+			text = ""
 			loadingView = ProgressBar(
 				this.context,
 				null,
@@ -82,30 +84,35 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 					color,
 					android.graphics.PorterDuff.Mode.MULTIPLY
 				)
-				layoutParams = RelativeLayout.LayoutParams(
-					54.uiPX(),
-					40.uiPX()
-				)
+				layoutParams =
+					RelativeLayout.LayoutParams(
+						54.uiPX(),
+						40.uiPX()
+					)
 				setCenterInParent()
 			}
 			addView(loadingView)
 		}
 		if (!needToShow && !loadingView.isNull()) {
-			isEnabled = true
 			removeView(loadingView)
 			loadingView = null
+			text = recoveryText
+			isEnabled = true
 		}
 	}
 
 	fun setWhiteStyle() {
-		textSize = 13.uiPX().toFloat()
+		textSize =
+			13.uiPX()
+				.toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.Width - PaddingSize.device * 2,
 			45.uiPX()
-		).apply {
-			topMargin = marginTop
-			leftMargin = PaddingSize.device
-		}
+		)
+			.apply {
+				topMargin = marginTop
+				leftMargin = PaddingSize.device
+			}
 
 		addTouchRippleAnimation(
 			Spectrum.white,
@@ -118,14 +125,17 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGrayStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
+		textSize =
+			14.uiPX()
+				.toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.Width - PaddingSize.device * 2,
 			45.uiPX()
-		).apply {
-			topMargin = top ?: marginTop
-			leftMargin = PaddingSize.device
-		}
+		)
+			.apply {
+				topMargin = top ?: marginTop
+				leftMargin = PaddingSize.device
+			}
 
 		addTouchRippleAnimation(
 			GrayScale.lightGray,
@@ -138,14 +148,17 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setBlueStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
+		textSize =
+			14.uiPX()
+				.toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.Width - PaddingSize.device * 2,
 			45.uiPX()
-		).apply {
-			topMargin = top ?: marginTop
-			leftMargin = PaddingSize.device
-		}
+		)
+			.apply {
+				topMargin = top ?: marginTop
+				leftMargin = PaddingSize.device
+			}
 
 		addTouchRippleAnimation(
 			Spectrum.blue,
@@ -158,17 +171,19 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setSmallButton(
-		color: Int,
-		textColor: Int = Spectrum.white
+		color: Int, textColor: Int = Spectrum.white
 	) {
-		textSize = 11.uiPX().toFloat()
+		textSize =
+			11.uiPX()
+				.toFloat()
 		layoutParams = RelativeLayout.LayoutParams(
 			75.uiPX(),
 			30.uiPX()
-		).apply {
-			topMargin = marginTop
-			leftMargin = PaddingSize.device
-		}
+		)
+			.apply {
+				topMargin = marginTop
+				leftMargin = PaddingSize.device
+			}
 		addTouchRippleAnimation(
 			color,
 			Spectrum.white,
@@ -180,8 +195,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun updateColor(
-		color: Int,
-		textColor: Int = Spectrum.white
+		color: Int, textColor: Int = Spectrum.white
 	) {
 		addTouchRippleAnimation(
 			color,

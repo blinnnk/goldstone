@@ -80,9 +80,9 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 			this.footer = footer
 			footer?.getConfirmButton {
 				onClick {
-					isEnabled = false
+					showLoadingStatus()
 					confirmTransfer {
-						isEnabled = true
+						showLoadingStatus(false)
 					}
 				}
 			}
@@ -102,8 +102,7 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 
 	private fun confirmTransfer(callback: () -> Unit) {
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
-		if (!getTransferCount().toString().checkDecimalIsvalid())
-			return
+		if (!getTransferCount().toString().checkDecimalIsvalid()) return
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			MyTokenTable.getBalanceWithSymbol(
@@ -112,7 +111,10 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 				true
 			) { balance ->
 				context?.runOnUiThread {
-					showAlertOrTransfer(balance, callback)
+					showAlertOrTransfer(
+						balance,
+						callback
+					)
 				}
 			}
 		}
@@ -146,11 +148,19 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 	}
 
 	private fun showConfirmAttentionView(callback: () -> Unit) {
-		context?.showAlertView(
-			TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase()
-		) {
-			presenter.transfer(it?.text.toString(), callback)
+		context?.showAlertView(TransactionText.confirmTransaction,
+			CommonText.enterPassword.toUpperCase(),
+			true,
+			{
+				// 点击 `Alert` 取消按钮a
+				footer?.getConfirmButton {
+					showLoadingStatus(false)
+				}
+			}) {
+			presenter.transfer(
+				it?.text.toString(),
+				callback
+			)
 		}
 	}
 

@@ -55,7 +55,7 @@ fun Context.alert(message: String) {
 }
 
 fun Context.showAlertView(
-	title: String, subtitle: String, showEditText: Boolean = true, action: (EditText?) -> Unit
+	title: String, subtitle: String, showEditText: Boolean = true, cancelAction: () -> Unit = {}, action: (EditText?) -> Unit
 ) {
 	var input: EditText? = null
 	alert(
@@ -76,7 +76,7 @@ fun Context.showAlertView(
 			}
 		}
 		yesButton { if (showEditText) input?.apply(action) else action(input) }
-		noButton { }
+		noButton { cancelAction() }
 	}.show()
 }
 
