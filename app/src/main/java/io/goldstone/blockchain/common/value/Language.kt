@@ -147,11 +147,11 @@ object ImportWalletText {
 	}
 	@JvmField
 	val mnemonicHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter your mnemonic with space split"
+		HoneyLanguage.English.code -> "Enter your mnemonic, split with spaces"
 		HoneyLanguage.Chinese.code -> "请按顺序输入助记词，词间使用空格符间隔"
 		HoneyLanguage.Japanese.code -> "単語の間のスペースを使用してニーモニックを順番に入力してください"
 		HoneyLanguage.Korean.code -> "단어 사이의 공백을 사용하여 니모닉을 순서대로 입력하십시오."
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите мнемонику в порядке, используя пробелы между словами"
+		HoneyLanguage.Russian.code -> "Введите свою мнемонику, разделите ее пробелами. Введите пароль."
 		HoneyLanguage.TraditionalChinese.code -> "請按順序輸入助記詞，詞間使用空格符間隔"
 		else -> "Enter your mnemonic with space split"
 	}
@@ -252,21 +252,21 @@ object WalletText {
 	@JvmField
 	val section = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My tokens: "
-		HoneyLanguage.Chinese.code -> "我的代币: "
+		HoneyLanguage.Chinese.code -> "我的资产: "
 		HoneyLanguage.Japanese.code -> "マイトークン: "
 		HoneyLanguage.Korean.code -> "내 토큰: "
 		HoneyLanguage.Russian.code -> "Мои токены: "
-		HoneyLanguage.TraditionalChinese.code -> "我的代幣: "
+		HoneyLanguage.TraditionalChinese.code -> "我的資產: "
 		else -> "My tokens: "
 	}
 	@JvmField
 	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Token"
-		HoneyLanguage.Chinese.code -> "添加其他代币"
+		HoneyLanguage.Chinese.code -> "添加其他Token"
 		HoneyLanguage.Japanese.code -> "トークンを追加する"
 		HoneyLanguage.Korean.code -> "더 많은 토큰 추가"
 		HoneyLanguage.Russian.code -> "Добавить еще токен"
-		HoneyLanguage.TraditionalChinese.code -> "添加其他代幣"
+		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
 		else -> "Add More Token"
 	}
 	@JvmField
@@ -882,11 +882,11 @@ object ProfileText {
 	@JvmField
 	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Currency Settings"
-		HoneyLanguage.Chinese.code -> "货币设置"
+		HoneyLanguage.Chinese.code -> "货币"
 		HoneyLanguage.Japanese.code -> "自国通貨"
 		HoneyLanguage.Korean.code -> "통화 설정"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
-		HoneyLanguage.TraditionalChinese.code -> "貨幣設置"
+		HoneyLanguage.TraditionalChinese.code -> "貨幣"
 		else -> "Currency Settings"
 	}
 	@JvmField
@@ -965,12 +965,12 @@ object EmptyText {
 	}
 	@JvmField
 	val searchTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "No Token Selected"
-		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
+		HoneyLanguage.English.code -> "Token Not Found"
+		HoneyLanguage.Chinese.code -> "没有找到这个Token"
+		HoneyLanguage.Japanese.code -> "トークンが見つかりません"
+		HoneyLanguage.Korean.code -> "토큰을 찾을 수 없음"
+		HoneyLanguage.Russian.code -> "Токен не найден"
+		HoneyLanguage.TraditionalChinese.code -> "沒有找到這個Token"
 		else -> "No Token Selected"
 	}
 	@JvmField
@@ -1079,33 +1079,33 @@ object QuotationText {
 	}
 	@JvmField
 	val addToken = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token"
-		HoneyLanguage.Chinese.code -> "代币"
-		HoneyLanguage.Japanese.code -> "トークン"
-		HoneyLanguage.Korean.code -> "토큰"
-		HoneyLanguage.Russian.code -> "знак"
-		HoneyLanguage.TraditionalChinese.code -> "代幣"
-		else -> "Token"
+		HoneyLanguage.English.code -> "Add Token"
+		HoneyLanguage.Chinese.code -> "管理"
+		HoneyLanguage.Japanese.code -> "管理"
+		HoneyLanguage.Korean.code -> "관리"
+		HoneyLanguage.Russian.code -> "управление"
+		HoneyLanguage.TraditionalChinese.code -> "管理"
+		else -> "Add Token"
 	}
 	@JvmField
 	val alarm = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Alarm"
 		HoneyLanguage.Chinese.code -> "价格提醒"
-		HoneyLanguage.Japanese.code -> "価格リマインダー"
+		HoneyLanguage.Japanese.code -> "リマインダー"
 		HoneyLanguage.Korean.code -> "가격 알림"
-		HoneyLanguage.Russian.code -> "сигнал тревоги"
+		HoneyLanguage.Russian.code -> "тревоги"
 		HoneyLanguage.TraditionalChinese.code -> "價格提醒"
 		else -> "Alarm"
 	}
 	@JvmField
 	val currentPrice = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Curren Price"
+		HoneyLanguage.English.code -> "current Price"
 		HoneyLanguage.Chinese.code -> "当前价格"
 		HoneyLanguage.Japanese.code -> "価格"
 		HoneyLanguage.Korean.code -> "가격"
 		HoneyLanguage.Russian.code -> "Текущая цена"
 		HoneyLanguage.TraditionalChinese.code -> "時價"
-		else -> "Curren Price"
+		else -> "current Price"
 	}
 	@JvmField
 	val priceHistory = when (currentLanguage) {
@@ -1117,42 +1117,36 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "價格歷史"
 		else -> "Price History"
 	}
-
 	@JvmField
 	val tokenDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token Info"
-		HoneyLanguage.Chinese.code -> "货币信息"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.English.code -> "Token Description"
+		HoneyLanguage.Chinese.code -> "Token 简介"
+		HoneyLanguage.Japanese.code -> "トークンの説明"
+		HoneyLanguage.Korean.code -> "토큰 소개"
+		HoneyLanguage.Russian.code -> "Информация о токенах"
+		HoneyLanguage.TraditionalChinese.code -> "Token 簡介"
+		else -> "Token Description"
 	}
-
 	@JvmField
-	val tokenInforMation = when (currentLanguage) {
+	val tokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Information"
-		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.Chinese.code -> "Token 信息"
+		HoneyLanguage.Japanese.code -> "トークン情報"
+		HoneyLanguage.Korean.code -> "토큰 정보"
+		HoneyLanguage.Russian.code -> "Информация о токенах"
+		HoneyLanguage.TraditionalChinese.code -> "Token 信息"
+		else -> "Token Information"
 	}
-
-
-
 	@JvmField
 	val tokenDescriptionPlaceHolder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description Content"
-		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.Chinese.code -> "Token 信息内容"
+		HoneyLanguage.Japanese.code -> "トークンの説明コンテンツ"
+		HoneyLanguage.Korean.code -> "토큰 설명 내용"
+		HoneyLanguage.Russian.code -> "Описание токена"
+		HoneyLanguage.TraditionalChinese.code -> "Token 信息內容"
+		else -> "Token Description Content"
 	}
-
 }
 
 object PincodeText {
