@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getDecimalCount
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
@@ -100,6 +101,10 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 	}
 
 	private fun confirmTransfer(callback: () -> Unit) {
+		// 如果输入的 `Decimal` 不合规就提示竞购并返回
+		if (!getTransferCount().toString().checkDecimalIsvalid())
+			return
+		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			MyTokenTable.getBalanceWithSymbol(
 				token?.symbol!!,
@@ -110,6 +115,15 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 					showAlertOrTransfer(balance, callback)
 				}
 			}
+		}
+	}
+
+	private fun String.checkDecimalIsvalid(): Boolean {
+		return if (getDecimalCount() > token?.decimal.orElse(0.0)) {
+			context?.alert("The value's decimal you inputed is bigger than this currency token's decimal please re-input")
+			false
+		} else {
+			true
 		}
 	}
 

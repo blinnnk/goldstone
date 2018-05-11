@@ -21,6 +21,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.json.JSONObject
+import java.math.BigInteger
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -94,4 +95,10 @@ fun JSONObject.safeGet(key: String): String {
 		Log.e("ERROR", error.toString())
 		""
 	}
+}
+
+fun String.getDecimalCount(): Int {
+	val integerPlaces = indexOf('.')
+	val decimalPlaces = length - integerPlaces - 1
+	return decimalPlaces
 }
