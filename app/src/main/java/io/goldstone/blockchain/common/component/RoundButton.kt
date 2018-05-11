@@ -72,6 +72,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		color: Int = Spectrum.red
 	) {
 		if (needToShow && loadingView.isNull()) {
+			isEnabled = false
 			loadingView = ProgressBar(
 				this.context,
 				null,
@@ -90,6 +91,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			addView(loadingView)
 		}
 		if (!needToShow && !loadingView.isNull()) {
+			isEnabled = true
 			removeView(loadingView)
 			loadingView = null
 		}

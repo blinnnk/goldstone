@@ -81,7 +81,9 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					text = CreateWalletText.create.toUpperCase()
 					marginTop = 0
 					setWhiteStyle()
-				}.click { presenter.showCreateWalletFragment() }.into(this)
+				}.click {
+					presenter.showCreateWalletFragment()
+				}.into(this)
 
 				importButton.apply {
 					text = ImportWalletText.importWallet.toUpperCase()

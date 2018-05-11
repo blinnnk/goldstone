@@ -77,7 +77,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setBlueStyle()
 					y += 10.uiPX()
 				}.click {
-					it.isClickable = false
+					it.isEnabled = false
 					presenter.importWalletByPrivateKey(
 						privateKeyInput,
 						passwordInput,
@@ -86,7 +86,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						nameInput,
 						passwordHintInput
 					) {
-						it.isClickable = true
+						it.isEnabled = true
 					}
 				}.into(this)
 

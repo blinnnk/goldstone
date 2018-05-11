@@ -94,7 +94,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					y += 10.uiPX()
 				}
 					.click {
-						it.isClickable = false
+						it.isEnabled = false
 						presenter.importWalletByMnemonic(
 							mnemonicInput,
 							passwordInput,
@@ -103,7 +103,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							agreementView.radioButton.isChecked,
 							walletNameInput
 						) {
-							it.isClickable = true
+							it.isEnabled = true
 						}
 					}
 					.into(this)
