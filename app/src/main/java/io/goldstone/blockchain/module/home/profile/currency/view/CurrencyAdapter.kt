@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.profile.currency.view
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.module.home.profile.currency.model.CurrencyModel
+import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 
 /**
  * @date 26/03/2018 2:26 PM
@@ -10,13 +10,13 @@ import io.goldstone.blockchain.module.home.profile.currency.model.CurrencyModel
  */
 
 class CurrencyAdapter(
-  override val dataSet: ArrayList<CurrencyModel>,
+  override val dataSet: ArrayList<SupportCurrencyTable>,
   private val callback: (CurrencyCell, Int) -> Unit
-  ) : HoneyBaseAdapter<CurrencyModel, CurrencyCell>() {
+  ) : HoneyBaseAdapter<SupportCurrencyTable, CurrencyCell>() {
 
   override fun generateCell(context: Context) = CurrencyCell(context)
 
-  override fun CurrencyCell.bindCell(data: CurrencyModel, position: Int) {
+  override fun CurrencyCell.bindCell(data: SupportCurrencyTable, position: Int) {
     model = data
     callback(this, position)
   }

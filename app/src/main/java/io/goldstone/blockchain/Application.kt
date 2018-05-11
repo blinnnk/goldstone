@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -51,6 +52,11 @@ class GoldStoneApp : Application() {
 			}
 		}
 
+		// 插入本本地支持的语言数据
+		SupportCurrencyTable.getSupportCurrencies {
+			it.isEmpty() isTrue { StartingPresenter.insertLocalCurrency(this) }
+		}
+		// 准备 `config` 信息
 		prepareAppConfig { registerDeviceForPush() }
 
 	}

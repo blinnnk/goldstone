@@ -1,0 +1,27 @@
+[
+  {
+    "countrySymbol": "CN",
+    "currencySymbol": "CNY",
+    "isUsed": false
+  },
+  {
+    "countrySymbol": "JP",
+    "currencySymbol": "JPY",
+    "isUsed": false
+  },
+  {
+    "countrySymbol": "KR",
+    "currencySymbol": "KRW",
+    "isUsed": false
+  },
+  {
+    "countrySymbol": "US",
+    "currencySymbol": "USD",
+    "isUsed": false
+  },
+  {
+    "countrySymbol": "RU",
+    "currencySymbol": "RUB",
+    "isUsed": false
+  }
+]
