@@ -5,7 +5,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.removeStartAndEndLineBreak
+import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
@@ -72,8 +72,8 @@ class PrivateKeyImportPresenter(
 			// 默认去除多余的空格
 			val currentPrivateKey =
 				(if (privateKey.length == 63) "0$privateKey" else privateKey).replaceWithPattern()
-					.replaceWithPattern("\n")
-					.removeStartAndEndLineBreak()
+					.removeStartAndEndValue()
+					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)

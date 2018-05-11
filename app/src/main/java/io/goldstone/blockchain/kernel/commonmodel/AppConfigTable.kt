@@ -24,7 +24,8 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int, var pincode: Int? = null,
+	var id: Int,
+	var pincode: Int? = null,
 	var showPincode: Boolean = false,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
@@ -160,7 +161,9 @@ data class AppConfigTable(
 					.apply {
 						getAppConfig().let {
 							update(it[0].apply { language = code })
-							GoldStoneAPI.context.runOnUiThread { callback() }
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
 						}
 					}
 			}

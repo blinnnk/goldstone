@@ -4,7 +4,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.removeStartAndEndLineBreak
+import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -43,8 +43,8 @@ class MnemonicImportDetailPresenter(
 			val mnemonicContent =
 				mnemonicInput.text.toString()
 					.replaceWithPattern()
-					.replaceWithPattern("\n")
-					.removeStartAndEndLineBreak()
+					.replace("\n", " ")
+					.removeStartAndEndValue(" ")
 			importWallet(
 				mnemonicContent,
 				passwordValue,

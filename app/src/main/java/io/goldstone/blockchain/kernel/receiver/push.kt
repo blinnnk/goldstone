@@ -113,6 +113,8 @@ fun Application.registerDeviceForPush() {
 	XGPushConfig.enableDebug(this, false)
 	XGPushManager.registerPush(this, object : XGIOperateCallback {
 		override fun onSuccess(token: Any?, p1: Int) {
+			// 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
+			registerDevice(token.toString())
 			// 如果本地有注册成功的标记则不再注册
 			getStringFromSharedPreferences(SharesPreference.registerPush).let {
 				Log.d("DEBUG", it)
@@ -120,8 +122,6 @@ fun Application.registerDeviceForPush() {
 			}
 			// 在本地数据库记录 `Push Token`
 			AppConfigTable.updatePushToken(token.toString())
-			// 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
-			registerDevice(token.toString())
 			XinGePushReceiver.registerWalletAddressForPush()
 		}
 
