@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
@@ -48,6 +49,13 @@ class ProfileOverlayPresenter(
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.aboutUs -> showAboutUsFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
+			ProfileText.chain -> showChainSelectionFragment()
+		}
+	}
+
+	private fun showChainSelectionFragment() {
+		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content) {
+			// Send Arguments
 		}
 	}
 

@@ -31,7 +31,9 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, contactCount.size.toString()),
 				ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
 				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
-				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, "")
+				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
+				ProfileModel(R.drawable.chain_icon, ProfileText.chain, "Ropstan"),
+				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, "")
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else {
