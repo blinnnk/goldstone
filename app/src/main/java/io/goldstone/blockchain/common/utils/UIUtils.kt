@@ -20,9 +20,22 @@ object UIUtils {
 		endColor: Int,
 		width: Float = ScreenSize.Width.toFloat(),
 		height: Float = ScreenSize.Height.toFloat()
-	) = LinearGradient(0f, 0f, width, height, startColor, endColor, Shader.TileMode.CLAMP)
+	) =
+		LinearGradient(
+			0f,
+			0f,
+			width,
+			height,
+			startColor,
+			endColor,
+			Shader.TileMode.CLAMP
+		)
 
-	fun subtractThenHalf(first: Int, second: Int) = (first - second) / 2
+	fun subtractThenHalf(
+		first: Int,
+		second: Int
+	) =
+		(first - second) / 2
 
 	fun generateAvatar(id: Int): Int {
 		val avatars = arrayListOf(
@@ -48,8 +61,17 @@ object UIUtils {
 
 fun String.toUpperCaseFirstLetter(): String {
 	isNotEmpty() isTrue {
-		if (length == 1) return substring(0, 1).toUpperCase()
-		return substring(0, 1).toUpperCase() + substring(1, length)
+		if (length == 1) return substring(
+			0,
+			1
+		).toUpperCase()
+		return substring(
+			0,
+			1
+		).toUpperCase() + substring(
+			1,
+			length
+		)
 	} otherwise {
 		return ""
 	}
@@ -58,15 +80,27 @@ fun String.toUpperCaseFirstLetter(): String {
 fun String.replaceWithPattern(
 	replace: String = " "
 ): String {
-	return Pattern.compile("\\s+").matcher(this).replaceAll(replace)
+	return Pattern.compile("\\s+")
+		.matcher(this)
+		.replaceAll(replace)
 }
 
-fun String.removeStartAndEndLineBreak(): String {
-	// 去除前后的空格或回车
-	return when {
-		last().toString() == "\n" -> substring(0, length - 1)
-		first().toString() == "\n" -> substring(1, length)
-		last().toString() == "\n" && first().toString() == "\n" -> substring(1, length - 1)
-		else -> this
+fun String.removeStartAndEndValue(value: String = "\n"): String {
+	var finalValue = this
+	if (finalValue.last().toString() == value) {
+		finalValue =
+			finalValue.substring(
+				0,
+				finalValue.length - 1
+			)
 	}
+	if (finalValue.first().toString() == value) {
+		finalValue =
+			finalValue.substring(
+				1,
+				finalValue.length
+			)
+	}
+	// 去除前后的空格或回车
+	return finalValue
 }
