@@ -47,7 +47,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	var asyncData: ArrayList<D>? by observing(null) {
 		recyclerView.adapter.apply {
 			isNull() isTrue {
-				setRecyclerViewAdapter(recyclerView, asyncData)
+				setRecyclerViewAdapter(
+					recyclerView,
+					asyncData
+				)
 			} otherwise {
 				notifyDataSetChanged()
 			}
@@ -84,11 +87,17 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 
-	open fun observingRecyclerViewScrolled(dx: Int, dy: Int) {
+	open fun observingRecyclerViewScrolled(
+		dx: Int,
+		dy: Int
+	) {
 		// Do Something
 	}
 
-	open fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
+	open fun observingRecyclerViewVerticalOffset(
+		offset: Int,
+		range: Int
+	) {
 		// Do Something
 	}
 
@@ -100,7 +109,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * 当设定 `Cell` 的单元高度后,就会在 `OnViewCreated` 的时机执行 `updateParentContentLayoutHeight`
 	 * 来动画伸展出初始界面.
 	 */
-	open fun setSlideUpWithCellHeight(): Int? = null
+	open fun setSlideUpWithCellHeight(): Int? =
+		null
 
 	open fun setSlideUpAnimation() {
 		// 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
@@ -108,7 +118,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			it.isNull() isTrue {
 				presenter.updateParentContentLayoutHeight()
 			} otherwise {
-				presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), it.orZero())
+				presenter.updateParentContentLayoutHeight(
+					asyncData?.size.orZero(),
+					it.orZero()
+				)
 			}
 		}
 	}
@@ -123,13 +136,22 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * 可以直接调用参数联动。
 	 * [asyncData] 这个数据是在 `Presenter` 里面实现好后返回到这里的实体.
 	 */
-	abstract fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<D>?)
+	abstract fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<D>?
+	)
 
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
-	open fun setRecyclerViewParams(width: Int, height: Int): RelativeLayout.LayoutParams =
-		RelativeLayout.LayoutParams(width, height)
+	open fun setRecyclerViewParams(
+		width: Int,
+		height: Int
+	): RelativeLayout.LayoutParams =
+		RelativeLayout.LayoutParams(
+			width,
+			height
+		)
 
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
@@ -147,7 +169,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
 	): View? {
 		presenter.onFragmentCreateView()
 		return UI {
@@ -158,30 +182,63 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				ScreenSize.Height - ScreenSize.statusBarHeight
 			}
 			wrapper = relativeLayout {
-				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
+				layoutParams =
+					setRecyclerViewParams(
+						matchParent,
+						wrapperHeight
+					)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
-				addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
+				addView(
+					recyclerView,
+					RelativeLayout.LayoutParams(
+						matchParent,
+						matchParent
+					)
+				)
 			}
 		}.view
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		presenter.onFragmentViewCreated()
 
 		// 监听 `RecyclerView` 滑动
 		recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
-			override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+			override fun onScrollStateChanged(
+				recyclerView: RecyclerView?,
+				newState: Int
+			) {
 				/** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
-				super.onScrollStateChanged(recyclerView, newState)
+				super.onScrollStateChanged(
+					recyclerView,
+					newState
+				)
 				observingRecyclerViewScrollState(newState)
 			}
 
-			override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-				super.onScrolled(recyclerView, dx, dy)
-				observingRecyclerViewScrolled(dx, dy)
+			override fun onScrolled(
+				recyclerView: RecyclerView?,
+				dx: Int,
+				dy: Int
+			) {
+				super.onScrolled(
+					recyclerView,
+					dx,
+					dy
+				)
+				observingRecyclerViewScrolled(
+					dx,
+					dy
+				)
 				observingRecyclerViewVerticalOffset(
 					recyclerView?.computeVerticalScrollOffset().orZero(),
 					recyclerView?.computeVerticalScrollRange().orZero()
@@ -219,14 +276,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		emptyLayout.isNotNull { return }
 		emptyLayout = EmptyView(wrapper.context).apply {
 			when (this@BaseRecyclerFragment) {
-				is PaymentValueDetailFragment                   -> return
-				is TokenDetailFragment                          -> setStyle(EmptyType.TokenDetail)
+				is PaymentValueDetailFragment -> return
+				is TokenDetailFragment -> setStyle(EmptyType.TokenDetail)
 				is ContactFragment, is AddressSelectionFragment -> setStyle(EmptyType.Contact)
-				is TokenSearchFragment                          -> setStyle(EmptyType.Search)
-				is QuotationSearchFragment                      -> setStyle(EmptyType.QuotationSearch)
-				is QuotationFragment                            -> setStyle(EmptyType.Quotation)
-				is WalletDetailFragment                         -> setStyle(EmptyType.WalletDetail)
-				else                                            -> setStyle(EmptyType.TransactionDetail)
+				is TokenSearchFragment -> setStyle(EmptyType.Search)
+				is QuotationSearchFragment -> setStyle(EmptyType.QuotationSearch)
+				is QuotationFragment -> setStyle(EmptyType.Quotation)
+				is WalletDetailFragment -> setStyle(EmptyType.WalletDetail)
+				else -> setStyle(EmptyType.TransactionDetail)
 			}
 		}
 		wrapper.addView(emptyLayout)

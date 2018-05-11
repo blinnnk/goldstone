@@ -32,6 +32,8 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
  * @author KaySaith
  */
 
+var walletDetailMemoryData: ArrayList<WalletDetailCellModel>? = null
+
 class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
@@ -45,7 +47,8 @@ class WalletDetailPresenter(
 	}
 
 	fun updateMyTokensPrice() {
-		fragment.asyncData?.let { asyncData ->
+		// 更新价目
+		walletDetailMemoryData?.let { asyncData ->
 			asyncData.map { it.contract }
 				.toJsonArray {
 					GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
@@ -79,10 +82,11 @@ class WalletDetailPresenter(
 				/** 先按照资产情况排序, 资产为零的按照权重排序 */
 				val currencyList = it.filter { it.currency > 0.0 }
 				val weightList = it.filter { it.currency == 0.0 }
-					currencyList.sortedByDescending { it.currency }
-						.plus(weightList.sortedByDescending { it.weight })
-						.toArrayList()
+				currencyList.sortedByDescending { it.currency }
+					.plus(weightList.sortedByDescending { it.weight })
+					.toArrayList()
 			}) {
+				walletDetailMemoryData = it
 				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 				fragment.updateHeaderValue()
 				fragment.setEmptyViewBy(it)
