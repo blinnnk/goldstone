@@ -80,9 +80,9 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 			this.footer = footer
 			footer?.getConfirmButton {
 				onClick {
-					isClickable = false
+					isEnabled = false
 					confirmTransfer {
-						isClickable = true
+						isEnabled = true
 					}
 				}
 			}

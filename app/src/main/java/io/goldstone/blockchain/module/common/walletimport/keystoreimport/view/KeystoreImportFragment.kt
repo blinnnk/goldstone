@@ -77,7 +77,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					text = CommonText.confirm.toUpperCase()
 					y += 10.uiPX()
 				}.click {
-					it.isClickable = false
+					it.isEnabled = false
 					presenter.importKeystoreWallet(
 						keystoreEditText.text.toString(),
 						passwordInput,
@@ -85,7 +85,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						agreementView.radioButton.isChecked,
 						hintInput
 					) {
-						it.isClickable = true
+						it.isEnabled = true
 					}
 				}.into(this)
 
