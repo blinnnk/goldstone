@@ -929,6 +929,16 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
 		else -> "Pin Code"
 	}
+	@JvmField
+	val chain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Select Chain"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
 }
 
 object EmptyText {

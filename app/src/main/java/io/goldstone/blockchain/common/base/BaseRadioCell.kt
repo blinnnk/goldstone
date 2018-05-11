@@ -61,12 +61,12 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		radioButton.isChecked = isSelected
 	}
 
-	fun showIcon(image: Int) {
+	fun showIcon(image: Int, color: Int = GrayScale.whiteGray) {
 		title.x = 50.uiPX().toFloat()
 		if (icon.isNull()) {
 			icon = ImageView(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-				addCorner(17.uiPX(), GrayScale.whiteGray)
+				addCorner(17.uiPX(), color)
 			}
 			icon?.into(this)
 			icon?.setCenterInVertical()
