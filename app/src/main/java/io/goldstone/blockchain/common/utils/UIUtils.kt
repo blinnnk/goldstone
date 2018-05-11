@@ -60,3 +60,12 @@ fun String.replaceWithPattern(
 ): String {
 	return Pattern.compile("\\s+").matcher(this).replaceAll(replace)
 }
+
+fun String.removeStartAndEndLineBreak(): String {
+	// 去除前后的空格或回车
+	return when {
+		last().toString() == "\n" -> substring(0, length - 1)
+		first().toString() == "\n" -> substring(1, length)
+		else -> this
+	}
+}

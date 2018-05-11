@@ -4,6 +4,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.removeStartAndEndLineBreak
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -39,24 +40,11 @@ class MnemonicImportDetailPresenter(
 			isAgree,
 			fragment.context
 		) { passwordValue, walletName ->
-			var mnemonicContent =
+			val mnemonicContent =
 				mnemonicInput.text.toString()
 					.replaceWithPattern()
 					.replaceWithPattern("\n")
-			// 去除前后的空格或回车
-			if (mnemonicContent.last().toString() == "\n") {
-				mnemonicContent =
-					mnemonicContent.substring(
-						0,
-						mnemonicContent.length - 1
-					)
-			} else if (mnemonicContent.first().toString() == "\n") {
-				mnemonicContent =
-					mnemonicContent.substring(
-						1,
-						mnemonicContent.length
-					)
-			}
+					.removeStartAndEndLineBreak()
 			importWallet(
 				mnemonicContent,
 				passwordValue,
