@@ -32,7 +32,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			if (iconUrl.isBlank()) {
 				icon.image.imageResource = R.drawable.default_token
 			} else {
-				icon.image.glideImage(iconUrl)
+				// 获取指定尺寸的图片
+				icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 			}
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name
