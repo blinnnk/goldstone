@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInfomationModel
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
@@ -244,23 +244,21 @@ class MarketTokenDetailPresenter(
 
 	fun setCurrencyInf(
 		currencyInfo: QuotationModel?,
-		tokenInfomation: TokenInfomation,
+		tokenInformation: TokenInformation,
 		priceHistroy: PriceHistoryView,
 		tokenInfo: TokenInfoView
 	) {
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
 				fragment.context?.runOnUiThread {
-					tokenInfomation.model =
-						TokenInfomationModel(
-							it,
-							info.symbol
-						)
-					priceHistroy.model =
-						PriceHistoryModel(
-							it,
-							info.quoteSymbol
-						)
+					tokenInformation.model = TokenInformationModel(
+						it,
+						info.symbol
+					)
+					priceHistroy.model = PriceHistoryModel(
+						it,
+						info.quoteSymbol
+					)
 				}
 			}
 			loadDescriptionFromLocalOrServer(
@@ -323,18 +321,16 @@ class MarketTokenDetailPresenter(
 		// 传默认值
 		fragment.currentPriceInfo.model = CurrentPriceModel()
 		// 长连接获取数据
-		QuotationPresenter.getPriceInfoBySocket(
-			arrayListOf(pair),
+		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair),
 			{
 				currentSocket = it
 				currentSocket?.runSocket()
 			}) {
 			if (it.pair == pair) {
-				fragment.currentPriceInfo.model =
-					CurrentPriceModel(
-						it,
-						quoteSymbol
-					)
+				fragment.currentPriceInfo.model = CurrentPriceModel(
+					it,
+					quoteSymbol
+				)
 			}
 		}
 	}
