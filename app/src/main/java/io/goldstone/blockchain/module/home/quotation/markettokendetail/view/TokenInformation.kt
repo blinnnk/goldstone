@@ -36,7 +36,7 @@ class TokenInformation(context: Context) : MarketTokenDetailBaseCell(context) {
 	private val marketCap = MarketTokenDetailBaseInfoCell(context)
 
 	init {
-		title.text = QuotationText.tokenInforMation
+		title.text = QuotationText.tokenInformation
 		layoutParams = RelativeLayout.LayoutParams(
 			matchParent,
 			210.uiPX()
