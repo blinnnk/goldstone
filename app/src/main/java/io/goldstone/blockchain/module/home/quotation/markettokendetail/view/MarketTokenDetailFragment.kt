@@ -25,12 +25,25 @@ import org.jetbrains.anko.verticalLayout
  */
 
 enum class MarketTokenDetailChartType(
-	val code: Int, val info: String
+	val code: Int,
+	val info: String
 ) {
-	Hour(0, "1hour"),
-	DAY(1, "1day"),
-	WEEK(2, "1week"),
-	MONTH(3, "1month")
+	Hour(
+		    0,
+		    "1hour"
+	    ),
+	DAY(
+		   1,
+		   "1day"
+	   ),
+	WEEK(
+		    2,
+		    "1week"
+	    ),
+	MONTH(
+		     3,
+		     "1month"
+	     )
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
@@ -45,7 +58,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	private val chartView by lazy { MarketTokenChart(context!!) }
 	private val priceHistroy by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
-	private val tokenInfomation by lazy { TokenInfomation(context!!) }
+	private val tokenInformation by lazy { TokenInformation(context!!) }
 
 	override val presenter = MarketTokenDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
@@ -58,7 +71,8 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				}
 				menu.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-				}.into(this)
+				}
+					.into(this)
 				menu.titles = arrayListOf(
 					MarketTokenDetailChartType.Hour.info,
 					MarketTokenDetailChartType.DAY.info,
@@ -67,7 +81,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				)
 				menu.getButton { button ->
 					button.onClick {
-						presenter.updateChartByMenu(chartView, button.id)
+						presenter.updateChartByMenu(
+							chartView,
+							button.id
+						)
 						menu.selected(button.id)
 						button.preventDuplicateClicks()
 					}
@@ -75,19 +92,28 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				menu.selected(MarketTokenDetailChartType.Hour.code)
 				chartView.into(this)
 				// 默认加载小时的图标数据
-				presenter.updateChartByMenu(chartView, MarketTokenDetailChartType.Hour.code)
+				presenter.updateChartByMenu(
+					chartView,
+					MarketTokenDetailChartType.Hour.code
+				)
 
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
 					}
-				}.into(this)
+				}
+					.into(this)
 
 				priceHistroy.into(this)
 				tokenInfo.into(this)
-				tokenInfomation.into(this)
+				tokenInformation.into(this)
 
-				presenter.setCurrencyInf(currencyInfo, tokenInfomation, priceHistroy, tokenInfo)
+				presenter.setCurrencyInf(
+					currencyInfo,
+					tokenInformation,
+					priceHistroy,
+					tokenInfo
+				)
 			}
 		}
 	}

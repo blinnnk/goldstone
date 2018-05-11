@@ -8,7 +8,7 @@ import org.json.JSONObject
  * @author KaySaith
  */
 
-data class TokenInfomationModel(
+data class TokenInformationModel(
 	val rankValue: String = "",
 	val avaliableSupply: String = "",
 	val marketCap: Double = 0.0

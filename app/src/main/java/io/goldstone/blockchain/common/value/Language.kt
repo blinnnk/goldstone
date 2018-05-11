@@ -1120,8 +1120,8 @@ object QuotationText {
 	}
 
 	@JvmField
-	val tokenInfoMation = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token Infomation"
+	val tokenInforMation = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Information"
 		HoneyLanguage.Chinese.code -> ""
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""

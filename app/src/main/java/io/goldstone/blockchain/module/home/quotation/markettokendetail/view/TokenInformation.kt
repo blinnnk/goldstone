@@ -9,7 +9,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.formatCurrency
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInfomationModel
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
 
@@ -20,9 +20,9 @@ import org.jetbrains.anko.verticalLayout
 
 @Suppress("DEPRECATION")
 
-class TokenInfomation(context: Context) : MarketTokenDetailBaseCell(context) {
+class TokenInformation(context: Context) : MarketTokenDetailBaseCell(context) {
 
-	var model: TokenInfomationModel by observing(TokenInfomationModel()) {
+	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		rank.setSubtitle(model.rankValue)
 		avalibaleSupply.setSubtitle(model.avaliableSupply)
 		// 服务器返回的是带 `,` 的字符串这里加工成 `Double`
@@ -36,7 +36,7 @@ class TokenInfomation(context: Context) : MarketTokenDetailBaseCell(context) {
 	private val marketCap = MarketTokenDetailBaseInfoCell(context)
 
 	init {
-		title.text = QuotationText.tokenInfoMation
+		title.text = QuotationText.tokenInforMation
 		layoutParams = RelativeLayout.LayoutParams(
 			matchParent,
 			210.uiPX()
