@@ -26,6 +26,8 @@ class ProfileCell(context: Context) : BaseCell(context) {
 		info.text = model.info
 	}
 
+	private var hasLayouted = false
+
 	var isCenterInVertical: Boolean by observing(false) {
 		if(isCenterInVertical) {
 			title.setCenterInVertical()
@@ -42,10 +44,13 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				setAlignParentBottom()
 				setAlignParentRight()
 			}
-			title.y -= 19.uiPX().toFloat()
-			icon.y -= 17.uiPX()
-			info.y -= 20.uiPX()
-			arrowY += 16.uiPX().toFloat()
+			if (!hasLayouted) {
+				title.y -= 19.uiPX().toFloat()
+				icon.y -= 17.uiPX()
+				info.y -= 20.uiPX()
+				arrowY += 16.uiPX().toFloat()
+			}
+			hasLayouted = true
 		}
 	}
 
