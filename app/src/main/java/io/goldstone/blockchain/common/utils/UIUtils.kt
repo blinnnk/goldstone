@@ -66,6 +66,7 @@ fun String.removeStartAndEndLineBreak(): String {
 	return when {
 		last().toString() == "\n" -> substring(0, length - 1)
 		first().toString() == "\n" -> substring(1, length)
+		last().toString() == "\n" && first().toString() == "\n" -> substring(1, length - 1)
 		else -> this
 	}
 }
