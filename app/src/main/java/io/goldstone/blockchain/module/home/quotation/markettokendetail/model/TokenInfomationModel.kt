@@ -19,9 +19,10 @@ data class TokenInformationModel(
 	) : this(
 		data.safeGet("rank"),
 		data.safeGet("supply") + " " + symbol,
+		if (data.safeGet("market_cap").isNotEmpty())
 		data.safeGet("market_cap").replace(
 			",",
 			""
-		).toDouble()
+		).toDouble() else 0.0
 	)
 }

@@ -25,8 +25,7 @@ import org.jetbrains.anko.verticalLayout
  */
 
 enum class MarketTokenDetailChartType(
-	val code: Int,
-	val info: String
+	val code: Int, val info: String
 ) {
 	Hour(
 		    0,
@@ -71,8 +70,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				}
 				menu.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-				}
-					.into(this)
+				}.into(this)
 				menu.titles = arrayListOf(
 					MarketTokenDetailChartType.Hour.info,
 					MarketTokenDetailChartType.DAY.info,
@@ -101,8 +99,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
 					}
-				}
-					.into(this)
+				}.into(this)
 
 				priceHistroy.into(this)
 				tokenInfo.into(this)

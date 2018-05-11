@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presen
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -18,6 +20,13 @@ class QuotationManagementPresenter(
 
 	override fun updateData() {
 		updateSelectionsData()
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
+			presenter.updateData()
+		}
 	}
 
 	private fun updateSelectionsData(callback: () -> Unit = {}) {

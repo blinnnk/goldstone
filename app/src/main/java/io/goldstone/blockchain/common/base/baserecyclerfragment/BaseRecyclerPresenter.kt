@@ -51,6 +51,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		// Do Something
 	}
 
+	open fun onFragmentDestroy() {
+		// Do Something
+	}
+
 	open fun onFragmentViewCreated() {
 		// 当 `ViewCreated`后执行更新数据函数
 		updateData()

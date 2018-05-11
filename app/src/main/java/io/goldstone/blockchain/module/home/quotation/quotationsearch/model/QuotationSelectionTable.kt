@@ -14,6 +14,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import java.io.Serializable
 
 /**
  * @date 26/04/2018 10:47 AM
@@ -36,15 +37,10 @@ data class QuotationSelectionTable(
 	@SerializedName("market")
 	var market: String,
 	@SerializedName("name")
-	var name: String, var infoTitle: String,
-	var orderID: Double = 0.0,
-	var lineChartDay: String,
-	var isSelecting: Boolean = false,
-	var description: String? = null,
-	var lineChartWeek: String? = "",
-	var lineChartMonth: String? = "",
-	var lineChartHour: String? = ""
-) {
+	var name: String, var infoTitle: String, var orderID: Double = 0.0, var lineChartDay: String,
+	var isSelecting: Boolean = false, var description: String? = null,
+	var lineChartWeek: String? = "", var lineChartMonth: String? = "", var lineChartHour: String? = ""
+) : Serializable {
 	constructor(
 		data: QuotationSelectionTable, lineChart: String
 	) : this(
@@ -67,6 +63,7 @@ data class QuotationSelectionTable(
 	)
 
 	companion object {
+
 		fun insertSelection(
 			table: QuotationSelectionTable, callback: () -> Unit
 		) {

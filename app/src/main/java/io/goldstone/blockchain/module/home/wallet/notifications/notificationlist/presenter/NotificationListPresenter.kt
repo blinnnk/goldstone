@@ -16,7 +16,6 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import kotlinx.coroutines.experimental.async
 import java.io.Serializable
 
 /**
