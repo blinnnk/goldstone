@@ -31,7 +31,7 @@ class TokenInfoView(context: Context) : MarketTokenDetailBaseCell(context) {
 
 	init {
 		title.text = QuotationText.tokenDescription
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 145.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		contentView.into(this)
 		contentView.y -= 10.uiPX()
 		contentView.setAlignParentBottom()

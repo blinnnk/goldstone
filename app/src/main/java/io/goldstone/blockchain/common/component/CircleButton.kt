@@ -7,11 +7,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -25,71 +23,91 @@ import org.jetbrains.anko.*
 
 class CircleButton(context: Context) : LinearLayout(context) {
 
-  var title: String by observing("") {
-    buttonTitle.text = title
-  }
+	var title: String by observing("") {
+		buttonTitle.text = title
+	}
 
-  var src: Int by observing(0) {
-    icon.imageResource = src
-  }
+	var src: Int by observing(0) {
+		icon.imageResource = src
+	}
 
-  private lateinit var iconView: LinearLayout
-  private val icon by lazy { ImageView(context) }
-  private val buttonTitle by lazy { TextView(context) }
+	private lateinit var iconView: LinearLayout
+	private val icon by lazy { ImageView(context) }
+	private val buttonTitle by lazy { TextView(context) }
 
-  init {
+	init {
 
-    orientation = VERTICAL
-    layoutParams = LinearLayout.LayoutParams(30.uiPX(), 55.uiPX())
+		orientation = VERTICAL
+		layoutParams =
+			LinearLayout.LayoutParams(
+				30.uiPX(),
+				65.uiPX()
+			)
 
-    relativeLayout {
-      // 透明背景色
-      layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
+		relativeLayout {
+			// 透明背景色
+			layoutParams =
+				RelativeLayout.LayoutParams(
+					30.uiPX(),
+					30.uiPX()
+				)
 
-      iconView = linearLayout {
-        lparams(matchParent, matchParent)
-        addCorner(18.uiPX(), Spectrum.opacity2White)
-      }
-      // ICON 图形
-      icon
-        .apply {
-          layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
-          setColorFilter(Spectrum.white)
-          scaleType = ImageView.ScaleType.CENTER_INSIDE
-        }
-        .into(this)
-    }
+			iconView = linearLayout {
+				lparams(
+					matchParent,
+					matchParent
+				)
+				addCorner(
+					18.uiPX(),
+					Spectrum.opacity2White
+				)
+			}
+			// ICON 图形
+			icon.apply {
+				layoutParams =
+					LinearLayout.LayoutParams(
+						matchParent,
+						30.uiPX()
+					)
+				setColorFilter(Spectrum.white)
+				scaleType = ImageView.ScaleType.CENTER_INSIDE
+			}.into(this)
+		}
 
-    buttonTitle
-      .apply {
-        layoutParams = LinearLayout.LayoutParams(matchParent, 25.uiPX())
-        textSize = 3.uiPX().toFloat()
-        typeface = GoldStoneFont.medium(context)
-        textColor = Spectrum.opacity5White
-        gravity = Gravity.CENTER_HORIZONTAL
-        y += 5.uiPX()
-      }
-      .into(this)
+		buttonTitle.apply {
+			layoutParams =
+				LinearLayout.LayoutParams(
+					matchParent,
+					25.uiPX()
+				)
+			textSize = 3.uiPX().toFloat()
+			typeface = GoldStoneFont.medium(context)
+			textColor = Spectrum.opacity5White
+			gravity = Gravity.CENTER_HORIZONTAL
+			y += 5.uiPX()
+		}.into(this)
 
-    addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.yellow, RippleMode.Round)
-  }
+	}
 
-  private fun setIconViewColor(color: Int) {
-    iconView.addCorner(18.uiPX(), color)
-  }
+	private fun setIconViewColor(color: Int) {
+		iconView.addCorner(
+			18.uiPX(),
+			color
+		)
+	}
 
-  fun setUnTransparent() {
-    buttonTitle.textColor = Spectrum.white
-    updateOriginYAnimation(17.uiPX().toFloat())
-    buttonTitle.updateOriginYAnimation(25.uiPX().toFloat())
-    setIconViewColor(Color.TRANSPARENT)
-  }
+	fun setUnTransparent() {
+		buttonTitle.textColor = Spectrum.white
+		updateOriginYAnimation(17.uiPX().toFloat())
+		buttonTitle.updateOriginYAnimation(25.uiPX().toFloat())
+		setIconViewColor(Color.TRANSPARENT)
+	}
 
-  fun setDefaultStyle() {
-    buttonTitle.textColor = Spectrum.opacity5White
-    updateOriginYAnimation(33.uiPX().toFloat())
-    buttonTitle.updateOriginYAnimation(33.uiPX().toFloat())
-    setIconViewColor(Spectrum.opacity2White)
-  }
+	fun setDefaultStyle() {
+		buttonTitle.textColor = Spectrum.opacity5White
+		updateOriginYAnimation(33.uiPX().toFloat())
+		buttonTitle.updateOriginYAnimation(33.uiPX().toFloat())
+		setIconViewColor(Spectrum.opacity2White)
+	}
 
 }

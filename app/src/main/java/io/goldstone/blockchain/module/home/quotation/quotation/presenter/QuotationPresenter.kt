@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import com.blinnnk.extension.*
-import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
@@ -12,6 +11,7 @@ import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
@@ -61,31 +61,26 @@ class QuotationPresenter(
 					"0",
 					linechart
 				)
-			}
-				.sortedByDescending {
-					it.orderID
-				}
-				.toArrayList()
-				.let {
-					// 把数据存在内存里面方便下次打开使用
-					memoryData = it
-					// 更新 `UI`
-					diffAndUpdateData(it)
-					// 设定 `Socket` 并执行
-					currentSocket.isNull() isTrue {
-						// 初始化 `Socket`
-						setSocket {
-							currentSocket?.runSocket()
-						}
-					} otherwise {
-						// 更新 `Sockert`
-						fragment.asyncData?.map { it.pair }
-							?.toArrayList()
-							?.toJsonArray {
-								currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
-							}
+			}.sortedByDescending {
+				it.orderID
+			}.toArrayList().let {
+				// 把数据存在内存里面方便下次打开使用
+				memoryData = it
+				// 更新 `UI`
+				diffAndUpdateData(it)
+				// 设定 `Socket` 并执行
+				currentSocket.isNull() isTrue {
+					// 初始化 `Socket`
+					setSocket {
+						currentSocket?.runSocket()
+					}
+				} otherwise {
+					// 更新 `Sockert`
+					fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
+						currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 					}
 				}
+			}
 		}
 	}
 
@@ -99,6 +94,7 @@ class QuotationPresenter(
 				it.runSocket()
 			}
 		}
+
 	}
 
 	private fun diffAndUpdateData(data: ArrayList<QuotationModel>) {
@@ -110,19 +106,21 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun ArrayList<Point>.checkTimeStampIfNeedUpdateBy(pair: String) {
+	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
 		sortedByDescending {
 			it.label.toLong()
 		}.let {
-			// 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件.
-			// 本地的当天 `lineChart` 的值是通过长连接实时更新的.
+			/**
+			 * 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件.
+			 * 本地的当天 `lineChart` 的值是通过长连接实时更新的.
+			 */
 			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
 				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
 					QuotationSelectionTable.updateLineChartDataBy(
 						pair,
 						newChart
 					) {
-						/** 防止服务器数据出错, 可能导致的死循环 */
+						/** 防止服务器数据出错或不足, 可能导致的死循环 */
 						if (updateChartTimes!! > 0) {
 							updateData()
 							updateChartTimes = updateChartTimes!! - 1
@@ -135,8 +133,7 @@ class QuotationPresenter(
 
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: () -> Unit) {
-		fragment.asyncData?.isEmpty()
-			?.isTrue { return }
+		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(fragment.asyncData?.map { it.pair }?.toArrayList(),
 			{
 				currentSocket = it
@@ -148,15 +145,13 @@ class QuotationPresenter(
 
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		if (isHidden) {
-			currentSocket?.isSocketConnected()
-				?.isTrue {
-					currentSocket?.closeSocket()
-				}
+			currentSocket?.isSocketConnected()?.isTrue {
+				currentSocket?.closeSocket()
+			}
 		} else {
-			currentSocket?.isSocketConnected()
-				?.isFalse {
-					currentSocket?.runSocket()
-				}
+			currentSocket?.isSocketConnected()?.isFalse {
+				currentSocket?.runSocket()
+			}
 		}
 	}
 
@@ -196,21 +191,17 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun convertDataToChartData(data: String): ArrayList<Point> {
+	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
 		val jsonarray = JSONArray(data)
 		(0 until jsonarray.length()).map {
-			val timeStamp =
-				jsonarray.getJSONObject(it)["time"].toString()
-					.toLong()
-			Point(
+			val timeStamp = jsonarray.getJSONObject(it)["time"].toString().toLong()
+			ChartPoint(
 				timeStamp.toString(),
 				jsonarray.getJSONObject(it)["price"].toString().toFloat()
 			)
+		}.reversed().let {
+			return it.toArrayList()
 		}
-			.reversed()
-			.let {
-				return it.toArrayList()
-			}
 	}
 
 	companion object {
@@ -236,12 +227,11 @@ class QuotationPresenter(
 
 		fun getQuotationFragment(activity: MainActivity?, callback: QuotationFragment.() -> Unit) {
 			activity?.apply {
-				supportFragmentManager.findFragmentByTag(FragmentTag.home)
-					?.apply {
-						findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.let {
-							callback(it)
-						}
+				supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
+					findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.let {
+						callback(it)
 					}
+				}
 			}
 		}
 	}

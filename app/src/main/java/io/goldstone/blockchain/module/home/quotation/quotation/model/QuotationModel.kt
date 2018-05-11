@@ -14,7 +14,7 @@ data class QuotationModel(
 	val name: String = "",
 	var price: String = "",
 	var percent: String = "",
-	val chartData: ArrayList<Point> = arrayListOf(),
+	val chartData: ArrayList<ChartPoint> = arrayListOf(),
 	val exchangeName: String = "",
 	val orderID: Double = 0.0,
 	val pairDisplay: String = "",
@@ -25,7 +25,7 @@ data class QuotationModel(
 		data: QuotationSelectionTable,
 		price: String,
 		percent: String,
-		chartData: ArrayList<Point>
+		chartData: ArrayList<ChartPoint>
 	) : this(
 		data.baseSymnbol.toUpperCase(),
 		data.name.toLowerCase(),
@@ -39,3 +39,12 @@ data class QuotationModel(
 		data.quoteSymbol
 	)
 }
+
+/**
+ * important `Serializable` 传参的时候 非继承与 `Serializable` 的会导致
+ * 崩溃. Look `https://stackoverflow.com/questions/4670215/`
+ */
+class ChartPoint(label: String, value: Float) : Point(
+	label,
+	value
+), Serializable
