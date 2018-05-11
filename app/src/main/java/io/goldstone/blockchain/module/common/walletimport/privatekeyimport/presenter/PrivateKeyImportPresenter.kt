@@ -5,6 +5,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -68,19 +69,27 @@ class PrivateKeyImportPresenter(
 		) {
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			// 默认去除多余的空格
-			val currentPrivateKey = (if (privateKey.length == 63) "0$privateKey" else privateKey).replace(
-				" ",
-				""
-			)
+			val currentPrivateKey =
+				(if (privateKey.length == 63) "0$privateKey" else privateKey).replaceWithPattern()
+					.replaceWithPattern("\n")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
 				return
 			}
 			// 解析私钥并导入钱包
-			fragment.context?.getWalletByPrivateKey(privateKey, password) { address ->
+			fragment.context?.getWalletByPrivateKey(
+				privateKey,
+				password
+			) { address ->
 				address?.let {
-					WalletImportPresenter.insertWalletToDatabase(fragment, it, name, hint, callback)
+					WalletImportPresenter.insertWalletToDatabase(
+						fragment,
+						it,
+						name,
+						hint,
+						callback
+					)
 				}
 			}
 		}

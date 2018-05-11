@@ -32,6 +32,9 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
  * @author KaySaith
  */
 
+/**
+ * 放在内存里面的数据, 提升展示的速度
+ */
 var walletDetailMemoryData: ArrayList<WalletDetailCellModel>? = null
 
 class WalletDetailPresenter(
@@ -47,7 +50,6 @@ class WalletDetailPresenter(
 	}
 
 	fun updateMyTokensPrice() {
-		// 更新价目
 		walletDetailMemoryData?.let { asyncData ->
 			asyncData.map { it.contract }
 				.toJsonArray {
