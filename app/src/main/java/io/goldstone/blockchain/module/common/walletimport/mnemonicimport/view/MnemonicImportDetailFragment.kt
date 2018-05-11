@@ -49,42 +49,36 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-				}
-					.into(this)
+				}.into(this)
 
 				pathInput.apply {
 					title = "Path"
 					hint = "m/44'/60'/0'/0/0"
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-				}
-					.into(this)
+				}.into(this)
 
 				walletNameInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.name
-				}
-					.into(this)
+				}.into(this)
 
 				passwordInput.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.password
-				}
-					.into(this)
+				}.into(this)
 
 				repeatPassword.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.repeatPassword
-				}
-					.into(this)
+				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.hint
-				}
-					.into(this)
+				}.into(this)
 
 				agreementView.into(this)
 
@@ -92,36 +86,30 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle()
 					y += 10.uiPX()
-				}
-					.click {
-						it.isEnabled = false
-						presenter.importWalletByMnemonic(
-							mnemonicInput,
-							passwordInput,
-							repeatPassword,
-							hintInput,
-							agreementView.radioButton.isChecked,
-							walletNameInput
-						) {
-							it.isEnabled = true
-						}
+				}.click {
+					it.showLoadingStatus()
+					presenter.importWalletByMnemonic(
+						mnemonicInput,
+						passwordInput,
+						repeatPassword,
+						hintInput,
+						agreementView.radioButton.isChecked,
+						walletNameInput
+					) {
+						it.showLoadingStatus(false)
 					}
-					.into(this)
+				}.into(this)
 
 
 				textView("What is mnemonic?") {
-					textSize =
-						5.uiPX()
-							.toFloat()
+					textSize = 5.uiPX().toFloat()
 					typeface = GoldStoneFont.heavy(context)
-					layoutParams =
-						LinearLayout.LayoutParams(
-							ScreenSize.Width,
-							30.uiPX()
-						)
-							.apply {
-								topMargin = 20.uiPX()
-							}
+					layoutParams = LinearLayout.LayoutParams(
+						ScreenSize.Width,
+						30.uiPX()
+					).apply {
+						topMargin = 20.uiPX()
+					}
 					textColor = Spectrum.blue
 					gravity = Gravity.CENTER
 				}

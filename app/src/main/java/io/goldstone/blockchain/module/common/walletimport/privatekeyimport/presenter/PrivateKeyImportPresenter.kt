@@ -71,8 +71,9 @@ class PrivateKeyImportPresenter(
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			// 默认去除多余的空格
 			val currentPrivateKey =
-				(if (privateKey.length == 63) "0$privateKey" else privateKey).replaceWithPattern()
-					.removeStartAndEndValue()
+				(if (privateKey.length == 63) "0$privateKey" else privateKey)
+					.replaceWithPattern()
+					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
