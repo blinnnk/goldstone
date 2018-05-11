@@ -26,12 +26,12 @@ class TokenInfoView(context: Context) : MarketTokenDetailBaseCell(context) {
 		textSize = 4.uiPX().toFloat()
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.medium(context)
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 100.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 105.uiPX())
 	}
 
 	init {
 		title.text = QuotationText.tokenDescription
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 155.uiPX())
 		contentView.into(this)
 		contentView.y -= 10.uiPX()
 		contentView.setAlignParentBottom()
