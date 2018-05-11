@@ -39,10 +39,24 @@ class MnemonicImportDetailPresenter(
 			isAgree,
 			fragment.context
 		) { passwordValue, walletName ->
-			val mnemonicContent =
+			var mnemonicContent =
 				mnemonicInput.text.toString()
 					.replaceWithPattern()
 					.replaceWithPattern("\n")
+			// 去除前后的空格或回车
+			if (mnemonicContent.last().toString() == "\n") {
+				mnemonicContent =
+					mnemonicContent.substring(
+						0,
+						mnemonicContent.length - 1
+					)
+			} else if (mnemonicContent.first().toString() == "\n") {
+				mnemonicContent =
+					mnemonicContent.substring(
+						1,
+						mnemonicContent.length
+					)
+			}
 			importWallet(
 				mnemonicContent,
 				passwordValue,
