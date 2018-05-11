@@ -80,7 +80,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 		setIntroText("obtaining token information from ethereum now just wait a moment")
 	}
 
-	fun setIntroText(intro: String) {
+	private fun setIntroText(intro: String) {
 		introView.text = intro
 	}
 

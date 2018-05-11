@@ -50,8 +50,7 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 							token,
 							token.get("force_show").toString().toInt() == TinyNumber.True.value
 						).let {
-							GoldStoneDataBase.database.defaultTokenDao()
-								.insert(it)
+							GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							context.runOnUiThread {
 								if (isEnd) callback()
 							}
@@ -67,15 +66,13 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
 					.forEachOrEnd { item, isEnd ->
-						System.out.println("___"+item)
 						val model = if (item.safeGet("currencySymbol") == CountryCode.currentCurrency) {
 							SupportCurrencyTable(item).apply { isUsed = true }
 						} else {
 							SupportCurrencyTable(item)
 						}
 
-						GoldStoneDataBase.database.currencyDao()
-							.insert(model)
+						GoldStoneDataBase.database.currencyDao().insert(model)
 
 						context.runOnUiThread {
 							if (isEnd) callback()
@@ -92,42 +89,37 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 					localTokens.isEmpty() isTrue {
 						context.doAsync {
 							serverTokens.forEach {
-								GoldStoneDataBase.database.defaultTokenDao()
-									.insert(it)
+								GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							}
 						}
 					} otherwise {
 						/** 如果本地的 `Tokens` 不是空的, 那么筛选出本地没有的插入到数据库 */
 						localTokens.forEach { localToken ->
-							serverTokens.find { it.symbol == localToken.symbol }
-								?.let {
-									serverTokens.remove(it)
-								}
+							serverTokens.find { it.symbol == localToken.symbol }?.let {
+								serverTokens.remove(it)
+							}
 						}
 
 						if (serverTokens.isNotEmpty()) {
 							context.doAsync {
 								serverTokens.forEach {
-									GoldStoneDataBase.database.defaultTokenDao()
-										.insert(it)
+									GoldStoneDataBase.database.defaultTokenDao().insert(it)
 								}
 							}
 						}
 
 						/** Filter `Tokens`  which doesn't exist in server but exist in local */
 						serverTokens.forEach { serverToken ->
-							localTokens.find { it.symbol == serverToken.symbol }
-								?.let {
-									localTokens.remove(it)
-								}
+							localTokens.find { it.symbol == serverToken.symbol }?.let {
+								localTokens.remove(it)
+							}
 						}
 
 						if (localTokens.isNotEmpty()) {
 							context.doAsync {
 								localTokens.forEach {
 									it.isDefault = false
-									GoldStoneDataBase.database.defaultTokenDao()
-										.update(it)
+									GoldStoneDataBase.database.defaultTokenDao().update(it)
 								}
 							}
 						}

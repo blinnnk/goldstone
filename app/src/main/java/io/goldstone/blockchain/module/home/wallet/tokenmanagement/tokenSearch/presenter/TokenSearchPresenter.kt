@@ -54,7 +54,8 @@ class TokenSearchPresenter(
 	}
 
 	private fun searchTokenByContractOrSymbol(
-		input: EditText, hold: (ArrayList<DefaultTokenTable>) -> Unit
+		input: EditText,
+		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 
 		val inputValue = input.text.toString()
@@ -67,7 +68,7 @@ class TokenSearchPresenter(
 		val isSearchSymbol = inputValue.length != CryptoValue.contractAddressLength
 
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(inputValue) { result ->
-			result.isNotNull {
+			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
 				MyTokenTable.getTokensWith(WalletTable.current.address) { localTokens ->
 					result.map { serverToken ->
