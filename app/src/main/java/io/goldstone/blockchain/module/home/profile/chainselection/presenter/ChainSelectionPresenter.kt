@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.chainselection.presenter
 
 import android.graphics.Color
-import android.widget.GridLayout
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.profile.chainselection.model.ChainSelectionModel

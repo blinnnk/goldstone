@@ -37,7 +37,10 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 
-			lparams(matchParent, matchParent)
+			lparams(
+				matchParent,
+				matchParent
+			)
 
 			gradientView.into(this)
 
@@ -85,7 +88,10 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					marginTop = PaddingSize.content
 					setWhiteStyle()
 				}.click {
-					NetworkUtil.hasNetworkWithAlert(context, AlertText.importWalletNetwork)
+					NetworkUtil.hasNetworkWithAlert(
+						context,
+						AlertText.importWalletNetwork
+					)
 					presenter.showImportWalletFragment()
 				}.into(this)
 
