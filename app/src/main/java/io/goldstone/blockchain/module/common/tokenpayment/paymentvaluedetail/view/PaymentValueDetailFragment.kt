@@ -145,6 +145,10 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 		} else {
 			alert("Calculating Now Please Wait")
 		}
+		// 恢复点击事件
+		footer?.getConfirmButton {
+			showLoadingStatus(false)
+		}
 	}
 
 	private fun showConfirmAttentionView(callback: () -> Unit) {
