@@ -24,22 +24,31 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	override val presenter = WalletDetailPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletDetailCellModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<WalletDetailCellModel>?
 	) {
-		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
-			onClick {
-				getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
-				preventDuplicateClicks()
+		recyclerView.adapter =
+			WalletDetailAdapter(asyncData.orEmptyArray(),
+				{
+					onClick {
+						getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
+						preventDuplicateClicks()
+					}
+				}) {
+				currentAccount.onClick { presenter.showWalletSettingsFragment() }
+				manageButton.onClick { presenter.showWalletListFragment() }
+				addTokenButton.onClick { presenter.showTokenManagementFragment() }
 			}
-		}) {
-			currentAccount.onClick { presenter.showWalletSettingsFragment() }
-			manageButton.onClick { presenter.showWalletListFragment() }
-			addTokenButton.onClick { presenter.showTokenManagementFragment() }
-		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		wrapper.addView(slideHeader)
 
 		/**
@@ -57,7 +66,10 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	private val headerHeight by lazy { HoneyUIUtils.getHeight(slideHeader) }
 	private var totalRange = 0
 
-	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
+	override fun observingRecyclerViewVerticalOffset(
+		offset: Int,
+		range: Int
+	) {
 		if (offset == 0) totalRange = 0
 		if (totalRange == 0) totalRange = range
 
