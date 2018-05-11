@@ -49,8 +49,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	fun updateChartByMenu(
-		chartView: MarketTokenChart,
-		buttonID: Int
+		chartView: MarketTokenChart, buttonID: Int
 	) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
@@ -129,9 +128,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenChart.updateChartDataBy(
-		pair: String,
-		period: String,
-		dateType: Int
+		pair: String, period: String, dateType: Int
 	) {
 		GoldStoneAPI.getQuotationCurrencyChart(
 			pair,
@@ -152,9 +149,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun checkDatabaseTimeIsValidBy(
-		period: String,
-		databaseTime: Long,
-		callback: Boolean.() -> Unit
+		period: String, databaseTime: Long, callback: Boolean.() -> Unit
 	) {
 		when (period) {
 			MarketTokenDetailChartType.WEEK.info -> {
@@ -180,8 +175,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenChart.updateChartUI(
-		data: ArrayList<ChartModel>,
-		dateType: Int
+		data: ArrayList<ChartModel>, dateType: Int
 	) {
 		fragment.context?.apply {
 			runOnUiThread {
@@ -206,8 +200,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun ArrayList<ChartModel>.updateChartDataInDatabaseBy(
-		period: String,
-		pair: String
+		period: String, pair: String
 	) {
 		map { JSONObject("{\"price\":\"${it.price}\",\"time\":${it.timestamp}}") }.let {
 			when (period) {
@@ -243,10 +236,8 @@ class MarketTokenDetailPresenter(
 	}
 
 	fun setCurrencyInf(
-		currencyInfo: QuotationModel?,
-		tokenInformation: TokenInformation,
-		priceHistroy: PriceHistoryView,
-		tokenInfo: TokenInfoView
+		currencyInfo: QuotationModel?, tokenInformation: TokenInformation,
+		priceHistroy: PriceHistoryView, tokenInfo: TokenInfoView
 	) {
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
@@ -269,8 +260,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun loadDescriptionFromLocalOrServer(
-		info: QuotationModel,
-		tokenInfo: TokenInfoView
+		info: QuotationModel, tokenInfo: TokenInfoView
 	) {
 		QuotationSelectionTable.getSelectionByPair(info.pair) {
 			it?.apply {
@@ -338,5 +328,9 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
+
+		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
+			presenter.resetSocket()
+		}
 	}
 }

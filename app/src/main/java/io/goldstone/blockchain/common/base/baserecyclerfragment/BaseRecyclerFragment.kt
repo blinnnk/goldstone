@@ -33,8 +33,7 @@ import org.jetbrains.anko.support.v4.UI
  * @author KaySaith
  */
 
-abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> :
-	Fragment() {
+abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> : Fragment() {
 
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
@@ -88,15 +87,13 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	open fun observingRecyclerViewScrolled(
-		dx: Int,
-		dy: Int
+		dx: Int, dy: Int
 	) {
 		// Do Something
 	}
 
 	open fun observingRecyclerViewVerticalOffset(
-		offset: Int,
-		range: Int
+		offset: Int, range: Int
 	) {
 		// Do Something
 	}
@@ -137,16 +134,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * [asyncData] 这个数据是在 `Presenter` 里面实现好后返回到这里的实体.
 	 */
 	abstract fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<D>?
+		recyclerView: BaseRecyclerView, asyncData: ArrayList<D>?
 	)
 
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
 	open fun setRecyclerViewParams(
-		width: Int,
-		height: Int
+		width: Int, height: Int
 	): RelativeLayout.LayoutParams =
 		RelativeLayout.LayoutParams(
 			width,
@@ -163,15 +158,18 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		presenter.onFragmentDetach()
 	}
 
+	override fun onDestroyView() {
+		super.onDestroyView()
+		presenter.onFragmentDestroy()
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		presenter.onFragmentCreate()
 	}
 
 	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedInstanceState: Bundle?
+		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
 	): View? {
 		presenter.onFragmentCreateView()
 		return UI {
@@ -182,11 +180,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				ScreenSize.Height - ScreenSize.statusBarHeight
 			}
 			wrapper = relativeLayout {
-				layoutParams =
-					setRecyclerViewParams(
-						matchParent,
-						wrapperHeight
-					)
+				layoutParams = setRecyclerViewParams(
+					matchParent,
+					wrapperHeight
+				)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
 				addView(
@@ -201,8 +198,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
+		view: View, savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(
 			view,
@@ -214,8 +210,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
 			override fun onScrollStateChanged(
-				recyclerView: RecyclerView?,
-				newState: Int
+				recyclerView: RecyclerView?, newState: Int
 			) {
 				/** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
 				super.onScrollStateChanged(
@@ -226,9 +221,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			}
 
 			override fun onScrolled(
-				recyclerView: RecyclerView?,
-				dx: Int,
-				dy: Int
+				recyclerView: RecyclerView?, dx: Int, dy: Int
 			) {
 				super.onScrolled(
 					recyclerView,
