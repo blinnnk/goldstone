@@ -7,6 +7,7 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInfomationModel
 import org.jetbrains.anko.matchParent
@@ -35,7 +36,7 @@ class TokenInfomation(context: Context) : MarketTokenDetailBaseCell(context) {
 	private val marketCap = MarketTokenDetailBaseInfoCell(context)
 
 	init {
-		title.text = "Token Infomation"
+		title.text = QuotationText.tokenInfoMation
 		layoutParams = RelativeLayout.LayoutParams(
 			matchParent,
 			210.uiPX()
