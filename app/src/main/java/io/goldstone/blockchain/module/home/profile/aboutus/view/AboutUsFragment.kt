@@ -48,7 +48,6 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 	}
 
 	override val presenter = AboutUsPresenter(this)
-	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			relativeLayout {
@@ -154,7 +153,6 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 						width = matchParent
 						height = 65.uiPX()
 					}
-
 
 				}.lparams {
 					width = matchParent

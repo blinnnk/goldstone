@@ -21,7 +21,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
@@ -53,7 +52,10 @@ class CreateWalletPresenter(
 		)
 	}
 
-	fun generateWalletWith(isAgree: Boolean, hintInput: EditText) {
+	fun generateWalletWith(
+		isAgree: Boolean,
+		hintInput: EditText
+	) {
 		checkInputValue(
 			nameText, passwordText, repeatPasswordText, isAgree, fragment.context
 		) { password, walletName ->
@@ -89,7 +91,11 @@ class CreateWalletPresenter(
 		}
 	}
 
-	private fun Context.generateWalletWith(password: String, name: String, hint: String? = null) {
+	private fun Context.generateWalletWith(
+		password: String,
+		name: String,
+		hint: String? = null
+	) {
 		generateWallet(password) { mnemonicCode, address ->
 			// 将基础的不存在安全问题的信息插入数据库
 			WalletTable.insert(WalletTable(0, name, address, true, hint)) {
@@ -117,7 +123,9 @@ class CreateWalletPresenter(
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
 		fun generateMyTokenInfo(
-			ownerAddress: String, isNewAccount: Boolean = false, callback: () -> Unit = {}
+			ownerAddress: String,
+			isNewAccount: Boolean = false,
+			callback: () -> Unit = {}
 		) {
 			// 首先从本地查找数据
 			DefaultTokenTable.getTokens { localTokens ->
@@ -129,24 +137,6 @@ class CreateWalletPresenter(
 				} otherwise {
 					localTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
 				}
-			}
-		}
-
-		fun updateMyTokensValue(
-			walletAddress: String = WalletTable.current.address, callback: () -> Unit = {}
-		) {
-			MyTokenTable.forEachMyTokens(walletAddress) { token, contract, isEnd ->
-				// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-				if (token.symbol == CryptoSymbol.eth) {
-					GoldStoneEthCall.getEthBalance(walletAddress) {
-						GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
-					}
-				} else {
-					GoldStoneEthCall.getTokenBalanceWithContract(contract, walletAddress) {
-						GoldStoneDataBase.database.myTokenDao().update(token.apply { balance = it })
-					}
-				}
-				if (isEnd) callback()
 			}
 		}
 
@@ -186,7 +176,9 @@ class CreateWalletPresenter(
 		}
 
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
-			ownerAddress: String, isNewAccount: Boolean, callback: () -> Unit
+			ownerAddress: String,
+			isNewAccount: Boolean,
+			callback: () -> Unit
 		) {
 			filter {
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
@@ -204,23 +196,27 @@ class CreateWalletPresenter(
 		}
 
 		private fun List<DefaultTokenTable>.insertNewAccount(
-			address: String, callback: () -> Unit
+			address: String,
+			callback: () -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach {
-						MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0))
+						MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0, it.contract))
 						completeMark()
 					}
 				}
 
-				override fun mergeCallBack() = callback()
+				override fun mergeCallBack() =
+					callback()
 			}.start()
 		}
 
 		private fun checkAddressBalanceThenInsert(
-			address: String, data: List<DefaultTokenTable>, callback: () -> Unit
+			address: String,
+			data: List<DefaultTokenTable>,
+			callback: () -> Unit
 		) {
 			// 不是新建账号就检查余额
 			object : ConcurrentAsyncCombine() {
@@ -230,12 +226,16 @@ class CreateWalletPresenter(
 						// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 						if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
 							GoldStoneEthCall.getEthBalance(address) {
-								MyTokenTable.insert(MyTokenTable(0, address, tokenInfo.symbol, it))
+								MyTokenTable.insert(
+									MyTokenTable(0, address, tokenInfo.symbol, it, tokenInfo.contract)
+								)
 								completeMark()
 							}
 						} else {
 							GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, address) {
-								MyTokenTable.insert(MyTokenTable(0, address, tokenInfo.symbol, it))
+								MyTokenTable.insert(
+									MyTokenTable(0, address, tokenInfo.symbol, it, tokenInfo.contract)
+								)
 								completeMark()
 							}
 						}

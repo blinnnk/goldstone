@@ -122,7 +122,9 @@ class TransactionDetailPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?, cellHeight: Int, maxHeight: Int
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
 	) {
 		setHeightMatchParent()
 	}
@@ -131,7 +133,7 @@ class TransactionDetailPresenter(
 		super.onFragmentShowFromHidden()
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment        -> {
+				is TransactionFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TransactionText.detail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -147,7 +149,7 @@ class TransactionDetailPresenter(
 					}
 				}
 
-				is NotificationFragment       -> {
+				is NotificationFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -166,7 +168,7 @@ class TransactionDetailPresenter(
 		}
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment        -> {
+				is TransactionFragment -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TransactionText.detail, argument
 					)
@@ -178,7 +180,7 @@ class TransactionDetailPresenter(
 					)
 				}
 
-				is NotificationFragment       -> {
+				is NotificationFragment -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
 					)
@@ -209,44 +211,28 @@ class TransactionDetailPresenter(
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
 				arrayListOf(
-					receipt.minerFee,
-					receipt.memo,
-					receipt.transactionHash,
-					receipt.blockNumber,
-					receipt.date,
-					receipt.url
+					receipt.minerFee, receipt.memo, receipt.transactionHash, receipt.blockNumber,
+					receipt.date, receipt.url
 				)
 			}
 
-			is TransactionReceipt   -> {
+			is TransactionReceipt -> {
 				arrayListOf(
-					minerFee,
-					"There isn't a memo",
-					currentHash,
-					receipt.blockNumber.toBigDecimal(),
-					date,
+					minerFee, "There isn't a memo", currentHash, receipt.blockNumber.toBigDecimal(), date,
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
 
-			else                    -> {
+			else -> {
 				arrayListOf(
-					minerFee,
-					"There isn't a memo",
-					currentHash,
-					"waiting",
-					date,
+					minerFee, "There isn't a memo", currentHash, "waiting", date,
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
 		}
 		arrayListOf(
-			TransactionText.minerFee,
-			TransactionText.memo,
-			TransactionText.transactionHash,
-			TransactionText.blockNumber,
-			TransactionText.transactionDate,
-			TransactionText.url
+			TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
+			TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let {
@@ -256,7 +242,11 @@ class TransactionDetailPresenter(
 
 	// 更新头部数字的工具
 	private fun updateHeaderValue(
-		count: Double, address: String, symbol: String, isPending: Boolean, isReceive: Boolean = false
+		count: Double,
+		address: String,
+		symbol: String,
+		isPending: Boolean,
+		isReceive: Boolean = false
 	) {
 		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
 			it?.setIconStyle(count, address, symbol, isReceive, isPending)
@@ -292,7 +282,7 @@ class TransactionDetailPresenter(
 			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)
 					.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-						presenter.updateMyTokensPrice()
+						presenter.updateData()
 					}
 			}
 		}
@@ -333,7 +323,8 @@ class TransactionDetailPresenter(
 
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
 	private fun TransactionDetailFragment.getTransactionFromChain(
-		taxHash: String, callback: () -> Unit = {}
+		taxHash: String,
+		callback: () -> Unit = {}
 	) {
 		web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
 			context?.runOnUiThread {
@@ -349,7 +340,8 @@ class TransactionDetailPresenter(
 	}
 
 	private fun TransactionDetailFragment.updateTransactionByNotificationHash(
-		info: NotificationTransactionInfo, callback: () -> Unit
+		info: NotificationTransactionInfo,
+		callback: () -> Unit
 	) {
 		web3j.ethGetTransactionByHash(info.hash).sendAsync().get().transaction?.let { receipt ->
 			context?.runOnUiThread {
@@ -372,7 +364,9 @@ class TransactionDetailPresenter(
 
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
-		receipt: Transaction, transaction: InputCodeData, isReceive: Boolean
+		receipt: Transaction,
+		transaction: InputCodeData,
+		isReceive: Boolean
 	) {
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
 			val address = if (isReceive) receipt.from else transaction.address
@@ -392,20 +386,12 @@ class TransactionDetailPresenter(
 	private fun Transaction.toAsyncData(): ArrayList<TransactionDetailModel> {
 		web3j.ethGetBlockByHash(blockHash, true).sendAsync().get().result.let { block ->
 			val receiptData = arrayListOf(
-				(gas * gasPrice).toDouble().toEthValue(),
-				"There isn't a memo",
-				hash,
-				blockNumber,
-				formatDate(block.timestamp.toLong()),
-				EtherScanApi.transactionsByHash(hash)
+				(gas * gasPrice).toDouble().toEthValue(), "There isn't a memo", hash, blockNumber,
+				formatDate(block.timestamp.toLong()), EtherScanApi.transactionsByHash(hash)
 			)
 			arrayListOf(
-				TransactionText.minerFee,
-				TransactionText.memo,
-				TransactionText.transactionHash,
-				TransactionText.blockNumber,
-				TransactionText.transactionDate,
-				TransactionText.url
+				TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
+				TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
 			).mapIndexed { index, it ->
 				TransactionDetailModel(receiptData[index].toString(), it)
 			}.let {
