@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
 
@@ -37,10 +38,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 
-			lparams(
-				matchParent,
-				matchParent
-			)
+			lparams(matchParent, matchParent)
 
 			gradientView.into(this)
 
@@ -74,32 +72,34 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				topMargin = (ScreenSize.Height * 0.22).toInt() + logoSize + 30.uiPX()
 			}
 
-			// Buttons
-			verticalLayout {
+			WalletTable.getAll {
+				// 本地没有钱包的情况下显示登录和导入按钮
+				if (isEmpty()) {
+					verticalLayout {
+						createButton.apply {
+							text = CreateWalletText.create.toUpperCase()
+							marginTop = 0
+							setWhiteStyle()
+						}.click {
+							presenter.showCreateWalletFragment()
+						}.into(this)
 
-				createButton.apply {
-					text = CreateWalletText.create.toUpperCase()
-					marginTop = 0
-					setWhiteStyle()
-				}.click {
-					presenter.showCreateWalletFragment()
-				}.into(this)
+						importButton.apply {
+							text = ImportWalletText.importWallet.toUpperCase()
+							marginTop = PaddingSize.content
+							setWhiteStyle()
+						}.click {
+							NetworkUtil.hasNetworkWithAlert(
+								context, AlertText.importWalletNetwork
+							)
+							presenter.showImportWalletFragment()
+						}.into(this)
 
-				importButton.apply {
-					text = ImportWalletText.importWallet.toUpperCase()
-					marginTop = PaddingSize.content
-					setWhiteStyle()
-				}.click {
-					NetworkUtil.hasNetworkWithAlert(
-						context,
-						AlertText.importWalletNetwork
-					)
-					presenter.showImportWalletFragment()
-				}.into(this)
-
-			}.lparams {
-				height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
-				alignParentBottom()
+					}.lparams {
+						height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
+						alignParentBottom()
+					}
+				}
 			}
 		}
 	}
