@@ -20,6 +20,7 @@ import java.util.*
 class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
+	private var headerView: WalletDetailHeaderView? = null
 
 	override val presenter = WalletDetailPresenter(this)
 
@@ -27,18 +28,25 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<WalletDetailCellModel>?
 	) {
-		recyclerView.adapter =
-			WalletDetailAdapter(asyncData.orEmptyArray(),
-				{
-					onClick {
-						getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
-						preventDuplicateClicks()
-					}
-				}) {
-				currentAccount.onClick { presenter.showWalletSettingsFragment() }
-				manageButton.onClick { presenter.showWalletListFragment() }
-				addTokenButton.onClick { presenter.showTokenManagementFragment() }
+		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
+			onClick {
+				getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
+				preventDuplicateClicks()
 			}
+		}) {
+			headerView = this
+			currentAccount.onClick { presenter.showWalletSettingsFragment() }
+			manageButton.onClick { presenter.showWalletListFragment() }
+			addTokenButton.onClick { presenter.showTokenManagementFragment() }
+		}
+	}
+
+	fun showLoadingView() {
+		headerView?.showLoadingView(true)
+	}
+
+	fun removeLoadingView() {
+		headerView?.showLoadingView(false)
 	}
 
 	override fun onViewCreated(
@@ -46,8 +54,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(
-			view,
-			savedInstanceState
+			view, savedInstanceState
 		)
 		wrapper.addView(slideHeader)
 
