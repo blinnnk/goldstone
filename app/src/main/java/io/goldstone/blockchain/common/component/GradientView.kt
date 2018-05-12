@@ -20,7 +20,8 @@ enum class GradientType {
 	BlueGreen,
 	DarkGreen,
 	DarkGreenYellow,
-	BlueGreenHorizontal
+	BlueGreenHorizontal,
+	BlueGray
 }
 
 class GradientView(context: Context) : View(context) {
@@ -52,6 +53,10 @@ class GradientView(context: Context) : View(context) {
 				Color.parseColor("#FF00FF80"),
 				Color.parseColor("#FF0076FF")
 			)
+			GradientType.BlueGray    -> setGradientColor(
+					Color.parseColor("#FF1E3950"),
+					Color.parseColor("#FF24353E")
+				)
 			GradientType.BlueGreen       -> LinearGradient(
 				0f,
 				0f,

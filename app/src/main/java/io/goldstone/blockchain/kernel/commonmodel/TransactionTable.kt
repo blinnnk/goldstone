@@ -8,7 +8,6 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -29,7 +28,8 @@ data class TransactionTable(
 	var nonce: String,
 	@SerializedName("blockHash")
 	var blockHash: String,
-	@Ignore @SerializedName("transactionIndex")
+	@Ignore
+	@SerializedName("transactionIndex")
 	private var transactionIndex: String,
 	@SerializedName("from")
 	var fromAddress: String,
@@ -45,17 +45,19 @@ data class TransactionTable(
 	var hasError: String,
 	@SerializedName("txreceipt_status")
 	var txreceipt_status: String,
-	@Ignore @SerializedName("input")
+	@Ignore
+	@SerializedName("input")
 	var input: String,
 	@SerializedName("contractAddress")
 	var contractAddress: String,
-	@Ignore @SerializedName("cumulativeGasUsed")
+	@Ignore
+	@SerializedName("cumulativeGasUsed")
 	private var cumulativeGasUsed: String,
 	@SerializedName("gasUsed")
 	var gasUsed: String,
-	@Ignore @SerializedName("confirmations")
-	private var confirmations: String,
-	var isReceive: Boolean,
+	@Ignore
+	@SerializedName("confirmations")
+	private var confirmations: String, var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -65,29 +67,7 @@ data class TransactionTable(
 ) {
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0,
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		false,
-		false,
-		"",
-		""
+		0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, "", ""
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -150,19 +130,6 @@ data class TransactionTable(
 			}
 		}
 
-		fun getTransactionListModelsByAddressAndModel(
-			address: String,
-			symbol: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
-		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao()
-					.getTransactionsByAddressAndSymbol(address, symbol)
-			}) {
-				hold(it.map { TransactionListModel(it) }.toArrayList())
-			}
-		}
-
 		fun getTransactionsByAddressAndSymbol(
 			address: String,
 			symbol: String,
@@ -184,11 +151,17 @@ data class TransactionTable(
 				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
 			}) {
 				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
-				hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
+				hold(
+					(it.maxBy { it.blockNumber }?.blockNumber
+						?: "0") + 1
+				)
 			}
 		}
 
-		fun deleteByAddress(address: String, callback: () -> Unit) {
+		fun deleteByAddress(
+			address: String,
+			callback: () -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.transactionDao().apply {
 					getTransactionsByAddress(address).forEach { delete(it) }
@@ -224,7 +197,9 @@ data class TransactionTable(
 
 @Dao
 interface TransactionDao {
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
+	)
 	fun getTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
@@ -236,9 +211,12 @@ interface TransactionDao {
 		isReceive: Boolean
 	): TransactionTable?
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC")
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
+	)
 	fun getTransactionsByAddressAndSymbol(
-		walletAddress: String, targetSymbol: String
+		walletAddress: String,
+		targetSymbol: String
 	): List<TransactionTable>
 
 	@Insert

@@ -16,9 +16,9 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notification.vie
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -42,6 +42,7 @@ class WalletDetailPresenter(
 	}
 
 	override fun updateData() {
+		fragment.showLoadingView()
 		// 查询钱包总数更新数字
 		WalletTable.apply { getAll { walletCount = size } }
 		// 先初始化空数组再更新列表
@@ -57,6 +58,7 @@ class WalletDetailPresenter(
 				// 再检查链上的最新价格和数量
 				getChainModels {
 					updateUIByData(it)
+					fragment.removeLoadingView()
 				}
 			}
 		}
