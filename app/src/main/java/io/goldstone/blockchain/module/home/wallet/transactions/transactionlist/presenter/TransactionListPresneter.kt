@@ -47,7 +47,9 @@ class TransactionListPresenter(
 					getMainActivity()?.updateTransactionInAsync(localTransactions!!)
 				}
 			} otherwise {
-				TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) { localData ->
+				TransactionTable.getTransactionListModelsByAddress(
+					WalletTable.current.address
+				) { localData ->
 					localData.isNotEmpty() isTrue {
 						asyncData = localData
 						localTransactions = localData
@@ -79,7 +81,7 @@ class TransactionListPresenter(
 	private fun MainActivity.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber = localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
-		val lastBlockNumber = if(currentBlockNumber.isNull()) "0" else currentBlockNumber + 1
+		val lastBlockNumber = if (currentBlockNumber.isNull()) "0" else currentBlockNumber + 1
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
 			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
@@ -110,7 +112,8 @@ class TransactionListPresenter(
 
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun MainActivity.getTransactionDataFromEtherScan(
-			startBlock: String, hold: (ArrayList<TransactionListModel>) -> Unit
+			startBlock: String,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// Show loading view
 			showLoadingView()
@@ -130,13 +133,16 @@ class TransactionListPresenter(
 		}
 
 		fun updateTransactions(
-			activity: MainActivity?, startBlock: String, hold: (ArrayList<TransactionListModel>) -> Unit
+			activity: MainActivity?,
+			startBlock: String,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			activity?.getTransactionDataFromEtherScan(startBlock, hold)
 		}
 
 		private fun mergeNormalAndTokenIncomingTransactions(
-			startBlock: String, hold: (ArrayList<TransactionTable>) -> Unit
+			startBlock: String,
+			hold: (ArrayList<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
 			return object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = 2
@@ -175,7 +181,8 @@ class TransactionListPresenter(
 		}
 
 		private fun MainActivity.filterCompletedData(
-			data: ArrayList<TransactionTable>, hold: (ArrayList<TransactionListModel>) -> Unit
+			data: ArrayList<TransactionTable>,
+			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// 把拉取到的数据加工数据格式并插入本地数据库
 			completeTransactionInfo(data) {
@@ -201,18 +208,21 @@ class TransactionListPresenter(
 		 * 在汇总到主线程.
 		 */
 		private fun completeTransactionInfo(
-			data: ArrayList<TransactionTable>, hold: ArrayList<TransactionTable>.() -> Unit
+			data: ArrayList<TransactionTable>,
+			hold: ArrayList<TransactionTable>.() -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = data.size
 				override fun concurrentJobs() {
 					data.forEach { transaction ->
 						CryptoUtils.isERC20Transfer(transaction) {
-							val contract = if (transaction.logIndex.isNotEmpty()) transaction.contractAddress else transaction.to
+							val contract = if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
+							else transaction.to
 							var receiveAddress = ""
 							var count = 0.0
-							// 首先从本地数据库检索 `contract` 对应的 `symbol`
+							/** 首先从本地数据库检索 `contract` 对应的 `symbol` */
 							DefaultTokenTable.getTokenByContractAddress(contract) { tokenInfo ->
+
 								transaction.logIndex.isNotEmpty() isTrue {
 									count = CryptoUtils.toCountByDecimal(
 										transaction.value.toDouble(), tokenInfo?.decimals.orElse(0.0)
@@ -229,9 +239,11 @@ class TransactionListPresenter(
 
 								tokenInfo.isNull() isTrue {
 									// 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
-									GoldStoneEthCall.getTokenSymbol(contract) { tokenSymbol ->
+									GoldStoneEthCall.getTokenSymbolAndDecimalByContract(contract) { symbol, decimal ->
 										TransactionTable.updateModelInfoFromChain(
-											transaction, true, tokenSymbol, count.toString(), receiveAddress
+											transaction, true, symbol, CryptoUtils.toCountByDecimal(
+												transaction.value.toDouble(), decimal
+											).toString(), receiveAddress
 										)
 										completeMark()
 									}
@@ -242,11 +254,10 @@ class TransactionListPresenter(
 									completeMark()
 								}
 							}
-						}.isFalse {
+						} isFalse {
+							/** 不是 ERC20 币种直接默认为 `ETH` */
 							TransactionTable.updateModelInfoFromChain(
-								transaction,
-								false,
-								CryptoSymbol.eth,
+								transaction, false, CryptoSymbol.eth,
 								CryptoUtils.toCountByDecimal(transaction.value.toDouble()).toString(),
 								transaction.to
 							)
