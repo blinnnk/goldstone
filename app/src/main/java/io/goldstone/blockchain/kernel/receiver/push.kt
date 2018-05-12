@@ -85,10 +85,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		notifiShowedRlt: XGPushShowedResult?
 	) {
 		if (context == null || notifiShowedRlt == null) return
-		showNotificationOnLockScreen(
-			context,
-			notifiShowedRlt.toString()
-		)
+		// Normal Notification
 	}
 
 	override fun onUnregisterResult(

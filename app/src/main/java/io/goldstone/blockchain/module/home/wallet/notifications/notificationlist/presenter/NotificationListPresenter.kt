@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 
 import android.os.Bundle
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -49,7 +50,6 @@ class NotificationListPresenter(
 			} otherwise {
 				fragment.getMainActivity()?.removeLoadingView()
 			}
-			updateParentContentLayoutHeight(localData.size)
 		}
 	}
 
