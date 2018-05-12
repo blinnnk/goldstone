@@ -43,14 +43,14 @@ class WalletImportPresenter(
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address) {
 							fragment.activity?.jump<SplashActivity>()
+							callback()
 						}
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerWalletAddressForPush()
-						callback()
 					}
 				} otherwise {
-					callback()
 					fragment.context?.alert(ImportWalletText.existAddress)
+					callback()
 				}
 			}
 		}

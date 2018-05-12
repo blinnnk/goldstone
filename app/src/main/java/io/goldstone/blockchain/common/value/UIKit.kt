@@ -50,6 +50,8 @@ object Spectrum {
 	@JvmField
 	val lightGreen = Color.parseColor("#801CC881")
 	@JvmField
+	val softGreen = Color.parseColor("#80D4FFCF")
+	@JvmField
 	val darkBlue = Color.parseColor("#FF0863B8")
 	@JvmField
 	val opacityDarkBlue = Color.parseColor("#800863B8")

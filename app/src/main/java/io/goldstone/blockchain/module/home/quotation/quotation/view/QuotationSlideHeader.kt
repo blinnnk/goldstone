@@ -34,7 +34,7 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 			title = QuotationText.addToken
 			src = R.drawable.add_token_icon
 			x += PaddingSize.device
-			y += 15.uiPX()
+			y = 15.uiPX().toFloat()
 		}.into(this)
 
 		addTokenButton.apply {
@@ -45,7 +45,7 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 			title = QuotationText.alarm
 			src = R.drawable.alarm_icon
 			x -= PaddingSize.device
-			y += 15.uiPX()
+			y = 15.uiPX().toFloat()
 		}.into(this)
 
 		setAlertButton.apply {

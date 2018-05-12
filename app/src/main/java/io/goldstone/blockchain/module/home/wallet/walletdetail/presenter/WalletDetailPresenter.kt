@@ -3,21 +3,17 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
@@ -42,57 +38,42 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
 	override fun onFragmentShowFromHidden() {
-		updateMyTokensPrice()
+		updateData()
 	}
 
 	override fun updateData() {
-		updateAllTokensInWallet()
-	}
-
-	fun updateMyTokensPrice() {
-		walletDetailMemoryData?.let { asyncData ->
-			asyncData.map { it.contract }
-				.toJsonArray {
-					GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
-						newPrices.forEachOrEnd { item, isEnd ->
-							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(
-								item.contract,
-								item.price
-							) {
-								if (isEnd) updateAllTokensInWallet()
-							}
-						}
-					}
-				}
-		}
-	}
-
-	private fun updateAllTokensInWallet() {
-
 		// 查询钱包总数更新数字
 		WalletTable.apply { getAll { walletCount = size } }
-
 		// 先初始化空数组再更新列表
 		if (fragment.asyncData.isNull()) {
 			fragment.asyncData = arrayListOf()
 			fragment.updateHeaderValue()
 		}
 		// Check the info of wallet currency list
-		WalletDetailCellModel.getModels { it ->
-			coroutinesTask({
-				/** 先按照资产情况排序, 资产为零的按照权重排序 */
-				val currencyList = it.filter { it.currency > 0.0 }
-				val weightList = it.filter { it.currency == 0.0 }
-				currencyList.sortedByDescending { it.currency }
-					.plus(weightList.sortedByDescending { it.weight })
-					.toArrayList()
-			}) {
-				walletDetailMemoryData = it
-				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-				fragment.updateHeaderValue()
-				fragment.setEmptyViewBy(it)
+		WalletDetailCellModel.apply {
+			// 显示本地的 `Token` 据
+			getLocalModels { it ->
+				updateUIByData(it)
+				// 再检查链上的最新价格和数量
+				getChainModels {
+					updateUIByData(it)
+				}
 			}
+		}
+	}
+
+	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
+		coroutinesTask({
+			/** 先按照资产情况排序, 资产为零的按照权重排序 */
+			val currencyList = data.filter { it.currency > 0.0 }
+			val weightList = data.filter { it.currency == 0.0 }
+			currencyList.sortedByDescending { it.currency }
+				.plus(weightList.sortedByDescending { it.weight }).toArrayList()
+		}) {
+			walletDetailMemoryData = it
+			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+			fragment.updateHeaderValue()
+			fragment.setEmptyViewBy(it)
 		}
 	}
 
@@ -100,23 +81,18 @@ class WalletDetailPresenter(
 	 * 每次后台到前台更新首页的 `token` 信息
 	 */
 	override fun onFragmentResume() {
-		CreateWalletPresenter.updateMyTokensValue {
-			if (fragment.asyncData.isNull()) {
-				updateAllTokensInWallet()
-			} else {
-				updateMyTokensPrice()
-			}
-		}
+		updateData()
 		showPinCodeFragment()
 	}
 
 	private fun showPinCodeFragment() {
-		fragment.activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull() isTrue {
+		fragment.activity?.supportFragmentManager?.findFragmentByTag(
+			FragmentTag.pinCode
+		).isNull() isTrue {
 			AppConfigTable.getAppConfig {
 				it?.showPincode?.isTrue {
 					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main,
-						FragmentTag.pinCode
+						ContainerID.main, FragmentTag.pinCode
 					) {
 						// Send Argument
 					}
@@ -144,8 +120,7 @@ class WalletDetailPresenter(
 	fun showWalletSettingsFragment() {
 		fragment.activity?.addFragmentAndSetArguments<WalletSettingsFragment>(ContainerID.main) {
 			putString(
-				ArgumentKey.walletSettingsTitle,
-				WalletSettingsText.walletSettings
+				ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
 			)
 		}
 	}
@@ -153,8 +128,7 @@ class WalletDetailPresenter(
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main) {
 			putSerializable(
-				ArgumentKey.tokenDetail,
-				model
+				ArgumentKey.tokenDetail, model
 			)
 		}
 	}
@@ -165,10 +139,8 @@ class WalletDetailPresenter(
 		WalletTable.current.balance = totalBalance
 		recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
 			it?.model = WalletDetailHeaderModel(
-				null,
-				CryptoUtils.scaleTo9(WalletTable.current.name),
-				CryptoUtils.scaleAddress(WalletTable.current.address),
-				totalBalance.toString(),
+				null, CryptoUtils.scaleTo9(WalletTable.current.name),
+				CryptoUtils.scaleAddress(WalletTable.current.address), totalBalance.toString(),
 				WalletTable.walletCount.orZero()
 			)
 		}
