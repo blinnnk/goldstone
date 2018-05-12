@@ -10,6 +10,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.QuotationText
@@ -35,7 +36,7 @@ data class CurrentPriceModel(
 class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
 
 	var model: CurrentPriceModel by observing(CurrentPriceModel()) {
-		val value = " ${model.baseCurrency}" + " ≈ 99.701 RMB"
+		val value = " ${model.baseCurrency}" + " ≈ 99.701 ${GoldStoneApp.currencyCode}"
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice}" + value, GrayScale.black, 12.uiPX(), true, false
 		)

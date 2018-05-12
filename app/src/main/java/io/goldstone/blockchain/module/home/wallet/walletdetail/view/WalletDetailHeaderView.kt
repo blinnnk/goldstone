@@ -139,6 +139,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		} else {
 			if (!progressBar.isNull()) {
 				removeView(progressBar)
+				progressBar = null
 			}
 		}
 	}
