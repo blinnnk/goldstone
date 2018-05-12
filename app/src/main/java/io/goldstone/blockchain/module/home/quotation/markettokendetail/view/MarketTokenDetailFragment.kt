@@ -63,13 +63,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
-				lparams {
-					width = ScreenSize.widthWithPadding
-					height = matchParent
-					leftMargin = PaddingSize.device
-				}
 				menu.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 15.uiPX()
+					}
 				}.into(this)
 				menu.titles = arrayListOf(
 					MarketTokenDetailChartType.Hour.info,
@@ -111,6 +108,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					priceHistroy,
 					tokenInfo
 				)
+			}.lparams {
+				width = ScreenSize.widthWithPadding
+				height = matchParent
+				leftMargin = PaddingSize.device
 			}
 		}
 	}

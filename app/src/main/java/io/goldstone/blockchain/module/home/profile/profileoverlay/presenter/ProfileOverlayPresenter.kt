@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.aboutus.view.AboutUsFragment
 import io.goldstone.blockchain.module.home.profile.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -53,6 +54,7 @@ class ProfileOverlayPresenter(
 		}
 	}
 
+
 	private fun showChainSelectionFragment() {
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content) {
 			// Send Arguments
@@ -84,8 +86,8 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showAboutUsFragment() {
-		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, "https://www.ethereum.org/")
+		fragment.addFragmentAndSetArgument<AboutUsFragment>(ContainerID.content) {
+			//
 		}
 	}
 

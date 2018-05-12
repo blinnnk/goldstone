@@ -31,9 +31,13 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, contactCount.size.toString()),
 				ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
 				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
-				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.chain_icon, ProfileText.chain, "Ropstan"),
-				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, "")
+				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
+				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
+				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
+				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
+				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
+				ProfileModel(R.drawable.version_icon, ProfileText.version, "BETA 1.0.0")
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else {
@@ -42,7 +46,7 @@ class ProfilePresenter(
 		}
 	}
 
-	fun showContactsFragment(title: String) {
+	fun showTargetFragment(title: String) {
 		fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
 			putString(ArgumentKey.profileTitle, title)
 		}

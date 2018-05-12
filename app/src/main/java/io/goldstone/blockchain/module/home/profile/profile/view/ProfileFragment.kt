@@ -29,7 +29,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			// 分配点击事件
 			item.apply {
 				// 调整布局
-				if (position == 4) {
+				if (position == 5) {
 					item.layoutParams.height = 90.uiPX()
 					isCenterInVertical = false
 				} else {
@@ -37,7 +37,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 					isCenterInVertical = true
 				}
 				onClick {
-					presenter.showContactsFragment(model.title)
+					presenter.showTargetFragment(model.title)
 					preventDuplicateClicks()
 				}
 			}
@@ -45,7 +45,10 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		wrapper.addView(slideHeader)
 	}
 

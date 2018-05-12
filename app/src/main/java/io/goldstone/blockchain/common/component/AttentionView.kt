@@ -21,24 +21,28 @@ import org.jetbrains.anko.rightPadding
 
 class AttentionView(context: Context) : TextView(context) {
 
-  init {
+	init {
+		typeface = GoldStoneFont.light(context)
+		gravity = Gravity.CENTER_VERTICAL
 
-    setWillNotDraw(false)
+		layoutParams =
+			LinearLayout.LayoutParams(
+				ScreenSize.Width - PaddingSize.device * 2,
+				80.uiPX()
+			).apply {
+				leftPadding = 20.uiPX()
+				rightPadding = 20.uiPX()
+				leftMargin = PaddingSize.device
+			}
 
-    typeface = GoldStoneFont.light(context)
-    gravity = Gravity.CENTER_VERTICAL
+		setBackgroundColor(Spectrum.darkBlue)
+	}
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 80.uiPX()).apply {
-      leftPadding = 20.uiPX()
-      rightPadding = 20.uiPX()
-      leftMargin = PaddingSize.device
-    }
-
-    setBackgroundColor(Spectrum.darkBlue)
-  }
-
-  override fun setBackgroundColor(color: Int) {
-    addCorner(CornerSize.default.toInt(), color)
-  }
+	override fun setBackgroundColor(color: Int) {
+		addCorner(
+			CornerSize.default.toInt(),
+			color
+		)
+	}
 
 }

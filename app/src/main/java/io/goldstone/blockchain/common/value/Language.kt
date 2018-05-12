@@ -920,6 +920,46 @@ object ProfileText {
 		else -> "About Us"
 	}
 	@JvmField
+	val support = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Support"
+		HoneyLanguage.Chinese.code -> "帮助中心"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "Support"
+	}
+	@JvmField
+	val privacy = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Privacy Policy"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	@JvmField
+	val terms = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Terms & Conditions"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	@JvmField
+	val version = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Version"
+		HoneyLanguage.Chinese.code -> "软件版本"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	@JvmField
 	val pinCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pin Code"
 		HoneyLanguage.Chinese.code -> "Pin 密码"
