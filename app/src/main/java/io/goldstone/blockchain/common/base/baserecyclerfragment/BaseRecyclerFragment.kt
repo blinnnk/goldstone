@@ -8,13 +8,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -33,10 +37,12 @@ import org.jetbrains.anko.support.v4.UI
  * @author KaySaith
  */
 
-abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> : Fragment() {
+abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> :
+	Fragment() {
 
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
+	private var loadingView: RecyclerLoadingView? = null
 
 	/**
 	 * @description
@@ -47,8 +53,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		recyclerView.adapter.apply {
 			isNull() isTrue {
 				setRecyclerViewAdapter(
-					recyclerView,
-					asyncData
+					recyclerView, asyncData
 				)
 			} otherwise {
 				notifyDataSetChanged()
@@ -87,13 +92,15 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	open fun observingRecyclerViewScrolled(
-		dx: Int, dy: Int
+		dx: Int,
+		dy: Int
 	) {
 		// Do Something
 	}
 
 	open fun observingRecyclerViewVerticalOffset(
-		offset: Int, range: Int
+		offset: Int,
+		range: Int
 	) {
 		// Do Something
 	}
@@ -116,8 +123,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				presenter.updateParentContentLayoutHeight()
 			} otherwise {
 				presenter.updateParentContentLayoutHeight(
-					asyncData?.size.orZero(),
-					it.orZero()
+					asyncData?.size.orZero(), it.orZero()
 				)
 			}
 		}
@@ -134,18 +140,19 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * [asyncData] 这个数据是在 `Presenter` 里面实现好后返回到这里的实体.
 	 */
 	abstract fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<D>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<D>?
 	)
 
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
 	open fun setRecyclerViewParams(
-		width: Int, height: Int
+		width: Int,
+		height: Int
 	): RelativeLayout.LayoutParams =
 		RelativeLayout.LayoutParams(
-			width,
-			height
+			width, height
 		)
 
 	override fun onAttach(context: Context?) {
@@ -169,7 +176,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
 	): View? {
 		presenter.onFragmentCreateView()
 		return UI {
@@ -181,16 +190,13 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			}
 			wrapper = relativeLayout {
 				layoutParams = setRecyclerViewParams(
-					matchParent,
-					wrapperHeight
+					matchParent, wrapperHeight
 				)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
 				addView(
-					recyclerView,
-					RelativeLayout.LayoutParams(
-						matchParent,
-						matchParent
+					recyclerView, RelativeLayout.LayoutParams(
+						matchParent, matchParent
 					)
 				)
 			}
@@ -198,11 +204,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	override fun onViewCreated(
-		view: View, savedInstanceState: Bundle?
+		view: View,
+		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(
-			view,
-			savedInstanceState
+			view, savedInstanceState
 		)
 		presenter.onFragmentViewCreated()
 
@@ -210,33 +216,34 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
 			override fun onScrollStateChanged(
-				recyclerView: RecyclerView?, newState: Int
+				recyclerView: RecyclerView?,
+				newState: Int
 			) {
 				/** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
 				super.onScrollStateChanged(
-					recyclerView,
-					newState
+					recyclerView, newState
 				)
 				observingRecyclerViewScrollState(newState)
 			}
 
 			override fun onScrolled(
-				recyclerView: RecyclerView?, dx: Int, dy: Int
+				recyclerView: RecyclerView?,
+				dx: Int,
+				dy: Int
 			) {
 				super.onScrolled(
-					recyclerView,
-					dx,
-					dy
+					recyclerView, dx, dy
 				)
 				observingRecyclerViewScrolled(
-					dx,
-					dy
+					dx, dy
 				)
 				observingRecyclerViewVerticalOffset(
 					recyclerView?.computeVerticalScrollOffset().orZero(),
 					recyclerView?.computeVerticalScrollRange().orZero()
 				)
-				observingRecyclerViewHorizontalOffset(recyclerView?.computeHorizontalScrollOffset().orZero())
+				observingRecyclerViewHorizontalOffset(
+					recyclerView?.computeHorizontalScrollOffset().orZero()
+				)
 			}
 		})
 	}
@@ -263,6 +270,26 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	private var emptyLayout: EmptyView? = null
+
+	/**
+	 * `Inside loadingView` 非阻碍式的 `Loading`
+	 */
+	open fun showLoadingView(content: String) {
+		if(loadingView.isNull()) {
+			loadingView = RecyclerLoadingView(context!!)
+			loadingView?.setTextContent(content)
+			wrapper.addView(loadingView, 0)
+			recyclerView.y = HoneyUIUtils.getHeight(loadingView!!).toFloat()
+		}
+	}
+
+	open fun removeLoadingView() {
+		if (!loadingView.isNull()) {
+			wrapper.removeView(loadingView)
+			loadingView = null
+			recyclerView.updateOriginYAnimation(0f)
+		}
+	}
 
 	open fun showEmptyView() {
 		// 如果已经存在 `emptyLayout` 跳出

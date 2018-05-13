@@ -31,7 +31,6 @@ class QuotationSearchPresenter(
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.setKeyboardConfirmEvent {
 				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					getMainActivity()?.showLoadingView()
 					searchTokenBy(text.toString())
 				}
 			}
@@ -55,6 +54,7 @@ class QuotationSearchPresenter(
 	}
 
 	private fun searchTokenBy(symbol: String) {
+		fragment.showLoadingView("Searching token information now")
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol) { searchList ->
 			// 获取本地自己选中的列表
@@ -77,7 +77,7 @@ class QuotationSearchPresenter(
 
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
-			getMainActivity()?.removeLoadingView()
+			removeLoadingView()
 			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(searchList.map {
 				QuotationSelectionTable(it, "")
 			}.toArrayList())
