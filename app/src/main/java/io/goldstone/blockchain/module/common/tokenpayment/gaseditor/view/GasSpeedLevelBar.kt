@@ -50,7 +50,6 @@ class GasSpeedLevelBar(context: Context) : RelativeLayout(context) {
 		}
 
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())
-		x += PaddingSize.device
 
 		linearLayout {
 			lparams {

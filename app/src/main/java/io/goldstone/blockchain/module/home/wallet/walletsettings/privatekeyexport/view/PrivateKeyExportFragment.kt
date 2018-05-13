@@ -37,13 +37,13 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			privateKeyTextView.apply {
 				addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 				layoutParams = LinearLayout.LayoutParams(
 					ScreenSize.Width - PaddingSize.device * 2, 120.uiPX()
 				).apply {
-					leftMargin = PaddingSize.device
 					topMargin = 20.uiPX()
 					setPadding(20.uiPX(), 16.uiPX(), 20.uiPX(), 10.uiPX())
 				}

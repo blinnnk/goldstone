@@ -25,7 +25,6 @@ class AttentionTextView(context: Context) : TextView(context) {
     textColor = GrayScale.midGray
     typeface = GoldStoneFont.medium(context)
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width -  30.uiPX() * 2, wrapContent).apply {
-      leftMargin = 30.uiPX()
       topMargin = 50.uiPX()
     }
     gravity = Gravity.CENTER

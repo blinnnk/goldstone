@@ -42,10 +42,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
-				lparams(
-					matchParent,
-					matchParent
-				)
+				gravity = Gravity.CENTER_HORIZONTAL
+				lparams(matchParent, matchParent)
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
@@ -89,12 +87,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(
-						mnemonicInput,
-						passwordInput,
-						repeatPassword,
-						hintInput,
-						agreementView.radioButton.isChecked,
-						walletNameInput
+						mnemonicInput, passwordInput, repeatPassword, hintInput,
+						agreementView.radioButton.isChecked, walletNameInput
 					) {
 						it.showLoadingStatus(false)
 					}
@@ -105,8 +99,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					textSize = 5.uiPX().toFloat()
 					typeface = GoldStoneFont.heavy(context)
 					layoutParams = LinearLayout.LayoutParams(
-						ScreenSize.Width,
-						30.uiPX()
+						ScreenSize.Width, 30.uiPX()
 					).apply {
 						topMargin = 20.uiPX()
 					}
@@ -116,5 +109,4 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}
 		}
 	}
-
 }

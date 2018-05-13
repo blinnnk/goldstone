@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.hint.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -35,6 +36,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	override val presenter = HintPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			hintInput.apply {
 				title = CreateWalletText.hint
@@ -53,7 +55,10 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		WalletTable.getCurrentWalletInfo { current ->
 			current?.apply {

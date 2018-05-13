@@ -25,23 +25,19 @@ class AttentionView(context: Context) : TextView(context) {
 		typeface = GoldStoneFont.light(context)
 		gravity = Gravity.CENTER_VERTICAL
 
-		layoutParams =
-			LinearLayout.LayoutParams(
-				ScreenSize.Width - PaddingSize.device * 2,
-				80.uiPX()
-			).apply {
-				leftPadding = 20.uiPX()
-				rightPadding = 20.uiPX()
-				leftMargin = PaddingSize.device
-			}
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.Width - PaddingSize.device * 2, 80.uiPX()
+		).apply {
+			leftPadding = 20.uiPX()
+			rightPadding = 20.uiPX()
+		}
 
 		setBackgroundColor(Spectrum.darkBlue)
 	}
 
 	override fun setBackgroundColor(color: Int) {
 		addCorner(
-			CornerSize.default.toInt(),
-			color
+			CornerSize.default.toInt(), color
 		)
 	}
 

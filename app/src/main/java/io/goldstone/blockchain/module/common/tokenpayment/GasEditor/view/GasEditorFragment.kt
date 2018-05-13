@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view
 
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -38,6 +39,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 
 			gasPriceInput.apply {

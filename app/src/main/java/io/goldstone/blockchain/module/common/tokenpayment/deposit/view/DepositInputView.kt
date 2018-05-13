@@ -21,10 +21,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.formatCurrency
-import org.jetbrains.anko.hintTextColor
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 2018/5/8 11:29 AM

@@ -31,70 +31,63 @@ import org.jetbrains.anko.*
 
 class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
-  private val attentionView by lazy { AttentionTextView(context!!) }
+	private val attentionView by lazy { AttentionTextView(context!!) }
 
-  private val nameInput by lazy { RoundInput(context!!) }
-  private val addressInput by lazy { WalletEditText(context!!) }
-  private val confirmButton by lazy { RoundButton(context!!) }
+	private val nameInput by lazy { RoundInput(context!!) }
+	private val addressInput by lazy { WalletEditText(context!!) }
+	private val confirmButton by lazy { RoundButton(context!!) }
 
-  override val presenter =  WatchOnlyImportPresenter(this)
+	override val presenter = WatchOnlyImportPresenter(this)
 
-  @SuppressLint("SetTextI18n")
-  override fun AnkoContext<Fragment>.initView() {
+	@SuppressLint("SetTextI18n")
+	override fun AnkoContext<Fragment>.initView() {
 
-    verticalLayout {
-      lparams(matchParent, matchParent)
+		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
+			lparams(matchParent, matchParent)
 
-      (attentionView.parent as? ViewGroup)?.apply {
-        findViewById<AttentionTextView>(ElementID.attentionText).isNotNull {
-          /** 临时解决异常的 `The specified child already has a parent` 错误 */
-          removeAllViews()
-        }
-      }
+			(attentionView.parent as? ViewGroup)?.apply {
+				findViewById<AttentionTextView>(ElementID.attentionText).isNotNull {
+					/** 临时解决异常的 `The specified child already has a parent` 错误 */
+					removeAllViews()
+				}
+			}
 
-      attentionView
-        .apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-          text = "You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
-        }
-        .into(this)
+			attentionView.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+				text =
+					"You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
+			}.into(this)
 
 
-      nameInput
-        .apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-          title = CreateWalletText.name
-        }
-        .into(this)
+			nameInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				title = CreateWalletText.name
+			}.into(this)
 
-      addressInput
-        .apply {
-          setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-          hint = "Enter Address That You Want to Watch"
-        }
-        .into(this)
+			addressInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				hint = "Enter Address That You Want to Watch"
+			}.into(this)
 
-      confirmButton
-        .apply {
-          marginTop = 20.uiPX()
-          setBlueStyle()
-          text = CommonText.startImporting.toUpperCase()
-        }
-        .click {
-          presenter.importWatchOnlyWallet(addressInput, nameInput)
-        }
-        .into(this)
+			confirmButton.apply {
+				marginTop = 20.uiPX()
+				setBlueStyle()
+				text = CommonText.startImporting.toUpperCase()
+			}.click {
+					presenter.importWatchOnlyWallet(addressInput, nameInput)
+				}.into(this)
 
-      textView("What is watch only wallet?") {
-        textSize = 5.uiPX().toFloat()
-        typeface = GoldStoneFont.heavy(context)
-        layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-          topMargin = 20.uiPX()
-        }
-        textColor = Spectrum.blue
-        gravity = Gravity.CENTER
-      }
-    }
-  }
+			textView("What is watch only wallet?") {
+				textSize = 5.uiPX().toFloat()
+				typeface = GoldStoneFont.heavy(context)
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+					topMargin = 20.uiPX()
+				}
+				textColor = Spectrum.blue
+				gravity = Gravity.CENTER
+			}
+		}
+	}
 
 }

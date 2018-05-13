@@ -36,6 +36,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			AppConfigTable.getAppConfig {
 				it?.pincode.isNotNull {

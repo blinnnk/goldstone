@@ -34,23 +34,14 @@ class MnemonicImportDetailPresenter(
 			return
 		}
 		CreateWalletPresenter.checkInputValue(
-			nameInput.text.toString(),
-			passwordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
-			isAgree,
-			fragment.context
+			nameInput.text.toString(), passwordInput.text.toString(), repeatPasswordInput.text.toString(),
+			isAgree, fragment.context
 		) { passwordValue, walletName ->
 			val mnemonicContent =
-				mnemonicInput.text.toString()
-					.replaceWithPattern()
-					.replace("\n", " ")
+				mnemonicInput.text.toString().replaceWithPattern().replace("\n", " ")
 					.removeStartAndEndValue(" ")
 			importWallet(
-				mnemonicContent,
-				passwordValue,
-				walletName,
-				hintInput.text?.toString(),
-				callback
+				mnemonicContent, passwordValue, walletName, hintInput.text?.toString(), callback
 			)
 		}
 	}
@@ -63,16 +54,11 @@ class MnemonicImportDetailPresenter(
 		callback: () -> Unit
 	) {
 		fragment.context?.getWalletByMnemonic(
-			mnemonic,
-			password
+			mnemonic, password
 		) { address ->
 			address?.let {
 				WalletImportPresenter.insertWalletToDatabase(
-					fragment,
-					it,
-					name,
-					hint,
-					callback
+					fragment, it, name, hint, callback
 				)
 			}
 		}

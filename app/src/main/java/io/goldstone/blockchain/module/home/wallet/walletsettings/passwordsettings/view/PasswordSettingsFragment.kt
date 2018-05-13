@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view
 
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
@@ -35,6 +36,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			oldPassword.apply {
 				title = WalletSettingsText.oldPassword

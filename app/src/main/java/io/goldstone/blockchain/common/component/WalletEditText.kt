@@ -9,7 +9,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.padding
@@ -25,7 +24,6 @@ class WalletEditText(context: Context) : EditText(context) {
 	init {
 		addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 120.uiPX()).apply {
-			leftMargin = PaddingSize.device
 			topMargin = 40.uiPX()
 			padding = 20.uiPX()
 		}

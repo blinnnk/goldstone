@@ -43,6 +43,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 
   private val path = HoneySvgPathConvert()
   private val arrow = path.parser(SvgPath.arrow)
+  private var hasTopLine = false
 
   init {
     this.setWillNotDraw(false)
@@ -63,6 +64,16 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
       canvas?.restore()
     }
 
+    if (hasTopLine) {
+      canvas?.drawLine(
+        0f,
+        0f,
+        width.toFloat(),
+        BorderSize.default,
+        paint
+      )
+    }
+
     canvas?.drawLine(
       0f,
       height - BorderSize.default,
@@ -70,6 +81,11 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
       height - BorderSize.default,
       paint
     )
+  }
+
+  fun hasTopLine()  {
+    hasTopLine = true
+    invalidate()
   }
 
   fun setGrayStyle() {

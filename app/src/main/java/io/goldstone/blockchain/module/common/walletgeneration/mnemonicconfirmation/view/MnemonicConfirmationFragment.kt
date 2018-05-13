@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -35,95 +36,70 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 	override val presenter = MnemonicConfirmationPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
+
 		verticalLayout {
-			attentionTextView.apply { text = CreateWalletText.mnemonicConfirmationDescription }
-				.into(this)
+
+			gravity = Gravity.CENTER_HORIZONTAL
+			lparams(matchParent, matchParent)
+
+			attentionTextView.apply { text = CreateWalletText.mnemonicConfirmationDescription }.into(this)
 
 			mnemonicInput.apply {
 				hint = "confirm mnemonic which you got before."
-			}
-				.into(this)
+			}.into(this)
 
 			// 根据助记词生成勾选助记词的按钮集合
 			relativeLayout {
-
-				layoutParams =
-					RelativeLayout.LayoutParams(
-						ScreenSize.widthWithPadding,
-						180.uiPX()
-					)
-
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 180.uiPX())
 				y += 20.uiPX()
-				x += PaddingSize.device
-
 				var contentWidth = 0
 				var contentTopMargin = 0
 				var modulus = 0
 
-				mnemonicCode?.split(" ".toRegex())
-					?.shuffled()
-					?.forEachIndexed { index, content ->
-						val wordWidth = content.count() * 12.uiPX() + 10.uiPX()
-						var isSelected = false
-						textView {
-							id = index
-							text = content
-							textColor = Spectrum.blue
-							textSize =
-								5.uiPX()
-									.toFloat()
-							backgroundColor = GrayScale.whiteGray
-							layoutParams =
-								RelativeLayout.LayoutParams(
-									wordWidth,
-									30.uiPX()
-								)
-							gravity = Gravity.CENTER
+				mnemonicCode?.split(" ".toRegex())?.shuffled()?.forEachIndexed { index, content ->
+					val wordWidth = content.count() * 12.uiPX() + 10.uiPX()
+					var isSelected = false
+					textView {
+						id = index
+						text = content
+						textColor = Spectrum.blue
+						textSize = 5.uiPX().toFloat()
+						typeface = GoldStoneFont.black(context)
+						addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
+						layoutParams = RelativeLayout.LayoutParams(
+							wordWidth, 30.uiPX()
+						)
+						gravity = Gravity.CENTER
 
-							onClick {
-								selectMnemonic(
-									mnemonicInput,
-									isSelected
-								)
-								isSelected = !isSelected
-							}
-
-							if (contentWidth > ScreenSize.widthWithPadding - 100.uiPX()) {
-								contentWidth = 0
-								modulus = index
-								contentTopMargin += 35.uiPX()
-							}
-							x = contentWidth.toFloat() + (index - modulus) * 10.uiPX()
-							y = contentTopMargin.toFloat()
-							contentWidth += wordWidth
+						onClick {
+							selectMnemonic(mnemonicInput, isSelected)
+							isSelected = !isSelected
 						}
+
+						if (contentWidth > ScreenSize.widthWithPadding - 100.uiPX()) {
+							contentWidth = 0
+							modulus = index
+							contentTopMargin += 35.uiPX()
+						}
+						x = contentWidth.toFloat() + (index - modulus) * 10.uiPX()
+						y = contentTopMargin.toFloat()
+						contentWidth += wordWidth
 					}
+				}
 			}
 
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				marginTop = 20.uiPX()
 				setBlueStyle()
-			}
-				.click {
-					presenter.clickConfirmationButton(
-						mnemonicCode.orEmpty(),
-						mnemonicInput.text.toString()
-					)
-				}
-				.into(this)
+			}.click {
+				presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
+			}.into(this)
 
 			textView("What is mnemonic?") {
-				textSize =
-					5.uiPX()
-						.toFloat()
+				textSize = 5.uiPX().toFloat()
 				typeface = GoldStoneFont.heavy(context)
-				layoutParams =
-					RelativeLayout.LayoutParams(
-						ScreenSize.widthWithPadding,
-						50.uiPX()
-					)
-				x = PaddingSize.device.toFloat()
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())
 				textColor = Spectrum.blue
 				gravity = Gravity.CENTER
 			}
@@ -138,14 +114,9 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		if (isSelected) {
 			backgroundColor = GrayScale.whiteGray
 			textColor = Spectrum.blue
-			input.setText(
-				input.text.toString().replace(
-					(" " + text.toString()),
-					""
-				)
-			)
+			input.setText(input.text.toString().replace((" " + text.toString()), ""))
 		} else {
-			backgroundColor = Spectrum.blue
+			addCorner(CornerSize.default.toInt(), Spectrum.blue)
 			textColor = Spectrum.white
 			val newContent = if (input.text.isEmpty()) text.toString() else " " + text.toString()
 			input.setText(input.text.toString() + newContent)
