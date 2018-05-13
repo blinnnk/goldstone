@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
-import android.widget.EditText
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -41,9 +40,9 @@ class TokenSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
-			overlayView.header.setKeyboardConfirmEvent {
+			overlayView.header.searchInputLinstener {
 				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					searchTokenByContractOrSymbol(this) {
+					searchTokenByContractOrSymbol(it) {
 						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
 						}
@@ -54,21 +53,19 @@ class TokenSearchPresenter(
 	}
 
 	private fun searchTokenByContractOrSymbol(
-		input: EditText,
+		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 
-		val inputValue = input.text.toString()
-
-		if (inputValue.isEmpty()) {
+		if (content.isEmpty()) {
 			fragment.context?.alert("Please enter the tokenInformation")
 			return
 		}
 
-		val isSearchSymbol = inputValue.length != CryptoValue.contractAddressLength
+		val isSearchSymbol = content.length != CryptoValue.contractAddressLength
 
 		fragment.showLoadingView("Searching token information now")
-		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(inputValue) { result ->
+		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
 				MyTokenTable.getTokensWith(WalletTable.current.address) { localTokens ->
@@ -85,12 +82,12 @@ class TokenSearchPresenter(
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 				isSearchSymbol isFalse {
-					GoldStoneEthCall.getTokenInfoByContractAddress(inputValue) { symbol, name, decimal ->
+					GoldStoneEthCall.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
 						hold(
 							arrayListOf(
 								DefaultTokenTable(
-									0, inputValue, "", symbol, TinyNumber.False.value, 0.0, name, decimal, null,
-									false, false, 0
+									0, content, "", symbol, TinyNumber.False.value, 0.0, name, decimal, null, false,
+									false, 0
 								)
 							)
 						)
