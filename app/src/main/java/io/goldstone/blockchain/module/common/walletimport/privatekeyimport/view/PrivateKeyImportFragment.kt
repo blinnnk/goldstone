@@ -42,6 +42,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
+				lparams(matchParent, matchParent)
+
 				privateKeyInput.apply {
 					hint = ImportWalletText.privateKeyHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
@@ -95,10 +98,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					textSize = 5.uiPX().toFloat()
 					typeface = GoldStoneFont.heavy(context)
 					layoutParams =
-						LinearLayout.LayoutParams(
-							ScreenSize.Width,
-							30.uiPX()
-						).apply {
+						LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
 							topMargin = 20.uiPX()
 						}
 					textColor = Spectrum.blue

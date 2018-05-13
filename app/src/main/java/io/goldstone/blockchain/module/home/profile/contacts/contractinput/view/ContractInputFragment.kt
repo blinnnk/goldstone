@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.contacts.contractinput.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
@@ -25,39 +26,42 @@ import org.jetbrains.anko.verticalLayout
 
 class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 
-  private val nameInput by lazy { RoundInput(context!!) }
-  private val addressInput by lazy { WalletEditText(context!!) }
-  private val confirmButton by lazy { RoundButton(context!!) }
+	private val nameInput by lazy { RoundInput(context!!) }
+	private val addressInput by lazy { WalletEditText(context!!) }
+	private val confirmButton by lazy { RoundButton(context!!) }
 
-  override val presenter = ContractInputPresenter(this)
+	override val presenter = ContractInputPresenter(this)
 
-  override fun AnkoContext<Fragment>.initView() {
-    verticalLayout {
-      lparams(matchParent, matchParent)
-      nameInput.apply {
-        title = "Contact Name"
-        setTextInput()
-        setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-      }.into(this)
+	override fun AnkoContext<Fragment>.initView() {
+		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
+			lparams(matchParent, matchParent)
+			nameInput.apply {
+				title = "Contact Name"
+				setTextInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+			}.into(this)
 
-      addressInput.apply {
-        setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-        hint = "Enter Address That You Want To Store"
-      }.into(this)
+			addressInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				hint = "Enter Address That You Want To Store"
+			}.into(this)
 
-      confirmButton.apply {
-        text = CommonText.confirm
-        marginTop = 20.uiPX()
-        setGrayStyle()
-      }.click {
-          presenter.addContact()
-        }.into(this)
-    }
-  }
+			confirmButton.apply {
+				text = CommonText.confirm
+				setGrayStyle(20.uiPX())
+			}.click {
+				presenter.addContact()
+			}.into(this)
+		}
+	}
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
-  }
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
+	}
 
 }

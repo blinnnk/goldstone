@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
@@ -32,12 +33,11 @@ class QRView(context: Context) : LinearLayout(context) {
 
 	init {
 		orientation = VERTICAL
+		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		qrImage.apply {
 			val size = (ScreenSize.Width * 0.8).toInt()
-			layoutParams = LinearLayout.LayoutParams(size, size).apply {
-				leftMargin = (ScreenSize.Width * 0.1).toInt()
-			}
+			layoutParams = LinearLayout.LayoutParams(size, size)
 			scaleType = ImageView.ScaleType.CENTER_CROP
 		}.into(this)
 

@@ -38,6 +38,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			privateKeyTextView.apply {
 				addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
@@ -46,7 +47,6 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				).apply {
 					maxLines = 8
 					movementMethod = ScrollingMovementMethod()
-					leftMargin = PaddingSize.device
 					topMargin = 20.uiPX()
 					setPadding(20.uiPX(), 16.uiPX(), 20.uiPX(), 10.uiPX())
 				}

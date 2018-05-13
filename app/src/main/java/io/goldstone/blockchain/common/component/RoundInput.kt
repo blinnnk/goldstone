@@ -69,9 +69,7 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.Width - PaddingSize.device * 2, 65.uiPX()
-		).apply {
-			leftMargin = PaddingSize.device
-		}
+		)
 
 		leftPadding = 35.uiPX()
 		backgroundTintMode = PorterDuff.Mode.CLEAR
@@ -86,8 +84,20 @@ open class RoundInput(context: Context) : EditText(context) {
 				afterTextChanged?.run()
 			}
 
-			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-			override fun onTextChanged(content: CharSequence?, start: Int, before: Int, count: Int) {
+			override fun beforeTextChanged(
+				s: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				content: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
 			}
 		})
 
@@ -115,7 +125,9 @@ open class RoundInput(context: Context) : EditText(context) {
 
 	open fun afterContentChanged(content: CharSequence?) {
 		if (content?.length.orZero() > maxCount) {
-			val newContent = content?.substring(0, maxCount) ?: ""
+			val newContent =
+				content?.substring(0, maxCount)
+					?: ""
 			setText(newContent)
 			textContent = newContent
 			context.alert("content is to long")
@@ -131,10 +143,8 @@ open class RoundInput(context: Context) : EditText(context) {
 		super.onDraw(canvas)
 
 		val rectF = RectF(
-			BorderSize.bold + paddingSize,
-			BorderSize.bold + paddingSize,
-			width - BorderSize.bold * 2 - paddingSize,
-			height - BorderSize.bold * 2 - paddingSize
+			BorderSize.bold + paddingSize, BorderSize.bold + paddingSize,
+			width - BorderSize.bold * 2 - paddingSize, height - BorderSize.bold * 2 - paddingSize
 		)
 
 		canvas?.drawRoundRect(rectF, height / 2f, height / 2f, paint)

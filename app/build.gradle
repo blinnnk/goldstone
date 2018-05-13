@@ -42,7 +42,7 @@ dependencies {
   // Recycler View
   implementation 'com.android.support:recyclerview-v7:27.1.1'
   // Anko
-  implementation('org.jetbrains.anko:anko:0.10.4') {
+  implementation('org.jetbrains.anko:anko:0.10.5') {
     exclude group: 'com.google.android', module: 'android'
   }
   // 黑蜜动画及其他便捷工具依赖工程

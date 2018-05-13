@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
 
 import android.content.Context
+import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInVertical
@@ -21,7 +22,6 @@ import org.jetbrains.anko.textView
 
 class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 
-	var confirmClickEvent: Runnable? = null
 	var customGasEvent: Runnable? = null
 	private val customButton by lazy { BaseCell(context) }
 	private val confirmButton by lazy { RoundButton(context) }
@@ -29,41 +29,27 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 	init {
 
 		orientation = VERTICAL
-		layoutParams =
-			LinearLayout.LayoutParams(
-				matchParent,
-				120.uiPX()
-			)
+		gravity = Gravity.CENTER_HORIZONTAL
+
+		layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
 
 		customButton.apply {
-			layoutParams =
-				LinearLayout.LayoutParams(
-					ScreenSize.widthWithPadding,
-					40.uiPX()
-				)
-					.apply {
-						leftMargin = PaddingSize.device
-					}
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX())
 			textView {
 				setGrayStyle()
 				text = TokenDetailText.customMiner
 				textColor = GrayScale.gray
-				textSize =
-					5.uiPX()
-						.toFloat()
+				textSize = 5.uiPX().toFloat()
 				typeface = GoldStoneFont.book(context)
 			}.setCenterInVertical()
-		}
-			.click {
-				customGasEvent?.run()
-			}
-			.into(this)
+		}.click {
+			customGasEvent?.run()
+		}.into(this)
 
 		confirmButton.apply {
 			setGrayStyle(20.uiPX())
 			text = CommonText.next.toUpperCase()
-		}
-			.into(this)
+		}.into(this)
 	}
 
 	fun setCanUseStyle(isSelected: Boolean) {

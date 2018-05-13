@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
@@ -41,6 +42,9 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+
+			gravity = Gravity.CENTER_HORIZONTAL
+
 			lparams(matchParent, matchParent)
 
 			attentionView.apply {

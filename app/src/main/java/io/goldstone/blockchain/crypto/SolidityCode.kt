@@ -30,3 +30,8 @@ object CryptoValue {
 object CryptoSymbol {
 	const val eth = "ETH"
 }
+
+object CryptoPath {
+	const val jaxxAndMetamask = "m/44'/60'/0'/0/0"
+	const val ledger = "m/44'/60'/0'/0"
+}

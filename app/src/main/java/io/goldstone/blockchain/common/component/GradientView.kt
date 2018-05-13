@@ -71,7 +71,7 @@ class GradientView(context: Context) : View(context) {
 				0f,
 				distance.toFloat(),
 				height.toFloat(),
-				intArrayOf(Color.rgb(1, 128, 175), Color.rgb(2, 209, 142)),
+				intArrayOf(Color.rgb(0, 120, 242), Color.rgb(2, 209, 142)),
 				floatArrayOf(0f, distance * 1f),
 				Shader.TileMode.CLAMP
 			)
