@@ -4,7 +4,6 @@ import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -29,16 +28,18 @@ class QuotationSearchPresenter(
 		super.onFragmentViewCreated()
 		setHeightMatchParent()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.setKeyboardConfirmEvent {
+			overlayView.header.searchInputLinstener {
 				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					searchTokenBy(text.toString())
+					searchTokenBy(it)
 				}
 			}
 		}
 	}
 
 	fun setQuotationSelfSelection(
-		model: QuotationSelectionTable, isSelect: Boolean = true, callback: () -> Unit = {}
+		model: QuotationSelectionTable,
+		isSelect: Boolean = true,
+		callback: () -> Unit = {}
 	) {
 		isSelect isTrue {
 			// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
@@ -85,7 +86,10 @@ class QuotationSearchPresenter(
 	}
 
 	companion object {
-		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+		fun getLineChartDataByPair(
+			pair: String,
+			hold: (String) -> Unit
+		) {
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(parameter) {
 				it.isNotEmpty() isTrue {
