@@ -89,16 +89,11 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun setInputFocus() {
-		valueInput.hintTextColor = Spectrum.opacity1White
-		valueInput.requestFocus()
+	fun getValue(): String {
+		return  valueInput.text.toString()
 	}
 
-	fun updateCurrencyValue(value: Double?) {
-		priceInfo.text = "≈ ${value.orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"
-	}
-
-	fun inputTextListener(hold: (String) -> Unit) {
+	fun inputTextListener(hold: (String) -> Unit = {}) {
 		valueInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				// 文字自适应宽度调整字号大小

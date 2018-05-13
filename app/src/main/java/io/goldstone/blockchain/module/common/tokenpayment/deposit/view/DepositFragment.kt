@@ -39,16 +39,17 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 				}
 				setAddressText()
 				setConfirmButtonEvent()
-				inputView.inputTextListener {
-					presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
-				}
 			}
+			inputView.inputTextListener()
 		}
 	}
 
 	private fun setConfirmButtonEvent() {
 		qrView.saveQRImageEvent = Runnable {
-			QRCodePresenter.saveQRCodeImageToAlbum(presenter.qrContent, this)
+			val value = inputView.getValue()
+			presenter.generateQRCode(if (value.isEmpty()) 0.0 else value.toDouble()) {
+				QRCodePresenter.saveQRCodeImageToAlbum(presenter.qrContent, this)
+			}
 		}
 	}
 

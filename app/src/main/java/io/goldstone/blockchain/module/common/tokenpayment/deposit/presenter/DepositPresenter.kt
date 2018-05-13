@@ -27,7 +27,7 @@ class DepositPresenter(
 		generateQRCode()
 	}
 
-	fun generateQRCode(amount: Double = 0.0) {
+	fun generateQRCode(amount: Double = 0.0, callback: () -> Unit = {}) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			WalletTable.getCurrentWalletAddress {
 				val content = when (token?.symbol) {
@@ -37,6 +37,7 @@ class DepositPresenter(
 				qrContent = content
 				QRCodePresenter.generateQRCode(content).let {
 					fragment.setQRImage(it)
+					callback()
 				}
 			}
 		}
