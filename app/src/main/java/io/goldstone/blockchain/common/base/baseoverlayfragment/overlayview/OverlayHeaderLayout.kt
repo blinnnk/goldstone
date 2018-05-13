@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.widget.EditText
@@ -103,7 +105,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showBackButton(isShow: Boolean, setClickEvent: ImageView.() -> Unit = {}) {
+	fun showBackButton(
+		isShow: Boolean,
+		setClickEvent: ImageView.() -> Unit = {}
+	) {
 		findViewById<ImageView>(ElementID.backButton).let {
 			it.isNull() isTrue {
 				isShow isTrue {
@@ -119,7 +124,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showAddButton(isShow: Boolean, setClickEvent: () -> Unit = {}) {
+	fun showAddButton(
+		isShow: Boolean,
+		setClickEvent: () -> Unit = {}
+	) {
 		findViewById<ImageView>(ElementID.addButton).let {
 			it.isNull() isTrue {
 				isShow isTrue {
@@ -144,7 +152,37 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		searchInput.onPressKeyboardEnterButton { action(searchInput.editText) }
 	}
 
-	fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit = {}) {
+	fun searchInputLinstener(action: (String) -> Unit) {
+		searchInput.editText.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(content: Editable?) {
+				if (!content.isNullOrBlank()) {
+					action(content.toString())
+				}
+			}
+
+			override fun beforeTextChanged(
+				s: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				s: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+
+		})
+	}
+
+	fun showSearchButton(
+		isShow: Boolean,
+		setClickEvent: () -> Unit = {}
+	) {
 		if (isShow) {
 			searchButton.click {
 				setClickEvent()
@@ -154,7 +192,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit = {}) {
+	fun showSearchInput(
+		isShow: Boolean = true,
+		cancelEvent: () -> Unit = {}
+	) {
 
 		showCloseButton(!isShow)
 
@@ -189,11 +230,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		canvas?.drawLine(
-			PaddingSize.device.toFloat(),
-			height - BorderSize.default,
-			(ScreenSize.Width - PaddingSize.device).toFloat(),
-			height - BorderSize.default,
-			paint
+			PaddingSize.device.toFloat(), height - BorderSize.default,
+			(ScreenSize.Width - PaddingSize.device).toFloat(), height - BorderSize.default, paint
 		)
 		canvas?.save()
 	}
