@@ -5,10 +5,10 @@ import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -18,20 +18,20 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 24/03/2018 2:12 PM
  * @author KaySaith
  */
 
-// 从数据库去除交易记录存放到内存里, 提升用户体验.
+// save data in memory for the next showing speed
 var localTransactions: ArrayList<TransactionListModel>? = null
 
 class TransactionListPresenter(
@@ -39,32 +39,15 @@ class TransactionListPresenter(
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 
 	override fun updateData() {
-		fragment.apply {
-			localTransactions.isNotNull {
-				asyncData = localTransactions
-				// 更新显示数据后, 异步继续更新新的数据.并动态刷新到界面
-				NetworkUtil.hasNetworkWithAlert(context).isTrue {
-					getMainActivity()?.updateTransactionInAsync(localTransactions!!)
-				}
-			} otherwise {
-				TransactionTable.getTransactionListModelsByAddress(
-					WalletTable.current.address
-				) { localData ->
-					localData.isNotEmpty() isTrue {
-						asyncData = localData
-						localTransactions = localData
-					} otherwise {
-						NetworkUtil.hasNetworkWithAlert(context).isTrue {
-							// 如果本地一条数据都没有就从 `StartBlock 0` 的位置从 `EtherScan` 上查询
-							getMainActivity()?.getTransactionDataFromEtherScan("0") {
-								asyncData = it
-								localTransactions = it
-							}
-						}
-					}
-				}
+		// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
+		if (localTransactions.isNull()) {
+			setHeightMatchParent {
+				fragment.initData()
 			}
+		} else {
+			fragment.initData()
 		}
+
 	}
 
 	fun showTransactionDetail(model: TransactionListModel?) {
@@ -78,12 +61,44 @@ class TransactionListPresenter(
 		}
 	}
 
-	private fun MainActivity.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
+	private fun TransactionListFragment.initData() {
+		showLoadingView("Loading transaction data now")
+		if (!localTransactions.isNull()) {
+			asyncData = localTransactions
+			/** show memory data and at the same time update the chain data in async thread */
+			updateTransactionInAsync(localTransactions!!)
+		} else {
+			TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
+				if (it.isNotEmpty()) {
+					asyncData = it
+					localTransactions = it
+					removeLoadingView()
+				} else {
+					/**
+					 * if there is none data in local then `StartBlock 0`
+					 * and load data from `EtherScan`
+					 **/
+					getTransactionDataFromEtherScan("0") {
+						asyncData = it
+						localTransactions = it
+						removeLoadingView()
+					}
+				}
+			}
+		}
+	}
+
+	private fun TransactionListFragment.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber = localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
 		val lastBlockNumber = if (currentBlockNumber.isNull()) "0" else currentBlockNumber + 1
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
+			/** chain data is empty then return and remove loading view*/
+			if (newData.isEmpty()) {
+				removeLoadingView()
+				return@getTransactionDataFromEtherScan
+			}
 			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
 			newData.forEachOrEnd { item, isEnd ->
 				localData.find {
@@ -93,39 +108,38 @@ class TransactionListPresenter(
 					TransactionTable.deleteByTaxHash(it.transactionHash)
 				}
 				if (isEnd) {
-					// 数据清理干净后在主线程更新 `UI`
-					runOnUiThread {
-						// 拉取到后, 把最新获取的数据合并本地数据更新到界面
+					// when finish update ui in UI thread
+					context?.runOnUiThread {
 						localData.addAll(0, newData)
-						// 把数据存到内存里面, 下次打开直接使用内存, 不用再度数据库，提升用户体验.
+						// save data into the memory for the next time showing speed
 						localTransactions = localData
-						fragment.asyncData = localTransactions
-						fragment.recyclerView.adapter.notifyDataSetChanged()
+						asyncData = localTransactions
+						recyclerView.adapter.notifyDataSetChanged()
+						removeLoadingView()
 					}
 				}
 			}
-			Log.d("DEBUG", "updated new transaction data")
 		}
 	}
 
 	companion object {
 
 		// 默认拉取全部的 `EtherScan` 的交易数据
-		private fun MainActivity.getTransactionDataFromEtherScan(
+		private fun BaseRecyclerFragment<*, *>.getTransactionDataFromEtherScan(
 			startBlock: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			// Show loading view
-			showLoadingView()
+			// 没有网络直接返回
+			if (!NetworkUtil.hasNetworkWithAlert(getContext())) return
+			// 请求所有链上的数据
 			mergeNormalAndTokenIncomingTransactions(startBlock) {
 				it.isNotEmpty() isTrue {
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					filterCompletedData(it, hold)
 					Log.d("DEBUG", "update the new data from chain")
 				} otherwise {
-					runOnUiThread {
-						removeLoadingView()
-						// 没有数据返回空数组
+					this.getContext()?.runOnUiThread {
+						// if data is empty then return an empty array
 						hold(arrayListOf())
 					}
 				}
@@ -133,11 +147,11 @@ class TransactionListPresenter(
 		}
 
 		fun updateTransactions(
-			activity: MainActivity?,
+			fragment: BaseRecyclerFragment<*, *>,
 			startBlock: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			activity?.getTransactionDataFromEtherScan(startBlock, hold)
+			fragment.getTransactionDataFromEtherScan(startBlock, hold)
 		}
 
 		private fun mergeNormalAndTokenIncomingTransactions(
@@ -180,7 +194,7 @@ class TransactionListPresenter(
 			}
 		}
 
-		private fun MainActivity.filterCompletedData(
+		private fun BaseRecyclerFragment<*, *>.filterCompletedData(
 			data: ArrayList<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {

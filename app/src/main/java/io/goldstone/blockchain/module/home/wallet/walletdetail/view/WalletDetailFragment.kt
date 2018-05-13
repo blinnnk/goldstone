@@ -41,11 +41,11 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 		}
 	}
 
-	fun showLoadingView() {
+	fun showMiniLoadingView() {
 		headerView?.showLoadingView(true)
 	}
 
-	fun removeLoadingView() {
+	fun removeMiniLoadingView() {
 		headerView?.showLoadingView(false)
 	}
 

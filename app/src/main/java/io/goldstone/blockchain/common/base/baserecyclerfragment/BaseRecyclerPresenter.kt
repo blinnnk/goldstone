@@ -140,9 +140,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		}
 	}
 
-	fun setHeightMatchParent() {
+	fun setHeightMatchParent(callback: () -> Unit = {}) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
+			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero()) {
+				callback()
+			}
 		}
 	}
 

@@ -44,7 +44,7 @@ class TokenSearchPresenter(
 			overlayView.header.setKeyboardConfirmEvent {
 				NetworkUtil.hasNetworkWithAlert(context) isTrue {
 					searchTokenByContractOrSymbol(this) {
-						fragment.context?.runOnUiThread {
+						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
 						}
 					}
@@ -67,6 +67,7 @@ class TokenSearchPresenter(
 
 		val isSearchSymbol = inputValue.length != CryptoValue.contractAddressLength
 
+		fragment.showLoadingView("Searching token information now")
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(inputValue) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
@@ -77,32 +78,26 @@ class TokenSearchPresenter(
 							isUsed = localTokens.any { it.symbol == serverToken.symbol }
 						}
 					}.let {
+						fragment.removeLoadingView()
 						hold(it.toArrayList())
 					}
 				}
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
-				isSearchSymbol.isFalse {
+				isSearchSymbol isFalse {
 					GoldStoneEthCall.getTokenInfoByContractAddress(inputValue) { symbol, name, decimal ->
 						hold(
 							arrayListOf(
 								DefaultTokenTable(
-									0,
-									inputValue,
-									"",
-									symbol,
-									TinyNumber.False.value,
-									0.0,
-									name,
-									decimal,
-									null,
-									false,
-									false,
-									0
+									0, inputValue, "", symbol, TinyNumber.False.value, 0.0, name, decimal, null,
+									false, false, 0
 								)
 							)
 						)
+						fragment.removeLoadingView()
 					}
+				} otherwise {
+					fragment.removeLoadingView()
 				}
 			}
 		}

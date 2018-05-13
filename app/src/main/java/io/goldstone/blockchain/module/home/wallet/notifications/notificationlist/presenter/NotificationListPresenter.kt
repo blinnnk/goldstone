@@ -35,7 +35,7 @@ class NotificationListPresenter(
 	}
 
 	private fun getDataFromDatabase() {
-		fragment.getMainActivity()?.showLoadingView()
+		fragment.showLoadingView("Loading notification history data")
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTIme }?.createTIme
 			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
@@ -47,7 +47,7 @@ class NotificationListPresenter(
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				updateDataFromServer(requestTime)
 			} otherwise {
-				fragment.getMainActivity()?.removeLoadingView()
+				fragment.removeLoadingView()
 			}
 			updateParentContentLayoutHeight(localData.size, fragment.setSlideUpWithCellHeight())
 		}
@@ -56,7 +56,7 @@ class NotificationListPresenter(
 	private fun updateDataFromServer(requestTime: Long) {
 		AppConfigTable.getAppConfig { config ->
 			GoldStoneAPI.getNotificationList(config?.goldStoneID.orEmpty(), requestTime) {
-				fragment.getMainActivity()?.removeLoadingView()
+				fragment.removeLoadingView()
 				it.isNotEmpty() isTrue {
 					NotificationTable.insertData(it.map { NotificationTable(it) }.toArrayList()) {
 						getDataFromDatabase()

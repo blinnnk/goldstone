@@ -9,7 +9,6 @@ import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
@@ -46,7 +45,9 @@ class TokenDetailPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?, cellHeight: Int, maxHeight: Int
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
 	) {
 		// 详情页面直接全屏高度
 		setHeightMatchParent()
@@ -84,6 +85,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
+		fragment.showLoadingView("Loading token data now")
 		loadDataFromDatabaseOrElse {
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				fragment.loadDataFromChain()
@@ -109,7 +111,7 @@ class TokenDetailPresenter(
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-				TransactionListPresenter.updateTransactions(getMainActivity(), blockNumber) {
+				TransactionListPresenter.updateTransactions(this@loadDataFromChain, blockNumber) {
 					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 						it.find { it.symbol == symbol }.isNotNull {
@@ -119,6 +121,7 @@ class TokenDetailPresenter(
 							// 链上和本地都没有数据就更新一个空数组作为默认
 							asyncData.isNull() isTrue {
 								updateChartBy(arrayListOf())
+								fragment.removeLoadingView()
 							}
 						}
 					}
@@ -162,6 +165,7 @@ class TokenDetailPresenter(
 					if (maxY == 0.0) maxY = 10.0
 					if (unitY == 0f) unitY = 1f
 					header?.setCharData(chartArray.reversed().toArrayList(), maxY.toFloat(), unitY)
+					fragment.removeLoadingView()
 				}
 			}
 		}
@@ -174,7 +178,8 @@ class TokenDetailPresenter(
 	}
 
 	private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
-		symbol: String, callback: (ArrayList<TokenBalanceTable>) -> Unit
+		symbol: String,
+		callback: (ArrayList<TokenBalanceTable>) -> Unit
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
 		TokenBalanceTable.getTodayBalance(
@@ -200,10 +205,14 @@ class TokenDetailPresenter(
 		}
 	}
 
-	data class DateBalance(val date: Long, val balance: Double)
+	data class DateBalance(
+		val date: Long,
+		val balance: Double
+	)
 
 	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
-		todayBalance: Double, callback: (ArrayList<DateBalance>) -> Unit
+		todayBalance: Double,
+		callback: (ArrayList<DateBalance>) -> Unit
 	) {
 		val maxCount = 6
 		val balances = arrayListOf<DateBalance>()
@@ -212,7 +221,8 @@ class TokenDetailPresenter(
 			override var asyncCount: Int = maxCount
 			override fun concurrentJobs() {
 				(0 until maxCount).forEach { index ->
-					val currentMills = if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
+					val currentMills =
+						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
 						it.timeStamp.toMills() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {
@@ -225,10 +235,12 @@ class TokenDetailPresenter(
 				}
 			}
 
-			override fun mergeCallBack() = callback(balances)
+			override fun mergeCallBack() =
+				callback(balances)
 		}.start()
 	}
 
-	private fun modulusByReceiveStatus(isReceived: Boolean) = if (isReceived) 1 else -1
+	private fun modulusByReceiveStatus(isReceived: Boolean) =
+		if (isReceived) 1 else -1
 
 }

@@ -26,8 +26,7 @@ import org.json.JSONObject
 import java.util.*
 
 @Suppress(
-	"DEPRECATION",
-	"IMPLICIT_CAST_TO_ANY"
+	"DEPRECATION", "IMPLICIT_CAST_TO_ANY"
 )
 /**
  * @date 25/04/2018 6:52 AM
@@ -40,16 +39,16 @@ class MarketTokenDetailPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		fragment.getParentFragment<QuotationOverlayFragment>()
-			?.apply {
-				overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
-			}
+		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
+			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
+		}
 
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
 
 	fun updateChartByMenu(
-		chartView: MarketTokenChart, buttonID: Int
+		chartView: MarketTokenChart,
+		buttonID: Int
 	) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
@@ -68,8 +67,7 @@ class MarketTokenDetailPresenter(
 		}
 
 		fragment.currencyInfo?.apply {
-			fragment.getMainActivity()
-				?.showLoadingView()
+			fragment.getMainActivity()?.showLoadingView()
 			QuotationSelectionTable.getSelectionByPair(pair) {
 				it?.apply {
 					val data: String? = when (period) {
@@ -81,9 +79,7 @@ class MarketTokenDetailPresenter(
 					if (data.isNullOrBlank()) {
 						// 更新网络数据
 						chartView.updateChartDataBy(
-							pair,
-							period,
-							dateType
+							pair, period, dateType
 						)
 						// 本地数据库如果没有数据就跳出逻辑
 						return@getSelectionByPair
@@ -93,30 +89,21 @@ class MarketTokenDetailPresenter(
 						// 把数据转换成需要的格式
 						(0 until jsonArray.length()).map {
 							ChartModel(JSONObject(jsonArray[it].toString()))
-						}
-							.toArrayList()
-							.let {
-								val databaseTime =
-									it.maxBy { it.timestamp }
-										?.timestamp?.toLong()
-										.orElse(0)
+						}.toArrayList().let {
+								val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLong().orElse(0)
 								/** 校验数据库的数据时间是否有效，是否需要更新 */
 								checkDatabaseTimeIsValidBy(
-									period,
-									databaseTime
+									period, databaseTime
 								) {
 									isTrue {
 										// 合规就更新本地数据库的数据
 										chartView.updateChartUI(
-											it,
-											dateType
+											it, dateType
 										)
 									} otherwise {
 										// 不合规就更新网络数据
 										chartView.updateChartDataBy(
-											pair,
-											period,
-											dateType
+											pair, period, dateType
 										)
 									}
 								}
@@ -128,28 +115,28 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenChart.updateChartDataBy(
-		pair: String, period: String, dateType: Int
+		pair: String,
+		period: String,
+		dateType: Int
 	) {
 		GoldStoneAPI.getQuotationCurrencyChart(
-			pair,
-			period,
-			8
+			pair, period, 8
 		) {
 			// 把数据更新到数据库
 			it.updateChartDataInDatabaseBy(
-				period,
-				pair
+				period, pair
 			)
 			// 更新 `UI` 界面
 			updateChartUI(
-				it,
-				dateType
+				it, dateType
 			)
 		}
 	}
 
 	private fun checkDatabaseTimeIsValidBy(
-		period: String, databaseTime: Long, callback: Boolean.() -> Unit
+		period: String,
+		databaseTime: Long,
+		callback: Boolean.() -> Unit
 	) {
 		when (period) {
 			MarketTokenDetailChartType.WEEK.info -> {
@@ -175,60 +162,52 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenChart.updateChartUI(
-		data: ArrayList<ChartModel>, dateType: Int
+		data: ArrayList<ChartModel>,
+		dateType: Int
 	) {
 		fragment.context?.apply {
 			runOnUiThread {
-				fragment.getMainActivity()
-					?.removeLoadingView()
+				fragment.getMainActivity()?.removeLoadingView()
 				chartData = data.sortedBy {
 					it.timestamp
-				}
-					.map {
-						Point(
-							DateUtils.formatDateTime(
-								this,
-								it.timestamp.toLong(),
-								dateType
-							),
-							it.price.toFloat()
-						)
-					}
-					.toArrayList()
+				}.map {
+					Point(
+						DateUtils.formatDateTime(
+							this, it.timestamp.toLong(), dateType
+						), it.price.toFloat()
+					)
+				}.toArrayList()
 			}
 		}
 	}
 
 	private fun ArrayList<ChartModel>.updateChartDataInDatabaseBy(
-		period: String, pair: String
+		period: String,
+		pair: String
 	) {
 		map { JSONObject("{\"price\":\"${it.price}\",\"time\":${it.timestamp}}") }.let {
 			when (period) {
 				MarketTokenDetailChartType.WEEK.info -> {
 					QuotationSelectionTable.updateLineChartWeekBy(
-						pair,
-						it.toString()
+						pair, it.toString()
 					)
 				}
 
 				MarketTokenDetailChartType.DAY.info -> {
 					QuotationSelectionTable.updateLineChartDataBy(
-						pair,
-						it.toString()
+						pair, it.toString()
 					)
 				}
 
 				MarketTokenDetailChartType.MONTH.info -> {
 					QuotationSelectionTable.updateLineChartMontyBy(
-						pair,
-						it.toString()
+						pair, it.toString()
 					)
 				}
 
 				MarketTokenDetailChartType.Hour.info -> {
 					QuotationSelectionTable.updateLineChartHourBy(
-						pair,
-						it.toString()
+						pair, it.toString()
 					)
 				}
 			}
@@ -236,31 +215,31 @@ class MarketTokenDetailPresenter(
 	}
 
 	fun setCurrencyInf(
-		currencyInfo: QuotationModel?, tokenInformation: TokenInformation,
-		priceHistroy: PriceHistoryView, tokenInfo: TokenInfoView
+		currencyInfo: QuotationModel?,
+		tokenInformation: TokenInformation,
+		priceHistroy: PriceHistoryView,
+		tokenInfo: TokenInfoView
 	) {
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
 				fragment.context?.runOnUiThread {
 					tokenInformation.model = TokenInformationModel(
-						it,
-						info.symbol
+						it, info.symbol
 					)
 					priceHistroy.model = PriceHistoryModel(
-						it,
-						info.quoteSymbol
+						it, info.quoteSymbol
 					)
 				}
 			}
 			loadDescriptionFromLocalOrServer(
-				info,
-				tokenInfo
+				info, tokenInfo
 			)
 		}
 	}
 
 	private fun loadDescriptionFromLocalOrServer(
-		info: QuotationModel, tokenInfo: TokenInfoView
+		info: QuotationModel,
+		tokenInfo: TokenInfoView
 	) {
 		QuotationSelectionTable.getSelectionByPair(info.pair) {
 			it?.apply {
@@ -272,32 +251,27 @@ class MarketTokenDetailPresenter(
 
 				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
 				if (description.isNullOrBlank() || !description?.substring(
-						0,
-						2
+						0, 2
 					).equals(
-						HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()),
-						true
+						HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()), true
 					)
 				) {
 					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->
 						fragment.context?.runOnUiThread {
 							tokenInfo.setTokenDescription(
 								description.substring(
-									0,
-									maxCount(description)
+									0, maxCount(description)
 								) + "..."
 							)
 						}
 						QuotationSelectionTable.updateDescription(
-							info.pair,
-							description
+							info.pair, description
 						)
 					}
 				} else {
 					tokenInfo.setTokenDescription(
 						description?.substring(
-							2,
-							maxCount(description)
+							2, maxCount(description)
 						) + "..."
 					)
 				}
@@ -311,15 +285,13 @@ class MarketTokenDetailPresenter(
 		// 传默认值
 		fragment.currentPriceInfo.model = CurrentPriceModel()
 		// 长连接获取数据
-		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair),
-			{
-				currentSocket = it
-				currentSocket?.runSocket()
-			}) {
+		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair), {
+			currentSocket = it
+			currentSocket?.runSocket()
+		}) {
 			if (it.pair == pair) {
 				fragment.currentPriceInfo.model = CurrentPriceModel(
-					it,
-					quoteSymbol
+					it, quoteSymbol
 				)
 			}
 		}

@@ -42,7 +42,7 @@ class WalletDetailPresenter(
 	}
 
 	override fun updateData() {
-		fragment.showLoadingView()
+		fragment.showMiniLoadingView()
 		// 查询钱包总数更新数字
 		WalletTable.apply { getAll { walletCount = size } }
 		// 先初始化空数组再更新列表
@@ -58,7 +58,7 @@ class WalletDetailPresenter(
 				// 再检查链上的最新价格和数量
 				getChainModels {
 					updateUIByData(it)
-					fragment.removeLoadingView()
+					fragment.removeMiniLoadingView()
 				}
 			}
 		}
