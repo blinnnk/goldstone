@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -25,75 +26,67 @@ import org.jetbrains.anko.verticalLayout
 
 open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
-  var model: TransactionDetailModel by observing(TransactionDetailModel()) {
-    description.text = model.description
-    info.text = if(model.info.isEmpty()) "waiting" else model.info
-  }
+	var model: TransactionDetailModel by observing(TransactionDetailModel()) {
+		description.text = model.description
+		info.text = if (model.info.isEmpty()) "waiting" else model.info
+	}
 
-  private val description = TextView(context)
-  private val info = TextView(context)
+	private val description = TextView(context)
+	private val info = TextView(context)
 
-  init {
+	init {
 
-    this.setWillNotDraw(false)
+		this.setWillNotDraw(false)
 
-    layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.cellHeight)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.cellHeight)
 
-    verticalLayout {
+		verticalLayout {
+			x = PaddingSize.device.toFloat()
+			description.apply {
+				textSize = 4.uiPX().toFloat()
+				textColor = GrayScale.midGray
+				typeface = GoldStoneFont.book(context)
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 17.uiPX()).apply {
+					topMargin = 15.uiPX()
+				}
+			}.into(this)
 
-      description
-        .apply {
-          textSize = 4.uiPX().toFloat()
-          textColor = GrayScale.midGray
-          typeface = GoldStoneFont.book(context)
-          layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 17.uiPX()).apply {
-            topMargin = 15.uiPX()
-          }
-        }
-        .into(this)
+			info.apply {
+				textSize = 5.uiPX().toFloat() - 1f
+				textColor = GrayScale.black
+				typeface = GoldStoneFont.medium(context)
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 25.uiPX())
+			}.into(this)
 
-      info
-        .apply {
-          textSize = 5.uiPX().toFloat() - 1f
-          textColor = GrayScale.black
-          typeface = GoldStoneFont.medium(context)
-          layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 25.uiPX())
-        }
-        .into(this)
+		}.let {
+			setCenterInVertical()
+		}
 
-    }.let {
-      setCenterInVertical()
-      setMargins<RelativeLayout.LayoutParams> { leftMargin = PaddingSize.device }
-    }
+	}
 
-  }
+	private val paint = Paint().apply {
+		isAntiAlias = true
+		color = GrayScale.lightGray
+		style = Paint.Style.FILL
+	}
 
-  private val paint = Paint().apply {
-    isAntiAlias = true
-    color = GrayScale.lightGray
-    style = Paint.Style.FILL
-  }
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+		canvas?.drawLine(
+			PaddingSize.device.toFloat(), height - BorderSize.default, (width - PaddingSize.device).toFloat(),
+			height - BorderSize.default, paint
+		)
+	}
 
-    canvas?.drawLine(
-      0f,
-      height - BorderSize.default,
-      (width - PaddingSize.device).toFloat(),
-      height - BorderSize.default,
-      paint
-    )
-  }
+	fun setTitleColor(color: Int) {
+		info.textColor = color
+	}
 
-  fun setTitleColor(color: Int) {
-    info.textColor = color
-  }
-
-  fun setGrayInfoStyle() {
-    info.textSize = 4.uiPX().toFloat() - 1f
-    info.textColor = GrayScale.midGray
-  }
+	fun setGrayInfoStyle() {
+		info.textSize = 4.uiPX().toFloat() - 1f
+		info.textColor = GrayScale.midGray
+	}
 
 }
 

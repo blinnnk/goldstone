@@ -61,7 +61,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
 		this.addView(icon.apply {
 			setGrayStyle()
-			setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
+			y = 16.uiPX().toFloat()
 		})
 
 		this.addView(tokenInfo.apply { setBlackTitles() })
