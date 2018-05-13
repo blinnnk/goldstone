@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -45,6 +46,8 @@ class TokenDetailPresenter(
 	override fun updateData() {
 		// 详情页面直接全屏高度
 		setHeightMatchParent {
+			fragment.asyncData = arrayListOf()
+			updateEmptyCharData(fragment.symbol!!)
 			prepareTokenDetailData()
 		}
 	}
@@ -136,25 +139,30 @@ class TokenDetailPresenter(
 	}
 
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
-		asyncData = data
+		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
+		setEmptyViewBy(data)
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			data.prepareTokenHistoryBalance(fragment.symbol!!) {
+			data.prepareTokenHistoryBalance(symbol!!) {
 				it.updateChartAndHeaderData()
 			}
 		} otherwise {
-			// 没网的时候返回空数据
-			val now = System.currentTimeMillis()
-			arrayListOf(
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, ""),
-				TokenBalanceTable(0, symbol!!, now, 0, 0.0, "")
-			).updateChartAndHeaderData()
+			updateEmptyCharData(symbol!!)
 		}
+	}
+
+	private fun updateEmptyCharData(symbol: String) {
+		// 没网的时候返回空数据
+		val now = System.currentTimeMillis()
+		arrayListOf(
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
+		).updateChartAndHeaderData()
 	}
 
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
