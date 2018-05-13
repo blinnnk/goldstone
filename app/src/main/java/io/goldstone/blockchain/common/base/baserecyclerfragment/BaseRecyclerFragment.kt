@@ -184,21 +184,15 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		return UI {
 			// 这个高度判断是解决少数虚拟键盘高度可以手动隐藏的, 例如 `Samsung S8, S9`
 			val wrapperHeight = if (activity?.navigationBarIsHidden() == true) {
-				context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight
+				context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight + 1.uiPX()
 			} else {
 				ScreenSize.Height - ScreenSize.statusBarHeight
 			}
 			wrapper = relativeLayout {
-				layoutParams = setRecyclerViewParams(
-					matchParent, wrapperHeight
-				)
+				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
-				addView(
-					recyclerView, RelativeLayout.LayoutParams(
-						matchParent, matchParent
-					)
-				)
+				addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
 			}
 		}.view
 	}

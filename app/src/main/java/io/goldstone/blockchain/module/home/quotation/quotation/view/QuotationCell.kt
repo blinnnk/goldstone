@@ -38,12 +38,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		tokenInfo.title.text = model.symbol
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
-			model.quoteSymbol.toUpperCase(),
-			model.quoteSymbol.toUpperCase() + " " + model.price,
-			GrayScale.midGray,
-			13.uiPX(),
-			false,
-			false
+			model.quoteSymbol.toUpperCase(), model.quoteSymbol.toUpperCase() + " " + model.price,
+			GrayScale.midGray, 13.uiPX(), false, false
 		)
 		tokenPrice.subtitle.text = model.percent + "%"
 		if (model.percent.toDouble() < 0) {
@@ -84,8 +80,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			typeface = GoldStoneFont.medium(context)
 			gravity = Gravity.END
 			layoutParams = RelativeLayout.LayoutParams(
-				matchParent,
-				20.uiPX()
+				matchParent, 20.uiPX()
 			)
 			x -= 20.uiPX()
 			y += 52.uiPX()
@@ -102,8 +97,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
-			setGrid(5,
-				10,
+			setGrid(5, 10,
 				Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
@@ -115,23 +109,17 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 					?: 0f
 			// 设定 `Y` 周波段
 			val stepDistance = generateStepDistance(
-				minValue.toDouble(),
-				maxValue.toDouble()
+				minValue.toDouble(), maxValue.toDouble()
 			)
 			val max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
 			val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
 			setAxisBorderValues(
-				min,
-				max,
-				stepDistance
+				min, max, stepDistance
 			)
 			// 设定外界 `Border` 颜色
 			setAxisColor(
 				Color.argb(
-					0,
-					0,
-					0,
-					0
+					0, 0, 0, 0
 				)
 			)
 			// 设定外边的 `Border` 的粗细
@@ -142,11 +130,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				chartData.forEach {
 					addPoint(
 						Point(
-							DateUtils.formatDateTime(
-								context,
-								it.label.toLong(),
-								DateUtils.FORMAT_NUMERIC_DATE
-							),
+							DateUtils.formatDateTime(context, it.label.toLong(), DateUtils.FORMAT_NUMERIC_DATE),
 							it.value
 						)
 					)
@@ -154,16 +138,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				// 这个是线的颜色
 				color = chartLineColor
 				// 渐变色彩
-				setGradientFill(
-					intArrayOf(
-						chartColor,
-						Color.TRANSPARENT
-					),
-					floatArrayOf(
-						0.28f,
-						1f
-					)
-				)
+				setGradientFill(intArrayOf(chartColor, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
 				// 线条联动用贝塞尔曲线
 				isSmooth = true
 				// 线条的粗细
@@ -179,8 +154,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				notifyDataUpdate()
 			} catch (error: Exception) {
 				Log.e(
-					"ERROR",
-					error.toString()
+					"ERROR", error.toString()
 				)
 			}
 
@@ -190,22 +164,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 
 	init {
-
-		layoutParams = LinearLayout.LayoutParams(
-			matchParent,
-			180.uiPX()
-		)
+		orientation = VERTICAL
+		gravity = Gravity.CENTER_HORIZONTAL
+		layoutParams = LinearLayout.LayoutParams(matchParent, 180.uiPX())
 
 		cellLayout = relativeLayout {
-			layoutParams = RelativeLayout.LayoutParams(
-				ScreenSize.widthWithPadding,
-				170.uiPX()
-			)
-			addCorner(
-				CornerSize.default.toInt(),
-				Spectrum.white
-			)
-			x += PaddingSize.device
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 170.uiPX())
+			addCorner(CornerSize.default.toInt(), Spectrum.white)
 
 			addView(tokenInfo)
 			addView(tokenPrice)
@@ -216,10 +181,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 
 			chartView.apply {
 				id = ElementID.chartView
-				layoutParams = RelativeLayout.LayoutParams(
-					matchParent,
-					90.uiPX()
-				)
+				layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
 				setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
 				y = 60.uiPX().toFloat()
 			}.into(this)
@@ -227,12 +189,14 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 
 	companion object {
-		fun generateStepDistance(minValue: Double, maxValue: Double): Float {
+		fun generateStepDistance(
+			minValue: Double,
+			maxValue: Double
+		): Float {
 			val stepsCount = 5   //代表希望分成几个阶段
 			val roughStep = (maxValue - minValue) / stepsCount
 			val stepLevel = Math.pow(
-				10.0,
-				Math.floor(Math.log10(roughStep))
+				10.0, Math.floor(Math.log10(roughStep))
 			) //代表gap的数量级
 			return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
 		}
