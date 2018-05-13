@@ -38,10 +38,15 @@ class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
+	override fun onFragmentHiddenChanged(isHidden: Boolean) {
+		loadDataFromDatabaseOrElse()
+	}
+
 	override fun updateData() {
-		prepareTokenDetailData()
 		// 详情页面直接全屏高度
-		setHeightMatchParent()
+		setHeightMatchParent {
+			prepareTokenDetailData()
+		}
 	}
 
 	override fun updateParentContentLayoutHeight(

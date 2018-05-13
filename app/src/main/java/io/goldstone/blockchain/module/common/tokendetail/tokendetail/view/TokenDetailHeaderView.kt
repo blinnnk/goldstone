@@ -38,12 +38,8 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 	private var chartData: ArrayList<Point>? by observing(null) {
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), matchParent)
-			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
-
 			// 设定背景的网格
-			setGrid(5,
-				10,
+			setGrid(5, 10,
 				Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
@@ -91,14 +87,26 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			val animation = Animation(1000)
 			animation.setInterpolator(OvershootInterpolator())
 			show(animation)
-		}.into(this)
+		}
 	}
+
+	private var hasShowAnimation = false
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
+		chartView
+			.apply {
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), matchParent)
+				setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+			}
+			.into(this)
 	}
 
-	fun setCharData(data: ArrayList<Point>, maxY: Float, unitY: Float) {
+	fun setCharData(
+		data: ArrayList<Point>,
+		maxY: Float,
+		unitY: Float
+	) {
 		this.maxY = maxY
 		this.unitY = unitY
 		chartData = data
