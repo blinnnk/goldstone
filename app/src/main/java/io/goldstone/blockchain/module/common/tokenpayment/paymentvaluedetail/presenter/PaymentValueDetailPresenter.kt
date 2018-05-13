@@ -208,11 +208,9 @@ class PaymentValueDetailPresenter(
 		// 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
 		currentNonce.isNull() isTrue {
 			GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
-				val myLatestNonce = first {
-					it.fromAddress.equals(
-						WalletTable.current.address, true
-					)
-				}.nonce.toLong()
+				val myLatestNonce = firstOrNull {
+					it.fromAddress.equals(WalletTable.current.address, true)
+				}?.nonce?.toLong() ?: 0
 				currentNonce = BigInteger.valueOf(myLatestNonce + 1)
 				generateTransaction(fragment.address!!, value, hold)
 			}
