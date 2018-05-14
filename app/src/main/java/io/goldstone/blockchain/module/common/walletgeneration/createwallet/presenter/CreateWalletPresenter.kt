@@ -55,12 +55,13 @@ class CreateWalletPresenter(
 
 	fun generateWalletWith(
 		isAgree: Boolean,
-		hintInput: EditText
+		hintInput: EditText,
+		callback: () -> Unit
 	) {
 		checkInputValue(
 			nameText, passwordText, repeatPasswordText, isAgree, fragment.context
 		) { password, walletName ->
-			fragment.context?.generateWalletWith(password, walletName, hintInput.text?.toString())
+			fragment.context?.generateWalletWith(password, walletName, hintInput.text?.toString(), callback)
 		}
 	}
 
@@ -95,7 +96,8 @@ class CreateWalletPresenter(
 	private fun Context.generateWalletWith(
 		password: String,
 		name: String,
-		hint: String? = null
+		hint: String? = null,
+		callback: () -> Unit
 	) {
 		generateWallet(password) { mnemonicCode, address ->
 			// 将基础的不存在安全问题的信息插入数据库
@@ -108,6 +110,7 @@ class CreateWalletPresenter(
 						putString(ArgumentKey.mnemonicCode, mnemonicCode)
 					}
 					showMnemonicBackupFragment(arguments)
+					callback()
 				}
 
 				XinGePushReceiver.registerWalletAddressForPush()

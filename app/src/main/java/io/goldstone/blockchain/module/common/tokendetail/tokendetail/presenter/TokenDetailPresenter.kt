@@ -108,7 +108,6 @@ class TokenDetailPresenter(
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
-				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
 				Log.d("DEBUG", "Without Local Transaction Data")
@@ -130,7 +129,6 @@ class TokenDetailPresenter(
 							// 链上和本地都没有数据就更新一个空数组作为默认
 							asyncData.isNull() isTrue {
 								updateChartBy(arrayListOf())
-								fragment.removeLoadingView()
 							}
 						}
 					}
@@ -146,6 +144,7 @@ class TokenDetailPresenter(
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			data.prepareTokenHistoryBalance(symbol!!) {
 				it.updateChartAndHeaderData()
+
 			}
 		} otherwise {
 			updateEmptyCharData(symbol!!)
@@ -164,9 +163,6 @@ class TokenDetailPresenter(
 			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
-		if (!NetworkUtil.hasNetwork(fragment.context)) {
-			fragment.removeLoadingView()
-		}
 	}
 
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
@@ -182,6 +178,7 @@ class TokenDetailPresenter(
 					if (maxY == 0.0) maxY = 10.0
 					if (unitY == 0f) unitY = 1f
 					header?.setCharData(chartArray.reversed().toArrayList(), maxY.toFloat(), unitY)
+					fragment.removeLoadingView()
 				}
 			}
 		}
