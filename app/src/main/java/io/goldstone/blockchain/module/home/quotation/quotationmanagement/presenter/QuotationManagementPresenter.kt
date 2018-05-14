@@ -22,6 +22,14 @@ class QuotationManagementPresenter(
 		updateSelectionsData()
 	}
 
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		// 重写
+	}
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
@@ -31,9 +39,7 @@ class QuotationManagementPresenter(
 
 	private fun updateSelectionsData(callback: () -> Unit = {}) {
 		QuotationSelectionTable.getMySelections {
-			it.sortedByDescending { it.orderID }
-				.toArrayList()
-				.let { orderedData ->
+			it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
 					fragment.apply {
 						asyncData.isNull() isTrue {
 							asyncData = orderedData
@@ -64,14 +70,12 @@ class QuotationManagementPresenter(
 					else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
 				}
 				QuotationSelectionTable.updateSelectionOrderIDBy(
-					data[toPosition].pair,
-					newOrderID
+					data[toPosition].pair, newOrderID
 				) {
 					// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
 					fragment.asyncData?.find {
 						it.baseSymnbol == data[toPosition].baseSymnbol
-					}
-						?.orderID = newOrderID
+					}?.orderID = newOrderID
 				}
 			}
 		}

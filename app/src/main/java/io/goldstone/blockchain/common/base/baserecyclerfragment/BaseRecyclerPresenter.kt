@@ -114,7 +114,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 
 	fun diffDataSetChanged(
-		oldData: ArrayList<D>, newData: ArrayList<D>, hold: (Boolean) -> Unit
+		oldData: ArrayList<D>,
+		newData: ArrayList<D>,
+		hold: (Boolean) -> Unit
 	) {
 		hold(oldData.getObjectMD5HexString() == newData.getObjectMD5HexString())
 	}
@@ -131,9 +133,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	) {
 		val actualHeight = dataCount.orZero() * cellHeight
 		val targetHeight = when {
-			dataCount == 0                            -> BasicSize.overlayMinHeight
+			dataCount == 0 -> BasicSize.overlayMinHeight
 			actualHeight > BasicSize.overlayMinHeight -> actualHeight
-			else                                      -> BasicSize.overlayMinHeight
+			else -> BasicSize.overlayMinHeight
 		}
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight)
@@ -148,17 +150,17 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		}
 	}
 
-	fun recoveryFragmentHeight() {
+	open fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			val recoveryHeight = fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
+			val recoveryHeight =
+				fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
 			val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-			overlayView.contentLayout.updateHeightAnimation(
-				when {
-					recoveryHeight == 0                         -> maxHeight
-					recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
-					else                                        -> BasicSize.overlayMinHeight
-				}, maxHeight
-			)
+			val realHeight = when {
+				recoveryHeight == 0 -> maxHeight
+				recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
+				else -> BasicSize.overlayMinHeight
+			}
+			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight)
 		}
 	}
 
