@@ -55,6 +55,7 @@ class TransactionDetailPresenter(
 	private val data by lazy {
 		fragment.arguments?.get(ArgumentKey.transactionDetail) as? ReceiptModel
 	}
+
 	private val dataFromList by lazy {
 		fragment.arguments?.get(ArgumentKey.transactionFromList) as? TransactionListModel
 	}
@@ -100,7 +101,8 @@ class TransactionDetailPresenter(
 			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 			 */
 			TransactionTable.getTransactionByHashAndReceivedStatus(
-				transaction.hash, transaction.isReceived
+				transaction.hash,
+				transaction.isReceived
 			) { localTransaction ->
 				if (localTransaction.isNull()) {
 					// 如果本地没有数据从链上查询所有需要的数据
@@ -353,8 +355,15 @@ class TransactionDetailPresenter(
 				CryptoUtils.isERC20TransferByInputCode(receipt.input) {
 					transactionInfo?.let { prepareHeaderValueFromNotification(receipt, it, info.isReceived) }
 				} isFalse {
-					val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
-					updateHeaderValue(count, receipt.from, CryptoSymbol.eth, false, info.isReceived)
+					val count =
+						CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
+					updateHeaderValue(
+						count,
+						if (info.isReceived) receipt.from else receipt.to,
+						CryptoSymbol.eth,
+						false,
+						info.isReceived
+					)
 				}
 
 				if (asyncData.isNull()) {
