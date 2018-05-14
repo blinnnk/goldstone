@@ -11,14 +11,15 @@ import android.widget.TextView
 import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.Size
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
-import org.jetbrains.anko.centerInParent
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
 
 /**
@@ -54,9 +55,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		}
 	}
 
-	private var viewSize = Size(
-		30.uiPX(), 65.uiPX()
-	)
+	private var viewSize = Size(30.uiPX(), 65.uiPX())
 
 	private var iconSize = 30.uiPX()
 
@@ -72,9 +71,8 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		iconView.layoutParams = LinearLayout.LayoutParams(viewSize.width, viewSize.width)
 		setIconViewColor(backgroundColor)
 		icon.setColorFilter(iconColor)
-		icon.layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-			centerInParent()
-		}
+		icon.layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize)
+		icon.setCenterInParent()
 	}
 
 	fun setTitleStyle(
@@ -90,12 +88,10 @@ class CircleButton(context: Context) : LinearLayout(context) {
 	init {
 		setStyleParameter()
 		orientation = VERTICAL
-
 		// 背景色的 `Layout`
 		iconView.into(this)
 		// ICON 图形
 		icon.into(iconView)
-
 		buttonTitle.into(this)
 		setTitleStyle()
 	}
