@@ -1,13 +1,18 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -128,6 +133,31 @@ data class TransactionTable(
 				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
 			}) {
 				hold(it.map { TransactionListModel(it) }.toArrayList())
+			}
+		}
+
+		fun getMyLatestNounce(hold: (Long?) -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.transactionDao().apply {
+					getTransactionsByAddress(WalletTable.current.address).let {
+						GoldStoneAPI.context.runOnUiThread {
+							if (it.isEmpty()) {
+								hold(null)
+								return@runOnUiThread
+							}
+							// 获取最大的 nonce
+							it.filter {
+								it.hasError == "0"
+							}.filter {
+								!it.isReceive
+							}.maxBy {
+								it.nonce
+							}.let {
+								hold(it?.nonce?.toLongOrNull())
+							}
+						}
+					}
+				}
 			}
 		}
 

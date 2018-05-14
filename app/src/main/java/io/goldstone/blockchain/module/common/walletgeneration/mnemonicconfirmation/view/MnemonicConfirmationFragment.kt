@@ -65,10 +65,8 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 						textColor = Spectrum.blue
 						textSize = fontSize(15)
 						typeface = GoldStoneFont.black(context)
-						addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
-						layoutParams = RelativeLayout.LayoutParams(
-							wordWidth, 30.uiPX()
-						)
+						addCorner(15.uiPX(), GrayScale.whiteGray)
+						layoutParams = RelativeLayout.LayoutParams(wordWidth, 30.uiPX())
 						gravity = Gravity.CENTER
 
 						onClick {
