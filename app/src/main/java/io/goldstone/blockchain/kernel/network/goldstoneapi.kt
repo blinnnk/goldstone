@@ -57,7 +57,8 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getCoinInfoBySymbolFromGoldStone(
-		symbols: String, hold: (ArrayList<TokenSearchModel>) -> Unit
+		symbols: String,
+		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
 			hold(toArrayList())
@@ -65,7 +66,10 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getCurrencyRate(symbols: String, hold: (Double) -> Unit) {
+	fun getCurrencyRate(
+		symbols: String,
+		hold: (Double) -> Unit
+	) {
 		requestData<String>(
 			APIPath.getCurrencyRate + symbols, "rate", true
 		) {
@@ -83,7 +87,9 @@ object GoldStoneAPI {
 	}
 
 	fun getERC20TokenTransaction(
-		address: String, startBlock: String = "0", hold: (ArrayList<ERC20TransactionModel>) -> Unit
+		address: String,
+		startBlock: String = "0",
+		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
 		requestData<ERC20TransactionModel>(
 			EtherScanApi.getAllTokenTransaction(address, startBlock), "result"
@@ -93,7 +99,10 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getMarketSearchList(pair: String, hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
+	fun getMarketSearchList(
+		pair: String,
+		hold: (ArrayList<QuotationSelectionTable>) -> Unit
+	) {
 		requestData<QuotationSelectionTable>(APIPath.marketSearch + pair, "pair_list") {
 			hold(toArrayList())
 		}
@@ -139,8 +148,9 @@ object GoldStoneAPI {
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"language\":\"$language\",\"cid\":\"$pushToken\",\"device\":\"$deviceID\",\"push_type\":$isChina,\"os\":$isAndroid}").orEmpty()
+			contentType, AesCrypto.encrypt(
+				"{\"language\":\"$language\",\"cid\":\"$pushToken\",\"device\":\"$deviceID\",\"push_type\":$isChina,\"os\":$isAndroid}"
+			).orEmpty()
 		).let {
 			postRequest(it, APIPath.registerDevice) {
 				hold(it)
@@ -149,7 +159,8 @@ object GoldStoneAPI {
 	}
 
 	fun getCurrencyLineChartData(
-		pairList: JsonArray, hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
+		pairList: JsonArray,
+		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		RequestBody.create(
@@ -164,7 +175,10 @@ object GoldStoneAPI {
 	}
 
 	fun registerWalletAddress(
-		addressList: JsonArray, deviceID: String, netWorkError: () -> Unit = {}, hold: (String) -> Unit
+		addressList: JsonArray,
+		deviceID: String,
+		netWorkError: () -> Unit = {},
+		hold: (String) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		RequestBody.create(
@@ -177,8 +191,27 @@ object GoldStoneAPI {
 		}
 	}
 
+	fun getUnreadCount(
+		deviceID: String,
+		time: Long,
+		netWorkError: () -> Unit = {},
+		hold: (String) -> Unit
+	) {
+		val contentType = MediaType.parse("application/json; charset=utf-8")
+		RequestBody.create(
+			contentType, AesCrypto.encrypt("{\"device\":\"$deviceID\",\"time\":\"$time\"}").orEmpty()
+		).let {
+
+			postRequest(it, APIPath.getUnreadCount, netWorkError) {
+				hold(it)
+			}
+		}
+	}
+
 	fun getNotificationList(
-		goldSonteID: String, time: Long, hold: (ArrayList<NotificationTable>) -> Unit
+		goldSonteID: String,
+		time: Long,
+		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		// 加密 `Post` 请求
@@ -193,7 +226,8 @@ object GoldStoneAPI {
 	}
 
 	fun getPriceByContractAddress(
-		addressList: JsonArray, hold: (ArrayList<TokenPriceModel>) -> Unit
+		addressList: JsonArray,
+		hold: (ArrayList<TokenPriceModel>) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		// 加密 `Post` 请求
@@ -208,20 +242,29 @@ object GoldStoneAPI {
 	}
 
 	fun getQuotationCurrencyChart(
-		pair: String, period: String, size: Int, hold: (ArrayList<ChartModel>) -> Unit
+		pair: String,
+		period: String,
+		size: Int,
+		hold: (ArrayList<ChartModel>) -> Unit
 	) {
 		requestData<ChartModel>(APIPath.getQuotationCurrencyChart(pair, period, size), "point_list") {
 			hold(this.toArrayList())
 		}
 	}
 
-	fun getQuotationCurrencyInfo(pair: String, hold: (JSONObject) -> Unit) {
+	fun getQuotationCurrencyInfo(
+		pair: String,
+		hold: (JSONObject) -> Unit
+	) {
 		requestData<String>(APIPath.getQuotationCurrencyInfo(pair), "", true) {
 			hold(JSONObject(this[0]))
 		}
 	}
 
-	fun getQuotationCurrencyDescription(symbol: String, hold: (String) -> Unit) {
+	fun getQuotationCurrencyDescription(
+		symbol: String,
+		hold: (String) -> Unit
+	) {
 		requestData<String>(
 			APIPath.getTokenDescription + symbol, "", true
 		) {
@@ -234,19 +277,30 @@ object GoldStoneAPI {
 	/**————————————————————— public network request method ———————————————————————*/
 
 	private inline fun <reified T> postRequestGetJsonObject(
-		body: RequestBody, keyName: String, path: String, crossinline hold: (List<T>) -> Unit
+		body: RequestBody,
+		keyName: String,
+		path: String,
+		crossinline hold: (List<T>) -> Unit
 	) {
 		val client = OkHttpClient()
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
+				override fun onFailure(
+					call: Call,
+					error: IOException
+				) {
 					println("$error")
 				}
 
-				override fun onResponse(call: Call, response: Response) {
+				override fun onResponse(
+					call: Call,
+					response: Response
+				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
-						val dataObject = data?.toJsonObject() ?: JSONObject("")
+						val dataObject =
+							data?.toJsonObject()
+								?: JSONObject("")
 						val jsonData = dataObject[keyName].toString()
 						val gson = Gson()
 						val collectionType = object : TypeToken<Collection<T>>() {}.type
@@ -261,17 +315,26 @@ object GoldStoneAPI {
 	}
 
 	private fun postRequest(
-		body: RequestBody, path: String, netWorkError: () -> Unit = {}, hold: (String) -> Unit
+		body: RequestBody,
+		path: String,
+		netWorkError: () -> Unit = {},
+		hold: (String) -> Unit
 	) {
 		val client = OkHttpClient()
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
+				override fun onFailure(
+					call: Call,
+					error: IOException
+				) {
 					Log.e("ERROR", error.toString())
 					netWorkError()
 				}
 
-				override fun onResponse(call: Call, response: Response) {
+				override fun onResponse(
+					call: Call,
+					response: Response
+				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						hold(data.orEmpty())
@@ -285,19 +348,30 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	private inline fun <reified T> requestData(
-		api: String, keyName: String, justGetData: Boolean = false, crossinline hold: List<T>.() -> Unit
+		api: String,
+		keyName: String,
+		justGetData: Boolean = false,
+		crossinline hold: List<T>.() -> Unit
 	) {
 		val client = OkHttpClient()
 		getcryptoGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
+				override fun onFailure(
+					call: Call,
+					error: IOException
+				) {
 					println("$error")
 				}
 
-				override fun onResponse(call: Call, response: Response) {
+				override fun onResponse(
+					call: Call,
+					response: Response
+				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
-						val dataObject = data?.toJsonObject() ?: JSONObject("")
+						val dataObject =
+							data?.toJsonObject()
+								?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 						if (justGetData) {
 							hold(listOf(jsonData as T))
@@ -317,19 +391,30 @@ object GoldStoneAPI {
 	/** 请求 ehterScan 的数据是明文请求不需要加密 */
 	@JvmStatic
 	private inline fun <reified T> requestUncryptoData(
-		api: String, keyName: String, justGetData: Boolean = false, crossinline hold: List<T>.() -> Unit
+		api: String,
+		keyName: String,
+		justGetData: Boolean = false,
+		crossinline hold: List<T>.() -> Unit
 	) {
 		val client = OkHttpClient()
 		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
-			override fun onFailure(call: Call, error: IOException) {
+			override fun onFailure(
+				call: Call,
+				error: IOException
+			) {
 				println("$error")
 			}
 
-			override fun onResponse(call: Call, response: Response) {
+			override fun onResponse(
+				call: Call,
+				response: Response
+			) {
 				val data = response.body()?.string()
 				try {
-					val dataObject = data?.toJsonObject() ?: JSONObject("")
+					val dataObject =
+						data?.toJsonObject()
+							?: JSONObject("")
 					val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 					if (justGetData) {
 						hold(listOf(jsonData as T))
@@ -347,19 +432,29 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	private inline fun <reified T> requestList(
-		api: String, keyName: String, crossinline hold: List<T>.() -> Unit
+		api: String,
+		keyName: String,
+		crossinline hold: List<T>.() -> Unit
 	) {
 		val client = OkHttpClient()
 		getcryptoGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
+				override fun onFailure(
+					call: Call,
+					error: IOException
+				) {
 					Log.e("ERROR", error.toString())
 				}
 
-				override fun onResponse(call: Call, response: Response) {
+				override fun onResponse(
+					call: Call,
+					response: Response
+				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
-						val dataObject = data?.toJsonObject() ?: JSONObject("")
+						val dataObject =
+							data?.toJsonObject()
+								?: JSONObject("")
 						val jsonArray = dataObject[keyName] as JSONArray
 						val dataArray = arrayListOf<T>()
 						(0 until jsonArray.length()).forEachOrEnd { index, isEnd ->
@@ -379,32 +474,46 @@ object GoldStoneAPI {
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
 	private const val secretKey = "gPBZ[5Ms#dn@]4oN,{86"
 
-	private fun getcryptoRequest(body: RequestBody, path: String, callback: (Request) -> Unit) {
+	private fun getcryptoRequest(
+		body: RequestBody,
+		path: String,
+		callback: (Request) -> Unit
+	) {
 		val timeStamp = System.currentTimeMillis().toString()
 		val version = "1.0.0"
 		AppConfigTable.getAppConfig {
 			it?.apply {
-				val sign = (goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
-					.removePrefix("0x")
-				val request = Request.Builder().url(path).method("POST", body)
-					.header("Content-type", "application/json").addHeader("device", goldStoneID)
-					.addHeader("timestamp", timeStamp).addHeader("os", "0").addHeader("version", version)
-					.addHeader("sign", sign).build()
+				val sign =
+					(goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
+						.removePrefix("0x")
+				val request =
+					Request.Builder().url(path).method("POST", body)
+						.header("Content-type", "application/json")
+						.addHeader("device", goldStoneID)
+						.addHeader("timestamp", timeStamp)
+						.addHeader("os", "0")
+						.addHeader("version", version)
+						.addHeader("sign", sign).build()
 				callback(request)
 			}
 		}
 	}
 
-	fun getcryptoGetRequest(api: String, callback: (Request) -> Unit) {
+	fun getcryptoGetRequest(
+		api: String,
+		callback: (Request) -> Unit
+	) {
 		val timeStamp = System.currentTimeMillis().toString()
 		val version = "1.0.0"
 		AppConfigTable.getAppConfig {
 			it?.apply {
-				val sign = (goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
-					.removePrefix("0x")
-				val request = Request.Builder().url(api).header("Content-type", "application/json")
-					.addHeader("device", goldStoneID).addHeader("timestamp", timeStamp).addHeader("os", "0")
-					.addHeader("version", version).addHeader("sign", sign).build()
+				val sign =
+					(goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
+						.removePrefix("0x")
+				val request =
+					Request.Builder().url(api).header("Content-type", "application/json")
+						.addHeader("device", goldStoneID).addHeader("timestamp", timeStamp).addHeader("os", "0")
+						.addHeader("version", version).addHeader("sign", sign).build()
 				callback(request)
 			}
 		}
@@ -412,7 +521,10 @@ object GoldStoneAPI {
 }
 
 object GoldStoneCode {
-	fun isSuccess(code: Any, callback: (isSuccessful: Boolean) -> Unit) {
+	fun isSuccess(
+		code: Any,
+		callback: (isSuccessful: Boolean) -> Unit
+	) {
 		if (code == 0) callback(true)
 		else {
 			callback(false)
