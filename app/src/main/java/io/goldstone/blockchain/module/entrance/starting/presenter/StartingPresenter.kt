@@ -97,16 +97,11 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						localTokens.forEach { localToken ->
 							serverTokens.find { it.symbol == localToken.symbol }?.let { serverToken ->
 								// 比对数据是否完全一致
-								if (localToken.iconUrl == serverToken.iconUrl && localToken.contract == serverToken.contract) {
-									serverTokens.remove(serverToken)
-								} else {
+								serverTokens.remove(serverToken)
+								if (localToken.iconUrl != serverToken.iconUrl) {
 									// 数据有变化直接更新服务器数据
 									doAsync {
-										GoldStoneDataBase.database.defaultTokenDao().apply {
-											getTokenByContract(localToken.contract)?.let {
-												update(serverToken)
-											}
-										}
+										GoldStoneDataBase.database.defaultTokenDao().update(localToken.apply { iconUrl = serverToken.iconUrl })
 									}
 								}
 							}
