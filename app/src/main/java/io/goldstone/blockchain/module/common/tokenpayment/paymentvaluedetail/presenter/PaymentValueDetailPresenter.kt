@@ -210,8 +210,10 @@ class PaymentValueDetailPresenter(
 			GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
 				val myLatestNonce = firstOrNull {
 					it.fromAddress.equals(WalletTable.current.address, true)
-				}?.nonce?.toLong() ?: 0
-				currentNonce = BigInteger.valueOf(myLatestNonce + 1)
+				}?.nonce?.toLong()
+				currentNonce =
+					if (myLatestNonce.isNull()) BigInteger.valueOf(0)
+					else BigInteger.valueOf(myLatestNonce!! + 1)
 				generateTransaction(fragment.address!!, value, hold)
 			}
 		} otherwise {
