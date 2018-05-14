@@ -111,4 +111,8 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 		description.text = "Recieve $symbol Count"
 	}
 
+	fun setPriceValue(price: Double) {
+		priceInfo.text = "≈ $price (${GoldStoneApp.currencyCode})"
+	}
+
 }

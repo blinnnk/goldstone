@@ -80,8 +80,18 @@ class TokenSearchPresenter(
 						hold(
 							arrayListOf(
 								DefaultTokenTable(
-									0, content, "", symbol, TinyNumber.False.value, 0.0, name, decimal, null, false,
-									false, 0
+									0,
+									content,
+									"",
+									symbol,
+									TinyNumber.False.value,
+									0.0,
+									name,
+									decimal,
+									null,
+									false,
+									false,
+									0
 								)
 							)
 						)
