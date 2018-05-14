@@ -101,11 +101,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								if (localToken.iconUrl != serverToken.iconUrl) {
 									// 数据有变化直接更新服务器数据
 									doAsync {
-										GoldStoneDataBase.database.defaultTokenDao().apply {
-											getTokenByContract(localToken.contract)?.let {
-												update(it.apply { iconUrl = serverToken.iconUrl })
-											}
-										}
+										GoldStoneDataBase.database.defaultTokenDao().update(localToken.apply { iconUrl = serverToken.iconUrl })
 									}
 								}
 							}
