@@ -47,7 +47,10 @@ object GoldStoneAPI {
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
 	@JvmStatic
-	fun getDefaultTokens(errorCallback: () -> Unit = {}, hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+	fun getDefaultTokens(
+		errorCallback: () -> Unit = {},
+		hold: (ArrayList<DefaultTokenTable>) -> Unit
+	) {
 		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list", false, {
 			errorCallback()
 		}) {
@@ -230,13 +233,17 @@ object GoldStoneAPI {
 
 	fun getPriceByContractAddress(
 		addressList: JsonArray,
+		errorCallback: () -> Unit,
 		hold: (ArrayList<TokenPriceModel>) -> Unit
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
 		RequestBody.create(contentType, content).let {
-			postRequestGetJsonObject<TokenPriceModel>(it, "price_list", APIPath.getPriceByAddress) {
+			postRequestGetJsonObject<TokenPriceModel>(
+				it, "price_list",
+				APIPath.getPriceByAddress,
+				errorCallback = { errorCallback() }) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -283,6 +290,7 @@ object GoldStoneAPI {
 		body: RequestBody,
 		keyName: String,
 		path: String,
+		noinline errorCallback: () -> Unit = {},
 		crossinline hold: (List<T>) -> Unit
 	) {
 		val client = OkHttpClient()
@@ -292,7 +300,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					println("$error")
+					Log.e("ERROR", error.toString())
 				}
 
 				override fun onResponse(
@@ -309,7 +317,7 @@ object GoldStoneAPI {
 						val collectionType = object : TypeToken<Collection<T>>() {}.type
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
-						GoldStoneCode.showErrorCodeReason(data)
+						GoldStoneCode.showErrorCodeReason(data, errorCallback)
 					}
 				}
 			})
@@ -493,11 +501,8 @@ object GoldStoneAPI {
 						.removePrefix("0x")
 				val request =
 					Request.Builder().url(path).method("POST", body)
-						.header("Content-type", "application/json")
-						.addHeader("device", goldStoneID)
-						.addHeader("timestamp", timeStamp)
-						.addHeader("os", "0")
-						.addHeader("version", version)
+						.header("Content-type", "application/json").addHeader("device", goldStoneID)
+						.addHeader("timestamp", timeStamp).addHeader("os", "0").addHeader("version", version)
 						.addHeader("sign", sign).build()
 				callback(request)
 			}
@@ -537,16 +542,21 @@ object GoldStoneCode {
 		}
 	}
 
-	fun showErrorCodeReason(data: String?) {
+	fun showErrorCodeReason(
+		data: String?,
+		errorCallback: () -> Unit = {}
+	) {
 		data?.apply {
 			val code = JSONObject(this).safeGet("code")
 			if (code.isNotEmpty()) {
 				when (code.toInt()) {
 					-1 -> {
-						Log.e("ERROR", "Server Error")
+						errorCallback()
+						Log.e("ERROR", "Server Error GoldStone")
 					}
 
 					-4 -> {
+						errorCallback()
 						Log.e("ERROR", "Url Error")
 						/**
 						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误

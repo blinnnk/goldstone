@@ -43,7 +43,7 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 			// 这个是线的颜色
 			color = chartLineColor
 			// 渐变色彩
-			setGradientFill(intArrayOf(chartColor, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
+			setGradientFill(intArrayOf(chartColor, Color.argb(0, 255, 255, 255)), floatArrayOf(0.28f, 1f))
 			// 线条联动用贝塞尔曲线
 			isSmooth = true
 			// 线条的粗细
@@ -51,8 +51,12 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 			// 设定字体
 			setTypeface(GoldStoneFont.heavy(context))
 			setFontSize(8.uiPX())
-			val maxValue = chartData.max()?.value ?: 0f
-			val minValue = chartData.min()?.value ?: 0f
+			val maxValue =
+				chartData.max()?.value
+					?: 0f
+			val minValue =
+				chartData.min()?.value
+					?: 0f
 			// 设定 `Y` 周波段
 			val stepDistance =
 				QuotationCell.generateStepDistance(minValue.toDouble(), maxValue.toDouble())
@@ -80,9 +84,10 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 20.uiPX() }
 		// 设定背景的网格
-		setGrid(5,
-			10,
-			Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
+		setGrid(5, 10, Paint().apply {
+			isAntiAlias = true
+			style = Paint.Style.FILL; color = GrayScale.lightGray
+		})
 		// 设定便捷字体颜色
 		setLabelsColor(GrayScale.midGray)
 		// 设定外界 `Border` 颜色
