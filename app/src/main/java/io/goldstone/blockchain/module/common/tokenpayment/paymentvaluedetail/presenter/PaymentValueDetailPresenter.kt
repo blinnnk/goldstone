@@ -156,8 +156,8 @@ class PaymentValueDetailPresenter(
 					}
 					// 主线程跳转到账目详情界面
 					fragment.context?.runOnUiThread {
-						callback()
 						goToTransactionDetailFragment(fragment.address!!, raw!!, fragment.token!!, taxHash)
+						callback()
 					}
 				}
 			}
