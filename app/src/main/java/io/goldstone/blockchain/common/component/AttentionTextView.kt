@@ -9,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
 
@@ -21,7 +22,7 @@ class AttentionTextView(context: Context) : TextView(context) {
 
   init {
     id = ElementID.attentionText
-    textSize = 5.uiPX().toFloat()
+    textSize = fontSize(15)
     textColor = GrayScale.midGray
     typeface = GoldStoneFont.medium(context)
     layoutParams = LinearLayout.LayoutParams(ScreenSize.Width -  30.uiPX() * 2, wrapContent).apply {

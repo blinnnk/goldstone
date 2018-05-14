@@ -63,7 +63,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				}
 
 				textView("the most useful and safest wallet in the world") {
-					textSize = 4.uiPX().toFloat()
+					textSize = fontSize(12)
 					typeface = GoldStoneFont.light(context)
 				}
 

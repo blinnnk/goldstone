@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
@@ -42,14 +43,14 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
     title
       .apply {
         textColor = titleColor
-        textSize = 4.uiPX().toFloat() + 1f
+        textSize = fontSize(13)
         typeface = GoldStoneFont.medium(context)
       }
       .into(this)
 
     description
       .apply {
-        textSize = 4.uiPX().toFloat() + 1f
+        textSize = fontSize(13)
         typeface = GoldStoneFont.medium(context)
         textColor = GrayScale.gray
         x -= 30.uiPX()

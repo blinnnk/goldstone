@@ -12,10 +12,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -34,7 +31,7 @@ class GasSpeedLevelBar(context: Context) : RelativeLayout(context) {
 
 		textView {
 			text = CommonText.slow
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = GrayScale.black
 			typeface = GoldStoneFont.black(context)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -43,7 +40,7 @@ class GasSpeedLevelBar(context: Context) : RelativeLayout(context) {
 
 		textView {
 			text = CommonText.fast
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = GrayScale.black
 			typeface = GoldStoneFont.black(context)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)

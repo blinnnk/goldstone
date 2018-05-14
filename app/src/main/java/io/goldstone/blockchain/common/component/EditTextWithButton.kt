@@ -36,7 +36,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 		id = ElementID.searchInput
 		editText.apply {
 			hint = "search contracts address or token name"
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = GrayScale.black
 			hintTextColor = GrayScale.midGray
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 35.uiPX())
@@ -56,7 +56,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 		button.apply {
 			text = CommonText.cancel
 			textColor = GrayScale.midGray
-			textSize = 4.uiPX().toFloat() - 1f
+			textSize = fontSize(13)
 			typeface = GoldStoneFont.book(context)
 			layoutParams = RelativeLayout.LayoutParams(70.uiPX(), matchParent)
 			gravity = Gravity.CENTER

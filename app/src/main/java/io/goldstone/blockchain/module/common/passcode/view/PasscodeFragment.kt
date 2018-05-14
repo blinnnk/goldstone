@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -79,7 +80,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 			failedAttention = TextView(context).apply {
 				y += 30.uiPX()
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				textColor = Spectrum.red
 				typeface = GoldStoneFont.medium(context)
 				text = content

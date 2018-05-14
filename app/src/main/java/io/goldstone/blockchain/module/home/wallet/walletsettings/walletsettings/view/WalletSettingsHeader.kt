@@ -62,7 +62,7 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
     copyButton
       .apply {
         text = WalletSettingsText.copy
-        textSize = 4.uiPX().toFloat()
+        textSize = fontSize(12)
         textColor = Spectrum.blue
         typeface = GoldStoneFont.book(context)
         gravity = Gravity.CENTER_HORIZONTAL

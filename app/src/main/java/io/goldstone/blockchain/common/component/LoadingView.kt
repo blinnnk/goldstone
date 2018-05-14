@@ -13,10 +13,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.CornerSize
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 
 /**
@@ -57,7 +54,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 			addView(loading)
 
 			introView.apply {
-				textSize = 4.uiPX().toFloat() + 1f
+				textSize = fontSize(13)
 				textColor = GrayScale.gray
 				gravity = Gravity.CENTER_HORIZONTAL
 				leftPadding = 30.uiPX()

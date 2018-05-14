@@ -20,10 +20,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.utils.measureTextWidth
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.WalletDetailSize
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
@@ -81,7 +78,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			}.into(this)
 
 			textView(WalletText.totalAssets + " (${GoldStoneApp.currencyCode})") {
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				typeface = GoldStoneFont.light(context)
 				textColor = Spectrum.opacity5White
 				gravity = Gravity.CENTER_HORIZONTAL

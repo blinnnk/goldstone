@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.matchParent
@@ -82,7 +83,7 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 				}
 				text = "≈ 0.0 (${GoldStoneApp.currencyCode})"
 				textColor = Spectrum.opacity5White
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
 				gravity = Gravity.CENTER
 			}.into(this)

@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
@@ -56,11 +57,11 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		}
 
 		balance.apply {
-			title.textSize = 6.uiPX().toFloat()
+			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
 			subtitle.apply {
 				text = WalletText.totalAssets + " " + GoldStoneApp.currencyCode
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 			}
 			isCenter = true
 			visibility = View.GONE

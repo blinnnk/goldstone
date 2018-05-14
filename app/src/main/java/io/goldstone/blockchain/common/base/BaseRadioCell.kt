@@ -11,6 +11,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 
@@ -36,7 +37,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		setGrayStyle()
 
 		this.addView(title.apply {
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			textColor = GrayScale.black
 			typeface = GoldStoneFont.medium(context)
 		})

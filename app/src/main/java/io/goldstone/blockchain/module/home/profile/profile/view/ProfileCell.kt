@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import org.jetbrains.anko.textColor
 
@@ -69,7 +70,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 
 		info.apply {
 			textColor = Spectrum.opacity5White
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			typeface = GoldStoneFont.heavy(context)
 			x -= CommonCellSize.rightPadding
 		}.into(this)
