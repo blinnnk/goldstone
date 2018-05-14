@@ -1238,36 +1238,12 @@ enum class HoneyLanguage(
 	val language: String,
 	val symbol: String
 ) {
-	English(
-		       0,
-		       "English",
-		       "EN"
-	       ),
-	Chinese(
-		       1,
-		       "Chinese",
-		       "ZH"
-	       ),
-	Japanese(
-		        2,
-		        "Japanese",
-		        "JP"
-	        ),
-	Russian(
-		       3,
-		       "Russian",
-		       "RU"
-	       ),
-	Korean(
-		      4,
-		      "Korean",
-		      "KR"
-	      ),
-	TraditionalChinese(
-		                  5,
-		                  "TraditionalChinese",
-		                  "TC"
-	                  );
+	English(0, "English", "EN"),
+	Chinese(1, "Chinese", "ZH"),
+	Japanese(2, "Japanese", "JP"),
+	Russian(3, "Russian", "RU"),
+	Korean(4, "Korean", "KR"),
+	TraditionalChinese(5, "TraditionalChinese", "TC");
 
 	companion object {
 		fun getLanguageCode(language: String): Int {

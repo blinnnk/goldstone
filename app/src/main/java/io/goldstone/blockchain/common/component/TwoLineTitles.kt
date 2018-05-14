@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.EmptyText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.sp
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
 
@@ -25,7 +26,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	}
 
 	val subtitle = textView {
-		textSize = 4.uiPX().toFloat()
+		textSize = sp(4).toFloat()
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
 		y -= 3.uiPX()
