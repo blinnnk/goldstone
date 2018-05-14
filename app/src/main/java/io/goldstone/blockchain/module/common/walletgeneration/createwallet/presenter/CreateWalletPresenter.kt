@@ -59,7 +59,7 @@ class CreateWalletPresenter(
 		callback: () -> Unit
 	) {
 		checkInputValue(
-			nameText, passwordText, repeatPasswordText, isAgree, fragment.context
+			nameText, passwordText, repeatPasswordText, isAgree, fragment.context, callback
 		) { password, walletName ->
 			fragment.context?.generateWalletWith(password, walletName, hintInput.text?.toString(), callback)
 		}
