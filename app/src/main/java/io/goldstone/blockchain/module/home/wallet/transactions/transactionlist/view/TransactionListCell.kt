@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.GridLayout
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
@@ -23,14 +24,20 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 	var model: TransactionListModel? by observing(null) {
 		model?.let {
 			icon.apply {
-				if (it.isReceived) {
-					src = R.drawable.receive_icon
-					iconColor = Spectrum.green
-					count?.title?.textColor = Spectrum.green
-				} else {
-					src = if (model?.isPending == true) R.drawable.pending_icon else R.drawable.send_icon
-					iconColor = if (model?.isPending == true) Spectrum.lightRed else GrayScale.midGray
+				if (it.hasError) {
+					src = R.drawable.error_icon
+					iconColor = Spectrum.red
 					count?.title?.textColor = Spectrum.red
+				} else {
+					if (it.isReceived) {
+						src = R.drawable.receive_icon
+						iconColor = Spectrum.green
+						count?.title?.textColor = Spectrum.green
+					} else {
+						src = if (model?.isPending == true) R.drawable.pending_icon else R.drawable.send_icon
+						iconColor = if (model?.isPending == true) Spectrum.darkBlue else GrayScale.midGray
+						count?.title?.textColor = Spectrum.red
+					}
 				}
 			}
 

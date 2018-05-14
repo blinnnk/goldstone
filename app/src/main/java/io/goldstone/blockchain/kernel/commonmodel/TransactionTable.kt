@@ -57,7 +57,8 @@ data class TransactionTable(
 	var gasUsed: String,
 	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String, var isReceive: Boolean,
+	private var confirmations: String,
+	var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
