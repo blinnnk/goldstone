@@ -70,14 +70,14 @@ class TransactionDetailPresenter(
 
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
 		dataFromList?.apply {
-			updateHeaderValue(count, targetAddress, symbol, isPending, isReceived)
+			updateHeaderValue(count, targetAddress, symbol, isPending, isReceived, hasError)
 			fragment.asyncData = generateModels(this)
 			currentHash = transactionHash
 			if (isPending) {
 				// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
 				doAsync {
 					fragment.getTransactionFromChain(transactionHash) {
-						updateHeaderValue(count, targetAddress, symbol, false)
+						updateHeaderValue(count, targetAddress, symbol, false, hasError)
 					}
 				}
 			}
@@ -114,7 +114,9 @@ class TransactionDetailPresenter(
 					// 本地有数据直接展示本地数据
 					localTransaction?.apply {
 						fragment.asyncData = generateModels(TransactionListModel(localTransaction))
-						updateHeaderValue(value.toDouble(), fromAddress, symbol, false, isReceive)
+						updateHeaderValue(
+							value.toDouble(), fromAddress, symbol, false, isReceive, hasError == "1"
+						)
 					}
 				}
 			}
@@ -246,10 +248,11 @@ class TransactionDetailPresenter(
 		address: String,
 		symbol: String,
 		isPending: Boolean,
-		isReceive: Boolean = false
+		isReceive: Boolean = false,
+		isError: Boolean = false
 	) {
 		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			it?.setIconStyle(count, address, symbol, isReceive, isPending)
+			it?.setIconStyle(count, address, symbol, isReceive, isPending, isError)
 		}
 	}
 

@@ -61,10 +61,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			)
 			wake.acquire(10000)
 			val wakeLock =
-				powerManager.newWakeLock(
-					PowerManager.PARTIAL_WAKE_LOCK,
-					"weakScreen"
-				)
+				powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "weakScreen")
 			wakeLock.acquire(10000)
 		}
 

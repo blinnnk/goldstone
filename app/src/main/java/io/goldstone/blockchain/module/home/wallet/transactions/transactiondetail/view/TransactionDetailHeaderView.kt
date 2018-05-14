@@ -28,84 +28,96 @@ import org.jetbrains.anko.verticalLayout
 
 class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-  private val info = TwoLineTitles(context)
-  private val gradientView = GradientView(context)
-  private val icon = RoundIcon(context)
-  private var pendingIcon: ProgressBar? = null
+	private val info = TwoLineTitles(context)
+	private val gradientView = GradientView(context)
+	private val icon = RoundIcon(context)
+	private var pendingIcon: ProgressBar? = null
 
-  init {
+	init {
 
-    gradientView
-      .apply {
-        setStyle(GradientType.DarkGreen, TransactionSize.headerView)
-        layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
-      }
-      .into(this)
+		gradientView.apply {
+			setStyle(GradientType.DarkGreen, TransactionSize.headerView)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
+		}.into(this)
 
-    verticalLayout {
+		verticalLayout {
 
-      layoutParams = RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 130.uiPX()).apply {
-        leftMargin = (ScreenSize.Width * 0.2).toInt()
-        addRule(CENTER_VERTICAL)
-      }
+			layoutParams =
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 130.uiPX()).apply {
+					leftMargin = (ScreenSize.Width * 0.2).toInt()
+					addRule(CENTER_VERTICAL)
+				}
 
-      gravity = Gravity.CENTER_HORIZONTAL
+			gravity = Gravity.CENTER_HORIZONTAL
 
-      icon
-        .apply {
-          setColorFilter(GrayScale.Opacity2Black)
-          setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-          elevation = 15.uiPX().toFloat()
-        }
-        .into(this)
+			icon.apply {
+				setColorFilter(GrayScale.Opacity2Black)
+				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
+				elevation = 15.uiPX().toFloat()
+			}.into(this)
 
-      info
-        .apply {
-          layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
-          isCenter = true
-          setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-          setWildStyle()
-        }
-        .into(this)
-    }
-  }
+			info.apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
+				isCenter = true
+				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
+				setWildStyle()
+			}.into(this)
+		}
+	}
 
-  @SuppressLint("SetTextI18n")
-  fun setIconStyle(count: Double, targetAddress: String, symbol: String, isReceive: Boolean, isPending: Boolean) {
-    val type = if(isReceive) "Received " else "Send "
-    info.title.text = "$type$count $symbol ${if(isReceive) "From" else "To"}"
-    info.subtitle.text = targetAddress
+	@SuppressLint("SetTextI18n")
+	fun setIconStyle(
+		count: Double,
+		targetAddress: String,
+		symbol: String,
+		isReceive: Boolean,
+		isPending: Boolean,
+		isError: Boolean
+	) {
 
-    if (isPending) {
-      icon.iconColor = Spectrum.lightRed
-      showPendingIcon()
-    } else {
-      showPendingIcon(false)
-      if(!isReceive) {
-        icon.iconColor = Spectrum.yellow
-        icon.src = R.drawable.send_icon
-        icon.setColorFilter(GrayScale.Opacity5Black)
-      } else {
-        icon.iconColor = Spectrum.green
-        icon.src = R.drawable.receive_icon
-      }
-    }
-  }
+		val type = if (isReceive) "Received " else "Send "
+		info.title.text = "$type$count $symbol ${if (isReceive) "From" else "To"}"
+		info.subtitle.text = targetAddress
 
-  private fun showPendingIcon(status: Boolean = true) {
-    pendingIcon.isNotNull {
-      if (!status) removeView(pendingIcon)
-    } otherwise {
-      if (status) {
-        pendingIcon = ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
-          indeterminateDrawable.setColorFilter(HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY)
-          RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-          y += 46.uiPX()
-        }
-        addView(pendingIcon)
-        pendingIcon?.setCenterInHorizontal()
-      }
-    }
-  }
+		if(isError) {
+			icon.iconColor = Spectrum.red
+			icon.src = R.drawable.error_icon
+			return
+		}
+		
+		if (isPending) {
+			icon.iconColor = Spectrum.lightRed
+			showPendingIcon()
+		} else {
+			showPendingIcon(false)
+			if (!isReceive) {
+				icon.iconColor = Spectrum.yellow
+				icon.src = R.drawable.send_icon
+				icon.setColorFilter(GrayScale.Opacity5Black)
+			} else {
+				icon.iconColor = Spectrum.green
+				icon.src = R.drawable.receive_icon
+			}
+		}
+	}
+
+	private fun showPendingIcon(status: Boolean = true) {
+		pendingIcon.isNotNull {
+			if (!status) removeView(pendingIcon)
+		} otherwise {
+			if (status) {
+				pendingIcon =
+					ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
+						indeterminateDrawable.setColorFilter(
+							HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY
+						)
+						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
+						y += 46.uiPX()
+					}
+				addView(pendingIcon)
+				pendingIcon?.setCenterInHorizontal()
+			}
+		}
+	}
 
 }
