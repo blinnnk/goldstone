@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import org.jetbrains.anko.matchParent
@@ -69,7 +70,7 @@ class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
 
 		priceTitles.apply {
 			textColor = GrayScale.black
-			textSize = 8.uiPX().toFloat()
+			textSize = fontSize(24)
 			typeface = GoldStoneFont.black(context)
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			gravity = Gravity.START or Gravity.BOTTOM
@@ -78,7 +79,7 @@ class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
 		priceTitles.setAlignParentBottom()
 		percent.apply {
 			textColor = Spectrum.green
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			gravity = Gravity.END or Gravity.BOTTOM

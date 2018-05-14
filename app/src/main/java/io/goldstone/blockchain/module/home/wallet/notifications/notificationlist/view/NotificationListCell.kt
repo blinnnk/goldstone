@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationType
@@ -50,7 +51,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
     date
       .apply {
         textColor = GrayScale.midGray
-        textSize = 3.uiPX() + 1f
+        textSize = fontSize(10)
         typeface = GoldStoneFont.book(context)
         x -= 30.uiPX()
       }

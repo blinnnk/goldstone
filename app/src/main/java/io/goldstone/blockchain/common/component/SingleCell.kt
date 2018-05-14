@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
 import org.jetbrains.anko.wrapContent
@@ -35,7 +36,7 @@ class SingleCell(context: Context) : BaseCell(context) {
 		setGrayStyle()
 		titleView = textView {
 			textColor = GrayScale.black
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}
 		titleView.setCenterInVertical()
@@ -43,7 +44,7 @@ class SingleCell(context: Context) : BaseCell(context) {
 		subtitleView = textView {
 			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
 			textColor = GrayScale.gray
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.book(context)
 			gravity = Gravity.END
 		}.apply {

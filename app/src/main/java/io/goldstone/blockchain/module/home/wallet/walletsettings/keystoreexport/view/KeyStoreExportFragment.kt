@@ -51,7 +51,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 					setPadding(20.uiPX(), 16.uiPX(), 20.uiPX(), 10.uiPX())
 				}
 				gravity = Gravity.CENTER_VERTICAL
-				textSize = 5.uiPX().toFloat()
+				textSize = fontSize(15)
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.heavy(context)
 				text = ImportWalletText.exportKeystore

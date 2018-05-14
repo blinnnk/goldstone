@@ -83,7 +83,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
 		title = textView {
 			textColor = GrayScale.black
-			textSize = FontSize.header
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 			gravity = Gravity.CENTER
 			layoutParams = RelativeLayout.LayoutParams(matchParent, headerHeight)

@@ -79,7 +79,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 		TextView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(50.uiPX(), 50.uiPX())
 			addCorner(25.uiPX(), GrayScale.lightGray)
-			textSize = 6.uiPX().toFloat()
+			textSize = fontSize(18)
 			textColor = GrayScale.gray
 			gravity = Gravity.CENTER
 		}

@@ -71,7 +71,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 		verticalLayout {
 			balanceTitle.apply {
-				textSize = 12.uiPX().toFloat()
+				textSize = fontSize(36)
 				typeface = GoldStoneFont.black(context)
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER_HORIZONTAL
@@ -98,7 +98,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			text = WalletText.section.toUpperCase()
 			typeface = GoldStoneFont.heavy(context)
 			textColor = Spectrum.white
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			y -= 10.uiPX()
 		}.apply {
 			setAlignParentBottom()

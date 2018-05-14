@@ -39,7 +39,7 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 				setGrayStyle()
 				text = TokenDetailText.customMiner
 				textColor = GrayScale.gray
-				textSize = 5.uiPX().toFloat()
+				textSize = fontSize(15)
 				typeface = GoldStoneFont.book(context)
 			}.setCenterInVertical()
 		}.click {

@@ -63,7 +63,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 						id = index
 						text = content
 						textColor = Spectrum.blue
-						textSize = 5.uiPX().toFloat()
+						textSize = fontSize(15)
 						typeface = GoldStoneFont.black(context)
 						addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 						layoutParams = RelativeLayout.LayoutParams(
@@ -97,7 +97,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			}.into(this)
 
 			textView("What is mnemonic?") {
-				textSize = 5.uiPX().toFloat()
+				textSize = fontSize(15)
 				typeface = GoldStoneFont.heavy(context)
 				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())
 				textColor = Spectrum.blue

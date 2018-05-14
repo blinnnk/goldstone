@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import com.blinnnk.extension.forEachOrEnd
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
@@ -11,7 +10,6 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.walletDetailMemoryData
 import java.io.Serializable
 
 /**
@@ -61,8 +59,6 @@ data class WalletDetailCellModel(
 						override fun concurrentJobs() {
 							allTokens.forEach { token ->
 								localTokens.find { it.symbol == token.symbol }?.let { targetToken ->
-									/** 有网络的时候从链上更新 `Balance` */
-									/** 没网的时候显示数据库的 `Balance` */
 									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
 									completeMark()
 								}
@@ -80,10 +76,8 @@ data class WalletDetailCellModel(
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
-
 			// 获取我的钱包的 `Token` 列表
 			MyTokenTable.getTokensWith(walletAddress) { allTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
@@ -119,8 +113,9 @@ data class WalletDetailCellModel(
 								}
 							}
 
-							override fun mergeCallBack() =
+							override fun mergeCallBack() {
 								hold(tokenList)
+							}
 						}.start()
 					}
 				}
@@ -129,15 +124,22 @@ data class WalletDetailCellModel(
 
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
 			map { it.contract }.toJsonArray {
-				GoldStoneAPI.getPriceByContractAddress(it) { newPrices ->
-					newPrices.forEachOrEnd { item, isEnd ->
-						// 同时更新缓存里面的数据
-						DefaultTokenTable.updateTokenPrice(
-							item.contract, item.price
-						) {
-							if (isEnd) callback()
+				GoldStoneAPI.getPriceByContractAddress(it, errorCallback = {
+					 callback()
+				}) { newPrices ->
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount: Int = size
+						override fun concurrentJobs() {
+							newPrices.forEach {
+								// 同时更新缓存里面的数据
+								DefaultTokenTable.updateTokenPrice(it.contract, it.price) {
+									completeMark()
+								}
+							}
 						}
-					}
+						override fun mergeCallBack() =
+							callback()
+					}.start()
 				}
 			}
 		}

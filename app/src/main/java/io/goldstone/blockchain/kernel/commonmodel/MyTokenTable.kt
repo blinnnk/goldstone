@@ -172,9 +172,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(
-						symbol, WalletTable.current.address
-					).let {
+					getTokenBySymbolAndAddress(symbol, WalletTable.current.address).let {
 						update(it.apply { this.balance = balance })
 					}
 				}
