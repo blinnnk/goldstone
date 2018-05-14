@@ -99,7 +99,10 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 					topMargin = 20.uiPX()
 				}
 			}.click {
-				presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput)
+				it.showLoadingStatus()
+				presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) {
+					it.showLoadingStatus(false)
+				}
 			}.into(this)
 		}
 	}
