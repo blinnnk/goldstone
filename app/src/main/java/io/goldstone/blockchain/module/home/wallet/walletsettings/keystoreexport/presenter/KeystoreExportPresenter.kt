@@ -13,16 +13,21 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.
  */
 
 class KeystoreExportPresenter(
-  override val fragment: KeystoreExportFragment
+	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
 
-  fun getPrivateKeyByAddress(passwordInput: EditText, hold: String.() -> Unit) {
-    fragment.activity?.apply { SoftKeyboard.hide(this) }
-    WalletTable.getCurrentWalletInfo {
-      fragment.context?.getKeystoreFile(it!!.address, passwordInput.text.toString()) {
-        hold(it)
-      }
-    }
-  }
+	fun getPrivateKeyByAddress(
+		passwordInput: EditText,
+		hold: String.() -> Unit
+	) {
+		fragment.activity?.apply {
+			SoftKeyboard.hide(this)
+		}
+		WalletTable.getCurrentWalletInfo {
+			fragment.context?.getKeystoreFile(it!!.address, passwordInput.text.toString()) {
+				hold(it)
+			}
+		}
+	}
 
 }

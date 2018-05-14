@@ -87,8 +87,14 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(
-						mnemonicInput, passwordInput, repeatPassword, hintInput,
-						agreementView.radioButton.isChecked, walletNameInput
+						pathInput,
+						mnemonicInput,
+						passwordInput,
+						repeatPassword,
+						hintInput,
+						agreementView.
+							radioButton.isChecked,
+						walletNameInput
 					) {
 						it.showLoadingStatus(false)
 					}

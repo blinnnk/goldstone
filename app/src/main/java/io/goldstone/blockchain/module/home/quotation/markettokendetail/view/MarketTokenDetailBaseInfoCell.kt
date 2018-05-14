@@ -57,7 +57,7 @@ open class MarketTokenDetailBaseInfoCell(context: Context) : RelativeLayout(cont
   }
 
   fun setPriceTitle(text: String) {
-    title.text = CustomTargetTextStyle("HEIGHEST / LOW", "$text  HEIGHEST / LOW", GrayScale.black, 9.uiPX(), true, false)
+    title.text = CustomTargetTextStyle("High / LOW", "$text  High / LOW", GrayScale.black, 9.uiPX(), true, false)
   }
 
   fun setPricesubtitle(text: String, currency: String) {

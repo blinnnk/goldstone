@@ -24,7 +24,8 @@ import java.io.File
  */
 
 fun Context.generateWallet(
-	password: String, holdAddress: (mnemonicCode: String, address: String) -> Unit
+	password: String,
+	holdAddress: (mnemonicCode: String, address: String) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val path = "m/44'/60'/0'/0/0"
@@ -49,12 +50,14 @@ fun Context.generateWallet(
 }
 
 fun Context.getWalletByMnemonic(
-	mnemonicCode: String, password: String, hold: (address: String?) -> Unit
+	mnemonicCode: String,
+	pathValue: String,
+	password: String,
+	hold: (address: String?) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
-	val path = "m/44'/60'/0'/0/0"
 	/** Generate HD Wallet */
-	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, path)
+	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
 	/** Generate Keystore */
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	/** Generate Keys */
@@ -72,7 +75,9 @@ fun Context.getWalletByMnemonic(
 }
 
 fun Context.getWalletByPrivateKey(
-	privateKey: String, password: String, hold: (address: String?) -> Unit
+	privateKey: String,
+	password: String,
+	hold: (address: String?) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	/** Generate Keystore */
@@ -99,7 +104,8 @@ fun Context.getWalletByPrivateKey(
 }
 
 fun Context.getCurrentAccount(
-	walletAddress: String, hold: (currentAccount: Account, keystore: KeyStore) -> Unit
+	walletAddress: String,
+	hold: (currentAccount: Account, keystore: KeyStore) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -112,7 +118,11 @@ fun Context.getCurrentAccount(
 	}
 }
 
-fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (String) -> Unit) {
+fun Context.getKeystoreFile(
+	walletAddress: String,
+	password: String,
+	hold: (String) -> Unit
+) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	(0 until keyStore.accounts.size()).forEach { index ->
@@ -129,7 +139,11 @@ fun Context.getKeystoreFile(walletAddress: String, password: String, hold: (Stri
 	}
 }
 
-fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String) -> Unit) {
+fun Context.getPrivateKey(
+	walletAddress: String,
+	password: String,
+	hold: (String) -> Unit
+) {
 	getKeystoreFile(walletAddress, password) {
 		try {
 			Wallet.decrypt(password, DecryptKeystore.GenerateFile(it.convertKeystoreToModel())).let {
@@ -142,7 +156,9 @@ fun Context.getPrivateKey(walletAddress: String, password: String, hold: (String
 }
 
 fun Context.deleteAccount(
-	walletAddress: String, password: String, callback: (correctPassword: Boolean) -> Unit
+	walletAddress: String,
+	password: String,
+	callback: (correctPassword: Boolean) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -172,7 +188,10 @@ fun Context.deleteAccount(
 }
 
 fun Context.updatePassword(
-	walletAddress: String, oldPassword: String, newPassword: String, callback: () -> Unit
+	walletAddress: String,
+	oldPassword: String,
+	newPassword: String,
+	callback: () -> Unit
 ) {
 	getPrivateKey(walletAddress, oldPassword) { privateKey ->
 		deleteAccount(walletAddress, oldPassword) {
