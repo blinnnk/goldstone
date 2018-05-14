@@ -76,7 +76,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 							isSelected = !isSelected
 						}
 
-						if (contentWidth > ScreenSize.widthWithPadding - 100.uiPX()) {
+						if (contentWidth > ScreenSize.widthWithPadding - 110.uiPX()) {
 							contentWidth = 0
 							modulus = index
 							contentTopMargin += 35.uiPX()
