@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -15,6 +16,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -25,10 +27,16 @@ import org.jetbrains.anko.textColor
  */
 
 data class CurrentPriceModel(
-	val currentPrice: Double = 0.0, val baseCurrency: String = "", val percent: String = "0.0"
+	val currentPrice: Double = 0.0,
+	val baseCurrency: String = "",
+	val percent: String = "0.0",
+	val usdtPrice: Double = 1.0
 ) {
 	constructor(data: CurrencyPriceInfoModel, symbol: String) : this(
-		data.price.toDouble(), symbol, data.percent
+		data.price.toDouble(),
+		symbol,
+		data.percent,
+		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0)
 	)
 }
 
@@ -36,7 +44,7 @@ data class CurrentPriceModel(
 class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
 
 	var model: CurrentPriceModel by observing(CurrentPriceModel()) {
-		val value = " ${model.baseCurrency}" + " ≈ 99.701 ${GoldStoneApp.currencyCode}"
+		val value = " ${model.baseCurrency}" + " ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${GoldStoneApp.currencyCode}"
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice}" + value, GrayScale.black, 12.uiPX(), true, false
 		)

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.model
 
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.safeGet
 import org.json.JSONObject
 
 /**
@@ -11,11 +12,13 @@ import org.json.JSONObject
 data class CurrencyPriceInfoModel(
 	@SerializedName("pair") val pair: String,
 	@SerializedName("price") val price: String,
-	@SerializedName("percent") val percent: String
+	@SerializedName("percent") val percent: String,
+	@SerializedName("usdt_price") val usdtPrice: String?
 ) {
 	constructor(data: JSONObject) : this(
-		data.get("pair").toString(),
-		data.get("price").toString(),
-		data.get("percent").toString()
+		data.safeGet("pair"),
+		data.safeGet("price"),
+		data.safeGet("percent"),
+		data.safeGet("usdt_price")
 	)
 }

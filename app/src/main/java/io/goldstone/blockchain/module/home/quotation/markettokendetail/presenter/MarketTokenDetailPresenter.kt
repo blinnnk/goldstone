@@ -42,14 +42,10 @@ class MarketTokenDetailPresenter(
 		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
 		}
-
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
 
-	fun updateChartByMenu(
-		chartView: MarketTokenChart,
-		buttonID: Int
-	) {
+	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
 			MarketTokenDetailChartType.DAY.code -> MarketTokenDetailChartType.DAY.info
@@ -78,9 +74,7 @@ class MarketTokenDetailPresenter(
 					}
 					if (data.isNullOrBlank()) {
 						// 更新网络数据
-						chartView.updateChartDataBy(
-							pair, period, dateType
-						)
+						chartView.updateChartDataBy(pair, period, dateType)
 						// 本地数据库如果没有数据就跳出逻辑
 						return@getSelectionByPair
 					} else {
@@ -90,24 +84,18 @@ class MarketTokenDetailPresenter(
 						(0 until jsonArray.length()).map {
 							ChartModel(JSONObject(jsonArray[it].toString()))
 						}.toArrayList().let {
-								val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLong().orElse(0)
-								/** 校验数据库的数据时间是否有效，是否需要更新 */
-								checkDatabaseTimeIsValidBy(
-									period, databaseTime
-								) {
-									isTrue {
-										// 合规就更新本地数据库的数据
-										chartView.updateChartUI(
-											it, dateType
-										)
-									} otherwise {
-										// 不合规就更新网络数据
-										chartView.updateChartDataBy(
-											pair, period, dateType
-										)
-									}
+							val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLong().orElse(0)
+							/** 校验数据库的数据时间是否有效，是否需要更新 */
+							checkDatabaseTimeIsValidBy(period, databaseTime) {
+								isTrue {
+									// 合规就更新本地数据库的数据
+									chartView.updateChartUI(it, dateType)
+								} otherwise {
+									// 不合规就更新网络数据
+									chartView.updateChartDataBy(pair, period, dateType)
 								}
 							}
+						}
 					}
 				}
 			}
@@ -119,17 +107,11 @@ class MarketTokenDetailPresenter(
 		period: String,
 		dateType: Int
 	) {
-		GoldStoneAPI.getQuotationCurrencyChart(
-			pair, period, 8
-		) {
+		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8) {
 			// 把数据更新到数据库
-			it.updateChartDataInDatabaseBy(
-				period, pair
-			)
+			it.updateChartDataInDatabaseBy(period, pair)
 			// 更新 `UI` 界面
-			updateChartUI(
-				it, dateType
-			)
+			updateChartUI(it, dateType)
 		}
 	}
 
@@ -161,10 +143,7 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun MarketTokenChart.updateChartUI(
-		data: ArrayList<ChartModel>,
-		dateType: Int
-	) {
+	private fun MarketTokenChart.updateChartUI(data: ArrayList<ChartModel>, dateType: Int) {
 		fragment.context?.apply {
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
@@ -290,9 +269,7 @@ class MarketTokenDetailPresenter(
 			currentSocket?.runSocket()
 		}) {
 			if (it.pair == pair) {
-				fragment.currentPriceInfo.model = CurrentPriceModel(
-					it, quoteSymbol
-				)
+				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
 			}
 		}
 	}
