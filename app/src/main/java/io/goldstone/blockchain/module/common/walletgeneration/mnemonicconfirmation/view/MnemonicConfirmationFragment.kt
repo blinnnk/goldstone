@@ -112,7 +112,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		isSelected: Boolean
 	) {
 		if (isSelected) {
-			backgroundColor = GrayScale.whiteGray
+			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 			textColor = Spectrum.blue
 			input.setText(input.text.toString().replace((" " + text.toString()), ""))
 		} else {
