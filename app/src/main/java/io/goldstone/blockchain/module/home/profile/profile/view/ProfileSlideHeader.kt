@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 
 /**
@@ -26,7 +27,7 @@ class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 		title.apply {
 			text = ProfileText.profile
 			textColor = Spectrum.white
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
 

@@ -56,7 +56,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 			verticalLayout {
 
 				textView("GOLD STONE") {
-					textSize = 7.uiPX().toFloat()
+					textSize = fontSize(21)
 					textColor = Spectrum.white
 					typeface = GoldStoneFont.black(context)
 					gravity = Gravity.CENTER_HORIZONTAL

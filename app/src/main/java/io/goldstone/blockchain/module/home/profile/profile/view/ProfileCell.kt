@@ -63,7 +63,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 		icon.into(this)
 		title.apply {
 			textColor = Spectrum.white
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 			x += CommonCellSize.iconPadding
 		}.into(this)

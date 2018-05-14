@@ -58,7 +58,7 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 					topMargin = 15.uiPX()
 				}
 				textColor = Spectrum.opacity5White
-				textSize = 5.uiPX().toFloat()
+				textSize = fontSize(15)
 				typeface = GoldStoneFont.medium(context)
 				gravity = Gravity.CENTER
 			}.into(this)
@@ -68,7 +68,7 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 				hint = "0.0"
 				hintTextColor = Spectrum.opacity5White
 				textColor = Spectrum.white
-				textSize = 16.uiPX().toFloat()
+				textSize = fontSize(48)
 				typeface = GoldStoneFont.heavy(context)
 				gravity = Gravity.CENTER
 				inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL

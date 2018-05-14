@@ -91,7 +91,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setWhiteStyle() {
-		textSize = fontSize(14)
+		textSize = fontSize(42)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = marginTop
 		}
@@ -104,7 +104,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGrayStyle(top: Int? = null) {
-		textSize = fontSize(14)
+		textSize = fontSize(42)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 		}
@@ -117,7 +117,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setBlueStyle(top: Int? = null) {
-		textSize = fontSize(14)
+		textSize = fontSize(42)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 		}
@@ -133,13 +133,11 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		color: Int,
 		textColor: Int = Spectrum.white
 	) {
-		textSize = fontSize(11)
+		textSize = fontSize(33)
 		layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
 			topMargin = marginTop
 		}
-		addTouchRippleAnimation(
-			color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f
-		)
+		addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
 		textPaint.color = textColor
 		invalidate()
 	}

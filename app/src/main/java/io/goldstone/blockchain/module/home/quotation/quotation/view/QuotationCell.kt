@@ -98,7 +98,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
 			setGrid(5, 10,
-				Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
+				Paint().apply {
+					isAntiAlias = true
+					style = Paint.Style.FILL; color = GrayScale.lightGray
+				})
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
 			val maxValue =
@@ -117,11 +120,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				min, max, stepDistance
 			)
 			// 设定外界 `Border` 颜色
-			setAxisColor(
-				Color.argb(
-					0, 0, 0, 0
-				)
-			)
+			setAxisColor(Color.argb(0, 0, 0, 0))
 			// 设定外边的 `Border` 的粗细
 			setAxisThickness(0f)
 
@@ -138,7 +137,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				// 这个是线的颜色
 				color = chartLineColor
 				// 渐变色彩
-				setGradientFill(intArrayOf(chartColor, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
+				setGradientFill(intArrayOf(chartColor, Color.argb(0, 255, 255, 255)), floatArrayOf(0.28f, 1f))
 				// 线条联动用贝塞尔曲线
 				isSmooth = true
 				// 线条的粗细

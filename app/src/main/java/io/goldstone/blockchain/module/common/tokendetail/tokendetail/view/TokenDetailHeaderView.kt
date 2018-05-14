@@ -61,7 +61,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 				setDotsRadius(5.uiPX().toFloat())
 				setDotsStrokeThickness(3.uiPX().toFloat())
 				// 渐变色彩
-				setGradientFill(intArrayOf(Spectrum.green, Color.TRANSPARENT), floatArrayOf(0.28f, 1f))
+				setGradientFill(intArrayOf(Spectrum.green, Color.argb(0, 255, 255, 255)), floatArrayOf(0.28f, 1f))
 				// 线条联动用贝塞尔曲线
 				isSmooth = true
 				// 线条的粗细

@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 
 /**
@@ -56,7 +57,7 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 		title.apply {
 			text = QuotationText.market
 			textColor = Spectrum.white
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
 

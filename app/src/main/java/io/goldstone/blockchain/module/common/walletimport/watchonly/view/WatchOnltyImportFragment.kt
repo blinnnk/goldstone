@@ -17,10 +17,7 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import org.jetbrains.anko.*
 
@@ -82,7 +79,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.into(this)
 
 			textView("What is watch only wallet?") {
-				textSize = 5.uiPX().toFloat()
+				textSize = fontSize(15)
 				typeface = GoldStoneFont.heavy(context)
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
 					topMargin = 20.uiPX()

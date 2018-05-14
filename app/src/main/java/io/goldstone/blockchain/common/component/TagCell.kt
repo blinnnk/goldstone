@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -34,7 +35,7 @@ class TagCell(context: Context) : LinearLayout(context) {
 
 		number.apply {
 			textColor = Spectrum.white
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			gravity = Gravity.CENTER
 			layoutParams = LinearLayout.LayoutParams(30.uiPX(), 30.uiPX())
 			typeface = GoldStoneFont.black(context)
@@ -44,7 +45,7 @@ class TagCell(context: Context) : LinearLayout(context) {
 
 		title.apply {
 			textColor = GrayScale.black
-			textSize = 5.uiPX().toFloat()
+			textSize = fontSize(15)
 			gravity = Gravity.CENTER
 			typeface = GoldStoneFont.black(context)
 			layoutParams = LinearLayout.LayoutParams(0, matchParent)

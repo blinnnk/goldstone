@@ -47,7 +47,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 
 				textView {
 					text = PincodeText.description
-					textSize = 5.uiPX().toFloat()
+					textSize = fontSize(15)
 					textColor = GrayScale.midGray
 					typeface = GoldStoneFont.medium(context)
 					gravity = Gravity.CENTER
