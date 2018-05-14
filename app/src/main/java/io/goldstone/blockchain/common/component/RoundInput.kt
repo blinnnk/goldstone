@@ -18,6 +18,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -38,7 +39,7 @@ open class RoundInput(context: Context) : EditText(context) {
 		invalidate()
 	}
 
-	private val maxCount = 20
+	private val maxCount = 16
 	private val paint = Paint()
 	private val textPaint = Paint()
 	private val backgroundPaint = Paint()
@@ -67,9 +68,7 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(
-			ScreenSize.Width - PaddingSize.device * 2, 65.uiPX()
-		)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 65.uiPX())
 
 		leftPadding = 35.uiPX()
 		backgroundTintMode = PorterDuff.Mode.CLEAR
@@ -117,17 +116,16 @@ open class RoundInput(context: Context) : EditText(context) {
 		return super.onTextContextMenuItem(id)
 	}
 
-	var onTextPaste: Runnable? = null
-	var onTextCut: Runnable? = null
-	var onTextCopy: Runnable? = null
+	private var onTextPaste: Runnable? = null
+	private var onTextCut: Runnable? = null
+	private var onTextCopy: Runnable? = null
 
 	var afterTextChanged: Runnable? = null
 
 	open fun afterContentChanged(content: CharSequence?) {
 		if (content?.length.orZero() > maxCount) {
 			val newContent =
-				content?.substring(0, maxCount)
-					?: ""
+				content?.substring(0, maxCount) ?: ""
 			setText(newContent)
 			textContent = newContent
 			context.alert("content is to long")
