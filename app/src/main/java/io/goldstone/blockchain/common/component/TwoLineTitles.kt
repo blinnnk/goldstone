@@ -72,8 +72,8 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	}
 
 	fun setSmallStyle() {
-		title.textSize = 4.uiPX() + 1f
-		subtitle.textSize = 3.uiPX() + 1f
+		title.textSize = fontSize(12)
+		subtitle.textSize = fontSize(10)
 	}
 
 	fun setWildStyle() {
@@ -83,12 +83,12 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
 	fun setBigWhiteStyle() {
 		title.apply {
-			textSize = 7.uiPX().toFloat()
+			textSize = fontSize(21)
 			typeface = GoldStoneFont.heavy(context)
 			textColor = Spectrum.white
 		}
 		subtitle.apply {
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = Spectrum.opacity5White
 			typeface = GoldStoneFont.medium(context)
 		}
@@ -97,12 +97,12 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	fun setQuotationStyle() {
 		y += 10.uiPX()
 		title.apply {
-			textSize = 7.uiPX().toFloat()
+			textSize = fontSize(21)
 			typeface = GoldStoneFont.black(context)
 			textColor = GrayScale.black
 		}
 		subtitle.apply {
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
 			y -= 5.uiPX()
@@ -112,7 +112,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	fun setOpacityWhiteStyle() {
 		title.typeface = GoldStoneFont.heavy(context)
 		title.textColor = Spectrum.opacity3White
-		title.textSize = 6.uiPX().toFloat()
+		title.textSize = fontSize(18)
 		subtitle.textColor = Spectrum.opacity3White
 	}
 

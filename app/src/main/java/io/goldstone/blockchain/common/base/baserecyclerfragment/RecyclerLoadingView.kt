@@ -14,6 +14,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -42,7 +43,7 @@ class RecyclerLoadingView(context: Context) : RelativeLayout(context) {
 
 		loadingText = textView {
 			x += 16.uiPX()
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = Spectrum.white
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
 			gravity = Gravity.CENTER

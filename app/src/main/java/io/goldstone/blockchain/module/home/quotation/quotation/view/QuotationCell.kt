@@ -75,7 +75,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 
 	private val exchangeName by lazy {
 		TextView(context).apply {
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
 			gravity = Gravity.END

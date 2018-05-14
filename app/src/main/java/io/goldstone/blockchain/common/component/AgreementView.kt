@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 
 /**
@@ -43,7 +44,7 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 		textView.apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
 			text = CustomTargetTextStyle(terms, "Agree on Terms of $terms", Spectrum.blue, 10.uiPX())
-			textSize = 3.uiPX().toFloat() + 2f
+			textSize = fontSize(11)
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
 			gravity = Gravity.CENTER

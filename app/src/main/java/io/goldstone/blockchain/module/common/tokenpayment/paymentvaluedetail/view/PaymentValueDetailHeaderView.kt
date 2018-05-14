@@ -20,10 +20,8 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
@@ -85,7 +83,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 				}
 				text = "≈ 0.0 (${GoldStoneApp.currencyCode})"
 				textColor = Spectrum.opacity5White
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
 				gravity = Gravity.CENTER
 			}.into(this)
@@ -100,7 +98,7 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 			textView {
 				text = "Miner Fee"
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				textColor = GrayScale.gray
 				typeface = GoldStoneFont.book(context)
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX()).apply {

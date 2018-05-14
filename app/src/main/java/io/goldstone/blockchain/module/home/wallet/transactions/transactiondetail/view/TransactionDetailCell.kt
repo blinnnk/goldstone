@@ -43,7 +43,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 		verticalLayout {
 			x = PaddingSize.device.toFloat()
 			description.apply {
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.book(context)
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 17.uiPX()).apply {
@@ -52,7 +52,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 			}.into(this)
 
 			info.apply {
-				textSize = 5.uiPX().toFloat() - 1f
+				textSize = fontSize(14)
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.medium(context)
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 25.uiPX())
@@ -84,7 +84,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGrayInfoStyle() {
-		info.textSize = 4.uiPX().toFloat() - 1f
+		info.textSize = fontSize(11)
 		info.textColor = GrayScale.midGray
 	}
 

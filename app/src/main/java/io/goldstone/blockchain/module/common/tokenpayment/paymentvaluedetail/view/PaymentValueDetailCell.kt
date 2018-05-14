@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.PaymentValueDetailModel
 import org.jetbrains.anko.textColor
 
@@ -45,7 +46,7 @@ class PaymentValueDetailCell(context: Context) : BaseCell(context) {
 
     feeTypeDescription
       .apply {
-        textSize = 4.uiPX().toFloat()
+        textSize = fontSize(12)
         textColor = GrayScale.gray
         typeface = GoldStoneFont.book(context)
       }

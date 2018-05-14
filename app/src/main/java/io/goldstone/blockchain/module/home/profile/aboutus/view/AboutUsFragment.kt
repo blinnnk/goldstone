@@ -21,10 +21,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.profile.aboutus.presenter.AboutUsPresenter
 import org.jetbrains.anko.*
 
@@ -75,7 +73,7 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 					}.into(this)
 
 					introTextView = textView {
-						textSize = 4.uiPX().toFloat() + 2f
+						textSize = fontSize(13)
 						textColor = GrayScale.gray
 						gravity = Gravity.CENTER_HORIZONTAL
 					}.lparams {
@@ -92,7 +90,7 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 							setStyleParameter(
 								Size(iconViewWidth, 120.uiPX()), iconSize, Spectrum.softGreen, Spectrum.green
 							)
-							setTitleStyle(4.uiPX().toFloat(), GrayScale.black, GoldStoneFont.black(context))
+							setTitleStyle(fontSize(12), GrayScale.black, GoldStoneFont.black(context))
 							title = "SAFE"
 							src = R.drawable.safe_icon
 						}.apply {
@@ -103,7 +101,7 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 							setStyleParameter(
 								Size(iconViewWidth, 120.uiPX()), iconSize, Spectrum.softGreen, Spectrum.green
 							)
-							setTitleStyle(4.uiPX().toFloat(), GrayScale.black, GoldStoneFont.black(context))
+							setTitleStyle(fontSize(12), GrayScale.black, GoldStoneFont.black(context))
 							title = "SPEED"
 							src = R.drawable.speed_icon
 						}.apply {
@@ -115,7 +113,7 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 					}
 
 					productIntro = textView {
-						textSize = 4.uiPX().toFloat() + 2f
+						textSize = fontSize(13)
 						textColor = GrayScale.gray
 						gravity = Gravity.CENTER_HORIZONTAL
 					}.lparams {

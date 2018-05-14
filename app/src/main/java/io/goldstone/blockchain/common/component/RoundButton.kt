@@ -91,7 +91,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setWhiteStyle() {
-		textSize = 13.uiPX().toFloat()
+		textSize = fontSize(14)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = marginTop
 		}
@@ -104,7 +104,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGrayStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
+		textSize = fontSize(14)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 		}
@@ -117,7 +117,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setBlueStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
+		textSize = fontSize(14)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 		}
@@ -133,7 +133,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		color: Int,
 		textColor: Int = Spectrum.white
 	) {
-		textSize = 11.uiPX().toFloat()
+		textSize = fontSize(11)
 		layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
 			topMargin = marginTop
 		}

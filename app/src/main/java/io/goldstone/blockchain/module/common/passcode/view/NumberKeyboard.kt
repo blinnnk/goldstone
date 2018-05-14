@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
@@ -44,7 +45,7 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
     (0 until totalCount).forEach {
       textView {
         text = if (it == 9) "0" else if (it == 10) CommonText.cancel else (it + 1).toString()
-        textSize = if (it == 10) 4.uiPX().toFloat() else 10.uiPX().toFloat()
+        textSize = if (it == 10) fontSize(12) else fontSize(30)
         typeface = GoldStoneFont.heavy(context)
         textColor = Spectrum.white
         gravity = Gravity.CENTER

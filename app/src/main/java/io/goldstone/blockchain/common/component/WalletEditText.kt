@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
@@ -28,7 +29,7 @@ class WalletEditText(context: Context) : EditText(context) {
 			padding = 20.uiPX()
 		}
 		hintTextColor = GrayScale.midGray
-		textSize = 5.uiPX().toFloat()
+		textSize = fontSize(15)
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.heavy(context)
 		gravity = Gravity.START

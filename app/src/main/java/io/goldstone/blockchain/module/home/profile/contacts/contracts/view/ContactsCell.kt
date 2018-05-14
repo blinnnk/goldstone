@@ -89,7 +89,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	private val deleteButton by lazy {
 		Button(context).apply {
 			text = CommonText.delete
-			textSize = 4.uiPX().toFloat()
+			textSize = fontSize(12)
 			layoutParams = RelativeLayout.LayoutParams(deleteButtonWidth, cellHeight)
 			x = ScreenSize.widthWithPadding.toFloat() + 3f
 			backgroundColor = Spectrum.red

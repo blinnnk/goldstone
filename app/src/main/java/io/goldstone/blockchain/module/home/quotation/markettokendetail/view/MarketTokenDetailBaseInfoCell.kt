@@ -11,6 +11,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -23,7 +24,7 @@ import org.jetbrains.anko.textColor
 open class MarketTokenDetailBaseInfoCell(context: Context) : RelativeLayout(context) {
 
   protected val title = TextView(context).apply {
-    textSize = 4.uiPX().toFloat()
+    textSize = fontSize(12)
     typeface = GoldStoneFont.heavy(context)
     textColor = GrayScale.gray
     layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -33,7 +34,7 @@ open class MarketTokenDetailBaseInfoCell(context: Context) : RelativeLayout(cont
 
   protected val subtitle = TextView(context).apply {
     visibility = View.GONE
-    textSize = 4.uiPX().toFloat()
+    textSize = fontSize(12)
     typeface = GoldStoneFont.heavy(context)
     textColor = GrayScale.black
     layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)

@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -49,7 +50,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
 			attentionView.apply {
 				text = CreateWalletText.attention
-				textSize = 4.uiPX().toFloat()
+				textSize = fontSize(12)
 				textColor = Spectrum.white
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 20.uiPX()
