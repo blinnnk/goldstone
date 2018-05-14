@@ -75,8 +75,11 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				setBlueStyle()
 				text = CommonText.startImporting.toUpperCase()
 			}.click {
-					presenter.importWatchOnlyWallet(addressInput, nameInput)
-				}.into(this)
+				it.showLoadingStatus()
+				presenter.importWatchOnlyWallet(addressInput, nameInput) {
+					it.showLoadingStatus(false)
+				}
+			}.into(this)
 
 			textView("What is watch only wallet?") {
 				textSize = 5.uiPX().toFloat()

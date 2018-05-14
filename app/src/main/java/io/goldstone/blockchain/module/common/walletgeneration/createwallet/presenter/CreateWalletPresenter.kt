@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.widget.EditText
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
@@ -99,7 +100,9 @@ class CreateWalletPresenter(
 		generateWallet(password) { mnemonicCode, address ->
 			// 将基础的不存在安全问题的信息插入数据库
 			WalletTable.insert(WalletTable(0, name, address, true, hint)) {
-				generateMyTokenInfo(address, true) {
+				generateMyTokenInfo(address, true, {
+					Log.e("error", "get default token from server has error")
+				}) {
 					// 传递数据到下一个 `Fragment`
 					val arguments = Bundle().apply {
 						putString(ArgumentKey.mnemonicCode, mnemonicCode)
@@ -125,13 +128,14 @@ class CreateWalletPresenter(
 		fun generateMyTokenInfo(
 			ownerAddress: String,
 			isNewAccount: Boolean = false,
+			errorCallback: () -> Unit,
 			callback: () -> Unit = {}
 		) {
 			// 首先从本地查找数据
 			DefaultTokenTable.getTokens { localTokens ->
 				localTokens.isEmpty() isTrue {
 					// 本地没有数据从服务器获取数据
-					GoldStoneAPI.getDefaultTokens { serverTokens ->
+					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 						serverTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
 					}
 				} otherwise {
