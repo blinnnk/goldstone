@@ -22,12 +22,14 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 /**
  * @date 22/03/2018 2:56 AM
  * @author KaySaith
  */
 
-class StartingPresenter(override val fragment: StartingFragment) : BasePresenter<StartingFragment>() {
+class StartingPresenter(override val fragment: StartingFragment) :
+	BasePresenter<StartingFragment>() {
 
 	fun showCreateWalletFragment() {
 		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.splash)
@@ -47,8 +49,7 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
 					.forEachOrEnd { token, isEnd ->
 						DefaultTokenTable(
-							token,
-							token.get("force_show").toString().toInt() == TinyNumber.True.value
+							token, token.get("force_show").toString().toInt() == TinyNumber.True.value
 						).let {
 							GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							context.runOnUiThread {
@@ -82,7 +83,6 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 		}
 
 		fun updateLocalDefaultTokens(context: Context) {
-			// 准备默认的 `Token List`
 			GoldStoneAPI.getDefaultTokens { serverTokens ->
 				DefaultTokenTable.getTokens { localTokens ->
 					/** 如果本地的 `Tokens` 是空的则直接插入全部服务端获取的 `Default Tokens` */
@@ -95,8 +95,20 @@ class StartingPresenter(override val fragment: StartingFragment) : BasePresenter
 					} otherwise {
 						/** 如果本地的 `Tokens` 不是空的, 那么筛选出本地没有的插入到数据库 */
 						localTokens.forEach { localToken ->
-							serverTokens.find { it.symbol == localToken.symbol }?.let {
-								serverTokens.remove(it)
+							serverTokens.find { it.symbol == localToken.symbol }?.let { serverToken ->
+								// 比对数据是否完全一致
+								if (localToken.iconUrl == serverToken.iconUrl && localToken.contract == serverToken.contract) {
+									serverTokens.remove(serverToken)
+								} else {
+									// 数据有变化直接更新服务器数据
+									doAsync {
+										GoldStoneDataBase.database.defaultTokenDao().apply {
+											getTokenByContract(localToken.contract)?.let {
+												update(serverToken)
+											}
+										}
+									}
+								}
 							}
 						}
 
