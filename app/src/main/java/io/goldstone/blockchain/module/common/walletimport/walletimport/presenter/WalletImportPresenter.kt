@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 
 import android.support.v4.app.Fragment
+import android.util.Log
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
@@ -41,7 +42,10 @@ class WalletImportPresenter(
 					// 在数据库记录钱包信息
 					WalletTable.insertAddress(address, name, hint) {
 						// 创建钱包并获取默认的 `token` 信息
-						CreateWalletPresenter.generateMyTokenInfo(address) {
+						CreateWalletPresenter.generateMyTokenInfo(address, false, {
+							Log.e("ERROR", "get default token from has error")
+							callback()
+						}) {
 							fragment.activity?.jump<SplashActivity>()
 							callback()
 						}

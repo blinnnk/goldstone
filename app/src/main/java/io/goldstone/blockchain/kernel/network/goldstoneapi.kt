@@ -30,6 +30,7 @@ import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import java.io.StreamCorruptedException
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -46,8 +47,10 @@ object GoldStoneAPI {
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
 	@JvmStatic
-	fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list") {
+	fun getDefaultTokens(errorCallback: () -> Unit = {}, hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list", false, {
+			errorCallback()
+		}) {
 			forEachOrEnd { token, isEnd ->
 				if (token.forceShow == TinyNumber.True.value) token.isUsed = true
 				if (isEnd) hold(toArrayList())
@@ -351,6 +354,7 @@ object GoldStoneAPI {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
+		crossinline netWorkError: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client = OkHttpClient()
@@ -360,6 +364,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
+					netWorkError()
 					println("$error")
 				}
 

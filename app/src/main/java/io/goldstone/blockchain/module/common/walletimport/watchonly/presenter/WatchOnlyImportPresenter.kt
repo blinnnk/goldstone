@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 
+import android.util.Log
 import android.widget.EditText
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
@@ -23,11 +24,12 @@ class WatchOnlyImportPresenter(
 	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
 
-	fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText) {
+	fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText, callback: () -> Unit) {
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		if (!WalletUtils.isValidAddress(address)) {
 			fragment.context?.alert("address isn't valid")
+			callback()
 			return
 		}
 
@@ -37,14 +39,19 @@ class WatchOnlyImportPresenter(
 		WalletTable.getWalletByAddress(address) {
 			it.isNull() isTrue {
 				WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
-					CreateWalletPresenter.generateMyTokenInfo(address) {
+					CreateWalletPresenter.generateMyTokenInfo(address, false, {
+						Log.e("ERROR", "server get default token error")
+						callback()
+					}) {
 						fragment.activity?.jump<SplashActivity>()
+						callback()
 					}
 					// 注册钱包地址用于发送 `Push`
 					XinGePushReceiver.registerWalletAddressForPush()
 				}
 			} otherwise {
 				fragment.context?.alert("There is already this account in gold stone")
+				callback()
 			}
 		}
 	}
