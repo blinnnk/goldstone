@@ -48,7 +48,6 @@ class TokenDetailPresenter(
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
 			updateEmptyCharData(fragment.symbol!!)
-			fragment.showLoadingView("Loading token data now")
 			prepareTokenDetailData()
 		}
 	}
@@ -94,6 +93,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
+		fragment.showLoadingView("Loading token data now")
 		loadDataFromDatabaseOrElse {
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				fragment.loadDataFromChain()
@@ -108,6 +108,7 @@ class TokenDetailPresenter(
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
+				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
 				Log.d("DEBUG", "Without Local Transaction Data")
@@ -163,6 +164,9 @@ class TokenDetailPresenter(
 			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
+		if (!NetworkUtil.hasNetwork(fragment.context)) {
+			fragment.removeLoadingView()
+		}
 	}
 
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
@@ -178,7 +182,6 @@ class TokenDetailPresenter(
 					if (maxY == 0.0) maxY = 10.0
 					if (unitY == 0f) unitY = 1f
 					header?.setCharData(chartArray.reversed().toArrayList(), maxY.toFloat(), unitY)
-					fragment.removeLoadingView()
 				}
 			}
 		}
