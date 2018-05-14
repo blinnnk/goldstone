@@ -76,6 +76,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				// 本地没有钱包的情况下显示登录和导入按钮
 				if (isEmpty()) {
 					verticalLayout {
+						gravity = Gravity.CENTER_HORIZONTAL
 						createButton.apply {
 							text = CreateWalletText.create.toUpperCase()
 							marginTop = 0
@@ -98,6 +99,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					}.lparams {
 						height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
 						alignParentBottom()
+						width = matchParent
 					}
 				}
 			}

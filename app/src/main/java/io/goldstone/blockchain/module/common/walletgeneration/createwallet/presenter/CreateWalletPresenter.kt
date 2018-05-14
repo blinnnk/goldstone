@@ -146,16 +146,19 @@ class CreateWalletPresenter(
 			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
+			failedCallback: () -> Unit = {},
 			callback: (password: String, walletName: String) -> Unit
 		) {
 
-			isAgree.isFalse {
+			isAgree isFalse {
 				context?.alert(CreateWalletText.agreeRemind)
+				failedCallback()
 				return
 			}
 
 			if (password != repeatPassword) {
 				context?.alert(CreateWalletText.repeatPassword)
+				failedCallback()
 				return
 			}
 
@@ -168,6 +171,7 @@ class CreateWalletPresenter(
 								callback(password, walletName)
 							} else {
 								alert(reasons.info)
+								failedCallback()
 							}
 						}
 					}
