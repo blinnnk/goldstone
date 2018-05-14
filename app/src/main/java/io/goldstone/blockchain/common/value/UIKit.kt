@@ -2,7 +2,9 @@ package io.goldstone.blockchain.common.value
 
 import android.content.res.Resources
 import android.graphics.Color
+import android.view.View
 import com.blinnnk.uikit.uiPX
+import org.jetbrains.anko.px2sp
 
 /**
  * @date 21/03/2018 7:30 PM
@@ -158,4 +160,8 @@ object Count {
 object WalletDetailSize {
 	@JvmField
 	val heightHeight = 365.uiPX()
+}
+
+fun View.fontSize(defaultSize: Int): Float {
+	return px2sp((Resources.getSystem().displayMetrics.density * defaultSize).toInt())
 }

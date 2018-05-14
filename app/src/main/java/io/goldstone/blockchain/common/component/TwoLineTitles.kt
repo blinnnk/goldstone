@@ -1,17 +1,19 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.content.res.Resources
+import android.util.TypedValue
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.EmptyText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
-import org.jetbrains.anko.sp
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
+import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 11:32 PM
@@ -21,12 +23,12 @@ import org.jetbrains.anko.textView
 class TwoLineTitles(context: Context) : LinearLayout(context) {
 
 	val title = textView {
-		textSize = 5.uiPX().toFloat()
+		textSize = fontSize(14)
 		textColor = Spectrum.white
 	}
 
 	val subtitle = textView {
-		textSize = sp(4).toFloat()
+		textSize = fontSize(12)
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
 		y -= 3.uiPX()
