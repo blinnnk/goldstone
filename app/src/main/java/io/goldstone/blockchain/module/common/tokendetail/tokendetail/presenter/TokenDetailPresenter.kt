@@ -48,6 +48,7 @@ class TokenDetailPresenter(
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
 			updateEmptyCharData(fragment.symbol!!)
+			fragment.showLoadingView("Loading token data now")
 			prepareTokenDetailData()
 		}
 	}
@@ -93,7 +94,6 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
-		fragment.showLoadingView("Loading token data now")
 		loadDataFromDatabaseOrElse {
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				fragment.loadDataFromChain()
