@@ -42,8 +42,13 @@ class PrivateKeyImportPresenter(
 			passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(),
 			isAgree,
-			fragment.context
+			fragment.context,
+			{
+				// Failed callback
+				callback()
+			}
 		) { passwordValue, walletName ->
+
 			importWallet(
 				privateKeyInput.text.toString(),
 				passwordValue,
@@ -73,16 +78,17 @@ class PrivateKeyImportPresenter(
 			val currentPrivateKey =
 				(if (privateKey.length == 63) "0$privateKey" else privateKey)
 					.replaceWithPattern()
-					.replace("\n", " ")
+					.replace("\n", "")
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback()
 				return
 			}
 			// 解析私钥并导入钱包
 			fragment.context?.getWalletByPrivateKey(
-				privateKey,
+				currentPrivateKey,
 				password
 			) { address ->
 				address?.let {

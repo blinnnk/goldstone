@@ -31,11 +31,15 @@ class MnemonicImportDetailPresenter(
 	) {
 		mnemonicInput.text.isEmpty() isTrue {
 			fragment.context?.alert("mnemonic is not correct")
+			callback()
 			return
 		}
 		CreateWalletPresenter.checkInputValue(
-			nameInput.text.toString(), passwordInput.text.toString(), repeatPasswordInput.text.toString(),
-			isAgree, fragment.context
+			nameInput.text.toString(),
+			passwordInput.text.toString(),
+			repeatPasswordInput.text.toString(),
+			isAgree, fragment.context,
+			failedCallback = { callback() }
 		) { passwordValue, walletName ->
 			val mnemonicContent =
 				mnemonicInput.text.toString().replaceWithPattern().replace("\n", " ")
