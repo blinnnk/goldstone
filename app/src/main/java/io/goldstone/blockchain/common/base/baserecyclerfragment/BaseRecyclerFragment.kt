@@ -42,7 +42,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
-	private var loadingView: RecyclerLoadingView? = null
+	private lateinit var loadingView: RecyclerLoadingView
 
 	/**
 	 * @description
@@ -189,6 +189,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				ScreenSize.Height - ScreenSize.statusBarHeight
 			}
 			wrapper = relativeLayout {
+				loadingView = RecyclerLoadingView(context!!)
+				loadingView.visibility = View.GONE
+				addView(loadingView, 0)
 				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
@@ -269,20 +272,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
 	open fun showLoadingView(content: String) {
-		if(loadingView.isNull()) {
-			loadingView = RecyclerLoadingView(context!!)
-			loadingView?.setTextContent(content)
-			wrapper.addView(loadingView, 0)
-			recyclerView.y = HoneyUIUtils.getHeight(loadingView!!).toFloat()
-		}
+		loadingView.setTextContent(content)
+		loadingView.visibility = View.VISIBLE
+		recyclerView.y = HoneyUIUtils.getHeight(loadingView).toFloat()
 	}
 
 	open fun removeLoadingView() {
-		if (!loadingView.isNull()) {
-			wrapper.removeView(loadingView)
-			loadingView = null
-			recyclerView.updateOriginYAnimation(0f)
-		}
+		loadingView.visibility = View.GONE
+		recyclerView.y = 0f
 	}
 
 	open fun showEmptyView() {

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -57,12 +56,7 @@ class TokenSearchPresenter(
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 
-		if (content.isEmpty()) {
-			fragment.context?.alert("Please enter the tokenInformation")
-			return
-		}
-
-		val isSearchSymbol = content.length != CryptoValue.contractAddressLength
+		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 
 		fragment.showLoadingView("Searching token information now")
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
@@ -81,13 +75,23 @@ class TokenSearchPresenter(
 				}
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
-				isSearchSymbol isFalse {
+				isSearchingSymbol isFalse {
 					GoldStoneEthCall.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
 						hold(
 							arrayListOf(
 								DefaultTokenTable(
-									0, content, "", symbol, TinyNumber.False.value, 0.0, name, decimal, null, false,
-									false, 0
+									0,
+									content,
+									"",
+									symbol,
+									TinyNumber.False.value,
+									0.0,
+									name,
+									decimal,
+									null,
+									false,
+									false,
+									0
 								)
 							)
 						)

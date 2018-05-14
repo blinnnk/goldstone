@@ -26,7 +26,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
+class PaymentValueDetailFragment :
+	BaseRecyclerFragment<PaymentValueDetailPresenter, PaymentValueDetailModel>() {
 
 	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
 	val token by lazy {
@@ -50,10 +51,7 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 		view: View,
 		savedInstanceState: Bundle?
 	) {
-		super.onViewCreated(
-			view,
-			savedInstanceState
-		)
+		super.onViewCreated(view, savedInstanceState)
 
 		recyclerView.getItemAtAdapterPosition<PaymentValueDetailHeaderView>(0) {
 			it?.let { header ->
@@ -76,7 +74,9 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 			}
 		}
 
-		recyclerView.getItemAtAdapterPosition<PaymentValueDetailFooter>(asyncData?.size.orZero() + 1) { footer ->
+		recyclerView.getItemAtAdapterPosition<PaymentValueDetailFooter>(
+			asyncData?.size.orZero() + 1
+		) { footer ->
 			this.footer = footer
 			footer?.getConfirmButton {
 				onClick {
@@ -106,14 +106,11 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			MyTokenTable.getBalanceWithSymbol(
-				token?.symbol!!,
-				WalletTable.current.address,
-				true
+				token?.symbol!!, WalletTable.current.address, true
 			) { balance ->
 				context?.runOnUiThread {
 					showAlertOrTransfer(
-						balance,
-						callback
+						balance, callback
 					)
 				}
 			}
@@ -122,7 +119,9 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 
 	private fun String.checkDecimalIsvalid(): Boolean {
 		return if (getDecimalCount() > token?.decimal.orElse(0.0)) {
-			context?.alert("The value's decimal you inputed is bigger than this currency token's decimal please re-input")
+			context?.alert(
+				"The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+			)
 			false
 		} else {
 			true
@@ -135,35 +134,33 @@ class PaymentValueDetailFragment : BaseRecyclerFragment<PaymentValueDetailPresen
 	) {
 		if (presenter.hasCalculated) {
 			if (transferCount <= 0) {
+				callback()
 				alert("Please Enter Your Transfer Value")
 			} else {
 				if (balance > transferCount) {
 					footer?.setCanUseStyle(true)
 					showConfirmAttentionView(callback)
-				} else alert("You haven't enough currency to transfer")
+				} else {
+					callback()
+					alert("You haven't enough currency to transfer")
+				}
 			}
 		} else {
+			callback()
 			alert("Calculating Now Please Wait")
-		}
-		// 恢复点击事件
-		footer?.getConfirmButton {
-			showLoadingStatus(false)
 		}
 	}
 
 	private fun showConfirmAttentionView(callback: () -> Unit) {
-		context?.showAlertView(TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(),
-			true,
-			{
+		context?.showAlertView(
+			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase(), true, {
 				// 点击 `Alert` 取消按钮a
 				footer?.getConfirmButton {
 					showLoadingStatus(false)
 				}
 			}) {
 			presenter.transfer(
-				it?.text.toString(),
-				callback
+				it?.text.toString(), callback
 			)
 		}
 	}
