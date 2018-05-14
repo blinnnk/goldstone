@@ -92,7 +92,7 @@ class TabItem(context: Context) : View(context) {
 		isAntiAlias = true
 		style = Paint.Style.FILL
 		color = GrayScale.midGray
-		textSize = fontSize(12)
+		textSize = 12.uiPX().toFloat()
 		typeface = GoldStoneFont.heavy(context)
 	}
 
