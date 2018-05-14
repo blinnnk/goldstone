@@ -27,22 +27,10 @@ import org.jetbrains.anko.verticalLayout
 enum class MarketTokenDetailChartType(
 	val code: Int, val info: String
 ) {
-	Hour(
-		    0,
-		    "1hour"
-	    ),
-	DAY(
-		   1,
-		   "1day"
-	   ),
-	WEEK(
-		    2,
-		    "1week"
-	    ),
-	MONTH(
-		     3,
-		     "1month"
-	     )
+	Hour(0, "1hour"),
+	DAY(1, "1day"),
+	WEEK(2, "1week"),
+	MONTH(3, "1month")
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
