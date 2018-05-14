@@ -17,6 +17,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.padding
@@ -76,7 +77,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 	}
 
 	fun setTitleStyle(
-		titleSize: Float = 3.uiPX().toFloat(),
+		titleSize: Float = fontSize(9),
 		color: Int = Spectrum.white,
 		typeFace: Typeface = GoldStoneFont.medium(context)
 	) {
