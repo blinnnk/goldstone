@@ -13,12 +13,12 @@ data class CurrencyPriceInfoModel(
 	@SerializedName("pair") val pair: String,
 	@SerializedName("price") val price: String,
 	@SerializedName("percent") val percent: String,
-	@SerializedName("usdt_price") val usdtPrice: String?
+	@SerializedName("quote_price") val usdtPrice: String?
 ) {
 	constructor(data: JSONObject) : this(
 		data.safeGet("pair"),
 		data.safeGet("price"),
 		data.safeGet("percent"),
-		data.safeGet("usdt_price")
+		data.safeGet("quote_price")
 	)
 }

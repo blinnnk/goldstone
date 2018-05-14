@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
@@ -21,6 +22,7 @@ class MnemonicImportDetailPresenter(
 ) : BasePresenter<MnemonicImportDetailFragment>() {
 
 	fun importWalletByMnemonic(
+		pathInput: EditText,
 		mnemonicInput: EditText,
 		passwordInput: EditText,
 		repeatPasswordInput: EditText,
@@ -29,42 +31,72 @@ class MnemonicImportDetailPresenter(
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
+
+		if (pathInput.text.isNotEmpty() && !isVaildPath(pathInput.text.toString())) {
+			fragment.context?.alert("incorrect path value")
+			callback()
+			return
+		}
+
 		mnemonicInput.text.isEmpty() isTrue {
 			fragment.context?.alert("mnemonic is not correct")
 			callback()
 			return
 		}
-		CreateWalletPresenter.checkInputValue(
-			nameInput.text.toString(),
-			passwordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
-			isAgree, fragment.context,
-			failedCallback = { callback() }
-		) { passwordValue, walletName ->
+		val pathValue =
+			if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0"
+			else pathInput.text.toString()
+		CreateWalletPresenter.checkInputValue(nameInput.text.toString(), passwordInput.text.toString(),
+			repeatPasswordInput.text.toString(), isAgree, fragment.context,
+			failedCallback = { callback() }) { passwordValue, walletName ->
 			val mnemonicContent =
 				mnemonicInput.text.toString().replaceWithPattern().replace("\n", " ")
 					.removeStartAndEndValue(" ")
 			importWallet(
-				mnemonicContent, passwordValue, walletName, hintInput.text?.toString(), callback
+				mnemonicContent,
+				pathValue,
+				passwordValue, walletName,
+				hintInput.text?.toString(),
+				callback
 			)
 		}
 	}
 
 	private fun importWallet(
 		mnemonic: String,
+		pathValue: String,
 		password: String,
 		name: String,
 		hint: String? = null,
 		callback: () -> Unit
 	) {
 		fragment.context?.getWalletByMnemonic(
-			mnemonic, password
+			mnemonic, pathValue, password
 		) { address ->
 			address?.let {
 				WalletImportPresenter.insertWalletToDatabase(
 					fragment, it, name, hint, callback
 				)
 			}
+		}
+	}
+
+	private fun isVaildPath(path: String): Boolean {
+		// 最小 3 位数字
+		if (path.length < 3) return false
+		// 格式化无用信息
+		val formatPath = path.replace("\n", "").replace(" ", "")
+		// 校验前两位强制内容
+		return if (formatPath.substring(0, 2).equals("m/", true)) {
+			val pathNumber =
+				formatPath
+					.replace("m", "")
+					.replace("/", "")
+					.replace("'", "")
+			// 检验剩余部分是否全部为数字
+			!pathNumber.toIntOrNull().isNull()
+		} else {
+			false
 		}
 	}
 
