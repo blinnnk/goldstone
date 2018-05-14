@@ -23,6 +23,7 @@ object APIPath {
 	const val getCurrencyLineChartData = "$url/account/lineDataByDay"
 	const val getPriceByAddress = "$url/index/priceByAddress"
 	const val getTokenDescription = "$url/market/coinDescription?symbol="
+	const val getUnreadCount = "$url/account/checkUnreadMessage"
 
 	@JvmField
 	val getQuotationCurrencyChart: (pair: String, period: String, size: Int) -> String =

@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.formatCurrency
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -114,7 +115,7 @@ class DepositInputView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setPriceValue(price: Double) {
-		priceInfo.text = "≈ $price (${GoldStoneApp.currencyCode})"
+		priceInfo.text = "≈ ${price.formatCurrency()} (${GoldStoneApp.currencyCode})"
 	}
 
 }
