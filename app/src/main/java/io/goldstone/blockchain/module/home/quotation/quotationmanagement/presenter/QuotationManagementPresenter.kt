@@ -27,7 +27,7 @@ class QuotationManagementPresenter(
 		cellHeight: Int,
 		maxHeight: Int
 	) {
-		// 重写
+		super.updateParentContentLayoutHeight(fragment.asyncData?.size.orZero(), fragment.setSlideUpWithCellHeight(), maxHeight)
 	}
 
 	override fun onFragmentDestroy() {
