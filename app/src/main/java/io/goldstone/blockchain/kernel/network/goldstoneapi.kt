@@ -205,9 +205,8 @@ object GoldStoneAPI {
 	) {
 		val contentType = MediaType.parse("application/json; charset=utf-8")
 		RequestBody.create(
-			contentType, AesCrypto.encrypt("{\"device\":\"$deviceID\",\"time\":\"$time\"}").orEmpty()
+			contentType, AesCrypto.encrypt("{\"device\":\"$deviceID\",\"time\":$time}").orEmpty()
 		).let {
-
 			postRequest(it, APIPath.getUnreadCount, netWorkError) {
 				hold(JSONObject(it).safeGet("count"))
 			}

@@ -93,5 +93,9 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	fun setNotificationUnreadCount(count: String) {
 		slideHeader.notifyButton.setRedotStyle(count)
 	}
+
+	fun recoveryNotifyButtonStyle() {
+		slideHeader.notifyButton.removeRedot()
+	}
 }
 

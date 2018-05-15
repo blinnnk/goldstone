@@ -133,22 +133,20 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		buttonTitle.textColor = Spectrum.white
 		updateOriginYAnimation(17.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(28.uiPX().toFloat())
-
-		if (!iconView.isNull()) {
-			setIconViewColor(Spectrum.red)
-		} else {
-			setIconViewColor(Color.TRANSPARENT)
+		setIconViewColor(Color.TRANSPARENT)
+		System.out.println(redotView)
+		if (!redotView.isNull()) {
+			setIconViewColor(Spectrum.lightRed)
 		}
 	}
 
 	fun setDefaultStyle() {
-		buttonTitle.textColor = Spectrum.opacity5White
+		buttonTitle.textColor = Spectrum.white
 		updateOriginYAnimation(27.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(35.uiPX().toFloat())
-		if (!iconView.isNull()) {
-			setIconViewColor(Spectrum.red)
-		} else {
-			setIconViewColor(Spectrum.opacity2White)
+		setIconViewColor(Spectrum.opacity2White)
+		if (!redotView.isNull()) {
+			setIconViewColor(Spectrum.lightRed)
 		}
 	}
 

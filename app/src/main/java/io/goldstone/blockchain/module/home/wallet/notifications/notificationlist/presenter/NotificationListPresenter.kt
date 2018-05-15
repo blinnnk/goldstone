@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.NotificationText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import java.io.Serializable
 
 /**
@@ -23,7 +25,10 @@ import java.io.Serializable
  * @author KaySaith
  */
 
-data class NotificationTransactionInfo(val hash: String, val isReceived: Boolean) : Serializable
+data class NotificationTransactionInfo(
+	val hash: String,
+	val isReceived: Boolean
+) : Serializable
 
 class NotificationListPresenter(
 	override val fragment: NotificationListFragment
@@ -32,6 +37,25 @@ class NotificationListPresenter(
 	override fun updateData() {
 		super.updateData()
 		getDataFromDatabase()
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		fragment.getMainActivity()
+			?.supportFragmentManager
+			?.findFragmentByTag(FragmentTag.home)
+			?.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)
+			?.apply {
+				presenter.updateUnreadCount()
+			}
+	}
+
+	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
+		fragment.getParentFragment<NotificationFragment>()?.apply {
+			presenter.showTargetFragment<TransactionDetailFragment>(TransactionText.detail,
+				NotificationText.notification,
+				Bundle().apply { putSerializable(ArgumentKey.notificationTransaction, transactionInfo) })
+		}
 	}
 
 	private fun getDataFromDatabase() {
@@ -63,14 +87,6 @@ class NotificationListPresenter(
 					}
 				}
 			}
-		}
-	}
-
-	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
-		fragment.getParentFragment<NotificationFragment>()?.apply {
-			presenter.showTargetFragment<TransactionDetailFragment>(TransactionText.detail,
-				NotificationText.notification,
-				Bundle().apply { putSerializable(ArgumentKey.notificationTransaction, transactionInfo) })
 		}
 	}
 
