@@ -29,9 +29,7 @@ class ProfileOverlayPresenter(
 		super.removeSelfFromActivity()
 		fragment.getMainActivity()?.apply {
 			supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
-				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.let {
-					it.presenter.updateData()
-				}
+				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.presenter?.updateData()
 			}
 		}
 	}
@@ -55,13 +53,13 @@ class ProfileOverlayPresenter(
 
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, "http://goldstone.io/privacy")
+			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
 		}
 	}
 
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, "http://goldstone.io/termAndConditions")
+			putString(ArgumentKey.webViewUrl, WebUrl.terms)
 		}
 	}
 
