@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
+import android.util.Size
 import android.widget.EditText
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
+import io.goldstone.blockchain.crypto.big39.MnemonicWordList
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
@@ -52,13 +54,21 @@ class MnemonicImportDetailPresenter(
 			val mnemonicContent =
 				mnemonicInput.text.toString().replaceWithPattern().replace("\n", " ")
 					.removeStartAndEndValue(" ")
-			importWallet(
-				mnemonicContent,
-				pathValue,
-				passwordValue, walletName,
-				hintInput.text?.toString(),
-				callback
-			)
+
+			isValidMnemonic(mnemonicContent) {
+				it isFalse {
+					fragment.context?.alert("Wrong mnemonic world")
+					callback()
+				} otherwise {
+					importWallet(
+						mnemonicContent,
+						pathValue,
+						passwordValue, walletName,
+						hintInput.text?.toString(),
+						callback
+					)
+				}
+			}
 		}
 	}
 
@@ -90,13 +100,43 @@ class MnemonicImportDetailPresenter(
 		return if (formatPath.substring(0, 2).equals("m/", true)) {
 			val pathNumber =
 				formatPath
-					.replace("m", "")
+					.substring(0)
 					.replace("/", "")
 					.replace("'", "")
 			// 检验剩余部分是否全部为数字
 			!pathNumber.toIntOrNull().isNull()
 		} else {
 			false
+		}
+	}
+
+	private fun isValidMnemonic(mnemonic: String, hold: (Boolean) -> Unit) {
+		val inputMnemonicSize = mnemonic.split(" ").size
+		if (inputMnemonicSize < 12) {
+			fragment.context?.alert("mnemonic lengh is not enough")
+			hold(false)
+			return
+		} else {
+			var errorCode = 1
+			object : ConcurrentAsyncCombine() {
+				override var asyncCount: Int = inputMnemonicSize
+				override fun concurrentJobs() {
+					mnemonic.split(" ").forEach { inputMnemonic ->
+						MnemonicWordList.any {
+							it == inputMnemonic
+						} isTrue {
+							errorCode *= 1
+							completeMark()
+						} otherwise {
+							errorCode *= 0
+							completeMark()
+						}
+					}
+				}
+				override fun mergeCallBack() {
+					hold(errorCode == 1)
+				}
+			}.start()
 		}
 	}
 
