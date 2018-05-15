@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
@@ -62,8 +60,7 @@ data class TransactionTable(
 	var gasUsed: String,
 	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String,
-	var isReceive: Boolean,
+	private var confirmations: String, var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -78,32 +75,9 @@ data class TransactionTable(
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
-		0,
-		data.blockNumber,
-		data.timeStamp,
-		data.transactionHash,
-		"",
-		"",
-		data.transactionIndex,
-		data.from,
-		data.to,
-		data.value,
-		"",
-		data.gasPrice,
-		"0",
-		"1",
-		"",
-		data.contract,
-		"",
-		data.gasUsed,
-		"",
-		data.isReceive,
-		true,
-		data.symbol,
-		data.to,
-		data.to,
-		false,
-		data.logIndex
+		0, data.blockNumber, data.timeStamp, data.transactionHash, "", "", data.transactionIndex,
+		data.from, data.to, data.value, "", data.gasPrice, "0", "1", "", data.contract, "",
+		data.gasUsed, "", data.isReceive, true, data.symbol, data.to, data.to, false, data.logIndex
 	)
 
 	companion object {
@@ -150,6 +124,8 @@ data class TransactionTable(
 								it.hasError == "0"
 							}.filter {
 								!it.isReceive
+							}.filter {
+								it.blockNumber.isNotEmpty()
 							}.maxBy {
 								it.nonce
 							}.let {
