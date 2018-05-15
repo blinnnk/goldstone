@@ -94,7 +94,11 @@ class QuotationPresenter(
 				it.runSocket()
 			}
 		}
-
+		if (currentSocket.isNull()) {
+			setSocket {
+				currentSocket?.runSocket()
+			}
+		}
 	}
 
 	private fun diffAndUpdateData(data: ArrayList<QuotationModel>) {

@@ -10,6 +10,7 @@ object FragmentTag {
 	const val walletDetail = "walletDetail"
 	const val walletSettings = "walletSettings"
 	const val profile = "profile"
+	const val profileOverlay = "profileOverlay"
 	const val transaction = "transaction"
 	const val transactionList = "transactionList"
 	const val quotation = "quotation"

@@ -4,12 +4,21 @@
   <style name="MainTheme" parent="Theme.AppCompat.NoActionBar">
     <item name="android:colorBackground">#00000000</item>
     <item name="android:windowDisablePreview">true</item>
-    页面跳转不要动画
-    <item name="android:windowAnimationStyle">@null</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="android:windowAnimationStyle">@style/Animation.AppCompat.DropDownUp</item>
     <!--关闭Window背景绘制-->
     <item name="android:windowEnableSplitTouch">false</item>
     <item name="android:splitMotionEvents">false</item>
 
+    <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
+    <item name="android:alertDialogTheme">@style/AlertDialogCustom</item>
+  </style>
+
+  <style name="AlertDialogCustom" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+    <item name="android:colorPrimary">@color/colorPrimary</item>
+    <item name="android:colorAccent">@color/colorAccent</item>
   </style>
 
 </resources>

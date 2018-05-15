@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
-import android.support.v4.app.FragmentActivity
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -14,6 +14,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -43,7 +44,10 @@ class WalletDetailPresenter(
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
 	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
 		updateData()
+		updateUnreadCount()
+		fragment.getMainActivity()?.backEvent = null
 	}
 
 	override fun updateData() {
@@ -76,11 +80,7 @@ class WalletDetailPresenter(
 		updateData()
 		showPinCodeFragment()
 		updateUnreadCount()
-	}
-
-	override fun onFragmentHiddenChanged(isHidden: Boolean) {
-		super.onFragmentHiddenChanged(isHidden)
-		updateUnreadCount()
+		fragment.getMainActivity()?.backEvent = null
 	}
 
 	fun showTransactionsFragment() {
@@ -169,10 +169,6 @@ class WalletDetailPresenter(
 				}
 			}
 		}
-	}
-
-	private fun FragmentActivity?.findIsItExist(fragmentTag: String): Boolean {
-		return !this?.supportFragmentManager?.findFragmentByTag(fragmentTag).isNull()
 	}
 
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {

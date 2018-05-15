@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.content.IntentFilter
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addFragment
@@ -8,15 +10,15 @@ import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.component.LoadingView
+import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import org.jetbrains.anko.relativeLayout
-import android.content.IntentFilter
-import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 
 class MainActivity : AppCompatActivity() {
 
+	var backEvent: Runnable? = null
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 
@@ -64,4 +66,19 @@ class MainActivity : AppCompatActivity() {
 		unregisterReceiver(netWorkReceiver)
 	}
 
+	override fun onBackPressed() {
+		if (backEvent.isNull()) {
+			super.onBackPressed()
+		} else {
+			backEvent?.run()
+		}
+	}
+
+	fun getHomeFragment(): HomeFragment? {
+		return supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment
+	}
+}
+
+fun FragmentActivity?.findIsItExist(fragmentTag: String): Boolean {
+	return !this?.supportFragmentManager?.findFragmentByTag(fragmentTag).isNull()
 }

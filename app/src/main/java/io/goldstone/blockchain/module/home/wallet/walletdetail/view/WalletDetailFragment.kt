@@ -97,5 +97,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	fun recoveryNotifyButtonStyle() {
 		slideHeader.notifyButton.removeRedot()
 	}
+
 }
 

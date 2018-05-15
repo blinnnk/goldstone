@@ -4,10 +4,7 @@ import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.aboutus.view.AboutUsFragment
 import io.goldstone.blockchain.module.home.profile.chainselection.view.ChainSelectionFragment
@@ -32,9 +29,7 @@ class ProfileOverlayPresenter(
 		super.removeSelfFromActivity()
 		fragment.getMainActivity()?.apply {
 			supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
-				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.let {
-					it.presenter.updateData()
-				}
+				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.presenter?.updateData()
 			}
 		}
 	}
@@ -51,9 +46,29 @@ class ProfileOverlayPresenter(
 			ProfileText.aboutUs -> showAboutUsFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
 			ProfileText.chain -> showChainSelectionFragment()
+			ProfileText.privacy -> showPrivacyFragment()
+			ProfileText.terms -> showTermsFragment()
+			ProfileText.support -> showSupportFragment()
 		}
 	}
 
+	private fun showPrivacyFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
+		}
+	}
+
+	private fun showTermsFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+		}
+	}
+
+	private fun showSupportFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.support)
+		}
+	}
 
 	private fun showChainSelectionFragment() {
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content) {
