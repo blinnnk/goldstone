@@ -14,6 +14,7 @@ import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -73,7 +74,12 @@ class WalletDetailPresenter(
 	override fun onFragmentResume() {
 		updateData()
 		showPinCodeFragment()
-		getUnreadCount()
+		updateUnreadCount()
+	}
+
+	override fun onFragmentHiddenChanged(isHidden: Boolean) {
+		super.onFragmentHiddenChanged(isHidden)
+		updateUnreadCount()
 	}
 
 	fun showTransactionsFragment() {
@@ -108,15 +114,29 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun getUnreadCount() {
+	fun updateUnreadCount() {
 		doAsync {
-			AppConfigTable.getAppConfig {
-				it?.apply {
-					GoldStoneAPI.getUnreadCount(goldStoneID, System.currentTimeMillis()) {
-						GoldStoneAPI.context.runOnUiThread {
-							System.out.println("fuck"+it)
-							if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
-								fragment.setNotificationUnreadCount(it)
+			AppConfigTable.getAppConfig { config ->
+				NotificationTable.getAllNotifications { notifications ->
+					config?.apply {
+						/**
+						 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
+						 * 如果本地有数据获取最后一条的创建时间作为请求时间
+						 */
+						val time =
+							if (notifications.isEmpty()) goldStoneID.substring(
+								goldStoneID.length - System.currentTimeMillis().toString().length,
+								goldStoneID.length
+							).toLong()
+							else notifications.maxBy { it.createTIme }?.createTIme.orElse(0)
+						GoldStoneAPI.getUnreadCount(goldStoneID, time) {
+							GoldStoneAPI.context.runOnUiThread {
+								System.out.println()
+								if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
+									fragment.setNotificationUnreadCount(it)
+								} else {
+									fragment.recoveryNotifyButtonStyle()
+								}
 							}
 						}
 					}

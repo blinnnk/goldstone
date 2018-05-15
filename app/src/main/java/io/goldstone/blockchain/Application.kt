@@ -2,6 +2,7 @@ package io.goldstone.blockchain
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
@@ -73,6 +74,8 @@ class GoldStoneApp : Application() {
 					AppConfigTable.insertAppConfig(callback)
 				} otherwise {
 					config?.isRegisteredAddresses?.isFalse {
+						// 打印必要数据在 `Debug` 的时候
+						Log.d("Config", "$config")
 						// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
 						XinGePushReceiver.registerWalletAddressForPush()
 					}

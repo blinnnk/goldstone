@@ -77,7 +77,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 				indeterminateDrawable.setColorFilter(
 					color, android.graphics.PorterDuff.Mode.MULTIPLY
 				)
-				layoutParams = RelativeLayout.LayoutParams(54.uiPX(), 40.uiPX())
+				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
 				setCenterInParent()
 			}
 			addView(loadingView)
