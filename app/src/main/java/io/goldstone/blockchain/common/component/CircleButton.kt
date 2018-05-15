@@ -134,7 +134,6 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		updateOriginYAnimation(17.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(28.uiPX().toFloat())
 		setIconViewColor(Color.TRANSPARENT)
-		System.out.println(redotView)
 		if (!redotView.isNull()) {
 			setIconViewColor(Spectrum.lightRed)
 		}

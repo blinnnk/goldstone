@@ -131,7 +131,6 @@ class WalletDetailPresenter(
 							else notifications.maxBy { it.createTIme }?.createTIme.orElse(0)
 						GoldStoneAPI.getUnreadCount(goldStoneID, time) {
 							GoldStoneAPI.context.runOnUiThread {
-								System.out.println()
 								if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
 									fragment.setNotificationUnreadCount(it)
 								} else {
