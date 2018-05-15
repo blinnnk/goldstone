@@ -15,13 +15,12 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.json.JSONObject
-import java.math.BigInteger
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -47,15 +46,22 @@ fun CharSequence.measureTextWidth(fontSize: Float): Float {
 	return textPaint.measureText(this.toString())
 }
 
-fun Fragment.getMainActivity() = activity as? MainActivity
-fun Context.getMainActivity() = this as? MainActivity
+fun Fragment.getMainActivity() =
+	activity as? MainActivity
+
+fun Context.getMainActivity() =
+	this as? MainActivity
 
 fun Context.alert(message: String) {
 	alert(Appcompat, message).show()
 }
 
 fun Context.showAlertView(
-	title: String, subtitle: String, showEditText: Boolean = true, cancelAction: () -> Unit = {}, action: (EditText?) -> Unit
+	title: String,
+	subtitle: String,
+	showEditText: Boolean = true,
+	cancelAction: () -> Unit = {},
+	action: (EditText?) -> Unit
 ) {
 	var input: EditText? = null
 	alert(
@@ -68,7 +74,7 @@ fun Context.showAlertView(
 						padding = 20.uiPX()
 					}
 					input = editText {
-						hintTextColor = Spectrum.opacity1White
+						hintTextColor = GrayScale.Opacity1Black
 						inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 						hint = CommonText.enterPassword
 					}
@@ -80,7 +86,7 @@ fun Context.showAlertView(
 	}.show()
 }
 
-fun<T: List<String>> T.toJsonArray(callback: (JsonArray) -> Unit) {
+fun <T : List<String>> T.toJsonArray(callback: (JsonArray) -> Unit) {
 	val stringArray = JsonArray()
 	forEachOrEnd { item, isEnd ->
 		stringArray.add(item)
