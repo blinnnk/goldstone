@@ -47,6 +47,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 			inputView.inputTextListener {
 				inputView.setPriceValue(symbolPrice * if (it.isEmpty()) 0.0 else it.toDouble())
+				presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
 			}
 		}
 	}
