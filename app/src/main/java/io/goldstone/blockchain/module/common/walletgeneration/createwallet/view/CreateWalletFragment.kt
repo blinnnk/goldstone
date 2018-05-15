@@ -18,11 +18,8 @@ import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 22/03/2018 2:23 AM
@@ -42,69 +39,71 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 	override val presenter = CreateWalletPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		verticalLayout {
+		scrollView {
+			verticalLayout {
 
-			gravity = Gravity.CENTER_HORIZONTAL
+				gravity = Gravity.CENTER_HORIZONTAL
 
-			lparams(matchParent, matchParent)
+				lparams(matchParent, matchParent)
 
-			attentionView.apply {
-				text = CreateWalletText.attention
-				textSize = fontSize(12)
-				textColor = Spectrum.white
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 20.uiPX()
-				}
-			}.into(this)
+				attentionView.apply {
+					text = CreateWalletText.attention
+					textSize = fontSize(12)
+					textColor = Spectrum.white
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 20.uiPX()
+					}
+				}.into(this)
 
-			nameEditText.apply {
-				title = CreateWalletText.name
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 30.uiPX()
-				}
-			}.into(this)
+				nameEditText.apply {
+					title = CreateWalletText.name
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 30.uiPX()
+					}
+				}.into(this)
 
-			passwordEditText.apply {
-				title = CreateWalletText.password
-				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 30.uiPX()
-				}
-			}.into(this)
+				passwordEditText.apply {
+					title = CreateWalletText.password
+					setPasswordInput()
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 30.uiPX()
+					}
+				}.into(this)
 
-			repeatPasswordEditText.apply {
-				title = CreateWalletText.repeatPassword
-				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 10.uiPX()
-				}
-			}.into(this)
+				repeatPasswordEditText.apply {
+					title = CreateWalletText.repeatPassword
+					setPasswordInput()
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 10.uiPX()
+					}
+				}.into(this)
 
-			hintInput.apply {
-				title = CreateWalletText.hint
-				setTextInput()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 10.uiPX()
-				}
-			}.into(this)
+				hintInput.apply {
+					title = CreateWalletText.hint
+					setTextInput()
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 10.uiPX()
+					}
+				}.into(this)
 
-			agreementView.apply {
-				radioButton.onClick { setRadioStatus() }
-				textView.onClick { presenter.showAgreementFragment() }
-			}.into(this)
+				agreementView.apply {
+					radioButton.onClick { setRadioStatus() }
+					textView.onClick { presenter.showAgreementFragment() }
+				}.into(this)
 
-			createButton.apply {
-				text = CreateWalletText.create.toUpperCase()
-				setGrayStyle()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 20.uiPX()
-				}
-			}.click {
-				it.showLoadingStatus()
-				presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) {
-					it.showLoadingStatus(false)
-				}
-			}.into(this)
+				createButton.apply {
+					text = CreateWalletText.create.toUpperCase()
+					setGrayStyle()
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 20.uiPX()
+					}
+				}.click {
+					it.showLoadingStatus()
+					presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) {
+						it.showLoadingStatus(false)
+					}
+				}.into(this)
+			}
 		}
 	}
 

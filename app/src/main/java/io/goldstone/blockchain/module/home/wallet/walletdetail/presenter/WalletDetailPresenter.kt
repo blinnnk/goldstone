@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -22,6 +23,8 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 3:45 PM
@@ -64,43 +67,13 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
-		coroutinesTask({
-			/** 先按照资产情况排序, 资产为零的按照权重排序 */
-			val currencyList = data.filter { it.currency > 0.0 }
-			val weightList = data.filter { it.currency == 0.0 }
-			currencyList.sortedByDescending { it.currency }
-				.plus(weightList.sortedByDescending { it.weight }).toArrayList()
-		}) {
-			walletDetailMemoryData = it
-			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-			fragment.updateHeaderValue()
-			fragment.setEmptyViewBy(it)
-		}
-	}
-
 	/**
 	 * 每次后台到前台更新首页的 `token` 信息
 	 */
 	override fun onFragmentResume() {
 		updateData()
 		showPinCodeFragment()
-	}
-
-	private fun showPinCodeFragment() {
-		fragment.activity?.supportFragmentManager?.findFragmentByTag(
-			FragmentTag.pinCode
-		).isNull() isTrue {
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main, FragmentTag.pinCode
-					) {
-						// Send Argument
-					}
-				}
-			}
-		}
+		getUnreadCount()
 	}
 
 	fun showTransactionsFragment() {
@@ -132,6 +105,54 @@ class WalletDetailPresenter(
 			putSerializable(
 				ArgumentKey.tokenDetail, model
 			)
+		}
+	}
+
+	private fun getUnreadCount() {
+		doAsync {
+			AppConfigTable.getAppConfig {
+				it?.apply {
+					GoldStoneAPI.getUnreadCount(goldStoneID, System.currentTimeMillis()) {
+						GoldStoneAPI.context.runOnUiThread {
+							System.out.println("fuck"+it)
+							if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
+								fragment.setNotificationUnreadCount(it)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
+		coroutinesTask({
+			/** 先按照资产情况排序, 资产为零的按照权重排序 */
+			val currencyList = data.filter { it.currency > 0.0 }
+			val weightList = data.filter { it.currency == 0.0 }
+			currencyList.sortedByDescending { it.currency }
+				.plus(weightList.sortedByDescending { it.weight }).toArrayList()
+		}) {
+			walletDetailMemoryData = it
+			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+			fragment.updateHeaderValue()
+			fragment.setEmptyViewBy(it)
+		}
+	}
+
+	private fun showPinCodeFragment() {
+		fragment.activity?.supportFragmentManager?.findFragmentByTag(
+			FragmentTag.pinCode
+		).isNull() isTrue {
+			AppConfigTable.getAppConfig {
+				it?.showPincode?.isTrue {
+					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
+						ContainerID.main, FragmentTag.pinCode
+					) {
+						// Send Argument
+					}
+				}
+			}
 		}
 	}
 

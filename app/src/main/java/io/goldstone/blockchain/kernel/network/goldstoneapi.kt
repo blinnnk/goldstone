@@ -209,7 +209,7 @@ object GoldStoneAPI {
 		).let {
 
 			postRequest(it, APIPath.getUnreadCount, netWorkError) {
-				hold(it)
+				hold(JSONObject(it).safeGet("count"))
 			}
 		}
 	}

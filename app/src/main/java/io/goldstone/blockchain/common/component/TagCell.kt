@@ -29,9 +29,7 @@ class TagCell(context: Context) : LinearLayout(context) {
 
 	init {
 
-		layoutParams = LinearLayout.LayoutParams(0, 42.uiPX()).apply {
-			margin = 5.uiPX()
-		}
+		layoutParams = LinearLayout.LayoutParams(0, 42.uiPX())
 
 		number.apply {
 			textColor = Spectrum.white

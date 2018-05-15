@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -11,6 +12,7 @@ import android.widget.TextView
 import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.Size
 import com.blinnnk.uikit.uiPX
@@ -20,7 +22,6 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
 
 /**
@@ -46,6 +47,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 		}
 	}
+
 	private val buttonTitle by lazy {
 		TextView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 25.uiPX())
@@ -57,8 +59,34 @@ class CircleButton(context: Context) : LinearLayout(context) {
 	}
 
 	private var viewSize = Size(30.uiPX(), 65.uiPX())
-
 	private var iconSize = 30.uiPX()
+
+	private var redotView: TextView? = null
+
+	fun setRedotStyle(count: String) {
+		if (redotView.isNull()) {
+			redotView = TextView(context).apply {
+				textSize = fontSize(15)
+				typeface = GoldStoneFont.black(context)
+				textColor = Spectrum.white
+				gravity = Gravity.CENTER
+				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+			}
+			redotView?.into(iconView)
+			icon.visibility = View.GONE
+		}
+		setIconViewColor(Spectrum.lightRed)
+		redotView?.text = count
+	}
+
+	fun removeRedot() {
+		if (!redotView.isNull()) {
+			iconView.removeView(redotView)
+			redotView = null
+			icon.visibility = View.VISIBLE
+			setIconViewColor(Spectrum.opacity2White)
+		}
+	}
 
 	fun setStyleParameter(
 		viewSize: Size = this.viewSize,
@@ -105,14 +133,23 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		buttonTitle.textColor = Spectrum.white
 		updateOriginYAnimation(17.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(28.uiPX().toFloat())
-		setIconViewColor(Color.TRANSPARENT)
+
+		if (!iconView.isNull()) {
+			setIconViewColor(Spectrum.red)
+		} else {
+			setIconViewColor(Color.TRANSPARENT)
+		}
 	}
 
 	fun setDefaultStyle() {
 		buttonTitle.textColor = Spectrum.opacity5White
 		updateOriginYAnimation(27.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(35.uiPX().toFloat())
-		setIconViewColor(Spectrum.opacity2White)
+		if (!iconView.isNull()) {
+			setIconViewColor(Spectrum.red)
+		} else {
+			setIconViewColor(Spectrum.opacity2White)
+		}
 	}
 
 }

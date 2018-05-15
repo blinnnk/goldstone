@@ -43,13 +43,17 @@ import org.web3j.utils.Convert
 import org.web3j.utils.Numeric
 import java.io.Serializable
 import java.math.BigInteger
+import kotlin.math.max
 
 /**
  * @date 28/03/2018 12:23 PM
  * @author KaySaith
  */
 
-data class GasFee(var gasLimit: Long, val gasPrice: Long) : Serializable
+data class GasFee(
+	var gasLimit: Long,
+	val gasPrice: Long
+) : Serializable
 
 class PaymentValueDetailPresenter(
 	override val fragment: PaymentValueDetailFragment
@@ -88,7 +92,9 @@ class PaymentValueDetailPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?, cellHeight: Int, maxHeight: Int
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
 	) {
 		setHeightMatchParent()
 	}
@@ -134,7 +140,10 @@ class PaymentValueDetailPresenter(
 	 * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
 	 * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
 	 */
-	fun transfer(password: String, callback: () -> Unit) {
+	fun transfer(
+		password: String,
+		callback: () -> Unit
+	) {
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
@@ -175,7 +184,10 @@ class PaymentValueDetailPresenter(
 	var hasCalculated = false
 	private var isItemCountChanged = true
 
-	fun updateTransactionAndAdapter(value: Double, callback: () -> Unit = {}) {
+	fun updateTransactionAndAdapter(
+		value: Double,
+		callback: () -> Unit = {}
+	) {
 		gasFeeFromCustom().isNull() isFalse {
 			fragment.getMainActivity()?.showLoadingView()
 			minerFeeType = MinerFeeType.Custom.content
@@ -203,18 +215,22 @@ class PaymentValueDetailPresenter(
 	 * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成对应不同速度的 `RawTransaction
 	 */
 	private fun prepareRawTransactionByGasPrices(
-		value: Double, hold: (ArrayList<RawTransaction>) -> Unit
+		value: Double,
+		hold: (ArrayList<RawTransaction>) -> Unit
 	) {
 		// 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
 		currentNonce.isNull() isTrue {
 			GoldStoneAPI.getTransactionListByAddress(WalletTable.current.address) {
-				val myLatestNonce = firstOrNull {
-					it.fromAddress.equals(WalletTable.current.address, true)
-				}?.nonce?.toLong()
-				currentNonce =
-					if (myLatestNonce.isNull()) BigInteger.valueOf(0)
-					else BigInteger.valueOf(myLatestNonce!! + 1)
-				generateTransaction(fragment.address!!, value, hold)
+				TransactionTable.getMyLatestNounce { localNounce ->
+					val myLatestNonce = firstOrNull {
+						it.fromAddress.equals(WalletTable.current.address, true)
+					}?.nonce?.toLong()
+					val chainNounce = if (myLatestNonce.isNull()) 0L
+					else myLatestNonce!! + 1
+					currentNonce =
+						BigInteger.valueOf(max(chainNounce, if (localNounce.isNull()) 0 else localNounce!! + 1))
+					generateTransaction(fragment.address!!, value, hold)
+				}
 			}
 		} otherwise {
 			generateTransaction(fragment.address!!, value, hold)
@@ -228,7 +244,9 @@ class PaymentValueDetailPresenter(
 	private var minGasLimit = BigInteger.valueOf(0)
 
 	private fun generateTransaction(
-		toAddress: String, value: Double, hold: (ArrayList<RawTransaction>) -> Unit
+		toAddress: String,
+		value: Double,
+		hold: (ArrayList<RawTransaction>) -> Unit
 	) {
 		val count: BigInteger
 		val data: String
@@ -241,17 +259,13 @@ class PaymentValueDetailPresenter(
 		} else {
 			to = fragment.token!!.contract
 			count = BigInteger.valueOf((value * Math.pow(10.0, fragment.token!!.decimal)).toLong())
-			data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() + count.toDataString()
+			data = SolidityCode.contractTransfer + toAddress.toDataStringFromAddress() +
+				count.toDataString()
 		}
 		// 这个 `Transaction` 是用来测量估算可能要用的 `gasLimit` 不是用来转账用的.
 		val transaction = Transaction(
-			WalletTable.current.address,
-			currentNonce,
-			BigInteger.valueOf(0),
-			BigInteger.valueOf(0),
-			to,
-			count,
-			data
+			WalletTable.current.address, currentNonce, BigInteger.valueOf(0), BigInteger.valueOf(0), to,
+			count, data
 		)
 
 		coroutinesTask({
@@ -263,22 +277,22 @@ class PaymentValueDetailPresenter(
 			/** 如果有过自定义设置, 那么增加自定义设置的选项 */
 			if (minerFeeType == MinerFeeType.Custom.content) {
 				if (defaultGasPrices.size <= 3) {
-					defaultGasPrices.add(BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei()))
+					defaultGasPrices.add(
+						BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei())
+					)
 				} else {
 					defaultGasPrices.remove(defaultGasPrices.last())
-					defaultGasPrices.add(BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei()))
+					defaultGasPrices.add(
+						BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0L).scaleToGwei())
+					)
 				}
 			}
 
 			defaultGasPrices.map { price ->
 				if (price == BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())) {
 					RawTransaction.createTransaction(
-						currentNonce,
-						price,
-						BigInteger.valueOf(gasFeeFromCustom()?.gasLimit.orElse(0)),
-						to,
-						count,
-						data
+						currentNonce, price, BigInteger.valueOf(gasFeeFromCustom()?.gasLimit.orElse(0)), to,
+						count, data
 					)
 				} else {
 					RawTransaction.createTransaction(
@@ -292,24 +306,30 @@ class PaymentValueDetailPresenter(
 	}
 
 	private fun generateModels(
-		rawTransactions: ArrayList<RawTransaction>, gasPrices: ArrayList<BigInteger>
-	) = rawTransactions.mapIndexed { index, it ->
-		PaymentValueDetailModel(gasPrices[index].toDouble(), it, minerFeeType)
-	}.toArrayList()
+		rawTransactions: ArrayList<RawTransaction>,
+		gasPrices: ArrayList<BigInteger>
+	) =
+		rawTransactions.mapIndexed { index, it ->
+			PaymentValueDetailModel(gasPrices[index].toDouble(), it, minerFeeType)
+		}.toArrayList()
 
 	private fun generateEmptyData() {
-		fragment.asyncData = arrayListOf(PaymentValueDetailModel().apply { type = MinerFeeType.Cheap.content },
-			PaymentValueDetailModel().apply { type = MinerFeeType.Fast.content },
-			PaymentValueDetailModel().apply { type = MinerFeeType.Recommend.content })
+		fragment.asyncData =
+			arrayListOf(PaymentValueDetailModel().apply { type = MinerFeeType.Cheap.content },
+				PaymentValueDetailModel().apply { type = MinerFeeType.Fast.content },
+				PaymentValueDetailModel().apply { type = MinerFeeType.Recommend.content })
 	}
 
 	private fun insertPendingDataToTransactionTable(
-		raw: RawTransaction, taxHash: String, token: WalletDetailCellModel
+		raw: RawTransaction,
+		taxHash: String,
+		token: WalletDetailCellModel
 	) {
 		TransactionTable().apply {
 			isReceive = false
 			symbol = token.symbol
-			timeStamp = (System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
+			timeStamp =
+				(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 			fromAddress = WalletTable.current.address
 			value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token.decimal).formatCount()
 			hash = taxHash
@@ -331,7 +351,10 @@ class PaymentValueDetailPresenter(
 	 * 转账开始后跳转到转账监听界面
 	 */
 	private fun goToTransactionDetailFragment(
-		address: String, raw: RawTransaction, token: WalletDetailCellModel, taxHash: String
+		address: String,
+		raw: RawTransaction,
+		token: WalletDetailCellModel,
+		taxHash: String
 	) {
 		// 准备跳转到下一个界面
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
@@ -354,10 +377,8 @@ class PaymentValueDetailPresenter(
 
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
-				Bundle().apply {
+			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
+				TokenDetailText.paymentValue, Bundle().apply {
 					putLong(ArgumentKey.gasLimit, minGasLimit.toLong())
 				})
 		}
