@@ -48,6 +48,7 @@ class ProfileOverlayPresenter(
 			ProfileText.chain -> showChainSelectionFragment()
 			ProfileText.privacy -> showPrivacyFragment()
 			ProfileText.terms -> showTermsFragment()
+			ProfileText.support -> showSupportFragment()
 		}
 	}
 
@@ -60,6 +61,12 @@ class ProfileOverlayPresenter(
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+		}
+	}
+
+	private fun showSupportFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.support)
 		}
 	}
 
