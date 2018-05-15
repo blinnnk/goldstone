@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
@@ -48,9 +49,11 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 				layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				mnemonicCode?.split(" ")?.forEachIndexed { index, value ->
-					TagCell(context).apply {
+					val cell = TagCell(context).apply {
 						setNumberAndText(index + 1, value)
-					}.into(this)
+					}
+					cell.into(this)
+					cell.setMargins<GridLayout.LayoutParams> { margin = 5.uiPX() }
 				}
 			}
 

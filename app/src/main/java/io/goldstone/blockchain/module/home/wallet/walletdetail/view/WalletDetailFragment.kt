@@ -89,5 +89,9 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 			isShow = false
 		}
 	}
+
+	fun setNotificationUnreadCount(count: String) {
+		slideHeader.notifyButton.setRedotStyle(count)
+	}
 }
 
