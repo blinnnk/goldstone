@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
+import android.support.v4.app.FragmentActivity
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -83,34 +84,62 @@ class WalletDetailPresenter(
 	}
 
 	fun showTransactionsFragment() {
-		fragment.activity?.addFragment<TransactionFragment>(ContainerID.main)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.transaction) isFalse {
+				addFragment<TransactionFragment>(ContainerID.main, FragmentTag.transaction)
+			}
+		}
 	}
 
 	fun showWalletListFragment() {
-		fragment.activity?.addFragment<WalletManagementFragment>(ContainerID.main)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.walletManagement) isFalse {
+				addFragment<WalletManagementFragment>(ContainerID.main, FragmentTag.walletManagement)
+			}
+		}
 	}
 
 	fun showNotificationListFragment() {
-		fragment.activity?.addFragment<NotificationFragment>(ContainerID.main)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.notification) isFalse {
+				addFragment<NotificationFragment>(ContainerID.main, FragmentTag.notification)
+			}
+		}
 	}
 
 	fun showTokenManagementFragment() {
-		fragment.activity?.addFragment<TokenManagementFragment>(ContainerID.main)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.tokenManagement) isFalse {
+				addFragment<TokenManagementFragment>(ContainerID.main, FragmentTag.tokenManagement)
+			}
+		}
 	}
 
 	fun showWalletSettingsFragment() {
-		fragment.activity?.addFragmentAndSetArguments<WalletSettingsFragment>(ContainerID.main) {
-			putString(
-				ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
-			)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.walletSettings) isFalse {
+				addFragmentAndSetArguments<WalletSettingsFragment>(
+					ContainerID.main, FragmentTag.walletSettings
+				) {
+					putString(
+						ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
+					)
+				}
+			}
 		}
 	}
 
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
-		fragment.activity?.addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main) {
-			putSerializable(
-				ArgumentKey.tokenDetail, model
-			)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.tokenDetail) isFalse {
+				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
+					ContainerID.main, FragmentTag.tokenDetail
+				) {
+					putSerializable(
+						ArgumentKey.tokenDetail, model
+					)
+				}
+			}
 		}
 	}
 
@@ -123,12 +152,10 @@ class WalletDetailPresenter(
 						 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
 						 * 如果本地有数据获取最后一条的创建时间作为请求时间
 						 */
-						val time =
-							if (notifications.isEmpty()) goldStoneID.substring(
-								goldStoneID.length - System.currentTimeMillis().toString().length,
-								goldStoneID.length
-							).toLong()
-							else notifications.maxBy { it.createTIme }?.createTIme.orElse(0)
+						val time = if (notifications.isEmpty()) goldStoneID.substring(
+							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
+						).toLong()
+						else notifications.maxBy { it.createTIme }?.createTIme.orElse(0)
 						GoldStoneAPI.getUnreadCount(goldStoneID, time) {
 							GoldStoneAPI.context.runOnUiThread {
 								if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
@@ -142,6 +169,10 @@ class WalletDetailPresenter(
 				}
 			}
 		}
+	}
+
+	private fun FragmentActivity?.findIsItExist(fragmentTag: String): Boolean {
+		return !this?.supportFragmentManager?.findFragmentByTag(fragmentTag).isNull()
 	}
 
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
