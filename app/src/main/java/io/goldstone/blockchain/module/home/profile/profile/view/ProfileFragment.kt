@@ -7,6 +7,9 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.module.home.home.view.HomeFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -22,7 +25,8 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 	override val presenter = ProfilePresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<ProfileModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<ProfileModel>?
 	) {
 
 		recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
@@ -45,10 +49,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(
-			view,
-			savedInstanceState
-		)
+		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
 	}
 
@@ -64,6 +65,12 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 		if (offset < headerHeight && isShow) {
 			slideHeader.onHeaderHidesStyle()
 			isShow = false
+		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		mainActivity?.getHomeFragment()?.apply {
+			presenter.showWalletDetailFragment()
 		}
 	}
 

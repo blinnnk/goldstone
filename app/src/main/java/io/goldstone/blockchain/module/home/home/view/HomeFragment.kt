@@ -27,51 +27,61 @@ import org.jetbrains.anko.verticalLayout
 
 class HomeFragment : BaseFragment<HomePresenter>() {
 
-  private val tabBar by lazy { TabBarView(context!!) }
+	private val tabBar by lazy { TabBarView(context!!) }
 
-  override val presenter = HomePresenter(this)
+	override val presenter = HomePresenter(this)
 
-  override fun AnkoContext<Fragment>.initView() {
-    relativeLayout {
-      lparams(matchParent, matchParent)
+	override fun AnkoContext<Fragment>.initView() {
+		relativeLayout {
+			lparams(matchParent, matchParent)
 
-      GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
+			GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
 
-      verticalLayout {
-        id = ContainerID.home
-        addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail) {
-          // Send Argument
-        }
-      }
+			verticalLayout {
+				id = ContainerID.home
+				addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail) {
+					// Send Argument
+				}
+			}
 
-      tabBar
-        .apply {
-          walletButton.setStyleAndClick {
-            presenter.showWalletDetailFragment()
-          }
-          marketButton.setStyleAndClick {
-            presenter.showQuotationFragment()
-          }
-          profileButton.setStyleAndClick {
-            presenter.showProfileFragment()
-          }
-        }
-        .into(this)
-      tabBar.setAlignParentBottom()
-    }
-  }
+			tabBar.apply {
+				walletButton.onClick {
+					presenter.showWalletDetailFragment()
+					walletButton.preventDuplicateClicks()
+				}
+				marketButton.onClick {
+					presenter.showQuotationFragment()
+					preventDuplicateClicks()
+				}
+				profileButton.onClick {
+					presenter.showProfileFragment()
+					preventDuplicateClicks()
+				}
+			}.into(this)
+			tabBar.setAlignParentBottom()
+		}
+	}
 
-  private fun TabItem.setStyleAndClick(callback: () -> Unit) {
-    onClick {
-      tabBar.apply {
-        walletButton.resetStyle()
-        marketButton.resetStyle()
-        profileButton.resetStyle()
-      }
-      callback()
-      setSelectedStyle()
-      preventDuplicateClicks()
-    }
-  }
+	private fun TabItem.setStyleAndClick(callback: () -> Unit) {
+		tabBar.apply {
+			walletButton.resetStyle()
+			marketButton.resetStyle()
+			profileButton.resetStyle()
+		}
+		callback()
+		setSelectedStyle()
+	}
+
+	fun selectWalletDetail(callback: () -> Unit) {
+		tabBar.walletButton.setStyleAndClick(callback)
+	}
+
+	fun selectQuotation(callback: () -> Unit) {
+		tabBar.marketButton.setStyleAndClick(callback)
+	}
+
+	fun setProfile(callback: () -> Unit) {
+		tabBar.profileButton.setStyleAndClick(callback)
+	}
 
 }

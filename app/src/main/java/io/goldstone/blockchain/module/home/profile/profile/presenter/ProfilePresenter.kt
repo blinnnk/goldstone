@@ -1,15 +1,14 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
 import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
@@ -47,9 +46,16 @@ class ProfilePresenter(
 	}
 
 	fun showTargetFragment(title: String) {
-		fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-			putString(ArgumentKey.profileTitle, title)
+		fragment.activity?.apply {
+			findIsItExist(FragmentTag.profileOverlay) isFalse {
+				addFragmentAndSetArguments<ProfileOverlayFragment>(
+					ContainerID.main, FragmentTag.profileOverlay
+				) {
+					putString(ArgumentKey.profileTitle, title)
+				}
+			}
 		}
+
 	}
 
 	private fun getCurrentLanguageSymbol() =

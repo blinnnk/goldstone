@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -18,11 +17,12 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
-import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
@@ -204,9 +204,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		view: View,
 		savedInstanceState: Bundle?
 	) {
-		super.onViewCreated(
-			view, savedInstanceState
-		)
+		super.onViewCreated(view, savedInstanceState)
 		presenter.onFragmentViewCreated()
 
 		// 监听 `RecyclerView` 滑动
@@ -217,9 +215,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				newState: Int
 			) {
 				/** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
-				super.onScrollStateChanged(
-					recyclerView, newState
-				)
+				super.onScrollStateChanged(recyclerView, newState)
 				observingRecyclerViewScrollState(newState)
 			}
 
@@ -228,12 +224,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				dx: Int,
 				dy: Int
 			) {
-				super.onScrolled(
-					recyclerView, dx, dy
-				)
-				observingRecyclerViewScrolled(
-					dx, dy
-				)
+				super.onScrolled(recyclerView, dx, dy)
+				observingRecyclerViewScrolled(dx, dy)
 				observingRecyclerViewVerticalOffset(
 					recyclerView?.computeVerticalScrollOffset().orZero(),
 					recyclerView?.computeVerticalScrollRange().orZero()
@@ -243,6 +235,9 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				)
 			}
 		})
+		getMainActivity()?.backEvent = Runnable {
+			setBackEvent(getMainActivity())
+		}
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {
@@ -251,6 +246,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		// 如果键盘在显示那么销毁键盘
 		activity?.apply { SoftKeyboard.hide(this) }
 		if (!hidden) {
+			// 重置回退栈事件
+			getMainActivity()?.backEvent = Runnable {
+				setBackEvent(getMainActivity())
+			}
 			presenter.onFragmentShowFromHidden()
 		}
 	}
@@ -316,6 +315,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		} else {
 			removeEmptyView()
 		}
+	}
+
+	open fun setBackEvent(mainActivity: MainActivity?) {
+
 	}
 
 }
