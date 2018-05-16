@@ -36,14 +36,11 @@ class TransactionDetailAdapter(
 		model = data
 		val textWidth = Resources.getSystem().displayMetrics.density * data.info.measureTextWidth(fontSize(14))
 		// 测算文字的内容高度来修改 `Cell` 的高度布局
-		Math.round(textWidth / ScreenSize.widthWithPadding.toDouble()).let {
-			layoutParams.height += (it * 10.uiPX()).toInt()
+		Math.floor(textWidth / ScreenSize.widthWithPadding.toDouble()).let {
+			layoutParams.height += (it * 20.uiPX()).toInt()
 		}
 		if (model.description == TransactionText.url) {
 			setContentColor(Spectrum.darkBlue)
-		}
-		if (model.description == TransactionText.transactionDate) {
-			layoutParams.height = TransactionSize.cellHeight
 		}
 		hold(this)
 	}
