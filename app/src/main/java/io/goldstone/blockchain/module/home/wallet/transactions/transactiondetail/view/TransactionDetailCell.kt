@@ -7,13 +7,12 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInVertical
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -81,13 +80,11 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 		)
 	}
 
-	fun setTitleColor(color: Int) {
+	fun setContentColor(color: Int) {
 		info.textColor = color
-	}
-
-	fun setGrayInfoStyle() {
-		info.textSize = fontSize(11)
-		info.textColor = GrayScale.midGray
+		info.text =
+			if (info.text.length > 100) (info.text.substring(0, 100) + "...").setUnderline()
+			else info.text.toString().setUnderline()
 	}
 
 }
