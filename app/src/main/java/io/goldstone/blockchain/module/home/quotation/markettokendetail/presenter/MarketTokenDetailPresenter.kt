@@ -45,7 +45,10 @@ class MarketTokenDetailPresenter(
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
 
-	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
+	fun updateChartByMenu(
+		chartView: MarketTokenChart,
+		buttonID: Int
+	) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
 			MarketTokenDetailChartType.DAY.code -> MarketTokenDetailChartType.DAY.info
@@ -125,12 +128,10 @@ class MarketTokenDetailPresenter(
 				// 如果本地数据库的时间周的最大时间小当前于自然周一的时间
 				callback(databaseTime > TimeUtils.getNatureSundayTimeInMill() - TimeUtils.ondDayInMills)
 			}
-
 			MarketTokenDetailChartType.DAY.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > 0.daysAgoInMills() - TimeUtils.oneHourInMills)
 			}
-
 			MarketTokenDetailChartType.MONTH.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > TimeUtils.getNatureMonthFirstTimeInMill() - TimeUtils.ondDayInMills)
@@ -167,27 +168,16 @@ class MarketTokenDetailPresenter(
 		map { JSONObject("{\"price\":\"${it.price}\",\"time\":${it.timestamp}}") }.let {
 			when (period) {
 				MarketTokenDetailChartType.WEEK.info -> {
-					QuotationSelectionTable.updateLineChartWeekBy(
-						pair, it.toString()
-					)
+					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
 				}
-
 				MarketTokenDetailChartType.DAY.info -> {
-					QuotationSelectionTable.updateLineChartDataBy(
-						pair, it.toString()
-					)
+					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
 				}
-
 				MarketTokenDetailChartType.MONTH.info -> {
-					QuotationSelectionTable.updateLineChartMontyBy(
-						pair, it.toString()
-					)
+					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
 				}
-
 				MarketTokenDetailChartType.Hour.info -> {
-					QuotationSelectionTable.updateLineChartHourBy(
-						pair, it.toString()
-					)
+					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
 				}
 			}
 		}
@@ -202,17 +192,11 @@ class MarketTokenDetailPresenter(
 		currencyInfo?.let { info ->
 			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
 				fragment.context?.runOnUiThread {
-					tokenInformation.model = TokenInformationModel(
-						it, info.symbol
-					)
-					priceHistroy.model = PriceHistoryModel(
-						it, info.quoteSymbol
-					)
+					tokenInformation.model = TokenInformationModel(it, info.symbol)
+					priceHistroy.model = PriceHistoryModel(it, info.quoteSymbol)
 				}
 			}
-			loadDescriptionFromLocalOrServer(
-				info, tokenInfo
-			)
+			loadDescriptionFromLocalOrServer(info, tokenInfo)
 		}
 	}
 
@@ -238,9 +222,7 @@ class MarketTokenDetailPresenter(
 					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->
 						fragment.context?.runOnUiThread {
 							tokenInfo.setTokenDescription(
-								description.substring(
-									0, maxCount(description)
-								) + "..."
+								description.substring(0, maxCount(description)) + "..."
 							)
 						}
 						QuotationSelectionTable.updateDescription(
@@ -249,9 +231,7 @@ class MarketTokenDetailPresenter(
 					}
 				} else {
 					tokenInfo.setTokenDescription(
-						description?.substring(
-							2, maxCount(description)
-						) + "..."
+						description?.substring(2, maxCount(description)) + "..."
 					)
 				}
 			}

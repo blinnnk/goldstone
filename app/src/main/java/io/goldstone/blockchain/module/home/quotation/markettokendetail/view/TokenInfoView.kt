@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.QuotationText
@@ -19,7 +20,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 
-class TokenInfoView(context: Context) : MarketTokenDetailBaseCell(context) {
+class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 
 	private val contentView = TextView(context).apply {
 		gravity = Gravity.TOP

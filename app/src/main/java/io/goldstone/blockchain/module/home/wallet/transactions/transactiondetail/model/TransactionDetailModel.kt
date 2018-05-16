@@ -6,6 +6,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
  */
 
 data class TransactionDetailModel(
-  val info: String = "",
-  val description: String = ""
+	var info: String = "",
+	var description: String = ""
 )

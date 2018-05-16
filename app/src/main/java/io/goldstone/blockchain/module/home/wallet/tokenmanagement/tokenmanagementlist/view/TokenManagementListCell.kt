@@ -2,12 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.content.Context
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R

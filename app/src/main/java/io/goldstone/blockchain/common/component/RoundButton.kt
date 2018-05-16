@@ -48,6 +48,8 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		// 视觉垂直居中的微调
 		y += 2.uiPX()
 
+		elevation = fontSize(2)
+
 	}
 
 	@SuppressLint("DrawAllocation")
@@ -110,7 +112,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		}
 
 		addTouchRippleAnimation(
-			GrayScale.lightGray, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f
+			GrayScale.whiteGray, Spectrum.green, RippleMode.Square, layoutParams.height / 2f
 		)
 		textPaint.color = GrayScale.midGray
 		invalidate()

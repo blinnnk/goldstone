@@ -465,8 +465,7 @@ object GoldStoneAPI {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						val dataObject =
-							data?.toJsonObject()
-								?: JSONObject("")
+							data?.toJsonObject() ?: JSONObject("")
 						val jsonArray = dataObject[keyName] as JSONArray
 						val dataArray = arrayListOf<T>()
 						(0 until jsonArray.length()).forEachOrEnd { index, isEnd ->

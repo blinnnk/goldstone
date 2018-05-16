@@ -1,4 +1,9 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
+package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
+
+/**
+ * @date 2018/5/16 11:43 PM
+ * @author KaySaith
+ */
 
 import android.content.Context
 import android.view.Gravity
@@ -9,7 +14,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -20,9 +24,8 @@ import org.jetbrains.anko.textView
  * @author KaySaith
  */
 
-class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
+class GasSelectionFooter(context: Context) : LinearLayout(context) {
 
-	var customGasEvent: Runnable? = null
 	private val customButton by lazy { BaseCell(context) }
 	private val confirmButton by lazy { RoundButton(context) }
 
@@ -42,12 +45,10 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 				textSize = fontSize(15)
 				typeface = GoldStoneFont.book(context)
 			}.setCenterInVertical()
-		}.click {
-			customGasEvent?.run()
 		}.into(this)
 
 		confirmButton.apply {
-			setGrayStyle(20.uiPX())
+			setBlueStyle(20.uiPX())
 			text = CommonText.next.toUpperCase()
 		}.into(this)
 	}
@@ -59,6 +60,10 @@ class PaymentValueDetailFooter(context: Context) : LinearLayout(context) {
 
 	fun getConfirmButton(action: RoundButton.() -> Unit) {
 		action(confirmButton)
+	}
+
+	fun getCustomButton(action: BaseCell.() -> Unit) {
+		action(customButton)
 	}
 
 }

@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 27/03/2018 3:27 AM
@@ -55,7 +56,8 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 				textSize = fontSize(14)
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.medium(context)
-				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 25.uiPX())
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+				y += 2.uiPX()
 			}.into(this)
 
 		}.let {

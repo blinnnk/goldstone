@@ -1233,6 +1233,106 @@ object PincodeText {
 	}
 }
 
+object PrepareTransferText {
+
+	@JvmField
+	val memoInformation = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Memo Information"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "Memo Information"
+	}
+
+	@JvmField
+	val memo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "MEMO"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "MEMO"
+	}
+
+	@JvmField
+	val addAMemo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Add A Memo"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "Add A Memo"
+	}
+	@JvmField
+	val price = when (currentLanguage) {
+		HoneyLanguage.English.code -> "UNIT PRICE"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "UNIT PRICE"
+	}
+
+	@JvmField
+	val currentPrice = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Current Price"
+		HoneyLanguage.Chinese.code -> ""
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> "Current Price"
+	}
+	@JvmField
+	val accountInfo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account Information"
+		HoneyLanguage.Chinese.code -> "Account Information"
+		HoneyLanguage.Japanese.code -> "Account Information"
+		HoneyLanguage.Korean.code -> "Account Information"
+		HoneyLanguage.Russian.code -> "Account Information"
+		HoneyLanguage.TraditionalChinese.code -> "Account Information"
+		else -> "Account Information"
+	}
+
+	@JvmField
+	val willSpending = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WILL SPENDING"
+		HoneyLanguage.Chinese.code -> "WILL SPENDING"
+		HoneyLanguage.Japanese.code -> "WILL SPENDING"
+		HoneyLanguage.Korean.code -> "WILL SPENDING"
+		HoneyLanguage.Russian.code -> "WILL SPENDING"
+		HoneyLanguage.TraditionalChinese.code -> "WILL SPENDING"
+		else -> "WILL SPENDING"
+	}
+
+	@JvmField
+	val send = when (currentLanguage) {
+		HoneyLanguage.English.code -> "SEND TO"
+		HoneyLanguage.Chinese.code -> "SEND TO"
+		HoneyLanguage.Japanese.code -> "SEND TO"
+		HoneyLanguage.Korean.code -> "SEND TO"
+		HoneyLanguage.Russian.code -> "SEND TO"
+		HoneyLanguage.TraditionalChinese.code -> "SEND TO"
+		else -> "SEND TO"
+	}
+
+	@JvmField
+	val from = when (currentLanguage) {
+		HoneyLanguage.English.code -> "FROM"
+		HoneyLanguage.Chinese.code -> "FROM"
+		HoneyLanguage.Japanese.code -> "FROM"
+		HoneyLanguage.Korean.code -> "FROM"
+		HoneyLanguage.Russian.code -> "FROM"
+		HoneyLanguage.TraditionalChinese.code -> "FROM"
+		else -> "FROM"
+	}
+}
+
 enum class HoneyLanguage(
 	val code: Int,
 	val language: String,

@@ -38,8 +38,7 @@ data class TransactionListModel(
 ) : Serializable {
 
 	constructor(data: TransactionTable) : this(
-		if (data.isERC20) data.tokenReceiveAddress.orEmpty() else data.to, // ERC 和 ETH 地址存放位置不同
-		CryptoUtils.scaleTo28(
+		data.tokenReceiveAddress.orEmpty(), CryptoUtils.scaleTo28(
 			HoneyDateUtil.getSinceTime(data.timeStamp) + descriptionText(
 				data.isReceive
 			) + data.fromAddress
@@ -54,20 +53,18 @@ data class TransactionListModel(
 		data.hash, getMemoFromInputCode(data.input),
 		(data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
 		EtherScanApi.singleTransactionHas(data.hash), // Api 地址拼接
-		data.isPending,
-		data.timeStamp,
-		data.value,
-		data.hasError == "1"
+		data.isPending, data.timeStamp, data.value, data.hasError == "1"
 	)
 
 }
 
-private val getMemoFromInputCode: (inputCode: String) -> String = {
+val getMemoFromInputCode: (inputCode: String) -> String = {
 	if (it == SolidityCode.ethTransfer) {
 		it.toAscii()
 	} else {
-		if (it.length > 138) it.substring(138, it.length).toAscii()
-		else "There isn't a memo"
+		if (it.length > 138) {
+			it.substring(136, it.length).toAscii()
+		} else "There isn't a memo"
 	}
 }
 

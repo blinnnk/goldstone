@@ -13,7 +13,8 @@ data class ERC20TransactionModel(
 	@SerializedName("address")
 	val contract: String,
 	@SerializedName("topics")
-	private val topics: ArrayList<String>, val from: String = topics[1],
+	private val topics: ArrayList<String>,
+	val from: String = topics[1],
 	val to: String = topics[2],
 	@SerializedName("data")
 	val value: String,

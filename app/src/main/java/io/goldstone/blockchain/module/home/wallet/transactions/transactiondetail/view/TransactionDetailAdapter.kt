@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
-import android.support.v7.widget.RecyclerView
+import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import io.goldstone.blockchain.common.value.Spectrum
+import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 
@@ -13,58 +13,28 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
  */
 
 class TransactionDetailAdapter(
-	private var dataSet: ArrayList<TransactionDetailModel>,
+	override var dataSet: ArrayList<TransactionDetailModel>,
 	private val hold: TransactionDetailCell.() -> Unit
-) : RecyclerView.Adapter<TransactionDetailAdapter.ViewHolder>() {
+) :
+	HoneyBaseAdapterWithHeaderAndFooter<TransactionDetailModel, TransactionDetailHeaderView, TransactionDetailCell, View>() {
 
-	enum class CellType(val value: Int) {
-		Header(0), Cell(1)
-	}
+	override fun generateCell(context: Context) =
+		TransactionDetailCell(context)
 
-	private var headerView: TransactionDetailHeaderView? = null
-	private var normalCell: TransactionDetailCell? = null
+	override fun generateFooter(context: Context) =
+		View(context)
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		var viewHolder: ViewHolder? = null
-		when (viewType) {
-			CellType.Header.value -> {
-				headerView = TransactionDetailHeaderView(parent.context)
-				viewHolder = ViewHolder(headerView)
-			}
+	override fun generateHeader(context: Context) =
+		TransactionDetailHeaderView(context)
 
-			CellType.Cell.value   -> {
-				normalCell = TransactionDetailCell(parent.context)
-				viewHolder = ViewHolder(normalCell)
-				hold(normalCell!!)
-			}
+	override fun TransactionDetailCell.bindCell(
+		data: TransactionDetailModel,
+		position: Int
+	) {
+		model = data
+		if (data.info.length > 50) {
+			layoutParams.height += 17.uiPX()
 		}
-		return viewHolder!!
+		hold(this)
 	}
-
-	override fun getItemViewType(position: Int): Int = when (position) {
-		0    -> CellType.Header.value
-		else -> CellType.Cell.value
-	}
-
-	override fun getItemCount(): Int = dataSet.size + 1
-
-	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		val cellType = getItemViewType(position)
-		when (cellType) {
-			CellType.Header.value -> {
-				// 赋值
-			}
-
-			CellType.Cell.value   -> {
-				// 赋值
-				(holder.itemView as? TransactionDetailCell)?.apply {
-					model = dataSet[position - 1]
-					if (model.description == TransactionText.url) setTitleColor(Spectrum.darkBlue)
-				}
-			}
-		}
-	}
-
-	inner class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView)
-
 }

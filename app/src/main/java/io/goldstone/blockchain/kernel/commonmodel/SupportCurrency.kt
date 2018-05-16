@@ -25,7 +25,7 @@ data class SupportCurrencyTable(
 	var isUsed: Boolean
 ) {
 
-	constructor() : this(
+	@Ignore constructor() : this(
 		0,
 		"",
 		"",

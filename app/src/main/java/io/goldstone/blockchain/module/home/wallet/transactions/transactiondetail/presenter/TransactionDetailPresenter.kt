@@ -30,6 +30,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.getMemoFromInputCode
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -101,8 +102,7 @@ class TransactionDetailPresenter(
 			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 			 */
 			TransactionTable.getTransactionByHashAndReceivedStatus(
-				transaction.hash,
-				transaction.isReceived
+				transaction.hash, transaction.isReceived
 			) { localTransaction ->
 				if (localTransaction.isNull()) {
 					// 如果本地没有数据从链上查询所有需要的数据
@@ -119,6 +119,28 @@ class TransactionDetailPresenter(
 						updateHeaderValue(
 							value.toDouble(), fromAddress, symbol, false, isReceive, hasError == "1"
 						)
+					}
+				}
+			}
+		}
+
+		// 如果没有拉取到 `Input Code` 这里再拉取并存入数据库
+		saveInputCodeByTaxHash(currentHash) {
+			fragment.asyncData!![1].info = getMemoFromInputCode(it)
+		}
+	}
+
+	private fun saveInputCodeByTaxHash(
+		taxHash: String,
+		callback: (String) -> Unit
+	) {
+		doAsync {
+			TransactionTable.getTransactionByHash(taxHash) {
+				it.any { it.input.isEmpty() } isTrue {
+					GoldStoneEthCall.getInputCodeByHash(taxHash) {
+						TransactionTable.updateInputCodeByHash(taxHash, it) {
+							callback(it)
+						}
 					}
 				}
 			}
@@ -210,7 +232,12 @@ class TransactionDetailPresenter(
 		val minerFee = if (data.isNull()) dataFromList?.minerFee
 		else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
 
-		val date = if (data.isNull()) dataFromList?.date else formatDate(data!!.timestamp / 1000)
+		val date = if (data.isNull()) dataFromList?.date
+		else formatDate(data!!.timestamp / 1000)
+
+		val memo =
+			if (data?.memo.isNull()) "There isn't a memo"
+			else data?.memo
 
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
@@ -222,14 +249,14 @@ class TransactionDetailPresenter(
 
 			is TransactionReceipt -> {
 				arrayListOf(
-					minerFee, "There isn't a memo", currentHash, receipt.blockNumber.toBigDecimal(), date,
+					minerFee, memo, currentHash, receipt.blockNumber.toBigDecimal(), date,
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
 
 			else -> {
 				arrayListOf(
-					minerFee, "There isn't a memo", currentHash, "waiting", date,
+					minerFee, memo, currentHash, "waiting", date,
 					EtherScanApi.transactionsByHash(currentHash)
 				)
 			}
@@ -355,13 +382,9 @@ class TransactionDetailPresenter(
 				CryptoUtils.isERC20TransferByInputCode(receipt.input) {
 					transactionInfo?.let { prepareHeaderValueFromNotification(receipt, it, info.isReceived) }
 				} isFalse {
-					val count =
-						CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
+					val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
 					updateHeaderValue(
-						count,
-						if (info.isReceived) receipt.from else receipt.to,
-						CryptoSymbol.eth,
-						false,
+						count, if (info.isReceived) receipt.from else receipt.to, CryptoSymbol.eth, false,
 						info.isReceived
 					)
 				}
@@ -415,13 +438,15 @@ class TransactionDetailPresenter(
 	// 自动监听交易完成后, 将转账信息插入数据库
 	private fun updateDataInDatabase(data: TransactionReceipt) {
 		GoldStoneDataBase.database.transactionDao().apply {
-			getTransactionByTaxHash(data.transactionHash)?.let {
-				update(it.apply {
-					blockNumber = data.blockNumber.toString()
-					isPending = false
-					hasError = "0"
-					txreceipt_status = "1"
-				})
+			getTransactionByTaxHash(data.transactionHash).let {
+				it.forEach {
+					update(it.apply {
+						blockNumber = data.blockNumber.toString()
+						isPending = false
+						hasError = "0"
+						txreceipt_status = "1"
+					})
+				}
 			}
 		}
 	}

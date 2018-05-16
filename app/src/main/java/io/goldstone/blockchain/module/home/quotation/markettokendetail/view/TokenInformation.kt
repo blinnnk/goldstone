@@ -7,6 +7,8 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.component.GraySqualCell
+import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -20,7 +22,7 @@ import org.jetbrains.anko.verticalLayout
 
 @Suppress("DEPRECATION")
 
-class TokenInformation(context: Context) : MarketTokenDetailBaseCell(context) {
+class TokenInformation(context: Context) : TopBottomLineCell(context) {
 
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		rank.setSubtitle(model.rankValue)
@@ -31,16 +33,13 @@ class TokenInformation(context: Context) : MarketTokenDetailBaseCell(context) {
 		)
 	}
 
-	private val rank = MarketTokenDetailBaseInfoCell(context)
-	private val avalibaleSupply = MarketTokenDetailBaseInfoCell(context)
-	private val marketCap = MarketTokenDetailBaseInfoCell(context)
+	private val rank = GraySqualCell(context)
+	private val avalibaleSupply = GraySqualCell(context)
+	private val marketCap = GraySqualCell(context)
 
 	init {
 		title.text = QuotationText.tokenInformation
-		layoutParams = RelativeLayout.LayoutParams(
-			matchParent,
-			210.uiPX()
-		)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 200.uiPX())
 		verticalLayout {
 			rank.into(this)
 			avalibaleSupply.into(this)

@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasEditorPresenter
-import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.model.MinerFeeType
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.MinerFeeType
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout

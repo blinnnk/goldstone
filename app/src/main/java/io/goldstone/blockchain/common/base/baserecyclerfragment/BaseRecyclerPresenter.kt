@@ -86,6 +86,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 				it.isFalse {
 					fragment.asyncData?.clear()
 					fragment.asyncData?.addAll(newData)
+					if (newData.isNotEmpty()) {
+						fragment.removeEmptyView()
+					} else {
+						fragment.showEmptyView()
+					}
 					dataSet.clear()
 					dataSet.addAll(newData)
 					notifyDataSetChanged()
@@ -105,6 +110,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 					} else {
 						fragment.showEmptyView()
 					}
+					fragment.asyncData?.clear()
+					fragment.asyncData?.addAll(newData)
 					dataSet.clear()
 					dataSet.addAll(newData)
 					notifyDataSetChanged()
