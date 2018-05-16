@@ -12,6 +12,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -81,7 +82,9 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 
 	fun setContentColor(color: Int) {
 		info.textColor = color
-		info.text = info.text.setUnderline().setItalic()
+		info.text =
+			if (info.text.length > 100) (info.text.substring(0, 100) + "...").setUnderline()
+			else info.text.toString().setUnderline()
 	}
 
 }
