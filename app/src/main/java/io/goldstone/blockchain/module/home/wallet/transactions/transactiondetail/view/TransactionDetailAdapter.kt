@@ -4,7 +4,11 @@ import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.utils.measureTextWidth
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 
 /**
@@ -32,8 +36,12 @@ class TransactionDetailAdapter(
 		position: Int
 	) {
 		model = data
-		if (data.info.length > 50) {
-			layoutParams.height += 17.uiPX()
+		// 测算文字的内容高度来修改 `Cell` 的高度布局
+		Math.round(data.info.measureTextWidth(fontSize(14)) / ScreenSize.widthWithPadding.toDouble()).let {
+			layoutParams.height += (it * 17.uiPX()).toInt()
+		}
+		if (model.description == TransactionText.url) {
+			setContentColor(Spectrum.darkBlue)
 		}
 		hold(this)
 	}

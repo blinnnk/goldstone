@@ -7,9 +7,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInVertical
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -81,13 +79,9 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 		)
 	}
 
-	fun setTitleColor(color: Int) {
+	fun setContentColor(color: Int) {
 		info.textColor = color
-	}
-
-	fun setGrayInfoStyle() {
-		info.textSize = fontSize(11)
-		info.textColor = GrayScale.midGray
+		info.text = info.text.setUnderline().setItalic()
 	}
 
 }
