@@ -203,9 +203,17 @@ class TransactionListPresenter(
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount: Int = size
 					override fun concurrentJobs() {
-						forEach {
-							GoldStoneDataBase.database.transactionDao().insert(it)
-							completeMark()
+						forEach { transactionTable ->
+							if (transactionTable.isERC20) {
+								GoldStoneEthCall.getInputCodeByHash(transactionTable.hash) {
+									GoldStoneDataBase.database.transactionDao()
+										.insert(transactionTable.apply { input = it })
+									completeMark()
+								}
+							} else {
+								GoldStoneDataBase.database.transactionDao().insert(transactionTable)
+								completeMark()
+							}
 						}
 					}
 

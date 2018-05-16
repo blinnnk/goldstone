@@ -6,6 +6,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.component.GraySqualCell
+import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.value.QuotationText
 import org.jetbrains.anko.matchParent
@@ -24,16 +26,16 @@ data class PriceHistoryModel(
 	val totalLow: String,
 	val baseSymbol: String
 ) {
-	constructor(data: JSONObject, symbol: String) : this(
-		data.safeGet("high_24"),
-		data.safeGet("low_24"),
-		data.safeGet("high_total"),
-		data.safeGet("low_total"),
-		symbol
+	constructor(
+		data: JSONObject,
+		symbol: String
+	) : this(
+		data.safeGet("high_24"), data.safeGet("low_24"), data.safeGet("high_total"),
+		data.safeGet("low_total"), symbol
 	)
 }
 
-class PriceHistoryView(context: Context) : MarketTokenDetailBaseCell(context) {
+class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 
 	var model: PriceHistoryModel? by observing(null) {
 		model?.apply {
@@ -42,12 +44,12 @@ class PriceHistoryView(context: Context) : MarketTokenDetailBaseCell(context) {
 		}
 	}
 
-	private val dayPrice = MarketTokenDetailBaseInfoCell(context)
-	private val totalPrice = MarketTokenDetailBaseInfoCell(context)
+	private val dayPrice = GraySqualCell(context)
+	private val totalPrice = GraySqualCell(context)
 
 	init {
 		title.text = QuotationText.priceHistory
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 
 		dayPrice.setPriceTitle("24 Hours")
 		totalPrice.setPriceTitle("Total")

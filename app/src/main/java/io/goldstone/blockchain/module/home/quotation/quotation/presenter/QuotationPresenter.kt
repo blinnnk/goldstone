@@ -106,7 +106,6 @@ class QuotationPresenter(
 			fragment.asyncData = data
 		} otherwise {
 			diffAndUpdateAdapterData<QuotationAdapter>(data)
-			fragment.setEmptyViewBy(data)
 		}
 	}
 

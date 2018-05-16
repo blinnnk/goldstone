@@ -12,6 +12,7 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.QuotationText
@@ -33,19 +34,21 @@ data class CurrentPriceModel(
 	val percent: String = "0.0",
 	val usdtPrice: Double = 1.0
 ) {
-	constructor(data: CurrencyPriceInfoModel, symbol: String) : this(
-		data.price.toDouble(),
-		symbol,
-		data.percent,
+	constructor(
+		data: CurrencyPriceInfoModel,
+		symbol: String
+	) : this(
+		data.price.toDouble(), symbol, data.percent,
 		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0)
 	)
 }
 
 @SuppressLint("SetTextI18n")
-class CurrentPriceView(context: Context) : MarketTokenDetailBaseCell(context) {
+class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 
 	var model: CurrentPriceModel by observing(CurrentPriceModel()) {
-		val value = " ${model.baseCurrency}" + " ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${GoldStoneApp.currencyCode}"
+		val value =
+			" ${model.baseCurrency}" + " ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${GoldStoneApp.currencyCode}"
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice}" + value, GrayScale.black, 12.uiPX(), true, false
 		)

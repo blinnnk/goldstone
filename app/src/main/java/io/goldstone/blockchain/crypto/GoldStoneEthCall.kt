@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.kernel.network.APIPath
 import okhttp3.*
 import org.json.JSONObject
@@ -29,6 +30,7 @@ object GoldStoneEthCall {
 		GetTokenDecimal("eth_call", SolidityCode.getDecimal),
 		GetTokenName("eth_call", SolidityCode.getTokenName),
 		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
+		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall)
 	}
 
 	@JvmStatic
@@ -98,6 +100,21 @@ object GoldStoneEthCall {
 		getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
 			getTokenDecimal(contractAddress) {
 				hold(tokenBalance / Math.pow(10.0, it))
+			}
+		}
+	}
+
+	@JvmStatic
+	fun getInputCodeByHash(
+		hash: String,
+		holdValue: (String) -> Unit = {}
+	) {
+		RequestBody.create(
+			contentType,
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
+		).let {
+			callEthBy(it) {
+				holdValue(JSONObject(it).safeGet("input"))
 			}
 		}
 	}

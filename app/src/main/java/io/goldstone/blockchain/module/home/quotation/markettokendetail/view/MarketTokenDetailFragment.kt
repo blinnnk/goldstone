@@ -24,9 +24,7 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 
-enum class MarketTokenDetailChartType(
-	val code: Int, val info: String
-) {
+enum class MarketTokenDetailChartType(val code: Int, val info: String) {
 	Hour(0, "1hour"),
 	DAY(1, "1day"),
 	WEEK(2, "1week"),
@@ -57,16 +55,13 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					}
 				}.into(this)
 				menu.titles = arrayListOf(
-					MarketTokenDetailChartType.Hour.info,
-					MarketTokenDetailChartType.DAY.info,
-					MarketTokenDetailChartType.WEEK.info,
-					MarketTokenDetailChartType.MONTH.info
+					MarketTokenDetailChartType.Hour.info, MarketTokenDetailChartType.DAY.info,
+					MarketTokenDetailChartType.WEEK.info, MarketTokenDetailChartType.MONTH.info
 				)
 				menu.getButton { button ->
 					button.onClick {
 						presenter.updateChartByMenu(
-							chartView,
-							button.id
+							chartView, button.id
 						)
 						menu.selected(button.id)
 						button.preventDuplicateClicks()
@@ -76,8 +71,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				chartView.into(this)
 				// 默认加载小时的图标数据
 				presenter.updateChartByMenu(
-					chartView,
-					MarketTokenDetailChartType.Hour.code
+					chartView, MarketTokenDetailChartType.Hour.code
 				)
 
 				currentPriceInfo.apply {
@@ -91,10 +85,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				tokenInformation.into(this)
 
 				presenter.setCurrencyInf(
-					currencyInfo,
-					tokenInformation,
-					priceHistroy,
-					tokenInfo
+					currencyInfo, tokenInformation, priceHistroy, tokenInfo
 				)
 			}.lparams {
 				width = ScreenSize.widthWithPadding

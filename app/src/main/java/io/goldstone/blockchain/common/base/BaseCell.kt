@@ -21,78 +21,70 @@ import io.goldstone.blockchain.common.value.*
 
 open class BaseCell(context: Context) : RelativeLayout(context) {
 
-  var hasArrow: Boolean by observing(true) {
-    invalidate()
-  }
+	var hasArrow: Boolean by observing(true) {
+		invalidate()
+	}
 
-  protected var arrowY: Float by observing(0f) {
-    invalidate()
-  }
+	protected var arrowY: Float by observing(0f) {
+		invalidate()
+	}
 
-  private val paint = Paint().apply {
-    isAntiAlias = true
-    style = Paint.Style.FILL
-    color = Spectrum.opacity2White
-  }
+	private val paint = Paint().apply {
+		isAntiAlias = true
+		style = Paint.Style.FILL
+		color = Spectrum.opacity2White
+	}
 
-  private val iconPaint = Paint().apply {
-    isAntiAlias = true
-    style = Paint.Style.FILL
-    color = Spectrum.opacity5White
-  }
+	private val iconPaint = Paint().apply {
+		isAntiAlias = true
+		style = Paint.Style.FILL
+		color = Spectrum.opacity5White
+	}
 
-  private val path = HoneySvgPathConvert()
-  private val arrow = path.parser(SvgPath.arrow)
-  private var hasTopLine = false
+	init {
+		this.setWillNotDraw(false)
 
-  init {
-    this.setWillNotDraw(false)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
+			leftMargin = PaddingSize.device
+		}
+	}
 
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
-      leftMargin = PaddingSize.device
-    }
-  }
+	private val path = HoneySvgPathConvert()
+	private val arrow = path.parser(SvgPath.arrow)
+	private var hasTopLine = false
 
-  @SuppressLint("DrawAllocation")
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+	@SuppressLint("DrawAllocation")
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-    if (hasArrow) {
-      canvas?.save()
-      canvas?.translate(width - 16.uiPX().toFloat(), height / 2f - 7.uiPX() + arrowY)
-      canvas?.drawPath(arrow, iconPaint)
-      canvas?.restore()
-    }
+		if (hasArrow) {
+			canvas?.save()
+			canvas?.translate(width - 16.uiPX().toFloat(), height / 2f - 7.uiPX() + arrowY)
+			canvas?.drawPath(arrow, iconPaint)
+			canvas?.restore()
+		}
 
-    if (hasTopLine) {
-      canvas?.drawLine(
-        0f,
-        0f,
-        width.toFloat(),
-        BorderSize.default,
-        paint
-      )
-    }
+		if (hasTopLine) {
+			canvas?.drawLine(
+				0f, 0f, width.toFloat(), BorderSize.default, paint
+			)
+		}
 
-    canvas?.drawLine(
-      0f,
-      height - BorderSize.default,
-      width.toFloat(),
-      height - BorderSize.default,
-      paint
-    )
-  }
+		canvas?.drawLine(
+			0f, height - BorderSize.default, width.toFloat(), height - BorderSize.default, paint
+		)
+	}
 
-  fun hasTopLine()  {
-    hasTopLine = true
-    invalidate()
-  }
+	fun hasTopLine() {
+		hasTopLine = true
+		invalidate()
+	}
 
-  fun setGrayStyle() {
-    iconPaint.color = GrayScale.Opacity1Black
-    paint.color = GrayScale.Opacity1Black
-    invalidate()
-    addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
-  }
+	fun setGrayStyle() {
+		iconPaint.color = GrayScale.Opacity1Black
+		paint.color = GrayScale.Opacity1Black
+		invalidate()
+		addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
+	}
 
 }

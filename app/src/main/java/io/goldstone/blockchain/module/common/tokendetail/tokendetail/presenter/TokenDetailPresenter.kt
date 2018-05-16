@@ -23,6 +23,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -139,7 +140,6 @@ class TokenDetailPresenter(
 
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
 		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
-		setEmptyViewBy(data)
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			data.prepareTokenHistoryBalance(symbol!!) {

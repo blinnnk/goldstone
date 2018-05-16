@@ -14,7 +14,7 @@ object ArgumentKey {
 	const val transactionFromList = "transactionFromList"
 	const val tokenDetail = "tokenDetail"
 	const val paymentAddress = "paymentAddress"
-	const val paymentSymbol = "paymentSymbol"
+	const val tokenModel = "tokenModel"
 	const val webViewUrl = "webViewUrl"
 	const val notificationTransaction = "notificationTransaction"
 	const val quotationOverlayTitle = "quotationOverlay"
@@ -22,6 +22,7 @@ object ArgumentKey {
 	const val quotationCurrencyDetail = "quotationCurrencyDetail"
 	const val gasEditor = "gasEditor"
 	const val gasLimit = "gasLimit"
+	const val gasPrepareModel = "gasPrepareModel"
 }
 
 object SharesPreference {

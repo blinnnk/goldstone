@@ -147,7 +147,7 @@ fun Double.formatCurrency(): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 3
 	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同
-	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
+	val prefix = if (value * rate >= 1.0) "" else if (value == 0.0) "0." else "0"
 	return prefix + formatEditor.format(this * rate)
 }
 
@@ -186,8 +186,6 @@ fun String.toMills(timeType: TimeType = TimeType.Second): Long {
 }
 
 fun Double.toGwei() = (this / 1000000000.0).toLong()
-
-fun Double.scaleToGwei() = this * 1000000000.0
 fun Long.scaleToGwei() = this * 1000000000
 
 /**
@@ -242,4 +240,8 @@ fun String.getObjectMD5HexString(): String {
 		println(error)
 		"error"
 	}
+}
+
+fun String.toHexCode(): String {
+	return toByteArray(charset("UTF-8")).toHexString("")
 }

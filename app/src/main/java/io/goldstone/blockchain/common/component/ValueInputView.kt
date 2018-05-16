@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view
+package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,42 +13,37 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orElse
-import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.common.component.GradientType
-import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
-import org.jetbrains.anko.*
+import org.jetbrains.anko.hintTextColor
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.verticalLayout
 
 /**
- * @date 28/03/2018 12:25 PM
+ * @date 2018/5/15 10:22 PM
  * @author KaySaith
  */
-@SuppressLint("SetTextI18n")
-class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-	private val gradientView by lazy { GradientView(context) }
-	private val description by lazy { TextView(context) }
-	private val valueInput by lazy { EditText(context) }
+@SuppressLint("SetTextI18n")
+open class ValueInputView(context: Context) : RelativeLayout(context) {
+
+	protected val gradientView by lazy { GradientView(context) }
+	protected val description by lazy { TextView(context) }
+	protected val valueInput by lazy { EditText(context) }
 	private val priceInfo by lazy { TextView(context) }
-	private val addressRemind by lazy { TransactionDetailCell(context) }
-	private val gradientViewHeight = 170.uiPX()
+	protected val gradientViewHeight = 170.uiPX()
 
 	init {
-
-		layoutParams = LinearLayout.LayoutParams(matchParent, 260.uiPX())
-
-		gradientView.apply {
+		this.addView(gradientView.apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, gradientViewHeight)
 			setStyle(GradientType.DarkGreenYellow, gradientViewHeight)
-		}.into(this)
+		})
 
 		verticalLayout {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, gradientViewHeight)
@@ -88,39 +83,11 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER
 			}.into(this)
 		}
-
-		verticalLayout {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
-			addressRemind.into(this)
-			addressRemind.apply {
-				setGrayInfoStyle()
-			}
-
-			textView {
-				text = "Miner Fee"
-				textSize = fontSize(12)
-				textColor = GrayScale.gray
-				typeface = GoldStoneFont.book(context)
-				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX()).apply {
-					leftMargin = PaddingSize.device
-					topMargin = 10.uiPX()
-				}
-			}
-		}.setAlignParentBottom()
-
 	}
 
-	fun setInputFocus() {
-		valueInput.hintTextColor = Spectrum.opacity1White
-		valueInput.requestFocus()
-	}
-
-	fun showTargetAddress(address: String) {
-		addressRemind.model = TransactionDetailModel(address, "Target Address")
-	}
-
-	fun updateCurrencyValue(value: Double?) {
-		priceInfo.text = "≈ ${value.orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"
+	fun updateCurrencyValue(value: Double) {
+		val count = if (valueInput.text.isEmpty()) 0.0 else valueInput.text.toString().toDouble()
+		priceInfo.text = "≈ ${(value * count).orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"
 	}
 
 	fun inputTextListener(hold: (String) -> Unit) {
@@ -142,6 +109,10 @@ class PaymentValueDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 	fun setHeaderSymbol(symbol: String) {
 		description.text = "Send $symbol Count"
+	}
+
+	fun getValue(): String {
+		return valueInput.text.toString()
 	}
 
 }

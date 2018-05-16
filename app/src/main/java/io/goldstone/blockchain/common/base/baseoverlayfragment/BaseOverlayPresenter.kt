@@ -111,4 +111,8 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		// Do Something
 	}
 
+	open fun onFragmentShowFromHidden() {
+		// Do Something
+	}
+
 }

@@ -182,7 +182,6 @@ class WalletDetailPresenter(
 			walletDetailMemoryData = it
 			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 			fragment.updateHeaderValue()
-			fragment.setEmptyViewBy(it)
 		}
 	}
 

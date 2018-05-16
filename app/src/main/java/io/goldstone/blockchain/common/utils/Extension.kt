@@ -10,12 +10,15 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.getDisplayHeight
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
@@ -75,6 +78,7 @@ fun Context.showAlertView(
 					}
 					input = editText {
 						hintTextColor = GrayScale.Opacity1Black
+						textColor = Spectrum.blue
 						inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 						hint = CommonText.enterPassword
 					}
@@ -105,6 +109,15 @@ fun JSONObject.safeGet(key: String): String {
 
 fun String.getDecimalCount(): Int {
 	val integerPlaces = indexOf('.')
-	val decimalPlaces = length - integerPlaces - 1
-	return decimalPlaces
+	return length - integerPlaces - 1
+}
+
+fun View.keyboardHeightListener(block: (keyboardHeight: Int) -> Unit) {
+	addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+		if (getDisplayHeight() != ScreenSize.Height) {
+			block(ScreenSize.Height - getDisplayHeight())
+		} else {
+			block(0)
+		}
+	}
 }

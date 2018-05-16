@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentvaluedetail.view.PaymentValueDetailFragment
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -32,7 +32,9 @@ class AddressSelectionPresenter(
 	}
 
 	override fun updateParentContentLayoutHeight(
-		dataCount: Int?, cellHeight: Int, maxHeight: Int
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
 	) {
 		// 详情页面直接全屏高度
 		setHeightMatchParent()
@@ -47,14 +49,14 @@ class AddressSelectionPresenter(
 
 			fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 				hideChildFragment(fragment)
-				addFragmentAndSetArgument<PaymentValueDetailFragment>(ContainerID.content) {
+				addFragmentAndSetArgument<PaymentPrepareFragment>(ContainerID.content) {
 					putString(ArgumentKey.paymentAddress, address)
-					putSerializable(ArgumentKey.paymentSymbol, token)
+					putSerializable(ArgumentKey.tokenModel, token)
 				}
 				overlayView.header.apply {
 					backButton.onClick {
 						headerTitle = TokenDetailText.address
-						presenter.popFragmentFrom<PaymentValueDetailFragment>()
+						presenter.popFragmentFrom<PaymentPrepareFragment>()
 						setHeightMatchParent()
 						showCloseButton(false)
 					}

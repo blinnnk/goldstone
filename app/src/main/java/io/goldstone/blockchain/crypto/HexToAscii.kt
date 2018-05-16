@@ -22,7 +22,6 @@ fun String.toAscii(): String {
 	// split into two characters
 	var i = 0
 	while (i < hex.length - 1) {
-
 		//split the hex into pairs
 		val pair = hex.substring(i, i + 2)
 		//convert hex to decimal
@@ -39,9 +38,8 @@ private fun checkCode(dec: Int): String {
 
 	// convert the decimal to character
 	str = Character.toString(dec.toChar())
-
 	if (dec < 32 || dec in 127 .. 160) str = ""
-	return str.trim()
+	return str
 }
 
 /**

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
@@ -48,7 +49,6 @@ data class TransactionTable(
 	var hasError: String,
 	@SerializedName("txreceipt_status")
 	var txreceipt_status: String,
-	@Ignore
 	@SerializedName("input")
 	var input: String,
 	@SerializedName("contractAddress")
@@ -60,8 +60,7 @@ data class TransactionTable(
 	var gasUsed: String,
 	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String,
-	var isReceive: Boolean,
+	private var confirmations: String, var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -76,9 +75,32 @@ data class TransactionTable(
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
-		0, data.blockNumber, data.timeStamp, data.transactionHash, "", "", data.transactionIndex,
-		data.from, data.to, data.value, "", data.gasPrice, "0", "1", "", data.contract, "",
-		data.gasUsed, "", data.isReceive, true, data.symbol, data.to, data.to, false, data.logIndex
+		0,
+		data.blockNumber,
+		data.timeStamp,
+		data.transactionHash,
+		"",
+		"",
+		data.transactionIndex,
+		data.from,
+		data.to,
+		data.value,
+		"",
+		data.gasPrice,
+		"0",
+		"1",
+		"",
+		data.contract,
+		"",
+		data.gasUsed,
+		"",
+		data.isReceive,
+		true,
+		data.symbol,
+		data.to,
+		data.to,
+		false,
+		data.logIndex
 	)
 
 	companion object {
@@ -182,8 +204,33 @@ data class TransactionTable(
 		// 异步方法
 		fun deleteByTaxHash(taxHash: String) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash)?.let {
-					delete(it)
+				getTransactionByTaxHash(taxHash).let {
+					it.forEach {
+						delete(it)
+					}
+				}
+			}
+		}
+
+		fun updateInputCodeByHash(
+			taxHash: String,
+			input: String,
+			callback: () -> Unit = {}
+		) {
+			GoldStoneDataBase.database.transactionDao().apply {
+				getTransactionByTaxHash(taxHash).let {
+					it.forEachOrEnd { item, isEnd ->
+						update(item.apply { this.input = input })
+						if (isEnd) callback()
+					}
+				}
+			}
+		}
+
+		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
+			GoldStoneDataBase.database.transactionDao().apply {
+				getTransactionByTaxHash(taxHash).let {
+					hold(it)
 				}
 			}
 		}
@@ -211,7 +258,7 @@ interface TransactionDao {
 	fun getTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
-	fun getTransactionByTaxHash(taxHash: String): TransactionTable?
+	fun getTransactionByTaxHash(taxHash: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
 	fun getTransactionByTaxHashAndReceivedStatus(

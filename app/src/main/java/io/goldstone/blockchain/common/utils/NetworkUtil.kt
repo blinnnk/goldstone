@@ -40,8 +40,11 @@ object NetworkUtil {
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
-	override fun onReceive(context: Context, intent: Intent) {
-		NetworkUtil.hasNetworkWithAlert(context) isTrue {
+	override fun onReceive(
+		context: Context,
+		intent: Intent
+	) {
+		NetworkUtil.hasNetwork(context) isTrue {
 			AppConfigTable.getAppConfig {
 				it?.isRegisteredAddresses?.isFalse {
 					XinGePushReceiver.registerWalletAddressForPush()
@@ -58,7 +61,8 @@ object TimeUtils {
 
 	fun timeIntervalFromUTC(): Long {
 		val offsetFromUtc = TimeZone.getDefault().getOffset(Date().time)
-		return Integer.toString(offsetFromUtc).toLongOrNull() ?: 0
+		return Integer.toString(offsetFromUtc).toLongOrNull()
+			?: 0
 	}
 
 	fun getNatureMondayTimeInMill(): Long {
