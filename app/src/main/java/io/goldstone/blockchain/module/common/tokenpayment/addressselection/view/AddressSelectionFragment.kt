@@ -20,10 +20,11 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	override val presenter = AddressSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<ContactTable>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<ContactTable>?
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			clickEvent = presenter.showPaymentValueDetailFragment(model.address)
+			clickEvent = presenter.showPaymentPrepareFragment(model.address)
 		}
 	}
 
@@ -54,11 +55,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 				showConfirmButton()
 				it?.getInputStatus { hasInput, address ->
 					setConfirmStatus(hasInput)
-					address?.apply {
-						confirmButtonClickEvent = this@AddressSelectionFragment.presenter.showPaymentValueDetailFragment(
-							address
-						)
-					}
+					confirmButtonClickEvent =
+						this@AddressSelectionFragment.presenter.showPaymentPrepareFragment(address.orEmpty())
 				}
 			}
 		}
