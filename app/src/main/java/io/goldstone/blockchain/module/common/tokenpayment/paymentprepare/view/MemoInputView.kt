@@ -74,7 +74,7 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 					if (context.navigationBarIsHidden()) 0 else HomeSize.tabBarHeight - 8.uiPX()
 				inputView.layoutParams.height = viewHeight
 				inputView.requestLayout()
-				confirmButton.y = viewHeight - buttonHeight * 1f - barHeight
+				confirmButton.y = viewHeight - buttonHeight * 1f - barHeight - 5.uiPX()
 				keyboardHeight = it
 			}
 		}
