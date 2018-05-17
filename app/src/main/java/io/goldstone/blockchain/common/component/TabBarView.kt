@@ -1,11 +1,7 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.view.Gravity
-import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -14,9 +10,7 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInHorizontal
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.HoneySvgPathConvert
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
