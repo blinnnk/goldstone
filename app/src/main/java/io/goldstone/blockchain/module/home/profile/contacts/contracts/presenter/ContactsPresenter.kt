@@ -24,6 +24,18 @@ class ContactPresenter(
 		updateAddressList()
 	}
 
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		super.updateParentContentLayoutHeight(
+			fragment.asyncData?.size.orZero(),
+			fragment.setSlideUpWithCellHeight(),
+			maxHeight
+		)
+	}
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateAddressList()
