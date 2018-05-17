@@ -277,14 +277,14 @@ class TransactionDetailPresenter(
 			is TransactionReceipt -> {
 				arrayListOf(
 					minerFee, memo, currentHash, receipt.blockNumber.toBigDecimal(), date,
-					EtherScanApi.transactionsByHash(currentHash)
+					EtherScanApi.singleTransactionHas(currentHash)
 				)
 			}
 
 			else -> {
 				arrayListOf(
-					minerFee, memo, currentHash, "waiting", date,
-					EtherScanApi.transactionsByHash(currentHash)
+					minerFee, memo, currentHash, "Waiting...", date,
+					EtherScanApi.singleTransactionHas(currentHash)
 				)
 			}
 		}
@@ -326,7 +326,7 @@ class TransactionDetailPresenter(
 					Log.d("DEBUG", it.hash)
 					it.hash == currentHash
 				}.subscribe {
-					println("succeed")
+					Log.d("DEBUG", "Succeed")
 					updateWalletDetailValue(activity)
 					onTransactionSucceed()
 				}
@@ -341,7 +341,7 @@ class TransactionDetailPresenter(
 			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)
 					.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-						presenter.updateData()
+						runOnUiThread { presenter.updateData() }
 					}
 			}
 		}
@@ -351,9 +351,7 @@ class TransactionDetailPresenter(
 		web3j.ethGetTransactionByHash(currentHash).sendAsync().get()?.let {
 			CryptoUtils.isERC20TransferByInputCode(it.transaction.input) {
 				val contract = it.transaction.to
-				GoldStoneEthCall.getTokenBalanceWithContract(
-					contract, WalletTable.current.address
-				) { balance ->
+				GoldStoneEthCall.getTokenBalanceWithContract(contract, WalletTable.current.address) { balance ->
 					GoldStoneEthCall.getTokenSymbol(contract) { symbol ->
 						MyTokenTable.updateCurrentWalletBalanceWithSymbol(balance, symbol)
 						callback()
@@ -381,13 +379,10 @@ class TransactionDetailPresenter(
 	}
 
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-	private fun TransactionDetailFragment.getTransactionFromChain(
-		taxHash: String,
-		callback: () -> Unit = {}
+	private fun TransactionDetailFragment.getTransactionFromChain(taxHash: String, callback: () -> Unit = {}
 	) {
 		web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
 			context?.runOnUiThread {
-				println(it)
 				asyncData?.clear()
 				asyncData?.addAll(generateModels(it))
 				recyclerView.adapter.notifyItemRangeChanged(1, 6)

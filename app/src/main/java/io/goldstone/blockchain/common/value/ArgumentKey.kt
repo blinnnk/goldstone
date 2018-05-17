@@ -25,6 +25,10 @@ object ArgumentKey {
 	const val gasPrepareModel = "gasPrepareModel"
 }
 
+object IntentKey {
+	const val hashFromNotify = "hashFromNotify"
+}
+
 object SharesPreference {
 	const val registerPush = "registerPush"
 }

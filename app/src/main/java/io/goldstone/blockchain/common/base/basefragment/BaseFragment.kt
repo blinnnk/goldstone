@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
@@ -75,7 +76,12 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 	}
 
 	open fun setBackEvent(activity: MainActivity) {
-
+		val parent = parentFragment
+		if (parent is BaseOverlayFragment<*>) {
+			parent.presenter.removeSelfFromActivity()
+			// 如果阻碍 `Loading` 存在也一并销毁
+			activity.removeLoadingView()
+		}
 	}
 
 }

@@ -23,7 +23,8 @@ data class InputCodeData(val type: String, val address: String, val count: Doubl
 object CryptoUtils {
 
 	fun scaleAddress(address: String): String {
-		return address.substring(0, 5) + " ··· " + address.substring(address.length - 5, address.length)
+		return if(address.isEmpty()) ""
+		else address.substring(0, 5) + " ··· " + address.substring(address.length - 5, address.length)
 	}
 
 	fun scaleTo9(address: String): String {

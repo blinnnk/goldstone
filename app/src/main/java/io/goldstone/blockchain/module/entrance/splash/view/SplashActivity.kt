@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.entrance.splash.view
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
@@ -57,6 +58,8 @@ class SplashActivity : AppCompatActivity() {
 		AppConfigTable.getAppConfig {
 			initLaunchLanguage(it?.language)
 			it?.let {
+				// 打印必要数据在 `Debug` 的时候
+				Log.d("Config", "$it")
 				getCurrencyRate(it)
 			}
 
@@ -66,10 +69,9 @@ class SplashActivity : AppCompatActivity() {
 					// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 					addFragment<StartingFragment>(container.id)
 				}
+			}.let {
+				setContentView(it)
 			}
-				.let {
-					setContentView(it)
-				}
 
 		}
 	}

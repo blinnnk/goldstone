@@ -166,10 +166,7 @@ data class MyTokenTable(
 			}
 		}
 
-		fun updateCurrentWalletBalanceWithSymbol(
-			balance: Double,
-			symbol: String
-		) {
+		fun updateCurrentWalletBalanceWithSymbol(balance: Double, symbol: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					getTokenBySymbolAndAddress(symbol, WalletTable.current.address).let {

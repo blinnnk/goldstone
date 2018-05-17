@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Context.POWER_SERVICE
+import android.content.Intent
 import android.media.RingtoneManager
 import android.os.PowerManager
 import android.support.v4.app.NotificationCompat
@@ -16,16 +17,17 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.common.value.SharesPreference
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import org.json.JSONObject
 
 /**
  * @date 19/04/2018 4:33 PM
@@ -101,17 +103,36 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	}
 
 	@SuppressLint("PrivateResource")
-	override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
+	override fun onTextMessage(
+		context: Context?,
+		message: XGPushTextMessage?
+	) {
 		if (context == null) return
-		showNotificationOnLockScreen(
-			context, message.toString()
-		)
+		showNotificationOnLockScreen(context, message.toString())
 	}
 
 	override fun onNotifactionClickedResult(
-		p0: Context?,
-		p1: XGPushClickedResult?
+		context: Context?,
+		result: XGPushClickedResult?
 	) {
+		result?.customContent?.let {
+			when(JSONObject(it).safeGet("uri")) {
+				ClassURI.transactionDetail -> {
+					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
+				}
+			}
+		}
+	}
+
+	private fun handlTransactionNotification(
+		context: Context?,
+		content: String?
+	) {
+		val intent = Intent(context, MainActivity::class.java)
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+		intent.putExtra(IntentKey.hashFromNotify, content)
+		context?.startActivity(intent)
+
 	}
 
 	companion object {
@@ -127,7 +148,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
 								isSucceed isTrue {
 									AppConfigTable.updateRegisterAddressesStatus(true)
-									println("Register Address Worked $it")
+									Log.d("DEBUG", "Register Address Worked $it")
 								} otherwise {
 									// 服务器返回错误的时候标记注册失败
 									AppConfigTable.updateRegisterAddressesStatus(false)
@@ -156,9 +177,7 @@ fun Application.registerDeviceForPush() {
 			registerDevice(token.toString())
 			// 如果本地有注册成功的标记则不再注册
 			getStringFromSharedPreferences(SharesPreference.registerPush).let {
-				Log.d(
-					"DEBUG", it
-				)
+				Log.d("DEBUG", it)
 				if (it == token) return
 			}
 			// 在本地数据库记录 `Push Token`
