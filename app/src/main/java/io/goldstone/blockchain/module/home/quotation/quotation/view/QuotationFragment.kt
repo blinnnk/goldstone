@@ -24,7 +24,8 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override val presenter = QuotationPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<QuotationModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<QuotationModel>?
 	) {
 		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
 			onClick {
@@ -34,7 +35,10 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
 
@@ -51,7 +55,10 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
 
-	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
+	override fun observingRecyclerViewVerticalOffset(
+		offset: Int,
+		range: Int
+	) {
 
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
