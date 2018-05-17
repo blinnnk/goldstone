@@ -78,8 +78,8 @@ class EmptyView(context: Context) : LinearLayout(context) {
 			}
 
 			EmptyType.WalletDetail -> {
-				y = (context.getRealScreenHeight() - WalletDetailSize.heightHeight - emptyViewHeight) / 2 +
-					WalletDetailSize.heightHeight - 140.uiPX() * 1f
+				y = (context.getRealScreenHeight() - WalletDetailSize.height - emptyViewHeight) / 2 +
+					WalletDetailSize.height - 140.uiPX() * 1f
 				layoutParams =
 					LinearLayout.LayoutParams(
 						300.uiPX(),

@@ -53,6 +53,9 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
 			presenter.onFragmentShowFromHidden()
+			getMainActivity()?.apply {
+				backEvent = Runnable { setBackEvent(this) }
+			}
 		}
 	}
 

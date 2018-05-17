@@ -6,8 +6,10 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.AddressSelectionPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 
 /**
@@ -59,6 +61,13 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 						this@AddressSelectionFragment.presenter.showPaymentPrepareFragment(address.orEmpty())
 				}
 			}
+		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			headerTitle = TokenDetailText.tokenDetail
+			presenter.popFragmentFrom<AddressSelectionFragment>()
 		}
 	}
 

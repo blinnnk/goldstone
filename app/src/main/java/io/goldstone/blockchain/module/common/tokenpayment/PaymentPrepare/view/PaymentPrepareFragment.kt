@@ -10,10 +10,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
@@ -29,6 +26,7 @@ import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -128,7 +126,10 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		updateValueTotalPrice()
 		resetBackButtonEvent()
@@ -180,7 +181,8 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun updateValueTotalPrice() {
-		val price = getParentFragment<TokenDetailOverlayFragment>()?.token?.price ?: 0.0
+		val price =
+			getParentFragment<TokenDetailOverlayFragment>()?.token?.price ?: 0.0
 		inputView.inputTextListener {
 			inputView.updateCurrencyValue(price)
 			if (it.isNotEmpty()) {
@@ -194,11 +196,15 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 
-	fun setSymbolAndPrice(
-		symbol: String,
-		price: String
-	) {
+	fun setSymbolAndPrice(symbol: String, price: String) {
 		this.inputView.setHeaderSymbol(symbol)
 		this.price.setSubtitle(price)
 	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<TokenDetailOverlayFragment>()?.let {
+			presenter.backEvent(it)
+		}
+	}
+
 }
