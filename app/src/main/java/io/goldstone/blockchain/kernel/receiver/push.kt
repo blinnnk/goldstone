@@ -4,6 +4,7 @@ package io.goldstone.blockchain.kernel.receiver
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
@@ -122,6 +123,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				}
 			}
 		}
+		// 清楚所有 `App Icon` 上的小红点
+		val notificationManager =
+			GoldStoneAPI.context.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		notificationManager.cancelAll()
 	}
 
 	private fun handlTransactionNotification(
