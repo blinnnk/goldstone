@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -100,6 +101,7 @@ class WalletDetailPresenter(
 	}
 
 	fun showNotificationListFragment() {
+		XinGePushReceiver.clearAppIconRedot()
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.notification) isFalse {
 				addFragment<NotificationFragment>(ContainerID.main, FragmentTag.notification)
