@@ -26,7 +26,7 @@ import org.jetbrains.anko.textColor
 class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 
 	val addTokenButton by lazy { CircleButton(context) }
-	val setAlertButton by lazy { CircleButton(context) }
+	private val setAlertButton by lazy { CircleButton(context) }
 	private val title = TextView(context)
 
 	init {

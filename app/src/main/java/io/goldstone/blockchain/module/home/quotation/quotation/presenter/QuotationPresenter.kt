@@ -37,6 +37,7 @@ class QuotationPresenter(
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
 
 	private var updateChartTimes: Int? = null
+	private var hasInitSocket = false
 
 	override fun updateData() {
 		// 如果内存有数据直接更新内存的数据
@@ -72,6 +73,7 @@ class QuotationPresenter(
 				currentSocket.isNull() isTrue {
 					// 初始化 `Socket`
 					setSocket {
+						hasInitSocket = true
 						currentSocket?.runSocket()
 					}
 				} otherwise {
@@ -94,7 +96,7 @@ class QuotationPresenter(
 				it.runSocket()
 			}
 		}
-		if (currentSocket.isNull()) {
+		if (currentSocket.isNull() && hasInitSocket) {
 			setSocket {
 				currentSocket?.runSocket()
 			}

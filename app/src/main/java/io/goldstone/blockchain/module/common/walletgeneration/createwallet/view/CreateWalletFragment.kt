@@ -41,9 +41,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
-
 				gravity = Gravity.CENTER_HORIZONTAL
-
 				lparams(matchParent, matchParent)
 
 				attentionView.apply {

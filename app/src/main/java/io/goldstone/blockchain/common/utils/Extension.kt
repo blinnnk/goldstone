@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.common.utils
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Paint
 import android.support.v4.app.Fragment
 import android.text.InputType
@@ -114,7 +115,7 @@ fun String.getDecimalCount(): Int {
 
 fun View.keyboardHeightListener(block: (keyboardHeight: Int) -> Unit) {
 	addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-		if (getDisplayHeight() != ScreenSize.Height) {
+		if (getDisplayHeight() != Resources.getSystem().displayMetrics.heightPixels) {
 			block(ScreenSize.Height - getDisplayHeight())
 		} else {
 			block(0)
