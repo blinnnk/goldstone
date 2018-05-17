@@ -59,6 +59,6 @@ class ProfilePresenter(
 	}
 
 	private fun getCurrentLanguageSymbol() =
-		HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero())
+		HoneyLanguage.getLanguageByCode(GoldStoneApp.currentLanguage.orZero())
 
 }

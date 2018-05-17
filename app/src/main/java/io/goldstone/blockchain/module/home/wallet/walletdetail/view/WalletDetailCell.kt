@@ -12,6 +12,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.crypto.formatCount
@@ -50,12 +51,10 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
 		icon.into(this)
 		tokenInfo.into(this)
-		valueInfo.apply {
-			isFloatRight = true
-			y += 2.uiPX()
-		}.into(this)
+		valueInfo.into(this)
 
 		tokenInfo.apply {
+			title.typeface = GoldStoneFont.heavy(context)
 			setCenterInVertical()
 			x += CommonCellSize.iconPadding
 			y += 2.uiPX()
@@ -64,9 +63,12 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		icon.setCenterInVertical()
 
 		valueInfo.apply {
+			title.typeface = GoldStoneFont.heavy(context)
 			setAlignParentRight()
 			setCenterInVertical()
 			x -= 30.uiPX()
+			isFloatRight = true
+			y += 2.uiPX()
 		}
 
 	}

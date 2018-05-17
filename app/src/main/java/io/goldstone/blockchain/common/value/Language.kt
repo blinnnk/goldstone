@@ -1349,6 +1349,18 @@ enum class HoneyLanguage(
 			}
 		}
 
+		fun getLanguageByCode(code: Int): String {
+			return when (code) {
+				HoneyLanguage.English.code -> HoneyLanguage.English.language
+				HoneyLanguage.Chinese.code -> HoneyLanguage.Chinese.language
+				HoneyLanguage.Japanese.code -> HoneyLanguage.Japanese.language
+				HoneyLanguage.Russian.code -> HoneyLanguage.Russian.language
+				HoneyLanguage.Korean.code -> HoneyLanguage.Korean.language
+				HoneyLanguage.TraditionalChinese.code -> HoneyLanguage.TraditionalChinese.language
+				else -> ""
+			}
+		}
+
 		fun getLanguageSymbol(code: Int): String {
 			return when (code) {
 				HoneyLanguage.English.code -> HoneyLanguage.English.symbol
