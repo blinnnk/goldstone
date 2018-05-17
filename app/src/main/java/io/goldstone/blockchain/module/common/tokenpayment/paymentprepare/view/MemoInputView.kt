@@ -7,10 +7,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.navigationBarIsHidden
-import com.blinnnk.extension.setCenterInHorizontal
-import com.blinnnk.extension.timeUpThen
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -65,13 +62,19 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 
 		confirmButton.into(this)
 
+		val barHeight = if ((context as Activity).navigationBarIsHidden()) {
+			HomeSize.tabBarHeight
+		} else {
+			0
+		}
+
 		keyboardHeightListener {
 			if (keyboardHeight != it) {
 				viewHeight = ScreenSize.Height - it - ScreenSize.statusBarHeight -
-					if ((context as Activity).navigationBarIsHidden()) 0 else HomeSize.tabBarHeight - 8.uiPX()
+					if (context.navigationBarIsHidden()) 0 else HomeSize.tabBarHeight - 8.uiPX()
 				inputView.layoutParams.height = viewHeight
 				inputView.requestLayout()
-				confirmButton.y = viewHeight - buttonHeight * 1f
+				confirmButton.y = viewHeight - buttonHeight * 1f - barHeight
 				keyboardHeight = it
 			}
 		}
