@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.content.Context
-import android.content.res.Resources
 import android.view.KeyCharacterMap
+import android.view.KeyCharacterMap.deviceHasKey
 import android.view.KeyEvent
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.utils.keyboardHeightListener
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 
@@ -21,16 +22,24 @@ class QuotationAdapter(
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, LinearLayout>() {
 
+	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
 		LinearLayout(context).apply {
-			val  hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)
-			val footerHeight = if(hasBackKey) 50.uiPX() else 10.uiPX()
-			layoutParams = LinearLayout.LayoutParams(matchParent, footerHeight)
-
+			val barHeight = if (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) {
+				60.uiPX()
+			} else 10.uiPX()
+			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
 
 	override fun generateHeader(context: Context) =
 		LinearLayout(context).apply {
+			/**
+			 * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
+			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
+			 */
+			keyboardHeightListener {
+				if (it < 0) { hasHiddenSoftNavigationBar = true }
+			}
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 		}
 
@@ -44,10 +53,4 @@ class QuotationAdapter(
 		model = data
 		hold(this)
 	}
-
-	fun hasNavBar(): Boolean {
-		val id = Resources.getSystem().getIdentifier("config_showNavigationBar", "bool", "android")
-		return id > 0 && Resources.getSystem().getBoolean(id)
-	}
-
 }

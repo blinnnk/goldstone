@@ -48,14 +48,13 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 	override val presenter = AboutUsPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, matchParent)
 			relativeLayout {
 				imageView {
 					y -= 5.uiPX()
 					imageResource = R.drawable.about_us_background
-					layoutParams = RelativeLayout.LayoutParams(
-						matchParent, 160.uiPX()
-					)
-					scaleType = ImageView.ScaleType.CENTER_INSIDE
+					layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
+					scaleType = ImageView.ScaleType.CENTER_CROP
 				}
 
 				imageView {
