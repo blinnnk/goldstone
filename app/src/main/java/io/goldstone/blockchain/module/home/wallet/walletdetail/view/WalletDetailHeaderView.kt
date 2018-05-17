@@ -61,7 +61,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 		setWillNotDraw(false)
 
-		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.heightHeight)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.height)
 
 		currentAccount.into(this)
 		currentAccount.apply {

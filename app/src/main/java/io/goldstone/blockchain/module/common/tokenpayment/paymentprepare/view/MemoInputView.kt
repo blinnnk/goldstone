@@ -71,7 +71,7 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 		keyboardHeightListener {
 			if (keyboardHeight != it) {
 				viewHeight = ScreenSize.Height - it - ScreenSize.statusBarHeight -
-					if (context.navigationBarIsHidden()) 0 else HomeSize.tabBarHeight - 8.uiPX()
+					if (context.navigationBarIsHidden()) 0 else HomeSize.tabBarHeight
 				inputView.layoutParams.height = viewHeight
 				inputView.requestLayout()
 				confirmButton.y = viewHeight - buttonHeight * 1f - barHeight + 5.uiPX()

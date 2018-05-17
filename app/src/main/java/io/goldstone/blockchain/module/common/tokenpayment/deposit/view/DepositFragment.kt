@@ -8,9 +8,11 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRView
@@ -81,6 +83,13 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	private fun setAddressText() {
 		WalletTable.getCurrentWalletAddress {
 			qrView.setAddressText(this)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			headerTitle = TokenDetailText.tokenDetail
+			presenter.popFragmentFrom<DepositFragment>()
 		}
 	}
 }

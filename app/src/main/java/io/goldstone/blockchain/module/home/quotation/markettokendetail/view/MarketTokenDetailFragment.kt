@@ -2,20 +2,19 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
+import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -100,8 +99,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	}
 
 	override fun setBackEvent(activity: MainActivity) {
-		getParentFragment<QuotationOverlayFragment> {
-			presenter.removeSelfFromActivity()
+		super.setBackEvent(activity)
+		// 恢复回退事件
+		activity.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.apply {
+			updateBackEvent()
 		}
 	}
 }

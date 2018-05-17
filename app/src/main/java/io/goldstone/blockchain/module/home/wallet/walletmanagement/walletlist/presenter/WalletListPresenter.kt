@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
@@ -30,7 +31,7 @@ class WalletListPresenter(
 
   fun switchWallet(address: String) {
     WalletTable.switchCurrentWallet(address) {
-      fragment.activity?.jump<MainActivity>()
+      fragment.activity?.jump<SplashActivity>()
     }
   }
 

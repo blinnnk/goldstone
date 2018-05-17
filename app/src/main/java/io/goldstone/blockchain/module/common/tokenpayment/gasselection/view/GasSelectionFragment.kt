@@ -20,6 +20,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -145,6 +146,12 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 			presenter.transfer(
 				it?.text.toString(), callback
 			)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<TokenDetailOverlayFragment>()?.let {
+			presenter.backEvent(it)
 		}
 	}
 

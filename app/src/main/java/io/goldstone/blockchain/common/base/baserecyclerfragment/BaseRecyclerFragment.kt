@@ -254,6 +254,13 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 
+	open fun updateBackEvent() {
+		// 重置回退栈事件
+		getMainActivity()?.backEvent = Runnable {
+			setBackEvent(getMainActivity())
+		}
+	}
+
 	override fun onDestroy() {
 		super.onDestroy()
 		// 如果键盘在显示那么销毁键盘
@@ -308,7 +315,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 
-	fun setEmptyViewBy(data: ArrayList<D>) {
+	private fun setEmptyViewBy(data: ArrayList<D>) {
 		if (data.isEmpty()) {
 			showEmptyView()
 		} else {
@@ -320,6 +327,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		val parent = parentFragment
 		if (parent is BaseOverlayFragment<*>) {
 			parent.presenter.removeSelfFromActivity()
+			// 如果阻碍 `Loading` 存在也一并销毁
+			mainActivity?.removeLoadingView()
 		}
 	}
 

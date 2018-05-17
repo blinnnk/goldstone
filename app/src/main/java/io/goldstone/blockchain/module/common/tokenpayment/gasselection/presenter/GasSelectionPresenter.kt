@@ -20,7 +20,6 @@ import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
@@ -136,14 +135,8 @@ class GasSelectionPresenter(
 			activity?.apply { SoftKeyboard.hide(this) }
 			removeChildFragment(fragment)
 			val model = ReceiptModel(
-				toWalletAddress,
-				raw.gasLimit,
-				raw.gasPrice,
-				raw.value,
-				token!!,
-				taxHash,
-				System.currentTimeMillis(),
-				prepareModel?.memo
+				toWalletAddress, raw.gasLimit, raw.gasPrice, raw.value, token!!, taxHash,
+				System.currentTimeMillis(), prepareModel?.memo
 			)
 			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.transactionDetail, model)
@@ -199,7 +192,7 @@ class GasSelectionPresenter(
 	fun insertCustomGasData() {
 		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
 		currentMinnerType = MinerFeeType.Custom.content
-		if(defaultGasPrices.size == 4) {
+		if (defaultGasPrices.size == 4) {
 			defaultGasPrices.remove(defaultGasPrices.last())
 		}
 		defaultGasPrices.add(gasPrice)
@@ -237,8 +230,8 @@ class GasSelectionPresenter(
 
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas, TokenDetailText.paymentValue, Bundle().apply {
+			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
+				TokenDetailText.paymentValue, Bundle().apply {
 					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
 				})
 		}
@@ -273,10 +266,16 @@ class GasSelectionPresenter(
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			overlayView.header.showBackButton(true) {
-				presenter.setValueHeader(token)
-				presenter.popFragmentFrom<GasSelectionFragment>()
-				recoveryFragmentHeight()
+				backEvent(this@apply)
 			}
+		}
+	}
+
+	fun backEvent(fragment: TokenDetailOverlayFragment) {
+		fragment.apply {
+			presenter.setValueHeader(token)
+			headerTitle = TokenDetailText.paymentValue
+			presenter.popFragmentFrom<GasSelectionFragment>()
 		}
 	}
 }

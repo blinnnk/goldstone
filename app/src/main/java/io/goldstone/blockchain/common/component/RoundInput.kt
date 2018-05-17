@@ -7,22 +7,16 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.text.Editable
+import android.text.InputFilter
 import android.text.InputType
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
-import com.blinnnk.extension.orZero
 import com.blinnnk.honey.setCursorColor
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.measureTextWidth
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.singleLine
@@ -39,11 +33,11 @@ open class RoundInput(context: Context) : EditText(context) {
 		invalidate()
 	}
 
-	private val maxCount = 16
 	private val paint = Paint()
 	private val textPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 16.uiPX().toFloat()
+	private var maxCount = 16
 
 	init {
 
@@ -68,18 +62,20 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - PaddingSize.device * 2, 65.uiPX())
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 65.uiPX())
 
 		leftPadding = 35.uiPX()
 		backgroundTintMode = PorterDuff.Mode.CLEAR
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.heavy(context)
+		fontSize(18)
 		setCursorColor(Spectrum.blue)
+
+		filters = arrayOf(InputFilter.LengthFilter(maxCount))
 
 		// `RoundInput` 主要用于输入用户名或密码, 防止输入太长内容做了长度限制
 		this.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(content: Editable?) {
-				afterContentChanged(content)
 				afterTextChanged?.run()
 			}
 
@@ -102,9 +98,8 @@ open class RoundInput(context: Context) : EditText(context) {
 
 	}
 
-	private var textContent: String = ""
 	fun getContent(hold: (String) -> Unit) {
-		hold(textContent)
+		hold(text.toString())
 	}
 
 	override fun onTextContextMenuItem(id: Int): Boolean {
@@ -121,18 +116,6 @@ open class RoundInput(context: Context) : EditText(context) {
 	private var onTextCopy: Runnable? = null
 
 	var afterTextChanged: Runnable? = null
-
-	open fun afterContentChanged(content: CharSequence?) {
-		if (content?.length.orZero() > maxCount) {
-			val newContent =
-				content?.substring(0, maxCount) ?: ""
-			setText(newContent)
-			textContent = newContent
-			context.alert("content is to long")
-		} else {
-			textContent = content.toString()
-		}
-	}
 
 	private val paddingSize = 5.uiPX()
 

@@ -32,7 +32,6 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 	private val balance by lazy { TwoLineTitles(context) }
 
 	init {
-
 		historyButton.apply {
 			title = "history"
 			src = R.drawable.history_icon

@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.P
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.web3j.protocol.Web3jFactory
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.http.HttpService
@@ -54,8 +55,8 @@ class PaymentPreparePresenter(
 		} else {
 			getPaymentPrepareModel(count, fragment.getMemoContent()) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-					presenter.showTargetFragment<GasSelectionFragment>(TokenDetailText.customGas,
-						TokenDetailText.paymentValue, Bundle().apply {
+					presenter.showTargetFragment<GasSelectionFragment>(
+						TokenDetailText.customGas, TokenDetailText.paymentValue, Bundle().apply {
 							putSerializable(ArgumentKey.gasPrepareModel, model)
 						})
 					callback()
@@ -144,4 +145,20 @@ class PaymentPreparePresenter(
 			)
 		}
 	}
+
+	override fun onFragmentShowFromHidden() {
+		fragment.getParentFragment<TokenDetailOverlayFragment> {
+			overlayView.header.backButton.onClick {
+				backEvent(this@getParentFragment)
+			}
+		}
+	}
+
+	fun backEvent(fragment: TokenDetailOverlayFragment) {
+		fragment.apply {
+			headerTitle = TokenDetailText.address
+			presenter.popFragmentFrom<PaymentPrepareFragment>()
+		}
+	}
+
 }
