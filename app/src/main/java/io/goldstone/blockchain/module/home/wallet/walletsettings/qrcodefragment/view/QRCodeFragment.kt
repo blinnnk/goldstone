@@ -3,8 +3,12 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment
 import android.graphics.Bitmap
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 
@@ -35,6 +39,13 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 	private fun setSaveImageEvent() {
 		qrView.saveQRImageEvent = Runnable {
 			QRCodePresenter.saveQRCodeImageToAlbum(qrView.getAddress(), this)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.walletSettings
+			presenter.showWalletSettingListFragment()
 		}
 	}
 }

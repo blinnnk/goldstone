@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
@@ -16,7 +17,9 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -79,6 +82,13 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 			}.into(this)
 
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.walletSettings
+			presenter.showWalletSettingListFragment()
 		}
 	}
 

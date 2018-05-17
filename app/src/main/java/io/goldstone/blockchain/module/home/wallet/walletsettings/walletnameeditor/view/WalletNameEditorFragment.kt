@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -14,7 +15,9 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -71,6 +74,13 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 			}.click {
 					presenter.changeWalletName(nameInput)
 				}.into(this)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.walletSettings
+			presenter.showWalletSettingListFragment()
 		}
 	}
 

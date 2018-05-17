@@ -33,7 +33,7 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 
 	init {
 		title.text = QuotationText.tokenDescription
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 155.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 145.uiPX())
 		contentView.into(this)
 		contentView.y -= 10.uiPX()
 		contentView.setAlignParentBottom()

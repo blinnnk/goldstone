@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.hint.presenter
+package io.goldstone.blockchain.module.home.wallet.walletsettings.hint.presenter
 
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
@@ -7,7 +7,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.profile.hint.view.HintFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
 
 /**
  * @date 24/04/2018 10:54 AM

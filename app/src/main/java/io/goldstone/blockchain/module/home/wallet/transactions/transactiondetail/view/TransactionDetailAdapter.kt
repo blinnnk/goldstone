@@ -1,12 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
 import android.content.Context
-import android.content.res.Resources
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.utils.measureTextWidth
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.updateHeightByText
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 
 /**
@@ -34,14 +34,11 @@ class TransactionDetailAdapter(
 		position: Int
 	) {
 		model = data
-		val textWidth = Resources.getSystem().displayMetrics.density * data.info.measureTextWidth(fontSize(14))
-		// 测算文字的内容高度来修改 `Cell` 的高度布局
-		Math.floor(textWidth / ScreenSize.widthWithPadding.toDouble()).let {
-			layoutParams.height += (it * 20.uiPX()).toInt()
-		}
+		updateHeightByText(data.info, fontSize(14))
 		if (model.description == TransactionText.url) {
 			setContentColor(Spectrum.darkBlue)
 		}
 		hold(this)
 	}
 }
+

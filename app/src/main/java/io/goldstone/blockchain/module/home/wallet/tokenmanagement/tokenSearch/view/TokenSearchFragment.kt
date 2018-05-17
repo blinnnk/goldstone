@@ -1,12 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.TokenManagementText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -51,6 +55,14 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	private fun insertTokenToDataBase(cell: TokenSearchCell) {
 		getMainActivity()?.apply {
 			TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
+		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		getParentFragment<TokenManagementFragment> {
+			headerTitle = TokenManagementText.addToken
+			presenter.popFragmentFrom<TokenSearchFragment>()
+			overlayView.header.showSearchInput(false)
 		}
 	}
 

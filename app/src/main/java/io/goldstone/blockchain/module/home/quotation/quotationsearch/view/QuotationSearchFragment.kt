@@ -1,9 +1,13 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -32,6 +36,14 @@ class QuotationSearchFragment :
 					}
 				}
 			}
+		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		getParentFragment<QuotationOverlayFragment> {
+			headerTitle = QuotationText.management
+			presenter.popFragmentFrom<QuotationSearchFragment>()
+			overlayView.header.showSearchInput(false)
 		}
 	}
 }

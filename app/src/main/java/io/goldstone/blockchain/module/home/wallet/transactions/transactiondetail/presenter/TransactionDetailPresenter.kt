@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.text.format.DateUtils
 import android.util.Log
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -15,6 +17,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
+import io.goldstone.blockchain.kernel.network.APIPath.etherScanTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -157,7 +160,11 @@ class TransactionDetailPresenter(
 
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
-		fragment.parentFragment.apply {
+		fragment.setBackEventByParentFragment()
+	}
+
+	private fun TransactionDetailFragment.setBackEventByParentFragment() {
+		parentFragment.apply {
 			when (this) {
 				is TransactionFragment -> {
 					overlayView.header.backButton.onClick {
@@ -186,11 +193,31 @@ class TransactionDetailPresenter(
 		}
 	}
 
+	fun runBackEventBy(parent: Fragment) {
+		when (parent) {
+			is TransactionFragment -> {
+				parent.headerTitle = TransactionText.detail
+				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+				setHeightMatchParent()
+			}
+
+			is TokenDetailOverlayFragment -> {
+				parent.headerTitle = TokenDetailText.tokenDetail
+				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+				setHeightMatchParent()
+			}
+
+			is NotificationFragment -> {
+				parent.headerTitle = TokenDetailText.tokenDetail
+				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+				updateParentContentLayoutHeight(fragment.asyncData?.size)
+			}
+		}
+	}
+
 	fun showEtherScanTransactionFragment() {
 		val argument = Bundle().apply {
-			putString(
-				ArgumentKey.webViewUrl, "https://ropsten.etherscan.io/tx/$currentHash"
-			)
+			putString(ArgumentKey.webViewUrl, etherScanTransactionDetail(currentHash))
 		}
 		fragment.parentFragment.apply {
 			when (this) {

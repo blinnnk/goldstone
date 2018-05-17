@@ -8,7 +8,6 @@ import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orElse
-import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
@@ -22,6 +21,7 @@ import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 25/04/2018 8:22 AM
@@ -54,7 +54,6 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		)
 
 		percent.text = model.percent + "%"
-
 		// 增减显示不同的颜色
 		if (model.percent.toDouble() < 0.0) {
 			percent.textColor = Spectrum.red
@@ -68,6 +67,8 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	private val percent by lazy { TextView(context) }
 
 	init {
+
+		orientation = VERTICAL
 		title.text = QuotationText.currentPrice
 		showTopLine = true
 
@@ -75,20 +76,18 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 			textColor = GrayScale.black
 			textSize = fontSize(24)
 			typeface = GoldStoneFont.black(context)
-			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			gravity = Gravity.START or Gravity.BOTTOM
 			y -= 5.uiPX()
 		}.into(this)
-		priceTitles.setAlignParentBottom()
 		percent.apply {
 			textColor = Spectrum.green
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
-			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+			layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())
 			gravity = Gravity.END or Gravity.BOTTOM
-			y -= 8.uiPX()
+			y -= 31.uiPX()
 		}.into(this)
-		percent.setAlignParentBottom()
 	}
 
 }

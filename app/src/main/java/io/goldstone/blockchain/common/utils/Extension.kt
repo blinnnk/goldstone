@@ -122,3 +122,16 @@ fun View.keyboardHeightListener(block: (keyboardHeight: Int) -> Unit) {
 		}
 	}
 }
+
+fun View.updateHeightByText(
+	content: String,
+	textSize: Float,
+	lineHeight: Int = 20.uiPX(),
+	maxWidth: Int = io.goldstone.blockchain.common.value.ScreenSize.widthWithPadding
+) {
+	val textWidth = Resources.getSystem().displayMetrics.density * content.measureTextWidth(textSize)
+	// 测算文字的内容高度来修改 `Cell` 的高度布局
+	Math.floor(textWidth / maxWidth.toDouble()).let {
+		layoutParams.height += (it * lineHeight).toInt()
+	}
+}

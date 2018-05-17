@@ -15,21 +15,27 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class NotificationListFragment : BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
+class NotificationListFragment :
+	BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
 
-  override val presenter = NotificationListPresenter(this)
+	override val presenter = NotificationListPresenter(this)
 
-  override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<NotificationTable>?) {
-    recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
-      onClick {
-        model?.apply {
-          presenter.showTransactionListDetailFragment(NotificationTransactionInfo(transactionHash, isReceived))
-        }
-        preventDuplicateClicks()
-      }
-    }
-  }
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<NotificationTable>?
+	) {
+		recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
+			onClick {
+				model?.apply {
+					presenter.showTransactionListDetailFragment(
+						NotificationTransactionInfo(transactionHash, isReceived)
+					)
+				}
+				preventDuplicateClicks()
+			}
+		}
+	}
 
-  override fun setSlideUpWithCellHeight() = 75.uiPX()
+	override fun setSlideUpWithCellHeight() = 75.uiPX()
 
 }

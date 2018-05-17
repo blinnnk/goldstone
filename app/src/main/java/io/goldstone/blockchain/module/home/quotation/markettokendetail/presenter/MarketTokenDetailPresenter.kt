@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.text.format.DateUtils
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.GoldStoneApp
@@ -10,7 +11,10 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.updateHeightByText
+import io.goldstone.blockchain.common.value.FontSize
 import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
@@ -213,17 +217,15 @@ class MarketTokenDetailPresenter(
 				}
 
 				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
-				if (description.isNullOrBlank() || !description?.substring(
-						0, 2
-					).equals(
+				if (description.isNullOrBlank() || !description?.substring(0, 2).equals(
 						HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()), true
 					)
 				) {
 					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->
 						fragment.context?.runOnUiThread {
-							tokenInfo.setTokenDescription(
-								description.substring(0, maxCount(description)) + "..."
-							)
+							val content = description.substring(0, maxCount(description)) + "..."
+							tokenInfo.setTokenDescription(content)
+							tokenInfo.updateHeightByText(content, tokenInfo.fontSize(14), 18.uiPX())
 						}
 						QuotationSelectionTable.updateDescription(
 							info.pair, description
