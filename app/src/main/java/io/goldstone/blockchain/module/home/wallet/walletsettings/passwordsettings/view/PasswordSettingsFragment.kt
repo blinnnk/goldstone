@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettin
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -13,7 +14,9 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -68,6 +71,13 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 			}.click {
 				presenter.updatePassword(oldPassword, newPassword, repeatPassword)
 			}.into(this)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.walletSettings
+			presenter.showWalletSettingListFragment()
 		}
 	}
 }

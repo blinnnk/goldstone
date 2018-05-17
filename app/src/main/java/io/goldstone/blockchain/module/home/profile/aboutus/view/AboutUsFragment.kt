@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.Size
@@ -23,7 +24,9 @@ import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.aboutus.presenter.AboutUsPresenter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.*
 
 /**
@@ -158,6 +161,12 @@ class AboutUsFragment : BaseFragment<AboutUsPresenter>() {
 					bottomPadding = 50.uiPX()
 				}
 			}
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<ProfileOverlayFragment> {
+			presenter.removeSelfFromActivity()
 		}
 	}
 }

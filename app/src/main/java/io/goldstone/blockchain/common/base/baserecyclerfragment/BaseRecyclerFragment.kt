@@ -15,6 +15,7 @@ import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -316,7 +317,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 
 	open fun setBackEvent(mainActivity: MainActivity?) {
-
+		val parent = parentFragment
+		if (parent is BaseOverlayFragment<*>) {
+			parent.presenter.removeSelfFromActivity()
+		}
 	}
 
 }

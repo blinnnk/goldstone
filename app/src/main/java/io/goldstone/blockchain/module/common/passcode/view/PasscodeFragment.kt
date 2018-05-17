@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
@@ -62,7 +60,10 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		activity?.apply { SoftKeyboard.hide(this) }
 	}

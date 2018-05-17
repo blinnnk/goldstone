@@ -13,23 +13,25 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class TransactionListFragment : BaseRecyclerFragment<TransactionListPresenter, TransactionListModel>() {
+class TransactionListFragment :
+	BaseRecyclerFragment<TransactionListPresenter, TransactionListModel>() {
 
-  override val presenter = TransactionListPresenter(this)
+	override val presenter = TransactionListPresenter(this)
 
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView,
-    asyncData: ArrayList<TransactionListModel>?
-  ) {
-    asyncData?.let {
-      recyclerView.adapter = TransactionListAdapter(it) {
-        onClick {
-          presenter.showTransactionDetail(model)
-          preventDuplicateClicks()
-        }
-      }
-    }
-  }
-  override fun setSlideUpWithCellHeight() = 75.uiPX()
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<TransactionListModel>?
+	) {
+		asyncData?.let {
+			recyclerView.adapter = TransactionListAdapter(it) {
+				onClick {
+					presenter.showTransactionDetail(model)
+					preventDuplicateClicks()
+				}
+			}
+		}
+	}
+
+	override fun setSlideUpWithCellHeight() = 75.uiPX()
 
 }

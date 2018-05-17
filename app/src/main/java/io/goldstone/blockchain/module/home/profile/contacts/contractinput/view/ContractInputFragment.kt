@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -14,7 +15,10 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContractInputPresenter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -64,4 +68,10 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 		presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
 	}
 
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<ProfileOverlayFragment> {
+			headerTitle = ProfileText.contacts
+			presenter.popFragmentFrom<ContractInputFragment>()
+		}
+	}
 }

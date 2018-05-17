@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.profile.hint.view.HintFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
@@ -48,7 +48,7 @@ class WalletSettingsPresenter(
 		}
 	}
 
-	private fun showWalletSettingListFragment() {
+	fun showWalletSettingListFragment() {
 		fragment.apply {
 			customHeader = {
 				layoutParams.height = 200.uiPX()

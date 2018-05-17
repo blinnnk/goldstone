@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.hint.view
+package io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -14,11 +14,14 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.profile.hint.presenter.HintPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.presenter.HintPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -74,6 +77,13 @@ class HintFragment : BaseFragment<HintPresenter>() {
 				}
 				hintInput.hint = this.hint
 			}
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.walletSettings
+			presenter.showWalletSettingListFragment()
 		}
 	}
 }

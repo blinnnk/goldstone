@@ -33,6 +33,11 @@ object APIPath {
 	@JvmField val getQuotationCurrencyInfo: (pair: String) -> String = {
 		pair -> "$url/market/coinDetail?pair=$pair"
 	}
+
+	@JvmField
+	val etherScanTransactionDetail: (taxHash: String) -> String = {
+		"https://ropsten.etherscan.io/tx/$it"
+	}
 	// ROPSTAN 节点请求地址
 	const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
 	const val ropstan = "http://118.89.147.176:8500"

@@ -15,13 +15,12 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 
 class NotificationFragment : BaseOverlayFragment<NotificationPresenter>() {
 
-  override val presenter = NotificationPresenter(this)
+	override val presenter = NotificationPresenter(this)
 
-  override fun ViewGroup.initView() {
-    headerTitle = NotificationText.notification
-    addFragmentAndSetArgument<NotificationListFragment>(ContainerID.content) {
-      // Send Argument
-    }
-  }
-
+	override fun ViewGroup.initView() {
+		headerTitle = NotificationText.notification
+		addFragmentAndSetArgument<NotificationListFragment>(ContainerID.content) {
+			// Send Argument
+		}
+	}
 }

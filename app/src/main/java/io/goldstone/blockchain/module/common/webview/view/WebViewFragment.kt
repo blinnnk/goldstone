@@ -2,7 +2,9 @@ package io.goldstone.blockchain.module.common.webview.view
 
 import android.R
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -17,8 +19,18 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.NotificationText
+import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
+import io.goldstone.blockchain.module.home.home.view.HomeFragment
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import org.jetbrains.anko.*
 
 /**
@@ -28,51 +40,96 @@ import org.jetbrains.anko.*
 
 class WebViewFragment : BaseFragment<WebViewPresenter>() {
 
-  private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
-  private val loading by lazy { ProgressBar(this.context, null, R.attr.progressBarStyleInverse) }
-  override val presenter = WebViewPresenter(this)
+	private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
+	private val loading by lazy { ProgressBar(this.context, null, R.attr.progressBarStyleInverse) }
+	override val presenter = WebViewPresenter(this)
 
-  @SuppressLint("SetJavaScriptEnabled")
-  override fun AnkoContext<Fragment>.initView() {
-    relativeLayout {
+	@SuppressLint("SetJavaScriptEnabled")
+	override fun AnkoContext<Fragment>.initView() {
+		relativeLayout {
 
-      loading.apply {
-        indeterminateDrawable.setColorFilter(HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY)
-        lparams {
-          width = 80.uiPX()
-          height = 80.uiPX()
-          centerInParent()
-          y -= 30.uiPX()
-        }
-      }.into(this)
+			loading.apply {
+				indeterminateDrawable.setColorFilter(
+					HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY
+				)
+				lparams {
+					width = 80.uiPX()
+					height = 80.uiPX()
+					centerInParent()
+					y -= 30.uiPX()
+				}
+			}.into(this)
 
-      // 当 `webView`加载完毕后清楚 `loading`
-      webView {
-        alpha = 0.1f
-        settings.javaScriptEnabled = true
-        webViewClient = WebViewClient()
-        this.loadUrl(urlPath)
-        layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
+			// 当 `webView`加载完毕后清楚 `loading`
+			webView {
+				alpha = 0.1f
+				settings.javaScriptEnabled = true
+				webViewClient = WebViewClient()
+				this.loadUrl(urlPath)
+				layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
 
-        webViewClient = object : WebViewClient() {
-          override fun onPageFinished(view: WebView, url: String) {
-            removeView(loading)
-            view.alpha = 1f
-          }
-        }
-      }
+				webViewClient = object : WebViewClient() {
+					override fun onPageFinished(
+						view: WebView,
+						url: String
+					) {
+						removeView(loading)
+						view.alpha = 1f
+					}
+				}
+			}
 
-      // 如果长时间没加载到 最长 `8s` 超时删除 `loading`
-      8000L timeUpThen {
-        context?.apply { removeView(loading)  }
-      }
+			// 如果长时间没加载到 最长 `8s` 超时删除 `loading`
+			8000L timeUpThen {
+				context?.apply { removeView(loading) }
+			}
 
-    }
+		}
+		setWebFragmentHeight()
+	}
 
-    // 需要添加到 `BaseOverlayFragment` 下面
-    getParentFragment<BaseOverlayFragment<*>>()?.apply {
-      overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
-    }
-  }
+	private fun setWebFragmentHeight() {
+		// 需要添加到 `BaseOverlayFragment` 下面
+		getParentFragment<BaseOverlayFragment<*>>()?.apply {
+			overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
+		}
+	}
+
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(view, savedInstanceState)
+		getMainActivity()?.backEvent = Runnable {
+			setBackEvent()
+		}
+	}
+
+	private fun setBackEvent() {
+		val parent = parentFragment
+		when(parent) {
+			is TransactionFragment -> {
+				parent.headerTitle = TransactionText.detail
+				parent.presenter.popFragmentFrom<WebViewFragment>()
+				setWebFragmentHeight()
+			}
+
+			is NotificationFragment -> {
+				parent.headerTitle = NotificationText.notification
+				parent.presenter.popFragmentFrom<WebViewFragment>()
+				setWebFragmentHeight()
+			}
+
+			is TokenDetailOverlayFragment -> {
+				parent.headerTitle = TokenDetailText.tokenDetail
+				parent.presenter.popFragmentFrom<WebViewFragment>()
+				setWebFragmentHeight()
+			}
+
+			is ProfileOverlayFragment -> {
+				parent.presenter.removeSelfFromActivity()
+			}
+		}
+	}
 
 }

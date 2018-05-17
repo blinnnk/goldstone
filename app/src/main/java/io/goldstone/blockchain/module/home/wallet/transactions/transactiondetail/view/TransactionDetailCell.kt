@@ -83,7 +83,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 	fun setContentColor(color: Int) {
 		info.textColor = color
 		info.text =
-			if (info.text.length > 100) (info.text.substring(0, 100) + "...").setUnderline()
+			if (info.text.length > 130) (info.text.substring(0, 130) + "...").setUnderline()
 			else info.text.toString().setUnderline()
 	}
 

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
@@ -11,8 +12,11 @@ import io.goldstone.blockchain.common.component.ButtonMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -92,6 +96,12 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				height = matchParent
 				leftMargin = PaddingSize.device
 			}
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<QuotationOverlayFragment> {
+			presenter.removeSelfFromActivity()
 		}
 	}
 }

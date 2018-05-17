@@ -16,7 +16,9 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.pincode.presenter.PinCodeEditorPresenter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.*
 
 /**
@@ -121,4 +123,9 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 		}
 	}
 
+	override fun setBackEvent(activity: MainActivity) {
+		getParentFragment<ProfileOverlayFragment> {
+			presenter.removeSelfFromActivity()
+		}
+	}
 }

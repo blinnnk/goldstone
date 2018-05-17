@@ -26,7 +26,7 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 				overlayView.header.showSearchButton(true) { presenter.showQutationSearchFragment() }
 			}
 
-			else                     -> presenter.showMarketTokenDetailFragment(currencyInfo)
+			else -> presenter.showMarketTokenDetailFragment(currencyInfo)
 		}
 
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()

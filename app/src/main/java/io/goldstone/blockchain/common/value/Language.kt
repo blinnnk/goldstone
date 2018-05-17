@@ -660,13 +660,13 @@ object TokenManagementText {
 
 	@JvmField
 	val addToken = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token"
+		HoneyLanguage.English.code -> "Add Token"
 		HoneyLanguage.Chinese.code -> "添加其他币种"
 		HoneyLanguage.Japanese.code -> "トークンを追加"
 		HoneyLanguage.Korean.code -> "토큰 추가"
 		HoneyLanguage.Russian.code -> "Добавить токен"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他幣種"
-		else -> "Token"
+		else -> "Add Token"
 	}
 }
 
