@@ -280,14 +280,14 @@ object WalletText {
 		else -> "Add Wallet"
 	}
 	@JvmField
-	val importWallet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Import Wallet"
-		HoneyLanguage.Chinese.code -> "导入钱包"
-		HoneyLanguage.Japanese.code -> "ウォレットをインポート"
-		HoneyLanguage.Korean.code -> "월렛 가져 오기"
-		HoneyLanguage.Russian.code -> "Импортный кошелек"
-		HoneyLanguage.TraditionalChinese.code -> "導入錢包"
-		else -> "Import Wallet"
+	val wallet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "wallet"
+		HoneyLanguage.Chinese.code -> "wallet"
+		HoneyLanguage.Japanese.code -> "wallet"
+		HoneyLanguage.Korean.code -> "wallet"
+		HoneyLanguage.Russian.code -> "wallet"
+		HoneyLanguage.TraditionalChinese.code -> "wallet"
+		else -> "wallet"
 	}
 }
 
@@ -615,16 +615,7 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "這是觀察錢包，無法進行轉賬交易。"
 		else -> "Current wallet is watch only type, This kind of operation is not allowed"
 	}
-	@JvmField
-	val modifyCountAfoterCustomGas = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Modifying transfer count will lead to a recalculation and you need to reset the custom gas settings"
-		HoneyLanguage.Chinese.code -> "修转账金额将导致重新计算燃气花费，您需要重置自定燃气费设置"
-		HoneyLanguage.Japanese.code -> "修理の転送量はガスコストの再計算をもたらすでしょう、あなたはカスタムガス料金設定をリセットする必要があります"
-		HoneyLanguage.Korean.code -> "수리 양도로 가스 비용이 다시 계산됩니다. 맞춤 가스 요금 설정을 재설정해야합니다."
-		HoneyLanguage.Russian.code -> "Изменение количества переводов приведет к перерасчету, и вам необходимо сбросить настройки пользовательского газа"
-		HoneyLanguage.TraditionalChinese.code -> "修轉賬金額將導致重新計算燃氣花費，您需要重置自定燃氣費設置"
-		else -> "Modifying transfer count will lead to a recalculation and you need to reset the custom gas settings"
-	}
+
 	@JvmField
 	val importWalletNetwork = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't network found, Importing Wallet need network to check the value of it"
