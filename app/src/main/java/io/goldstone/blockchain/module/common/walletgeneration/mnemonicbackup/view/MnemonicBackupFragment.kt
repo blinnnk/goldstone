@@ -3,8 +3,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vi
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.GridLayout
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
@@ -53,7 +51,6 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 						setNumberAndText(index + 1, value)
 					}
 					cell.into(this)
-					cell.setMargins<GridLayout.LayoutParams> { margin = 5.uiPX() }
 				}
 			}
 
