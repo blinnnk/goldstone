@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_receipt_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_share_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,9 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="history_icon" />
+                            <entry key="height" value="20" />
+                            <entry key="outputName" value="share_icon" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/history_icon(2).svg" />
                             <entry key="width" value="20" />

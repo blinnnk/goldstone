@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.findChildFragmentByTag
+import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
@@ -11,11 +14,9 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
-import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -27,7 +28,10 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 
-enum class MarketTokenDetailChartType(val code: Int, val info: String) {
+enum class MarketTokenDetailChartType(
+	val code: Int,
+	val info: String
+) {
 	Hour(0, "1hour"),
 	DAY(1, "1day"),
 	WEEK(2, "1week"),
@@ -98,11 +102,15 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
-		super.setBackEvent(activity)
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
+		super.setBackEvent(activity, parent)
 		// 恢复回退事件
-		activity.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.apply {
-			updateBackEvent()
-		}
+		activity.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
+			?.apply {
+				updateBackEvent()
+			}
 	}
 }

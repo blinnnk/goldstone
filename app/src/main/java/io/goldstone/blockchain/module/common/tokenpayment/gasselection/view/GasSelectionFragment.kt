@@ -149,7 +149,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
 		getParentFragment<TokenDetailOverlayFragment>()?.let {
 			presenter.backEvent(it)
 		}

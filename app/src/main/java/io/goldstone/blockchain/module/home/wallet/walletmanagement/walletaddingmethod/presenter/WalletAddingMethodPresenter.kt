@@ -13,15 +13,15 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingm
  */
 
 class WalletAddingMethodPresenter(
-  override val fragment: WalletAddingMethodFragment
-  ) : BasePresenter<WalletAddingMethodFragment>() {
+	override val fragment: WalletAddingMethodFragment
+) : BasePresenter<WalletAddingMethodFragment>() {
 
-  fun showImportWalletFragment() {
-    fragment.activity?.addFragment<WalletImportFragment>(ContainerID.main)
-  }
+	fun showImportWalletFragment() {
+		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.main)
+	}
 
-  fun showCreateWalletFragment() {
-    fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.main)
-  }
+	fun showCreateWalletFragment() {
+		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.main)
+	}
 
 }

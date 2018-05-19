@@ -11,7 +11,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundIcon
-import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
@@ -77,14 +76,20 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		getParentFragment<WalletManagementFragment> {
 			overlayView.header.showAddButton(false)
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<WalletManagementFragment> {
 			headerTitle = CurrentWalletText.Wallets
 			presenter.popFragmentFrom<WalletAddingMethodFragment>()

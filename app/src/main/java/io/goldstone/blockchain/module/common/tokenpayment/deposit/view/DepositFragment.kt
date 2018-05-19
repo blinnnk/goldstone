@@ -86,7 +86,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			headerTitle = TokenDetailText.tokenDetail
 			presenter.popFragmentFrom<DepositFragment>()

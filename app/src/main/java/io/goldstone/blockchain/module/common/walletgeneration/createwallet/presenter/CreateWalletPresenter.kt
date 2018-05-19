@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.widget.EditText
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
@@ -19,7 +18,6 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
@@ -281,6 +279,5 @@ class CreateWalletPresenter(
 				}
 			}.start()
 		}
-
 	}
 }

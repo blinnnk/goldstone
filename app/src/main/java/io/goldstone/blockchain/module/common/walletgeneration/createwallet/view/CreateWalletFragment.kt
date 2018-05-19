@@ -102,11 +102,15 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.updateConfirmButtonStyle(
 			nameEditText, passwordEditText, repeatPasswordEditText, createButton
 		)
 	}
+
 
 }

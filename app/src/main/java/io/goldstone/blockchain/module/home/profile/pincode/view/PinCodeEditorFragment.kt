@@ -122,7 +122,10 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
 		}

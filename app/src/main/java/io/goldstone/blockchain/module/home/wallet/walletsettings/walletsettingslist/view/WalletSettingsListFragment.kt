@@ -6,6 +6,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter.WalletSettingsListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -40,5 +41,10 @@ class WalletSettingsListFragment :
 	}
 
 	override fun setSlideUpWithCellHeight() = 50.uiPX()
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		super.setBackEvent(mainActivity)
+		mainActivity?.backEvent = null
+	}
 
 }

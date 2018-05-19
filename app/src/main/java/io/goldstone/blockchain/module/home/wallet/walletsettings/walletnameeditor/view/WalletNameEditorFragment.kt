@@ -72,12 +72,15 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 				text = CommonText.confirm
 				setGrayStyle()
 			}.click {
-					presenter.changeWalletName(nameInput)
-				}.into(this)
+				presenter.changeWalletName(nameInput)
+			}.into(this)
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.walletSettings
 			presenter.showWalletSettingListFragment()

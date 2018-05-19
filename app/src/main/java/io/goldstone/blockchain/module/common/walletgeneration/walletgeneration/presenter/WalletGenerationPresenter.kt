@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 
 /**
  * @date 22/03/2018 9:38 PM
@@ -27,6 +28,11 @@ class WalletGenerationPresenter(
 			}
 			headerTitle = CreateWalletText.create
 		}
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		WalletImportPresenter.recoveryBackEventInMainActivity(fragment.activity)
 	}
 
 }

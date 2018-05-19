@@ -16,19 +16,20 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 
 class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 
-  val menuBar by lazy { MenuBar(context!!) }
-  val viewPager by lazy { WalletImportViewPager(this) }
+	val menuBar by lazy { MenuBar(context!!) }
+	val viewPager by lazy { WalletImportViewPager(this) }
 
-  override val presenter = WalletImportPresenter(this)
+	override val presenter = WalletImportPresenter(this)
 
-  override fun setContentHeight() = activity?.getRealScreenHeight().orZero()
+	override fun setContentHeight() =
+		activity?.getRealScreenHeight().orZero()
 
-  override fun ViewGroup.initView() {
+	override fun ViewGroup.initView() {
 
-    addView(viewPager)
-    menuBar.into(this)
-    presenter.onClickMenuBarItem()
-    headerTitle = ImportWalletText.importWallet
-  }
+		addView(viewPager)
+		menuBar.into(this)
+		presenter.onClickMenuBarItem()
+		headerTitle = ImportWalletText.importWallet
+	}
 
 }

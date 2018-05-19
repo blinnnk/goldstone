@@ -11,7 +11,6 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
 /**

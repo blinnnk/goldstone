@@ -36,6 +36,7 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
 				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
+				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""),
 				ProfileModel(R.drawable.version_icon, ProfileText.version, "BETA 1.0.0")
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
