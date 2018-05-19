@@ -45,34 +45,31 @@ dependencies {
   implementation('org.jetbrains.anko:anko:0.10.5') {
     exclude group: 'com.google.android', module: 'android'
   }
-  // 黑蜜动画及其他便捷工具依赖工程
+  // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.2.9.1'
-
   // Crypto
   implementation 'org.ethereum:geth:1.8.2'
   implementation 'com.github.walleth.kethereum:bip39:0.40'
-  implementation('org.web3j:core:3.3.1-android')
-
+  implementation 'org.web3j:core:3.3.1-android'
   // BlurView
   implementation 'com.github.mmin18:realtimeblurview:1.1.0'
   // Chart
   implementation 'com.diogobernardino:williamchart:2.5.0'
   // Room Database
-  implementation 'android.arch.persistence.room:runtime:1.0.0'
-  kapt 'android.arch.persistence.room:compiler:1.0.0'
+  implementation 'android.arch.persistence.room:runtime:1.1.0'
+  kapt 'android.arch.persistence.room:compiler:1.1.0'
   // OkHttp
   implementation 'com.squareup.okhttp3:okhttp:3.10.0'
   implementation 'com.google.code.gson:gson:2.8.2'
-
   // ZXing QR Code
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
-
   // 信鸽 Push
   implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
   // wup包
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   // mid包
   implementation 'com.tencent.mid:mid:4.0.6-release'
+
 }
 
 repositories {

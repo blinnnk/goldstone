@@ -15,6 +15,7 @@ import com.db.chart.model.LineSet
 import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -70,7 +71,7 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 		try {
 			notifyDataUpdate()
 		} catch (error: Exception) {
-			Log.e("ERROR", error.toString())
+			LogUtil.error("position: MarketTokenChart, error: $error")
 		}
 
 		val animation = Animation(1000)

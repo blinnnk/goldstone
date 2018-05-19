@@ -7,6 +7,9 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import java.util.*
@@ -49,6 +52,15 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 				it?.isRegisteredAddresses?.isFalse {
 					XinGePushReceiver.registerWalletAddressForPush()
 				}
+			}
+		} otherwise {
+			GoldStoneDialog.show(context) {
+				showButtons {  }
+				setImage(R.drawable.alert_banner)
+				setContent(
+					"Network Browken",
+					"An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+				)
 			}
 		}
 	}

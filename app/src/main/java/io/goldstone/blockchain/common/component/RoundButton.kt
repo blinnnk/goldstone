@@ -26,9 +26,8 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	var text by observing("") {
 		invalidate()
 	}
-
 	var marginTop = 0
-
+	private val shadowSize = 2.uiPX().toFloat()
 	private val buttonHeight = 45.uiPX()
 
 	private val textPaint = Paint()
@@ -44,11 +43,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.isAntiAlias = true
 		textPaint.style = Paint.Style.FILL
 		textPaint.typeface = GoldStoneFont.heavy(context)
-
-		// 视觉垂直居中的微调
-		y += 2.uiPX()
-
-		elevation = fontSize(2)
+		elevation = shadowSize
 
 	}
 
@@ -96,6 +91,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = marginTop
+			bottomMargin = 5.uiPX()
 		}
 
 		addTouchRippleAnimation(
@@ -109,6 +105,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
 		}
 
 		addTouchRippleAnimation(
@@ -122,6 +119,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
 		}
 
 		addTouchRippleAnimation(
@@ -138,6 +136,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textSize = 11.uiPX().toFloat()
 		layoutParams = RelativeLayout.LayoutParams(75.uiPX(), 30.uiPX()).apply {
 			topMargin = marginTop
+			bottomMargin = 5.uiPX()
 		}
 		addTouchRippleAnimation(color, Spectrum.white, RippleMode.Square, layoutParams.height / 2f)
 		textPaint.color = textColor

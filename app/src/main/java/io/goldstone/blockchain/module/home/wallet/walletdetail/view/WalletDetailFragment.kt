@@ -39,7 +39,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 			manageButton.onClick { presenter.showWalletListFragment() }
 			addTokenButton.onClick { presenter.showTokenManagementFragment() }
 		}
-
 	}
 
 	fun showMiniLoadingView() {
@@ -100,4 +99,3 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	}
 
 }
-

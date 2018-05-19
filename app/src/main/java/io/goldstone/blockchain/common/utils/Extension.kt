@@ -19,6 +19,7 @@ import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
@@ -103,7 +104,7 @@ fun JSONObject.safeGet(key: String): String {
 	return try {
 		get(key).toString()
 	} catch (error: Exception) {
-		Log.e("ERROR", error.toString())
+		LogUtil.error("function: safeGet $error")
 		""
 	}
 }

@@ -13,16 +13,16 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 class SplashPresenter(val activity: SplashActivity) {
 
-  fun hasAccountThenLogin() {
-    WalletTable.getAll {
-      isNotEmpty() isTrue {
-        WalletTable.getCurrentWalletInfo {
-          it?.apply {
-            WalletTable.current = it
-            activity.jump<MainActivity>()
-          }
-        }
-      }
-    }
-  }
+	fun hasAccountThenLogin() {
+		WalletTable.getAll {
+			isNotEmpty() isTrue {
+				WalletTable.getCurrentWallet {
+					it?.apply {
+						WalletTable.current = it
+						activity.jump<MainActivity>()
+					}
+				}
+			}
+		}
+	}
 }

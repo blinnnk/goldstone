@@ -3,9 +3,8 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vi
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.GridLayout
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -17,7 +16,12 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter.MnemonicBackupPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
 
 /**
@@ -29,42 +33,74 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
+	private val skipButton by lazy { RoundButton(context!!) }
 	private val attentionTextView by lazy { AttentionTextView(context!!) }
 
 	override val presenter = MnemonicBackupPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		verticalLayout {
-
-			gravity = Gravity.CENTER_HORIZONTAL
-
+		scrollView {
 			lparams(matchParent, matchParent)
-			attentionTextView.apply {
-				text = CreateWalletText.mnemonicBackupAttention
-			}.into(this)
-
-			gridLayout {
-				rowCount = 6
-				columnCount = 2
-				layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-				mnemonicCode?.split(" ")?.forEachIndexed { index, value ->
-					val cell = TagCell(context).apply {
-						setNumberAndText(index + 1, value)
+			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
+				lparams(matchParent, matchParent)
+				attentionTextView.apply {
+					text = CreateWalletText.mnemonicBackupAttention
+				}.into(this)
+				gridLayout {
+					rowCount = 6
+					columnCount = 2
+					layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
+					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+					mnemonicCode?.split(" ")?.forEachIndexed { index, value ->
+						val cell = TagCell(context).apply {
+							setNumberAndText(index + 1, value)
+						}
+						cell.into(this)
 					}
-					cell.into(this)
-					cell.setMargins<GridLayout.LayoutParams> { margin = 5.uiPX() }
+				}
+				skipButton.apply {
+					text = CommonText.skip.toUpperCase()
+					setBlueStyle(50.uiPX())
+				}.click {
+					presenter.skipBackUp()
+				}.into(this)
+				confirmButton.apply {
+					text = CommonText.confirm.toUpperCase()
+					setBlueStyle(5.uiPX())
+				}.click {
+					Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonicCode) }
+						.let { presenter.goToMnemonicConfirmation(it) }
+				}.into(this)
+			}
+		}
+	}
+
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		val current = activity
+		if (current is SplashActivity && !hidden) {
+			current.backEvent = Runnable {
+				getParentFragment<WalletGenerationFragment> {
+					presenter.removeSelfFromActivity()
+					current.backEvent = null
 				}
 			}
+		}
+	}
 
-			confirmButton.apply {
-				text = CommonText.confirm.toUpperCase()
-				marginTop = 30.uiPX()
-				setBlueStyle()
-			}.click {
-				Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonicCode) }
-					.let { presenter.goToMnemonicConfirmation(it) }
-			}.into(this)
+	override fun setBackEvent(activity: MainActivity) {
+		val parent = parentFragment
+		when (parent) {
+			is WalletGenerationFragment -> {
+				parent.headerTitle = CreateWalletText.create
+				parent.presenter.popFragmentFrom<MnemonicBackupFragment>()
+			}
+
+			is WalletSettingsFragment -> {
+				parent.headerTitle = WalletSettingsText.walletSettings
+				parent.presenter.showWalletSettingListFragment()
+			}
 		}
 	}
 

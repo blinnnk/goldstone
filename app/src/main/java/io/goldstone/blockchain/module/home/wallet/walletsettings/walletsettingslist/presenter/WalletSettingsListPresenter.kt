@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.setBold
+import com.blinnnk.extension.setItalic
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
@@ -39,18 +41,28 @@ class WalletSettingsListPresenter(
 	}
 
 	override fun updateData() {
+
 		val balanceText =
 			WalletTable.current.balance?.formatCurrency() + " (${GoldStoneApp.currencyCode})"
-		fragment.asyncData = arrayListOf(
-			WalletSettingsListModel(WalletSettingsText.checkQRCode),
-			WalletSettingsListModel(WalletSettingsText.balance, balanceText),
-			WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.current.name),
-			WalletSettingsListModel(WalletSettingsText.hint, "······"),
-			WalletSettingsListModel(WalletSettingsText.passwordSettings),
-			WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
-			WalletSettingsListModel(WalletSettingsText.exportKeystore),
-			WalletSettingsListModel(WalletSettingsText.delete)
-		)
+		WalletTable.getCurrentWallet { wallet ->
+			arrayListOf(
+				WalletSettingsListModel(WalletSettingsText.checkQRCode),
+				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
+				WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.current.name),
+				WalletSettingsListModel(WalletSettingsText.hint, "······"),
+				WalletSettingsListModel(WalletSettingsText.passwordSettings),
+				WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
+				WalletSettingsListModel(WalletSettingsText.exportKeystore),
+				WalletSettingsListModel(WalletSettingsText.backUpMnemonic, WalletSettingsText.safeAttention),
+				WalletSettingsListModel(WalletSettingsText.delete)
+			).let {
+				// 如果已经备份了助记词就不再显示提示条目
+				if (wallet?.hasBackUpMnemonic == true) {
+					it.removeAt(it.lastIndex - 1)
+				}
+				fragment.asyncData = it
+			}
+		}
 	}
 
 	fun showTargetFragment(title: String) {
@@ -63,8 +75,7 @@ class WalletSettingsListPresenter(
 	/** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
 	fun deleteWallet() {
 		fragment.context?.showAlertView(
-			WalletSettingsText.deleteInfoTitle,
-			WalletSettingsText.deleteInfoSubtitle,
+			WalletSettingsText.deleteInfoTitle, WalletSettingsText.deleteInfoSubtitle,
 			!WalletTable.current.isWatchOnly
 		) {
 			deleteWalletData(it?.text.toString())
@@ -83,7 +94,10 @@ class WalletSettingsListPresenter(
 		}
 	}
 
-	private fun Fragment.deleteRoutineWallet(address: String, password: String) {
+	private fun Fragment.deleteRoutineWallet(
+		address: String,
+		password: String
+	) {
 		// delete `keystore` file
 		context?.deleteAccount(address, password) {
 			it.isFalse {

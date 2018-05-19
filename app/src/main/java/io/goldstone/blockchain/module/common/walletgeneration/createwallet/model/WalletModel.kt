@@ -24,13 +24,16 @@ import java.util.*
 @Entity(tableName = "wallet")
 data class WalletTable(
 	//@PrimaryKey autoGenerate 自增
-	@PrimaryKey(autoGenerate = true) var id: Int, var name: String,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int, var name: String,
 	var address: String,
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
 	var passwordHint: String? = null,
-	var balance: Double? = 0.0
+	var balance: Double? = 0.0,
+	var encryptMnemonic: String? = null,
+	var hasBackUpMnemonic: Boolean = false
 ) {
 	companion object {
 
@@ -41,7 +44,10 @@ data class WalletTable(
 		}
 		var walletCount: Int? = null
 
-		fun insert(model: WalletTable, callback: () -> Unit = {}) {
+		fun insert(
+			model: WalletTable,
+			callback: () -> Unit = {}
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
@@ -52,6 +58,39 @@ data class WalletTable(
 			}) {
 				current.isWatchOnly = it?.isWatchOnly.orFalse()
 				callback()
+			}
+		}
+
+		fun saveEncryptMnemonicIfUserSkip(
+			encryptMnemonic: String,
+			address: String = current.address,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					getWalletByAddress(address)?.let {
+						update(it.apply { this.encryptMnemonic = encryptMnemonic })
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
+		fun deleteEncryptMnemonicAfterUserHasBackUp(callback: () -> Unit = {}) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					getWalletByAddress(current.address)?.let {
+						update(it.apply {
+							this.encryptMnemonic = null
+							hasBackUpMnemonic = true
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
 			}
 		}
 
@@ -71,7 +110,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getCurrentWalletInfo(hold: (WalletTable?) -> Unit) {
+		fun getCurrentWallet(hold: (WalletTable?) -> Unit) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
 					balance = current.balance
@@ -80,12 +119,15 @@ data class WalletTable(
 		}
 
 		fun getCurrentWalletAddress(hold: String.() -> Unit) {
-			WalletTable.getCurrentWalletInfo {
+			WalletTable.getCurrentWallet {
 				hold(it!!.address)
 			}
 		}
 
-		fun updateName(newName: String, callback: () -> Unit) {
+		fun updateName(
+			newName: String,
+			callback: () -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
@@ -97,7 +139,10 @@ data class WalletTable(
 			}
 		}
 
-		fun updateHint(newHint: String, callback: () -> Unit) {
+		fun updateHint(
+			newHint: String,
+			callback: () -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
@@ -109,7 +154,10 @@ data class WalletTable(
 			}
 		}
 
-		fun switchCurrentWallet(walletAddress: String, callback: (WalletTable?) -> Unit) {
+		fun switchCurrentWallet(
+			walletAddress: String,
+			callback: (WalletTable?) -> Unit
+		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
@@ -145,7 +193,10 @@ data class WalletTable(
 			}
 		}
 
-		fun isWatchOnlyWalletShowAlertOrElse(context: Context, callback: () -> Unit) {
+		fun isWatchOnlyWalletShowAlertOrElse(
+			context: Context,
+			callback: () -> Unit
+		) {
 			current.isWatchOnly.isTrue {
 				context.alert(Appcompat, AlertText.watchOnly).show()
 				return
@@ -153,7 +204,10 @@ data class WalletTable(
 			callback()
 		}
 
-		fun getWalletByAddress(address: String, callback: (WalletTable?) -> Unit) {
+		fun getWalletByAddress(
+			address: String,
+			callback: (WalletTable?) -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
 			}) {
@@ -161,7 +215,12 @@ data class WalletTable(
 			}
 		}
 
-		fun insertAddress(address: String, name: String, hint: String? = null, callback: () -> Unit) {
+		fun insertAddress(
+			address: String,
+			name: String,
+			hint: String? = null,
+			callback: () -> Unit
+		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
 					it.isNull().isFalse {

@@ -84,10 +84,11 @@ class TabItem(context: Context) : LinearLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(iconSize, 28.uiPX())
 		scaleType = ImageView.ScaleType.CENTER_INSIDE
 		setColorFilter(GrayScale.midGray)
+		y += 1.uiPX()
 	}
 
 	private val titleView by lazy { TextView(context).apply {
-		textSize = fontSize(10)
+		textSize = fontSize(9)
 		textColor = GrayScale.midGray
 		typeface = GoldStoneFont.heavy(context)
 		layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())

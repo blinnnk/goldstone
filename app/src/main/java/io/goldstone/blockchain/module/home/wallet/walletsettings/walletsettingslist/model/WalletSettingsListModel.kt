@@ -7,5 +7,5 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 data class WalletSettingsListModel(
   val title: String = "",
-  val description: String = ""
+  val description: CharSequence = ""
 )

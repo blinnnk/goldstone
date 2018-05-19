@@ -1,0 +1,172 @@
+package io.goldstone.blockchain.common.component
+
+import android.app.Activity
+import android.content.Context
+import android.graphics.Color
+import android.view.Gravity
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.animation.updateAlphaAnimation
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.uikit.RippleMode
+import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import org.jetbrains.anko.*
+
+/**
+ * @date 2018/5/19 11:45 AM
+ * @author KaySaith
+ */
+
+class GoldStoneDialog(context: Context) : RelativeLayout(context) {
+
+	private val image by lazy { ImageView(context) }
+	private val content by lazy { TwoLineTitles(context) }
+	private val cancelButton by lazy {
+		TextView(context).apply {
+			gravity = Gravity.END or Gravity.CENTER_VERTICAL
+			text = CommonText.cancel
+			textSize = fontSize(12)
+			textColor = Spectrum.blue
+			layoutParams = LinearLayout.LayoutParams(60.uiPX(), 35.uiPX())
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+		}.click {
+			GoldStoneDialog.remove(context)
+		}
+	}
+
+	private val confirmButton by lazy {
+		TextView(context).apply {
+			gravity = Gravity.END or Gravity.CENTER_VERTICAL
+			text = CommonText.confirm
+			textSize = fontSize(12)
+			textColor = Spectrum.blue
+			layoutParams = LinearLayout.LayoutParams(60.uiPX(), 35.uiPX())
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+		}
+	}
+
+	private lateinit var buttonLayout: LinearLayout
+
+	init {
+		id = ElementID.dialog
+		isClickable = true
+		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		backgroundColor = GrayScale.Opacity2Black
+		updateAlphaAnimation(1f)
+		verticalLayout {
+			backgroundColor = Spectrum.white
+			elevation = 30.uiPX().toFloat()
+			lparams(300.uiPX(), wrapContent)
+			image.apply {
+				scaleType = ImageView.ScaleType.CENTER_CROP
+				backgroundColor = GrayScale.whiteGray
+				layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
+			}.into(this)
+			content.apply {
+				padding = 15.uiPX()
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+				y = 10.uiPX().toFloat()
+				setDialogStyle()
+			}.into(this)
+			buttonLayout = linearLayout {
+				bottomPadding = 10.uiPX()
+				lparams(wrapContent, wrapContent)
+			}
+		}.setCenterInParent()
+	}
+
+	fun <T> setImage(src: T) {
+		image.glideImage(src)
+	}
+
+	fun setContent(
+		title: String,
+		subtitle: String
+	) {
+		content.title.text = title
+		content.subtitle.text = subtitle
+	}
+
+	fun showOnlyConfirmButton(clickEvent: () -> Unit) {
+		buttonLayout.x = 220.uiPX().toFloat()
+		confirmButton.click {
+			clickEvent()
+		}.into(buttonLayout)
+	}
+
+	fun showButtons(confirmEvent: () -> Unit) {
+		buttonLayout.x = 160.uiPX().toFloat()
+		cancelButton.into(buttonLayout)
+		confirmButton.click {
+			confirmEvent()
+		}.into(buttonLayout)
+	}
+
+	companion object {
+		fun show(
+			context: Context,
+			hold: GoldStoneDialog.() -> Unit
+		) {
+			// 判断父级所在主题添加到不同的顶层 `Layout` 里面
+			(context as? Activity)?.let {
+				when (it) {
+					is SplashActivity -> {
+						it.findViewById<RelativeLayout>(ContainerID.splash)?.apply {
+							// 防止重复添加
+							findViewById<GoldStoneDialog>(ElementID.dialog).isNull {
+								GoldStoneDialog(context).let {
+									hold(it)
+									it.into(this)
+								}
+							}
+						}
+					}
+
+					else -> {
+						it.findViewById<RelativeLayout>(ContainerID.main)?.apply {
+							// 防止重复添加
+							findViewById<GoldStoneDialog>(ElementID.dialog).isNull {
+								GoldStoneDialog(context).let {
+									hold(it)
+									it.into(this)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		fun remove(context: Context) {
+			(context as? Activity)?.let { activity ->
+				when (activity) {
+					is SplashActivity -> {
+						activity.findViewById<RelativeLayout>(ContainerID.splash)?.apply {
+							findViewById<GoldStoneDialog>(ElementID.dialog)?.let {
+								it.updateAlphaAnimation(0f) { removeView(it) }
+							}
+						}
+					}
+
+					else -> {
+						activity.findViewById<RelativeLayout>(ContainerID.main)?.apply {
+							findViewById<GoldStoneDialog>(ElementID.dialog)?.let {
+								it.updateAlphaAnimation(0f) { removeView(it) }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+}

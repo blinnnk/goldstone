@@ -3,7 +3,9 @@ package io.goldstone.blockchain.crypto
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.safeGet
+import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.kernel.network.APIPath
 import okhttp3.*
 import org.json.JSONObject
@@ -225,7 +227,7 @@ object GoldStoneEthCall {
 				call: Call,
 				error: IOException
 			) {
-				println("$error")
+				LogUtil.error("path: callEthBy onFailure $error")
 			}
 
 			@SuppressLint("SetTextI18n")
@@ -234,11 +236,11 @@ object GoldStoneEthCall {
 				response: Response
 			) {
 				val data = response.body()?.string()
-				val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 				try {
+					val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 					hold(dataObject["result"].toString())
 				} catch (error: Exception) {
-					Log.e("ERROR", error.toString())
+					LogUtil.error("path: callEthBy $error")
 				}
 			}
 		})

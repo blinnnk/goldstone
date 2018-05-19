@@ -86,7 +86,6 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 			lparams {
 				width = ScreenSize.widthWithPadding
 				height = 80.uiPX()
-				leftMargin = PaddingSize.device
 			}
 
 			textView(PincodeText.show).apply {

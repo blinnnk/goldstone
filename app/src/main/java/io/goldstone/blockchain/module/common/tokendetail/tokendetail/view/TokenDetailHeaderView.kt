@@ -17,7 +17,9 @@ import com.db.chart.model.LineSet
 import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TokenDetailSize
 import org.jetbrains.anko.margin
@@ -81,7 +83,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			try {
 				notifyDataUpdate()
 			} catch (error: Exception) {
-				Log.e("ERROR", error.toString())
+				LogUtil.error("position: TokenDetailHeaderView $error")
 			}
 
 			val animation = Animation(1000)

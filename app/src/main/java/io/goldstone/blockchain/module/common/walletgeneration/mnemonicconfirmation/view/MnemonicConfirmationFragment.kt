@@ -1,15 +1,19 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.WalletEditText
@@ -18,6 +22,9 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -118,6 +125,34 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			textColor = Spectrum.white
 			val newContent = if (input.text.isEmpty()) text.toString() else " " + text.toString()
 			input.setText(input.text.toString() + newContent)
+		}
+	}
+
+	override fun setBackEvent(activity: MainActivity) {
+		val parent = parentFragment
+		if (parent is BaseOverlayFragment<*>) {
+			parent.headerTitle = CreateWalletText.mnemonicBackUp
+			parent.presenter.popFragmentFrom<MnemonicConfirmationFragment>()
+		}
+	}
+
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(view, savedInstanceState)
+		backEventFroSplashActivity()
+	}
+
+	private fun backEventFroSplashActivity() {
+		val currentActivity = activity
+		if (currentActivity is SplashActivity) {
+			currentActivity.backEvent = Runnable {
+				getParentFragment<WalletGenerationFragment> {
+					headerTitle = CreateWalletText.mnemonicBackUp
+					presenter.popFragmentFrom<MnemonicConfirmationFragment>()
+				}
+			}
 		}
 	}
 

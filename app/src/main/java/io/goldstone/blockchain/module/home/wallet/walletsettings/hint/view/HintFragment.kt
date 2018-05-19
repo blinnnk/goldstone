@@ -19,8 +19,8 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.presenter.HintPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.presenter.HintPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -63,7 +63,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-		WalletTable.getCurrentWalletInfo { current ->
+		WalletTable.getCurrentWallet { current ->
 			current?.apply {
 				// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
 				AppConfigTable.getAppConfig {

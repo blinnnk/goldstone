@@ -14,12 +14,15 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -61,7 +64,9 @@ class CreateWalletPresenter(
 		checkInputValue(
 			nameText, passwordText, repeatPasswordText, isAgree, fragment.context, callback
 		) { password, walletName ->
-			fragment.context?.generateWalletWith(password, walletName, hintInput.text?.toString(), callback)
+			fragment.context?.generateWalletWith(
+				password, walletName, hintInput.text?.toString(), callback
+			)
 		}
 	}
 
@@ -103,17 +108,35 @@ class CreateWalletPresenter(
 			// 将基础的不存在安全问题的信息插入数据库
 			WalletTable.insert(WalletTable(0, name, address, true, hint)) {
 				generateMyTokenInfo(address, true, {
-					Log.e("error", "get default token from server has error")
+					LogUtil.error("position: generateWalletWith function: generateMyTokenInfo")
 				}) {
 					// 传递数据到下一个 `Fragment`
 					val arguments = Bundle().apply {
 						putString(ArgumentKey.mnemonicCode, mnemonicCode)
 					}
-					showMnemonicBackupFragment(arguments)
-					callback()
+					// 防止用户跳过助记词, 会在完成助记词后清楚记录的加密数据
+					saveEncryptMnemonic(mnemonicCode, address) {
+						showMnemonicBackupFragment(arguments)
+						callback()
+					}
 				}
 
 				XinGePushReceiver.registerWalletAddressForPush()
+			}
+
+		}
+	}
+
+	private fun saveEncryptMnemonic(
+		mnemonic: String?,
+		address: String,
+		callback: () -> Unit
+	) {
+		mnemonic?.let {
+			WalletTable.saveEncryptMnemonicIfUserSkip(
+				JavaKeystoreUtil(fragment.context!!, "skipBackUp").encryptData(it), address
+			) {
+				callback()
 			}
 		}
 	}

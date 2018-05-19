@@ -56,5 +56,4 @@ object AesCrypto {
 			null
 		}
 	}
-
 }

@@ -1,12 +1,12 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 
-import android.util.Log
 import android.widget.EditText
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -40,7 +40,7 @@ class WatchOnlyImportPresenter(
 			it.isNull() isTrue {
 				WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
 					CreateWalletPresenter.generateMyTokenInfo(address, false, {
-						Log.e("ERROR", "server get default token error")
+						LogUtil.error("position: WatchOnlyImportPresenter function : generateMyTokenInfo")
 						callback()
 					}) {
 						fragment.activity?.jump<SplashActivity>()
