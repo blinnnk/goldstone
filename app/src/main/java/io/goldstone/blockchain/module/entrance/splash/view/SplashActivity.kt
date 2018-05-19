@@ -8,6 +8,7 @@ import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
@@ -59,7 +60,7 @@ class SplashActivity : AppCompatActivity() {
 			initLaunchLanguage(it?.language)
 			it?.let {
 				// 打印必要数据在 `Debug` 的时候
-				Log.d("Config", "$it")
+				LogUtil.debug("position: SplashActivity, config: $it")
 				getCurrencyRate(it)
 			}
 

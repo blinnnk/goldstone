@@ -12,6 +12,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -104,7 +105,7 @@ class GasSelectionPresenter(
 					val hexValue = Numeric.toHexString(signedMessage)
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
-						Log.d("DEBUG", "taxHash $taxHash")
+						LogUtil.debug("function: sendRawTransaction, taxHash: $taxHash")
 						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 						taxHash.isValidTaxHash() isTrue {
 							// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息

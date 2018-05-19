@@ -10,6 +10,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
@@ -136,7 +137,7 @@ class TokenDetailPresenter(
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
-				Log.d("DEBUG", "Without Local Transaction Data")
+				LogUtil.debug("function: loadDataFromDatabaseOrElse, reason: Without Local Transaction Data")
 			}
 		}
 	}

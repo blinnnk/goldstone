@@ -3,8 +3,8 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
-import android.util.Log
 import com.blinnnk.extension.isTrue
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
@@ -44,7 +44,7 @@ fun Context.generateWallet(
 	try {
 		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
 	} catch (error: Exception) {
-		Log.e("ERROR", error.toString())
+		LogUtil.error("position: generateWallet $error")
 	}
 }
 
@@ -115,7 +115,7 @@ fun Context.getKeystoreFile(
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
 					runOnUiThread { alert("Wrong Password") }
-					Log.e("ERROR", "$error")
+					LogUtil.error("function: getKeystoreFile $error")
 				}
 			}
 		}
@@ -133,7 +133,7 @@ fun Context.getPrivateKey(
 				hold(it.privateKey.toString(16))
 			}
 		} catch (error: Exception) {
-			Log.e("ERROR", "$error")
+			LogUtil.error("function: getPrivateKey $error")
 		}
 	}
 }

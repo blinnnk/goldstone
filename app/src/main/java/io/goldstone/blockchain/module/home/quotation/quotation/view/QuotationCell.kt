@@ -18,6 +18,7 @@ import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -152,9 +153,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			try {
 				notifyDataUpdate()
 			} catch (error: Exception) {
-				Log.e(
-					"ERROR", error.toString()
-				)
+				LogUtil.error("position: QuotationCell, error: $error")
 			}
 
 			setClickablePointRadius(30.uiPX().toFloat())

@@ -18,6 +18,7 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.*
@@ -156,7 +157,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
 								isSucceed isTrue {
 									AppConfigTable.updateRegisterAddressesStatus(true)
-									Log.d("DEBUG", "Register Address Worked $it")
+									LogUtil.debug("function: registerWalletAddress, code: $it")
 								} otherwise {
 									// 服务器返回错误的时候标记注册失败
 									AppConfigTable.updateRegisterAddressesStatus(false)
@@ -185,7 +186,7 @@ fun Application.registerDeviceForPush() {
 			registerDevice(token.toString())
 			// 如果本地有注册成功的标记则不再注册
 			getStringFromSharedPreferences(SharesPreference.registerPush).let {
-				Log.d("DEBUG", it)
+				LogUtil.debug("function: getStringFromSharedPreferences, token: $it")
 				if (it == token) return
 			}
 			// 在本地数据库记录 `Push Token`

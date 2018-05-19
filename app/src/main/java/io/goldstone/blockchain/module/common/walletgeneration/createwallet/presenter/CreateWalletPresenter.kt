@@ -14,10 +14,12 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
@@ -106,7 +108,7 @@ class CreateWalletPresenter(
 			// 将基础的不存在安全问题的信息插入数据库
 			WalletTable.insert(WalletTable(0, name, address, true, hint)) {
 				generateMyTokenInfo(address, true, {
-					Log.e("error", "get default token from server has error")
+					LogUtil.error("position: generateWalletWith function: generateMyTokenInfo")
 				}) {
 					// 传递数据到下一个 `Fragment`
 					val arguments = Bundle().apply {

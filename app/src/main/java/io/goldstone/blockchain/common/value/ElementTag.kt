@@ -25,3 +25,8 @@ object FragmentTag {
 	const val tokenManagement = "tokenManagement"
 	const val tokenDetail = "tokenDetail"
 }
+
+object LogTag {
+	const val error = "ERROR"
+	const val debug = "DEBUG"
+}

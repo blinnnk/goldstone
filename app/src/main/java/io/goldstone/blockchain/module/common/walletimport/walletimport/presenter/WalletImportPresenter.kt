@@ -7,6 +7,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -50,7 +51,7 @@ class WalletImportPresenter(
 					WalletTable.insertAddress(address, name, hint) {
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
-							Log.e("ERROR", "get default token from has error")
+							LogUtil.error("function: generateMyTokenInfo")
 							setBackUpMnemonicStatus(callback)
 						}) {
 							fragment.activity?.jump<SplashActivity>()

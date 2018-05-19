@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
@@ -30,7 +31,6 @@ import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
-import java.io.StreamCorruptedException
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -239,9 +239,7 @@ object GoldStoneAPI {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
 		RequestBody.create(contentType, content).let {
-			postRequestGetJsonObject<TokenPriceModel>(
-				it, "price_list",
-				APIPath.getPriceByAddress,
+			postRequestGetJsonObject<TokenPriceModel>(it, "price_list", APIPath.getPriceByAddress,
 				errorCallback = { errorCallback() }) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
@@ -299,7 +297,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					Log.e("ERROR", error.toString())
+					LogUtil.error("path:$path, error:$error")
 				}
 
 				override fun onResponse(
@@ -337,7 +335,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					Log.e("ERROR", error.toString())
+					LogUtil.error("path:$path, error:$error")
 					netWorkError()
 				}
 
@@ -349,7 +347,7 @@ object GoldStoneAPI {
 					try {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
-						Log.e("ERROR", error.toString())
+						LogUtil.error("path: $path error: $error")
 					}
 				}
 			})
@@ -372,7 +370,7 @@ object GoldStoneAPI {
 					error: IOException
 				) {
 					netWorkError()
-					println("$error")
+					LogUtil.error("path:$keyName, error:$error")
 				}
 
 				override fun onResponse(
@@ -415,7 +413,7 @@ object GoldStoneAPI {
 				call: Call,
 				error: IOException
 			) {
-				println("$error")
+				LogUtil.error("path:$keyName, error:$error")
 			}
 
 			override fun onResponse(
@@ -455,7 +453,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					Log.e("ERROR", error.toString())
+					LogUtil.error("path:$keyName, error:$error")
 				}
 
 				override fun onResponse(
@@ -465,7 +463,8 @@ object GoldStoneAPI {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						val dataObject =
-							data?.toJsonObject() ?: JSONObject("")
+							data?.toJsonObject()
+								?: JSONObject("")
 						val jsonArray = dataObject[keyName] as JSONArray
 						val dataArray = arrayListOf<T>()
 						(0 until jsonArray.length()).forEachOrEnd { index, isEnd ->
@@ -536,7 +535,7 @@ object GoldStoneCode {
 		if (code == 0) callback(true)
 		else {
 			callback(false)
-			Log.e("ERROR", "Wrong Code")
+			LogUtil.error("function: GoldStoneCode, wrongCode: $code")
 		}
 	}
 
@@ -550,12 +549,12 @@ object GoldStoneCode {
 				when (code.toInt()) {
 					-1 -> {
 						errorCallback()
-						Log.e("ERROR", "Server Error GoldStone")
+						LogUtil.error("Server Error GoldStone")
 					}
 
 					-4 -> {
 						errorCallback()
-						Log.e("ERROR", "Url Error")
+						LogUtil.error("Url Error")
 						/**
 						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误
 						 */

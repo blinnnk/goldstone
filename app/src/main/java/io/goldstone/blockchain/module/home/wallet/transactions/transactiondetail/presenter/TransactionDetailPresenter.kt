@@ -3,10 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.format.DateUtils
-import android.util.Log
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -262,9 +261,8 @@ class TransactionDetailPresenter(
 		val date = if (data.isNull()) dataFromList?.date
 		else formatDate(data!!.timestamp / 1000)
 
-		val memo =
-			if (data?.memo.isNull()) "There isn't a memo"
-			else data?.memo
+		val memo = if (data?.memo.isNull()) "There isn't a memo"
+		else data?.memo
 
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
@@ -323,15 +321,15 @@ class TransactionDetailPresenter(
 			try {
 				// 开启监听交易是否完成
 				transactionObserver = web3j.transactionObservable().filter {
-					Log.d("DEBUG", it.hash)
+					LogUtil.debug("function: observerTransaction, value: ${it.hash}")
 					it.hash == currentHash
 				}.subscribe {
-					Log.d("DEBUG", "Succeed")
+					LogUtil.debug("function: observerTransaction status: Succeed")
 					updateWalletDetailValue(activity)
 					onTransactionSucceed()
 				}
 			} catch (error: Exception) {
-				Log.e("ERROR", error.toString())
+				LogUtil.error("function: observerTransaction, error: $error")
 			}
 		}
 	}
@@ -351,7 +349,9 @@ class TransactionDetailPresenter(
 		web3j.ethGetTransactionByHash(currentHash).sendAsync().get()?.let {
 			CryptoUtils.isERC20TransferByInputCode(it.transaction.input) {
 				val contract = it.transaction.to
-				GoldStoneEthCall.getTokenBalanceWithContract(contract, WalletTable.current.address) { balance ->
+				GoldStoneEthCall.getTokenBalanceWithContract(
+					contract, WalletTable.current.address
+				) { balance ->
 					GoldStoneEthCall.getTokenSymbol(contract) { symbol ->
 						MyTokenTable.updateCurrentWalletBalanceWithSymbol(balance, symbol)
 						callback()
@@ -379,7 +379,9 @@ class TransactionDetailPresenter(
 	}
 
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-	private fun TransactionDetailFragment.getTransactionFromChain(taxHash: String, callback: () -> Unit = {}
+	private fun TransactionDetailFragment.getTransactionFromChain(
+		taxHash: String,
+		callback: () -> Unit = {}
 	) {
 		web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
 			context?.runOnUiThread {
