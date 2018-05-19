@@ -103,7 +103,7 @@ class MnemonicImportDetailPresenter(
 		return if (formatPath.substring(0, 2).equals("m/", true)) {
 			val pathNumber =
 				formatPath
-					.substring(0)
+					.substring(1, formatPath.length)
 					.replace("/", "")
 					.replace("'", "")
 			// 检验剩余部分是否全部为数字

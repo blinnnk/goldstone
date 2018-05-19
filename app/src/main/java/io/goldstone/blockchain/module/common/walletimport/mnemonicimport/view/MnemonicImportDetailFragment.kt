@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
+import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -36,6 +37,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 	override val presenter = MnemonicImportDetailPresenter(this)
 
+	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -49,6 +51,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				pathInput.apply {
 					title = "Path"
 					hint = "m/44'/60'/0'/0/0"
+					setText("m/44'/60'/0'/0/0")
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
 
@@ -89,8 +92,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						passwordInput,
 						repeatPassword,
 						hintInput,
-						agreementView.
-							radioButton.isChecked,
+						agreementView.radioButton.isChecked,
 						walletNameInput
 					) {
 						it.showLoadingStatus(false)
