@@ -13,7 +13,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.keyboardHeightListener
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
@@ -49,10 +48,9 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 			typeface = GoldStoneFont.heavy(context)
 			gravity = Gravity.CENTER
 			backgroundTintMode = PorterDuff.Mode.CLEAR
-			layoutParams =
-				RelativeLayout.LayoutParams(
-					io.goldstone.blockchain.common.value.ScreenSize.widthWithPadding, ScreenSize.Height
-				)
+			layoutParams = RelativeLayout.LayoutParams(
+				io.goldstone.blockchain.common.value.ScreenSize.widthWithPadding, ScreenSize.Height
+			)
 		}.into(this)
 		inputView.setCenterInHorizontal()
 		AnimationDuration.Default timeUpThen {

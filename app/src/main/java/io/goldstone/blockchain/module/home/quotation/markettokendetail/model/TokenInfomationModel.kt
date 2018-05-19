@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.model
 
-import io.goldstone.blockchain.common.utils.safeGet
+import com.blinnnk.extension.safeGet
 import org.json.JSONObject
 
 /**
@@ -17,12 +17,9 @@ data class TokenInformationModel(
 		data: JSONObject,
 		symbol: String
 	) : this(
-		data.safeGet("rank"),
-		data.safeGet("supply") + " " + symbol,
-		if (data.safeGet("market_cap").isNotEmpty())
-		data.safeGet("market_cap").replace(
-			",",
-			""
+		data.safeGet("rank"), data.safeGet("supply") + " " + symbol,
+		if (data.safeGet("market_cap").isNotEmpty()) data.safeGet("market_cap").replace(
+			",", ""
 		).toDouble() else 0.0
 	)
 }

@@ -11,15 +11,14 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.PowerManager
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.safeGet
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.toJsonObject

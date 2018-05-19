@@ -1,23 +1,23 @@
 package io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter
 
-import android.text.InputType
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.noButton
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
+import org.jetbrains.anko.yesButton
 import org.web3j.crypto.WalletUtils
 
 /**
@@ -44,26 +44,24 @@ class AddressSelectionPresenter(
 		setHeightMatchParent()
 	}
 
-	fun showPaymentPrepareFragment(address: String): Runnable {
-		return Runnable {
-			WalletUtils.isValidAddress(address).isFalse {
-				fragment.context?.alert("address isn't valid")
-				return@Runnable
-			}
-			WalletTable.getAllAddresses {
-				any { it == address } isTrue {
-					fragment.alert(
-						"are you decide to transfer to this address which is existing in your local wallets?",
-						"Transfer Attention"
-					) {
-						yesButton {
-							goToPaymentPrepareFragment(address)
-						}
-						noButton {  }
-					}.show()
-				} otherwise {
-					goToPaymentPrepareFragment(address)
-				}
+	fun showPaymentPrepareFragment(address: String) {
+		WalletUtils.isValidAddress(address).isFalse {
+			fragment.context?.alert("address isn't valid")
+			return
+		}
+		WalletTable.getAllAddresses {
+			any { it == address } isTrue {
+				fragment.alert(
+					"are you decide to transfer to this address which is existing in your local wallets?",
+					"Transfer Attention"
+				) {
+					yesButton {
+						goToPaymentPrepareFragment(address)
+					}
+					noButton { }
+				}.show()
+			} otherwise {
+				goToPaymentPrepareFragment(address)
 			}
 		}
 	}

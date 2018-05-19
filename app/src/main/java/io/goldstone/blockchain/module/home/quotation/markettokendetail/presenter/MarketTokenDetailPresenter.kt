@@ -3,17 +3,16 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.text.format.DateUtils
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.updateHeightByText
-import io.goldstone.blockchain.common.value.FontSize
 import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -225,7 +224,7 @@ class MarketTokenDetailPresenter(
 						fragment.context?.runOnUiThread {
 							val content = description.substring(0, maxCount(description)) + "..."
 							tokenInfo.setTokenDescription(content)
-							tokenInfo.updateHeightByText(content, tokenInfo.fontSize(14), 18.uiPX())
+							tokenInfo.updateHeightByText(content, tokenInfo.fontSize(14), 18.uiPX(), ScreenSize.widthWithPadding)
 						}
 						QuotationSelectionTable.updateDescription(
 							info.pair, description

@@ -60,7 +60,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		id = ElementID.dialog
 		isClickable = true
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		backgroundColor = GrayScale.Opacity2Black
+		backgroundColor = GrayScale.Opacity5Black
 		updateAlphaAnimation(1f)
 		verticalLayout {
 			backgroundColor = Spectrum.white
@@ -168,5 +168,4 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
 }

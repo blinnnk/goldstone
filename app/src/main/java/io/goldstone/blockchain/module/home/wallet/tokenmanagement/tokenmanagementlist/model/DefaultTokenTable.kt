@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel

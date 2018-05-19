@@ -2,12 +2,11 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.content.Context
 import android.view.KeyCharacterMap
-import android.view.KeyCharacterMap.deviceHasKey
 import android.view.KeyEvent
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.utils.keyboardHeightListener
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 
@@ -25,9 +24,10 @@ class QuotationAdapter(
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
 		LinearLayout(context).apply {
-			val barHeight = if (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) {
-				60.uiPX()
-			} else 10.uiPX()
+			val barHeight =
+				if (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) {
+					60.uiPX()
+				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
 
@@ -38,7 +38,9 @@ class QuotationAdapter(
 			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
 			 */
 			keyboardHeightListener {
-				if (it < 0) { hasHiddenSoftNavigationBar = true }
+				if (it < 0) {
+					hasHiddenSoftNavigationBar = true
+				}
 			}
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 		}
