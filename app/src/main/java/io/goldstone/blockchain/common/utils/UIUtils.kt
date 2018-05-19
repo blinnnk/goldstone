@@ -76,25 +76,3 @@ fun String.removeStartAndEndValue(value: String = "\n"): String {
 	// 去除前后的空格或回车
 	return finalValue
 }
-
-private fun String.checkChineseCount(
-	callback: (Int) -> Unit = {}
-): Boolean {
-	var result = false
-	var chineseCount = 0
-	forEachIndexed { index, char ->
-		if (char.isChinese()) {
-			result = true
-			chineseCount += 1
-		}
-		if (index == lastIndex) {
-			callback(chineseCount)
-		}
-	}
-	return result
-}
-
-private fun Char.isChinese(): Boolean {
-	val ub = Character.UnicodeBlock.of(this)
-	return ub === Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub === Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub === Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A || ub === Character.UnicodeBlock.GENERAL_PUNCTUATION || ub === Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION || ub === Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
-}

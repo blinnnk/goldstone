@@ -31,6 +31,8 @@ object GrayScale {
 	@JvmField
 	val Opacity2Black = Color.parseColor("#33000000")
 	@JvmField
+	val Opacity3Black = Color.parseColor("#4D000000")
+	@JvmField
 	val Opacity5Black = Color.parseColor("#80000000")
 	@JvmField
 	val Opacity7Black = Color.parseColor("#B3000000")

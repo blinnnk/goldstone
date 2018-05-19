@@ -2,10 +2,8 @@ package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
+import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.safeGet
-import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.kernel.network.APIPath
 import okhttp3.*
 import org.json.JSONObject

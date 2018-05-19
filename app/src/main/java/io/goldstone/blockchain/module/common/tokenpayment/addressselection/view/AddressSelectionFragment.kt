@@ -1,16 +1,25 @@
 package io.goldstone.blockchain.module.common.tokenpayment.addressselection.view
 
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.otherwise
+import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.RippleMode
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.AddressSelectionPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.textColor
 
 /**
  * @date 28/03/2018 9:24 AM
@@ -19,6 +28,19 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
 
+	private val confirmButton by lazy {
+		TextView(context).apply {
+			text = CommonText.confirm
+			typeface = GoldStoneFont.heavy(context)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 50.uiPX())
+			textSize = fontSize(14)
+			textColor = GrayScale.midGray
+			gravity = Gravity.CENTER
+			setAlignParentBottom()
+			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
+		}
+	}
+
 	override val presenter = AddressSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -26,39 +48,36 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		asyncData: ArrayList<ContactTable>?
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			clickEvent = presenter.showPaymentPrepareFragment(model.address)
+			clickEvent = Runnable { presenter.showPaymentPrepareFragment(model.address) }
 		}
 	}
 
-	override fun onDestroyView() {
-		super.onDestroyView()
-		getParentFragment<TokenDetailOverlayFragment> {
-			showConfirmButton(false)
-		}
-	}
-
-	override fun onHiddenChanged(hidden: Boolean) {
-		super.onHiddenChanged(hidden)
-		// 通过自己的显示状态管理父级头部的 `ConfirmButton` 显示状态
-		getParentFragment<TokenDetailOverlayFragment> {
-			hidden isTrue {
-				showConfirmButton(false)
-			} otherwise {
-				showConfirmButton()
-				setConfirmStatus(true)
-			}
-		}
+	override fun onViewCreated(
+		view: View,
+		savedInstanceState: Bundle?
+	) {
+		super.onViewCreated(view, savedInstanceState)
+		wrapper.addView(confirmButton)
 	}
 
 	fun updateHeaderViewStatus() {
 		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) {
 			it?.setFocusStatus()
-			getParentFragment<TokenDetailOverlayFragment> {
-				showConfirmButton()
-				it?.getInputStatus { hasInput, address ->
-					setConfirmStatus(hasInput)
-					confirmButtonClickEvent =
-						this@AddressSelectionFragment.presenter.showPaymentPrepareFragment(address.orEmpty())
+			it?.getInputStatus { _, address ->
+				if (!address.isNullOrBlank()) {
+					confirmButton.apply {
+						textColor = Spectrum.white
+						addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square)
+						onClick {
+							presenter.showPaymentPrepareFragment(address.orEmpty())
+							preventDuplicateClicks()
+						}
+					}
+				} else {
+					confirmButton.apply {
+						textColor = GrayScale.midGray
+						addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
+					}
 				}
 			}
 		}

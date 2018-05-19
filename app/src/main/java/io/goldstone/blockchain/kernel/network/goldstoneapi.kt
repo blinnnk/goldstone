@@ -2,16 +2,15 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable

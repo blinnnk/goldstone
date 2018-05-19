@@ -1,14 +1,10 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.safeGet
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -101,7 +97,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								if (localToken.iconUrl != serverToken.iconUrl) {
 									// 数据有变化直接更新服务器数据
 									doAsync {
-										GoldStoneDataBase.database.defaultTokenDao().update(localToken.apply { iconUrl = serverToken.iconUrl })
+										GoldStoneDataBase.database.defaultTokenDao()
+											.update(localToken.apply { iconUrl = serverToken.iconUrl })
 									}
 								}
 							}

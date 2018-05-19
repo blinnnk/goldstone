@@ -3,7 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import io.goldstone.blockchain.common.utils.updateHeightByText
+import com.blinnnk.extension.updateHeightByText
+import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.common.value.fontSize
@@ -34,7 +36,7 @@ class TransactionDetailAdapter(
 		position: Int
 	) {
 		model = data
-		updateHeightByText(data.info, fontSize(14))
+		updateHeightByText(data.info, fontSize(14), 20.uiPX(), ScreenSize.widthWithPadding)
 		if (model.description == TransactionText.url) {
 			setContentColor(Spectrum.darkBlue)
 		}
