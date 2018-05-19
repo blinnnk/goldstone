@@ -68,7 +68,10 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 		presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<ProfileOverlayFragment> {
 			headerTitle = ProfileText.contacts
 			presenter.popFragmentFrom<ContractInputFragment>()

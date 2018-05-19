@@ -15,17 +15,17 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagem
  */
 
 class WalletManagementPresenter(
-  override val fragment: WalletManagementFragment
-  ) : BaseOverlayPresenter<WalletManagementFragment>() {
+	override val fragment: WalletManagementFragment
+) : BaseOverlayPresenter<WalletManagementFragment>() {
 
-  fun showWalletAddingMethodFragment() {
-    showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
-  }
+	fun showWalletAddingMethodFragment() {
+		showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
+	}
 
-  fun showWalletListFragment() {
-    fragment.addFragmentAndSetArgument<WalletListFragment>(ContainerID.content) {
-      // Send Argument
-    }
-  }
+	fun showWalletListFragment() {
+		fragment.addFragmentAndSetArgument<WalletListFragment>(ContainerID.content) {
+			// Send Argument
+		}
+	}
 
 }

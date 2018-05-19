@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
@@ -64,7 +65,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 				var modulus = 0
 
 				mnemonicCode?.split(" ".toRegex())?.shuffled()?.forEachIndexed { index, content ->
-					val wordWidth = content.count() * 12.uiPX() + 10.uiPX()
+					val wordWidth = content.measureTextWidth(15.uiPX().toFloat()).toInt() + 20.uiPX()
 					var isSelected = false
 					textView {
 						id = index
@@ -77,7 +78,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 						gravity = Gravity.CENTER
 
 						onClick {
-							selectMnemonic(mnemonicInput, isSelected)
+							selectMnemonic(mnemonicInput, !isSelected)
 							isSelected = !isSelected
 						}
 
@@ -116,10 +117,16 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		input: EditText,
 		isSelected: Boolean
 	) {
-		if (isSelected) {
+		if (!isSelected) {
 			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 			textColor = Spectrum.blue
-			input.setText(input.text.toString().replace((" " + text.toString()), ""))
+			if (input.text.toString().isNotEmpty()) {
+				if (input.text.toString().contains(" ")) {
+					input.setText(input.text.toString().replace((" " + text.toString()), ""))
+				} else {
+					input.setText(input.text.toString().replace((text.toString()), ""))
+				}
+			}
 		} else {
 			addCorner(CornerSize.default.toInt(), Spectrum.blue)
 			textColor = Spectrum.white
@@ -128,8 +135,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
-		val parent = parentFragment
+	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
 		if (parent is BaseOverlayFragment<*>) {
 			parent.headerTitle = CreateWalletText.mnemonicBackUp
 			parent.presenter.popFragmentFrom<MnemonicConfirmationFragment>()

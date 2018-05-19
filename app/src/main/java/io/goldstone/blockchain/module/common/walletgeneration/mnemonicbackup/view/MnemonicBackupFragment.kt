@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.jump
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -89,12 +90,14 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
-		val parent = parentFragment
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		when (parent) {
 			is WalletGenerationFragment -> {
-				parent.headerTitle = CreateWalletText.create
-				parent.presenter.popFragmentFrom<MnemonicBackupFragment>()
+				parent.presenter.removeSelfFromActivity()
+				this.activity?.jump<SplashActivity>()
 			}
 
 			is WalletSettingsFragment -> {

@@ -80,7 +80,10 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.walletSettings
 			presenter.showWalletSettingListFragment()

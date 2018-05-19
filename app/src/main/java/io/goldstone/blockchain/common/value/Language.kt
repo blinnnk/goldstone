@@ -965,23 +965,35 @@ object ProfileText {
 	@JvmField
 	val terms = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Terms & Conditions"
-		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.Chinese.code -> "Terms & Conditions"
+		HoneyLanguage.Japanese.code -> "Terms & Conditions"
+		HoneyLanguage.Korean.code -> "Terms & Conditions"
+		HoneyLanguage.Russian.code -> "Terms & Conditions"
+		HoneyLanguage.TraditionalChinese.code -> "Terms & Conditions"
+		else -> "Terms & Conditions"
 	}
 	@JvmField
 	val version = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Version"
 		HoneyLanguage.Chinese.code -> "软件版本"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
+		HoneyLanguage.Japanese.code -> "Version"
+		HoneyLanguage.Korean.code -> "Version"
+		HoneyLanguage.Russian.code -> "Version"
+		HoneyLanguage.TraditionalChinese.code -> "Version"
+		else -> "Version"
 	}
+
+	@JvmField
+	val shareApp = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Share Application"
+		HoneyLanguage.Chinese.code -> "Share Application"
+		HoneyLanguage.Japanese.code -> "Share Application"
+		HoneyLanguage.Korean.code -> "Share Application"
+		HoneyLanguage.Russian.code -> "Share Application"
+		HoneyLanguage.TraditionalChinese.code -> "Share Application"
+		else -> "Share Application"
+	}
+
 	@JvmField
 	val pinCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pin Code"

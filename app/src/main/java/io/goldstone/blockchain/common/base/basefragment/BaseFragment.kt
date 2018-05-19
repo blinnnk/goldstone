@@ -46,7 +46,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		super.onViewCreated(view, savedInstanceState)
 		presenter.onFragmentViewCreated()
 		getMainActivity()?.apply {
-			backEvent = Runnable { setBackEvent(this) }
+			backEvent = Runnable { setBackEvent(this, parentFragment) }
 		}
 	}
 
@@ -55,7 +55,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		if (!hidden) {
 			presenter.onFragmentShowFromHidden()
 			getMainActivity()?.apply {
-				backEvent = Runnable { setBackEvent(this) }
+				backEvent = Runnable { setBackEvent(this, parentFragment) }
 			}
 		}
 	}
@@ -75,8 +75,18 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		presenter.onFragmentDestroy()
 	}
 
-	open fun setBackEvent(activity: MainActivity) {
-		val parent = parentFragment
+	open fun recoveryBackEvent() {
+		getMainActivity()?.apply {
+			backEvent = Runnable {
+				setBackEvent(this, parentFragment)
+			}
+		}
+	}
+
+	open fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		if (parent is BaseOverlayFragment<*>) {
 			parent.presenter.removeSelfFromActivity()
 			// 如果阻碍 `Loading` 存在也一并销毁
