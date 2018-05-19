@@ -9,6 +9,8 @@ import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -96,9 +98,11 @@ class PrivateKeyImportPresenter(
 						fragment,
 						it,
 						name,
-						hint,
-						callback
-					)
+						hint
+					) {
+						// 导入钱包不需要提示助记词备份
+						WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(callback)
+					}
 				}
 			}
 		}

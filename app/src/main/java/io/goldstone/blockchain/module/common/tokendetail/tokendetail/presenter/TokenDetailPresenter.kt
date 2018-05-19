@@ -6,7 +6,9 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -23,7 +25,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -64,10 +65,12 @@ class TokenDetailPresenter(
 
 	fun showAddressSelectionFragment() {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-				presenter.showTargetFragment<AddressSelectionFragment>(
-					TokenDetailText.address, TokenDetailText.tokenDetail
-				)
+			hasBackUpOrElse {
+				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+					presenter.showTargetFragment<AddressSelectionFragment>(
+						TokenDetailText.address, TokenDetailText.tokenDetail
+					)
+				}
 			}
 		}
 	}
@@ -85,10 +88,31 @@ class TokenDetailPresenter(
 
 	fun showDepositFragment() {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-				presenter.showTargetFragment<DepositFragment>(
-					TokenDetailText.deposit, TokenDetailText.tokenDetail
-				)
+			hasBackUpOrElse {
+				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+					presenter.showTargetFragment<DepositFragment>(
+						TokenDetailText.deposit, TokenDetailText.tokenDetail
+					)
+				}
+			}
+		}
+	}
+
+	private fun hasBackUpOrElse(callback: () -> Unit) {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				hasBackUpMnemonic isFalse {
+					GoldStoneDialog.show(fragment.context!!) {
+						showButtons { }
+						setImage(R.drawable.alert_banner)
+						setContent(
+							"Back Up Mnemonic",
+							"An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+						)
+					}
+				} otherwise {
+					callback()
+				}
 			}
 		}
 	}
@@ -129,10 +153,8 @@ class TokenDetailPresenter(
 							loadDataFromDatabaseOrElse()
 						} otherwise {
 							// 链上和本地都没有数据就更新一个空数组作为默认
-							asyncData.isNull() isTrue {
-								updateChartBy(arrayListOf())
-								fragment.removeLoadingView()
-							}
+							updateChartBy(arrayListOf())
+							fragment.removeLoadingView()
 						}
 					}
 				}
@@ -157,12 +179,9 @@ class TokenDetailPresenter(
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
 		arrayListOf(
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
 	}

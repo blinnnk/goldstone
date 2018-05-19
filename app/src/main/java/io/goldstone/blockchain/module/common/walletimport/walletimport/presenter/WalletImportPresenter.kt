@@ -9,6 +9,7 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -36,7 +37,13 @@ class WalletImportPresenter(
 	}
 
 	companion object {
-		fun insertWalletToDatabase(fragment: Fragment, address: String, name: String, hint: String?, callback: () -> Unit) {
+		fun insertWalletToDatabase(
+			fragment: Fragment,
+			address: String,
+			name: String,
+			hint: String?,
+			callback: () -> Unit
+		) {
 			WalletTable.getWalletByAddress(address) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
@@ -44,19 +51,22 @@ class WalletImportPresenter(
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
 							Log.e("ERROR", "get default token from has error")
-							callback()
+							setBackUpMnemonicStatus(callback)
 						}) {
 							fragment.activity?.jump<SplashActivity>()
-							callback()
+							setBackUpMnemonicStatus(callback)
 						}
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerWalletAddressForPush()
 					}
 				} otherwise {
 					fragment.context?.alert(ImportWalletText.existAddress)
-					callback()
 				}
 			}
+		}
+
+		private fun setBackUpMnemonicStatus(callback: () -> Unit) {
+			WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(callback)
 		}
 	}
 }

@@ -46,8 +46,8 @@ Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
 
 class SplashActivity : AppCompatActivity() {
 
+	var backEvent: Runnable? = null
 	private val container by lazy { SplashContainer(this) }
-
 	private val presenter = SplashPresenter(this)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +73,14 @@ class SplashActivity : AppCompatActivity() {
 				setContentView(it)
 			}
 
+		}
+	}
+
+	override fun onBackPressed() {
+		if (backEvent.isNull()) {
+			super.onBackPressed()
+		} else {
+			backEvent?.run()
 		}
 	}
 

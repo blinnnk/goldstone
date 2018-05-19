@@ -56,6 +56,12 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.textColor = GrayScale.gray
 	}
 
+	fun setDialogStyle() {
+		setBlackTitles()
+		title.textSize = fontSize(16)
+		subtitle.y += 5.uiPX()
+	}
+
 	fun setColorStyle(color: Int) {
 		title.textColor = color
 		subtitle.textColor = color

@@ -11,7 +11,7 @@ import io.goldstone.blockchain.crypto.toAddressCode
 
 object APIPath {
 	// 常规业务的 `API` 地址
-	private const val url = "http://150.109.49.242:8001"
+	private const val url = "https://goldstone-api-test.naonaola.com"
 	const val defaultTokenList = "$url/index/defaultCoinList"
 	const val getCoinInfo = "$url/index/searchToken?symbolOrContract="
 	const val getCurrencyRate = "$url/index/exchangeRate?currency="

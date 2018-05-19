@@ -7,7 +7,6 @@ import android.util.Log
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
-import org.ethereum.geth.Account
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.runOnUiThread
@@ -82,7 +81,6 @@ fun Context.getWalletByPrivateKey(
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	/** Generate Keystore */
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-
 	/** Convert PrivateKey To BigInteger */
 	val currentPrivateKey = privateKey.toBigInteger(16)
 	/** Get Public Key and Private Key*/
@@ -103,21 +101,6 @@ fun Context.getWalletByPrivateKey(
 	hold(address)
 }
 
-fun Context.getCurrentAccount(
-	walletAddress: String,
-	hold: (currentAccount: Account, keystore: KeyStore) -> Unit
-) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	(0 until keyStore.accounts.size()).forEach { index ->
-		keyStore.accounts.get(index).address.hex.let {
-			it.equals(walletAddress, true) isTrue {
-				hold(keyStore.accounts.get(index), keyStore)
-			}
-		}
-	}
-}
-
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
@@ -132,7 +115,7 @@ fun Context.getKeystoreFile(
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
 					runOnUiThread { alert("Wrong Password") }
-					println(error)
+					Log.e("ERROR", "$error")
 				}
 			}
 		}
@@ -150,7 +133,7 @@ fun Context.getPrivateKey(
 				hold(it.privateKey.toString(16))
 			}
 		} catch (error: Exception) {
-			println(error)
+			Log.e("ERROR", "$error")
 		}
 	}
 }

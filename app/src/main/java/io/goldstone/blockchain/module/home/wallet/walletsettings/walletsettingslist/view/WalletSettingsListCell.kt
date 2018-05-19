@@ -4,15 +4,14 @@ import android.content.Context
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
@@ -26,63 +25,63 @@ import org.jetbrains.anko.textColor
 
 class WalletSettingsListCell(context: Context) : BaseCell(context) {
 
-  var model: WalletSettingsListModel by observing(WalletSettingsListModel()) {
-    title.text = model.title
-    if (model.title == WalletSettingsText.checkQRCode) showQRIcon()
-    else description.text = model.description
-  }
+	var model: WalletSettingsListModel by observing(WalletSettingsListModel()) {
+		title.text = model.title
+		when {
+			model.title == WalletSettingsText.checkQRCode -> showQRIcon()
+			model.description == WalletSettingsText.safeAttention -> {
+				description.textColor = Spectrum.red
+				description.text = model.description.setBold().setItalic()
+			}
+			else -> description.text = model.description
+		}
+	}
 
-  private val title = TextView(context)
-  private val qrIcon by lazy { ImageView(context) }
-  private val description by lazy { TextView(context) }
+	private val title = TextView(context)
+	private val qrIcon by lazy { ImageView(context) }
+	private val description by lazy { TextView(context) }
 
-  private var titleColor = GrayScale.black
+	private var titleColor = GrayScale.black
 
-  init {
+	init {
 
-    title
-      .apply {
-        textColor = titleColor
-        textSize = fontSize(13)
-        typeface = GoldStoneFont.medium(context)
-      }
-      .into(this)
+		title.apply {
+			textColor = titleColor
+			textSize = fontSize(13)
+			typeface = GoldStoneFont.medium(context)
+		}.into(this)
 
-    description
-      .apply {
-        textSize = fontSize(13)
-        typeface = GoldStoneFont.medium(context)
-        textColor = GrayScale.gray
-        x -= 30.uiPX()
-      }
-      .into(this)
+		description.apply {
+			textSize = fontSize(13)
+			typeface = GoldStoneFont.medium(context)
+			textColor = GrayScale.gray
+			x -= 30.uiPX()
+		}.into(this)
 
-    setGrayStyle()
+		setGrayStyle()
 
-    title.setCenterInVertical()
+		title.setCenterInVertical()
 
-    description.apply {
-      setAlignParentRight()
-      setCenterInVertical()
-    }
+		description.apply {
+			setAlignParentRight()
+			setCenterInVertical()
+		}
 
-    layoutParams.height = 50.uiPX()
+		layoutParams.height = 50.uiPX()
 
-  }
+	}
 
-  private fun showQRIcon() {
-    removeView(description)
-    qrIcon
-      .apply {
-        imageResource = R.drawable.qrcode_icon
-        layoutParams = LinearLayout.LayoutParams(20.uiPX(), 20.uiPX())
-        x -= 30.uiPX()
-      }
-      .into(this)
-    qrIcon.apply {
-      setAlignParentRight()
-      setCenterInVertical()
-    }
-  }
+	private fun showQRIcon() {
+		removeView(description)
+		qrIcon.apply {
+			imageResource = R.drawable.qrcode_icon
+			layoutParams = LinearLayout.LayoutParams(20.uiPX(), 20.uiPX())
+			x -= 30.uiPX()
+		}.into(this)
+		qrIcon.apply {
+			setAlignParentRight()
+			setCenterInVertical()
+		}
+	}
 
 }

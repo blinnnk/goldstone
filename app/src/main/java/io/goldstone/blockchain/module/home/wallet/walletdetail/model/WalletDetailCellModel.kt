@@ -33,12 +33,16 @@ data class WalletDetailCellModel(
 		data: DefaultTokenTable,
 		balance: Double
 	) : this(
-		data.iconUrl, data.symbol, data.name, data.decimals,
-		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)), data.price, 0.0,
-		data.contract, data.weight
-	) {
-		currency = CryptoUtils.formatDouble(count * data.price)
-	}
+		data.iconUrl,
+		data.symbol,
+		data.name,
+		data.decimals,
+		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
+		data.price,
+		CryptoUtils.formatDouble(CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)) * data.price),
+		data.contract,
+		data.weight
+	)
 
 	companion object {
 

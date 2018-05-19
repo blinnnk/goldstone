@@ -502,6 +502,16 @@ object CommonText {
 		else -> "Confirm"
 	}
 	@JvmField
+	val skip = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Back Up Later"
+		HoneyLanguage.Chinese.code -> "Back Up Later"
+		HoneyLanguage.Japanese.code -> "Back Up Later"
+		HoneyLanguage.Korean.code -> "Back Up Later"
+		HoneyLanguage.Russian.code -> "Back Up Later"
+		HoneyLanguage.TraditionalChinese.code -> "Back Up Later"
+		else -> "Back Up Later"
+	}
+	@JvmField
 	val create = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Create"
 		HoneyLanguage.Chinese.code -> "添加"
@@ -786,6 +796,28 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "導出 Keystore"
 		else -> "Export Keystore"
 	}
+	@JvmField
+	val backUpMnemonic = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.Chinese.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.Japanese.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.Korean.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.Russian.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.TraditionalChinese.code -> "Back Up Your Mnemonic"
+		else -> "Back Up Your Mnemonic"
+	}
+
+	@JvmField
+	val safeAttention = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Safe Attention"
+		HoneyLanguage.Chinese.code -> "Safe Attention"
+		HoneyLanguage.Japanese.code -> "Safe Attention"
+		HoneyLanguage.Korean.code -> "Safe Attention"
+		HoneyLanguage.Russian.code -> "Safe Attention"
+		HoneyLanguage.TraditionalChinese.code -> "Safe Attention"
+		else -> "Safe Attention"
+	}
+
 	@JvmField
 	val delete = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Dellet Wallet"

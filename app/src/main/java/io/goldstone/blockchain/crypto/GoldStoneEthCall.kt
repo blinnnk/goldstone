@@ -234,8 +234,8 @@ object GoldStoneEthCall {
 				response: Response
 			) {
 				val data = response.body()?.string()
-				val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 				try {
+					val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 					hold(dataObject["result"].toString())
 				} catch (error: Exception) {
 					Log.e("ERROR", error.toString())

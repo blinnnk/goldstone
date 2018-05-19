@@ -40,10 +40,10 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, matchParent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-
 				attentionView.apply {
 					text = CreateWalletText.attention
 					textSize = fontSize(12)
@@ -91,10 +91,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
 				createButton.apply {
 					text = CreateWalletText.create.toUpperCase()
-					setGrayStyle()
-					setMargins<LinearLayout.LayoutParams> {
-						topMargin = 20.uiPX()
-					}
+					setGrayStyle(20.uiPX())
 				}.click {
 					it.showLoadingStatus()
 					presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) {

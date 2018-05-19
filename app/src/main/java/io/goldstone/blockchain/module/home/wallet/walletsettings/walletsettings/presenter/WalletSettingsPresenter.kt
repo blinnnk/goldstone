@@ -8,11 +8,14 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -45,6 +48,7 @@ class WalletSettingsPresenter(
 			WalletSettingsText.checkQRCode -> showQRCodeFragment()
 			WalletSettingsText.hint -> showHintEditorFragment()
 			WalletSettingsText.walletSettings -> showWalletSettingListFragment()
+			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
 		}
 	}
 
@@ -87,6 +91,24 @@ class WalletSettingsPresenter(
 						// 加载 `Hint` 编辑界面
 						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content) {
 							// Send Arguments
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private fun showMnemonicBackUpFragment() {
+		fragment.apply {
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				WalletTable.getCurrentWallet {
+					it?.apply {
+						encryptMnemonic?.let {
+							setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+							val mnemonicCode = JavaKeystoreUtil(fragment.context!!, "skipBackUp").decryptData(it)
+							replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
+								putString(ArgumentKey.mnemonicCode, mnemonicCode)
+							}
 						}
 					}
 				}

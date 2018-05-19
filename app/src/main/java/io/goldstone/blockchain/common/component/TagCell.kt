@@ -12,10 +12,7 @@ import io.goldstone.blockchain.common.utils.measureTextWidth
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.linearLayout
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 2018/5/13 10:19 PM
@@ -30,6 +27,8 @@ class TagCell(context: Context) : LinearLayout(context) {
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(wrapContent, 47.uiPX())
+		leftPadding = 5.uiPX()
+		rightPadding = 5.uiPX()
 		// 在 `API 22` 上的动态 `Margin` 不生效, 临时用套层方法. 发现好的方法随时替换
 		tagLayout = linearLayout {
 			layoutParams = LinearLayout.LayoutParams(0, 42.uiPX())

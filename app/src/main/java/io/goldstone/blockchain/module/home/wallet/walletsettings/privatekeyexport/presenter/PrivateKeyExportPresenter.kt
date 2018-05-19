@@ -16,9 +16,12 @@ class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {
 
-	fun getPrivateKeyByAddress(passwordInput: EditText, hold: String.() -> Unit) {
+	fun getPrivateKeyByAddress(
+		passwordInput: EditText,
+		hold: String.() -> Unit
+	) {
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		WalletTable.getCurrentWalletInfo {
+		WalletTable.getCurrentWallet {
 			fragment.context?.getPrivateKey(it!!.address, passwordInput.text.toString()) {
 				hold(it)
 			}

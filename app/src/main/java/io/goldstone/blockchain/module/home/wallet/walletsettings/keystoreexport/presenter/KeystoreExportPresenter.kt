@@ -23,7 +23,7 @@ class KeystoreExportPresenter(
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		WalletTable.getCurrentWalletInfo {
+		WalletTable.getCurrentWallet {
 			fragment.context?.getKeystoreFile(it!!.address, passwordInput.text.toString()) {
 				hold(it)
 			}

@@ -24,7 +24,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	private val tag: String = "GoldStoneWebSocket"
 	private val timeout = 30000L
 	private val normalCloseCode = 1000
-	private val serverURL = "ws://150.109.49.242:8001/ws"
+	private val serverURL = "wss://goldstone-api-test.naonaola.com/ws"
 	private var isConnected = false
 	private val handler = Handler(Looper.getMainLooper())
 	private val handlerPing = Handler(Looper.getMainLooper())
