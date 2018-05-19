@@ -70,7 +70,29 @@ data class TransactionTable(
 ) {
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, "", ""
+		0,
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		false,
+		false,
+		"",
+		""
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -227,7 +249,10 @@ data class TransactionTable(
 			}
 		}
 
-		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
+		fun getTransactionByHash(
+			taxHash: String,
+			hold: (List<TransactionTable>) -> Unit
+		) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				getTransactionByTaxHash(taxHash).let {
 					hold(it)
@@ -267,7 +292,7 @@ interface TransactionDao {
 	): TransactionTable?
 
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE (recordOwnerAddress LIKE :walletAddress OR fromAddress LIKE :walletAddress) AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
 	)
 	fun getTransactionsByAddressAndSymbol(
 		walletAddress: String,

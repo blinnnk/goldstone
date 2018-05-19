@@ -25,7 +25,9 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		addView(qrView, LinearLayout.LayoutParams(matchParent, matchParent))
+		qrView.showAllButtons()
 		setSaveImageEvent()
+		setShareImageEvent()
 	}
 
 	fun setAddressText(address: String) {
@@ -39,6 +41,12 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 	private fun setSaveImageEvent() {
 		qrView.saveQRImageEvent = Runnable {
 			QRCodePresenter.saveQRCodeImageToAlbum(qrView.getAddress(), this)
+		}
+	}
+
+	private fun setShareImageEvent() {
+		qrView.shareEvent = Runnable {
+			QRCodePresenter.shareQRImage(this, qrView.getAddress())
 		}
 	}
 

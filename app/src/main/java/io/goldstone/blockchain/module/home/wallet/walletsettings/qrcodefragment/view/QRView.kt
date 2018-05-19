@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.CommonText
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 2018/5/8 12:23 PM
@@ -25,11 +26,14 @@ import org.jetbrains.anko.matchParent
 class QRView(context: Context) : LinearLayout(context) {
 
 	var saveQRImageEvent: Runnable? = null
+	var shareEvent: Runnable? = null
 
 	private val address by lazy { AttentionTextView(context) }
 	private val qrImage by lazy { ImageView(context) }
 	private val saveImageButton by lazy { RoundButton(context) }
+	private val shareButton by lazy { RoundButton(context) }
 	private val copyAddressButton by lazy { RoundButton(context) }
+	private var buttonsLayout: LinearLayout
 
 	init {
 		orientation = VERTICAL
@@ -45,22 +49,10 @@ class QRView(context: Context) : LinearLayout(context) {
 			setMargins<LinearLayout.LayoutParams> { topMargin = (-15).uiPX() }
 		}.into(this)
 
-		copyAddressButton.apply {
-			text = CommonText.copyAddress
-			setBlueStyle()
-			setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-		}.click { context.clickToCopy(address.text.toString()) }.into(this)
-
-		saveImageButton.apply {
-			text = CommonText.saveToAlbum
-			setBlueStyle()
-			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 10.uiPX()
-				bottomMargin = 10.uiPX()
-			}
-		}.click {
-			saveQRImageEvent?.run()
-		}.into(this)
+		buttonsLayout = verticalLayout {
+			gravity = Gravity.CENTER_HORIZONTAL
+			lparams(matchParent, matchParent)
+		}
 	}
 
 	fun setAddressText(address: String) {
@@ -72,5 +64,40 @@ class QRView(context: Context) : LinearLayout(context) {
 	}
 
 	fun getAddress(): String = address.text.toString()
+
+	fun showCopyButtons() {
+		copyAddressButton.apply {
+			text = CommonText.copyAddress
+			setBlueStyle()
+			setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+		}.click { context.clickToCopy(address.text.toString()) }.into(buttonsLayout)
+	}
+
+	fun showSaveAndShareButtons() {
+		saveImageButton.apply {
+			text = CommonText.saveToAlbum
+			setBlueStyle()
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+			}
+		}.click {
+			saveQRImageEvent?.run()
+		}.into(buttonsLayout)
+
+		shareButton.apply {
+			text = CommonText.shareQRImage
+			setBlueStyle()
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+			}
+		}.click {
+			shareEvent?.run()
+		}.into(buttonsLayout)
+	}
+
+	fun showAllButtons() {
+		showCopyButtons()
+		showSaveAndShareButtons()
+	}
 
 }

@@ -552,6 +552,16 @@ object CommonText {
 		else -> "Save To Album"
 	}
 	@JvmField
+	val shareQRImage = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Share QR Image"
+		HoneyLanguage.Chinese.code -> "Share QR Image"
+		HoneyLanguage.Japanese.code -> "Share QR Image"
+		HoneyLanguage.Korean.code -> "Share QR Image"
+		HoneyLanguage.Russian.code -> "Share QR Image"
+		HoneyLanguage.TraditionalChinese.code -> "Share QR Image"
+		else -> "Share QR Image"
+	}
+	@JvmField
 	val copyAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Copy Address"
 		HoneyLanguage.Chinese.code -> "点击复制地址"

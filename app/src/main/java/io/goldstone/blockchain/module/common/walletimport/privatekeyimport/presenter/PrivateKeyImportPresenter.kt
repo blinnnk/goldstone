@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 import android.support.v4.app.Fragment
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.removeStartAndEndValue
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.web3j.crypto.WalletUtils
 
 /**
@@ -89,20 +91,16 @@ class PrivateKeyImportPresenter(
 				return
 			}
 			// 解析私钥并导入钱包
-			fragment.context?.getWalletByPrivateKey(
-				currentPrivateKey,
-				password
+			fragment.context?.getWalletByPrivateKey(currentPrivateKey, password
 			) { address ->
 				address?.let {
 					WalletImportPresenter.insertWalletToDatabase(
 						fragment,
 						it,
 						name,
-						hint
-					) {
-						// 导入钱包不需要提示助记词备份
-						WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(callback)
-					}
+						hint,
+						callback
+					)
 				}
 			}
 		}
