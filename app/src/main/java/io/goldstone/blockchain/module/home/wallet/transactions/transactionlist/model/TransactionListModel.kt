@@ -61,10 +61,10 @@ data class TransactionListModel(
 
 val getMemoFromInputCode: (inputCode: String) -> String = {
 	if (it == SolidityCode.ethTransfer) {
-		it.toAscii()
+		it.toAscii(false)
 	} else {
 		if (it.length > 138) {
-			it.substring(136, it.length).toAscii()
+			it.substring(136, it.length).toAscii(false)
 		} else "There isn't a memo"
 	}
 }

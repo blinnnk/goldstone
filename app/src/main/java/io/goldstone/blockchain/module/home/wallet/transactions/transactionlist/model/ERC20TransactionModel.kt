@@ -36,7 +36,8 @@ data class ERC20TransactionModel(
 	var symbol: String
 ) {
 	constructor(data: ERC20TransactionModel) : this(
-		data.contract, data.topics,
+		data.contract,
+		data.topics,
 		data.topics[1].toAddressFromCode(), // fromAddress
 		data.topics[2].toAddressFromCode(), // toAddress
 		data.value.toDecimalFromHex(),

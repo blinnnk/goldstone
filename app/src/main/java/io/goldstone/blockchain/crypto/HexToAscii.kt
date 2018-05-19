@@ -7,7 +7,7 @@ import java.math.BigInteger
  * @author KaySaith
  */
 
-fun String.toAscii(): String {
+fun String.toAscii(removeBlank: Boolean = true): String {
 	/** 去掉前两个字母 `0x` */
 	var hex = if (substring(0, 2) == "0x") substring(2, length) else this
 	var ascii = ""
@@ -26,7 +26,11 @@ fun String.toAscii(): String {
 		val pair = hex.substring(i, i + 2)
 		//convert hex to decimal
 		val dec = Integer.parseInt(pair, 16)
-		str = checkCode(dec)
+		str = if (removeBlank) {
+			checkCode(dec).trim()
+		} else {
+			checkCode(dec)
+		}
 		ascii += str
 		i += 2
 	}

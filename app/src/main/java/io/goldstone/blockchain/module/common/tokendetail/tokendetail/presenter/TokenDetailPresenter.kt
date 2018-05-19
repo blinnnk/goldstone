@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
@@ -137,7 +136,9 @@ class TokenDetailPresenter(
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
-				LogUtil.debug("function: loadDataFromDatabaseOrElse, reason: Without Local Transaction Data")
+				LogUtil.debug(
+					"function: loadDataFromDatabaseOrElse, reason: Without Local Transaction Data"
+				)
 			}
 		}
 	}

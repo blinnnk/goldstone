@@ -72,15 +72,16 @@ class WalletImportPresenter(
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
 							LogUtil.error("function: generateMyTokenInfo")
-							setBackUpMnemonicStatus(callback)
+							callback()
 						}) {
-							fragment.activity?.jump<SplashActivity>()
 							setBackUpMnemonicStatus(callback)
+							fragment.activity?.jump<SplashActivity>()
 						}
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerWalletAddressForPush()
 					}
 				} otherwise {
+					callback()
 					fragment.context?.alert(ImportWalletText.existAddress)
 				}
 			}

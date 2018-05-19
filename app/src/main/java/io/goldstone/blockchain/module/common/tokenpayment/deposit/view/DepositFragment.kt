@@ -43,7 +43,9 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 					topMargin = 170.uiPX()
 				}
 				setAddressText()
+				qrView.showSaveAndShareButtons()
 				setConfirmButtonEvent()
+				setShareEvent()
 			}
 			prepareSymbolPrice()
 
@@ -68,6 +70,15 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			val value = inputView.getValue()
 			presenter.generateQRCode(if (value.isEmpty()) 0.0 else value.toDouble()) {
 				QRCodePresenter.saveQRCodeImageToAlbum(presenter.qrContent, this)
+			}
+		}
+	}
+
+	private fun setShareEvent() {
+		qrView.shareEvent = Runnable {
+			val value = inputView.getValue()
+			presenter.generateQRCode(if (value.isEmpty()) 0.0 else value.toDouble()) {
+				QRCodePresenter.shareQRImage( this, presenter.qrContent)
 			}
 		}
 	}

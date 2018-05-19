@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.common.component
 
 import android.app.Activity
@@ -10,11 +12,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
+import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
@@ -31,27 +35,13 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 	private val image by lazy { ImageView(context) }
 	private val content by lazy { TwoLineTitles(context) }
 	private val cancelButton by lazy {
-		TextView(context).apply {
-			gravity = Gravity.END or Gravity.CENTER_VERTICAL
-			text = CommonText.cancel
-			textSize = fontSize(12)
-			textColor = Spectrum.blue
-			layoutParams = LinearLayout.LayoutParams(60.uiPX(), 35.uiPX())
-			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
-		}.click {
+		DialogButton(context, CommonText.cancel).click {
 			GoldStoneDialog.remove(context)
 		}
 	}
 
 	private val confirmButton by lazy {
-		TextView(context).apply {
-			gravity = Gravity.END or Gravity.CENTER_VERTICAL
-			text = CommonText.confirm
-			textSize = fontSize(12)
-			textColor = Spectrum.blue
-			layoutParams = LinearLayout.LayoutParams(60.uiPX(), 35.uiPX())
-			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
-		}
+		DialogButton(context, CommonText.confirm)
 	}
 
 	private lateinit var buttonLayout: LinearLayout
@@ -63,8 +53,8 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		backgroundColor = GrayScale.Opacity5Black
 		updateAlphaAnimation(1f)
 		verticalLayout {
-			backgroundColor = Spectrum.white
-			elevation = 30.uiPX().toFloat()
+			addCorner(5.uiPX(), Spectrum.white)
+			elevation = 40.uiPX().toFloat()
 			lparams(300.uiPX(), wrapContent)
 			image.apply {
 				scaleType = ImageView.ScaleType.CENTER_CROP
@@ -97,18 +87,33 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 	}
 
 	fun showOnlyConfirmButton(clickEvent: () -> Unit) {
-		buttonLayout.x = 220.uiPX().toFloat()
+		buttonLayout.x = 210.uiPX().toFloat()
 		confirmButton.click {
 			clickEvent()
 		}.into(buttonLayout)
 	}
 
 	fun showButtons(confirmEvent: () -> Unit) {
-		buttonLayout.x = 160.uiPX().toFloat()
+		buttonLayout.x = 140.uiPX().toFloat()
 		cancelButton.into(buttonLayout)
 		confirmButton.click {
 			confirmEvent()
 		}.into(buttonLayout)
+	}
+
+	inner class DialogButton(
+		context: Context,
+		title: String
+	) : TextView(context) {
+		init {
+			gravity = Gravity.END or Gravity.CENTER_VERTICAL
+			text = title
+			textSize = fontSize(14)
+			typeface = GoldStoneFont.heavy(context)
+			textColor = Spectrum.blue
+			layoutParams = LinearLayout.LayoutParams(70.uiPX(), 35.uiPX())
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
+		}
 	}
 
 	companion object {
