@@ -106,11 +106,13 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			headerTitle = TokenDetailText.customGas
 			presenter.popFragmentFrom<GasEditorFragment>()
 		}
 	}
-
 }

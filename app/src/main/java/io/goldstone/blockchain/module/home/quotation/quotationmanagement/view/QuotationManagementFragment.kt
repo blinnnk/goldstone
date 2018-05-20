@@ -15,33 +15,36 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 
-class QuotationManagementFragment : BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
+class QuotationManagementFragment :
+	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
 
-  override val presenter = QuotationManagementPresenter(this)
-  override fun setRecyclerViewAdapter(
-    recyclerView: BaseRecyclerView, asyncData: ArrayList<QuotationSelectionTable>?
-  ) {
-    recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
-      cell.switch.onClick {
-        cell.searchModel?.apply {
-          QuotationSelectionTable.removeSelectionBy(pair)
-        }
-      }
-    }
-  }
+	override val presenter = QuotationManagementPresenter(this)
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<QuotationSelectionTable>?
+	) {
+		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
+			cell.switch.onClick {
+				cell.searchModel?.apply {
+					QuotationSelectionTable.removeSelectionBy(pair)
+				}
+			}
+		}
+	}
 
-  override fun setSlideUpWithCellHeight() = QuotationSize.cellHeight
+	override fun setSlideUpWithCellHeight() =
+		QuotationSize.cellHeight
 
-  override fun onHiddenChanged(hidden: Boolean) {
-    super.onHiddenChanged(hidden)
-    // 从下一个界面返回的时候更新这个界面的 `UI` 数据
-    getParentFragment<QuotationOverlayFragment> {
-      if(hidden) {
-        overlayView.header.showSearchButton(false)
-      }
-      else overlayView.header.showSearchButton(true) {
-        presenter.showQutationSearchFragment()
-      }
-    }
-  }
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
+		getParentFragment<QuotationOverlayFragment> {
+			if (hidden) {
+				overlayView.header.showSearchButton(false)
+			} else overlayView.header.showSearchButton(true) {
+				presenter.showQutationSearchFragment()
+			}
+		}
+	}
+
 }

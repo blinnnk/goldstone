@@ -5,6 +5,8 @@ import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import com.google.android.gms.analytics.HitBuilders
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -49,6 +51,15 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 					preventDuplicateClicks()
 				}
 			}
+		}
+	}
+
+	override fun onResume() {
+		super.onResume()
+		(activity?.application as? GoldStoneApp)?.apply {
+			getDefaultTracker()?.send(
+				HitBuilders.ScreenViewBuilder().set("&cd", "Quotation Screen").build()
+			)
 		}
 	}
 

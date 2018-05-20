@@ -78,7 +78,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		qrView.shareEvent = Runnable {
 			val value = inputView.getValue()
 			presenter.generateQRCode(if (value.isEmpty()) 0.0 else value.toDouble()) {
-				QRCodePresenter.shareQRImage( this, presenter.qrContent)
+				QRCodePresenter.shareQRImage(this, presenter.qrContent)
 			}
 		}
 	}
@@ -97,7 +97,10 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			headerTitle = TokenDetailText.tokenDetail
 			presenter.popFragmentFrom<DepositFragment>()

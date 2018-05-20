@@ -79,12 +79,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
-						privateKeyInput,
-						passwordInput,
-						repeatPassword,
-						agreementView.radioButton.isChecked,
-						nameInput,
-						passwordHintInput
+						privateKeyInput, passwordInput, repeatPassword, agreementView.radioButton.isChecked,
+						nameInput, passwordHintInput
 					) {
 						it.showLoadingStatus(false)
 					}
@@ -94,10 +90,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				textView("What is private key?") {
 					textSize = fontSize(15)
 					typeface = GoldStoneFont.heavy(context)
-					layoutParams =
-						LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-							topMargin = 20.uiPX()
-						}
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+						topMargin = 20.uiPX()
+					}
 					textColor = Spectrum.blue
 					gravity = Gravity.CENTER
 				}
