@@ -98,7 +98,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
-			setGrid(5, 10,
+			setGrid(5, 7,
 				Paint().apply {
 					isAntiAlias = true
 					style = Paint.Style.FILL; color = GrayScale.lightGray

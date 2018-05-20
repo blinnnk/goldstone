@@ -4,16 +4,14 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
-import com.kenai.jffi.Main
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 
 /**
@@ -47,7 +45,16 @@ class MnemonicConfirmationPresenter(
 		when (currentActivity) {
 			is MainActivity -> {
 				fragment.getParentFragment<WalletSettingsFragment> {
-					context?.alert("Back Up Mnemonic Succeed")
+					GoldStoneDialog.show(context!!) {
+						showOnlyConfirmButton {
+							GoldStoneDialog.remove(context)
+						}
+						setImage(R.drawable.alert_banner)
+						setContent(
+							"WELCOME",
+							"You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
+						)
+					}
 					presenter.removeSelfFromActivity()
 				}
 			}

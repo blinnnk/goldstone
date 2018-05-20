@@ -30,7 +30,6 @@ data class WalletTable(
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
-	var passwordHint: String? = null,
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
 	var hasBackUpMnemonic: Boolean = false
@@ -78,7 +77,7 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteEncryptMnemonicAfterUserHasBackUp(callback: () -> Unit = {}) {
+		fun deleteEncryptMnemonicAfterUserHasBackUp() {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					getWalletByAddress(current.address)?.let {
@@ -86,9 +85,6 @@ data class WalletTable(
 							this.encryptMnemonic = null
 							hasBackUpMnemonic = true
 						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
 					}
 				}
 			}
@@ -214,25 +210,6 @@ data class WalletTable(
 				callback(it)
 			}
 		}
-
-		fun insertAddress(
-			address: String,
-			name: String,
-			hint: String? = null,
-			callback: () -> Unit
-		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true).let {
-					it.isNull().isFalse {
-						GoldStoneDataBase.database.walletDao().update(it!!.apply { isUsing = false })
-					}
-					WalletTable.insert(WalletTable(0, name, address, true, hint))
-				}
-			}) {
-				callback()
-			}
-		}
-
 	}
 }
 

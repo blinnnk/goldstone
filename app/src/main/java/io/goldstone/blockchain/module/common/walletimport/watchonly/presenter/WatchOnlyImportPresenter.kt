@@ -24,7 +24,11 @@ class WatchOnlyImportPresenter(
 	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
 
-	fun importWatchOnlyWallet(addressInput: EditText, nameInput: EditText, callback: () -> Unit) {
+	fun importWatchOnlyWallet(
+		addressInput: EditText,
+		nameInput: EditText,
+		callback: () -> Unit
+	) {
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		if (!WalletUtils.isValidAddress(address)) {
@@ -38,7 +42,7 @@ class WatchOnlyImportPresenter(
 
 		WalletTable.getWalletByAddress(address) {
 			it.isNull() isTrue {
-				WalletTable.insert(WalletTable(0, name, address, true, null, true)) {
+				WalletTable.insert(WalletTable(0, name, address, true, null, true, 0.0, null, true)) {
 					CreateWalletPresenter.generateMyTokenInfo(address, false, {
 						LogUtil.error("position: WatchOnlyImportPresenter function : generateMyTokenInfo")
 						callback()
