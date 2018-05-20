@@ -38,6 +38,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
+	val count by lazy { arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0) }
 	private val inputView by lazy { ValueInputView(context!!) }
 	private val sendInfo by lazy { GraySqualCell(context!!) }
 	private val from by lazy { GraySqualCell(context!!) }
@@ -60,7 +61,10 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 					gravity = Gravity.CENTER_HORIZONTAL
 					lparams(matchParent, matchParent)
 
-					addView(inputView.apply { backgroundColor = Color.RED })
+					addView(inputView.apply {
+						backgroundColor = Color.RED
+						setInputValue(count)
+					})
 
 					TopBottomLineCell(context).apply {
 						layoutParams =
@@ -182,7 +186,8 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 	private fun updateValueTotalPrice() {
 		val price =
-			getParentFragment<TokenDetailOverlayFragment>()?.token?.price ?: 0.0
+			getParentFragment<TokenDetailOverlayFragment>()?.token?.price
+				?: 0.0
 		inputView.inputTextListener {
 			inputView.updateCurrencyValue(price)
 			if (it.isNotEmpty()) {
@@ -196,12 +201,18 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 
-	fun setSymbolAndPrice(symbol: String, price: String) {
+	fun setSymbolAndPrice(
+		symbol: String,
+		price: String
+	) {
 		this.inputView.setHeaderSymbol(symbol)
 		this.price.setSubtitle(price)
 	}
 
-	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<TokenDetailOverlayFragment>()?.let {
 			presenter.backEvent(it)
 		}

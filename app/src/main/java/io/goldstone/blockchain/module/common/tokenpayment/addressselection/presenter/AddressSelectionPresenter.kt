@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -44,7 +45,66 @@ class AddressSelectionPresenter(
 		setHeightMatchParent()
 	}
 
-	fun showPaymentPrepareFragment(address: String) {
+	fun showPaymentPrepareFragmentByQRCode(result: String) {
+		val minERC20ResultCount = 100
+		val content = result.orEmpty()
+		// 不符合标准的长度直接返回
+		if (content.length < CryptoValue.bip39AddressLength || content.substring(0, 2) != "0x") {
+			fragment.context?.alert("Not valid QR code image")
+			return
+		}
+
+		// 单纯的地址二维码
+		if (content.length == CryptoValue.bip39AddressLength) {
+			showPaymentPrepareFragment(content)
+			return
+		}
+
+		// 校验信息
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token?.let {
+			if (content.length > CryptoValue.bip39AddressLength) {
+
+				val amount = "amount"
+				val token = "token"
+				val ethContract = "0x0"
+				
+				var transaferCount = 0.0
+
+				// 准备 `Count` 信息, 如果包含有 `amount` 关键字
+				if (content.contains(amount)) {
+					// 含有 `contract` 和不含有的解析 `amount` 的方式不同
+					transaferCount = if (content.contains(token)) {
+						content.substring(50, content.length - 49).toDoubleOrNull().orElse(0.0)
+					} else {
+						content.substring(50, content.length).toDoubleOrNull().orElse(0.0)
+					}
+				}
+
+				// 准备 `Contract` 信息, 如果包含有 `token` 关键字就是 `ERC20` 否则是 `ETH`
+				val contract = if (content.contains(token) && content.length >= minERC20ResultCount) {
+					content.substring(content.length - CryptoValue.bip39AddressLength, content.length)
+				} else {
+					ethContract
+				}
+
+				if (contract.isNotEmpty() && it.contract != contract) {
+					fragment.context?.alert(
+						"The Token which got by scanning QR code is different with current token please check"
+					)
+					return
+				}
+
+				showPaymentPrepareFragment(
+					content.substring(0, CryptoValue.bip39AddressLength), transaferCount
+				)
+			}
+		}
+	}
+
+	fun showPaymentPrepareFragment(
+		address: String,
+		count: Double = 0.0
+	) {
 		WalletUtils.isValidAddress(address).isFalse {
 			fragment.context?.alert("address isn't valid")
 			return
@@ -56,21 +116,25 @@ class AddressSelectionPresenter(
 					"Transfer Attention"
 				) {
 					yesButton {
-						goToPaymentPrepareFragment(address)
+						goToPaymentPrepareFragment(address, count)
 					}
 					noButton { }
 				}.show()
 			} otherwise {
-				goToPaymentPrepareFragment(address)
+				goToPaymentPrepareFragment(address, count)
 			}
 		}
 	}
 
-	private fun goToPaymentPrepareFragment(address: String) {
+	private fun goToPaymentPrepareFragment(
+		address: String,
+		count: Double = 0.0
+	) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			hideChildFragment(fragment)
 			addFragmentAndSetArgument<PaymentPrepareFragment>(ContainerID.content) {
 				putString(ArgumentKey.paymentAddress, address)
+				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
 			overlayView.header.apply {
