@@ -11,7 +11,9 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.checkPermissionThen
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -27,7 +29,7 @@ import java.util.*
  * @author KaySaith
  */
 
-class QRCodePresenter(
+open class QRCodePresenter(
 	override val fragment: QRCodeFragment
 ) : BasePresenter<QRCodeFragment>() {
 
@@ -78,6 +80,18 @@ class QRCodePresenter(
 			}
 		}
 
+		fun scanQRCode(fragment: Fragment) {
+			val integrator = IntentIntegrator.forSupportFragment(fragment)
+			integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+			integrator.setOrientationLocked(false)
+			integrator.captureActivity = CaptureActivity::class.java
+			integrator.setCameraId(0)
+			integrator.setPrompt("Scan QR Code GoldStone")
+			integrator.setBeepEnabled(true)
+			integrator.setBarcodeImageEnabled(true)
+			integrator.initiateScan()
+		}
+
 		private fun saveImage(
 			bitmap: Bitmap,
 			fragment: Fragment,
@@ -105,10 +119,9 @@ class QRCodePresenter(
 			} catch (e: Exception) {
 				e.printStackTrace()
 			}
-			val providerURI =
-				FileProvider.getUriForFile(
-					GoldStoneAPI.context, BuildConfig.APPLICATION_ID + ".provider", file
-				)
+			val providerURI = FileProvider.getUriForFile(
+				GoldStoneAPI.context, BuildConfig.APPLICATION_ID + ".provider", file
+			)
 			hold(providerURI)
 		}
 	}

@@ -14,6 +14,7 @@ object ArgumentKey {
 	const val transactionFromList = "transactionFromList"
 	const val tokenDetail = "tokenDetail"
 	const val paymentAddress = "paymentAddress"
+	const val paymentCount = "count"
 	const val tokenModel = "tokenModel"
 	const val webViewUrl = "webViewUrl"
 	const val notificationTransaction = "notificationTransaction"

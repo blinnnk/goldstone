@@ -68,6 +68,14 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
+	private val scanButton by lazy {
+		HeaderIcon(context).apply {
+			id = ElementID.scanButton
+			imageResource = R.drawable.scan_qr_icon
+			setRightPosition()
+		}
+	}
+
 	private val searchInput by lazy {
 		EditTextWithButton(context)
 	}
@@ -99,6 +107,21 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		findViewById<ImageView>(ElementID.closeButton).apply {
 			if (isShow) {
 				isNull() isTrue { addView(closeButton) }
+			} else {
+				isNull() isFalse { removeView(this) }
+			}
+		}
+	}
+
+	fun showScanButton(
+		isShow: Boolean,
+		action: () -> Unit = {}
+	) {
+		findViewById<ImageView>(ElementID.scanButton).apply {
+			if (isShow) {
+				isNull() isTrue {
+					addView(scanButton.click { action() })
+				}
 			} else {
 				isNull() isFalse { removeView(this) }
 			}

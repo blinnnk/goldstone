@@ -26,6 +26,7 @@ object ElementID {
 	const val loadingView = 2011
 	const val emptyView = 2012
 	const val dialog = 2013
+	const val scanButton = 20014
 }
 
 object ViewPagerID {
