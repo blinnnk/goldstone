@@ -11,7 +11,6 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.support.v4.toast
 import java.util.*
 
 /**

@@ -38,7 +38,7 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
 				topMargin = 3.uiPX()
 				scaleType = ImageView.ScaleType.CENTER_INSIDE
 			}
-			addCorner(17.uiPX(), Spectrum.blue)
+			addCorner(17.uiPX(), Spectrum.blue, true)
 		}.into(this)
 
 		info.apply {

@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.updateHeightByText
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionText
@@ -36,7 +35,7 @@ class TransactionDetailAdapter(
 		position: Int
 	) {
 		model = data
-		updateHeightByText(data.info, fontSize(14), 20.uiPX(), ScreenSize.widthWithPadding)
+		updateHeightByText(data.info, fontSize(14), ScreenSize.widthWithPadding)
 		if (model.description == TransactionText.url) {
 			setContentColor(Spectrum.darkBlue)
 		}

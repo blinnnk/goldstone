@@ -78,11 +78,8 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importKeystoreWallet(
-						keystoreEditText.text.toString(),
-						passwordInput,
-						nameInput,
-						agreementView.radioButton.isChecked,
-						hintInput
+						keystoreEditText.text.toString(), passwordInput, nameInput,
+						agreementView.radioButton.isChecked, hintInput
 					) {
 						it.showLoadingStatus(false)
 					}
@@ -91,14 +88,14 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				textView("What is keystore?") {
 					textSize = fontSize(15)
 					typeface = GoldStoneFont.heavy(context)
-					layoutParams =
-						LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-							topMargin = 20.uiPX()
-						}
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+						topMargin = 20.uiPX()
+					}
 					textColor = Spectrum.blue
 					gravity = Gravity.CENTER
 				}
 			}
 		}
 	}
+
 }

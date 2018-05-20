@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onResume() {
 		super.onResume()
+		// Push 跳转
 		if (currentIntent.isNull()) {
 			// App 不存在的时候使用传递的参数
 			showTransactionDetailFragment(intent)

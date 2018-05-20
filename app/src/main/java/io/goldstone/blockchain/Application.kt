@@ -6,6 +6,8 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import com.google.android.gms.analytics.GoogleAnalytics
+import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
@@ -27,9 +29,14 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class GoldStoneApp : Application() {
 
+	private var sAnalytics: GoogleAnalytics? = null
+	private var tracker: Tracker? = null
+
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
+
+		sAnalytics = GoogleAnalytics.getInstance(this)
 
 		// create and init database
 		GoldStoneDataBase.initDatabase(this)
@@ -59,6 +66,19 @@ class GoldStoneApp : Application() {
 		// 准备 `config` 信息
 		prepareAppConfig { registerDeviceForPush() }
 
+	}
+
+	/**
+	 * Gets the default [Tracker] for this [Application].
+	 * @return tracker
+	 */
+	@Synchronized
+	fun getDefaultTracker(): Tracker? {
+		// To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+		if (tracker.isNull()) {
+			tracker = sAnalytics?.newTracker(R.xml.global_tracker)
+		}
+		return tracker
 	}
 
 	companion object {

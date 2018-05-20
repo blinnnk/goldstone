@@ -71,7 +71,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 				getConfirmButton {
 					onClick {
 						showLoadingStatus()
-						confirmTransfer{
+						confirmTransfer {
 							showLoadingStatus(false)
 						}
 					}
@@ -138,8 +138,8 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	}
 
 	private fun showConfirmAttentionView(callback: () -> Unit) {
-		context?.showAlertView(
-			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase(), true, {
+		context?.showAlertView(TransactionText.confirmTransaction,
+			CommonText.enterPassword.toUpperCase(), true, {
 				// 点击 `Alert` 取消按钮a
 				footer.getConfirmButton { showLoadingStatus(false) }
 			}) {
@@ -149,7 +149,10 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		getParentFragment<TokenDetailOverlayFragment>()?.let {
 			presenter.backEvent(it)
 		}

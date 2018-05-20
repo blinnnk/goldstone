@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "154204693666",
+    "firebase_url": "https://goldstone-fcae4.firebaseio.com",
+    "project_id": "goldstone-fcae4",
+    "storage_bucket": "goldstone-fcae4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154204693666:android:9d8ea672f27711b0",
+        "android_client_info": {
+          "package_name": "io.goldstone.blockchain"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154204693666-70pfdo13mtf6rq2c68ncg6t16kba7g3c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9yZy5aFJZQwb0d_U-TnAfAKLBiW8NhZc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
