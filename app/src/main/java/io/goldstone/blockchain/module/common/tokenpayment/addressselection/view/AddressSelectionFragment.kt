@@ -71,8 +71,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 
 		wrapper.keyboardHeightListener {
 			if (keyboardHeight != it) {
-				viewHeight = ScreenSize.heightWithOutHeader - it + (if (it < 0) HomeSize.tabBarHeight else 0)
-				confirmButton.y = viewHeight - buttonHeight * 1f - if(it > 0) 20.uiPX() else 0
+				viewHeight = ScreenSize.heightWithOutHeader - it
+				confirmButton.y = viewHeight - buttonHeight * 1f
 				keyboardHeight = it
 			}
 		}

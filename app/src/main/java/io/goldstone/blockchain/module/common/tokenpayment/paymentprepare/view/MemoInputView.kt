@@ -63,11 +63,10 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 
 		keyboardHeightListener {
 			if (keyboardHeight != it) {
-				viewHeight = ScreenSize.heightWithOutHeader - it +
-					(if (it < 0) HomeSize.tabBarHeight else 0)
+				viewHeight = ScreenSize.heightWithOutHeader - it
 				inputView.layoutParams.height = viewHeight
 				inputView.requestLayout()
-				confirmButton.y = viewHeight - buttonHeight * 1f - if (it > 0) 20.uiPX() else 0
+				confirmButton.y = viewHeight - buttonHeight * 1f
 				keyboardHeight = it
 			}
 		}
