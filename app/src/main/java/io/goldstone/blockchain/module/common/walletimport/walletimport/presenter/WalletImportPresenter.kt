@@ -52,7 +52,7 @@ class WalletImportPresenter(
 				val currentFragment =
 					activity.supportFragmentManager.findFragmentByTag(FragmentTag.walletManagement)
 						?.childFragmentManager?.fragments?.last()
-				if(currentFragment is WalletAddingMethodFragment) {
+				if (currentFragment is WalletAddingMethodFragment) {
 					currentFragment.recoveryBackEvent()
 				}
 			}
@@ -68,13 +68,12 @@ class WalletImportPresenter(
 			WalletTable.getWalletByAddress(address) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
-					WalletTable.insertAddress(address, name, hint) {
+					WalletTable.insert(WalletTable(0, name, address, true, hint, false, 0.0, null, true)) {
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
 							LogUtil.error("function: generateMyTokenInfo")
 							callback()
 						}) {
-							setBackUpMnemonicStatus(callback)
 							fragment.activity?.jump<SplashActivity>()
 						}
 						// 注册钱包地址用于发送 `Push`
@@ -85,10 +84,6 @@ class WalletImportPresenter(
 					fragment.context?.alert(ImportWalletText.existAddress)
 				}
 			}
-		}
-
-		private fun setBackUpMnemonicStatus(callback: () -> Unit) {
-			WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(callback)
 		}
 	}
 }

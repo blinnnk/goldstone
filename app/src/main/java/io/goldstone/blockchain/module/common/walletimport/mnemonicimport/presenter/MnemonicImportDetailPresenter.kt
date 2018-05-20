@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
-import android.util.Size
 import android.widget.EditText
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
@@ -10,7 +12,6 @@ import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.crypto.big39.MnemonicWordList
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -46,9 +47,8 @@ class MnemonicImportDetailPresenter(
 			callback()
 			return
 		}
-		val pathValue =
-			if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0"
-			else pathInput.text.toString()
+		val pathValue = if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0"
+		else pathInput.text.toString()
 		CreateWalletPresenter.checkInputValue(nameInput.text.toString(), passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(), isAgree, fragment.context,
 			failedCallback = { callback() }) { passwordValue, walletName ->
@@ -62,10 +62,7 @@ class MnemonicImportDetailPresenter(
 					callback()
 				} otherwise {
 					importWallet(
-						mnemonicContent,
-						pathValue,
-						passwordValue, walletName,
-						hintInput.text?.toString(),
+						mnemonicContent, pathValue, passwordValue, walletName, hintInput.text?.toString(),
 						callback
 					)
 				}
@@ -86,10 +83,8 @@ class MnemonicImportDetailPresenter(
 		) { address ->
 			address?.let {
 				WalletImportPresenter.insertWalletToDatabase(
-					fragment, it, name, hint) {
-					// 导入钱包不需要提示助记词备份
-					WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(callback)
-				}
+					fragment, it, name, hint, callback
+				)
 			}
 		}
 	}
@@ -101,11 +96,7 @@ class MnemonicImportDetailPresenter(
 		val formatPath = path.replace("\n", "").replace(" ", "")
 		// 校验前两位强制内容
 		return if (formatPath.substring(0, 2).equals("m/", true)) {
-			val pathNumber =
-				formatPath
-					.substring(1, formatPath.length)
-					.replace("/", "")
-					.replace("'", "")
+			val pathNumber = formatPath.substring(1, formatPath.length).replace("/", "").replace("'", "")
 			// 检验剩余部分是否全部为数字
 			!pathNumber.toIntOrNull().isNull()
 		} else {
@@ -113,7 +104,10 @@ class MnemonicImportDetailPresenter(
 		}
 	}
 
-	private fun isValidMnemonic(mnemonic: String, hold: (Boolean) -> Unit) {
+	private fun isValidMnemonic(
+		mnemonic: String,
+		hold: (Boolean) -> Unit
+	) {
 		val inputMnemonicSize = mnemonic.split(" ").size
 		if (inputMnemonicSize < 12) {
 			fragment.context?.alert("mnemonic lengh is not enough")
@@ -136,6 +130,7 @@ class MnemonicImportDetailPresenter(
 						}
 					}
 				}
+
 				override fun mergeCallBack() {
 					hold(errorCode == 1)
 				}

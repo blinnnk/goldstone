@@ -112,7 +112,7 @@ class CreateWalletPresenter(
 					val arguments = Bundle().apply {
 						putString(ArgumentKey.mnemonicCode, mnemonicCode)
 					}
-					// 防止用户跳过助记词, 会在完成助记词后清楚记录的加密数据
+					// 防止用户跳过助记词, 会在完成助记词后清除记录的加密数据
 					saveEncryptMnemonic(mnemonicCode, address) {
 						showMnemonicBackupFragment(arguments)
 						callback()
