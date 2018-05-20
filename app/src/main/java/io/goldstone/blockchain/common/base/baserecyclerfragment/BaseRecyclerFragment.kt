@@ -302,7 +302,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				else -> setStyle(EmptyType.TransactionDetail)
 			}
 		}
-		wrapper.addView(emptyLayout)
+		wrapper.addView(emptyLayout, 0)
 		if (this@BaseRecyclerFragment !is TokenDetailFragment) emptyLayout?.setCenterInParent()
 	}
 
@@ -313,6 +313,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			wrapper.invalidate()
 			emptyLayout = null
 		}
+	}
+
+	fun updateWrapperHeight(height: Int) {
+		wrapper.layoutParams = RelativeLayout.LayoutParams(matchParent, height)
+		wrapper.requestLayout()
 	}
 
 	private fun setEmptyViewBy(data: ArrayList<D>) {
