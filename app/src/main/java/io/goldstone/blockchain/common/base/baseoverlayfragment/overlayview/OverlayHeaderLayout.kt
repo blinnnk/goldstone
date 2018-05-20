@@ -80,7 +80,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		EditTextWithButton(context)
 	}
 
-	private val headerHeight = 65.uiPX()
+	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
 
 	init {

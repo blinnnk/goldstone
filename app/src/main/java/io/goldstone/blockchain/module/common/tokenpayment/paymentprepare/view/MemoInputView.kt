@@ -7,9 +7,11 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.keyboardHeightListener
+import com.blinnnk.extension.setCenterInHorizontal
+import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -33,6 +35,7 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 			textColor = Spectrum.white
 			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
 			text = CommonText.confirm
+			y = ScreenSize.fullHeight - buttonHeight * 1f
 		}
 	}
 	private val buttonHeight = 50.uiPX()
@@ -40,7 +43,7 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 	private var keyboardHeight = 0
 
 	init {
-		layoutParams = RelativeLayout.LayoutParams(matchParent, ScreenSize.Height)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		backgroundColor = Spectrum.white
 		inputView.apply {
 			textSize = fontSize(18)
@@ -48,31 +51,23 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 			typeface = GoldStoneFont.heavy(context)
 			gravity = Gravity.CENTER
 			backgroundTintMode = PorterDuff.Mode.CLEAR
-			layoutParams = RelativeLayout.LayoutParams(
-				io.goldstone.blockchain.common.value.ScreenSize.widthWithPadding, ScreenSize.Height
-			)
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 		}.into(this)
 		inputView.setCenterInHorizontal()
 		AnimationDuration.Default timeUpThen {
 			inputView.requestFocus()
-			SoftKeyboard.show(context as Activity, inputView)
+			(context as? Activity)?.let { SoftKeyboard.show(it, inputView) }
 		}
 
 		confirmButton.into(this)
 
-		val barHeight = if ((context as Activity).navigationBarIsHidden()) {
-			HomeSize.tabBarHeight
-		} else {
-			0
-		}
-
 		keyboardHeightListener {
 			if (keyboardHeight != it) {
-				viewHeight = ScreenSize.Height - it - ScreenSize.statusBarHeight -
-					if (context.navigationBarIsHidden()) 0 else HomeSize.tabBarHeight
+				viewHeight = ScreenSize.heightWithOutHeader - it +
+					(if (it < 0) HomeSize.tabBarHeight else 0)
 				inputView.layoutParams.height = viewHeight
 				inputView.requestLayout()
-				confirmButton.y = viewHeight - buttonHeight * 1f - barHeight + 5.uiPX()
+				confirmButton.y = viewHeight - buttonHeight * 1f - if (it > 0) 20.uiPX() else 0
 				keyboardHeight = it
 			}
 		}

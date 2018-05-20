@@ -31,11 +31,15 @@ import org.jetbrains.anko.textColor
 
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
 
+	private val buttonHeight = 50.uiPX()
+	private var viewHeight = 0
+	private var keyboardHeight = 0
+
 	private val confirmButton by lazy {
 		TextView(context).apply {
 			text = CommonText.confirm
 			typeface = GoldStoneFont.heavy(context)
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 50.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
 			textSize = fontSize(14)
 			textColor = GrayScale.midGray
 			gravity = Gravity.CENTER
@@ -63,6 +67,14 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		wrapper.addView(confirmButton)
 		setScanButtonStatus {
 			QRCodePresenter.scanQRCode(this)
+		}
+
+		wrapper.keyboardHeightListener {
+			if (keyboardHeight != it) {
+				viewHeight = ScreenSize.heightWithOutHeader - it + (if (it < 0) HomeSize.tabBarHeight else 0)
+				confirmButton.y = viewHeight - buttonHeight * 1f - if(it > 0) 20.uiPX() else 0
+				keyboardHeight = it
+			}
 		}
 	}
 

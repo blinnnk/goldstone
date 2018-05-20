@@ -67,7 +67,7 @@ class AddressSelectionPresenter(
 				val amount = "amount"
 				val token = "token"
 				val ethContract = "0x0"
-				
+
 				var transaferCount = 0.0
 
 				// 准备 `Count` 信息, 如果包含有 `amount` 关键字
