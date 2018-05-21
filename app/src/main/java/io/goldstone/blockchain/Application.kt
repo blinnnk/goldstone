@@ -74,7 +74,6 @@ class GoldStoneApp : Application() {
 	 */
 	@Synchronized
 	fun getDefaultTracker(): Tracker? {
-		// To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
 		if (tracker.isNull()) {
 			tracker = sAnalytics?.newTracker(R.xml.global_tracker)
 		}

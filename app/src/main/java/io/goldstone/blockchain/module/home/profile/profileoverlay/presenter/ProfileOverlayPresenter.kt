@@ -47,6 +47,13 @@ class ProfileOverlayPresenter(
 			ProfileText.privacy -> showPrivacyFragment()
 			ProfileText.terms -> showTermsFragment()
 			ProfileText.support -> showSupportFragment()
+			ProfileText.aboutUs -> showAboutFragment()
+		}
+	}
+
+	private fun showAboutFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
 		}
 	}
 
