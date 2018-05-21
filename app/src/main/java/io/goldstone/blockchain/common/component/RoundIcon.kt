@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.extension.addCorner
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing

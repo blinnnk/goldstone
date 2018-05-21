@@ -26,11 +26,9 @@ import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
-import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import org.jetbrains.anko.*
 
 /**
