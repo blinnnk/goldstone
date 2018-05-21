@@ -4,6 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.QuotationSize
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -30,6 +31,11 @@ class QuotationManagementFragment :
 				}
 			}
 		}
+	}
+
+	override fun onResume() {
+		super.onResume()
+		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
 
 	override fun setSlideUpWithCellHeight() =

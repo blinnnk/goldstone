@@ -5,10 +5,9 @@ import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
-import com.google.android.gms.analytics.HitBuilders
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
@@ -56,11 +55,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 
 	override fun onResume() {
 		super.onResume()
-		(activity?.application as? GoldStoneApp)?.apply {
-			getDefaultTracker()?.send(
-				HitBuilders.ScreenViewBuilder().set("&cd", "Quotation Screen").build()
-			)
-		}
+		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
 
 	private var isShow = false

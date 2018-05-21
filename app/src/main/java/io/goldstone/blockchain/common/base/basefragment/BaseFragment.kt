@@ -67,6 +67,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 
 	override fun onResume() {
 		super.onResume()
+		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 		presenter.onFragmentResume()
 	}
 

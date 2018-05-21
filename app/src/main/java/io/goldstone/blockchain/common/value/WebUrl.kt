@@ -6,8 +6,9 @@ package io.goldstone.blockchain.common.value
  */
 
 object WebUrl {
-	const val header = "http://182.254.146.83:8095"
+	const val header = "http://www.goldstone.io"
 	const val privacy = "$header/privacy.html"
 	const val terms = "$header/termAndConditions.html"
 	const val support = "$header/support.html"
+	const val aboutUs ="$header/aboutUs.html"
 }

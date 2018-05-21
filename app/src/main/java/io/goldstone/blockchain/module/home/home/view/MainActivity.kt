@@ -7,6 +7,9 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
+import com.google.android.gms.analytics.HitBuilders
+import com.google.android.gms.analytics.Tracker
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
@@ -22,9 +25,13 @@ class MainActivity : AppCompatActivity() {
 	var backEvent: Runnable? = null
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
+	private var tracker: Tracker? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		val application = application as GoldStoneApp
+		tracker = application.getDefaultTracker()
 
 		hideStatusBar()
 
@@ -56,6 +63,11 @@ class MainActivity : AppCompatActivity() {
 		} else {
 			showTransactionDetailFragment(currentIntent)
 		}
+	}
+
+	fun sendAnalyticsData(className: String) {
+		tracker?.setScreenName(className)
+		tracker?.send(HitBuilders.ScreenViewBuilder().build())
 	}
 
 	fun showLoadingView() {
