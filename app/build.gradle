@@ -21,10 +21,21 @@ android {
       XG_ACCESS_ID : "2100282353",
       XG_ACCESS_KEY: "A9BWBA6J671X"
     ]
+    ndk {
+      abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+    }
   }
   buildTypes {
+    debug {
+      minifyEnabled true
+      zipAlignEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
     release {
-      minifyEnabled false
+      minifyEnabled true
+      zipAlignEnabled true
+      shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
@@ -38,7 +49,9 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
   // Glide Image Loader
-  implementation 'com.github.bumptech.glide:glide:4.6.1'
+  implementation 'com.github.bumptech.glide:glide:4.7.1'
+  annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+  kapt 'com.github.bumptech.glide:compiler:4.7.1'
   // Recycler View
   implementation 'com.android.support:recyclerview-v7:27.1.1'
   // Anko
@@ -65,12 +78,11 @@ dependencies {
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.2'
   // 信鸽 Push
-  implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
+   implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
   // wup包
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   // mid包
   implementation 'com.tencent.mid:mid:4.0.6-release'
-
   // Google Analytics
   implementation 'com.google.android.gms:play-services-analytics:15.0.2'
 }
