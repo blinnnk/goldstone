@@ -46,7 +46,6 @@
 
     <activity
       android:name=".module.home.home.view.MainActivity"
-      android:launchMode="singleTask"
       android:screenOrientation="portrait"
       android:windowSoftInputMode="adjustResize" />
 

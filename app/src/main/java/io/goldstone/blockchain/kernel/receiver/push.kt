@@ -117,7 +117,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		result: XGPushClickedResult?
 	) {
 		result?.customContent?.let {
-			when(JSONObject(it).safeGet("uri")) {
+			when (JSONObject(it).safeGet("uri")) {
 				ClassURI.transactionDetail -> {
 					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
@@ -141,9 +141,12 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		fun clearAppIconRedot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =
-				GoldStoneAPI.context.applicationContext?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+				GoldStoneAPI.context.applicationContext?.getSystemService(
+					Context.NOTIFICATION_SERVICE
+				) as NotificationManager
 			notificationManager.cancelAll()
 		}
+
 		fun registerWalletAddressForPush() {
 			WalletTable.getAllAddresses {
 				AppConfigTable.getAppConfig { config ->
