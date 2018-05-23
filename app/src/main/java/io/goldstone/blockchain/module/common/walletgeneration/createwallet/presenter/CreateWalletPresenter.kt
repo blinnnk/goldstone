@@ -121,7 +121,6 @@ class CreateWalletPresenter(
 
 				XinGePushReceiver.registerWalletAddressForPush()
 			}
-
 		}
 	}
 

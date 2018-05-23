@@ -34,7 +34,6 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, SupportCurrency
 		}
 	}
 
-	override fun setSlideUpWithCellHeight() =
-		50.uiPX()
+	override fun setSlideUpWithCellHeight() = 50.uiPX()
 
 }
