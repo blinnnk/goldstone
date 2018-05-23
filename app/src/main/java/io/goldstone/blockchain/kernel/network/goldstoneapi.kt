@@ -11,6 +11,7 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -238,8 +239,8 @@ object GoldStoneAPI {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
 		RequestBody.create(contentType, content).let {
-			postRequestGetJsonObject<TokenPriceModel>(it, "price_list", APIPath.getPriceByAddress,
-				errorCallback = { errorCallback() }) {
+			postRequestGetJsonObject<TokenPriceModel>(
+				it, "price_list", APIPath.getPriceByAddress, errorCallback = { errorCallback() }) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -481,9 +482,8 @@ object GoldStoneAPI {
 	}
 
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
-	private const val secretKey = "gPBZ[5Ms#dn@]4oN,{86"
 
-	private fun getcryptoRequest(
+	fun getcryptoRequest(
 		body: RequestBody,
 		path: String,
 		callback: (Request) -> Unit
@@ -493,13 +493,18 @@ object GoldStoneAPI {
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				val sign =
-					(goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
-						.removePrefix("0x")
+					(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version).getObjectMD5HexString().removePrefix("0x")
 				val request =
-					Request.Builder().url(path).method("POST", body)
-						.header("Content-type", "application/json").addHeader("device", goldStoneID)
-						.addHeader("timestamp", timeStamp).addHeader("os", "0").addHeader("version", version)
-						.addHeader("sign", sign).build()
+					Request.Builder()
+						.url(path)
+						.method("POST", body)
+						.header("Content-type", "application/json")
+						.addHeader("device", goldStoneID)
+						.addHeader("timestamp", timeStamp)
+						.addHeader("os", "0")
+						.addHeader("version", version)
+						.addHeader("sign", sign)
+						.build()
 				callback(request)
 			}
 		}
@@ -514,12 +519,16 @@ object GoldStoneAPI {
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				val sign =
-					(goldStoneID + "0" + secretKey + timeStamp + version).getObjectMD5HexString()
-						.removePrefix("0x")
+					(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version).getObjectMD5HexString().removePrefix("0x")
 				val request =
-					Request.Builder().url(api).header("Content-type", "application/json")
-						.addHeader("device", goldStoneID).addHeader("timestamp", timeStamp).addHeader("os", "0")
-						.addHeader("version", version).addHeader("sign", sign).build()
+					Request.Builder()
+						.url(api)
+						.header("Content-type", "application/json")
+						.addHeader("device", goldStoneID)
+						.addHeader("timestamp", timeStamp)
+						.addHeader("os", "0")
+						.addHeader("version", version)
+						.addHeader("sign", sign).build()
 				callback(request)
 			}
 		}

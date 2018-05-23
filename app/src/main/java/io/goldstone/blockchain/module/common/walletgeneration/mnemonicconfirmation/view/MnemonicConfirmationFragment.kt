@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.presenter.MnemonicConfirmationPresenter
@@ -135,7 +136,10 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		}
 	}
 
-	override fun setBackEvent(activity: MainActivity, parent: Fragment?) {
+	override fun setBackEvent(
+		activity: MainActivity,
+		parent: Fragment?
+	) {
 		if (parent is BaseOverlayFragment<*>) {
 			parent.headerTitle = CreateWalletText.mnemonicBackUp
 			parent.presenter.popFragmentFrom<MnemonicConfirmationFragment>()

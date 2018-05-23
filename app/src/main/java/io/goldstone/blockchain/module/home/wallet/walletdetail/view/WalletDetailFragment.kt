@@ -67,7 +67,6 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 			historyButton.onClick { presenter.showTransactionsFragment() }
 			notifyButton.onClick { presenter.showNotificationListFragment() }
 		}
-		
 	}
 
 	private var isShow = false

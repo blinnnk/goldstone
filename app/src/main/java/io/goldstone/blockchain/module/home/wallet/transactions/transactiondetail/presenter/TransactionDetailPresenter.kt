@@ -16,7 +16,6 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.APIPath
-import io.goldstone.blockchain.kernel.network.APIPath.etherScanTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -216,7 +215,7 @@ class TransactionDetailPresenter(
 
 	fun showEtherScanTransactionFragment() {
 		val argument = Bundle().apply {
-			putString(ArgumentKey.webViewUrl, etherScanTransactionDetail(currentHash))
+			putString(ArgumentKey.webViewUrl, EtherScanApi.transactionDetail(currentHash))
 		}
 		fragment.parentFragment.apply {
 			when (this) {
