@@ -62,6 +62,11 @@ fun String.replaceWithPattern(
 }
 
 fun String.removeStartAndEndValue(value: String = "\n"): String {
+
+	if (isNullOrEmpty()) {
+		return ""
+	}
+
 	var finalValue = this
 	if (finalValue.last().toString() == value) {
 		finalValue = finalValue.substring(

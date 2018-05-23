@@ -64,7 +64,7 @@ class RoundButtonWithIcon(context: Context) : View(context) {
     super.onDraw(canvas)
 
     canvas?.save()
-    canvas?.translate(width - 24.uiPX().toFloat(), height / 2f - 7.uiPX())
+    canvas?.translate(width - 24.uiPX().toFloat(), height / 2f - 6.uiPX())
     canvas?.drawPath(arrow, iconPaint)
     canvas?.restore()
 

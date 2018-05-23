@@ -1,10 +1,14 @@
+@file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+
 package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.APIPath
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -111,7 +115,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}")
 		).let {
 			callEthBy(it) {
 				holdValue(JSONObject(it).safeGet("input"))
@@ -126,7 +130,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it) }
 		}
@@ -140,7 +144,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
@@ -153,7 +157,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -166,7 +170,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
@@ -179,7 +183,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -191,7 +195,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}")
 		).let {
 			callEthBy(it) {
 				holdValue(it.hexToDecimal())
@@ -205,42 +209,41 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
 	}
+
+	private const val currentChain = APIPath.ropstan
 
 	private fun callEthBy(
 		body: RequestBody,
 		hold: (String) -> Unit
 	) {
 		val client = OkHttpClient()
-		val request =
-			Request.Builder().url(APIPath.ropstan).method("POST", body)
-				.header("Content-type", "application/json").build()
 
-		client.newCall(request).enqueue(object : Callback {
-			override fun onFailure(
-				call: Call,
-				error: IOException
-			) {
-				LogUtil.error("path: callEthBy onFailure $error")
-			}
-
-			@SuppressLint("SetTextI18n")
-			override fun onResponse(
-				call: Call,
-				response: Response
-			) {
-				val data = response.body()?.string()
-				try {
-					val dataObject = JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
-					hold(dataObject["result"].toString())
-				} catch (error: Exception) {
-					LogUtil.error("path: callEthBy $error")
+		GoldStoneAPI.getcryptoRequest(body, currentChain) {
+			client.newCall(it).enqueue(object : Callback {
+				override fun onFailure(call: Call, error: IOException) {
+					LogUtil.error("path: callEthBy onFailure $error")
 				}
-			}
-		})
+
+				@SuppressLint("SetTextI18n")
+				override fun onResponse(
+					call: Call,
+					response: Response
+				) {
+					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					try {
+						val dataObject =
+							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+						hold(dataObject["result"].toString())
+					} catch (error: Exception) {
+						LogUtil.error("path: callEthBy $error")
+					}
+				}
+			})
+		}
 	}
 }
