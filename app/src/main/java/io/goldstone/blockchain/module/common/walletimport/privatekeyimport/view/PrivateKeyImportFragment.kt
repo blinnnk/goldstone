@@ -87,7 +87,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.into(this)
 
 
-				textView("What is private key?") {
+				textView(QAText.whatIsPrivateKey) {
 					textSize = fontSize(15)
 					typeface = GoldStoneFont.heavy(context)
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {

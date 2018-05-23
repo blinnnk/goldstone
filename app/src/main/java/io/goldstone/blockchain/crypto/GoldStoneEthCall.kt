@@ -4,14 +4,19 @@ package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import okhttp3.*
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
+import java.math.BigInteger
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -27,6 +32,7 @@ object GoldStoneEthCall {
 		val method: String,
 		val code: String = ""
 	) {
+		EthCall("eth_call", SolidityCode.ethCall),
 		GetSymbol("eth_call", SolidityCode.ethCall),
 		GetTokenBalance("eth_call", SolidityCode.getTokenBalance),
 		GetBalance("eth_getBalance"),
@@ -34,7 +40,9 @@ object GoldStoneEthCall {
 		GetTokenDecimal("eth_call", SolidityCode.getDecimal),
 		GetTokenName("eth_call", SolidityCode.getTokenName),
 		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
-		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall)
+		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall),
+		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall),
+		PendingFitler("eth_newFilter", SolidityCode.ethCall)
 	}
 
 	@JvmStatic
@@ -114,11 +122,60 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) {
 				holdValue(JSONObject(it).safeGet("input"))
+			}
+		}
+	}
+
+	@JvmStatic
+	fun getTransactionByHash(
+		hash: String,
+		unfinishedCallback: () -> Unit = {},
+		holdValue: (TransactionTable) -> Unit
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
+			)
+		).let {
+			System.out.println("begin")
+			callEthBy(it) {
+				val data = it.toJsonObject()
+				if (data.safeGet("transactionIndex").toDecimalFromHex().toIntOrNull().orZero() == 0) {
+					unfinishedCallback()
+					System.out.println("shit _______+++++")
+				} else {
+					holdValue(TransactionTable(data))
+				}
+			}
+		}
+	}
+
+	@JvmStatic
+	fun getTransactionExecutedValue(
+		to: String,
+		from: String,
+		data: String,
+		holdValue: (BigInteger) -> Unit = {}
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetEstimateGas.method}\",  \"params\":[{\"to\": \"$to\", \"from\": \"$from\", \"data\": \"$data\"}],\"id\":1}"
+			)
+		).let {
+			callEthBy(it) {
+				GoldStoneAPI.context.runOnUiThread {
+					try {
+						holdValue(it.toDecimalFromHex().toBigDecimal().toBigInteger())
+					} catch (error: Exception) {
+						LogUtil.error("function: getTransactionExecutedValue, error: $error")
+					}
+				}
 			}
 		}
 	}
@@ -129,8 +186,9 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it) }
 		}
@@ -143,8 +201,9 @@ object GoldStoneEthCall {
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
@@ -156,8 +215,9 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -169,8 +229,9 @@ object GoldStoneEthCall {
 		holdValue: (Double) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
@@ -182,8 +243,9 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -194,8 +256,9 @@ object GoldStoneEthCall {
 		holdValue: (Double) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}"
+			)
 		).let {
 			callEthBy(it) {
 				holdValue(it.hexToDecimal())
@@ -208,8 +271,9 @@ object GoldStoneEthCall {
 		holdValue: (Double) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}")
+			contentType, AesCrypto.encrypt(
+				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
+			)
 		).let {
 			callEthBy(it) { holdValue(it.hexToDecimal()) }
 		}
@@ -219,13 +283,17 @@ object GoldStoneEthCall {
 
 	private fun callEthBy(
 		body: RequestBody,
+		errorCallback: () -> Unit = {},
 		hold: (String) -> Unit
 	) {
 		val client = OkHttpClient()
 
 		GoldStoneAPI.getcryptoRequest(body, currentChain) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
+				override fun onFailure(
+					call: Call,
+					error: IOException
+				) {
 					LogUtil.error("path: callEthBy onFailure $error")
 				}
 
@@ -240,6 +308,8 @@ object GoldStoneEthCall {
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
+						System.out.println("hey")
+						errorCallback()
 						LogUtil.error("path: callEthBy $error")
 					}
 				}

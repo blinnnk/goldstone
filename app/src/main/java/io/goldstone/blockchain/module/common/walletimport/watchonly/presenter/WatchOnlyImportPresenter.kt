@@ -8,6 +8,7 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -32,7 +33,7 @@ class WatchOnlyImportPresenter(
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		if (!WalletUtils.isValidAddress(address)) {
-			fragment.context?.alert("address isn't valid")
+			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			callback()
 			return
 		}
@@ -54,7 +55,7 @@ class WatchOnlyImportPresenter(
 					XinGePushReceiver.registerWalletAddressForPush()
 				}
 			} otherwise {
-				fragment.context?.alert("There is already this account in gold stone")
+				fragment.context?.alert(ImportWalletText.existAddress)
 				callback()
 			}
 		}

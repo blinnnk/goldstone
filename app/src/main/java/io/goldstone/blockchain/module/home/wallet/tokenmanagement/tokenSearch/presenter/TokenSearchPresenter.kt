@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
 import com.blinnnk.extension.*
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -59,7 +59,7 @@ class TokenSearchPresenter(
 
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 
-		fragment.showLoadingView("Searching token information now")
+		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果

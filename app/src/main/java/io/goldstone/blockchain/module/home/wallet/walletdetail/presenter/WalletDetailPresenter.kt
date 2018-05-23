@@ -75,13 +75,18 @@ class WalletDetailPresenter(
 	}
 
 	/**
-	 * 每次后台到前台更新首页的 `token` 信息
+	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
+	private var isFirstTime = true
+
 	override fun onFragmentResume() {
-		updateData()
-		showPinCodeFragment()
-		updateUnreadCount()
+		if (!isFirstTime) {
+			updateData()
+			showPinCodeFragment()
+			updateUnreadCount()
+		}
 		fragment.getMainActivity()?.backEvent = null
+		isFirstTime = false
 	}
 
 	fun showTransactionsFragment() {

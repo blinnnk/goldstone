@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
 
 import android.os.Bundle
-import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
@@ -10,6 +9,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -62,7 +62,7 @@ class TransactionListPresenter(
 	}
 
 	private fun TransactionListFragment.initData() {
-		showLoadingView("Loading transaction data now")
+		showLoadingView(LoadingText.transactionData)
 		if (!localTransactions.isNull()) {
 			asyncData = localTransactions
 			/** show memory data and at the same time update the chain data in async thread */

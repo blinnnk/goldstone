@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.view
 
-import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
@@ -36,7 +35,6 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 	override val presenter = WatchOnlyImportPresenter(this)
 
-	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 
 		verticalLayout {
@@ -52,8 +50,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 			attentionView.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-				text =
-					"You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
+				text = WatchOnlyText.intro
 			}.into(this)
 
 
@@ -64,7 +61,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 			addressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-				hint = "Enter Address That You Want to Watch"
+				hint = WatchOnlyText.enterDescription
 			}.into(this)
 
 			confirmButton.apply {
@@ -78,7 +75,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				}
 			}.into(this)
 
-			textView("What is watch only wallet?") {
+			textView(QAText.whatIsWatchOnlyWallet) {
 				textSize = fontSize(15)
 				typeface = GoldStoneFont.heavy(context)
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {

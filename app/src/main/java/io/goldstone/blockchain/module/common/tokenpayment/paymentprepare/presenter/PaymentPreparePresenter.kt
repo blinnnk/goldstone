@@ -51,7 +51,7 @@ class PaymentPreparePresenter(
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
-			fragment.context?.alert("You have to set the transfer count")
+			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
 		} else {
 			getPaymentPrepareModel(count, fragment.getMemoContent()) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
@@ -116,17 +116,9 @@ class PaymentPreparePresenter(
 				countWithDecimal.toDataString() + // 数量
 				if (memo.isEmpty()) "" else memo.toHexCode() // Memo
 		}
-		// 这个 `Transaction` 是用来测量估算可能要用的 `gasLimit` 不是用来转账用的.
-		val transaction = Transaction(
-			WalletTable.current.address, currentNonce, BigInteger.valueOf(0), BigInteger.valueOf(0), to,
-			countWithDecimal, data
-		)
 
-		coroutinesTask({
-			// 测量 `Transaction` 得出 `GasLimit`
-			if (currentToken?.symbol == CryptoSymbol.eth) BigInteger.valueOf(21000)
-			else web3j.ethEstimateGas(transaction).sendAsync().get().amountUsed
-		}) { limit ->
+		GoldStoneEthCall.getTransactionExecutedValue(
+			to, WalletTable.current.address, data) { limit ->
 			hold(
 				PaymentPrepareModel(
 					currentNonce!!, limit, to, countWithDecimal, value, data, fragment.address!!,

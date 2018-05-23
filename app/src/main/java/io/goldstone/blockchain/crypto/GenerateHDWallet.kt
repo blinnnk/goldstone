@@ -6,6 +6,7 @@ import android.content.Context
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
@@ -114,7 +115,7 @@ fun Context.getKeystoreFile(
 				try {
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
-					runOnUiThread { alert("Wrong Password") }
+					runOnUiThread { alert(CommonText.wrongPassword) }
 					LogUtil.error("function: getKeystoreFile $error")
 				}
 			}

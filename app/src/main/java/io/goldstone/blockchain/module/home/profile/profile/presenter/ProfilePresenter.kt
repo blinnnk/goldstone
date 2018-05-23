@@ -31,14 +31,16 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, contactCount.size.toString()),
 				ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
 				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
-				ProfileModel(R.drawable.chain_icon, ProfileText.chain, "Ropstan"),
+				ProfileModel(R.drawable.chain_icon, ProfileText.chain, ChainText.ropstan),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
 				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
-				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""),
-				ProfileModel(R.drawable.version_icon, ProfileText.version, SystemUtils.getVersionName(fragment.context!!))
+				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""), ProfileModel(
+					R.drawable.version_icon, ProfileText.version,
+					SystemUtils.getVersionName(fragment.context!!)
+				)
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else {
@@ -54,7 +56,8 @@ class ProfilePresenter(
 					showShareChooser()
 				} else {
 					addFragmentAndSetArguments<ProfileOverlayFragment>(
-						ContainerID.main, FragmentTag.profileOverlay) {
+						ContainerID.main, FragmentTag.profileOverlay
+					) {
 						putString(ArgumentKey.profileTitle, title)
 					}
 				}
@@ -64,7 +67,10 @@ class ProfilePresenter(
 
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
-		intent.putExtra(Intent.EXTRA_TEXT, "GoldStone\ncrypto digtal wallet the safest one for you\nhttp://goldstone.io")
+		intent.putExtra(
+			Intent.EXTRA_TEXT,
+			"GoldStone\ncrypto digtal wallet the safest one for you\nhttp://goldstone.io"
+		)
 		intent.type = "text/plain"
 		fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 	}

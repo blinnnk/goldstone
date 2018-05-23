@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettin
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.updatePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -33,7 +34,7 @@ class PasswordSettingsPresenter(
 			fragment.context?.updatePassword(
 				WalletTable.current.address, oldPasswordInput.text.toString(), password
 			) {
-				fragment.toast("Modify Succeed")
+				fragment.toast(CommonText.succeed)
 				fragment.getParentFragment<WalletSettingsFragment> {
 					presenter.showTargetFragmentByTitle(WalletSettingsText.walletSettings)
 				}

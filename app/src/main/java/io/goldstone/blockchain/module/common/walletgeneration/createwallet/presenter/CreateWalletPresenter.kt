@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
@@ -25,11 +26,11 @@ import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.agreementfragment.view.AgreementFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.doAsync
@@ -49,8 +50,11 @@ class CreateWalletPresenter(
 	private var repeatPasswordText = ""
 
 	fun showAgreementFragment() {
-		showTargetFragment<AgreementFragment, WalletGenerationFragment>(
-			CreateWalletText.agreement, CreateWalletText.mnemonicBackUp
+		val argument = Bundle().apply {
+			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+		}
+		showTargetFragment<WebViewFragment, WalletGenerationFragment>(
+			CreateWalletText.agreement, CreateWalletText.mnemonicBackUp, argument
 		)
 	}
 

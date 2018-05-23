@@ -38,11 +38,8 @@ data class TransactionListModel(
 ) : Serializable {
 
 	constructor(data: TransactionTable) : this(
-		data.tokenReceiveAddress.orEmpty(), CryptoUtils.scaleTo28(
-			HoneyDateUtil.getSinceTime(data.timeStamp) + descriptionText(
-				data.isReceive
-			) + data.fromAddress
-		), // 副标题的生成
+		data.tokenReceiveAddress.orEmpty(),
+		CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp) + descriptionText(data.isReceive) + data.fromAddress), // 副标题的生成
 		data.value.toDouble(), // 转账个数
 		data.symbol, data.isReceive, DateUtils.formatDateTime(
 			GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR

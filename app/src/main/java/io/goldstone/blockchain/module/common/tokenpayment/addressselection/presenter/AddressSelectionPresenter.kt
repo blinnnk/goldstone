@@ -5,9 +5,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -50,7 +48,7 @@ class AddressSelectionPresenter(
 		val content = result.orEmpty()
 		// 不符合标准的长度直接返回
 		if (content.length < CryptoValue.bip39AddressLength || content.substring(0, 2) != "0x") {
-			fragment.context?.alert("Not valid QR code image")
+			fragment.context?.alert(QRText.unvalidQRCodeAlert)
 			return
 		}
 
@@ -88,9 +86,7 @@ class AddressSelectionPresenter(
 				}
 
 				if (contract.isNotEmpty() && it.contract != contract) {
-					fragment.context?.alert(
-						"The Token which got by scanning QR code is different with current token please check"
-					)
+					fragment.context?.alert(QRText.unvalidContract)
 					return
 				}
 
@@ -106,14 +102,14 @@ class AddressSelectionPresenter(
 		count: Double = 0.0
 	) {
 		WalletUtils.isValidAddress(address).isFalse {
-			fragment.context?.alert("address isn't valid")
+			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			return
 		}
 		WalletTable.getAllAddresses {
 			any { it == address } isTrue {
 				fragment.alert(
-					"are you decide to transfer to this address which is existing in your local wallets?",
-					"Transfer Attention"
+					TokenDetailText.transferToLocalWalletAlertDescription,
+					TokenDetailText.transferToLocalWalletAlertTitle
 				) {
 					yesButton {
 						goToPaymentPrepareFragment(address, count)

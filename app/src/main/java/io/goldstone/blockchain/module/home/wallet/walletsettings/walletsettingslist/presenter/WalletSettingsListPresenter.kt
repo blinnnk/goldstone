@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -101,7 +102,7 @@ class WalletSettingsListPresenter(
 		// delete `keystore` file
 		context?.deleteAccount(address, password) {
 			it.isFalse {
-				fragment.context?.alert("Wrong Password")
+				fragment.context?.alert(CommonText.wrongPassword)
 				getMainActivity()?.removeLoadingView()
 				return@deleteAccount
 			}

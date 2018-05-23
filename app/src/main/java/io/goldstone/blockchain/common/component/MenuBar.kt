@@ -12,11 +12,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -27,117 +23,117 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 open class MenuBar(context: Context) : LinearLayout(context) {
 
-  var clickEvent: Runnable? = null
-  private val titles = arrayListOf("mnemonic", "keystore", "private key", "watch only")
-  private var totalItemWidth = 0
-  private var clickItemID: Int? = null
+	var clickEvent: Runnable? = null
+	private val titles = arrayListOf(
+		ImporMneubar.mnemonic, ImporMneubar.keystore, ImporMneubar.privateKey, ImporMneubar.watchOnly
+	)
+	private var totalItemWidth = 0
+	private var clickItemID: Int? = null
 
-  init {
-    backgroundColor = Spectrum.white
-    titles.forEachIndexed { index, string ->
-      Item(context)
-        .apply {
-          id = index
-          text = string
-          layoutParams = LinearLayout.LayoutParams(getTextWidth(string), 35.uiPX()).apply {
-            setMargins(PaddingSize.device, 20.uiPX(), 10.uiPX(), 0)
-            totalItemWidth += getTextWidth(string) + 30.uiPX() // 计算总的 `Menu` 宽度
-          }
-          onClick {
-            clickItemID = id
-            clickEvent?.run()
-          }
-        }
-        .into(this)
-    }
-    layoutParams = LinearLayout.LayoutParams(ScreenSize.Width + 50.uiPX(), 70.uiPX())
-  }
+	init {
+		backgroundColor = Spectrum.white
+		titles.forEachIndexed { index, string ->
+			Item(context).apply {
+				id = index
+				text = string
+				layoutParams = LinearLayout.LayoutParams(getTextWidth(string), 35.uiPX()).apply {
+					setMargins(PaddingSize.device, 20.uiPX(), 10.uiPX(), 0)
+					totalItemWidth += getTextWidth(string) + 30.uiPX() // 计算总的 `Menu` 宽度
+				}
+				onClick {
+					clickItemID = id
+					clickEvent?.run()
+				}
+			}.into(this)
+		}
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width + 50.uiPX(), 70.uiPX())
+	}
 
-  fun onClickItem(hold: Item.() -> Unit) {
-    clickItemID?.apply {
-      selectItem(this)
-      hold(findViewById(this))
-    }
-  }
+	fun onClickItem(hold: Item.() -> Unit) {
+		clickItemID?.apply {
+			selectItem(this)
+			hold(findViewById(this))
+		}
+	}
 
-  fun selectItem(index: Int) {
-    (0 until titles.size).forEach {
-      findViewById<Item>(it)?.apply {
-        if (it == index) setSelectedStyle(true)
-        else setSelectedStyle(false)
-      }
-    }
-  }
+	fun selectItem(index: Int) {
+		(0 until titles.size).forEach {
+			findViewById<Item>(it)?.apply {
+				if (it == index) setSelectedStyle(true)
+				else setSelectedStyle(false)
+			}
+		}
+	}
 
-  fun floatRight() {
-    (0 until titles.size).forEach {
-      findViewById<Item>(it)?.apply {
-        x -= totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
-      }
-    }
-  }
+	fun floatRight() {
+		(0 until titles.size).forEach {
+			findViewById<Item>(it)?.apply {
+				x -= totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
+			}
+		}
+	}
 
-  fun floatLeft() {
-    (0 until titles.size).forEach {
-      findViewById<Item>(it)?.apply {
-        x += totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
-      }
-    }
-  }
+	fun floatLeft() {
+		(0 until titles.size).forEach {
+			findViewById<Item>(it)?.apply {
+				x += totalItemWidth - ScreenSize.Width + 12.uiPX().toFloat()
+			}
+		}
+	}
 
-  private fun getTextWidth(text: String): Int {
-    val textPaint = Paint()
-    textPaint.textSize = 16.uiPX().toFloat()
-    textPaint.typeface = GoldStoneFont.heavy(context)
-    return textPaint.measureText(text).toInt()
-  }
+	private fun getTextWidth(text: String): Int {
+		val textPaint = Paint()
+		textPaint.textSize = 16.uiPX().toFloat()
+		textPaint.typeface = GoldStoneFont.heavy(context)
+		return textPaint.measureText(text).toInt()
+	}
 
 }
 
 class Item(context: Context) : View(context) {
 
-  var text by observing("") {
-    invalidate()
-  }
+	var text by observing("") {
+		invalidate()
+	}
 
-  private var hasUnderLine = false
-  private var titleColor = GrayScale.black
-  private val paint = Paint()
-  private val textPaint = Paint()
-  private val textSize = 16.uiPX().toFloat()
+	private var hasUnderLine = false
+	private var titleColor = GrayScale.black
+	private val paint = Paint()
+	private val textPaint = Paint()
+	private val textSize = 16.uiPX().toFloat()
 
-  init {
-    paint.isAntiAlias = true
-    paint.style = Paint.Style.FILL
-    paint.color = GrayScale.black
+	init {
+		paint.isAntiAlias = true
+		paint.style = Paint.Style.FILL
+		paint.color = GrayScale.black
 
-    textPaint.isAntiAlias = true
-    textPaint.style = Paint.Style.FILL
-    textPaint.color = titleColor
-    textPaint.textSize = textSize
-    textPaint.typeface = GoldStoneFont.heavy(context)
-  }
+		textPaint.isAntiAlias = true
+		textPaint.style = Paint.Style.FILL
+		textPaint.color = titleColor
+		textPaint.textSize = textSize
+		textPaint.typeface = GoldStoneFont.heavy(context)
+	}
 
-  @SuppressLint("DrawAllocation")
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
+	@SuppressLint("DrawAllocation")
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
 
-    textPaint.color = GrayScale.midGray
+		textPaint.color = GrayScale.midGray
 
-    if (hasUnderLine) {
-      val rectF = RectF(0f, height - BorderSize.bold, width.toFloat(), height.toFloat())
-      canvas?.drawRect(rectF, paint)
-      textPaint.color = GrayScale.black
-    }
+		if (hasUnderLine) {
+			val rectF = RectF(0f, height - BorderSize.bold, width.toFloat(), height.toFloat())
+			canvas?.drawRect(rectF, paint)
+			textPaint.color = GrayScale.black
+		}
 
-    val textY = (height + textSize) / 2 - 3.uiPX()
-    canvas?.drawText(text, 0f, textY, textPaint)
+		val textY = (height + textSize) / 2 - 3.uiPX()
+		canvas?.drawText(text, 0f, textY, textPaint)
 
-  }
+	}
 
-  fun setSelectedStyle(isSelect: Boolean) {
-    hasUnderLine = isSelect
-    invalidate()
-  }
+	fun setSelectedStyle(isSelect: Boolean) {
+		hasUnderLine = isSelect
+		invalidate()
+	}
 
 }

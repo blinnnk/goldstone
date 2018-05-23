@@ -9,7 +9,9 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.removeStartAndEndValue
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
@@ -26,14 +28,11 @@ class MnemonicConfirmationPresenter(
 	override val fragment: MnemonicConfirmationFragment
 ) : BasePresenter<MnemonicConfirmationFragment>() {
 
-	fun clickConfirmationButton(
-		correct: String,
-		current: String
-	) {
-		compareMnemonicCode(correct, current.removeStartAndEndValue(" ")) isTrue {
+	fun clickConfirmationButton(correct: String, current: String) {
+		compareMnemonicCode(correct, current) isTrue {
 			validAndContinue()
 		} otherwise {
-			fragment.context?.alert("incorrect mnemonic please re-enter")
+			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}
 	}
 
@@ -74,10 +73,7 @@ class MnemonicConfirmationPresenter(
 				GoldStoneDialog.remove(context)
 			}
 			setImage(R.drawable.alert_banner)
-			setContent(
-				"WELCOME",
-				"You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
-			)
+			setContent(CommonText.succeed, DialogText.backUpMnemonicSucceed)
 		}
 		callback()
 	}

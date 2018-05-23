@@ -11,9 +11,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.TokenDetailText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
@@ -106,8 +104,7 @@ class TokenDetailPresenter(
 						showButtons { }
 						setImage(R.drawable.alert_banner)
 						setContent(
-							"Back Up Mnemonic",
-							"An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+							DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
 						)
 					}
 				} otherwise {
@@ -118,7 +115,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
-		fragment.showLoadingView("Loading token data now")
+		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse {
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				fragment.loadDataFromChain()
