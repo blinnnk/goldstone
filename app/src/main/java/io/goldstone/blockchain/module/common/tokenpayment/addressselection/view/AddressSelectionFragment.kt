@@ -103,6 +103,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		data: Intent?
 	) {
 		super.onActivityResult(requestCode, resultCode, data)
+		if (data.isNull()) return
 		val intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
 		intentResult?.let {
 			presenter.showPaymentPrepareFragmentByQRCode(it.contents)
