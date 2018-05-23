@@ -78,7 +78,7 @@ dependencies {
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.2'
   // 信鸽 Push
-   implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
+  implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
   // wup包
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   // mid包

@@ -71,8 +71,7 @@ fun String.toDecimalFromHex(): String {
 	var value: BigInteger = BigInteger.valueOf(0)
 	(0 until hexNum.length).map { hexNum[it] }.map { digits.indexOf(it.toString()) }
 		.forEachIndexed { index, it ->
-			value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toLong().toBigDecimal()
-				.toBigInteger()
+			value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toLong().toBigDecimal().toBigInteger()
 		}
 	return value.toDouble().formatHex()
 }

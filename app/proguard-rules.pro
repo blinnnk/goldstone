@@ -29,6 +29,8 @@
 -verbose
 -dontpreverify
 
+-obfuscationdictionary keywords.txt
+
 # Suppress duplicate warning for system classes;  Blaze is passing android.jar
 # to proguard multiple times.
 -dontnote android.**
@@ -100,6 +102,7 @@
   public static final android.os.Parcelable$Creator *;
 }
 
+-keep class **.R
 -keepclassmembers class **.R$* {
     public static <fields>;
 }
@@ -121,6 +124,7 @@
     public static ** valueOf(java.lang.String);
 }
 
+-keepnames class * implements java.io.Serializable
 -keepclassmembers class * implements java.io.Serializable {
     static final long serialVersionUID;
     private static final java.io.ObjectStreamField[] serialPersistentFields;
@@ -156,7 +160,7 @@
 -dontskipnonpubliclibraryclassmembers
 -printmapping proguardMapping.txt
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
--keepattributes *Annotation*,InnerClasses, Signature, SourceFile,LineNumberTable
+-keepattributes *Annotation*,InnerClasses, Signature, SourceFile,LineNumberTable, Exceptions
 
 -printmapping build/mapping.txt
 
@@ -166,8 +170,6 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
--keepattributes Signature
--keepattributes Exceptions
 
 # OKHTTP
 -dontwarn okhttp3.**
@@ -177,12 +179,14 @@
 
 # Gson
 -keep class com.google.gson.** { *; }
--keepattributes Signature
 
 # Sentry Java
 -dontwarn javax.naming.**
 -dontwarn javax.servlet.**
 -dontwarn org.slf4j.**
+
+# Only necessary if you downloaded the SDK jar directly instead of from maven.
+-keep class com.shaded.fasterxml.jackson.** { *; }
 
 # Sun Misc
 -dontwarn sun.misc.****
@@ -198,6 +202,9 @@
 
 # Ethereum Geth
 -keep class org.ethereum.geth.** { *; }
+
+# PBKDF2withHmacSHA512
+-keep class org.spongycastle.** { *; }
 
 # V8 Render
 -keep class android.support.v8.renderscript.** { *; }
@@ -227,3 +234,25 @@
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
+
+-keep class android.support.design.widget.TabLayout { *; }
+-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+    public *;
+}
+-keep class android.support.annotation.Keep
+
+-keep @android.support.annotation.Keep class * {*;}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <init>(...);
+}
+
+-adaptclassstrings com.example.Test

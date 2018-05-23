@@ -28,20 +28,20 @@ fun Context.generateWallet(
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val path = "m/44'/60'/0'/0/0"
-	/** Generate Mnemonic */
-	val mnemonicCode = Mnemonic.generateMnemonic()
-	/** Generate HD Wallet */
-	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, path)
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	/** Generate Keys */
-	val masterKey = masterWallet.getKeyPair()
-	/** Get Public Key and Private Key*/
-	val publicKey = Keys.getAddress(masterKey.publicKey)
-	val address = "0x" + publicKey.toLowerCase()
-	holdAddress(mnemonicCode, address)
-	/** Import Private Key to Keystore */
 	try {
+		/** Generate Mnemonic */
+		val mnemonicCode = Mnemonic.generateMnemonic()
+		/** Generate HD Wallet */
+		val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, path)
+		/** Generate Keystore */
+		val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+		/** Generate Keys */
+		val masterKey = masterWallet.getKeyPair()
+		/** Get Public Key and Private Key*/
+		val publicKey = Keys.getAddress(masterKey.publicKey)
+		val address = "0x" + publicKey.toLowerCase()
+		holdAddress(mnemonicCode, address)
+		/** Import Private Key to Keystore */
 		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
 	} catch (error: Exception) {
 		LogUtil.error("position: generateWallet $error")
