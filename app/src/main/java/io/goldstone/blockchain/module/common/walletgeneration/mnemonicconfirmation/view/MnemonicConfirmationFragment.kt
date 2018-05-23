@@ -53,7 +53,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			attentionTextView.apply { text = CreateWalletText.mnemonicConfirmationDescription }.into(this)
 
 			mnemonicInput.apply {
-				hint = "confirm mnemonic which you got before."
+				hint = WalletSettingsText.backUpMnemonicGotBefore
 			}.into(this)
 
 			// 根据助记词生成勾选助记词的按钮集合
@@ -102,7 +102,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 				presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
 			}.into(this)
 
-			textView("What is mnemonic?") {
+			textView(QAText.whatIsMnemonic) {
 				textSize = fontSize(15)
 				typeface = GoldStoneFont.heavy(context)
 				layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())

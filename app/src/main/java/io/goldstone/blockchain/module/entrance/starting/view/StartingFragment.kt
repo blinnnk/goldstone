@@ -55,14 +55,14 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 			// Intro
 			verticalLayout {
 
-				textView("GOLD STONE") {
+				textView(SplashText.goldStone) {
 					textSize = fontSize(21)
 					textColor = Spectrum.white
 					typeface = GoldStoneFont.black(context)
 					gravity = Gravity.CENTER_HORIZONTAL
 				}
 
-				textView("the most useful and safest wallet in the world") {
+				textView(SplashText.slogan) {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.light(context)
 				}

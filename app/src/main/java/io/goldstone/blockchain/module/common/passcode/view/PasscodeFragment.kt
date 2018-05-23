@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.passcode.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -73,7 +72,6 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		passcodeInput.swipe()
 	}
 
-	@SuppressLint("SetTextI18n")
 	fun showFailedAttention(content: String) {
 		failedAttention.isNull() isFalse {
 			failedAttention?.text = content

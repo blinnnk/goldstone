@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -55,7 +56,7 @@ class QuotationSearchPresenter(
 	}
 
 	private fun searchTokenBy(symbol: String) {
-		fragment.showLoadingView("Searching token information now")
+		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol) { searchList ->
 			// 获取本地自己选中的列表

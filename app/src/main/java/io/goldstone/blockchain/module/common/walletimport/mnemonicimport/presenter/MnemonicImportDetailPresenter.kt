@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.big39.MnemonicWordList
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -37,18 +38,17 @@ class MnemonicImportDetailPresenter(
 	) {
 
 		if (pathInput.text.isNotEmpty() && !isVaildPath(pathInput.text.toString())) {
-			fragment.context?.alert("incorrect path value")
+			fragment.context?.alert(ImportWalletText.pathAlert)
 			callback()
 			return
 		}
 
 		mnemonicInput.text.isEmpty() isTrue {
-			fragment.context?.alert("mnemonic is not correct")
+			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 			callback()
 			return
 		}
-		val pathValue = if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0"
-		else pathInput.text.toString()
+		val pathValue = if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0" else pathInput.text.toString()
 		CreateWalletPresenter.checkInputValue(nameInput.text.toString(), passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(), isAgree, fragment.context,
 			failedCallback = { callback() }) { passwordValue, walletName ->
@@ -58,7 +58,7 @@ class MnemonicImportDetailPresenter(
 
 			isValidMnemonic(mnemonicContent) {
 				it isFalse {
-					fragment.context?.alert("Wrong mnemonic world")
+					fragment.context?.alert(ImportWalletText.mnemonicAlert)
 					callback()
 				} otherwise {
 					importWallet(
@@ -110,7 +110,7 @@ class MnemonicImportDetailPresenter(
 	) {
 		val inputMnemonicSize = mnemonic.split(" ").size
 		if (inputMnemonicSize < 12) {
-			fragment.context?.alert("mnemonic lengh is not enough")
+			fragment.context?.alert(ImportWalletText.mnemonicLengthAlert)
 			hold(false)
 			return
 		} else {

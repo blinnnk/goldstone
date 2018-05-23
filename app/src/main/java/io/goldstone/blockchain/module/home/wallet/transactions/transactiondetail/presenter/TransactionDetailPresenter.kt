@@ -5,17 +5,16 @@ import android.support.v4.app.Fragment
 import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.big39.TransactionStatusObserver
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -36,11 +35,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.web3j.protocol.Web3jFactory
-import org.web3j.protocol.core.methods.response.Transaction
-import org.web3j.protocol.core.methods.response.TransactionReceipt
-import org.web3j.protocol.http.HttpService
-import rx.Subscription
 
 /**
  * @date 27/03/2018 3:27 AM
@@ -78,11 +72,7 @@ class TransactionDetailPresenter(
 			currentHash = transactionHash
 			if (isPending) {
 				// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
-				doAsync {
-					fragment.getTransactionFromChain(transactionHash) {
-						updateHeaderValue(count, targetAddress, symbol, false, hasError)
-					}
-				}
+				observerTransaction()
 			}
 		}
 
@@ -271,9 +261,9 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			is TransactionReceipt -> {
+			is TransactionTable -> {
 				arrayListOf(
-					minerFee, memo, currentHash, receipt.blockNumber.toBigDecimal(), date,
+					minerFee, memo, currentHash, receipt.blockNumber, date,
 					EtherScanApi.singleTransactionHas(currentHash)
 				)
 			}
@@ -311,26 +301,18 @@ class TransactionDetailPresenter(
 
 	/** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 
-	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
-	private var transactionObserver: Subscription? = null
 	private fun observerTransaction() {
 		// 在页面销毁后需要用到, `activity` 所以提前存储起来
-		val activity = fragment.getMainActivity()
-		doAsync {
-			try {
-				// 开启监听交易是否完成
-				transactionObserver = web3j.transactionObservable().filter {
-					LogUtil.debug("function: observerTransaction, value: ${it.hash}")
-					it.hash == currentHash
-				}.subscribe {
-					LogUtil.debug("function: observerTransaction status: Succeed")
-					updateWalletDetailValue(activity)
+		val currentActivity = fragment.getMainActivity()
+		object : TransactionStatusObserver() {
+			override val transactionHash = currentHash
+			override fun getStatus(status: Boolean) {
+				if (status) {
 					onTransactionSucceed()
+					updateWalletDetailValue(currentActivity)
 				}
-			} catch (error: Exception) {
-				LogUtil.error("function: observerTransaction, error: $error")
 			}
-		}
+		}.start()
 	}
 
 	private fun updateWalletDetailValue(activity: MainActivity?) {
@@ -345,9 +327,9 @@ class TransactionDetailPresenter(
 	}
 
 	private fun updateMyTokenBalanceByTransaction(callback: () -> Unit) {
-		web3j.ethGetTransactionByHash(currentHash).sendAsync().get()?.let {
-			CryptoUtils.isERC20TransferByInputCode(it.transaction.input) {
-				val contract = it.transaction.to
+		GoldStoneEthCall.getTransactionByHash(currentHash) { transaction ->
+			if (transaction.isERC20) {
+				val contract = transaction.to
 				GoldStoneEthCall.getTokenBalanceWithContract(
 					contract, WalletTable.current.address
 				) { balance ->
@@ -356,7 +338,7 @@ class TransactionDetailPresenter(
 						callback()
 					}
 				}
-			} isFalse {
+			} else {
 				GoldStoneEthCall.getEthBalance(WalletTable.current.address) {
 					MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, CryptoSymbol.eth)
 					callback()
@@ -371,18 +353,20 @@ class TransactionDetailPresenter(
 	private fun onTransactionSucceed() {
 		data?.apply {
 			updateHeaderValue(count, address, token.symbol, false, false)
-			transactionObserver!!.unsubscribe()
-			transactionObserver = null
-			fragment.getTransactionFromChain(taxHash)
+			fragment.getTransactionFromChain()
+		}
+
+		dataFromList?.apply {
+			updateHeaderValue(count, addressName, symbol, false, false)
+			fragment.getTransactionFromChain()
 		}
 	}
 
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
 	private fun TransactionDetailFragment.getTransactionFromChain(
-		taxHash: String,
 		callback: () -> Unit = {}
 	) {
-		web3j.ethGetTransactionReceipt(taxHash).sendAsync().get().transactionReceipt?.let {
+		GoldStoneEthCall.getTransactionByHash(currentHash) {
 			context?.runOnUiThread {
 				asyncData?.clear()
 				asyncData?.addAll(generateModels(it))
@@ -390,7 +374,7 @@ class TransactionDetailPresenter(
 				callback()
 			}
 			// 成功获取数据后在异步线程更新数据库记录
-			updateDataInDatabase(it)
+			updateDataInDatabase(it.blockNumber)
 		}
 	}
 
@@ -398,7 +382,7 @@ class TransactionDetailPresenter(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
-		web3j.ethGetTransactionByHash(info.hash).sendAsync().get().transaction?.let { receipt ->
+		GoldStoneEthCall.getTransactionByHash(currentHash) { receipt ->
 			context?.runOnUiThread {
 				// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
 				val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
@@ -407,8 +391,8 @@ class TransactionDetailPresenter(
 				} isFalse {
 					val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
 					updateHeaderValue(
-						count, if (info.isReceived) receipt.from else receipt.to, CryptoSymbol.eth, false,
-						info.isReceived
+						count, if (info.isReceived) receipt.fromAddress else receipt.to, CryptoSymbol.eth,
+						false, info.isReceived
 					)
 				}
 
@@ -422,12 +406,12 @@ class TransactionDetailPresenter(
 
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
-		receipt: Transaction,
+		receipt: TransactionTable,
 		transaction: InputCodeData,
 		isReceive: Boolean
 	) {
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
-			val address = if (isReceive) receipt.from else transaction.address
+			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
 					val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
@@ -441,30 +425,28 @@ class TransactionDetailPresenter(
 	}
 
 	// 从通知中心进入的, 使用 `web3` 获取的 `Transaction` 转换成标准的使用格式
-	private fun Transaction.toAsyncData(): ArrayList<TransactionDetailModel> {
-		web3j.ethGetBlockByHash(blockHash, true).sendAsync().get().result.let { block ->
-			val receiptData = arrayListOf(
-				(gas * gasPrice).toDouble().toEthValue(), "There isn't a memo", hash, blockNumber,
-				formatDate(block.timestamp.toLong()), EtherScanApi.transactionsByHash(hash)
-			)
-			arrayListOf(
-				TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
-				TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
-			).mapIndexed { index, it ->
-				TransactionDetailModel(receiptData[index].toString(), it)
-			}.let {
-				return it.toArrayList()
-			}
+	private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
+		val receiptData = arrayListOf(
+			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(), "There isn't a memo",
+			hash, blockNumber, formatDate(30000000L), EtherScanApi.transactionsByHash(hash)
+		)
+		arrayListOf(
+			TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
+			TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
+		).mapIndexed { index, it ->
+			TransactionDetailModel(receiptData[index], it)
+		}.let {
+			return it.toArrayList()
 		}
 	}
 
 	// 自动监听交易完成后, 将转账信息插入数据库
-	private fun updateDataInDatabase(data: TransactionReceipt) {
+	private fun updateDataInDatabase(blockNumber: String) {
 		GoldStoneDataBase.database.transactionDao().apply {
-			getTransactionByTaxHash(data.transactionHash).let {
+			getTransactionByTaxHash(currentHash).let {
 				it.forEach {
 					update(it.apply {
-						blockNumber = data.blockNumber.toString()
+						this.blockNumber = blockNumber
 						isPending = false
 						hasError = "0"
 						txreceipt_status = "1"

@@ -16,6 +16,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.QRText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
@@ -64,7 +65,7 @@ open class QRCodePresenter(
 				val bitmap = barcodeEncoder.encodeBitmap(content, BarcodeFormat.QR_CODE, size, size)
 				// 防止生成 bitmap 有一定概率太慢, 这里延时保存一下
 				300L timeUpThen { saveImage(bitmap, fragment, hold) }
-				fragment.toast("QR code image has saved to album")
+				fragment.toast(QRText.savedAttention)
 			}
 		}
 
@@ -76,7 +77,7 @@ open class QRCodePresenter(
 				val intent = Intent(Intent.ACTION_SEND)
 				intent.type = "image/*"
 				intent.putExtra(Intent.EXTRA_STREAM, it)
-				fragment.activity?.startActivity(Intent.createChooser(intent, "Share QR Image"))
+				fragment.activity?.startActivity(Intent.createChooser(intent, QRText.shareQRTitle))
 			}
 		}
 
@@ -86,7 +87,7 @@ open class QRCodePresenter(
 			integrator.setOrientationLocked(false)
 			integrator.captureActivity = CaptureActivity::class.java
 			integrator.setCameraId(0)
-			integrator.setPrompt("Scan QR Code GoldStone")
+			integrator.setPrompt(QRText.screenText)
 			integrator.setBeepEnabled(true)
 			integrator.setBarcodeImageEnabled(true)
 			integrator.initiateScan()

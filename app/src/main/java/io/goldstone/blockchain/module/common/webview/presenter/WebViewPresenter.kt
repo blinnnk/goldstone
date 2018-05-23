@@ -9,7 +9,5 @@ import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
  */
 
 class WebViewPresenter(
-  override val fragment: WebViewFragment
-  ) : BasePresenter<WebViewFragment>() {
-
-}
+	override val fragment: WebViewFragment
+) : BasePresenter<WebViewFragment>()

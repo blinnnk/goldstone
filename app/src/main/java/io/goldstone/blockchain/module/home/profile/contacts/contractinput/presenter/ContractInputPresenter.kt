@@ -9,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -34,12 +35,12 @@ class ContractInputPresenter(
 	fun addContact() {
 
 		if (nameText.isEmpty()) {
-			fragment.context?.alert("You must enter a contact name")
+			fragment.context?.alert(ContactText.emptyNameAlert)
 			return
 		}
 
 		if (addressText.isEmpty()) {
-			fragment.context?.alert("You must enter a wallet address")
+			fragment.context?.alert(ContactText.emptyAddressAlert)
 			return
 		}
 
@@ -53,14 +54,16 @@ class ContractInputPresenter(
 			}
 		} else {
 			if (nameText.isNotEmpty()) {
-				fragment.context?.alert("Wrong Address Format")
+				fragment.context?.alert(ContactText.wrongAddressFormat)
 				return
 			}
 		}
 	}
 
 	fun setConfirmButtonStyle(
-		nameInput: EditText, addressInput: EditText, confirmButton: RoundButton
+		nameInput: EditText,
+		addressInput: EditText,
+		confirmButton: RoundButton
 	) {
 		nameInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
@@ -68,8 +71,20 @@ class ContractInputPresenter(
 				setStyle(confirmButton)
 			}
 
-			override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
-			override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
 
 			}
 		})
@@ -80,8 +95,21 @@ class ContractInputPresenter(
 				setStyle(confirmButton)
 			}
 
-			override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
-			override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
 		})
 	}
 

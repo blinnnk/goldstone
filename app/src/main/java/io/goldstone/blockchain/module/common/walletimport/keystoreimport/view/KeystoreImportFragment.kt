@@ -85,7 +85,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					}
 				}.into(this)
 
-				textView("What is keystore?") {
+				textView(QAText.whatIsKeystore) {
 					textSize = fontSize(15)
 					typeface = GoldStoneFont.heavy(context)
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {

@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContractInputPresenter
@@ -41,14 +42,14 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			nameInput.apply {
-				title = "Contact Name"
+				title = ContactText.contactName
 				setTextInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 			}.into(this)
 
 			addressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = "Enter Address That You Want To Store"
+				hint = ContactText.hint
 			}.into(this)
 
 			confirmButton.apply {

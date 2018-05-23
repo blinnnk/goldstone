@@ -95,7 +95,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				}.into(this)
 
 
-				textView("What is mnemonic?") {
+				textView(QAText.whatIsMnemonic) {
 					textSize = fontSize(15)
 					typeface = GoldStoneFont.heavy(context)
 					layoutParams = LinearLayout.LayoutParams(

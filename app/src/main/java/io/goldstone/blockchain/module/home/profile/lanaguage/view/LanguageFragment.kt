@@ -25,9 +25,7 @@ class LanguageFragment : BaseRecyclerFragment<LanguagePresenter, LanguageModel>(
 		recyclerView.adapter = LanguageAdapter(asyncData.orEmptyArray()) { item, _ ->
 			item.apply {
 				onClick {
-					presenter.setLanguage(model.name) {
-						setSwitchStatusBy(this)
-					}
+					presenter.setLanguage(model.name) { setSwitchStatusBy(this) }
 					preventDuplicateClicks()
 				}
 			}

@@ -23,8 +23,10 @@ class LanguagePresenter(
 
 	override fun updateData() {
 		fragment.asyncData = arrayListOf(
-			LanguageModel(HoneyLanguage.English.language), LanguageModel(HoneyLanguage.Chinese.language),
-			LanguageModel(HoneyLanguage.Japanese.language), LanguageModel(HoneyLanguage.Russian.language),
+			LanguageModel(HoneyLanguage.English.language),
+			LanguageModel(HoneyLanguage.Chinese.language),
+			LanguageModel(HoneyLanguage.Japanese.language),
+			LanguageModel(HoneyLanguage.Russian.language),
 			LanguageModel(HoneyLanguage.Korean.language)
 		)
 	}

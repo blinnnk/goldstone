@@ -2,9 +2,12 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -12,6 +15,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.json.JSONObject
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -60,7 +64,8 @@ data class TransactionTable(
 	var gasUsed: String,
 	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String, var isReceive: Boolean,
+	private var confirmations: String,
+	var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -123,6 +128,33 @@ data class TransactionTable(
 		data.to,
 		false,
 		data.logIndex
+	)
+
+	// 这个是专门为入账的 `ERC20 Token` 准备的
+	constructor(data: JSONObject) : this(
+		0,
+		data.safeGet("blockNumber"),
+		"",
+		data.safeGet("hash"),
+		data.safeGet("nonce").toDecimalFromHex(),
+		data.safeGet("blockHash"),
+		data.safeGet("transactionIndex").toDecimalFromHex(),
+		data.safeGet("from"),
+		data.safeGet("to"),
+		data.safeGet("value").toDecimalFromHex(),
+		data.safeGet("gas").toDecimalFromHex(),
+		data.safeGet("gasPrice").toDecimalFromHex(),
+		"0",
+		"1",
+		data.safeGet("input"),
+		if(CryptoUtils.isERC20TransferByInputCode(data.safeGet("input"))) data.safeGet("to") else "0x0",
+		"",
+		"",
+		"",
+		data.safeGet("from") != WalletTable.current.address,
+		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
+		"",
+		""
 	)
 
 	companion object {

@@ -9,8 +9,10 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Count
+import io.goldstone.blockchain.common.value.PincodeText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
@@ -25,11 +27,14 @@ class PinCodeEditorPresenter(
 	override val fragment: PinCodeEditorFragment
 ) : BasePresenter<PinCodeEditorFragment>() {
 
-	fun setShowPinCodeStatus(status: Boolean, callback: (Boolean) -> Unit = {}) {
+	fun setShowPinCodeStatus(
+		status: Boolean,
+		callback: (Boolean) -> Unit = {}
+	) {
 		AppConfigTable.apply {
 			getAppConfig {
 				if (it?.pincode.isNull()) {
-					fragment.context?.alert("please set your pin code on below")
+					fragment.context?.alert(PincodeText.turnOnAttention)
 					callback(false)
 					return@getAppConfig
 				}
@@ -41,26 +46,28 @@ class PinCodeEditorPresenter(
 	}
 
 	fun resetPinCode(
-		newPinCode: EditText, repeatPinCode: EditText, switch: HoneyBaseSwitch
+		newPinCode: EditText,
+		repeatPinCode: EditText,
+		switch: HoneyBaseSwitch
 	) {
 
 		if (newPinCode.text.isEmpty()) {
-			fragment.context?.alert("Please Enter four bit ciphers")
+			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
 
 		if (newPinCode.text.length > Count.pinCode || repeatPinCode.text.length > Count.pinCode) {
-			fragment.context?.alert("Please Enter four bit ciphers")
+			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
 
 		if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
-			fragment.context?.alert("New pin decode with repeat pin code isn't same, please check")
+			fragment.context?.alert(PincodeText.verifyAlert)
 			return
 		}
 
 		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
-			fragment.context?.alert("Succeed")
+			fragment.context?.alert(CommonText.succeed)
 			setShowPinCodeStatus(true)
 			switch.isChecked = true
 		}

@@ -28,9 +28,10 @@ import org.jetbrains.anko.*
 
 class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 
+	val confirmButton by lazy { RoundButton(context!!) }
+
 	private val newPinCode by lazy { RoundInput(context!!) }
 	private val repeatPinCode by lazy { RoundInput(context!!) }
-	val confirmButton by lazy { RoundButton(context!!) }
 	private val switch by lazy { HoneyBaseSwitch(context!!) }
 
 	override val presenter = PinCodeEditorPresenter(this)
