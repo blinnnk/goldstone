@@ -35,17 +35,17 @@ class ContractInputPresenter(
 
 		if (nameText.isEmpty()) {
 			fragment.context?.alert("You must enter a contact name")
+			return
 		}
 
 		if (addressText.isEmpty()) {
 			fragment.context?.alert("You must enter a wallet address")
+			return
 		}
 
 		if (WalletUtils.isValidAddress(addressText) && nameText.isNotEmpty()) {
 			ContactTable.insertContact(
-				ContactTable(
-					0, "", nameText, addressText
-				)
+				ContactTable(0, "", nameText, addressText)
 			) {
 				fragment.getParentFragment<ProfileOverlayFragment> {
 					presenter.popFragmentFrom<ContractInputFragment>()
@@ -54,6 +54,7 @@ class ContractInputPresenter(
 		} else {
 			if (nameText.isNotEmpty()) {
 				fragment.context?.alert("Wrong Address Format")
+				return
 			}
 		}
 	}
