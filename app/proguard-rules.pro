@@ -205,6 +205,8 @@
 
 # PBKDF2withHmacSHA512
 -keep class org.spongycastle.** { *; }
+#-keep class java.security.spec.**  { *; }
+#-keep class sun.security.jca.** { *; }
 
 # V8 Render
 -keep class android.support.v8.renderscript.** { *; }
