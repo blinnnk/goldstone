@@ -44,7 +44,7 @@ class AddressSelectionPresenter(
 	}
 
 	fun showPaymentPrepareFragmentByQRCode(result: String) {
-		val minERC20ResultCount = 100
+		val minERC20ResultLength = 100
 		val content = result.orEmpty()
 		// 不符合标准的长度直接返回
 		if (content.length < CryptoValue.bip39AddressLength || content.substring(0, 2) != "0x") {
@@ -79,7 +79,7 @@ class AddressSelectionPresenter(
 				}
 
 				// 准备 `Contract` 信息, 如果包含有 `token` 关键字就是 `ERC20` 否则是 `ETH`
-				val contract = if (content.contains(token) && content.length >= minERC20ResultCount) {
+				val contract = if (content.contains(token) && content.length >= minERC20ResultLength) {
 					content.substring(content.length - CryptoValue.bip39AddressLength, content.length)
 				} else {
 					ethContract

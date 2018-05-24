@@ -86,7 +86,11 @@ fun <T : List<String>> T.toJsonArray(callback: (JsonArray) -> Unit) {
 	}
 }
 
-fun String.getDecimalCount(): Int {
-	val integerPlaces = indexOf('.')
-	return length - integerPlaces - 1
+fun String.getDecimalCount(): Int? {
+	return if (contains('.')) {
+		val integerPlaces = indexOf('.')
+		length - integerPlaces - 1
+	} else {
+		null
+	}
 }

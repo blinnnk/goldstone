@@ -105,6 +105,7 @@ fun Context.getWalletByPrivateKey(
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
+	errorCallback: () -> Unit = {},
 	hold: (String) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
@@ -115,6 +116,7 @@ fun Context.getKeystoreFile(
 				try {
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
+					errorCallback()
 					runOnUiThread { alert(CommonText.wrongPassword) }
 					LogUtil.error("function: getKeystoreFile $error")
 				}
@@ -126,9 +128,10 @@ fun Context.getKeystoreFile(
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
+	errorCallback: () -> Unit = {},
 	hold: (String) -> Unit
 ) {
-	getKeystoreFile(walletAddress, password) {
+	getKeystoreFile(walletAddress, password, errorCallback) {
 		try {
 			Wallet.decrypt(password, DecryptKeystore.GenerateFile(it.convertKeystoreToModel())).let {
 				hold(it.privateKey.toString(16))

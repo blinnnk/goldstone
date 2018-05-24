@@ -36,6 +36,7 @@ import org.web3j.crypto.Credentials
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionEncoder
 import org.web3j.utils.Numeric
+import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
@@ -43,7 +44,10 @@ import java.math.BigInteger
  * @author KaySaith
  */
 
-enum class MinerFeeType(val content: String, var value: Long) {
+enum class MinerFeeType(
+	val content: String,
+	var value: Long
+) {
 	Recommend("recommend", 30),
 	Cheap("cheap", 1),
 	Fast("fast", 100),
@@ -72,8 +76,8 @@ class GasSelectionPresenter(
 		)
 	}
 
-	fun getTransferCount(): Double {
-		return prepareModel?.count.orElse(0.0)
+	fun getTransferCount(): BigDecimal {
+		return prepareModel?.count?.toBigDecimal() ?: BigDecimal.ZERO
 	}
 
 	/**
@@ -86,7 +90,9 @@ class GasSelectionPresenter(
 	) {
 		doAsync {
 			// 获取当前账户的私钥
-			fragment.context?.getPrivateKey(WalletTable.current.address, password) { privateKey ->
+			fragment.context?.getPrivateKey(
+				WalletTable.current.address, password, callback
+			) { privateKey ->
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
 						nounce, getSelectedGasPrice(currentMinnerType),
@@ -227,8 +233,8 @@ class GasSelectionPresenter(
 
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
-				TokenDetailText.paymentValue, Bundle().apply {
+			presenter.showTargetFragment<GasEditorFragment>(
+				TokenDetailText.customGas, TokenDetailText.paymentValue, Bundle().apply {
 					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
 				})
 		}

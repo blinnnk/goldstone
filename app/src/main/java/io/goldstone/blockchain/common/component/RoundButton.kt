@@ -8,12 +8,14 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 
 /**
@@ -36,27 +38,20 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		invalidate()
 	}
 
-	private var loadingView: ProgressBar? = null
-
 	init {
 		setWillNotDraw(false)
 		textPaint.isAntiAlias = true
 		textPaint.style = Paint.Style.FILL
 		textPaint.typeface = GoldStoneFont.heavy(context)
 		elevation = shadowSize
-
 	}
 
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-
 		val textX = (width - textPaint.measureText(text)) / 2
 		val textY = (height + textSize) / 2 - 2.uiPX()
-		canvas?.drawText(
-			text, textX, textY, textPaint
-		)
-
+		canvas?.drawText(text, textX, textY, textPaint)
 		canvas?.save()
 	}
 
@@ -65,23 +60,34 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		color: Int = Spectrum.white,
 		recoveryText: String = CommonText.confirm
 	) {
-		if (needToShow && loadingView.isNull()) {
+		if (needToShow) {
 			isEnabled = false
 			text = ""
-			loadingView = ProgressBar(
-				this.context, null, android.R.attr.progressBarStyleInverse
-			).apply {
-				indeterminateDrawable.setColorFilter(
-					color, android.graphics.PorterDuff.Mode.MULTIPLY
-				)
-				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-				setCenterInParent()
+			try {
+				if (findViewById<ProgressBar>(ElementID.buttonLoading).isNull()) {
+					ProgressBar(
+						context, null, android.R.attr.progressBarStyleInverse
+					).apply {
+						id = ElementID.buttonLoading
+						indeterminateDrawable.setColorFilter(
+							color, android.graphics.PorterDuff.Mode.MULTIPLY
+						)
+						layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+						setCenterInParent()
+					}.into(this)
+				}
+			} catch (error: Exception) {
+				LogUtil.error("position: RoundButton error: $error")
 			}
-			addView(loadingView)
 		}
-		if (!needToShow && !loadingView.isNull()) {
-			removeView(loadingView)
-			loadingView = null
+		if (!needToShow) {
+			try {
+				findViewById<ProgressBar>(ElementID.buttonLoading)?.let {
+					removeView(it)
+				}
+			} catch (error: Exception) {
+				LogUtil.error("position: RoundButton error: $error")
+			}
 			text = recoveryText
 			isEnabled = true
 		}
