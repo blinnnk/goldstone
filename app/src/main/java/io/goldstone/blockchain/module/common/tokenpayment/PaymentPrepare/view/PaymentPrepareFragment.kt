@@ -63,7 +63,9 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 					addView(inputView.apply {
 						backgroundColor = Color.RED
-						setInputValue(count)
+						if (count > 0) {
+							setInputValue(count)
+						}
 					})
 
 					TopBottomLineCell(context).apply {
@@ -137,6 +139,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		updateValueTotalPrice()
 		resetBackButtonEvent()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		inputView.setFoucs()
 	}
 
 	fun getMemoContent(): String {

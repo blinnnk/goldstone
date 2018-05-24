@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.PorterDuff
 import android.text.Editable
@@ -15,6 +16,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.orElse
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
@@ -132,5 +134,11 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	fun getValue(): String {
 		return valueInput.text.toString()
 	}
+
+	fun setFoucs() {
+		valueInput.requestFocus()
+		(context as? Activity)?.apply { SoftKeyboard.show(this, valueInput) }
+	}
+
 
 }

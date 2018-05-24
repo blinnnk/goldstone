@@ -13,9 +13,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getDecimalCount
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.PrepareTransferText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
@@ -72,7 +70,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 					onClick {
 						showLoadingStatus()
 						confirmTransfer {
-							showLoadingStatus(false)
+							showLoadingStatus(false, Spectrum.white, CommonText.next)
 						}
 					}
 				}
@@ -95,7 +93,10 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	private fun confirmTransfer(callback: () -> Unit) {
 		val token = getParentFragment<TokenDetailOverlayFragment>()?.token
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
-		if (!presenter.getTransferCount().toString().checkDecimalIsvalid(token)) return
+		if (!presenter.getTransferCount().toString().checkDecimalIsvalid(token)) {
+			callback()
+			return
+		}
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
 			MyTokenTable.getBalanceWithSymbol(
@@ -109,13 +110,13 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	}
 
 	private fun String.checkDecimalIsvalid(token: WalletDetailCellModel?): Boolean {
-		return if (getDecimalCount() > token?.decimal.orElse(0.0)) {
-			context?.alert(
-				"The value's decimal you inputed is bigger than this currency token's decimal please re-input"
-			)
-			false
-		} else {
-			true
+		return when {
+			getDecimalCount().isNull() -> return true
+			getDecimalCount().orZero() > token?.decimal.orElse(0.0) -> {
+				context?.alert(AlertText.transferWrongDecimal)
+				false
+			}
+			else -> true
 		}
 	}
 
@@ -123,29 +124,27 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		balance: Double,
 		callback: () -> Unit
 	) {
-		if (presenter.getTransferCount() <= 0) {
+		if (presenter.getTransferCount().toDouble() <= 0) {
 			callback()
-			alert("Please Enter Your Transfer Value")
+			alert(AlertText.emptyTransferValue)
 		} else {
-			if (balance > presenter.getTransferCount()) {
+			if (balance > presenter.getTransferCount().toDouble()) {
 				footer.setCanUseStyle(true)
 				showConfirmAttentionView(callback)
 			} else {
 				callback()
-				alert("You haven't enough currency to transfer")
+				alert(AlertText.balanceNotEnough)
 			}
 		}
 	}
 
 	private fun showConfirmAttentionView(callback: () -> Unit) {
-		context?.showAlertView(TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(), true, {
-				// 点击 `Alert` 取消按钮a
+		context?.showAlertView(
+			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase(), true, {
+				// 点击 `Alert` 取消按钮
 				footer.getConfirmButton { showLoadingStatus(false) }
 			}) {
-			presenter.transfer(
-				it?.text.toString(), callback
-			)
+			presenter.transfer(it?.text.toString(), callback)
 		}
 	}
 

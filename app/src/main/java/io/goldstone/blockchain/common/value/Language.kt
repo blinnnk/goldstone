@@ -831,6 +831,39 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額\n"
 		else -> "There isn't network found, Importing Wallet need network to check the value of it"
 	}
+
+	@JvmField
+	val balanceNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "You haven't enough currency to transfer"
+		HoneyLanguage.Chinese.code -> "You haven't enough currency to transfer"
+		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer"
+		HoneyLanguage.Korean.code -> "You haven't enough currency to transfer"
+		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer"
+		HoneyLanguage.TraditionalChinese.code -> "You haven't enough currency to transfer"
+		else -> "You haven't enough currency to transfer"
+	}
+
+	@JvmField
+	val transferWrongDecimal = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		HoneyLanguage.Chinese.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		HoneyLanguage.Japanese.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		HoneyLanguage.Korean.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		HoneyLanguage.Russian.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		HoneyLanguage.TraditionalChinese.code -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+		else -> "The value's decimal you inputed is bigger than this currency token's decimal please re-input"
+	}
+
+	@JvmField
+	val emptyTransferValue = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please Enter Your Transfer Value"
+		HoneyLanguage.Chinese.code -> "Please Enter Your Transfer Value"
+		HoneyLanguage.Japanese.code -> "Please Enter Your Transfer Value"
+		HoneyLanguage.Korean.code -> "Please Enter Your Transfer Value"
+		HoneyLanguage.Russian.code -> "Please Enter Your Transfer Value"
+		HoneyLanguage.TraditionalChinese.code -> "Please Enter Your Transfer Value"
+		else -> "Please Enter Your Transfer Value"
+	}
 }
 
 object CurrentWalletText {

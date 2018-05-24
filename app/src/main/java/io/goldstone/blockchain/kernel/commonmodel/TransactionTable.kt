@@ -133,7 +133,7 @@ data class TransactionTable(
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: JSONObject) : this(
 		0,
-		data.safeGet("blockNumber"),
+		data.safeGet("blockNumber").toDecimalFromHex(),
 		"",
 		data.safeGet("hash"),
 		data.safeGet("nonce").toDecimalFromHex(),

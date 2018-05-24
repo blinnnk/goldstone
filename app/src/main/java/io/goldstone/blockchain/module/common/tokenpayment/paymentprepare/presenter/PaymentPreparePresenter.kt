@@ -5,7 +5,6 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
-import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -14,7 +13,6 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
@@ -23,9 +21,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.Pa
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.web3j.protocol.Web3jFactory
-import org.web3j.protocol.core.methods.request.Transaction
-import org.web3j.protocol.http.HttpService
 import org.web3j.utils.Convert
 import java.math.BigInteger
 import kotlin.math.max
@@ -39,7 +34,6 @@ class PaymentPreparePresenter(
 	override val fragment: PaymentPrepareFragment
 ) : BasePresenter<PaymentPrepareFragment>() {
 
-	private val web3j = Web3jFactory.build(HttpService(APIPath.ropstan))
 	private var currentToken: WalletDetailCellModel? = null
 	private var currentNonce: BigInteger? = null
 
@@ -52,11 +46,12 @@ class PaymentPreparePresenter(
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
 			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
+			callback()
 		} else {
 			getPaymentPrepareModel(count, fragment.getMemoContent()) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-					presenter.showTargetFragment<GasSelectionFragment>(
-						TokenDetailText.customGas, TokenDetailText.paymentValue, Bundle().apply {
+					presenter.showTargetFragment<GasSelectionFragment>(TokenDetailText.customGas,
+						TokenDetailText.paymentValue, Bundle().apply {
 							putSerializable(ArgumentKey.gasPrepareModel, model)
 						})
 					callback()
@@ -118,7 +113,8 @@ class PaymentPreparePresenter(
 		}
 
 		GoldStoneEthCall.getTransactionExecutedValue(
-			to, WalletTable.current.address, data) { limit ->
+			to, WalletTable.current.address, data
+		) { limit ->
 			hold(
 				PaymentPrepareModel(
 					currentNonce!!, limit, to, countWithDecimal, value, data, fragment.address!!,
