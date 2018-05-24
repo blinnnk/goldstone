@@ -4,7 +4,6 @@ package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
@@ -143,12 +142,10 @@ object GoldStoneEthCall {
 				"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
 			)
 		).let {
-			System.out.println("begin")
 			callEthBy(it) {
 				val data = it.toJsonObject()
 				if (data.safeGet("transactionIndex").toDecimalFromHex().toIntOrNull().orZero() == 0) {
 					unfinishedCallback()
-					System.out.println("shit _______+++++")
 				} else {
 					holdValue(TransactionTable(data))
 				}
@@ -308,7 +305,6 @@ object GoldStoneEthCall {
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
-						System.out.println("hey")
 						errorCallback()
 						LogUtil.error("path: callEthBy $error")
 					}

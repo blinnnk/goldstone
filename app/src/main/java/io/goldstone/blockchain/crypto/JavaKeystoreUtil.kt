@@ -14,7 +14,7 @@ import java.security.PrivateKey
 import javax.crypto.Cipher.*
 
 class JavaKeystoreUtil(
-	private val keyStoreAlias: String
+	private val keyStoreAlias: String = "skipBackUp"
 ) {
 
 	private val keyStore: KeyStore

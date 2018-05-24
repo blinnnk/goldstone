@@ -105,7 +105,7 @@ class WalletSettingsPresenter(
 					it?.apply {
 						encryptMnemonic?.let {
 							setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-							val mnemonicCode = JavaKeystoreUtil("skipBackUp").decryptData(it)
+							val mnemonicCode = JavaKeystoreUtil().decryptData(it)
 							replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
 								putString(ArgumentKey.mnemonicCode, mnemonicCode)
 							}

@@ -28,9 +28,12 @@ class MnemonicConfirmationPresenter(
 	override val fragment: MnemonicConfirmationFragment
 ) : BasePresenter<MnemonicConfirmationFragment>() {
 
-	fun clickConfirmationButton(correct: String, current: String) {
+	fun clickConfirmationButton(
+		correct: String,
+		current: String
+	) {
 		compareMnemonicCode(correct, current) isTrue {
-			validAndContinue()
+			validAndContinue(correct)
 		} otherwise {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}
@@ -43,8 +46,9 @@ class MnemonicConfirmationPresenter(
 		return correct.equals(current, true)
 	}
 
-	private fun validAndContinue() {
+	private fun validAndContinue(mnemonic: String) {
 		val currentActivity = fragment.activity
+
 		when (currentActivity) {
 			is MainActivity -> {
 				fragment.getParentFragment<WalletSettingsFragment> {
@@ -61,10 +65,14 @@ class MnemonicConfirmationPresenter(
 			}
 
 			is SplashActivity -> {
-				fragment.activity?.jump<SplashActivity>()
+				WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(
+					mnemonic
+				) {
+					fragment.activity?.jump<SplashActivity>()
+				}
 			}
 		}
-		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp()
+
 	}
 
 	private fun Context.showSucceedDialog(callback: () -> Unit) {
