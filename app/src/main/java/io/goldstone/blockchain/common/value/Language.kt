@@ -845,13 +845,13 @@ object AlertText {
 
 	@JvmField
 	val balanceNotEnough = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Chinese.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Korean.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.TraditionalChinese.code -> "You haven't enough currency to transfer"
-		else -> "You haven't enough currency to transfer"
+		HoneyLanguage.English.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Chinese.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Korean.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.TraditionalChinese.code -> "You haven't enough currency to transfer and gas fee"
+		else -> "You haven't enough currency to transfer and gas fee"
 	}
 
 	@JvmField

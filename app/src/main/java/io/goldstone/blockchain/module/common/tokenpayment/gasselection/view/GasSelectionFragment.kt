@@ -1,27 +1,26 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
-import android.content.Context
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GraySqualCell
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getDecimalCount
-import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.PrepareTransferText
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -69,7 +68,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 				getConfirmButton {
 					onClick {
 						showLoadingStatus()
-						confirmTransfer {
+						presenter.confirmTransfer(footer) {
 							showLoadingStatus(false, Spectrum.white, CommonText.next)
 						}
 					}
@@ -88,64 +87,6 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 
 	fun setSpendingValue(value: String) {
 		spendingCell.setSubtitle(value)
-	}
-
-	private fun confirmTransfer(callback: () -> Unit) {
-		val token = getParentFragment<TokenDetailOverlayFragment>()?.token
-		// 如果输入的 `Decimal` 不合规就提示竞购并返回
-		if (!presenter.getTransferCount().toString().checkDecimalIsvalid(token)) {
-			callback()
-			return
-		}
-		// 检查网络并执行转账操作
-		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			MyTokenTable.getBalanceWithSymbol(
-				token?.symbol!!, WalletTable.current.address, true
-			) { balance ->
-				context?.runOnUiThread {
-					showAlertOrTransfer(balance, callback)
-				}
-			}
-		}
-	}
-
-	private fun String.checkDecimalIsvalid(token: WalletDetailCellModel?): Boolean {
-		return when {
-			getDecimalCount().isNull() -> return true
-			getDecimalCount().orZero() > token?.decimal.orElse(0.0) -> {
-				context?.alert(AlertText.transferWrongDecimal)
-				false
-			}
-			else -> true
-		}
-	}
-
-	private fun Context.showAlertOrTransfer(
-		balance: Double,
-		callback: () -> Unit
-	) {
-		if (presenter.getTransferCount().toDouble() <= 0) {
-			callback()
-			alert(AlertText.emptyTransferValue)
-		} else {
-			if (balance > presenter.getTransferCount().toDouble()) {
-				footer.setCanUseStyle(true)
-				showConfirmAttentionView(callback)
-			} else {
-				callback()
-				alert(AlertText.balanceNotEnough)
-			}
-		}
-	}
-
-	private fun showConfirmAttentionView(callback: () -> Unit) {
-		context?.showAlertView(
-			TransactionText.confirmTransaction, CommonText.enterPassword.toUpperCase(), true, {
-				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton { showLoadingStatus(false) }
-			}) {
-			presenter.transfer(it?.text.toString(), callback)
-		}
 	}
 
 	override fun setBackEvent(

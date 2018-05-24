@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
@@ -144,7 +145,7 @@ object GoldStoneEthCall {
 		).let {
 			callEthBy(it) {
 				val data = it.toJsonObject()
-				if (data.safeGet("transactionIndex").toDecimalFromHex().toIntOrNull().orZero() == 0) {
+				if (data.safeGet("blockNumber").toDecimalFromHex().toIntOrNull().isNull()) {
 					unfinishedCallback()
 				} else {
 					holdValue(TransactionTable(data))
