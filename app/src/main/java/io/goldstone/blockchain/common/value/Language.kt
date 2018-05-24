@@ -311,6 +311,28 @@ object DialogText {
 		HoneyLanguage.TraditionalChinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
 		else -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
 	}
+
+	@JvmField
+	val networkTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Network Browken"
+		HoneyLanguage.Chinese.code -> "Network Browken"
+		HoneyLanguage.Japanese.code -> "Network Browken"
+		HoneyLanguage.Korean.code -> "Network Browken"
+		HoneyLanguage.Russian.code -> "Network Browken"
+		HoneyLanguage.TraditionalChinese.code -> "Network Browken"
+		else -> "Network Browken"
+	}
+
+	@JvmField
+	val networkDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Chinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Japanese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Korean.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Russian.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.TraditionalChinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		else -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+	}
 }
 
 object WalletText {

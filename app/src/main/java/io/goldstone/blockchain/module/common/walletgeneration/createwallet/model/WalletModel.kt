@@ -88,7 +88,9 @@ data class WalletTable(
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					getAllWallets().let {
-						it.find { JavaKeystoreUtil().decryptData(it.encryptMnemonic!!) == mnemonic }?.let {
+						it.findLast {
+							JavaKeystoreUtil().decryptData(it.encryptMnemonic!!) == mnemonic
+						}?.let {
 							update(it.apply {
 								this.encryptMnemonic = null
 								hasBackUpMnemonic = true

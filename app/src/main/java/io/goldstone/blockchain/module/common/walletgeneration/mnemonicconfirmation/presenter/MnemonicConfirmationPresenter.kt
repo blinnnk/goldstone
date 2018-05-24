@@ -48,31 +48,29 @@ class MnemonicConfirmationPresenter(
 
 	private fun validAndContinue(mnemonic: String) {
 		val currentActivity = fragment.activity
+		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(
+			mnemonic
+		) {
+			when (currentActivity) {
+				is MainActivity -> {
+					fragment.getParentFragment<WalletSettingsFragment> {
+						context?.showSucceedDialog {
+							presenter.removeSelfFromActivity()
+						}
+					}
 
-		when (currentActivity) {
-			is MainActivity -> {
-				fragment.getParentFragment<WalletSettingsFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
+					fragment.getParentFragment<WalletGenerationFragment> {
+						context?.showSucceedDialog {
+							presenter.removeSelfFromActivity()
+						}
 					}
 				}
 
-				fragment.getParentFragment<WalletGenerationFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
-					}
-				}
-			}
-
-			is SplashActivity -> {
-				WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(
-					mnemonic
-				) {
+				is SplashActivity -> {
 					fragment.activity?.jump<SplashActivity>()
 				}
 			}
 		}
-
 	}
 
 	private fun Context.showSucceedDialog(callback: () -> Unit) {
@@ -80,7 +78,7 @@ class MnemonicConfirmationPresenter(
 			showOnlyConfirmButton {
 				GoldStoneDialog.remove(context)
 			}
-			setImage(R.drawable.alert_banner)
+			setImage(R.drawable.succeed_banner)
 			setContent(CommonText.succeed, DialogText.backUpMnemonicSucceed)
 		}
 		callback()
