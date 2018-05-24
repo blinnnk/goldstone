@@ -875,6 +875,28 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "Please Enter Your Transfer Value"
 		else -> "Please Enter Your Transfer Value"
 	}
+
+	@JvmField
+	val gasEditorEmpty = when (currentLanguage) {
+		HoneyLanguage.English.code -> "You have to set gas price or gas limit"
+		HoneyLanguage.Chinese.code -> "You have to set gas price or gas limit"
+		HoneyLanguage.Japanese.code -> "You have to set gas price or gas limit"
+		HoneyLanguage.Korean.code -> "You have to set gas price or gas limit"
+		HoneyLanguage.Russian.code -> "You have to set gas price or gas limit"
+		HoneyLanguage.TraditionalChinese.code -> "You have to set gas price or gas limit"
+		else -> "You have to set gas price or gas limit"
+	}
+
+	@JvmField
+	val gasLimitValue = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Gas limit must more than"
+		HoneyLanguage.Chinese.code -> "Gas limit must more than"
+		HoneyLanguage.Japanese.code -> "Gas limit must more than"
+		HoneyLanguage.Korean.code -> "Gas limit must more than"
+		HoneyLanguage.Russian.code -> "Gas limit must more than"
+		HoneyLanguage.TraditionalChinese.code -> "Gas limit must more than"
+		else -> "Gas limit must more than"
+	}
 }
 
 object CurrentWalletText {

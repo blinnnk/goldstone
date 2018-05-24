@@ -4,6 +4,7 @@ import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -28,12 +29,12 @@ class GasEditorPresenter(
 
 	fun confirmGasCustom(gasPrice: Long, gasLimit: Long) {
 		if (gasPrice <= 0 || gasLimit <= 0) {
-			fragment.context?.alert("You have to set gas price or gas limit")
+			fragment.context?.alert(AlertText.gasEditorEmpty)
 			return
 		}
 
 		if (gasLimit < fragment.minLimit ?: 21000) {
-			fragment.context?.alert("Gas limit must more than ${fragment.minLimit ?: 21000}")
+			fragment.context?.alert("${AlertText.gasLimitValue} ${fragment.minLimit ?: 21000}")
 			return
 		}
 
