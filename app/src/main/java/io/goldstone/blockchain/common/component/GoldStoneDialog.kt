@@ -59,7 +59,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			image.apply {
 				scaleType = ImageView.ScaleType.CENTER_CROP
 				backgroundColor = GrayScale.whiteGray
-				layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
+				layoutParams = LinearLayout.LayoutParams(matchParent, 150.uiPX())
 			}.into(this)
 			content.apply {
 				padding = 15.uiPX()

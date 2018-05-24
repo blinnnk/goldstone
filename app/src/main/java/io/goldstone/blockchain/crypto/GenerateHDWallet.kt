@@ -162,7 +162,7 @@ fun Context.deleteAccount(
 				} catch (error: Exception) {
 					callback(false)
 					isCorrect = false
-					println(error)
+					LogUtil.error("function: DeleteAccount, error: $error")
 				}
 
 				if (isCorrect == true) {

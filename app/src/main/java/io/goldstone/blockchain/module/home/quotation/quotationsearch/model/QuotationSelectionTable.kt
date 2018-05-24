@@ -113,13 +113,18 @@ data class QuotationSelectionTable(
 		}
 
 		fun removeSelectionBy(
-			pair: String, callback: () -> Unit = {}
+			pair: String,
+			callback: () -> Unit = {}
 		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
-					getSelectionByPair(pair)?.let {
-						delete(it)
-						GoldStoneAPI.context.runOnUiThread { callback() }
+					getSelectionByPair(pair).let {
+						if (it.isNull()) {
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						} else {
+							delete(it!!)
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
 					}
 				}
 			}

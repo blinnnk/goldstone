@@ -74,14 +74,18 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			}.into(this)
 
 			confirmButton.apply {
-				text = CommonText.confirm.toUpperCase()
+				text = CommonText.confirm
 				setBlueStyle()
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 15.uiPX()
 				}
 			}.click {
-				presenter.getPrivateKeyByAddress(passwordInput) {
-					privateKeyTextView.text = this
+				it.showLoadingStatus()
+				presenter.getKeystoreByAddress(passwordInput) {
+					if (isNotEmpty()) {
+						privateKeyTextView.text = this
+					}
+					it.showLoadingStatus(false)
 				}
 			}.into(this)
 		}
