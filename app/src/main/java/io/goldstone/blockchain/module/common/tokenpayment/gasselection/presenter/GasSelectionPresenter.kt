@@ -1,35 +1,34 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.removeChildFragment
+import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.web3j.crypto.Credentials
@@ -43,16 +42,6 @@ import java.math.BigInteger
  * @date 2018/5/16 3:54 PM
  * @author KaySaith
  */
-
-enum class MinerFeeType(
-	val content: String,
-	var value: Long
-) {
-	Recommend("recommend", 30),
-	Cheap("cheap", 1),
-	Fast("fast", 100),
-	Custom("custom", 0)
-}
 
 class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
@@ -76,18 +65,84 @@ class GasSelectionPresenter(
 		)
 	}
 
-	fun getTransferCount(): BigDecimal {
-		return prepareModel?.count?.toBigDecimal() ?: BigDecimal.ZERO
+	private var currentGasUsedInEth: Double? = null
+
+	fun insertCustomGasData() {
+		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
+		currentMinnerType = MinerFeeType.Custom.content
+		if (defaultGasPrices.size == 4) {
+			defaultGasPrices.remove(defaultGasPrices.last())
+		}
+		defaultGasPrices.add(gasPrice)
+		fragment.clearGasLayout()
+		generateGasSelections(fragment.getGasLayout())
+	}
+
+	fun generateGasSelections(parent: LinearLayout) {
+		defaultGasPrices.forEachIndexed { index, minner ->
+			GasSelectionCell(parent.context).apply {
+				id = index
+				model = GasSelectionModel(
+					minner.toString().toDouble(), prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
+					currentMinnerType
+				)
+				if (model.isSelected) {
+					getGasCurrencyPrice(model.count) {
+						fragment.setSpendingValue(it)
+					}
+					/** 更新默认的燃气花销的 `ETH` 用于用户余额判断 */
+					currentGasUsedInEth = getGasEthCount(model.count)
+				}
+			}.click {
+				currentMinnerType = it.model.type
+				updateGasSettings(parent)
+				getGasCurrencyPrice(it.model.count) {
+					fragment.setSpendingValue(it)
+				}
+				/** 更新当前选择的燃气花销的 `ETH` 用于用户余额判断 */
+				currentGasUsedInEth = getGasEthCount(it.model.count)
+			}.into(parent)
+		}
+	}
+
+	fun goToGasEditorFragment() {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
+				TokenDetailText.paymentValue, Bundle().apply {
+					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
+				})
+		}
+	}
+
+	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
+		val token = fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+		// 如果输入的 `Decimal` 不合规就提示竞购并返回
+		if (!getTransferCount().toString().checkDecimalIsvalid(token)) {
+			callback()
+			return
+		}
+		// 检查网络并执行转账操作
+		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
+			MyTokenTable.getBalanceWithSymbol(
+				token?.symbol!!, WalletTable.current.address, true
+			) { balance ->
+				fragment.context?.runOnUiThread {
+					showAlertOrTransfer(balance, footer, callback)
+				}
+			}
+		}
+	}
+
+	private fun getTransferCount(): BigDecimal {
+		return prepareModel?.count?.toBigDecimal()
+			?: BigDecimal.ZERO
 	}
 
 	/**
 	 * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
 	 * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
 	 */
-	fun transfer(
-		password: String,
-		callback: () -> Unit
-	) {
+	private fun transfer(password: String, callback: () -> Unit) {
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(
@@ -192,37 +247,48 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun insertCustomGasData() {
-		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
-		currentMinnerType = MinerFeeType.Custom.content
-		if (defaultGasPrices.size == 4) {
-			defaultGasPrices.remove(defaultGasPrices.last())
+	private fun String.checkDecimalIsvalid(token: WalletDetailCellModel?): Boolean {
+		return when {
+			getDecimalCount().isNull() -> return true
+
+			getDecimalCount().orZero() > token?.decimal.orElse(0.0) -> {
+				fragment.context?.alert(AlertText.transferWrongDecimal)
+				false
+			}
+
+			else -> true
 		}
-		defaultGasPrices.add(gasPrice)
-		fragment.clearGasLayout()
-		generateGasSelections(fragment.getGasLayout())
 	}
 
-	fun generateGasSelections(parent: LinearLayout) {
-		defaultGasPrices.forEachIndexed { index, minner ->
-			GasSelectionCell(parent.context).apply {
-				id = index
-				model = GasSelectionModel(
-					minner.toString().toDouble(), prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-					currentMinnerType
-				)
-				if (model.isSelected) {
-					getGasCurrencyPrice(model.count) {
-						fragment.setSpendingValue(it)
-					}
-				}
-			}.click {
-				currentMinnerType = it.model.type
-				updateGasSettings(parent)
-				getGasCurrencyPrice(it.model.count) {
-					fragment.setSpendingValue(it)
-				}
-			}.into(parent)
+	private fun Context.showAlertOrTransfer(
+		balance: Double,
+		footer: GasSelectionFooter,
+		callback: () -> Unit
+	) {
+		if (getTransferCount().toDouble() <= 0) {
+			callback()
+			alert(AlertText.emptyTransferValue)
+		} else {
+			if (balance > getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0)) {
+				footer.setCanUseStyle(true)
+				showConfirmAttentionView(footer, callback)
+			} else {
+				callback()
+				alert(AlertText.balanceNotEnough)
+			}
+		}
+	}
+
+	private fun showConfirmAttentionView(
+		footer: GasSelectionFooter,
+		callback: () -> Unit
+	) {
+		fragment.context?.showAlertView(TransactionText.confirmTransaction,
+			CommonText.enterPassword.toUpperCase(), true, {
+				// 点击 `Alert` 取消按钮
+				footer.getConfirmButton { showLoadingStatus(false) }
+			}) {
+			transfer(it?.text.toString(), callback)
 		}
 	}
 
@@ -231,12 +297,11 @@ class GasSelectionPresenter(
 		else prepareModel?.gasLimit?.toLong().orElse(0)
 	}
 
-	fun goToGasEditorFragment() {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas, TokenDetailText.paymentValue, Bundle().apply {
-					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
-				})
+	private fun getGasEthCount(info: String): Double {
+		return if (info.length > 3) {
+			info.replace(" ", "").substring(0, info.lastIndex - 3).toDouble()
+		} else {
+			0.0
 		}
 	}
 
@@ -245,12 +310,9 @@ class GasSelectionPresenter(
 		hold: (String) -> Unit
 	) {
 		DefaultTokenTable.getTokenBySymbol(CryptoSymbol.eth) {
-			val count = if (info.length > 3) {
-				info.replace(" ", "").substring(0, info.lastIndex - 3).toDouble()
-			} else {
-				0.0
-			}
-			hold("≈ " + (count * it.price).formatCurrency() + " " + GoldStoneApp.currencyCode)
+			hold(
+				"≈ " + (getGasEthCount(info) * it.price).formatCurrency() + " " + GoldStoneApp.currencyCode
+			)
 		}
 	}
 

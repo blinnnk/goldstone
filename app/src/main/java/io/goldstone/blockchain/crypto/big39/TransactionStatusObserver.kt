@@ -2,8 +2,6 @@ package io.goldstone.blockchain.crypto.big39
 
 import android.os.Handler
 import android.os.Looper
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.timeUpThen
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -24,7 +22,7 @@ abstract class TransactionStatusObserver {
 		doAsync {
 			GoldStoneEthCall.getTransactionByHash(transactionHash, {
 				handler.removeCallbacks(reDo)
-				handler.postDelayed(reDo, 2000L)
+				handler.postDelayed(reDo, 3000L)
 			}) {
 				GoldStoneAPI.context.runOnUiThread {
 					getStatus(true)

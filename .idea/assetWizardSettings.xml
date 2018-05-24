@@ -28,10 +28,11 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="height" value="36" />
-                            <entry key="outputName" value="scan_qr_icon" />
+                            <entry key="outputName" value="transfer_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/history_icon(2).svg" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/arrow-shuffle.svg" />
                             <entry key="width" value="36" />
                           </map>
                         </option>

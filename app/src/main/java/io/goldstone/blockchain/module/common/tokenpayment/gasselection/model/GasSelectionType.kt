@@ -4,7 +4,6 @@ import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.crypto.toGWeiValue
 import io.goldstone.blockchain.crypto.toGasValue
 import io.goldstone.blockchain.crypto.toGwei
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.MinerFeeType
 
 /**
  * @date 2018/5/16 11:37 PM

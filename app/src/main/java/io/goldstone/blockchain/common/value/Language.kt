@@ -227,6 +227,17 @@ object ImportWalletText {
 	}
 
 	@JvmField
+	val exportWrongPassword = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter the correct password"
+		HoneyLanguage.Chinese.code -> "Enter the correct password"
+		HoneyLanguage.Japanese.code -> "Enter the correct password"
+		HoneyLanguage.Korean.code -> "Enter the correct password"
+		HoneyLanguage.Russian.code -> "Enter the correct password"
+		HoneyLanguage.TraditionalChinese.code -> "Enter the correct password"
+		else -> "Enter the correct password"
+	}
+
+	@JvmField
 	val privateKeyAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "privateKey is not correct"
 		HoneyLanguage.Chinese.code -> "privateKey is not correct"
@@ -656,7 +667,7 @@ object CommonText {
 
 	@JvmField
 	val confirm = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Confirm"
+		HoneyLanguage.English.code -> "Confirm".toUpperCase()
 		HoneyLanguage.Chinese.code -> "确认"
 		HoneyLanguage.Japanese.code -> "確認"
 		HoneyLanguage.Korean.code -> "확인"
@@ -678,7 +689,7 @@ object CommonText {
 
 	@JvmField
 	val succeed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Succeed"
+		HoneyLanguage.English.code -> "Succeed".toUpperCase()
 		HoneyLanguage.Chinese.code -> "成功"
 		HoneyLanguage.Japanese.code -> "Succeed"
 		HoneyLanguage.Korean.code -> "Succeed"
@@ -698,7 +709,7 @@ object CommonText {
 	}
 	@JvmField
 	val create = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Create"
+		HoneyLanguage.English.code -> "Create".toUpperCase()
 		HoneyLanguage.Chinese.code -> "添加"
 		HoneyLanguage.Japanese.code -> "追加"
 		HoneyLanguage.Korean.code -> "만들기"
@@ -708,7 +719,7 @@ object CommonText {
 	}
 	@JvmField
 	val cancel = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Cancel"
+		HoneyLanguage.English.code -> "Cancel".toUpperCase()
 		HoneyLanguage.Chinese.code -> "取消"
 		HoneyLanguage.Japanese.code -> "キャンセル"
 		HoneyLanguage.Korean.code -> "취소"
@@ -718,7 +729,7 @@ object CommonText {
 	}
 	@JvmField
 	val next = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Next"
+		HoneyLanguage.English.code -> "Next".toUpperCase()
 		HoneyLanguage.Chinese.code -> "下一步"
 		HoneyLanguage.Japanese.code -> "次へ"
 		HoneyLanguage.Korean.code -> "다음"
@@ -778,7 +789,7 @@ object CommonText {
 	}
 	@JvmField
 	val delete = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DELETE"
+		HoneyLanguage.English.code -> "DELETE".toUpperCase()
 		HoneyLanguage.Chinese.code -> "删除钱包"
 		HoneyLanguage.Japanese.code -> "削除"
 		HoneyLanguage.Korean.code -> "지갑 지우기"
@@ -834,13 +845,13 @@ object AlertText {
 
 	@JvmField
 	val balanceNotEnough = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Chinese.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Korean.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer"
-		HoneyLanguage.TraditionalChinese.code -> "You haven't enough currency to transfer"
-		else -> "You haven't enough currency to transfer"
+		HoneyLanguage.English.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Chinese.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Korean.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.TraditionalChinese.code -> "You haven't enough currency to transfer and gas fee"
+		else -> "You haven't enough currency to transfer and gas fee"
 	}
 
 	@JvmField

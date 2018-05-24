@@ -34,7 +34,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 	init {
 		historyButton.apply {
 			title = WalletText.historyButton
-			src = R.drawable.history_icon
+			src = R.drawable.transfer_icon_small
 			x += PaddingSize.device
 			y = 15.uiPX().toFloat()
 		}.into(this)

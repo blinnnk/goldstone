@@ -77,8 +77,12 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					topMargin = 15.uiPX()
 				}
 			}.click {
+				it.showLoadingStatus()
 				presenter.getPrivateKeyByAddress(passwordInput) {
-					privateKeyTextView.text = this
+					if (isNotEmpty()) {
+						privateKeyTextView.text = this
+					}
+					it.showLoadingStatus(false)
 				}
 			}.into(this)
 

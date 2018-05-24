@@ -36,7 +36,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
     when (model?.type.orZero()) {
       NotificationType.Transaction.code -> {
         setIconColor(Spectrum.green)
-        setIconResource(R.drawable.transaction_icon)
+        setIconResource(R.drawable.transfer_icon)
       }
       NotificationType.System.code -> {
         setIconColor(GrayScale.midGray)
