@@ -135,7 +135,7 @@ class CreateWalletPresenter(
 	) {
 		mnemonic?.let {
 			WalletTable.saveEncryptMnemonicIfUserSkip(
-				JavaKeystoreUtil("skipBackUp").encryptData(it), address
+				JavaKeystoreUtil().encryptData(it), address
 			) {
 				callback()
 			}

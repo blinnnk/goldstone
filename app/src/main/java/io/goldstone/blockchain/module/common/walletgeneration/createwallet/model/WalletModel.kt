@@ -2,10 +2,14 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 
 import android.arch.persistence.room.*
 import android.content.Context
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orFalse
+import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.localTransactions
@@ -77,14 +81,24 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteEncryptMnemonicAfterUserHasBackUp() {
+		fun deleteEncryptMnemonicAfterUserHasBackUp(
+			mnemonic: String,
+			callback: () -> Unit
+		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
-					getWalletByAddress(current.address)?.let {
-						update(it.apply {
-							this.encryptMnemonic = null
-							hasBackUpMnemonic = true
-						})
+					getAllWallets().let {
+						it.findLast {
+							JavaKeystoreUtil().decryptData(it.encryptMnemonic!!) == mnemonic
+						}?.let {
+							update(it.apply {
+								this.encryptMnemonic = null
+								hasBackUpMnemonic = true
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
+							})
+						}
 					}
 				}
 			}

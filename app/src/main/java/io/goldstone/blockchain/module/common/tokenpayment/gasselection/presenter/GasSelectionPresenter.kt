@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isTrue
@@ -44,10 +43,7 @@ import java.math.BigInteger
  * @author KaySaith
  */
 
-enum class MinerFeeType(
-	val content: String,
-	var value: Long
-) {
+enum class MinerFeeType(val content: String, var value: Long) {
 	Recommend("recommend", 30),
 	Cheap("cheap", 1),
 	Fast("fast", 100),

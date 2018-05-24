@@ -10,6 +10,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.value.DialogText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 
@@ -55,10 +56,9 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 		} otherwise {
 			GoldStoneDialog.show(context) {
 				showButtons { }
-				setImage(R.drawable.alert_banner)
+				setImage(R.drawable.network_browken_banner)
 				setContent(
-					"Network Browken",
-					"An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+					DialogText.networkTitle, DialogText.networkDescription
 				)
 			}
 		}
