@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.pr
 import android.os.Bundle
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -34,18 +36,19 @@ class MnemonicBackupPresenter(
 		}
 	}
 
-	fun goToMnemonicConfirmation(arguments: Bundle) {
+	fun goToMnemonicConfirmation(mnemonic: String?) {
+		val argument = Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonic) }
 		val parent = fragment.parentFragment
 		when (parent) {
 			is WalletGenerationFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletGenerationFragment>(
-					CreateWalletText.mnemonicConfirmation, CreateWalletText.mnemonicBackUp, arguments
+					CreateWalletText.mnemonicConfirmation, CreateWalletText.mnemonicBackUp, argument
 				)
 			}
 
 			is WalletSettingsFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletSettingsFragment>(
-					WalletSettingsText.walletSettings, CreateWalletText.mnemonicBackUp, arguments
+					WalletSettingsText.walletSettings, CreateWalletText.mnemonicBackUp, argument
 				)
 			}
 		}
