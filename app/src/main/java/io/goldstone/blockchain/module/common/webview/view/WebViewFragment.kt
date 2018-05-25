@@ -19,13 +19,12 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.NotificationText
-import io.goldstone.blockchain.common.value.TokenDetailText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -98,8 +97,18 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-		getMainActivity()?.backEvent = Runnable {
-			setBackEvent()
+		val currentActivity = activity
+		when (currentActivity) {
+			is SplashActivity -> {
+				currentActivity.backEvent = Runnable {
+					setBackEvent()
+				}
+			}
+			is MainActivity -> {
+				currentActivity.backEvent = Runnable {
+					setBackEvent()
+				}
+			}
 		}
 	}
 
@@ -120,6 +129,12 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
+				parent.presenter.popFragmentFrom<WebViewFragment>()
+				setWebFragmentHeight()
+			}
+
+			is WalletGenerationFragment -> {
+				parent.headerTitle = CreateWalletText.create
 				parent.presenter.popFragmentFrom<WebViewFragment>()
 				setWebFragmentHeight()
 			}
