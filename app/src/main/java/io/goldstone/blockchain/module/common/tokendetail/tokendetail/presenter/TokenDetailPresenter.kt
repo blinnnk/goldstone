@@ -101,7 +101,7 @@ class TokenDetailPresenter(
 			it?.apply {
 				hasBackUpMnemonic isFalse {
 					GoldStoneDialog.show(fragment.context!!) {
-						showButtons { }
+						showButtons(DialogText.goToBackUp) { }
 						setImage(R.drawable.succeed_banner)
 						setContent(
 							DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
