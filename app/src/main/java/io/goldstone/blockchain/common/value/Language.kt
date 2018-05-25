@@ -897,7 +897,20 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "Gas limit must more than"
 		else -> "Gas limit must more than"
 	}
+
+	@JvmField
+	val transferUnvalidInputFromat = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wrong Input Value Format, Please Check"
+		HoneyLanguage.Chinese.code -> "Wrong Input Value Format, Please Check"
+		HoneyLanguage.Japanese.code -> "Wrong Input Value Format, Please Check"
+		HoneyLanguage.Korean.code -> "Wrong Input Value Format, Please Check"
+		HoneyLanguage.Russian.code -> "Wrong Input Value Format, Please Check"
+		HoneyLanguage.TraditionalChinese.code -> "Wrong Input Value Format, Please Check"
+		else -> "Wrong Input Value Format, Please Check"
+	}
 }
+
+
 
 object CurrentWalletText {
 

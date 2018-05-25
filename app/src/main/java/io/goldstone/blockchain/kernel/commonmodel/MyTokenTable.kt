@@ -41,21 +41,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun forEachMyTokens(
-			walletAddress: String,
-			holdToken: (token: MyTokenTable, contract: String, isEnd: Boolean) -> Unit
-		) {
-			DefaultTokenTable.getTokens { tokenInfo ->
-				getTokensWith(walletAddress) { myTokens ->
-					myTokens.forEachOrEnd { myToken, isEnd ->
-						holdToken(
-							myToken, tokenInfo.find { it.symbol == myToken.symbol }?.contract.orEmpty(), isEnd
-						)
-					}
-				}
-			}
-		}
-
 		fun deleteBySymbol(
 			symbol: String,
 			address: String,
