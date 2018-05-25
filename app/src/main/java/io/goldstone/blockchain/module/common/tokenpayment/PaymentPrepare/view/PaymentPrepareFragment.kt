@@ -65,6 +65,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 						backgroundColor = Color.RED
 						if (count > 0) {
 							setInputValue(count)
+							confirmButton.setBlueStyle(20.uiPX())
 						}
 					})
 
