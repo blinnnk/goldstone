@@ -31,6 +31,7 @@ import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -76,11 +77,10 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
+		errorCallback: () -> Unit = {},
 		hold: (Double) -> Unit
 	) {
-		requestData<String>(
-			APIPath.getCurrencyRate + symbols, "rate", true
-		) {
+		requestData<String>(APIPath.getCurrencyRate + symbols, "rate", true, errorCallback) {
 			this[0].isNotNull { hold(this[0].toDouble()) }
 		}
 	}
@@ -215,8 +215,8 @@ object GoldStoneAPI {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
 		RequestBody.create(requestContentType, content).let {
-			postRequestGetJsonObject<TokenPriceModel>(
-				it, "price_list", APIPath.getPriceByAddress, errorCallback = { errorCallback() }) {
+			postRequestGetJsonObject<TokenPriceModel>(it, "price_list", APIPath.getPriceByAddress,
+				errorCallback = { errorCallback() }) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -259,6 +259,10 @@ object GoldStoneAPI {
 
 	/**————————————————————— public network request method ———————————————————————*/
 
+	private val client =
+		OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS)
+			.build()
+
 	private inline fun <reified T> postRequestGetJsonObject(
 		body: RequestBody,
 		keyName: String,
@@ -266,13 +270,13 @@ object GoldStoneAPI {
 		noinline errorCallback: () -> Unit = {},
 		crossinline hold: (List<T>) -> Unit
 	) {
-		val client = OkHttpClient()
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
 					call: Call,
 					error: IOException
 				) {
+					errorCallback()
 					LogUtil.error(path, error)
 				}
 
@@ -304,7 +308,7 @@ object GoldStoneAPI {
 		netWorkError: () -> Unit = {},
 		hold: (String) -> Unit
 	) {
-		val client = OkHttpClient()
+
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
@@ -338,7 +342,7 @@ object GoldStoneAPI {
 		crossinline netWorkError: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
-		val client = OkHttpClient()
+
 		getcryptoGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
@@ -382,7 +386,12 @@ object GoldStoneAPI {
 		justGetData: Boolean = false,
 		crossinline hold: List<T>.() -> Unit
 	) {
-		val client = OkHttpClient()
+		val client =
+			OkHttpClient.Builder()
+				.connectTimeout(10, TimeUnit.SECONDS)
+				.readTimeout(20, TimeUnit.SECONDS)
+				.build()
+
 		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(
@@ -424,16 +433,14 @@ object GoldStoneAPI {
 		callback: (Request) -> Unit
 	) {
 		val timeStamp = System.currentTimeMillis().toString()
-		val version = "1.0.0"
+		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				val sign =
 					(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
 						.removePrefix("0x")
 				val request =
-					Request.Builder()
-						.url(path)
-						.method("POST", body)
+					Request.Builder().url(path).method("POST", body)
 						.header("Content-type", "application/json")
 						.addHeader("device", goldStoneID)
 						.addHeader("timestamp", timeStamp)
@@ -452,7 +459,7 @@ object GoldStoneAPI {
 		callback: (Request) -> Unit
 	) {
 		val timeStamp = System.currentTimeMillis().toString()
-		val version = SystemUtils.getVersionName(GoldStoneAPI.context)
+		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				val sign =

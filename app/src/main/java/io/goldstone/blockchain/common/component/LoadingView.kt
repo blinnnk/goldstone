@@ -4,12 +4,14 @@ import android.R
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -39,19 +41,10 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
 
-			val loading = ProgressBar(this.context, null, R.attr.progressBarStyleInverse).apply {
-				indeterminateDrawable.setColorFilter(
-					HoneyColor.Red,
-					android.graphics.PorterDuff.Mode.MULTIPLY
-				)
-				lparams {
-					width = 80.uiPX()
-					height = 80.uiPX()
-					centerInParent()
-					y -= 30.uiPX()
-				}
+			addLoadingCircle(this) {
+				setCenterInParent()
+				y -= 30.uiPX()
 			}
-			addView(loading)
 
 			introView.apply {
 				textSize = fontSize(13)
@@ -79,6 +72,21 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 
 	private fun setIntroText(intro: String) {
 		introView.text = intro
+	}
+
+	companion object {
+		fun addLoadingCircle(parent: ViewGroup, size: Int = 80.uiPX(), color: Int = HoneyColor.Red,getCircle: ProgressBar.() -> Unit) {
+			val loading = ProgressBar(
+				parent.context,
+				null,
+				R.attr.progressBarStyleInverse
+			).apply {
+				indeterminateDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY)
+				layoutParams = RelativeLayout.LayoutParams(size, size)
+				getCircle(this)
+			}
+			parent.addView(loading)
+		}
 	}
 
 }

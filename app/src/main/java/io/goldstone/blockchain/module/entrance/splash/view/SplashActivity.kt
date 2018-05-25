@@ -8,11 +8,13 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
 ─────────────────────────────────────────────────────────────
@@ -56,25 +58,23 @@ class SplashActivity : AppCompatActivity() {
 
 		hideStatusBar()
 
+		container.apply {
+			savedInstanceState.isNull {
+				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+				addFragment<StartingFragment>(container.id)
+			}
+		}.let {
+			setContentView(it)
+		}
+
 		AppConfigTable.getAppConfig {
 			initLaunchLanguage(it?.language)
 			it?.let {
 				// 打印必要数据在 `Debug` 的时候
 				LogUtil.debug(this.javaClass.simpleName, "Config: $it")
 				doAsync {
-					getCurrencyRate(it)  {
-						runOnUiThread {
-							presenter.hasAccountLoginOrElse {
-								container.apply {
-									savedInstanceState.isNull {
-										// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-										addFragment<StartingFragment>(container.id)
-									}
-								}.let {
-									setContentView(it)
-								}
-							}
-						}
+					getCurrencyRate(it) {
+						presenter.hasAccountThenLogin()
 					}
 				}
 			}
@@ -98,11 +98,19 @@ class SplashActivity : AppCompatActivity() {
 	}
 
 	// 获取当前的汇率
-	private fun getCurrencyRate(config: AppConfigTable, callback: () -> Unit) {
+	private fun getCurrencyRate(
+		config: AppConfigTable,
+		callback: () -> Unit
+	) {
 		GoldStoneApp.currencyCode = config.currencyCode
-		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
+		GoldStoneAPI.getCurrencyRate(config.currencyCode, {
+			GoldStoneAPI.context.runOnUiThread {
+				callback()
+				alert("there are some problerems about requesting crrency rate")
+			}
+		}) {
 			GoldStoneApp.currentRate = it
-			callback()
+			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}
 

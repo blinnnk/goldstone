@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.entrance.starting.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyUIUtils
@@ -10,6 +12,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
+import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -100,6 +103,12 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
 						alignParentBottom()
 						width = matchParent
+					}
+				} else {
+					LoadingView.addLoadingCircle(this@relativeLayout, 30.uiPX(), Spectrum.white) {
+						setAlignParentBottom()
+						setCenterInHorizontal()
+						y -= 100.uiPX()
 					}
 				}
 			}
