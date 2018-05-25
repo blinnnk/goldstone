@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.home.view
 
 import android.support.v4.app.Fragment
+import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
@@ -12,6 +14,7 @@ import io.goldstone.blockchain.common.component.TabBarView
 import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.AnkoContext
@@ -34,9 +37,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-
 			GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
-
 			verticalLayout {
 				id = ContainerID.home
 				addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail) {
@@ -58,6 +59,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 					preventDuplicateClicks()
 				}
 			}.into(this)
+
 			tabBar.setAlignParentBottom()
 		}
 	}

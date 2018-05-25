@@ -237,10 +237,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	data class DateBalance(
-		val date: Long,
-		val balance: Double
-	)
+	data class DateBalance(val date: Long, val balance: Double)
 
 	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,

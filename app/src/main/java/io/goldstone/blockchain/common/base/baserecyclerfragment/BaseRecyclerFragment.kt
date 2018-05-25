@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
@@ -184,7 +183,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		return UI {
 			// 这个高度判断是解决少数虚拟键盘高度可以手动隐藏的, 例如 `Samsung S8, S9`
 			val wrapperHeight = if (activity?.navigationBarIsHidden() == true) {
-				context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight + 1.uiPX()
+				context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight
 			} else {
 				ScreenSize.Height - ScreenSize.statusBarHeight
 			}

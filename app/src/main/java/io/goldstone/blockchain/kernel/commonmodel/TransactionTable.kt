@@ -75,29 +75,7 @@ data class TransactionTable(
 ) {
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0,
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		false,
-		false,
-		"",
-		""
+		0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, "", ""
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -134,8 +112,7 @@ data class TransactionTable(
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
-		"",
-		data.safeGet("hash"),
+		"", data.safeGet("hash"),
 		data.safeGet("nonce").toDecimalFromHex(),
 		data.safeGet("blockHash"),
 		data.safeGet("transactionIndex").toDecimalFromHex(),
@@ -147,7 +124,8 @@ data class TransactionTable(
 		"0",
 		"1",
 		data.safeGet("input"),
-		if(CryptoUtils.isERC20TransferByInputCode(data.safeGet("input"))) data.safeGet("to") else "0x0",
+		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
+			data.safeGet("to") else "0x0",
 		"",
 		"",
 		"",
@@ -184,6 +162,17 @@ data class TransactionTable(
 				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
 			}) {
 				hold(it.map { TransactionListModel(it) }.toArrayList())
+			}
+		}
+
+		fun getTransactionsByAddress(
+			address: String,
+			hold: (ArrayList<TransactionTable>) -> Unit
+		) {
+			coroutinesTask({
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+			}) {
+				hold(it.toArrayList())
 			}
 		}
 
@@ -324,7 +313,7 @@ interface TransactionDao {
 	): TransactionTable?
 
 	@Query(
-		"SELECT * FROM transactionList WHERE (recordOwnerAddress LIKE :walletAddress OR fromAddress LIKE :walletAddress) AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
 	)
 	fun getTransactionsByAddressAndSymbol(
 		walletAddress: String,

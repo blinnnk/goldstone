@@ -64,16 +64,16 @@ class SplashActivity : AppCompatActivity() {
 				getCurrencyRate(it)
 			}
 
-			presenter.hasAccountThenLogin()
-			container.apply {
-				savedInstanceState.isNull {
-					// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-					addFragment<StartingFragment>(container.id)
+			presenter.hasAccountLoginOrElse {
+				container.apply {
+					savedInstanceState.isNull {
+						// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+						addFragment<StartingFragment>(container.id)
+					}
+				}.let {
+					setContentView(it)
 				}
-			}.let {
-				setContentView(it)
 			}
-
 		}
 	}
 
@@ -97,6 +97,7 @@ class SplashActivity : AppCompatActivity() {
 	private fun getCurrencyRate(config: AppConfigTable) {
 		GoldStoneApp.currencyCode = config.currencyCode
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
+			System.out.println(Thread.currentThread().name)
 			GoldStoneApp.currentRate = it
 		}
 	}
