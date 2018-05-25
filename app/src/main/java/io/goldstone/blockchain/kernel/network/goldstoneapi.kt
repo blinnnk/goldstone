@@ -31,6 +31,7 @@ import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -76,11 +77,10 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
+		errorCallback: () -> Unit = {},
 		hold: (Double) -> Unit
 	) {
-		requestData<String>(
-			APIPath.getCurrencyRate + symbols, "rate", true
-		) {
+		requestData<String>(APIPath.getCurrencyRate + symbols, "rate", true, errorCallback) {
 			this[0].isNotNull { hold(this[0].toDouble()) }
 		}
 	}
@@ -266,7 +266,11 @@ object GoldStoneAPI {
 		noinline errorCallback: () -> Unit = {},
 		crossinline hold: (List<T>) -> Unit
 	) {
-		val client = OkHttpClient()
+		val client = OkHttpClient.Builder()
+			.connectTimeout(10, TimeUnit.SECONDS)
+			.readTimeout(20, TimeUnit.SECONDS)
+			.build()
+
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
@@ -304,13 +308,14 @@ object GoldStoneAPI {
 		netWorkError: () -> Unit = {},
 		hold: (String) -> Unit
 	) {
-		val client = OkHttpClient()
+		val client = OkHttpClient.Builder()
+			.connectTimeout(10, TimeUnit.SECONDS)
+			.readTimeout(20, TimeUnit.SECONDS)
+			.build()
+
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
-				) {
+				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
 					netWorkError()
 				}
@@ -338,21 +343,21 @@ object GoldStoneAPI {
 		crossinline netWorkError: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
-		val client = OkHttpClient()
+		val client = OkHttpClient.Builder()
+			.connectTimeout(10, TimeUnit.SECONDS)
+			.readTimeout(20, TimeUnit.SECONDS)
+			.build()
+
 		getcryptoGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
+				override fun onFailure(call: Call, error: IOException
 				) {
+					System.out.println("hello")
 					netWorkError()
 					LogUtil.error(keyName, error)
 				}
 
-				override fun onResponse(
-					call: Call,
-					response: Response
-				) {
+				override fun onResponse(call: Call, response: Response) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						val dataObject =
@@ -382,20 +387,19 @@ object GoldStoneAPI {
 		justGetData: Boolean = false,
 		crossinline hold: List<T>.() -> Unit
 	) {
-		val client = OkHttpClient()
+		val client = OkHttpClient.Builder()
+			.connectTimeout(10, TimeUnit.SECONDS)
+			.readTimeout(20, TimeUnit.SECONDS)
+			.build()
+
 		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
-			override fun onFailure(
-				call: Call,
-				error: IOException
-			) {
+			override fun onFailure(call: Call, error: IOException) {
+				System.out.println("hello1")
 				LogUtil.error(keyName, error)
 			}
 
-			override fun onResponse(
-				call: Call,
-				response: Response
-			) {
+			override fun onResponse(call: Call, response: Response) {
 				val data = response.body()?.string()
 				try {
 					val dataObject =
