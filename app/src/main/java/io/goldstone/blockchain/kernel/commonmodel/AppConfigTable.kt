@@ -6,6 +6,7 @@ import android.provider.Settings
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -32,7 +33,8 @@ data class AppConfigTable(
 	var isRegisteredAddresses: Boolean = false,
 	var language: Int = HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
-	var pushToken: String = ""
+	var pushToken: String = "",
+	var chainID: String = ChainID.Main.id
 ) {
 
 	companion object {

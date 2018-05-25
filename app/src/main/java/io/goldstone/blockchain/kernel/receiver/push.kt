@@ -218,7 +218,7 @@ fun Context.registerDevice(
 		config?.apply {
 			GoldStoneAPI.registerDevice(
 				HoneyLanguage.getLanguageSymbol(language).toLowerCase(), token, goldStoneID, isChina,
-				TinyNumber.True.value
+				TinyNumber.True.value, config.chainID.toInt()
 			) {
 				// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
 				GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {

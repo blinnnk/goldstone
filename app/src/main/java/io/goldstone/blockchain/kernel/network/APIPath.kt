@@ -15,7 +15,6 @@ object APIPath {
 	const val defaultTokenList = "$url/index/defaultCoinList"
 	const val getCoinInfo = "$url/index/searchToken?symbolOrContract="
 	const val getCurrencyRate = "$url/index/exchangeRate?currency="
-	const val getCountryList = "$url/index/countryList"
 	const val registerDevice = "$url/account/registerDevice"
 	const val updateAddress = "$url/account/updateAddress"
 	const val getNotification = "$url/account/unreadMessageList"
@@ -28,6 +27,7 @@ object APIPath {
 	/** Chain Address */
 	const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
 	const val ropstan = "https://eth-node-ropsten.naonaola.com/eth"
+	const val main = "https://eth-node-mainnet.naonaola.com/eth"
 
 	@JvmField
 	val getQuotationCurrencyChart: (
