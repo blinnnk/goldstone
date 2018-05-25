@@ -106,24 +106,28 @@ class CreateWalletPresenter(
 		hint: String? = null,
 		callback: () -> Unit
 	) {
-		generateWallet(password) { mnemonicCode, address ->
-			// 将基础的不存在安全问题的信息插入数据库
-			WalletTable.insert(WalletTable(0, name, address, true, hint)) {
-				generateMyTokenInfo(address, true, {
-					LogUtil.error("position: generateWalletWith function: generateMyTokenInfo")
-				}) {
-					// 传递数据到下一个 `Fragment`
-					val arguments = Bundle().apply {
-						putString(ArgumentKey.mnemonicCode, mnemonicCode)
+		doAsync {
+			generateWallet(password) { mnemonicCode, address ->
+				// 将基础的不存在安全问题的信息插入数据库
+				WalletTable.insert(WalletTable(0, name, address, true, hint)) {
+					generateMyTokenInfo(address, true, {
+						LogUtil.error("position: generateWalletWith function: generateMyTokenInfo")
+					}) {
+						// 传递数据到下一个 `Fragment`
+						val arguments = Bundle().apply {
+							putString(ArgumentKey.mnemonicCode, mnemonicCode)
+						}
+						// 防止用户跳过助记词, 会在完成助记词后清除记录的加密数据
+						saveEncryptMnemonic(mnemonicCode, address) {
+							fragment.context?.runOnUiThread {
+								showMnemonicBackupFragment(arguments)
+								callback()
+							}
+						}
 					}
-					// 防止用户跳过助记词, 会在完成助记词后清除记录的加密数据
-					saveEncryptMnemonic(mnemonicCode, address) {
-						showMnemonicBackupFragment(arguments)
-						callback()
-					}
-				}
 
-				XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerWalletAddressForPush()
+				}
 			}
 		}
 	}
@@ -144,7 +148,7 @@ class CreateWalletPresenter(
 
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
 		showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
-			CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments
+			CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments, false
 		)
 	}
 

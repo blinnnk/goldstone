@@ -93,9 +93,10 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		}.into(buttonLayout)
 	}
 
-	fun showButtons(confirmEvent: () -> Unit) {
+	fun showButtons(confirmTitle: String = CommonText.confirm, confirmEvent: () -> Unit) {
 		buttonLayout.x = 140.uiPX().toFloat()
 		cancelButton.into(buttonLayout)
+		confirmButton.text = confirmTitle
 		confirmButton.click {
 			confirmEvent()
 		}.into(buttonLayout)

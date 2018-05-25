@@ -70,8 +70,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(5.uiPX())
 				}.click {
-					Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonicCode) }
-						.let { presenter.goToMnemonicConfirmation(it) }
+					presenter.goToMnemonicConfirmation(mnemonicCode)
 				}.into(this)
 			}
 		}

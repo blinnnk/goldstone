@@ -3,6 +3,8 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
+import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
@@ -151,22 +153,27 @@ fun Context.deleteAccount(
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	// If there is't account found then return
 	if (keyStore.accounts.size() == 0L) return
-	(0 until keyStore.accounts.size()).forEach { index ->
+
+	var targentAccountIndex: Long? = null
+
+	(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
 		keyStore.accounts.get(index).address.hex.let {
-			it.equals(walletAddress, true) isTrue {
+			if (it.equals(walletAddress, true)) {
+				targentAccountIndex = index
+			}
+			if (isEnd && !targentAccountIndex.isNull()) {
 				// 先通过解锁来严重密码的正确性, 在通过结果执行删除钱包操作
 				var isCorrect: Boolean
 				try {
-					keyStore.unlock(keyStore.accounts.get(index), password)
+					keyStore.unlock(keyStore.accounts.get(targentAccountIndex!!), password)
 					isCorrect = true
 				} catch (error: Exception) {
 					callback(false)
 					isCorrect = false
 					LogUtil.error("function: DeleteAccount, error: $error")
 				}
-
-				if (isCorrect == true) {
-					keyStore.deleteAccount(keyStore.accounts.get(index), password)
+				if (isCorrect) {
+					keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
 					callback(true)
 				}
 			}

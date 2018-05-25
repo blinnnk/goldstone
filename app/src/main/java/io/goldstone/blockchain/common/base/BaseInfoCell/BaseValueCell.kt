@@ -28,10 +28,6 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 	protected var count: TwoLineTitles? = null
 
 	init {
-
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 75.uiPX())
-		x += PaddingSize.device
-
 		setIconColor()
 		this.addView(icon)
 
@@ -42,6 +38,8 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 
 		icon.setCenterInVertical()
 		info.setCenterInVertical()
+
+		layoutParams.height = 75.uiPX()
 
 	}
 

@@ -13,10 +13,10 @@ import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.AttentionView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -59,6 +59,16 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 30.uiPX()
 					}
 				}.into(this)
+
+				textView {
+					text = CreateWalletText.passwordRules
+					textSize = fontSize(12)
+					textColor = GrayScale.midGray
+					typeface = GoldStoneFont.medium(context)
+					gravity = Gravity.CENTER_HORIZONTAL
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+					y += 12.uiPX()
+				}
 
 				passwordEditText.apply {
 					title = CreateWalletText.password

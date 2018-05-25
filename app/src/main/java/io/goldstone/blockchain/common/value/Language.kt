@@ -31,6 +31,18 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "產生錢包"
 		else -> "Create Wallet"
 	}
+
+	@JvmField
+	val passwordRules = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Chinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Japanese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Korean.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Russian.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.TraditionalChinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		else -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+	}
+
 	@JvmField
 	val mnemonicBackUp = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic Backup"
@@ -343,6 +355,17 @@ object DialogText {
 		HoneyLanguage.Russian.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
 		HoneyLanguage.TraditionalChinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
 		else -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+	}
+
+	@JvmField
+	val goToBackUp = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BACK UP"
+		HoneyLanguage.Chinese.code -> "BACK UP"
+		HoneyLanguage.Japanese.code -> "BACK UP"
+		HoneyLanguage.Korean.code -> "BACK UP"
+		HoneyLanguage.Russian.code -> "BACK UP"
+		HoneyLanguage.TraditionalChinese.code -> "BACK UP"
+		else -> "BACK UP"
 	}
 }
 

@@ -68,7 +68,8 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	inline fun <reified T : Fragment, reified Parent : BaseOverlayFragment<*>> showTargetFragment(
 		title: String,
 		popTitle: String,
-		arguments: Bundle? = null
+		arguments: Bundle? = null,
+		hasBackButton: Boolean = true
 	) {
 		if (fragment.parentFragment is Parent) {
 			fragment.getParentFragment<Parent>()?.apply {
@@ -78,7 +79,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 					arguments?.let { putAll(it) }
 				}
 				overlayView.header.apply {
-					showBackButton(true) {
+					showBackButton(hasBackButton) {
 						presenter.popFragmentFrom<T>()
 						headerTitle = popTitle
 					}
