@@ -56,14 +56,13 @@ class MnemonicConfirmationPresenter(
 					fragment.getParentFragment<WalletSettingsFragment> {
 						context?.showSucceedDialog {
 							presenter.removeSelfFromActivity()
-							activity?.jump<SplashActivity>()
 						}
 					}
 
 					fragment.getParentFragment<WalletGenerationFragment> {
 						context?.showSucceedDialog {
 							presenter.removeSelfFromActivity()
-							activity?.jump<SplashActivity>()
+							fragment.activity?.jump<SplashActivity>()
 						}
 					}
 				}
