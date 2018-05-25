@@ -29,3 +29,4 @@
 Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
 ────────────────────────────────────────────────────────────────────────────────────
 ```
+<image src="goldstone/app/src/main/res/drawable/logo.png"></image>
