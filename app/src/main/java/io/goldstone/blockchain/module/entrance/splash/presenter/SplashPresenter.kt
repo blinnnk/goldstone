@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -13,7 +14,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 class SplashPresenter(val activity: SplashActivity) {
 
-	fun hasAccountThenLogin() {
+	fun hasAccountLoginOrElse(callback: () -> Unit) {
 		WalletTable.getAll {
 			isNotEmpty() isTrue {
 				WalletTable.getCurrentWallet {
@@ -22,6 +23,8 @@ class SplashPresenter(val activity: SplashActivity) {
 						activity.jump<MainActivity>()
 					}
 				}
+			} otherwise {
+				callback()
 			}
 		}
 	}

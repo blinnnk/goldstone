@@ -64,7 +64,8 @@ data class TransactionTable(
 	var gasUsed: String,
 	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String, var isReceive: Boolean,
+	private var confirmations: String,
+	var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
@@ -79,22 +80,59 @@ data class TransactionTable(
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
-		0, data.blockNumber, data.timeStamp, data.transactionHash, "", "", data.transactionIndex,
-		data.from, data.to, data.value, "", data.gasPrice, "0", "1", "", data.contract, "",
-		data.gasUsed, "", data.isReceive, true, data.symbol, data.to, data.to, false, data.logIndex
+		0,
+		data.blockNumber,
+		data.timeStamp,
+		data.transactionHash,
+		"",
+		"",
+		data.transactionIndex,
+		data.from,
+		data.to,
+		data.value,
+		"",
+		data.gasPrice,
+		"0",
+		"1",
+		"",
+		data.contract,
+		"",
+		data.gasUsed,
+		"",
+		data.isReceive,
+		true,
+		data.symbol,
+		data.to,
+		data.to,
+		false,
+		data.logIndex
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: JSONObject) : this(
-		0, data.safeGet("blockNumber").toDecimalFromHex(), "", data.safeGet("hash"),
-		data.safeGet("nonce").toDecimalFromHex(), data.safeGet("blockHash"),
-		data.safeGet("transactionIndex").toDecimalFromHex(), data.safeGet("from"), data.safeGet("to"),
-		data.safeGet("value").toDecimalFromHex(), data.safeGet("gas").toDecimalFromHex(),
-		data.safeGet("gasPrice").toDecimalFromHex(), "0", "1", data.safeGet("input"),
-		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input"))) data.safeGet(
-			"to"
-		) else "0x0", "", "", "", data.safeGet("from") != WalletTable.current.address,
-		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")), "", ""
+		0,
+		data.safeGet("blockNumber").toDecimalFromHex(),
+		"", data.safeGet("hash"),
+		data.safeGet("nonce").toDecimalFromHex(),
+		data.safeGet("blockHash"),
+		data.safeGet("transactionIndex").toDecimalFromHex(),
+		data.safeGet("from"),
+		data.safeGet("to"),
+		data.safeGet("value").toDecimalFromHex(),
+		data.safeGet("gas").toDecimalFromHex(),
+		data.safeGet("gasPrice").toDecimalFromHex(),
+		"0",
+		"1",
+		data.safeGet("input"),
+		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
+			data.safeGet("to") else "0x0",
+		"",
+		"",
+		"",
+		data.safeGet("from") != WalletTable.current.address,
+		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
+		"",
+		""
 	)
 
 	companion object {
