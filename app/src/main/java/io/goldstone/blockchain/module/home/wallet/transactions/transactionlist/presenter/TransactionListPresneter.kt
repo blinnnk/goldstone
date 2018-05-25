@@ -229,8 +229,8 @@ class TransactionListPresenter(
 					}
 
 					override fun mergeCallBack() {
-						removeLoadingView()
 						hold(map { TransactionListModel(it) }.toArrayList())
+						removeLoadingView()
 					}
 				}.start()
 			}

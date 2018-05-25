@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.view.Gravity
-import android.view.ViewOutlineProvider
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -29,7 +31,10 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 	val profileButton by lazy { TabItem(context) }
 
 	init {
-		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
+
+		setWillNotDraw(false)
+
+		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight + 2.uiPX())
 
 		walletButton.apply {
 			type = TabItemType.Wallet
@@ -51,28 +56,33 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 
 		// 默认选中
 		walletButton.setSelectedStyle()
-
-		outlineProvider = ViewOutlineProvider.BOUNDS
 		backgroundColor = Spectrum.white
+	}
 
-		elevation = 50.uiPX().toFloat()
+	private val paint = Paint().apply {
+		isAntiAlias = true
+		color = GrayScale.Opacity1Black
+		style = Paint.Style.FILL
+	}
+
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
+		canvas?.drawLine(0f, 0f, width.toFloat(), 1f, paint)
 	}
 
 }
 
-enum class TabItemType {
-	Market, Wallet, Profile
-}
+enum class TabItemType { Market, Wallet, Profile }
 
 class TabItem(context: Context) : LinearLayout(context) {
 
 	var type: TabItemType by observing(TabItemType.Market) {
-		iconImage.imageResource = when(type) {
+		iconImage.imageResource = when (type) {
 			TabItemType.Market -> R.drawable.market_icon
 			TabItemType.Wallet -> R.drawable.wallet_detail_icon
 			TabItemType.Profile -> R.drawable.profile_icon
 		}
-		titleView.text = when(type) {
+		titleView.text = when (type) {
 			TabItemType.Market -> QuotationText.market.toLowerCase()
 			TabItemType.Wallet -> WalletText.wallet.toLowerCase()
 			TabItemType.Profile -> ProfileText.profile.toLowerCase()
@@ -87,13 +97,15 @@ class TabItem(context: Context) : LinearLayout(context) {
 		y += 1.uiPX()
 	}
 
-	private val titleView by lazy { TextView(context).apply {
-		textSize = fontSize(9)
-		textColor = GrayScale.midGray
-		typeface = GoldStoneFont.heavy(context)
-		layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())
-		gravity = Gravity.CENTER_HORIZONTAL
-	} }
+	private val titleView by lazy {
+		TextView(context).apply {
+			textSize = fontSize(9)
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.heavy(context)
+			layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())
+			gravity = Gravity.CENTER_HORIZONTAL
+		}
+	}
 
 	init {
 		topPadding = 3.uiPX()

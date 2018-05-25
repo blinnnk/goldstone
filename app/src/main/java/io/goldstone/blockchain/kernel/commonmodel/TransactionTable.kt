@@ -275,7 +275,7 @@ interface TransactionDao {
 	): TransactionTable?
 
 	@Query(
-		"SELECT * FROM transactionList WHERE (recordOwnerAddress LIKE :walletAddress OR fromAddress LIKE :walletAddress) AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
 	)
 	fun getTransactionsByAddressAndSymbol(
 		walletAddress: String,
