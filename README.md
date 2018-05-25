@@ -29,4 +29,4 @@
 Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
 ────────────────────────────────────────────────────────────────────────────────────
 ```
-<image src="https://github.com/blinnnk/goldstone/blob/dev/app/src/main/res/drawable/logo.png?raw=true"></image>
+<image src="https://github.com/blinnnk/goldstone/blob/dev/app/src/main/res/drawable/logo.png?raw=true" height="200" width="200"></image>
