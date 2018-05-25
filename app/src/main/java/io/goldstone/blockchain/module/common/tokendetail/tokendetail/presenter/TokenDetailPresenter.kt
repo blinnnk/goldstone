@@ -133,9 +133,7 @@ class TokenDetailPresenter(
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
-				LogUtil.debug(
-					"function: loadDataFromDatabaseOrElse, reason: Without Local Transaction Data"
-				)
+				LogUtil.debug(this.javaClass.simpleName, "reason: Without Local Transaction Data")
 			}
 		}
 	}
@@ -237,7 +235,10 @@ class TokenDetailPresenter(
 		}
 	}
 
-	data class DateBalance(val date: Long, val balance: Double)
+	data class DateBalance(
+		val date: Long,
+		val balance: Double
+	)
 
 	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,

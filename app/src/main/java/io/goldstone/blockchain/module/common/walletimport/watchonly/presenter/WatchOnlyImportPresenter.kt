@@ -45,7 +45,7 @@ class WatchOnlyImportPresenter(
 			it.isNull() isTrue {
 				WalletTable.insert(WalletTable(0, name, address, true, null, true, 0.0, null, true)) {
 					CreateWalletPresenter.generateMyTokenInfo(address, false, {
-						LogUtil.error("position: WatchOnlyImportPresenter function : generateMyTokenInfo")
+						LogUtil.error(this.javaClass.simpleName)
 						callback()
 					}) {
 						fragment.activity?.jump<SplashActivity>()

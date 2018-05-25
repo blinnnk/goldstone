@@ -71,7 +71,7 @@ class WalletImportPresenter(
 					WalletTable.insert(WalletTable(0, name, address, true, hint, false, 0.0, null, true)) {
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
-							LogUtil.error("function: generateMyTokenInfo")
+							LogUtil.error("insertWalletToDatabase")
 							callback()
 						}) {
 							fragment.activity?.jump<SplashActivity>()

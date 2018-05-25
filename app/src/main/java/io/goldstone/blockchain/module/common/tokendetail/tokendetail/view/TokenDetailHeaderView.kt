@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
-import android.util.Log
 import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -19,7 +18,6 @@ import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.LogTag
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TokenDetailSize
 import org.jetbrains.anko.margin
@@ -63,7 +61,9 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 				setDotsRadius(5.uiPX().toFloat())
 				setDotsStrokeThickness(3.uiPX().toFloat())
 				// 渐变色彩
-				setGradientFill(intArrayOf(Spectrum.green, Color.argb(0, 255, 255, 255)), floatArrayOf(0.28f, 1f))
+				setGradientFill(
+					intArrayOf(Spectrum.green, Color.argb(0, 255, 255, 255)), floatArrayOf(0.28f, 1f)
+				)
 				// 线条联动用贝塞尔曲线
 				isSmooth = true
 				// 线条的粗细
@@ -83,7 +83,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			try {
 				notifyDataUpdate()
 			} catch (error: Exception) {
-				LogUtil.error("position: TokenDetailHeaderView $error")
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 
 			val animation = Animation(1000)
@@ -92,16 +92,12 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	private var hasShowAnimation = false
-
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
-		chartView
-			.apply {
-				layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), matchParent)
-				setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
-			}
-			.into(this)
+		chartView.apply {
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), matchParent)
+			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+		}.into(this)
 	}
 
 	fun setCharData(

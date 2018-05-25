@@ -47,7 +47,7 @@ fun Context.generateWallet(
 		/** Import Private Key to Keystore */
 		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
 	} catch (error: Exception) {
-		LogUtil.error("position: generateWallet $error")
+		LogUtil.error("generateWallet", error)
 	}
 }
 
@@ -120,7 +120,7 @@ fun Context.getKeystoreFile(
 				} catch (error: Exception) {
 					errorCallback()
 					runOnUiThread { alert(CommonText.wrongPassword) }
-					LogUtil.error("function: getKeystoreFile $error")
+					LogUtil.error("getKeystoreFile", error)
 				}
 			}
 		}
@@ -139,7 +139,7 @@ fun Context.getPrivateKey(
 				hold(it.privateKey.toString(16))
 			}
 		} catch (error: Exception) {
-			LogUtil.error("function: getPrivateKey $error")
+			LogUtil.error("getPrivateKey", error)
 		}
 	}
 }
@@ -170,7 +170,7 @@ fun Context.deleteAccount(
 				} catch (error: Exception) {
 					callback(false)
 					isCorrect = false
-					LogUtil.error("function: DeleteAccount, error: $error")
+					LogUtil.error("deleteAccount", error)
 				}
 				if (isCorrect) {
 					keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)

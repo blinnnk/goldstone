@@ -10,12 +10,18 @@ import io.goldstone.blockchain.common.value.LogTag
 
 object LogUtil {
 
-	fun error(error: String) {
-		Log.e(LogTag.error, error)
+	fun error(
+		position: String,
+		error: Throwable? = null
+	) {
+		Log.e(LogTag.error, "position: $position error: $error")
 	}
 
-	fun debug(debug: String) {
-		Log.e(LogTag.debug, debug)
+	fun debug(
+		position: String,
+		debug: String
+	) {
+		Log.e(LogTag.debug, "position: $position debug: $debug")
 	}
 
 }

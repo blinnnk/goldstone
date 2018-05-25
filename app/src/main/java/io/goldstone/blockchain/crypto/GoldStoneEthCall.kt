@@ -5,7 +5,6 @@ package io.goldstone.blockchain.crypto
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -171,7 +170,7 @@ object GoldStoneEthCall {
 					try {
 						holdValue(it.toDecimalFromHex().toBigDecimal().toBigInteger())
 					} catch (error: Exception) {
-						LogUtil.error("function: getTransactionExecutedValue, error: $error")
+						LogUtil.error(this.javaClass.simpleName, error)
 					}
 				}
 			}
@@ -292,7 +291,7 @@ object GoldStoneEthCall {
 					call: Call,
 					error: IOException
 				) {
-					LogUtil.error("path: callEthBy onFailure $error")
+					LogUtil.error(this.javaClass.simpleName, error)
 				}
 
 				@SuppressLint("SetTextI18n")
@@ -307,7 +306,7 @@ object GoldStoneEthCall {
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
 						errorCallback()
-						LogUtil.error("path: callEthBy $error")
+						LogUtil.error(this.javaClass.simpleName, error)
 					}
 				}
 			})

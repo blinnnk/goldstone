@@ -159,7 +159,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
 								isSucceed isTrue {
 									AppConfigTable.updateRegisterAddressesStatus(true)
-									LogUtil.debug("function: registerWalletAddress, code: $it")
+									LogUtil.debug(this.javaClass.simpleName, "code: $it")
 								} otherwise {
 									// 服务器返回错误的时候标记注册失败
 									AppConfigTable.updateRegisterAddressesStatus(false)
@@ -188,7 +188,7 @@ fun Application.registerDeviceForPush() {
 			registerDevice(token.toString())
 			// 如果本地有注册成功的标记则不再注册
 			getStringFromSharedPreferences(SharesPreference.registerPush).let {
-				LogUtil.debug("function: getStringFromSharedPreferences, token: $it")
+				LogUtil.debug(this.javaClass.simpleName, "token: $it")
 				if (it == token) return
 			}
 			// 在本地数据库记录 `Push Token`

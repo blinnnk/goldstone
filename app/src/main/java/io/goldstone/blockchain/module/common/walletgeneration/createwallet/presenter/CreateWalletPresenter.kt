@@ -111,7 +111,7 @@ class CreateWalletPresenter(
 				// 将基础的不存在安全问题的信息插入数据库
 				WalletTable.insert(WalletTable(0, name, address, true, hint)) {
 					generateMyTokenInfo(address, true, {
-						LogUtil.error("position: generateWalletWith function: generateMyTokenInfo")
+						LogUtil.error("generateWalletWith")
 					}) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
