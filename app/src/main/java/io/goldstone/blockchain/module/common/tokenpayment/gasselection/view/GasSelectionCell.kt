@@ -35,9 +35,6 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 	private val feeTypeDescription by lazy { TextView(context) }
 
 	init {
-
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX())
-
 		info
 			.apply {
 				setBlackTitles()
@@ -73,6 +70,8 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 		}
 		setGrayStyle()
 		hasArrow = false
+
+		layoutParams.height = 60.uiPX()
 	}
 
 }

@@ -90,10 +90,11 @@ class TransactionListPresenter(
 
 	private fun TransactionListFragment.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
-		val currentBlockNumber = localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
-		val lastBlockNumber = if (currentBlockNumber.isNull()) "0" else currentBlockNumber + 1
+		val currentBlockNumber =
+			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
+				?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-		getTransactionDataFromEtherScan(lastBlockNumber) { newData ->
+		getTransactionDataFromEtherScan(currentBlockNumber) { newData ->
 			/** chain data is empty then return and remove loading view*/
 			if (newData.isEmpty()) {
 				removeLoadingView()
@@ -186,8 +187,19 @@ class TransactionListPresenter(
 						}.sortedByDescending {
 							it.timeStamp
 						}.toArrayList()
-					}) {
-						hold(it)
+					}) { newData ->
+						if (newData.isEmpty()) {
+							hold(newData)
+						} else {
+							TransactionTable.getTransactionsByAddress(WalletTable.current.address) { localData ->
+								newData.forEachOrEnd { item, isEnd ->
+									if (localData.any { it.hash == item.hash }) {
+										newData.remove(item)
+									}
+									if (isEnd) { hold(newData) }
+								}
+							}
+						}
 					}
 				}
 			}
