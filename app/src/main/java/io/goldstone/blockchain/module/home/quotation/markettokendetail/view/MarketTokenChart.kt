@@ -71,7 +71,7 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 		try {
 			notifyDataUpdate()
 		} catch (error: Exception) {
-			LogUtil.error("position: MarketTokenChart, error: $error")
+			LogUtil.error(this.javaClass.simpleName, error)
 		}
 
 		val animation = Animation(1000)

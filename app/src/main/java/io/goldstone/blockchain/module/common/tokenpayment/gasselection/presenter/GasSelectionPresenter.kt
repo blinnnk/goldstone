@@ -162,7 +162,7 @@ class GasSelectionPresenter(
 					val hexValue = Numeric.toHexString(signedMessage)
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
-						LogUtil.debug("function: sendRawTransaction, taxHash: $taxHash")
+						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 						taxHash.isValidTaxHash() isTrue {
 							// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息

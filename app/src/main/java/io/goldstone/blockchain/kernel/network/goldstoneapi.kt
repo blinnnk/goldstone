@@ -276,7 +276,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					LogUtil.error("path:$path, error:$error")
+					LogUtil.error(path, error)
 				}
 
 				override fun onResponse(
@@ -314,7 +314,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					LogUtil.error("path:$path, error:$error")
+					LogUtil.error(path, error)
 					netWorkError()
 				}
 
@@ -326,7 +326,7 @@ object GoldStoneAPI {
 					try {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
-						LogUtil.error("path: $path error: $error")
+						LogUtil.error(path, error)
 					}
 				}
 			})
@@ -349,7 +349,7 @@ object GoldStoneAPI {
 					error: IOException
 				) {
 					netWorkError()
-					LogUtil.error("path:$keyName, error:$error")
+					LogUtil.error(keyName, error)
 				}
 
 				override fun onResponse(
@@ -392,7 +392,7 @@ object GoldStoneAPI {
 				call: Call,
 				error: IOException
 			) {
-				LogUtil.error("path:$keyName, error:$error")
+				LogUtil.error(keyName, error)
 			}
 
 			override fun onResponse(
@@ -432,7 +432,7 @@ object GoldStoneAPI {
 					call: Call,
 					error: IOException
 				) {
-					LogUtil.error("path:$keyName, error:$error")
+					LogUtil.error(keyName, error)
 				}
 
 				override fun onResponse(

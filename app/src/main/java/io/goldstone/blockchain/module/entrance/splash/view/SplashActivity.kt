@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.entrance.splash.view
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNull
@@ -13,6 +12,7 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
+import org.jetbrains.anko.doAsync
 
 /**
 ─────────────────────────────────────────────────────────────
@@ -60,8 +60,8 @@ class SplashActivity : AppCompatActivity() {
 			initLaunchLanguage(it?.language)
 			it?.let {
 				// 打印必要数据在 `Debug` 的时候
-				LogUtil.debug("position: SplashActivity, config: $it")
-				getCurrencyRate(it)
+				LogUtil.debug(this.javaClass.simpleName, "Config: $it")
+				doAsync { getCurrencyRate(it) }
 			}
 
 			presenter.hasAccountLoginOrElse {
@@ -97,7 +97,6 @@ class SplashActivity : AppCompatActivity() {
 	private fun getCurrencyRate(config: AppConfigTable) {
 		GoldStoneApp.currencyCode = config.currencyCode
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
-			System.out.println(Thread.currentThread().name)
 			GoldStoneApp.currentRate = it
 		}
 	}

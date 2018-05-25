@@ -46,7 +46,7 @@ class KeystoreImportPresenter(
 				}
 			} catch (error: Exception) {
 				fragment.context?.alert("Error, Please check your keystore format or password")
-				LogUtil.error("function: importKeystoreWallet, error: $error")
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 		} otherwise {
 			fragment.context?.alert("You must agree terms")

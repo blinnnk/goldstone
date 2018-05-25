@@ -153,7 +153,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			try {
 				notifyDataUpdate()
 			} catch (error: Exception) {
-				LogUtil.error("position: QuotationCell, error: $error")
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 
 			setClickablePointRadius(30.uiPX().toFloat())

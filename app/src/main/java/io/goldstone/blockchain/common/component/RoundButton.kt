@@ -77,7 +77,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 					}.into(this)
 				}
 			} catch (error: Exception) {
-				LogUtil.error("position: RoundButton error: $error")
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 		}
 		if (!needToShow) {
@@ -86,7 +86,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 					removeView(it)
 				}
 			} catch (error: Exception) {
-				LogUtil.error("position: RoundButton error: $error")
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 			text = recoveryText
 			isEnabled = true
