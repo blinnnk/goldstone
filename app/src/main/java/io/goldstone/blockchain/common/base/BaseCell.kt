@@ -13,6 +13,9 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneySvgPathConvert
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.*
+import org.jetbrains.anko.leftPadding
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.rightPadding
 
 /**
  * @date 23/03/2018 11:46 PM
@@ -44,8 +47,9 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 	init {
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 60.uiPX()).apply {
-			leftMargin = PaddingSize.device
+		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX()).apply {
+			leftPadding = PaddingSize.device
+			rightPadding = PaddingSize.device
 		}
 	}
 
@@ -59,19 +63,19 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 
 		if (hasArrow) {
 			canvas?.save()
-			canvas?.translate(width - 16.uiPX().toFloat(), height / 2f - 7.uiPX() + arrowY)
+			canvas?.translate(width - 36.uiPX().toFloat(), height / 2f - 7.uiPX() + arrowY)
 			canvas?.drawPath(arrow, iconPaint)
 			canvas?.restore()
 		}
 
 		if (hasTopLine) {
 			canvas?.drawLine(
-				0f, 0f, width.toFloat(), BorderSize.default, paint
+				PaddingSize.device.toFloat(), 0f, (width - PaddingSize.device).toFloat(), BorderSize.default, paint
 			)
 		}
 
 		canvas?.drawLine(
-			0f, height - BorderSize.default, width.toFloat(), height - BorderSize.default, paint
+			PaddingSize.device.toFloat(), height - BorderSize.default, (width - PaddingSize.device).toFloat(), height - BorderSize.default, paint
 		)
 	}
 
