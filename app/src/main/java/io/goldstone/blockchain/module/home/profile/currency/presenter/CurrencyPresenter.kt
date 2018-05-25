@@ -56,9 +56,6 @@ class CurrencyPresenter(
 		SupportCurrencyTable.updateUsedStatus(code) {
 			AppConfigTable.updateCurrency(code) {
 				fragment.activity?.jump<SplashActivity>()
-				// 杀掉进程
-				android.os.Process.killProcess(android.os.Process.myPid())
-				System.exit(0)
 			}
 		}
 	}

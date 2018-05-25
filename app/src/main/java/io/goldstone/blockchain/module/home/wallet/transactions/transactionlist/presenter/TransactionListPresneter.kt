@@ -47,7 +47,6 @@ class TransactionListPresenter(
 		} else {
 			fragment.initData()
 		}
-
 	}
 
 	fun showTransactionDetail(model: TransactionListModel?) {

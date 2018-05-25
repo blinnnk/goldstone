@@ -61,17 +61,21 @@ class SplashActivity : AppCompatActivity() {
 			it?.let {
 				// 打印必要数据在 `Debug` 的时候
 				LogUtil.debug(this.javaClass.simpleName, "Config: $it")
-				doAsync { getCurrencyRate(it) }
-			}
-
-			presenter.hasAccountLoginOrElse {
-				container.apply {
-					savedInstanceState.isNull {
-						// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-						addFragment<StartingFragment>(container.id)
+				doAsync {
+					getCurrencyRate(it)  {
+						runOnUiThread {
+							presenter.hasAccountLoginOrElse {
+								container.apply {
+									savedInstanceState.isNull {
+										// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+										addFragment<StartingFragment>(container.id)
+									}
+								}.let {
+									setContentView(it)
+								}
+							}
+						}
 					}
-				}.let {
-					setContentView(it)
 				}
 			}
 		}
@@ -94,10 +98,11 @@ class SplashActivity : AppCompatActivity() {
 	}
 
 	// 获取当前的汇率
-	private fun getCurrencyRate(config: AppConfigTable) {
+	private fun getCurrencyRate(config: AppConfigTable, callback: () -> Unit) {
 		GoldStoneApp.currencyCode = config.currencyCode
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) {
 			GoldStoneApp.currentRate = it
+			callback()
 		}
 	}
 
