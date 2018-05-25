@@ -13,12 +13,15 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -88,6 +91,11 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun updateCurrencyValue(value: Double) {
+		if (valueInput.text?.toString()?.toDoubleOrNull().isNull() && valueInput.text.isNotEmpty()) {
+			context?.alert(AlertText.transferUnvalidInputFromat)
+			valueInput.text.clear()
+			return
+		}
 		val count = if (valueInput.text.isEmpty()) 0.0 else valueInput.text.toString().toDouble()
 		priceInfo.text =
 			"≈ ${(value * count).orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"

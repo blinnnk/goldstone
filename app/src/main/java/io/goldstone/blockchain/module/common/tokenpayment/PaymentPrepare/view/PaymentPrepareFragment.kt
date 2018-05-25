@@ -193,8 +193,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 	private fun updateValueTotalPrice() {
 		val price =
-			getParentFragment<TokenDetailOverlayFragment>()?.token?.price
-				?: 0.0
+			getParentFragment<TokenDetailOverlayFragment>()?.token?.price ?: 0.0
 		inputView.inputTextListener {
 			inputView.updateCurrencyValue(price)
 			if (it.isNotEmpty()) {
