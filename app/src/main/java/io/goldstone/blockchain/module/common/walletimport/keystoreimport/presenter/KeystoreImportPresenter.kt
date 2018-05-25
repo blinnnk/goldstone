@@ -11,6 +11,8 @@ import io.goldstone.blockchain.crypto.convertKeystoreToModel
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.web3j.crypto.Wallet
 
 /**
@@ -31,22 +33,28 @@ class KeystoreImportPresenter(
 		callback: () -> Unit
 	) {
 		isAgree isTrue {
-			try {
-				Wallet.decrypt(
-					password.text.toString(), DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
-				)?.let {
-					PrivateKeyImportPresenter.importWallet(
-						it.privateKey.toString(16),
-						password.text.toString(),
-						nameInput.text.toString(),
-						fragment,
-						hintInput.text?.toString(),
-						callback
-					)
+			doAsync {
+				try {
+					Wallet.decrypt(
+						password.text.toString(), DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
+					)?.let {
+						PrivateKeyImportPresenter.importWallet(
+							it.privateKey.toString(16),
+							password.text.toString(),
+							nameInput.text.toString(),
+							fragment,
+							hintInput.text?.toString()
+						) {
+							fragment.context?.runOnUiThread { callback() }
+						}
+					}
+				} catch (error: Exception) {
+					fragment.context?.runOnUiThread {
+						fragment.context?.alert("Error, Please check your keystore format or password")
+						callback()
+					}
+					LogUtil.error(this.javaClass.simpleName, error)
 				}
-			} catch (error: Exception) {
-				fragment.context?.alert("Error, Please check your keystore format or password")
-				LogUtil.error(this.javaClass.simpleName, error)
 			}
 		} otherwise {
 			fragment.context?.alert("You must agree terms")
