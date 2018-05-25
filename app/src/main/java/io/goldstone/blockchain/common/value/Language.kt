@@ -31,6 +31,18 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "產生錢包"
 		else -> "Create Wallet"
 	}
+
+	@JvmField
+	val passwordRules = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Chinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Japanese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Korean.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.Russian.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.TraditionalChinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		else -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+	}
+
 	@JvmField
 	val mnemonicBackUp = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic Backup"
