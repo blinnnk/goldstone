@@ -384,12 +384,13 @@ object GoldStoneAPI {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
+		crossinline errorCallback: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
 			OkHttpClient.Builder()
-				.connectTimeout(10, TimeUnit.SECONDS)
-				.readTimeout(20, TimeUnit.SECONDS)
+				.connectTimeout(20, TimeUnit.SECONDS)
+				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
 
 		val request = Request.Builder().url(api).build()
@@ -398,6 +399,7 @@ object GoldStoneAPI {
 				call: Call,
 				error: IOException
 			) {
+				errorCallback()
 				LogUtil.error(keyName, error)
 			}
 
@@ -419,6 +421,7 @@ object GoldStoneAPI {
 						hold(gson.fromJson(jsonData, collectionType))
 					}
 				} catch (error: Exception) {
+					errorCallback()
 					GoldStoneCode.showErrorCodeReason(data)
 				}
 			}

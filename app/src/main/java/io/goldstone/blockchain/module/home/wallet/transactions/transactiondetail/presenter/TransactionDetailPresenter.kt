@@ -427,7 +427,7 @@ class TransactionDetailPresenter(
 	private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		val receiptData = arrayListOf(
 			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(), "There isn't a memo",
-			hash, blockNumber, formatDate(30000000L), EtherScanApi.transactionsByHash(hash)
+			hash, blockNumber, formatDate(0), EtherScanApi.transactionsByHash(hash)
 		)
 		arrayListOf(
 			TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,

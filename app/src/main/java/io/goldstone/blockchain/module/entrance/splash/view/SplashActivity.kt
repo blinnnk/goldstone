@@ -9,6 +9,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
@@ -73,10 +74,8 @@ class SplashActivity : AppCompatActivity() {
 				setCurrentChainID(chainID)
 				// 打印必要数据在 `Debug` 的时候
 				LogUtil.debug(this.javaClass.simpleName, "Config: $this")
-				doAsync {
-					getCurrencyRate(this@apply) {
-						presenter.hasAccountThenLogin()
-					}
+				getCurrencyRate(this) {
+					presenter.hasAccountThenLogin()
 				}
 			}
 		}
@@ -107,15 +106,17 @@ class SplashActivity : AppCompatActivity() {
 		config: AppConfigTable,
 		callback: () -> Unit
 	) {
-		GoldStoneApp.currencyCode = config.currencyCode
-		GoldStoneAPI.getCurrencyRate(config.currencyCode, {
-			GoldStoneAPI.context.runOnUiThread {
-				callback()
-				alert("there are some problerems about requesting crrency rate")
+		doAsync {
+			GoldStoneApp.currencyCode = config.currencyCode
+			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+					this@SplashActivity.alert(AlertText.getRateFromServerError)
+				}
+			}) {
+				GoldStoneApp.currentRate = it
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
-		}) {
-			GoldStoneApp.currentRate = it
-			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}
 
