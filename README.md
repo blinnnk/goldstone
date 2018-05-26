@@ -36,7 +36,7 @@ GoldStone uses a decentralized way to send transactions and keep assets secure. 
 Thoughtfully-designed interface, with a smooth user experience. Smart suggestion for gas-price setting, with an ease of use. An elegant way to manage Ethereum assets. 
 ___
 
-* Networks main(1), ropsten(3), rinkeby(4)
+* Networks main(1), ropsten(3), rinkeby(4), koven(5)
 * Tokens(ERC-20)
 * Watch only accounts
 * Contains go-ethereum light client
