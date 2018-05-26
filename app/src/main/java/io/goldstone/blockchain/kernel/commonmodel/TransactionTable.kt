@@ -75,7 +75,28 @@ data class TransactionTable(
 ) {
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, "", ""
+		0,
+		"",
+		"",
+		"", "",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		false,
+		false,
+		"",
+		""
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -102,7 +123,7 @@ data class TransactionTable(
 		data.isReceive,
 		true,
 		data.symbol,
-		data.to,
+		WalletTable.current.address,
 		data.to,
 		false,
 		data.logIndex

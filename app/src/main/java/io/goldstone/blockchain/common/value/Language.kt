@@ -963,6 +963,17 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "Error, Please check your keystore format or password"
 		else -> "Error, Please check your keystore format or password"
 	}
+
+	@JvmField
+	val getRateFromServerError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There are some problerems about requesting crrency rate"
+		HoneyLanguage.Chinese.code -> "There are some problerems about requesting crrency rate"
+		HoneyLanguage.Japanese.code -> "There are some problerems about requesting crrency rate"
+		HoneyLanguage.Korean.code -> "There are some problerems about requesting crrency rate"
+		HoneyLanguage.Russian.code -> "There are some problerems about requesting crrency rate"
+		HoneyLanguage.TraditionalChinese.code -> "There are some problerems about requesting crrency rate"
+		else -> "There are some problerems about requesting crrency rate"
+	}
 }
 
 object CurrentWalletText {
