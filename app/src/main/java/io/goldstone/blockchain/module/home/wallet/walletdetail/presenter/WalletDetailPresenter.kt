@@ -35,11 +35,6 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-/**
- * 放在内存里面的数据, 提升展示的速度
- */
-var walletDetailMemoryData: ArrayList<WalletDetailCellModel>? = null
-
 class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
@@ -186,7 +181,6 @@ class WalletDetailPresenter(
 			currencyList.sortedByDescending { it.currency }
 				.plus(weightList.sortedByDescending { it.weight }).toArrayList()
 		}) {
-			walletDetailMemoryData = it
 			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 			fragment.updateHeaderValue()
 		}
