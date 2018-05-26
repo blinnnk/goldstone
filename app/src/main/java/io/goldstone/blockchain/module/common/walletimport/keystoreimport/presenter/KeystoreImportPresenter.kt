@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter
 
-import android.util.Log
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.convertKeystoreToModel
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
@@ -36,28 +37,28 @@ class KeystoreImportPresenter(
 			doAsync {
 				try {
 					Wallet.decrypt(
-						password.text.toString(), DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
+						password.text.toString(),
+						DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
 					)?.let {
 						PrivateKeyImportPresenter.importWallet(
 							it.privateKey.toString(16),
 							password.text.toString(),
 							nameInput.text.toString(),
-							fragment,
-							hintInput.text?.toString()
+							fragment, hintInput.text?.toString()
 						) {
 							fragment.context?.runOnUiThread { callback() }
 						}
 					}
 				} catch (error: Exception) {
 					fragment.context?.runOnUiThread {
-						fragment.context?.alert("Error, Please check your keystore format or password")
+						fragment.context?.alert(AlertText.wrongKeyStorePassword)
 						callback()
 					}
 					LogUtil.error(this.javaClass.simpleName, error)
 				}
 			}
 		} otherwise {
-			fragment.context?.alert("You must agree terms")
+			fragment.context?.alert(CreateWalletText.agreeRemind)
 		}
 
 	}

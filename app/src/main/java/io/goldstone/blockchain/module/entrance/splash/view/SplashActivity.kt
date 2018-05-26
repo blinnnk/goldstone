@@ -68,12 +68,13 @@ class SplashActivity : AppCompatActivity() {
 		}
 
 		AppConfigTable.getAppConfig {
-			initLaunchLanguage(it?.language)
-			it?.let {
+			it?.apply {
+				initLaunchLanguage(language)
+				setCurrentChainID(chainID)
 				// 打印必要数据在 `Debug` 的时候
-				LogUtil.debug(this.javaClass.simpleName, "Config: $it")
+				LogUtil.debug(this.javaClass.simpleName, "Config: $this")
 				doAsync {
-					getCurrencyRate(it) {
+					getCurrencyRate(this@apply) {
 						presenter.hasAccountThenLogin()
 					}
 				}
@@ -93,8 +94,12 @@ class SplashActivity : AppCompatActivity() {
 	 * Querying the language type of the current account
 	 * set and displaying the interface from the database.
 	 */
-	private fun initLaunchLanguage(code: Int?) {
-		GoldStoneApp.currentLanguage = code ?: GoldStoneApp.currentLanguage
+	private fun initLaunchLanguage(code: Int) {
+		GoldStoneApp.currentLanguage = code
+	}
+
+	private fun setCurrentChainID(id: String) {
+		GoldStoneApp.currentChain = id
 	}
 
 	// 获取当前的汇率

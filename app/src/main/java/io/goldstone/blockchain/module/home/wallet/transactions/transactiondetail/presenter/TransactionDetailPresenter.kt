@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.*
-import io.goldstone.blockchain.crypto.big39.TransactionStatusObserver
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase

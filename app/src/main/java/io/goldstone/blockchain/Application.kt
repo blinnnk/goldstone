@@ -9,6 +9,7 @@ import com.blinnnk.extension.otherwise
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.crypto.GoldStoneEthCall
@@ -20,8 +21,8 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import okhttp3.Interceptor
 
-@Suppress("DEPRECATION")
 /**
  * @date 22/03/2018 3:02 PM
  * @author KaySaith
@@ -35,6 +36,8 @@ class GoldStoneApp : Application() {
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
+
+		// init google analytics
 		sAnalytics = GoogleAnalytics.getInstance(this)
 
 		// create and init database
@@ -46,23 +49,13 @@ class GoldStoneApp : Application() {
 		// init `Api` context
 		GoldStoneAPI.context = this
 
-		NetworkUtil.hasNetwork(this) isTrue {
-			// update local `Tokens` info list
-			StartingPresenter.updateLocalDefaultTokens(this)
-		} otherwise {
-			/** 没有网络且本地数据为空的时候插入本地事先准备好的 `Token Json` */
-			DefaultTokenTable.getTokens {
-				it.isEmpty() isTrue {
-					StartingPresenter.insertLocalTokens(this)
-				}
-			}
-		}
+		// check network to get default toke list
+		initDefaultTokenByNetWork()
 
-		// 插入本本地支持的语言数据
-		SupportCurrencyTable.getSupportCurrencies {
-			it.isEmpty() isTrue { StartingPresenter.insertLocalCurrency(this) }
-		}
-		// 准备 `config` 信息
+		// insert support currency list from local json
+		initSupportCurrencyList()
+
+		// prepare `config` information
 		prepareAppConfig { registerDeviceForPush() }
 
 	}
@@ -79,16 +72,39 @@ class GoldStoneApp : Application() {
 		return tracker
 	}
 
+	private fun initDefaultTokenByNetWork() {
+		NetworkUtil.hasNetwork(this) isTrue {
+			// update local `Tokens` info list
+			StartingPresenter.updateLocalDefaultTokens(this)
+		} otherwise {
+			// if there isn't network init local token list
+			DefaultTokenTable.getTokens {
+				it.isEmpty() isTrue {
+					StartingPresenter.insertLocalTokens(this)
+				}
+			}
+		}
+	}
+
+	private fun initSupportCurrencyList() {
+		SupportCurrencyTable.getSupportCurrencies {
+			it.isEmpty() isTrue {
+				StartingPresenter.insertLocalCurrency(this)
+			}
+		}
+	}
+
 	companion object {
 
 		var currentRate: Double = 1.0
 		var currencyCode: String = CountryCode.currentCurrency
 		var currentLanguage: Int? =
 			HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol)
+		var currentChain = ChainID.Main.id
 
 		private fun prepareAppConfig(callback: () -> Unit) {
 			AppConfigTable.getAppConfig { config ->
-				config.isNull().isTrue {
+				config.isNull() isTrue {
 					AppConfigTable.insertAppConfig(callback)
 				} otherwise {
 					config?.isRegisteredAddresses?.isFalse {

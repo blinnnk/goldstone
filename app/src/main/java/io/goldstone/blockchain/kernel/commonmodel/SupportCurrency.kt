@@ -58,8 +58,7 @@ data class SupportCurrencyTable(
 
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.currencyDao()
-					.getSupportCurrencies()
+				GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
 			}) {
 				hold(it.toArrayList())
 			}

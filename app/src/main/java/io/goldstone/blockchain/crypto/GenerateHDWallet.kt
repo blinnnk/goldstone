@@ -14,9 +14,9 @@ import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.runOnUiThread
 import org.kethereum.bip39.Mnemonic
-import org.kethereum.crypto.Keys
 import org.kethereum.crypto.publicKeyFromPrivate
 import org.walleth.khex.hexToByteArray
+import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import java.io.File
 
@@ -39,7 +39,7 @@ fun Context.generateWallet(
 		/** Generate Keystore */
 		val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 		/** Generate Keys */
-		val masterKey = masterWallet.getKeyPair()
+		val masterKey = masterWallet.keyPair
 		/** Get Public Key and Private Key*/
 		val publicKey = Keys.getAddress(masterKey.publicKey)
 		val address = "0x" + publicKey.toLowerCase()
@@ -63,7 +63,7 @@ fun Context.getWalletByMnemonic(
 	/** Generate Keystore */
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	/** Generate Keys */
-	val masterKey = masterWallet.getKeyPair()
+	val masterKey = masterWallet.keyPair
 	/** Get Public Key and Private Key*/
 	val publicKey = Keys.getAddress(masterKey.publicKey)
 	val address = "0x" + publicKey.toLowerCase()

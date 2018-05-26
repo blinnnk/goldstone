@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -37,8 +38,8 @@ class LanguagePresenter(
 	) {
 		fragment.context?.apply {
 			alert(
-				"Once you selected it, application will be rebooted and just wait several seconds.",
-				"Are You Sure To Switch Language Settings?"
+				AlertText.switchLanguage,
+				AlertText.switchLanguageConfirmText
 			) {
 				yesButton {
 					updateLanguageValue(language)

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto.big39
+package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.os.Handler
 import android.os.Looper
