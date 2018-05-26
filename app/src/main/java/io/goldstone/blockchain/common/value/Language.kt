@@ -13,13 +13,13 @@ object CreateWalletText {
 
 	@JvmField
 	val attention = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Password strength is critical to guard your wallet We can’t recover the password, please back up cautiously"
+		HoneyLanguage.English.code -> "Password strength is critical for the security of your wallet. We will be unable to recover your password, so make sure save it yourself, and in a very secure way!"
 		HoneyLanguage.Chinese.code -> "越强的密码越安全，请尽量设置更复杂的密码。我们不会为您保管密码，请您谨慎保管。"
 		HoneyLanguage.Japanese.code -> "パスワードが複雑になればなるほど、財布はより安全になります。 あなたのパスワードを保持しません、慎重にバックアップしてください。"
 		HoneyLanguage.Korean.code -> "암호가 복잡할수록 지갑은 안전합니다"
 		HoneyLanguage.Russian.code -> "Чем сложнее пароль, тем более безопасен кошелек"
 		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管。"
-		else -> "Password strength is critical to guard your wallet We can’t recover the password, please back up cautiously"
+		else -> "Password strength is critical for the security of your wallet. We will be unable to recover your password, so make sure save it yourself, and in a very secure way!"
 	}
 	@JvmField
 	val create = when (currentLanguage) {
@@ -931,9 +931,39 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "Wrong Input Value Format, Please Check"
 		else -> "Wrong Input Value Format, Please Check"
 	}
+
+	@JvmField
+	val switchLanguage = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		HoneyLanguage.Chinese.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		HoneyLanguage.Japanese.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		HoneyLanguage.Korean.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		HoneyLanguage.Russian.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		HoneyLanguage.TraditionalChinese.code -> "Once you selected it, application will be rebooted and just wait several seconds."
+		else -> "Once you selected it, application will be rebooted and just wait several seconds."
+	}
+	@JvmField
+	val switchLanguageConfirmText = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Are You Sure To Switch Language Settings?"
+		HoneyLanguage.Chinese.code -> "Are You Sure To Switch Language Settings?"
+		HoneyLanguage.Japanese.code -> "Are You Sure To Switch Language Settings?"
+		HoneyLanguage.Korean.code -> "Are You Sure To Switch Language Settings?"
+		HoneyLanguage.Russian.code -> "Are You Sure To Switch Language Settings?"
+		HoneyLanguage.TraditionalChinese.code -> "Are You Sure To Switch Language Settings?"
+		else -> "Are You Sure To Switch Language Settings?"
+	}
+
+	@JvmField
+	val wrongKeyStorePassword = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Error, Please check your keystore format or password"
+		HoneyLanguage.Chinese.code -> "Error, Please check your keystore format or password"
+		HoneyLanguage.Japanese.code -> "Error, Please check your keystore format or password"
+		HoneyLanguage.Korean.code -> "Error, Please check your keystore format or password"
+		HoneyLanguage.Russian.code -> "Error, Please check your keystore format or password"
+		HoneyLanguage.TraditionalChinese.code -> "Error, Please check your keystore format or password"
+		else -> "Error, Please check your keystore format or password"
+	}
 }
-
-
 
 object CurrentWalletText {
 
@@ -1872,6 +1902,17 @@ object ChainText {
 		HoneyLanguage.Russian.code -> "Koven Testnet"
 		HoneyLanguage.TraditionalChinese.code -> "Koven Testnet"
 		else -> "Koven Testnet"
+	}
+
+	@JvmField
+	val rinkeby = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Rinkeby Testnet"
+		HoneyLanguage.Chinese.code -> "Rinkeby Testnet"
+		HoneyLanguage.Japanese.code -> "Rinkeby Testnet"
+		HoneyLanguage.Korean.code -> "Rinkeby Testnet"
+		HoneyLanguage.Russian.code -> "Rinkeby Testnet"
+		HoneyLanguage.TraditionalChinese.code -> "Rinkeby Testnet"
+		else -> "Rinkeby Testnet"
 	}
 }
 

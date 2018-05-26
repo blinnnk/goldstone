@@ -10,7 +10,8 @@ import io.goldstone.blockchain.module.home.profile.chainselection.model.ChainSel
  */
 
 class ChainSelectionAdapter(
-	override val dataSet: ArrayList<ChainSelectionModel>
+	override val dataSet: ArrayList<ChainSelectionModel>,
+	private val hold: ChainSelectionCell.() -> Unit
 	) : HoneyBaseAdapter<ChainSelectionModel, ChainSelectionCell>() {
 	override fun generateCell(context: Context) = ChainSelectionCell(context)
 
@@ -19,6 +20,7 @@ class ChainSelectionAdapter(
 		position: Int
 	) {
 		model = data
+		hold(this)
 	}
 
 }

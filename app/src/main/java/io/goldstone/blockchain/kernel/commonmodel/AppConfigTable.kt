@@ -162,6 +162,22 @@ data class AppConfigTable(
 			}
 		}
 
+		fun updateChainID(
+			chainID: String,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply { this.chainID = chainID })
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
 		fun updateCurrency(
 			code: String,
 			callback: () -> Unit

@@ -6,8 +6,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.APIPath
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -276,7 +278,15 @@ object GoldStoneEthCall {
 		}
 	}
 
-	private const val currentChain = APIPath.ropstan
+	private val currentChain: (currentChainID: String) -> String = {
+		when (it) {
+			ChainID.Main.id -> APIPath.main
+			ChainID.Ropstan.id -> APIPath.ropstan
+			ChainID.Rinkeby.id -> APIPath.ropstan
+			ChainID.Kovan.id -> APIPath.ropstan
+			else -> APIPath.main
+		}
+	}
 
 	private fun callEthBy(
 		body: RequestBody,
@@ -285,7 +295,7 @@ object GoldStoneEthCall {
 	) {
 		val client = OkHttpClient()
 
-		GoldStoneAPI.getcryptoRequest(body, currentChain) {
+		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.currentChain)) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
 					call: Call,
