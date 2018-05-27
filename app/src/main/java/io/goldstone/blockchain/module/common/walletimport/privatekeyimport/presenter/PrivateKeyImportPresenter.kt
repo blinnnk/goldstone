@@ -32,11 +32,13 @@ class PrivateKeyImportPresenter(
 		hintInput: EditText,
 		callback: () -> Unit
 	) {
+		
 		privateKeyInput.text.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.privateKeyAlert)
 			callback()
 			return
 		}
+		
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),

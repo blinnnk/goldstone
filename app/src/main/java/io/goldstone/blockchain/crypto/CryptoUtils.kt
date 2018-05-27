@@ -4,10 +4,9 @@ import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import org.kethereum.extensions.toHexStringZeroPadded
-import org.walleth.khex.toHexString
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.text.DecimalFormat

@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -94,7 +94,7 @@ class TransactionListPresenter(
 				?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(currentBlockNumber) { newData ->
-			/** chain data is empty then return and remove loading view*/
+			/** chain data is empty then return and remove loading view */
 			if (newData.isEmpty()) {
 				removeLoadingView()
 				return@getTransactionDataFromEtherScan
@@ -215,7 +215,8 @@ class TransactionListPresenter(
 					override fun concurrentJobs() {
 						forEach { transactionTable ->
 							if (transactionTable.isERC20) {
-								GoldStoneEthCall.getInputCodeByHash(transactionTable.hash) {
+								GoldStoneEthCall
+									.getInputCodeByHash(transactionTable.hash) {
 									GoldStoneDataBase.database.transactionDao()
 										.insert(transactionTable.apply { input = it })
 									completeMark()
@@ -270,7 +271,8 @@ class TransactionListPresenter(
 
 								tokenInfo.isNull() isTrue {
 									// 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
-									GoldStoneEthCall.getTokenSymbolAndDecimalByContract(contract) { symbol, decimal ->
+									GoldStoneEthCall
+										.getTokenSymbolAndDecimalByContract(contract) { symbol, decimal ->
 										TransactionTable.updateModelInfoFromChain(
 											transaction, true, symbol, CryptoUtils.toCountByDecimal(
 												transaction.value.toDouble(), decimal

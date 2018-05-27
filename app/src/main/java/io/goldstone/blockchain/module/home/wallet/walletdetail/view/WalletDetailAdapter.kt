@@ -17,14 +17,12 @@ import org.jetbrains.anko.matchParent
  * @date 23/03/2018 4:16 PM
  * @author KaySaith
  */
-
 class WalletDetailAdapter(
 	override val dataSet: ArrayList<WalletDetailCellModel>,
 	private val holdCell: WalletDetailCell.() -> Unit,
 	private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, LinearLayout>() {
-
 	override fun generateCell(context: Context) =
 		WalletDetailCell(context)
 

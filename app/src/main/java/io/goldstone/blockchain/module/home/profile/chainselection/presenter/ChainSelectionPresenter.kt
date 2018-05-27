@@ -15,7 +15,6 @@ import io.goldstone.blockchain.module.home.profile.chainselection.view.ChainSele
  * @date 2018/5/11 4:26 PM
  * @author KaySaith
  */
-
 class ChainSelectionPresenter(
 	override val fragment: ChainSelectionFragment
 ) : BaseRecyclerPresenter<ChainSelectionFragment, ChainSelectionModel>() {
@@ -25,7 +24,12 @@ class ChainSelectionPresenter(
 			it?.apply {
 				fragment.asyncData = arrayListOf(
 					ChainSelectionModel(ChainText.goldStoneMain, chainID == ChainID.Main.id, Spectrum.lightRed, ChainID.Main.id),
-					ChainSelectionModel(ChainText.rinkeby, chainID == ChainID.Rinkeby.id, Spectrum.lightGreen, ChainID.Rinkeby.id),
+					ChainSelectionModel(
+						ChainText.rinkeby,
+						chainID == ChainID.Rinkeby.id,
+						Spectrum.lightGreen,
+						ChainID.Rinkeby.id
+					),
 					ChainSelectionModel(ChainText.ropstan, chainID == ChainID.Ropstan.id, Color.GRAY, ChainID.Ropstan.id),
 					ChainSelectionModel(ChainText.koven, chainID == ChainID.Kovan.id, Spectrum.blue, ChainID.Kovan.id)
 				)

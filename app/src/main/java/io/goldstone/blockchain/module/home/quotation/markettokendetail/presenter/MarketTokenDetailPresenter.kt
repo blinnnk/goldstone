@@ -35,11 +35,10 @@ import java.util.*
  * @date 25/04/2018 6:52 AM
  * @author KaySaith
  */
-
 class MarketTokenDetailPresenter(
 	override val fragment: MarketTokenDetailFragment
 ) : BasePresenter<MarketTokenDetailFragment>() {
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
@@ -47,7 +46,7 @@ class MarketTokenDetailPresenter(
 		}
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
-
+	
 	fun updateChartByMenu(
 		chartView: MarketTokenChart,
 		buttonID: Int
@@ -59,7 +58,6 @@ class MarketTokenDetailPresenter(
 			MarketTokenDetailChartType.Hour.code -> MarketTokenDetailChartType.Hour.info
 			else -> ""
 		}
-
 		val dateType: Int = when (period) {
 			MarketTokenDetailChartType.WEEK.info -> DateUtils.FORMAT_NUMERIC_DATE
 			MarketTokenDetailChartType.DAY.info -> DateUtils.FORMAT_NUMERIC_DATE
@@ -67,7 +65,7 @@ class MarketTokenDetailPresenter(
 			MarketTokenDetailChartType.Hour.info -> DateUtils.FORMAT_SHOW_TIME
 			else -> 1000
 		}
-
+		
 		fragment.currencyInfo?.apply {
 			fragment.getMainActivity()?.showLoadingView()
 			QuotationSelectionTable.getSelectionByPair(pair) {
@@ -107,7 +105,7 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun MarketTokenChart.updateChartDataBy(
 		pair: String,
 		period: String,
@@ -120,7 +118,7 @@ class MarketTokenDetailPresenter(
 			updateChartUI(it, dateType)
 		}
 	}
-
+	
 	private fun checkDatabaseTimeIsValidBy(
 		period: String,
 		databaseTime: Long,
@@ -131,22 +129,24 @@ class MarketTokenDetailPresenter(
 				// 如果本地数据库的时间周的最大时间小当前于自然周一的时间
 				callback(databaseTime > TimeUtils.getNatureSundayTimeInMill() - TimeUtils.ondDayInMills)
 			}
+			
 			MarketTokenDetailChartType.DAY.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > 0.daysAgoInMills() - TimeUtils.oneHourInMills)
 			}
+			
 			MarketTokenDetailChartType.MONTH.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > TimeUtils.getNatureMonthFirstTimeInMill() - TimeUtils.ondDayInMills)
 			}
-
+			
 			else -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > System.currentTimeMillis() - TimeUtils.oneHourInMills)
 			}
 		}
 	}
-
+	
 	private fun MarketTokenChart.updateChartUI(data: ArrayList<ChartModel>, dateType: Int) {
 		fragment.context?.apply {
 			runOnUiThread {
@@ -163,7 +163,7 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun ArrayList<ChartModel>.updateChartDataInDatabaseBy(
 		period: String,
 		pair: String
@@ -173,19 +173,22 @@ class MarketTokenDetailPresenter(
 				MarketTokenDetailChartType.WEEK.info -> {
 					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
 				}
+				
 				MarketTokenDetailChartType.DAY.info -> {
 					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
 				}
+				
 				MarketTokenDetailChartType.MONTH.info -> {
 					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
 				}
+				
 				MarketTokenDetailChartType.Hour.info -> {
 					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
 				}
 			}
 		}
 	}
-
+	
 	fun setCurrencyInf(
 		currencyInfo: QuotationModel?,
 		tokenInformation: TokenInformation,
@@ -202,19 +205,17 @@ class MarketTokenDetailPresenter(
 			loadDescriptionFromLocalOrServer(info, tokenInfo)
 		}
 	}
-
+	
 	private fun loadDescriptionFromLocalOrServer(
 		info: QuotationModel,
 		tokenInfo: TokenInfoView
 	) {
 		QuotationSelectionTable.getSelectionByPair(info.pair) {
 			it?.apply {
-
 				val maxCount: (String?) -> Int = { it ->
 					if (it?.length.orZero() < 300) it?.length.orZero()
 					else 300
 				}
-
 				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
 				if (description.isNullOrBlank() || !description?.substring(0, 2).equals(
 						HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()), true
@@ -238,9 +239,9 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private var currentSocket: GoldStoneWebSocket? = null
-
+	
 	private fun QuotationModel.updateCurrencyPriceInfo() {
 		// 传默认值
 		fragment.currentPriceInfo.model = CurrentPriceModel()
@@ -254,11 +255,11 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-
+		
 		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
 			presenter.resetSocket()
 		}

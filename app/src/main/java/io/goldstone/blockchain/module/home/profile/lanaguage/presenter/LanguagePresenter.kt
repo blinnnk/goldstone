@@ -17,7 +17,6 @@ import org.jetbrains.anko.yesButton
  * @date 26/03/2018 6:42 PM
  * @author KaySaith
  */
-
 class LanguagePresenter(
 	override val fragment: LanguageFragment
 ) : BaseRecyclerPresenter<LanguageFragment, LanguageModel>() {

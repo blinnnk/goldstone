@@ -15,17 +15,16 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.Quotat
  * @date 21/04/2018 4:14 PM
  * @author KaySaith
  */
-
 class QuotationOverlayPresenter(
 	override val fragment: QuotationOverlayFragment
 ) : BaseOverlayPresenter<QuotationOverlayFragment>() {
-
+	
 	fun showQutationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content) {
 			//
 		}
 	}
-
+	
 	fun showMarketTokenDetailFragment(model: QuotationModel?) {
 		fragment.addFragmentAndSetArgument<MarketTokenDetailFragment>(ContainerID.content) {
 			putSerializable(
@@ -34,7 +33,7 @@ class QuotationOverlayPresenter(
 			)
 		}
 	}
-
+	
 	fun showQutationSearchFragment() {
 		showTargetFragment<QuotationSearchFragment>(
 			QuotationText.search,
@@ -48,5 +47,4 @@ class QuotationOverlayPresenter(
 			}
 		}
 	}
-
 }

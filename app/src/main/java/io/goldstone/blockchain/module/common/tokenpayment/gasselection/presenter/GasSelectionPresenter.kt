@@ -15,6 +15,7 @@ import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
@@ -161,7 +162,8 @@ class GasSelectionPresenter(
 					// 生成签名哈希值
 					val hexValue = Numeric.toHexString(signedMessage)
 					// 发起 `sendRawTransaction` 请求
-					GoldStoneEthCall.sendRawTransaction(hexValue) { taxHash ->
+					GoldStoneEthCall
+						.sendRawTransaction(hexValue) { taxHash ->
 						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 						taxHash.isValidTaxHash() isTrue {

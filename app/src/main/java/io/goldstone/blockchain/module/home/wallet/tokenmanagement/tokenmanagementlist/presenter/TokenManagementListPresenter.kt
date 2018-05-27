@@ -16,14 +16,13 @@ import org.jetbrains.anko.runOnUiThread
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-
 // 获取数据后把默认列表防止到内存里加快每次访问的速度
 private var defaultTokenList: ArrayList<DefaultTokenTable>? = null
 
 class TokenManagementListPresenter(
 	override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
-
+	
 	override fun updateData() {
 		defaultTokenList.isNull() isFalse {
 			fragment.asyncData = defaultTokenList
@@ -32,7 +31,7 @@ class TokenManagementListPresenter(
 			fragment.prepareMyDefaultTokens()
 		}
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
@@ -40,12 +39,12 @@ class TokenManagementListPresenter(
 	) {
 		setHeightMatchParent()
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
 	}
-
+	
 	private fun TokenManagementListFragment.prepareMyDefaultTokens() {
 		doAsync {
 			// 在异步线程更新数据
@@ -70,9 +69,9 @@ class TokenManagementListPresenter(
 			}
 		}
 	}
-
+	
 	companion object {
-
+		
 		private var needShowLoadingView = true
 		fun updateMyTokensInfoBy(cell: TokenManagementListCell, activity: MainActivity) {
 			/**

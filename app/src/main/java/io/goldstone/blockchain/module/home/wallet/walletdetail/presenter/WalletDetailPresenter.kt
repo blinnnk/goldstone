@@ -34,18 +34,17 @@ import org.jetbrains.anko.runOnUiThread
  * @date 23/03/2018 3:45 PM
  * @author KaySaith
  */
-
 class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
-
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
 	}
-
+	
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 查询钱包总数更新数字
@@ -68,12 +67,12 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	/**
 	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
 	private var isFirstTime = true
-
+	
 	override fun onFragmentResume() {
 		if (!isFirstTime) {
 			updateData()
@@ -83,7 +82,7 @@ class WalletDetailPresenter(
 		fragment.getMainActivity()?.backEvent = null
 		isFirstTime = false
 	}
-
+	
 	fun showTransactionsFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.transaction) isFalse {
@@ -91,7 +90,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showWalletListFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.walletManagement) isFalse {
@@ -99,7 +98,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showNotificationListFragment() {
 		XinGePushReceiver.clearAppIconRedot()
 		fragment.activity?.apply {
@@ -108,7 +107,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showTokenManagementFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenManagement) isFalse {
@@ -116,7 +115,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showWalletSettingsFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.walletSettings) isFalse {
@@ -130,7 +129,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
@@ -144,7 +143,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun updateUnreadCount() {
 		doAsync {
 			AppConfigTable.getAppConfig { config ->
@@ -172,20 +171,22 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
-		coroutinesTask({
-			/** 先按照资产情况排序, 资产为零的按照权重排序 */
-			val currencyList = data.filter { it.currency > 0.0 }
-			val weightList = data.filter { it.currency == 0.0 }
-			currencyList.sortedByDescending { it.currency }
-				.plus(weightList.sortedByDescending { it.weight }).toArrayList()
-		}) {
+		coroutinesTask(
+			{
+				/** 先按照资产情况排序, 资产为零的按照权重排序 */
+				val currencyList = data.filter { it.currency > 0.0 }
+				val weightList = data.filter { it.currency == 0.0 }
+				currencyList.sortedByDescending { it.currency }
+					.plus(weightList.sortedByDescending { it.weight }).toArrayList()
+			}
+		) {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 			fragment.updateHeaderValue()
 		}
 	}
-
+	
 	private fun showPinCodeFragment() {
 		fragment.activity?.supportFragmentManager?.findFragmentByTag(
 			FragmentTag.pinCode
@@ -201,7 +202,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun WalletDetailFragment.updateHeaderValue() {
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`

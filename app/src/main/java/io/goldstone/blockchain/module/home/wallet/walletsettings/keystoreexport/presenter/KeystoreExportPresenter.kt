@@ -17,7 +17,6 @@ import org.jetbrains.anko.support.v4.toast
  * @date 06/04/2018 1:46 AM
  * @author KaySaith
  */
-
 class KeystoreExportPresenter(
 	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
@@ -26,7 +25,6 @@ class KeystoreExportPresenter(
 		passwordInput: EditText,
 		hold: String.() -> Unit
 	) {
-
 		if (passwordInput.text?.toString().orEmpty().length < 8) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")

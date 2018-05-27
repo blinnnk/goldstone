@@ -20,9 +20,7 @@ import org.jetbrains.anko.imageResource
  * @date 24/03/2018 12:21 AM
  * @author KaySaith
  */
-
 class CurrentAccountView(context: Context) : RelativeLayout(context) {
-
 	val avatar by lazy { ImageView(context) }
 	val info by lazy { TwoLineTitles(context) }
 	private val qrIcon by lazy { ImageView(context) }

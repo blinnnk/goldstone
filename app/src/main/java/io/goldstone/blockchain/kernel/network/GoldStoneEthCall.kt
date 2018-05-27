@@ -1,6 +1,6 @@
 @file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,9 +10,8 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.APIPath
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -40,8 +39,12 @@ object GoldStoneEthCall {
 		GetTotalSupply("eth_call", SolidityCode.getTotalSupply),
 		GetTokenDecimal("eth_call", SolidityCode.getDecimal),
 		GetTokenName("eth_call", SolidityCode.getTokenName),
-		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName),
-		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall),
+		SendRawTransaction("eth_sendRawTransaction",
+		                   SolidityCode.getTokenName
+		                  ),
+		GetTransactionByHash("eth_getTransactionByHash",
+		                     SolidityCode.ethCall
+		                    ),
 		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall),
 		PendingFitler("eth_newFilter", SolidityCode.ethCall)
 	}
@@ -66,17 +69,17 @@ object GoldStoneEthCall {
 		walletAddress: String
 	) {
 		getTokenSymbol(contractAddress) { symbol ->
-			getTokenName(contractAddress) { name ->
-				getTokenDecimal(contractAddress) { decimal ->
-					getTokenTotalSupply(contractAddress) { totalSupply ->
-						getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
-							// 用的时候再完善这里
-							println(symbol + name + decimal + totalSupply + tokenBalance)
-						}
+				getTokenName(contractAddress) { name ->
+						getTokenDecimal(contractAddress) { decimal ->
+								getTokenTotalSupply(contractAddress) { totalSupply ->
+										getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
+												// 用的时候再完善这里
+												println(symbol + name + decimal + totalSupply + tokenBalance)
+											}
+									}
+							}
 					}
-				}
 			}
-		}
 	}
 
 	@JvmStatic
@@ -85,12 +88,12 @@ object GoldStoneEthCall {
 		hold: (symbol: String, name: String, decimal: Double) -> Unit
 	) {
 		getTokenSymbol(contractAddress) { symbol ->
-			getTokenName(contractAddress) { name ->
-				getTokenDecimal(contractAddress) { decimal ->
-					hold(symbol, name, decimal)
-				}
+				getTokenName(contractAddress) { name ->
+						getTokenDecimal(contractAddress) { decimal ->
+								hold(symbol, name, decimal)
+							}
+					}
 			}
-		}
 	}
 
 	@JvmStatic
@@ -99,10 +102,10 @@ object GoldStoneEthCall {
 		hold: (symbol: String, decimal: Double) -> Unit
 	) {
 		getTokenSymbol(contractAddress) { symbol ->
-			getTokenDecimal(contractAddress) { decimal ->
-				hold(symbol, decimal)
+				getTokenDecimal(contractAddress) { decimal ->
+						hold(symbol, decimal)
+					}
 			}
-		}
 	}
 
 	fun getTokenCountWithDecimalByContract(
@@ -111,10 +114,10 @@ object GoldStoneEthCall {
 		hold: (Double) -> Unit
 	) {
 		getTokenBalanceWithContract(contractAddress, walletAddress) { tokenBalance ->
-			getTokenDecimal(contractAddress) {
-				hold(tokenBalance / Math.pow(10.0, it))
+				getTokenDecimal(contractAddress) {
+					hold(tokenBalance / Math.pow(10.0, it))
+				}
 			}
-		}
 	}
 
 	@JvmStatic
@@ -295,7 +298,11 @@ object GoldStoneEthCall {
 	) {
 		val client = OkHttpClient()
 
-		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.currentChain)) {
+		GoldStoneAPI.getcryptoRequest(body,
+		                              currentChain(
+			                              GoldStoneApp.currentChain
+		                              )
+		) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
 					call: Call,

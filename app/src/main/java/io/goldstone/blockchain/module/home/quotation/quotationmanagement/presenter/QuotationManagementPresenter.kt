@@ -13,52 +13,55 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
  * @date 21/04/2018 3:58 PM
  * @author KaySaith
  */
-
 class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
-
+	
 	override fun updateData() {
 		updateSelectionsData()
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
 		maxHeight: Int
 	) {
-		super.updateParentContentLayoutHeight(fragment.asyncData?.size.orZero(), fragment.setSlideUpWithCellHeight(), maxHeight)
+		super.updateParentContentLayoutHeight(
+			fragment.asyncData?.size.orZero(),
+			fragment.setSlideUpWithCellHeight(),
+			maxHeight
+		)
 	}
-
+	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
 			presenter.updateData()
 		}
 	}
-
+	
 	private fun updateSelectionsData(callback: () -> Unit = {}) {
 		QuotationSelectionTable.getMySelections {
 			it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
-					fragment.apply {
-						asyncData.isNull() isTrue {
-							asyncData = orderedData
-						} otherwise {
-							diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
-						}
+				fragment.apply {
+					asyncData.isNull() isTrue {
+						asyncData = orderedData
+					} otherwise {
+						diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
 					}
 				}
+			}
 			callback()
 		}
 	}
-
+	
 	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
 		fragment.updateSelectionOrderID()
 	}
-
+	
 	private fun getCurrentAsyncData() =
 		fragment.asyncData.orEmptyArray()
-
+	
 	private fun QuotationManagementFragment.updateSelectionOrderID() {
 		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { fromPosition, toPosition ->
 			val data = getCurrentAsyncData()
@@ -80,7 +83,7 @@ class QuotationManagementPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		// 更新数据
 		updateSelectionsData {

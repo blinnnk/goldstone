@@ -17,11 +17,10 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
  * @date 25/03/2018 2:46 AM
  * @author KaySaith
  */
-
 class TokenManagementPresenter(
 	override val fragment: TokenManagementFragment
 ) : BaseOverlayPresenter<TokenManagementFragment>() {
-
+	
 	override fun onFragmentDestroy() {
 		fragment.getMainActivity()?.apply {
 			supportFragmentManager.findFragmentByTag(FragmentTag.home)
@@ -30,14 +29,13 @@ class TokenManagementPresenter(
 				}
 		}
 	}
-
+	
 	fun showTokenManagementFragment() {
 		fragment.apply {
-
 			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content) {
 				// Send Arguments
 			}
-
+			
 			overlayView.header.apply {
 				showSearchButton(true) {
 					showTokenSearchFragment()
@@ -49,7 +47,7 @@ class TokenManagementPresenter(
 			}
 		}
 	}
-
+	
 	private fun TokenManagementFragment.showTokenSearchFragment() {
 		childFragmentManager.fragments.apply {
 			if (last() is TokenManagementListFragment) hideChildFragment(last())
@@ -58,5 +56,4 @@ class TokenManagementPresenter(
 			}
 		}
 	}
-
 }

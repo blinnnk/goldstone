@@ -28,31 +28,29 @@ import org.json.JSONObject
  * @date 26/03/2018 8:56 PM
  * @author KaySaith
  */
-
 var selectionMD5: String? = null
 var memoryData: ArrayList<QuotationModel>? = null
 
 class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
-
+	
 	private var updateChartTimes: Int? = null
 	private var hasInitSocket = false
-
+	
 	override fun updateData() {
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let { diffAndUpdateData(it) }
-
+		
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
 			if (selectionMD5 == selections.getObjectMD5HexString()) {
 				return@getMySelections
 			}
 			selectionMD5 = selections.getObjectMD5HexString()
-
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
-
+			
 			selections.map { selection ->
 				val linechart = convertDataToChartData(selection.lineChartDay)
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
@@ -85,11 +83,11 @@ class QuotationPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentResume() {
 		resetSocket()
 	}
-
+	
 	fun resetSocket() {
 		currentSocket?.let {
 			if (!it.isSocketConnected()) {
@@ -102,7 +100,7 @@ class QuotationPresenter(
 			}
 		}
 	}
-
+	
 	private fun diffAndUpdateData(data: ArrayList<QuotationModel>) {
 		fragment.asyncData.isNull() isTrue {
 			fragment.asyncData = data
@@ -110,7 +108,7 @@ class QuotationPresenter(
 			diffAndUpdateAdapterData<QuotationAdapter>(data)
 		}
 	}
-
+	
 	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
 		sortedByDescending {
 			it.label.toLong()
@@ -135,19 +133,19 @@ class QuotationPresenter(
 			}
 		}
 	}
-
+	
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: () -> Unit) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(fragment.asyncData?.map { it.pair }?.toArrayList(),
-			{
-				currentSocket = it
-				callback()
-			}) {
+		                     {
+			                     currentSocket = it
+			                     callback()
+		                     }) {
 			fragment.updateAdapterDataset(it)
 		}
 	}
-
+	
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		if (isHidden) {
 			currentSocket?.isSocketConnected()?.isTrue {
@@ -159,7 +157,7 @@ class QuotationPresenter(
 			}
 		}
 	}
-
+	
 	private fun QuotationFragment.updateAdapterDataset(data: CurrencyPriceInfoModel) {
 		doAsync {
 			var index: Int? = null
@@ -177,7 +175,7 @@ class QuotationPresenter(
 			}
 		}
 	}
-
+	
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putString(
@@ -186,7 +184,7 @@ class QuotationPresenter(
 			)
 		}
 	}
-
+	
 	fun showMarketTokenDetailFragment(model: QuotationModel) {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putSerializable(
@@ -195,7 +193,7 @@ class QuotationPresenter(
 			)
 		}
 	}
-
+	
 	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
 		val jsonarray = JSONArray(data)
 		(0 until jsonarray.length()).map {
@@ -208,7 +206,7 @@ class QuotationPresenter(
 			return it.toArrayList()
 		}
 	}
-
+	
 	companion object {
 		fun getPriceInfoBySocket(
 			pairList: ArrayList<String>?, holdSocket: (GoldStoneWebSocket) -> Unit,
@@ -223,13 +221,13 @@ class QuotationPresenter(
 						sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 					}
 				}
-
+				
 				override fun getServerBack(content: JSONObject) {
 					hold(CurrencyPriceInfoModel(content))
 				}
 			}.apply(holdSocket)
 		}
-
+		
 		fun getQuotationFragment(activity: MainActivity?, callback: QuotationFragment.() -> Unit) {
 			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {

@@ -16,7 +16,6 @@ import org.jetbrains.anko.support.v4.toast
  * @date 26/03/2018 9:13 PM
  * @author KaySaith
  */
-
 class PasswordSettingsPresenter(
 	override val fragment: PasswordSettingsFragment
 ) : BasePresenter<PasswordSettingsFragment>() {

@@ -22,7 +22,6 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
  * @date 23/04/2018 2:34 PM
  * @author KaySaith
  */
-
 class PinCodeEditorPresenter(
 	override val fragment: PinCodeEditorFragment
 ) : BasePresenter<PinCodeEditorFragment>() {
@@ -50,7 +49,6 @@ class PinCodeEditorPresenter(
 		repeatPinCode: EditText,
 		switch: HoneyBaseSwitch
 	) {
-
 		if (newPinCode.text.isEmpty()) {
 			fragment.context?.alert(PincodeText.countAlert)
 			return

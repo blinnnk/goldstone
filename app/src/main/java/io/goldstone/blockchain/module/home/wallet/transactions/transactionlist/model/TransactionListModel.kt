@@ -17,7 +17,6 @@ import java.io.Serializable
  * @date 24/03/2018 7:09 PM
  * @author KaySaith
  */
-
 data class TransactionListModel(
 	val addressName: String,
 	val addressInfo: String,
@@ -36,24 +35,24 @@ data class TransactionListModel(
 	val value: String,
 	val hasError: Boolean
 ) : Serializable {
-
+	
 	constructor(data: TransactionTable) : this(
 		data.tokenReceiveAddress.orEmpty(),
 		CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp) + descriptionText(data.isReceive) + data.fromAddress), // 副标题的生成
 		data.value.toDouble(), // 转账个数
-		data.symbol, data.isReceive, DateUtils.formatDateTime(
-			GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR
-		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_TIME
-		), // 拼接时间
+		data.symbol,
+		data.isReceive,
+		DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_TIME), // 拼接时间
 		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
 		data.hash, getMemoFromInputCode(data.input),
 		(data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
 		EtherScanApi.singleTransactionHas(data.hash), // Api 地址拼接
-		data.isPending, data.timeStamp, data.value, data.hasError == "1"
+		data.isPending,
+		data.timeStamp,
+		data.value,
+		data.hasError == "1"
 	)
-
 }
 
 val getMemoFromInputCode: (inputCode: String) -> String = {
@@ -65,7 +64,6 @@ val getMemoFromInputCode: (inputCode: String) -> String = {
 		} else "There isn't a memo"
 	}
 }
-
 private val descriptionText: (isReceive: Boolean) -> String = {
 	if (it) " incoming from " else " send from "
 }

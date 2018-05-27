@@ -1,5 +1,5 @@
 @file:JvmName("Wordlist")
-package io.goldstone.blockchain.crypto.big39
+package io.goldstone.blockchain.crypto.bip39
 
 /**
  * @date 2018/5/15 2:20 PM

@@ -15,10 +15,10 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintF
  * @date 24/04/2018 10:54 AM
  * @author KaySaith
  */
-
 class HintPresenter(
 	override val fragment: HintFragment
 ) : BasePresenter<HintFragment>() {
+
 	fun updateHint(hintInput: EditText) {
 		hintInput.text?.toString()?.let {
 			it.isNotEmpty() isTrue {

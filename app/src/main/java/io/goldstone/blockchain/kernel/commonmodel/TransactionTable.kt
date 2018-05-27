@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
@@ -16,12 +17,13 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
+import java.math.BigInteger
+import kotlin.math.max
 
 /**
  * @date 07/04/2018 7:32 PM
  * @author KaySaith
  */
-
 @Entity(tableName = "transactionList")
 data class TransactionTable(
 	@PrimaryKey(autoGenerate = true)
@@ -73,12 +75,14 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = ""
 ) {
+
 	/** 默认的 `constructor` */
 	constructor() : this(
 		0,
 		"",
 		"",
-		"", "",
+		"",
+		"",
 		"",
 		"",
 		"",
@@ -133,7 +137,8 @@ data class TransactionTable(
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
-		"", data.safeGet("hash"),
+		"",
+		data.safeGet("hash"),
 		data.safeGet("nonce").toDecimalFromHex(),
 		data.safeGet("blockHash"),
 		data.safeGet("transactionIndex").toDecimalFromHex(),
@@ -142,8 +147,7 @@ data class TransactionTable(
 		data.safeGet("value").toDecimalFromHex(),
 		data.safeGet("gas").toDecimalFromHex(),
 		data.safeGet("gasPrice").toDecimalFromHex(),
-		"0",
-		"1",
+		"0", "1",
 		data.safeGet("input"),
 		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
 			data.safeGet("to") else "0x0",
@@ -153,11 +157,10 @@ data class TransactionTable(
 		data.safeGet("from") != WalletTable.current.address,
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		""
+		WalletTable.current.address
 	)
 
 	companion object {
-
 		fun updateModelInfoFromChain(
 			transaction: TransactionTable,
 			isERC20: Boolean,
@@ -180,8 +183,8 @@ data class TransactionTable(
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			}) {
+				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+			               }) {
 				hold(it.map { TransactionListModel(it) }.toArrayList())
 			}
 		}
@@ -191,13 +194,34 @@ data class TransactionTable(
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			}) {
+				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+			               }) {
 				hold(it.toArrayList())
 			}
 		}
 
-		fun getMyLatestNounce(hold: (Long?) -> Unit) {
+		/**
+		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nounce` 值来生成
+		 * 最近可用的 `Nounce`
+		 */
+		fun getLatestValidNounce(hold: (BigInteger) -> Unit) {
+			GoldStoneAPI.getTransactionListByAddress {
+				TransactionTable.getLocalLatestNounce { localNounce ->
+					val myLatestNonce = firstOrNull {
+						it.fromAddress.equals(WalletTable.current.address, true)
+					}?.nonce?.toLong()
+					val chainNounce = if (myLatestNonce.isNull()) 0L
+					else myLatestNonce!! + 1
+					BigInteger.valueOf(
+						max(chainNounce, if (localNounce.isNull()) 0 else localNounce!! + 1)
+					).let {
+						hold(it)
+					}
+				}
+			}
+		}
+
+		private fun getLocalLatestNounce(hold: (Long?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.transactionDao().apply {
 					getTransactionsByAddress(WalletTable.current.address).let {
@@ -230,9 +254,9 @@ data class TransactionTable(
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao()
-					.getTransactionsByAddressAndSymbol(address, symbol)
-			}) {
+				               GoldStoneDataBase.database.transactionDao()
+					               .getTransactionsByAddressAndSymbol(address, symbol)
+			               }) {
 				hold(it.toArrayList())
 			}
 		}
@@ -242,12 +266,12 @@ data class TransactionTable(
 			hold: (String) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			}) {
+				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+			               }) {
 				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
 				hold(
 					(it.maxBy { it.blockNumber }?.blockNumber
-						?: "0") + 1
+					 ?: "0") + 1
 				)
 			}
 		}
@@ -257,10 +281,10 @@ data class TransactionTable(
 			callback: () -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao().apply {
-					getTransactionsByAddress(address).forEach { delete(it) }
-				}
-			}) {
+				               GoldStoneDataBase.database.transactionDao().apply {
+					               getTransactionsByAddress(address).forEach { delete(it) }
+				               }
+			               }) {
 				callback()
 			}
 		}
@@ -308,9 +332,9 @@ data class TransactionTable(
 			hold: (TransactionTable?) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.transactionDao()
-					.getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
-			}) {
+				               GoldStoneDataBase.database.transactionDao()
+					               .getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
+			               }) {
 				hold(it)
 			}
 		}
@@ -319,6 +343,7 @@ data class TransactionTable(
 
 @Dao
 interface TransactionDao {
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
 	)

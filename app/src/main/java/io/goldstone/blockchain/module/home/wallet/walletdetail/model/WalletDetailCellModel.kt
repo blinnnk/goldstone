@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -99,7 +99,8 @@ data class WalletDetailCellModel(
 								allTokens.forEach { token ->
 									localTokens.find { it.symbol == token.symbol }?.let { targetToken ->
 										if (targetToken.symbol == CryptoSymbol.eth) {
-											GoldStoneEthCall.getEthBalance(walletAddress) {
+											GoldStoneEthCall
+												.getEthBalance(walletAddress) {
 												MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, targetToken.symbol)
 												tokenList.add(WalletDetailCellModel(targetToken, it))
 												completeMark()

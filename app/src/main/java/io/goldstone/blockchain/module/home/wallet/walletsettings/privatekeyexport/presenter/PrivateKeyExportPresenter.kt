@@ -16,7 +16,6 @@ import org.jetbrains.anko.support.v4.toast
  * @date 06/04/2018 1:02 AM
  * @author KaySaith
  */
-
 class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {

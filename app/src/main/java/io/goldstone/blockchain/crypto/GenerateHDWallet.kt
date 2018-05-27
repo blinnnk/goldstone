@@ -9,13 +9,11 @@ import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.runOnUiThread
-import org.kethereum.bip39.Mnemonic
-import org.kethereum.crypto.publicKeyFromPrivate
-import org.walleth.khex.hexToByteArray
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import java.io.File

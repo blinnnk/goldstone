@@ -20,7 +20,6 @@ import org.jetbrains.anko.yesButton
  * @date 26/03/2018 2:24 PM
  * @author KaySaith
  */
-
 class CurrencyPresenter(
 	override val fragment: CurrencyFragment
 ) : BaseRecyclerPresenter<CurrencyFragment, SupportCurrencyTable>() {

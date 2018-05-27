@@ -19,11 +19,10 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
  * @date 26/03/2018 12:56 AM
  * @author KaySaith
  */
-
 class ProfileOverlayPresenter(
 	override val fragment: ProfileOverlayFragment
 ) : BaseOverlayPresenter<ProfileOverlayFragment>() {
-
+	
 	override fun removeSelfFromActivity() {
 		super.removeSelfFromActivity()
 		fragment.getMainActivity()?.apply {
@@ -32,11 +31,11 @@ class ProfileOverlayPresenter(
 			}
 		}
 	}
-
+	
 	fun showContactInputFragment() {
 		showTargetFragment<ContractInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
 	}
-
+	
 	fun showTargetFragmentByTitle(title: String) {
 		when (title) {
 			ProfileText.contacts -> showContactsFragment()
@@ -50,59 +49,58 @@ class ProfileOverlayPresenter(
 			ProfileText.aboutUs -> showAboutFragment()
 		}
 	}
-
+	
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
 		}
 	}
-
+	
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
 		}
 	}
-
+	
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
 		}
 	}
-
+	
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.support)
 		}
 	}
-
+	
 	private fun showChainSelectionFragment() {
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content) {
 			// Send Arguments
 		}
 	}
-
+	
 	private fun showPinCodeEditorFragment() {
 		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content) {
 			// Send Arguments
 		}
 	}
-
+	
 	private fun showContactsFragment() {
 		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content) {
 			// Send Arguments
 		}
 	}
-
+	
 	private fun showCurrencyFragment() {
 		fragment.addFragmentAndSetArgument<CurrencyFragment>(ContainerID.content) {
 			// Send Arguments
 		}
 	}
-
+	
 	private fun showLanguageFragment() {
 		fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content) {
 			// Send Arguments
 		}
 	}
-
 }

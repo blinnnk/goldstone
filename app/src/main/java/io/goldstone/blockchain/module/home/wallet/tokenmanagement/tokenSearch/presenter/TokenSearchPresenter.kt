@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -77,7 +77,8 @@ class TokenSearchPresenter(
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 				isSearchingSymbol isFalse {
-					GoldStoneEthCall.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
+					GoldStoneEthCall
+						.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
 						hold(
 							arrayListOf(
 								DefaultTokenTable(

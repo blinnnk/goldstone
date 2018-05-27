@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -271,7 +271,8 @@ class CreateWalletPresenter(
 								completeMark()
 							}
 						} else {
-							GoldStoneEthCall.getTokenBalanceWithContract(tokenInfo.contract, address) {
+							GoldStoneEthCall
+								.getTokenBalanceWithContract(tokenInfo.contract, address) {
 								MyTokenTable.insert(
 									MyTokenTable(0, address, tokenInfo.symbol, it, tokenInfo.contract)
 								)
