@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -16,32 +17,34 @@ import org.jetbrains.anko.runOnUiThread
  * @date 01/04/2018 12:38 AM
  * @author KaySaith
  */
-
 @Entity(tableName = "myTokens")
 data class MyTokenTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int, var ownerAddress: String,
 	var symbol: String,
 	var balance: Double,
-	var contract: String
+	var contract: String,
+	var chainID: String = GoldStoneApp.currentChain
 ) {
+	
 	companion object {
-
+		
 		fun insert(model: MyTokenTable) {
 			GoldStoneDataBase.database.myTokenDao().insert(model)
 		}
-
+		
 		fun getTokensWith(
 			walletAddress: String = WalletTable.current.address,
 			callback: (ArrayList<MyTokenTable>) -> Unit = {}
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.myTokenDao().getTokensBy(walletAddress)
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.myTokenDao().getTokensBy(walletAddress)
+				}) {
 				callback(it.toArrayList())
 			}
 		}
-
+		
 		fun deleteBySymbol(
 			symbol: String,
 			address: String,
@@ -62,39 +65,41 @@ data class MyTokenTable(
 				}
 			}
 		}
-
+		
 		fun deleteByAddress(
 			address: String,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokensBy(address).forEach { delete(it) }
-				}
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.myTokenDao().apply {
+						getTokensBy(address).forEach { delete(it) }
+					}
+				}) {
 				callback()
 			}
 		}
-
+		
 		fun insertBySymbol(
 			symbol: String,
 			ownerAddress: String,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.apply {
-					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-					myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull() isTrue {
-						getBalanceAndInsertWithSymbol(
-							symbol, ownerAddress
-						)
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.apply {
+						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+						myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull() isTrue {
+							getBalanceAndInsertWithSymbol(
+								symbol, ownerAddress
+							)
+						}
 					}
-				}
-			}) {
+				}) {
 				callback()
 			}
 		}
-
+		
 		private fun getBalanceAndInsertWithSymbol(
 			symbol: String,
 			ownerAddress: String,
@@ -125,7 +130,7 @@ data class MyTokenTable(
 				}
 			}
 		}
-
+		
 		fun getBalanceWithSymbol(
 			symbol: String,
 			ownerAddress: String,
@@ -151,7 +156,7 @@ data class MyTokenTable(
 				}
 			}
 		}
-
+		
 		fun updateCurrentWalletBalanceWithSymbol(
 			balance: Double,
 			symbol: String
@@ -169,25 +174,29 @@ data class MyTokenTable(
 
 @Dao
 interface MyTokenDao {
-
-	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND ownerAddress LIKE :walletAddress")
+	
+	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
 	fun getTokenBySymbolAndAddress(
 		symbol: String,
-		walletAddress: String
+		walletAddress: String,
+		chainID: String = GoldStoneApp.currentChain
 	): MyTokenTable
-
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
-	fun getTokensBy(walletAddress: String): List<MyTokenTable>
-
-	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol")
-	fun getTokenBySymbol(symbol: String): MyTokenTable
-
+	
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	fun getTokensBy(
+		walletAddress: String,
+		chainID: String = GoldStoneApp.currentChain
+	): List<MyTokenTable>
+	
+	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND chainID Like :chainID ")
+	fun getTokenBySymbol(symbol: String, chainID: String = GoldStoneApp.currentChain): MyTokenTable
+	
 	@Insert
 	fun insert(token: MyTokenTable)
-
+	
 	@Update
 	fun update(token: MyTokenTable)
-
+	
 	@Delete
 	fun delete(token: MyTokenTable)
 }

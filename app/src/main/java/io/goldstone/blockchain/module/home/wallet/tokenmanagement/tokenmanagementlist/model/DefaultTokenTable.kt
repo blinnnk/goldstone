@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
@@ -17,8 +16,8 @@ import org.json.JSONObject
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-
 enum class TinyNumber(val value: Int) {
+	
 	True(1),
 	False(0)
 }
@@ -40,13 +39,16 @@ data class DefaultTokenTable(
 	@SerializedName("name")
 	var name: String,
 	@SerializedName("decimals")
-	var decimals: Double, var totalSupply: String? = null,
+	var decimals: Double,
+	var totalSupply: String? = null,
+	// 个人通过 `Contract` 搜索到的, 和 `Server` 与 `Local` Json 数据都不同的部分.
 	var isDefault: Boolean = true,
 	@Ignore
 	var isUsed: Boolean = false,
 	@SerializedName("weight")
 	var weight: Int
 ) {
+	
 	/** 默认的 `constructor` */
 	constructor() : this(
 		0,
@@ -62,7 +64,7 @@ data class DefaultTokenTable(
 		false,
 		0
 	)
-
+	
 	constructor(
 		data: TokenSearchModel,
 		isUsed: Boolean = false
@@ -76,11 +78,11 @@ data class DefaultTokenTable(
 		data.name,
 		data.decimal.toDouble(),
 		"",
-		false,
+		isUsed,
 		isUsed,
 		data.weight
 	)
-
+	
 	constructor(
 		localData: JSONObject,
 		isUsed: Boolean = false
@@ -94,75 +96,60 @@ data class DefaultTokenTable(
 		localData.safeGet("name"),
 		localData.safeGet("decimals").toDouble(),
 		localData.safeGet("total_supply"),
-		false,
+		localData.safeGet("is_default").toInt() == TinyNumber.True.value,
 		isUsed,
 		if (localData.safeGet("weight").isEmpty()) 0
 		else localData.safeGet("weight").toInt()
 	)
-
+	
 	companion object {
-
+		
 		fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getAllTokens()
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao()
+						.getAllTokens()
+				}) {
 				hold(it.toArrayList())
 			}
 		}
-
-		fun forEachDefaultTokensToEnd(hold: (token: DefaultTokenTable, isEnd: Boolean) -> Unit) {
-			getTokens {
-				it.forEachOrEnd { item, isEnd ->
-					hold(
-						item,
-						isEnd
-					)
-				}
+		
+		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao()
+						.getDefaultTokens()
+				}) {
+				hold(it.toArrayList())
 			}
 		}
-
+		
 		fun getTokenBySymbol(
 			symbol: String,
 			hold: (DefaultTokenTable) -> Unit
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenBySymbol(symbol)
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao()
+						.getTokenBySymbol(symbol)
+				}) {
 				hold(it)
 			}
 		}
-
+		
 		fun getTokenByContractAddress(
 			contractAddress: String,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenByContract(contractAddress)
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao()
+						.getTokenByContract(contractAddress)
+				}) {
 				hold(it)
 			}
 		}
-
-		fun updateUsedStatusBySymbol(
-			symbol: String,
-			status: Boolean,
-			callback: () -> Unit = {}
-		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getTokenBySymbol(symbol).let {
-							update(it.apply { isUsed = status })
-						}
-					}
-			}) {
-				callback()
-			}
-		}
-
+		
 		fun updateTokenPrice(
 			contract: String,
 			newPrice: Double,
@@ -178,27 +165,42 @@ data class DefaultTokenTable(
 					}
 			}
 		}
-
+		
+		fun updateTokenDefaultStatus(
+			contract: String,
+			isDefault: Boolean,
+			callback: () -> Unit = {}
+		) {
+			doAsync {
+				GoldStoneDataBase.database.defaultTokenDao()
+					.apply {
+						getTokenByContract(contract)?.let {
+							update(it.apply { this.isDefault = isDefault })
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
+					}
+			}
+		}
+		
 		fun getContractAddressBySymbol(
 			symbol: String,
 			hold: (String) -> Unit
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenBySymbol(symbol)
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao()
+						.getTokenBySymbol(symbol)
+				}) {
 				hold(it.contract)
 			}
 		}
-
+		
 		fun insertToken(
 			token: DefaultTokenTable,
 			callback: () -> Unit
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.defaultTokenDao()
-					.insert(token)
-			}) {
+			coroutinesTask(
+				{ GoldStoneDataBase.database.defaultTokenDao().insert(token) }) {
 				callback()
 			}
 		}
@@ -207,21 +209,25 @@ data class DefaultTokenTable(
 
 @Dao
 interface DefaultTokenDao {
+	
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
-
+	
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault")
+	fun getDefaultTokens(isDefault: Boolean = true): List<DefaultTokenTable>
+	
 	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol")
 	fun getTokenBySymbol(symbol: String): DefaultTokenTable
-
+	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContract(contract: String): DefaultTokenTable?
-
+	
 	@Insert
 	fun insert(token: DefaultTokenTable)
-
+	
 	@Update
 	fun update(token: DefaultTokenTable)
-
+	
 	@Delete
 	fun delete(token: DefaultTokenTable)
 }

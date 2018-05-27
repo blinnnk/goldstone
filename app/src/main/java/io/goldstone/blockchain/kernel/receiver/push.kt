@@ -28,15 +28,16 @@ import io.goldstone.blockchain.kernel.network.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 
 /**
  * @date 19/04/2018 4:33 PM
  * @author KaySaith
  */
-
 class XinGePushReceiver : XGPushBaseReceiver() {
-
+	
 	@SuppressLint("InvalidWakeLockTag", "WrongConstant")
 	private fun showNotificationOnLockScreen(
 		context: Context,
@@ -46,7 +47,6 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 		val ringTone = RingtoneManager.getRingtone(context, notification)
 		ringTone.play()
-
 		// 激活屏幕让屏幕亮起来, 在锁屏的时候
 		val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
 		if (!powerManager.isInteractive) {
@@ -59,19 +59,18 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "weakScreen")
 			wakeLock.acquire(10000)
 		}
-
 		val builder = NotificationCompat.Builder(context)
 		builder.setContentTitle("GoldStone").setContentText(content).setSmallIcon(R.mipmap.ic_launcher)
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 	}
-
+	
 	override fun onSetTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-
+	
 	override fun onNotifactionShowedResult(
 		context: Context?,
 		notifiShowedRlt: XGPushShowedResult?
@@ -79,7 +78,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null || notifiShowedRlt == null) return
 		// Normal Notification
 	}
-
+	
 	override fun onUnregisterResult(
 		context: Context?,
 		p1: Int
@@ -88,21 +87,21 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			return
 		}
 	}
-
+	
 	override fun onDeleteTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-
+	
 	override fun onRegisterResult(
 		p0: Context?,
 		p1: Int,
 		p2: XGPushRegisterResult?
 	) {
 	}
-
+	
 	@SuppressLint("PrivateResource")
 	override fun onTextMessage(
 		context: Context?,
@@ -111,7 +110,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null) return
 		showNotificationOnLockScreen(context, message.toString())
 	}
-
+	
 	override fun onNotifactionClickedResult(
 		context: Context?,
 		result: XGPushClickedResult?
@@ -125,7 +124,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		}
 		clearAppIconRedot()
 	}
-
+	
 	private fun handlTransactionNotification(
 		context: Context?,
 		content: String?
@@ -134,9 +133,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 		intent.putExtra(IntentKey.hashFromNotify, content)
 		context?.startActivity(intent)
-
 	}
-
+	
 	companion object {
 		fun clearAppIconRedot() {
 			// 清楚所有 `App Icon` 上的小红点
@@ -146,7 +144,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				) as NotificationManager
 			notificationManager.cancelAll()
 		}
-
+		
 		fun registerWalletAddressForPush() {
 			WalletTable.getAllAddresses {
 				AppConfigTable.getAppConfig { config ->
@@ -180,22 +178,20 @@ fun Application.registerDeviceForPush() {
 		this, false
 	)
 	XGPushManager.registerPush(this, object : XGIOperateCallback {
-		override fun onSuccess(
-			token: Any?,
-			p1: Int
-		) {
+		override fun onSuccess(token: Any?, p1: Int) {
 			// 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
-			registerDevice(token.toString())
-			// 如果本地有注册成功的标记则不再注册
-			getStringFromSharedPreferences(SharesPreference.registerPush).let {
-				LogUtil.debug(this.javaClass.simpleName, "token: $it")
-				if (it == token) return
+			registerDevice(token.toString()) {
+				// 如果本地有注册成功的标记则不再注册
+				getStringFromSharedPreferences(SharesPreference.registerPush).let {
+					LogUtil.debug(this.javaClass.simpleName, "token: $it")
+					if (it == token) return@registerDevice
+				}
+				// 在本地数据库记录 `Push Token`
+				AppConfigTable.updatePushToken(token.toString())
+				XinGePushReceiver.registerWalletAddressForPush()
 			}
-			// 在本地数据库记录 `Push Token`
-			AppConfigTable.updatePushToken(token.toString())
-			XinGePushReceiver.registerWalletAddressForPush()
 		}
-
+		
 		override fun onFail(
 			p0: Any?,
 			p1: Int,
@@ -208,24 +204,33 @@ fun Application.registerDeviceForPush() {
 @SuppressLint("HardwareIds")
 fun Context.registerDevice(
 	token: String,
-	callback: () -> Unit = {}
+	callback: () -> Unit
 ) {
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value
-
-	AppConfigTable.getAppConfig { config ->
-		config?.apply {
-			GoldStoneAPI.registerDevice(
-				HoneyLanguage.getLanguageSymbol(language).toLowerCase(), token, goldStoneID, isChina,
-				TinyNumber.True.value, config.chainID.toInt()
-			) {
-				// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-				GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-					saveDataToSharedPreferences(
-						SharesPreference.registerPush, token
-					)
-					callback()
+	
+	doAsync {
+		AppConfigTable.getAppConfig { config ->
+			config?.apply {
+				GoldStoneAPI.registerDevice(
+					HoneyLanguage.getLanguageSymbol(language).toLowerCase(), token, goldStoneID, isChina,
+					TinyNumber.True.value, config.chainID.toInt(),
+					{
+						// Error Callback
+						LogUtil.error(this.javaClass.simpleName)
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				) {
+					// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
+						saveDataToSharedPreferences(SharesPreference.registerPush, token)
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
 				}
 			}
 		}

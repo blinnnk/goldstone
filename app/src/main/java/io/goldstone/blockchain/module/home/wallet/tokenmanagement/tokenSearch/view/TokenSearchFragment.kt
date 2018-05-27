@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view
 
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -19,11 +16,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 27/03/2018 11:22 AM
  * @author KaySaith
  */
-
 class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTokenTable>() {
-
+	
 	override val presenter = TokenSearchPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?
 	) {
@@ -31,7 +27,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 			cell.switch.onClick { cell.setMyTokenStatus() }
 		}
 	}
-
+	
 	private fun TokenSearchCell.setMyTokenStatus() {
 		// 更新缓存中的数据, 防止 `Recycler` 复用的时候 `switch` `UI` 样式变化
 		asyncData?.find {
@@ -39,25 +35,32 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		}?.let {
 			it.isUsed = switch.isChecked
 		}
+		
 		model?.let {
 			DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
 				localToken.isNotNull {
-					insertTokenToDataBase(this)
+					insertToMyToken(switch.isChecked, it)
 				} otherwise {
-					DefaultTokenTable.insertToken(it) {
-						insertTokenToDataBase(this)
+					DefaultTokenTable.insertToken(it.apply { this.isDefault = switch.isChecked }) {
+						insertToMyToken(switch.isChecked, it)
 					}
 				}
 			}
 		}
+		
+		switch.preventDuplicateClicks()
 	}
-
-	private fun insertTokenToDataBase(cell: TokenSearchCell) {
+	
+	private fun insertToMyToken(isSelected: Boolean, model: DefaultTokenTable?) {
 		getMainActivity()?.apply {
-			TokenManagementListPresenter.updateMyTokensInfoBy(cell, this)
+			model?.let {
+				DefaultTokenTable.updateTokenDefaultStatus(it.contract, isSelected) {
+					TokenManagementListPresenter.updateMyTokensInfoBy(isSelected, model.symbol)
+				}
+			}
 		}
 	}
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
 			headerTitle = TokenManagementText.addToken
@@ -65,5 +68,4 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 			overlayView.header.showSearchInput(false)
 		}
 	}
-
 }
