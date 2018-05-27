@@ -8,17 +8,15 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  * @date 27/03/2018 11:25 AM
  * @author KaySaith
  */
-
 class TokenSearchAdapter(
-  override val dataSet: ArrayList<DefaultTokenTable>,
-  private val hold: (TokenSearchCell) -> Unit
-  ) : HoneyBaseAdapter<DefaultTokenTable, TokenSearchCell>() {
-
-  override fun generateCell(context: Context) = TokenSearchCell(context)
-
-  override fun TokenSearchCell.bindCell(data: DefaultTokenTable, position: Int) {
-    hold(this)
-    model = data
-  }
-
+	override val dataSet: ArrayList<DefaultTokenTable>,
+	private val hold: (TokenSearchCell) -> Unit
+) : HoneyBaseAdapter<DefaultTokenTable, TokenSearchCell>() {
+	
+	override fun generateCell(context: Context) = TokenSearchCell(context)
+	
+	override fun TokenSearchCell.bindCell(data: DefaultTokenTable, position: Int) {
+		model = data
+		hold(this)
+	}
 }

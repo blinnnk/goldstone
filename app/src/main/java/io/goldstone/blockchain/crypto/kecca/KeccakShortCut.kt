@@ -7,4 +7,4 @@ fun String.keccak() = hexToByteArray().keccak()
 fun ByteArray.keccak() = Keccak.Digest256().let {
 	it.update(this)
 	it.digest()
-}
+}!!

@@ -68,7 +68,11 @@ class MnemonicImportDetailPresenter(
 				callback()
 			} otherwise {
 				importWallet(
-					mnemonicContent, pathValue, passwordValue, walletName, hintInput.text?.toString(),
+					mnemonicContent,
+					pathValue,
+					passwordValue,
+					walletName,
+					hintInput.text?.toString(),
 					callback
 				)
 			}

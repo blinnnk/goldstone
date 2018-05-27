@@ -75,7 +75,13 @@ class SplashActivity : AppCompatActivity() {
 				// 打印必要数据在 `Debug` 的时候
 				LogUtil.debug(this.javaClass.simpleName, "Config: $this")
 				getCurrencyRate(this) {
-					presenter.hasAccountThenLogin()
+					// check network to get default toke list
+					// insert support currency list from local json
+					presenter.initSupportCurrencyList {
+						presenter.initDefaultTokenByNetWork {
+							presenter.hasAccountThenLogin()
+						}
+					}
 				}
 			}
 		}

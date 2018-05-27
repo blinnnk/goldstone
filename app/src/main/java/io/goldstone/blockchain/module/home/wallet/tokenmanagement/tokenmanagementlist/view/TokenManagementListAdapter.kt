@@ -11,7 +11,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class TokenManagementListAdapter(
   override val dataSet: ArrayList<DefaultTokenTable>,
-  private val callback: (TokenManagementListCell) -> Unit
+  private val callback: TokenManagementListCell.() -> Unit
   ) : HoneyBaseAdapter<DefaultTokenTable, TokenManagementListCell>() {
 
   override fun generateCell(context: Context) = TokenManagementListCell(context)

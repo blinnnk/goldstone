@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -23,24 +26,20 @@ import org.jetbrains.anko.runOnUiThread
  * @date 22/03/2018 2:56 AM
  * @author KaySaith
  */
-
 class StartingPresenter(override val fragment: StartingFragment) :
 	BasePresenter<StartingFragment>() {
-
+	
 	fun showCreateWalletFragment() {
 		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.splash)
 	}
-
+	
 	fun showImportWalletFragment() {
 		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.splash)
 	}
-
+	
 	companion object {
-
-		fun insertLocalTokens(
-			context: Context,
-			callback: () -> Unit = {}
-		) {
+		
+		fun insertLocalTokens(context: Context, callback: () -> Unit) {
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
 					.forEachOrEnd { token, isEnd ->
@@ -55,11 +54,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 			}
 		}
-
-		fun insertLocalCurrency(
-			context: Context,
-			callback: () -> Unit = {}
-		) {
+		
+		fun insertLocalCurrency(context: Context, callback: () -> Unit) {
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
 					.forEachOrEnd { item, isEnd ->
@@ -68,62 +64,30 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						} else {
 							SupportCurrencyTable(item)
 						}
-
+						
 						GoldStoneDataBase.database.currencyDao().insert(model)
-
+						
 						context.runOnUiThread {
 							if (isEnd) callback()
 						}
 					}
 			}
 		}
-
-		fun updateLocalDefaultTokens(context: Context) {
-			GoldStoneAPI.getDefaultTokens { serverTokens ->
-				DefaultTokenTable.getTokens { localTokens ->
-					/** 如果本地的 `Tokens` 是空的则直接插入全部服务端获取的 `Default Tokens` */
-					localTokens.isEmpty() isTrue {
-						context.doAsync {
-							serverTokens.forEach {
-								GoldStoneDataBase.database.defaultTokenDao().insert(it)
-							}
-						}
-					} otherwise {
-						/** 如果本地的 `Tokens` 不是空的, 那么筛选出本地没有的插入到数据库 */
-						localTokens.forEach { localToken ->
-							serverTokens.find { it.symbol == localToken.symbol }?.let { serverToken ->
-								// 比对数据是否完全一致
-								serverTokens.remove(serverToken)
-								if (localToken.iconUrl != serverToken.iconUrl) {
-									// 数据有变化直接更新服务器数据
-									doAsync {
-										GoldStoneDataBase.database.defaultTokenDao()
-											.update(localToken.apply { iconUrl = serverToken.iconUrl })
+		
+		fun updateLocalDefaultTokens(errorCallback: () -> Unit) {
+			doAsync {
+				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+					if (serverTokens.isNotEmpty()) {
+						serverTokens.forEach {
+							GoldStoneDataBase.database.defaultTokenDao().apply {
+								val localToken = getTokenByContract(it.contract)
+								if (localToken.isNull()) {
+									insert(it)
+								} else {
+									if (localToken!!.iconUrl != it.iconUrl) {
+										// 数据有变化直接更新服务器数据
+										update(localToken.apply { iconUrl = it.iconUrl })
 									}
-								}
-							}
-						}
-
-						if (serverTokens.isNotEmpty()) {
-							context.doAsync {
-								serverTokens.forEach {
-									GoldStoneDataBase.database.defaultTokenDao().insert(it)
-								}
-							}
-						}
-
-						/** Filter `Tokens`  which doesn't exist in server but exist in local */
-						serverTokens.forEach { serverToken ->
-							localTokens.find { it.symbol == serverToken.symbol }?.let {
-								localTokens.remove(it)
-							}
-						}
-
-						if (localTokens.isNotEmpty()) {
-							context.doAsync {
-								localTokens.forEach {
-									it.isDefault = false
-									GoldStoneDataBase.database.defaultTokenDao().update(it)
 								}
 							}
 						}
@@ -132,5 +96,4 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 	}
-
 }

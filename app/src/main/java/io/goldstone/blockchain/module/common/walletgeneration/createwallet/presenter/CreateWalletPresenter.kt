@@ -9,6 +9,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -17,14 +18,15 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
@@ -40,15 +42,14 @@ import org.jetbrains.anko.runOnUiThread
  * @date 22/03/2018 2:46 AM
  * @author KaySaith
  */
-
 class CreateWalletPresenter(
 	override val fragment: CreateWalletFragment
 ) : BasePresenter<CreateWalletFragment>() {
-
+	
 	private var nameText = ""
 	private var passwordText = ""
 	private var repeatPasswordText = ""
-
+	
 	fun showAgreementFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
@@ -57,7 +58,7 @@ class CreateWalletPresenter(
 			CreateWalletText.agreement, CreateWalletText.mnemonicBackUp, argument
 		)
 	}
-
+	
 	fun generateWalletWith(
 		isAgree: Boolean,
 		hintInput: EditText,
@@ -71,7 +72,7 @@ class CreateWalletPresenter(
 			)
 		}
 	}
-
+	
 	fun updateConfirmButtonStyle(
 		nameInput: RoundInput,
 		passwordInput: RoundInput,
@@ -91,7 +92,7 @@ class CreateWalletPresenter(
 			setConfirmButtonStyle(confirmButton)
 		}
 	}
-
+	
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
 		if (nameText.count() * passwordText.count() * repeatPasswordText.count() != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
@@ -99,7 +100,7 @@ class CreateWalletPresenter(
 			confirmButton.setGrayStyle(20.uiPX())
 		}
 	}
-
+	
 	private fun Context.generateWalletWith(
 		password: String,
 		name: String,
@@ -125,13 +126,13 @@ class CreateWalletPresenter(
 							}
 						}
 					}
-
+					
 					XinGePushReceiver.registerWalletAddressForPush()
 				}
 			}
 		}
 	}
-
+	
 	private fun saveEncryptMnemonic(
 		mnemonic: String?,
 		address: String,
@@ -145,13 +146,13 @@ class CreateWalletPresenter(
 			}
 		}
 	}
-
+	
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
 		showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
 			CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments, false
 		)
 	}
-
+	
 	companion object {
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
@@ -160,13 +161,16 @@ class CreateWalletPresenter(
 			ownerAddress: String,
 			isNewAccount: Boolean = false,
 			errorCallback: () -> Unit,
-			callback: () -> Unit = {}
+			callback: () -> Unit
 		) {
+			System.out.println("hello 4")
 			// 首先从本地查找数据
 			DefaultTokenTable.getTokens { localTokens ->
+				System.out.println("hello 5")
 				localTokens.isEmpty() isTrue {
 					// 本地没有数据从服务器获取数据
 					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+						System.out.println("hello 6")
 						serverTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
 					}
 				} otherwise {
@@ -174,7 +178,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-
+		
 		fun checkInputValue(
 			name: String,
 			password: String,
@@ -184,19 +188,17 @@ class CreateWalletPresenter(
 			failedCallback: () -> Unit = {},
 			callback: (password: String, walletName: String) -> Unit
 		) {
-
 			isAgree isFalse {
 				context?.alert(CreateWalletText.agreeRemind)
 				failedCallback()
 				return
 			}
-
+			
 			if (password != repeatPassword) {
 				context?.alert(CreateWalletText.repeatPassword)
 				failedCallback()
 				return
 			}
-
 			val walletName = if (name.isEmpty()) "Wallet" else name
 			doAsync {
 				password.checkPasswordInRules { _, reasons ->
@@ -213,7 +215,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-
+		
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			ownerAddress: String,
 			isNewAccount: Boolean,
@@ -233,7 +235,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-
+		
 		private fun List<DefaultTokenTable>.insertNewAccount(
 			address: String,
 			callback: () -> Unit
@@ -242,16 +244,20 @@ class CreateWalletPresenter(
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach {
-						MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0, it.contract))
+						ChainID.getAllChainID().forEach { chainID ->
+							MyTokenTable.insert(
+								MyTokenTable(0, address, it.symbol, 0.0, it.contract, chainID)
+							)
+						}
 						completeMark()
 					}
 				}
-
+				
 				override fun mergeCallBack() =
 					callback()
 			}.start()
 		}
-
+		
 		private fun checkAddressBalanceThenInsert(
 			address: String,
 			data: List<DefaultTokenTable>,
@@ -265,27 +271,44 @@ class CreateWalletPresenter(
 						// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 						if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
 							GoldStoneEthCall.getEthBalance(address) {
-								MyTokenTable.insert(
-									MyTokenTable(0, address, tokenInfo.symbol, it, tokenInfo.contract)
-								)
+								insertMyTokenBalanceByChainID(address, tokenInfo, it)
 								completeMark()
 							}
 						} else {
 							GoldStoneEthCall
 								.getTokenBalanceWithContract(tokenInfo.contract, address) {
-								MyTokenTable.insert(
-									MyTokenTable(0, address, tokenInfo.symbol, it, tokenInfo.contract)
-								)
-								completeMark()
-							}
+									insertMyTokenBalanceByChainID(address, tokenInfo, it)
+									completeMark()
+								}
 						}
 					}
 				}
-
+				
 				override fun mergeCallBack() {
 					callback()
 				}
 			}.start()
+		}
+		
+		private fun insertMyTokenBalanceByChainID(
+			address: String,
+			tokenInfo: DefaultTokenTable,
+			balance: Double
+		) {
+			ChainID.getAllChainID().forEach { chainID ->
+				val currentBalance = if (GoldStoneApp.currentChain == chainID) balance else 0.0
+				MyTokenTable
+					.insert(
+						MyTokenTable(
+							0,
+							address,
+							tokenInfo.symbol,
+							currentBalance,
+							tokenInfo.contract,
+							chainID
+						)
+					)
+			}
 		}
 	}
 }

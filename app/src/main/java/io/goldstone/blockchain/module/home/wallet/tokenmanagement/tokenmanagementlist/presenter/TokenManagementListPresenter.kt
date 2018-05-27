@@ -4,10 +4,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -48,20 +45,22 @@ class TokenManagementListPresenter(
 	private fun TokenManagementListFragment.prepareMyDefaultTokens() {
 		doAsync {
 			// 在异步线程更新数据
-			DefaultTokenTable.getTokens { defaultTokens ->
+			DefaultTokenTable.getDefaultTokens { defaultTokens ->
 				defaultTokens.forEachOrEnd { defaultToken, isEnd ->
 					val address = WalletTable.current.address
 					MyTokenTable.getTokensWith(address) { myTokens ->
 						defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
 						if (isEnd) {
+							val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 							// 在主线程更新 `UI`
 							context?.runOnUiThread {
 								asyncData.isNull() isTrue {
-									asyncData = defaultTokens
+									asyncData = sortedList
 								} otherwise {
-									diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(defaultTokens)
+									asyncData = sortedList
+									fragment.recyclerView.adapter.notifyDataSetChanged()
 								}
-								defaultTokenList = defaultTokens
+								defaultTokenList = sortedList
 							}
 						}
 					}
@@ -72,32 +71,13 @@ class TokenManagementListPresenter(
 	
 	companion object {
 		
-		private var needShowLoadingView = true
-		fun updateMyTokensInfoBy(cell: TokenManagementListCell, activity: MainActivity) {
-			/**
-			 * show `Loading View` at 100ms later to prevent too fast
-			 * to response the result that make ui flash
-			 */
-			100L timeUpThen {
-				if (needShowLoadingView) {
-					activity.showLoadingView()
-				}
-			}
-			cell.apply {
-				if (switch.isChecked) {
-					// once it is checked then insert this symbol into `MyTokenTable` database
-					MyTokenTable.insertBySymbol(getSymbol(), WalletTable.current.address) {
-						needShowLoadingView = false
-						activity.removeLoadingView()
-					}
-				} else {
-					needShowLoadingView = false
-					activity.removeLoadingView()
-					// once it is unchecked then delete this symbol from `MyTokenTable` database
-					MyTokenTable.deleteBySymbol(getSymbol(), WalletTable.current.address)
-				}
-				// prevent duplicate clicks
-				cell.switch.preventDuplicateClicks()
+		fun updateMyTokensInfoBy(isSelected: Boolean, symbol: String) {
+			if (isSelected) {
+				// once it is checked then insert this symbol into `MyTokenTable` database
+				MyTokenTable.insertBySymbol(symbol, WalletTable.current.address)
+			} else {
+				// once it is unchecked then delete this symbol from `MyTokenTable` database
+				MyTokenTable.deleteBySymbol(symbol, WalletTable.current.address)
 			}
 		}
 	}

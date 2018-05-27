@@ -70,10 +70,13 @@ class WalletImportPresenter(
 					// 在数据库记录钱包信息
 					WalletTable.insert(WalletTable(0, name, address, true, hint, false, 0.0, null, true)) {
 						// 创建钱包并获取默认的 `token` 信息
+						System.out.println("hello 1")
 						CreateWalletPresenter.generateMyTokenInfo(address, false, {
+							System.out.println("hello 2")
 							LogUtil.error("insertWalletToDatabase")
 							callback()
 						}) {
+							System.out.println("hello 3")
 							fragment.activity?.jump<SplashActivity>()
 						}
 						// 注册钱包地址用于发送 `Push`
