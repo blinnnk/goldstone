@@ -13,7 +13,6 @@ import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.localTransactions
-import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.walletDetailMemoryData
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
@@ -43,7 +42,6 @@ data class WalletTable(
 		var current: WalletTable by observing(WalletTable(0, "", "", false)) {
 			// 每次切换账户需要清空放在内存里面的当前账户的信息.
 			localTransactions = null
-			walletDetailMemoryData = null
 		}
 		var walletCount: Int? = null
 

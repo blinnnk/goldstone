@@ -2,9 +2,6 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -13,7 +10,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -23,7 +20,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.web3j.utils.Convert
 import java.math.BigInteger
-import kotlin.math.max
 
 /**
  * @date 2018/5/15 10:19 PM
@@ -35,7 +31,6 @@ class PaymentPreparePresenter(
 ) : BasePresenter<PaymentPrepareFragment>() {
 
 	private var currentToken: WalletDetailCellModel? = null
-	private var currentNonce: BigInteger? = null
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -68,23 +63,8 @@ class PaymentPreparePresenter(
 		memo: String,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
-		// 获取当前账户在链上的 `nonce`， 这个行为比较耗时所以把具体业务和获取 `nonce` 分隔开
-		currentNonce.isNull() isTrue {
-			GoldStoneAPI.getTransactionListByAddress {
-				TransactionTable.getMyLatestNounce { localNounce ->
-					val myLatestNonce = firstOrNull {
-						it.fromAddress.equals(WalletTable.current.address, true)
-					}?.nonce?.toLong()
-					val chainNounce = if (myLatestNonce.isNull()) 0L
-					else myLatestNonce!! + 1
-					currentNonce = BigInteger.valueOf(
-						max(chainNounce, if (localNounce.isNull()) 0 else localNounce!! + 1)
-					)
-					generateTransaction(fragment.address!!, value, memo, hold)
-				}
-			}
-		} otherwise {
-			generateTransaction(fragment.address!!, value, memo, hold)
+		TransactionTable.getLatestValidNounce {
+			generateTransaction(fragment.address!!, value, memo, it, hold)
 		}
 	}
 
@@ -92,6 +72,7 @@ class PaymentPreparePresenter(
 		toAddress: String,
 		value: Double,
 		memo: String,
+		nounce: BigInteger,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
 		val countWithDecimal: BigInteger
@@ -117,7 +98,7 @@ class PaymentPreparePresenter(
 		) { limit ->
 			hold(
 				PaymentPrepareModel(
-					currentNonce!!, limit, to, countWithDecimal, value, data, fragment.address!!,
+					nounce, limit, to, countWithDecimal, value, data, fragment.address!!,
 					fragment.getMemoContent()
 				)
 			)

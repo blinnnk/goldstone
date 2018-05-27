@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Handler
 import android.os.Looper
-import io.goldstone.blockchain.crypto.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -20,7 +20,8 @@ abstract class TransactionStatusObserver {
 
 	open fun checkStatusByTransaction() {
 		doAsync {
-			GoldStoneEthCall.getTransactionByHash(transactionHash, {
+			GoldStoneEthCall
+				.getTransactionByHash(transactionHash, {
 				handler.removeCallbacks(reDo)
 				handler.postDelayed(reDo, 3000L)
 			}) {
@@ -33,11 +34,15 @@ abstract class TransactionStatusObserver {
 
 	abstract fun getStatus(status: Boolean)
 
-	private val reDo: Runnable = Runnable {
-		checkStatusByTransaction()
+	fun removeObserver() {
+		handler.removeCallbacks(reDo)
 	}
 
 	fun start() {
+		checkStatusByTransaction()
+	}
+	
+	private val reDo: Runnable = Runnable {
 		checkStatusByTransaction()
 	}
 

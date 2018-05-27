@@ -6,16 +6,14 @@ import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.TokenDetailText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -42,31 +40,33 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * 这个界面由两个入场场景公用, 分别是账单列表进入或转账完成进入, `fragment` 承担了两种身份
  * 固再次需要注意.
  */
-
 class TransactionDetailPresenter(
 	override val fragment: TransactionDetailFragment
 ) : BaseRecyclerPresenter<TransactionDetailFragment, TransactionDetailModel>() {
-
+	
 	private val data by lazy {
 		fragment.arguments?.get(ArgumentKey.transactionDetail) as? ReceiptModel
 	}
-
 	private val dataFromList by lazy {
 		fragment.arguments?.get(ArgumentKey.transactionFromList) as? TransactionListModel
 	}
-
-	private val notificationTransaction by lazy {
+	private val notificationData by lazy {
 		fragment.arguments?.get(ArgumentKey.notificationTransaction) as? NotificationTransactionInfo
 	}
-
 	private var count = 0.0
 	private var currentHash = ""
-
+	
 	override fun updateData() {
-
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
 		dataFromList?.apply {
-			updateHeaderValue(count, targetAddress, symbol, isPending, isReceived, hasError)
+			updateHeaderValue(
+				count,
+				targetAddress,
+				symbol,
+				isPending,
+				isReceived,
+				hasError
+			)
 			fragment.asyncData = generateModels(this)
 			currentHash = transactionHash
 			if (isPending) {
@@ -74,32 +74,36 @@ class TransactionDetailPresenter(
 				observerTransaction()
 			}
 		}
-
 		/** 这个是转账完毕后进入的初始数据 */
 		data?.apply {
 			currentHash = taxHash
 			count = CryptoUtils.toCountByDecimal(value.toDouble(), token.decimal)
 			fragment.asyncData = generateModels()
 			observerTransaction()
-			updateHeaderValue(count, address, token.symbol, true)
+			updateHeaderValue(
+				count,
+				address,
+				token.symbol,
+				true
+			)
 		}
-
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
-		notificationTransaction?.let { transaction ->
+		notificationData?.let { transaction ->
 			currentHash = transaction.hash
 			/**
 			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
 			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 			 */
 			TransactionTable.getTransactionByHashAndReceivedStatus(
-				transaction.hash, transaction.isReceived
+				transaction.hash,
+				transaction.isReceived
 			) { localTransaction ->
 				if (localTransaction.isNull()) {
 					// 如果本地没有数据从链上查询所有需要的数据
 					fragment.apply {
-						getMainActivity()?.showLoadingView()
+						showLoadingView(LoadingText.transactionData)
 						updateTransactionByNotificationHash(transaction) {
-							getMainActivity()?.removeLoadingView()
+							removeLoadingView()
 						}
 					}
 				} else {
@@ -107,23 +111,24 @@ class TransactionDetailPresenter(
 					localTransaction?.apply {
 						fragment.asyncData = generateModels(TransactionListModel(localTransaction))
 						updateHeaderValue(
-							value.toDouble(), fromAddress, symbol, false, isReceive, hasError == "1"
+							value.toDouble(),
+							fromAddress,
+							symbol,
+							false,
+							isReceive,
+							hasError == "1"
 						)
 					}
 				}
 			}
 		}
-
 		// 如果没有拉取到 `Input Code` 这里再拉取并存入数据库
 		saveInputCodeByTaxHash(currentHash) {
 			fragment.asyncData!![1].info = getMemoFromInputCode(it)
 		}
 	}
-
-	private fun saveInputCodeByTaxHash(
-		taxHash: String,
-		callback: (String) -> Unit
-	) {
+	
+	private fun saveInputCodeByTaxHash(taxHash: String, callback: (String) -> Unit) {
 		doAsync {
 			TransactionTable.getTransactionByHash(taxHash) {
 				it.any { it.input.isEmpty() } isTrue {
@@ -136,7 +141,7 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
@@ -144,12 +149,12 @@ class TransactionDetailPresenter(
 	) {
 		setHeightMatchParent()
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.setBackEventByParentFragment()
 	}
-
+	
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
 		parentFragment.apply {
 			when (this) {
@@ -160,7 +165,7 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
-
+				
 				is TokenDetailOverlayFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -168,7 +173,7 @@ class TransactionDetailPresenter(
 						setHeightMatchParent()
 					}
 				}
-
+				
 				is NotificationFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
@@ -179,7 +184,7 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
 			is TransactionFragment -> {
@@ -187,21 +192,21 @@ class TransactionDetailPresenter(
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 				setHeightMatchParent()
 			}
-
+			
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 				setHeightMatchParent()
 			}
-
+			
 			is NotificationFragment -> {
-				parent.headerTitle = TokenDetailText.tokenDetail
+				parent.headerTitle = NotificationText.notification
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 				updateParentContentLayoutHeight(fragment.asyncData?.size)
 			}
 		}
 	}
-
+	
 	fun showEtherScanTransactionFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, EtherScanApi.transactionDetail(currentHash))
@@ -213,22 +218,22 @@ class TransactionDetailPresenter(
 						TransactionText.etherScanTransaction, TransactionText.detail, argument
 					)
 				}
-
+				
 				is TokenDetailOverlayFragment -> {
 					presenter.showTargetFragment<WebViewFragment>(
 						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
 					)
 				}
-
+				
 				is NotificationFragment -> {
 					presenter.showTargetFragment<WebViewFragment>(
-						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
+						TransactionText.etherScanTransaction, NotificationText.notification, argument
 					)
 				}
 			}
 		}
 	}
-
+	
 	// 将时间戳转化为界面显示的时间格式的工具
 	private fun formatDate(timeStamp: Long): String {
 		return DateUtils.formatDateTime(
@@ -237,53 +242,65 @@ class TransactionDetailPresenter(
 			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
-
+	
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
 	private fun generateModels(
 		receipt: Any? = null
 	): ArrayList<TransactionDetailModel> {
-
 		val minerFee = if (data.isNull()) dataFromList?.minerFee
 		else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
-
 		val date = if (data.isNull()) dataFromList?.date
 		else formatDate(data!!.timestamp / 1000)
-
 		val memo = if (data?.memo.isNull()) "There isn't a memo"
 		else data?.memo
-
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
 				arrayListOf(
-					receipt.minerFee, receipt.memo, receipt.transactionHash, receipt.blockNumber,
-					receipt.date, receipt.url
+					receipt.minerFee,
+					receipt.memo,
+					receipt.transactionHash,
+					receipt.blockNumber,
+					receipt.date,
+					receipt.url
 				)
 			}
-
+			
 			is TransactionTable -> {
 				arrayListOf(
-					minerFee, memo, currentHash, receipt.blockNumber, date,
+					minerFee,
+					memo,
+					currentHash,
+					receipt.blockNumber,
+					date,
 					EtherScanApi.singleTransactionHas(currentHash)
 				)
 			}
-
+			
 			else -> {
 				arrayListOf(
-					minerFee, memo, currentHash, "Waiting...", date,
+					minerFee,
+					memo,
+					currentHash,
+					"Waiting...",
+					date,
 					EtherScanApi.singleTransactionHas(currentHash)
 				)
 			}
 		}
 		arrayListOf(
-			TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
-			TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
+			TransactionText.minerFee,
+			TransactionText.memo,
+			TransactionText.transactionHash,
+			TransactionText.blockNumber,
+			TransactionText.transactionDate,
+			TransactionText.url
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let {
 			return it.toArrayList()
 		}
 	}
-
+	
 	// 更新头部数字的工具
 	private fun updateHeaderValue(
 		count: Double,
@@ -294,12 +311,18 @@ class TransactionDetailPresenter(
 		isError: Boolean = false
 	) {
 		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			it?.setIconStyle(count, address, symbol, isReceive, isPending, isError)
+			it?.setIconStyle(
+				count,
+				address,
+				symbol,
+				isReceive,
+				isPending,
+				isError
+			)
 		}
 	}
-
+	
 	/** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
-
 	private fun observerTransaction() {
 		// 在页面销毁后需要用到, `activity` 所以提前存储起来
 		val currentActivity = fragment.getMainActivity()
@@ -309,11 +332,12 @@ class TransactionDetailPresenter(
 				if (status) {
 					onTransactionSucceed()
 					updateWalletDetailValue(currentActivity)
+					removeObserver()
 				}
 			}
 		}.start()
 	}
-
+	
 	private fun updateWalletDetailValue(activity: MainActivity?) {
 		updateMyTokenBalanceByTransaction {
 			activity?.apply {
@@ -324,9 +348,10 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun updateMyTokenBalanceByTransaction(callback: () -> Unit) {
-		GoldStoneEthCall.getTransactionByHash(currentHash) { transaction ->
+		GoldStoneEthCall
+			.getTransactionByHash(currentHash) { transaction ->
 			if (transaction.isERC20) {
 				val contract = transaction.to
 				GoldStoneEthCall.getTokenBalanceWithContract(
@@ -345,7 +370,7 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-
+	
 	/**
 	 * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
 	 */
@@ -354,13 +379,13 @@ class TransactionDetailPresenter(
 			updateHeaderValue(count, address, token.symbol, false, false)
 			fragment.getTransactionFromChain()
 		}
-
+		
 		dataFromList?.apply {
 			updateHeaderValue(count, addressName, symbol, false, false)
 			fragment.getTransactionFromChain()
 		}
 	}
-
+	
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
 	private fun TransactionDetailFragment.getTransactionFromChain(
 		callback: () -> Unit = {}
@@ -376,33 +401,41 @@ class TransactionDetailPresenter(
 			updateDataInDatabase(it.blockNumber)
 		}
 	}
-
+	
 	private fun TransactionDetailFragment.updateTransactionByNotificationHash(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
-		GoldStoneEthCall.getTransactionByHash(currentHash) { receipt ->
+		GoldStoneEthCall
+			.getTransactionByHash(currentHash) { receipt ->
 			context?.runOnUiThread {
 				// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
 				val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
 				CryptoUtils.isERC20TransferByInputCode(receipt.input) {
-					transactionInfo?.let { prepareHeaderValueFromNotification(receipt, it, info.isReceived) }
+					transactionInfo?.let {
+						prepareHeaderValueFromNotification(receipt, it, info.isReceived)
+					}
 				} isFalse {
 					val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
 					updateHeaderValue(
-						count, if (info.isReceived) receipt.fromAddress else receipt.to, CryptoSymbol.eth,
-						false, info.isReceived
+						count,
+						if (info.isReceived) receipt.fromAddress else receipt.to,
+						CryptoSymbol.eth,
+						false,
+						info.isReceived
 					)
 				}
-
+				
 				if (asyncData.isNull()) {
-					receipt.toAsyncData().let { asyncData = it.toArrayList() }
+					receipt.toAsyncData().let {
+						asyncData = it.toArrayList()
+					}
 				}
 				callback()
 			}
 		}
 	}
-
+	
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
 		receipt: TransactionTable,
@@ -412,33 +445,57 @@ class TransactionDetailPresenter(
 		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
-				GoldStoneEthCall.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
+				GoldStoneEthCall
+					.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
 					val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
-					updateHeaderValue(count, address, symbol, false, isReceive)
+					updateHeaderValue(
+						count,
+						address,
+						symbol,
+						false,
+						isReceive
+					)
 				}
 			} otherwise {
-				val count = CryptoUtils.toCountByDecimal(transaction.count, it?.decimals.orElse(0.0))
-				updateHeaderValue(count, address, it?.symbol.orEmpty(), false, isReceive)
+				val count = CryptoUtils.toCountByDecimal(
+					transaction.count,
+					it?.decimals.orElse(0.0)
+				)
+				updateHeaderValue(
+					count,
+					address,
+					it?.symbol.orEmpty(),
+					false,
+					isReceive
+				)
 			}
 		}
 	}
-
+	
 	// 从通知中心进入的, 使用 `web3` 获取的 `Transaction` 转换成标准的使用格式
 	private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		val receiptData = arrayListOf(
-			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(), "There isn't a memo",
-			hash, blockNumber, formatDate(0), EtherScanApi.transactionsByHash(hash)
+			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(),
+			"There isn't a memo",
+			hash,
+			blockNumber,
+			formatDate(0),
+			EtherScanApi.transactionsByHash(hash)
 		)
 		arrayListOf(
-			TransactionText.minerFee, TransactionText.memo, TransactionText.transactionHash,
-			TransactionText.blockNumber, TransactionText.transactionDate, TransactionText.url
+			TransactionText.minerFee,
+			TransactionText.memo,
+			TransactionText.transactionHash,
+			TransactionText.blockNumber,
+			TransactionText.transactionDate,
+			TransactionText.url
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index], it)
 		}.let {
 			return it.toArrayList()
 		}
 	}
-
+	
 	// 自动监听交易完成后, 将转账信息插入数据库
 	private fun updateDataInDatabase(blockNumber: String) {
 		GoldStoneDataBase.database.transactionDao().apply {
@@ -454,5 +511,4 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-
 }

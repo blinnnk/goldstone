@@ -16,15 +16,14 @@ import org.jetbrains.anko.runOnUiThread
  * @date 21/04/2018 4:32 PM
  * @author KaySaith
  */
-
 class QuotationSearchPresenter(
 	override val fragment: QuotationSearchFragment
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
-
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		setHeightMatchParent()
@@ -36,7 +35,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-
+	
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
 		isSelect: Boolean = true,
@@ -54,7 +53,7 @@ class QuotationSearchPresenter(
 			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
 		}
 	}
-
+	
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
@@ -76,7 +75,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-
+	
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
@@ -85,7 +84,7 @@ class QuotationSearchPresenter(
 			}.toArrayList())
 		}
 	}
-
+	
 	companion object {
 		fun getLineChartDataByPair(
 			pair: String,

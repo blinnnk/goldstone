@@ -20,11 +20,10 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
  * @date 25/03/2018 10:52 PM
  * @author KaySaith
  */
-
 class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
-
+	
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
 			val data = arrayListOf(
@@ -38,9 +37,9 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
 				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
 				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""), ProfileModel(
-					R.drawable.version_icon, ProfileText.version,
-					SystemUtils.getVersionName(fragment.context!!)
-				)
+				R.drawable.version_icon, ProfileText.version,
+				SystemUtils.getVersionName(fragment.context!!)
+			)
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else {
@@ -48,7 +47,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	fun showTargetFragment(title: String) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.profileOverlay) isFalse {
@@ -64,7 +63,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
 		intent.putExtra(
@@ -74,8 +73,7 @@ class ProfilePresenter(
 		intent.type = "text/plain"
 		fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 	}
-
+	
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(GoldStoneApp.currentLanguage.orZero())
-
 }

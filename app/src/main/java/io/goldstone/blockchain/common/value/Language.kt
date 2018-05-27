@@ -1973,7 +1973,19 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "Loading token data now"
 		else -> "Loading token data now"
 	}
+	
+	@JvmField
+	val notificationData = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Loading notification history data"
+		HoneyLanguage.Chinese.code -> "Loading notification history data"
+		HoneyLanguage.Japanese.code -> "Loading notification history data"
+		HoneyLanguage.Korean.code -> "Loading notification history data"
+		HoneyLanguage.Russian.code -> "Loading notification history data"
+		HoneyLanguage.TraditionalChinese.code -> "Loading notification history data"
+		else -> "Loading notification history data"
+	}
 }
+
 
 object QRText {
 

@@ -25,19 +25,14 @@ import org.jetbrains.anko.*
  * @date 23/04/2018 2:34 PM
  * @author KaySaith
  */
-
 class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
-
 	val confirmButton by lazy { RoundButton(context!!) }
-
 	private val newPinCode by lazy { RoundInput(context!!) }
 	private val repeatPinCode by lazy { RoundInput(context!!) }
 	private val switch by lazy { HoneyBaseSwitch(context!!) }
-
 	override val presenter = PinCodeEditorPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
@@ -83,7 +78,6 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 
 	private fun ViewGroup.initSwitchCell() {
 		relativeLayout {
-
 			lparams {
 				width = ScreenSize.widthWithPadding
 				height = 80.uiPX()
@@ -110,7 +104,6 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 					}
 				}.into(this)
 			}
-
 			// 分割线
 			View(context).apply {
 				lparams {

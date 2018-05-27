@@ -62,7 +62,6 @@ dependencies {
   implementation 'com.blinnnk:honeyui:0.2.9.4'
   // Crypto
   implementation 'org.ethereum:geth:1.8.2'
-  implementation 'com.github.walleth.kethereum:bip39:0.50'
   implementation 'org.web3j:core:3.3.1-android'
   // BlurView
   implementation 'com.github.mmin18:realtimeblurview:1.1.0'
