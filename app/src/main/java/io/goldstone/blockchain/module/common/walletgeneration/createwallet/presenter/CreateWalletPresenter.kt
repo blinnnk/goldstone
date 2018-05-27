@@ -163,14 +163,11 @@ class CreateWalletPresenter(
 			errorCallback: () -> Unit,
 			callback: () -> Unit
 		) {
-			System.out.println("hello 4")
 			// 首先从本地查找数据
 			DefaultTokenTable.getTokens { localTokens ->
-				System.out.println("hello 5")
 				localTokens.isEmpty() isTrue {
 					// 本地没有数据从服务器获取数据
 					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-						System.out.println("hello 6")
 						serverTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
 					}
 				} otherwise {

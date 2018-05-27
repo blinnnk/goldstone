@@ -52,9 +52,7 @@ object GoldStoneAPI {
 		errorCallback: () -> Unit = {},
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
-		System.out.println("hello 7")
 		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list", false, errorCallback) {
-			System.out.println("hello 8")
 			forEachOrEnd { token, isEnd ->
 				if (token.forceShow == TinyNumber.True.value) token.isUsed = true
 				if (isEnd) hold(toArrayList())
@@ -338,15 +336,12 @@ object GoldStoneAPI {
 		crossinline netWorkError: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
-		System.out.println("hello 1900")
 		getcryptoGetRequest(api) {
-			System.out.println("hello 1901")
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(
 					call: Call,
 					error: IOException
 				) {
-					System.out.println("hello 1902")
 					netWorkError()
 					LogUtil.error(keyName + "requestData", error)
 				}
@@ -370,7 +365,6 @@ object GoldStoneAPI {
 						}
 					} catch (error: Exception) {
 						netWorkError()
-						System.out.println("hello 1903")
 						GoldStoneCode.showErrorCodeReason(data)
 						LogUtil.error("$keyName requestData", error)
 					}
