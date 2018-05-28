@@ -28,7 +28,6 @@ class KeystoreExportPresenter(
 			hold("")
 			return
 		}
-		System.out.println("hell3")
 
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
