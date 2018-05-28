@@ -1,10 +1,16 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -20,7 +26,8 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "myTokens")
 data class MyTokenTable(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int, var ownerAddress: String,
+	var id: Int,
+	var ownerAddress: String,
 	var symbol: String,
 	var balance: Double,
 	var contract: String,

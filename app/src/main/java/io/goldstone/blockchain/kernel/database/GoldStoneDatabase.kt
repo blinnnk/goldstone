@@ -22,13 +22,16 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  * @date 03/04/2018 12:53 PM
  * @author KaySaith
  */
-
 @Database(
-	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class), (TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class), (AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class), (SupportCurrencyTable::class)],
+	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
+		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
+		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
+		(SupportCurrencyTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
+	
 	abstract fun walletDao(): WalletDao
 	abstract fun myTokenDao(): MyTokenDao
 	abstract fun defaultTokenDao(): DefaultTokenDao
@@ -39,20 +42,17 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun notificationDao(): NotificationDao
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
-
+	
 	companion object {
-		const val databaseVersion = 1
+		const val databaseVersion = 2
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
-
+		
 		fun initDatabase(context: Context) {
 			database =
-				Room.databaseBuilder(
-					context,
-					GoldStoneDataBase::class.java,
-					databaseName
-				)
+				Room.databaseBuilder(context, GoldStoneDataBase::class.java, databaseName)
 					.addMigrations()
+					.allowMainThreadQueries()
 					.build()
 		}
 	}

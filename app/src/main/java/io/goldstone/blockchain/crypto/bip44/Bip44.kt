@@ -16,16 +16,17 @@ data class BIP44(val path: List<BIP44Element>) {
 				throw (IllegalArgumentException("Must start with m/"))
 			}
 			val cleanPath = path.replace("m/", "").replace(" ", "")
-			return BIP44(cleanPath
-				             .split("/")
-				             .filter { it.isNotEmpty() }
-				             .map {
-					             BIP44Element(
-						             hardened = it.contains("'"),
-						             number = it.replace("'", "").toIntOrNull()
-						                      ?: throw IllegalArgumentException("not a number $it")
-					             )
-				             })
+			return BIP44(
+				cleanPath
+					.split("/")
+					.filter { it.isNotEmpty() }
+					.map {
+						BIP44Element(
+							hardened = it.contains("'"),
+							number = it.replace("'", "").toIntOrNull()
+							         ?: throw IllegalArgumentException("not a number $it")
+						)
+					})
 		}
 	}
 	

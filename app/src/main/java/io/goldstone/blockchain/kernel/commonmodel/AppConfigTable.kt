@@ -25,7 +25,8 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int, var pincode: Int? = null,
+	var id: Int,
+	var pincode: Int? = null,
 	var showPincode: Boolean = false,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,

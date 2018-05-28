@@ -14,7 +14,6 @@ import org.json.JSONObject
  * @date 2018/5/11 2:15 PM
  * @author KaySaith
  */
-
 @Entity(tableName = "supportCurrency")
 data class SupportCurrencyTable(
 	@PrimaryKey(autoGenerate = true)
@@ -23,23 +22,23 @@ data class SupportCurrencyTable(
 	var currencySymbol: String,
 	var isUsed: Boolean
 ) {
-
+	
 	@Ignore constructor() : this(
 		0,
 		"",
 		"",
 		false
 	)
-
+	
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("countrySymbol"),
 		data.safeGet("currencySymbol"),
 		data.safeGet("isUsed").toBoolean()
 	)
-
+	
 	companion object {
-
+		
 		fun updateUsedStatus(symbol: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.currencyDao()
@@ -55,33 +54,32 @@ data class SupportCurrencyTable(
 					}
 			}
 		}
-
+		
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
-			}) {
+				               GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
+			               }) {
 				hold(it.toArrayList())
 			}
 		}
-
 	}
 }
 
 @Dao
 interface SupportCurrencyDao {
-
+	
 	@Query("SELECT * FROM supportCurrency")
 	fun getSupportCurrencies(): List<SupportCurrencyTable>
-
+	
 	@Query("SELECT * FROM supportCurrency WHERE currencySymbol LIKE :symbol")
 	fun getCurrencyBySymbol(symbol: String): SupportCurrencyTable?
-
+	
 	@Insert
 	fun insert(token: SupportCurrencyTable)
-
+	
 	@Update
 	fun update(token: SupportCurrencyTable)
-
+	
 	@Delete
 	fun delete(token: SupportCurrencyTable)
 }

@@ -27,24 +27,23 @@ import org.jetbrains.anko.*
  * @date 21/03/2018 10:15 PM
  * @author KaySaith
  */
-
 class StartingFragment : BaseFragment<StartingPresenter>() {
-
+	
 	override val presenter = StartingPresenter(this)
-
-	private val gradientView by lazy { GradientView(context!!).apply { setStyle(GradientType.Blue) } }
+	private val gradientView by lazy {
+		GradientView(context!!).apply {
+			setStyle(GradientType.Blue)
+		}
+	}
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
-
 	private val logoSize = 175.uiPX()
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
-
 			lparams(matchParent, matchParent)
-
+			
 			gradientView.into(this)
-
 			// Logo
 			imageView {
 				glideImage(R.drawable.logo)
@@ -54,27 +53,24 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				centerHorizontally()
 				topMargin = (ScreenSize.Height * 0.24).toInt()
 			}
-
 			// Intro
 			verticalLayout {
-
 				textView(SplashText.goldStone) {
 					textSize = fontSize(21)
 					textColor = Spectrum.white
 					typeface = GoldStoneFont.black(context)
 					gravity = Gravity.CENTER_HORIZONTAL
 				}
-
+				
 				textView(SplashText.slogan) {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.light(context)
 				}
-
 			}.lparams {
 				centerHorizontally()
 				topMargin = (ScreenSize.Height * 0.22).toInt() + logoSize + 30.uiPX()
 			}
-
+			
 			WalletTable.getAll {
 				// 本地没有钱包的情况下显示登录和导入按钮
 				if (isEmpty()) {
@@ -87,7 +83,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						}.click {
 							presenter.showCreateWalletFragment()
 						}.into(this)
-
+						
 						importButton.apply {
 							text = ImportWalletText.importWallet.toUpperCase()
 							marginTop = PaddingSize.content
@@ -98,7 +94,6 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 							)
 							presenter.showImportWalletFragment()
 						}.into(this)
-
 					}.lparams {
 						height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
 						alignParentBottom()
@@ -114,5 +109,4 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 			}
 		}
 	}
-
 }
