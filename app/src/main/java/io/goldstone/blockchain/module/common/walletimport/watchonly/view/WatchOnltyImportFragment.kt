@@ -4,21 +4,17 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.component.RoundInput
-import io.goldstone.blockchain.common.component.WalletEditText
-import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 2:15 AM
@@ -74,16 +70,14 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					it.showLoadingStatus(false)
 				}
 			}.into(this)
-
-			textView(QAText.whatIsWatchOnlyWallet) {
-				textSize = fontSize(15)
-				typeface = GoldStoneFont.heavy(context)
-				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
-					topMargin = 20.uiPX()
+			
+			ExplanationTitle(context).apply {
+				text = QAText.whatIsWatchOnlyWallet.setUnderline()
+			}.click {
+				getParentFragment<WalletImportFragment> {
+					presenter.showWebViewFragment(WebUrl.whatIsWatchOnly, QAText.whatIsWatchOnlyWallet)
 				}
-				textColor = Spectrum.blue
-				gravity = Gravity.CENTER
-			}
+			}.into(this)
 		}
 	}
 

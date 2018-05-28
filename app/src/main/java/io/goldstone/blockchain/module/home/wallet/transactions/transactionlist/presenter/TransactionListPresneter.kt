@@ -13,10 +13,10 @@ import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -30,25 +30,18 @@ import org.jetbrains.anko.runOnUiThread
  * @date 24/03/2018 2:12 PM
  * @author KaySaith
  */
-
 // save data in memory for the next showing speed
 var localTransactions: ArrayList<TransactionListModel>? = null
 
 class TransactionListPresenter(
 	override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
-
+	
 	override fun updateData() {
 		// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
-		if (localTransactions.isNull()) {
-			setHeightMatchParent {
-				fragment.initData()
-			}
-		} else {
-			fragment.initData()
-		}
+		fragment.initData()
 	}
-
+	
 	fun showTransactionDetail(model: TransactionListModel?) {
 		fragment.getParentFragment<TransactionFragment>()?.apply {
 			Bundle().apply {
@@ -59,7 +52,7 @@ class TransactionListPresenter(
 			}
 		}
 	}
-
+	
 	private fun TransactionListFragment.initData() {
 		showLoadingView(LoadingText.transactionData)
 		if (!localTransactions.isNull()) {
@@ -86,12 +79,12 @@ class TransactionListPresenter(
 			}
 		}
 	}
-
+	
 	private fun TransactionListFragment.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
-				?: "0"
+			?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(currentBlockNumber) { newData ->
 			/** chain data is empty then return and remove loading view */
@@ -121,9 +114,9 @@ class TransactionListPresenter(
 			}
 		}
 	}
-
+	
 	companion object {
-
+		
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun BaseRecyclerFragment<*, *>.getTransactionDataFromEtherScan(
 			startBlock: String,
@@ -144,7 +137,7 @@ class TransactionListPresenter(
 				}
 			}.start()
 		}
-
+		
 		fun updateTransactions(
 			fragment: BaseRecyclerFragment<*, *>,
 			startBlock: String,
@@ -152,7 +145,7 @@ class TransactionListPresenter(
 		) {
 			fragment.getTransactionDataFromEtherScan(startBlock, hold)
 		}
-
+		
 		private fun mergeNormalAndTokenIncomingTransactions(
 			startBlock: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -173,20 +166,20 @@ class TransactionListPresenter(
 						completeMark()
 					}
 				}
-
+				
 				override fun mergeCallBack() {
 					coroutinesTask({
-						arrayListOf<TransactionTable>().apply {
-							addAll(chainData)
-							addAll(logData)
-						}.filter {
-							it.to.isNotEmpty() && it.value.toDouble() > 0.0
-						}.distinctBy {
-							it.hash
-						}.sortedByDescending {
-							it.timeStamp
-						}.toArrayList()
-					}) { newData ->
+						               arrayListOf<TransactionTable>().apply {
+							               addAll(chainData)
+							               addAll(logData)
+						               }.filter {
+							               it.to.isNotEmpty() && it.value.toDouble() > 0.0
+						               }.distinctBy {
+							               it.hash
+						               }.sortedByDescending {
+							               it.timeStamp
+						               }.toArrayList()
+					               }) { newData ->
 						if (newData.isEmpty()) {
 							hold(newData)
 						} else {
@@ -195,7 +188,9 @@ class TransactionListPresenter(
 									if (localData.any { it.hash == item.hash }) {
 										newData.remove(item)
 									}
-									if (isEnd) { hold(newData) }
+									if (isEnd) {
+										hold(newData)
+									}
 								}
 							}
 						}
@@ -203,7 +198,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-
+		
 		private fun BaseRecyclerFragment<*, *>.filterCompletedData(
 			data: ArrayList<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
@@ -217,17 +212,17 @@ class TransactionListPresenter(
 							if (transactionTable.isERC20) {
 								GoldStoneEthCall
 									.getInputCodeByHash(transactionTable.hash) {
-									GoldStoneDataBase.database.transactionDao()
-										.insert(transactionTable.apply { input = it })
-									completeMark()
-								}
+										GoldStoneDataBase.database.transactionDao()
+											.insert(transactionTable.apply { input = it })
+										completeMark()
+									}
 							} else {
 								GoldStoneDataBase.database.transactionDao().insert(transactionTable)
 								completeMark()
 							}
 						}
 					}
-
+					
 					override fun mergeCallBack() {
 						hold(map { TransactionListModel(it) }.toArrayList())
 						removeLoadingView()
@@ -235,7 +230,7 @@ class TransactionListPresenter(
 				}.start()
 			}
 		}
-
+		
 		/**
 		 * 补全从 `EtherScan` 拉下来的账单中各种 `token` 的信息, 需要很多种线程情况, 这里使用异步并发观察结果
 		 * 在汇总到主线程.
@@ -268,18 +263,18 @@ class TransactionListPresenter(
 									)
 									receiveAddress = transactionInfo?.address!!
 								}
-
+								
 								tokenInfo.isNull() isTrue {
 									// 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
 									GoldStoneEthCall
 										.getTokenSymbolAndDecimalByContract(contract) { symbol, decimal ->
-										TransactionTable.updateModelInfoFromChain(
-											transaction, true, symbol, CryptoUtils.toCountByDecimal(
+											TransactionTable.updateModelInfoFromChain(
+												transaction, true, symbol, CryptoUtils.toCountByDecimal(
 												transaction.value.toDouble(), decimal
 											).toString(), receiveAddress
-										)
-										completeMark()
-									}
+											)
+											completeMark()
+										}
 								} otherwise {
 									TransactionTable.updateModelInfoFromChain(
 										transaction, true, tokenInfo!!.symbol, count.toString(), receiveAddress
@@ -298,7 +293,7 @@ class TransactionListPresenter(
 						}
 					}
 				}
-
+				
 				override fun mergeCallBack() {
 					hold(data)
 				}

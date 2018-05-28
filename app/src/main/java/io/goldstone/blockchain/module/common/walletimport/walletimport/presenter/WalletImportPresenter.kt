@@ -2,19 +2,20 @@ package io.goldstone.blockchain.module.common.walletimport.walletimport.presente
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view.WalletAddingMethodFragment
@@ -85,4 +86,52 @@ class WalletImportPresenter(
 			}
 		}
 	}
+	
+	fun showWebViewFragment(url: String, title: String) {
+		
+		fragment.headerTitle = title
+		
+		hideChildFragments()
+		
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, url)
+		}
+		
+		fragment.overlayView.header.apply {
+			showCloseButton(false)
+			showBackButton(true) {
+				removeWebFragment()
+				showChildFragments()
+				showBackButton(false)
+				showCloseButton(true)
+			}
+		}
+	}
+	
+	private fun hideChildFragments() {
+		fragment.childFragmentManager.apply {
+			fragments.forEach {
+				beginTransaction().hide(it).commit()
+			}
+		}
+	}
+	
+	private fun showChildFragments() {
+		fragment.childFragmentManager.apply {
+			fragments.forEach {
+				beginTransaction().show(it).commit()
+			}
+		}
+	}
+	
+	private fun removeWebFragment() {
+		fragment.childFragmentManager.apply {
+			fragments?.find {
+				it is WebViewFragment
+			}?.let {
+				beginTransaction().remove(it).commit()
+			}
+		}
+	}
+	
 }

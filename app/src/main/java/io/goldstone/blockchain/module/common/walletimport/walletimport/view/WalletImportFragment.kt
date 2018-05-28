@@ -31,5 +31,7 @@ class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 		presenter.onClickMenuBarItem()
 		headerTitle = ImportWalletText.importWallet
 	}
+	
+	
 
 }

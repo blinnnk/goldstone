@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 	fun showHomeFragment() {
 		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
 			if(it.isHidden) {
-				supportFragmentManager.beginTransaction().show(it).commit()
+				supportFragmentManager?.beginTransaction()?.show(it)?.commit()
 			}
 		}
 	}

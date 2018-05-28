@@ -56,4 +56,9 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 		backgroundLayout.addTopLRCorner(CornerSize.big, Color.TRANSPARENT)
 		header.addTopLRCorner(CornerSize.big, Spectrum.white)
 	}
+	
+	fun showBackgroundLayout() {
+		backgroundLayout.addTopLRCorner(CornerSize.big, Spectrum.white)
+		header.addTopLRCorner(CornerSize.big, Color.TRANSPARENT)
+	}
 }

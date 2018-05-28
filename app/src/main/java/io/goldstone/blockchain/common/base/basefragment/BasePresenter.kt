@@ -89,7 +89,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 						presenter.popFragmentFrom<T>()
 						headerTitle = popTitle
 					}
-					showCloseButton(false)
+					showCloseButton(!hasBackButton)
 				}
 				headerTitle = title
 			}
