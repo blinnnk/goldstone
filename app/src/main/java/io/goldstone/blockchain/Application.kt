@@ -37,7 +37,7 @@ class GoldStoneApp : Application() {
 		// init google analytics
 		sAnalytics = GoogleAnalytics.getInstance(this)
 		// create and init database
-		GoldStoneDataBase.initDatabase(this)
+		GoldStoneDataBase.initDatabase(applicationContext)
 		// init ethereum utils `Context`
 		GoldStoneEthCall.context = this
 		// init `Api` context

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.removeChildFragment
-import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
@@ -16,14 +15,12 @@ import io.goldstone.blockchain.common.value.ContainerID
  * @date 22/03/2018 2:29 AM
  * @author KaySaith
  */
-
 abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
-
+	
 	abstract val fragment: T
-
+	
 	open fun removeSelfFromActivity() {
-		fragment.removeSelfWithAnimation(fragment.overlayView.overlayLayout)
-
+		fragment.removeSelf()
 		/**
 		 * 空判断有键盘就销毁没有键盘就不向下执行.`ContentOverlay` 带键盘场景较多增加了 `Super` 方法
 		 */
@@ -31,7 +28,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			SoftKeyboard.hide(this)
 		}
 	}
-
+	
 	/**
 	 * 为了体验, 之前的 `Fragment` 都是使用隐藏,
 	 * @important 当级别超过 `2` 层记得去从隐藏到显示
@@ -63,7 +60,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			}
 		}
 	}
-
+	
 	inline fun <reified T : Fragment> showTargetFragment(
 		title: String,
 		previousTitle: String,
@@ -86,33 +83,39 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			}
 		}
 	}
-
+	
 	fun onFragmentAttach() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentCreateView() {
 		// Do Something When fragment Attach
 	}
-
+	
 	open fun onFragmentViewCreated() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentDetach() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentDestroy() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentResume() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentShowFromHidden() {
 		// Do Something
 	}
+}
 
+fun Fragment.removeSelf(callback: () -> Unit = { }) {
+	activity?.let {
+		it.supportFragmentManager.beginTransaction().remove(this).commit()
+		callback()
+	}
 }

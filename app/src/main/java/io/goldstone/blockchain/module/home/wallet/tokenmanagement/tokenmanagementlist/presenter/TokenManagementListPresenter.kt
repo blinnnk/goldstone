@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
-import com.blinnnk.extension.*
+import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -13,20 +15,12 @@ import org.jetbrains.anko.runOnUiThread
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-// 获取数据后把默认列表防止到内存里加快每次访问的速度
-private var defaultTokenList: ArrayList<DefaultTokenTable>? = null
-
 class TokenManagementListPresenter(
 	override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 	
 	override fun updateData() {
-		defaultTokenList.isNull() isFalse {
-			fragment.asyncData = defaultTokenList
-			fragment.prepareMyDefaultTokens()
-		} otherwise {
-			fragment.prepareMyDefaultTokens()
-		}
+		fragment.prepareMyDefaultTokens()
 	}
 	
 	override fun updateParentContentLayoutHeight(
@@ -54,13 +48,8 @@ class TokenManagementListPresenter(
 							val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 							// 在主线程更新 `UI`
 							context?.runOnUiThread {
-								asyncData.isNull() isTrue {
-									asyncData = sortedList
-								} otherwise {
-									asyncData = sortedList
-									fragment.recyclerView.adapter.notifyDataSetChanged()
-								}
-								defaultTokenList = sortedList
+								asyncData = sortedList
+								fragment.recyclerView.adapter.notifyDataSetChanged()
 							}
 						}
 					}
