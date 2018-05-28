@@ -23,7 +23,7 @@ class KeystoreExportPresenter(
 		passwordInput: EditText,
 		hold: String.() -> Unit
 	) {
-		if (!passwordInput.text?.toString().isNullOrBlank()) {
+		if (passwordInput.text?.toString().isNullOrBlank()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")
 			return

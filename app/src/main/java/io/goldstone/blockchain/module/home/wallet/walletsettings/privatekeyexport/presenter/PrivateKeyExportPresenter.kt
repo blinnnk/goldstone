@@ -24,7 +24,7 @@ class PrivateKeyExportPresenter(
 		passwordInput: EditText,
 		hold: String.() -> Unit
 	) {
-		if (passwordInput.text?.toString().orEmpty().length < 8) {
+		if (passwordInput.text?.toString().isNullOrBlank()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")
 			return
