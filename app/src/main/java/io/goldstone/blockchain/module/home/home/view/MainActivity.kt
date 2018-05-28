@@ -101,6 +101,20 @@ class MainActivity : AppCompatActivity() {
 	fun getHomeFragment(): HomeFragment? {
 		return supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment
 	}
+	
+	fun hideHomeFragment() {
+		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
+			supportFragmentManager.beginTransaction().hide(it).commit()
+		}
+	}
+	
+	fun showHomeFragment() {
+		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
+			if(it.isHidden) {
+				supportFragmentManager.beginTransaction().show(it).commit()
+			}
+		}
+	}
 
 	/**
 	 * 接受到 `Push` 跳转到 `NotificationFragment`

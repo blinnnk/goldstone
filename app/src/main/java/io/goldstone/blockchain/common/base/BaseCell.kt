@@ -45,8 +45,8 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 	}
 
 	init {
+		
 		this.setWillNotDraw(false)
-
 		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX()).apply {
 			leftPadding = PaddingSize.device
 			rightPadding = PaddingSize.device

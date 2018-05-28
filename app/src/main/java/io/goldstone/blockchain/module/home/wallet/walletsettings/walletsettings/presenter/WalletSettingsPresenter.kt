@@ -3,10 +3,12 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.view.View
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -173,7 +175,11 @@ class WalletSettingsPresenter(
 		overlayView.apply {
 			header.showBackButton(true) { showWalletSettingListFragment() }
 			header.showCloseButton(false)
-			contentLayout.updateHeightAnimation(contentHeight)
+			contentLayout.updateHeightAnimation(contentHeight) {
+				if (contentHeight >= ScreenSize.Height) {
+					fragment.getMainActivity()?.hideHomeFragment()
+				}
+			}
 		}
 	}
 

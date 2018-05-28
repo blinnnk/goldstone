@@ -11,9 +11,8 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter.
  * @date 21/04/2018 4:14 PM
  * @author KaySaith
  */
-
 class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>() {
-
+	
 	private val title by lazy { arguments?.getString(ArgumentKey.quotationOverlayTitle) }
 	private val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationOverlayInfo) as? QuotationModel
@@ -25,11 +24,10 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 				presenter.showQutationManagementFragment()
 				overlayView.header.showSearchButton(true) { presenter.showQutationSearchFragment() }
 			}
-
+			
 			else -> presenter.showMarketTokenDetailFragment(currencyInfo)
 		}
-
+		
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()
 	}
-
 }
