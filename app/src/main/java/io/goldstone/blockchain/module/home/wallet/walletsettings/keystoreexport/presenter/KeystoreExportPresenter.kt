@@ -23,11 +23,12 @@ class KeystoreExportPresenter(
 		passwordInput: EditText,
 		hold: String.() -> Unit
 	) {
-		if (!passwordInput.text?.toString().isNullOrBlank()) {
+		if (passwordInput.text?.toString().isNullOrBlank()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")
 			return
 		}
+		System.out.println("hell3")
 
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
