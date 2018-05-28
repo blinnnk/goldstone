@@ -7,10 +7,8 @@ import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getKeystoreFile
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
-import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -25,7 +23,7 @@ class KeystoreExportPresenter(
 		passwordInput: EditText,
 		hold: String.() -> Unit
 	) {
-		if (passwordInput.text?.toString().orEmpty().length < 8) {
+		if (!passwordInput.text?.toString().isNullOrBlank()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")
 			return
