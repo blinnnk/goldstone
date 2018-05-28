@@ -17,13 +17,11 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 26/03/2018 8:56 PM
  * @author KaySaith
  */
-
 class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationModel>() {
-
+	
 	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
-
 	override val presenter = QuotationPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationModel>?
@@ -35,14 +33,14 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			}
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
-
+		
 		slideHeader.apply {
 			addTokenButton.apply {
 				onClick {
@@ -52,20 +50,19 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			}
 		}
 	}
-
+	
 	override fun onResume() {
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
-
+	
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
-
+	
 	override fun observingRecyclerViewVerticalOffset(
 		offset: Int,
 		range: Int
 	) {
-
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
@@ -75,9 +72,8 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			isShow = false
 		}
 	}
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
 	}
-
 }

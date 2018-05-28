@@ -9,6 +9,7 @@ import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
 /**
@@ -102,6 +103,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	
 	open fun onFragmentDestroy() {
 		// Do Something
+		fragment.getMainActivity()?.showHomeFragment()
 	}
 	
 	open fun onFragmentResume() {

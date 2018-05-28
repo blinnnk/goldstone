@@ -85,5 +85,13 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	fun setProfile(callback: () -> Unit) {
 		tabBar.profileButton.setStyleAndClick(callback)
 	}
+	
+	fun hideTabbarView() {
+		tabBar.alpha = 0f
+	}
+	
+	fun showTabbarView() {
+		tabBar.alpha = 1f
+	}
 
 }

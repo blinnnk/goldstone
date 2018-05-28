@@ -44,7 +44,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	@SuppressLint("SetJavaScriptEnabled")
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
-
+			hideParentLayout()
 			loading.apply {
 				indeterminateDrawable.setColorFilter(
 					HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY
@@ -59,19 +59,14 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 
 			// 当 `webView`加载完毕后清楚 `loading`
 			webView {
-				alpha = 0.1f
 				settings.javaScriptEnabled = true
 				webViewClient = WebViewClient()
 				this.loadUrl(urlPath)
 				layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
 
 				webViewClient = object : WebViewClient() {
-					override fun onPageFinished(
-						view: WebView,
-						url: String
-					) {
+					override fun onPageFinished(view: WebView, url: String) {
 						removeView(loading)
-						view.alpha = 1f
 					}
 				}
 			}
@@ -89,6 +84,12 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		// 需要添加到 `BaseOverlayFragment` 下面
 		getParentFragment<BaseOverlayFragment<*>>()?.apply {
 			overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
+		}
+	}
+	
+	private fun hideParentLayout() {
+		getParentFragment<BaseOverlayFragment<*>>()?.let {
+			it.overlayView.hideBackgroundLayout()
 		}
 	}
 

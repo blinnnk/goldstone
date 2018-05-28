@@ -19,42 +19,41 @@ import org.jetbrains.anko.relativeLayout
  * @date 22/03/2018 2:40 AM
  * @author KaySaith
  */
-
 class OverlayView(context: Context) : RelativeLayout(context) {
-
-  val header = OverlayHeaderLayout(context)
-  var overlayLayout: RelativeLayout
-  lateinit var contentLayout: RelativeLayout
-
-  init {
-
-    id = ContainerID.overlay
-
-    // 内容的容器用来做动画
-    overlayLayout = relativeLayout {
-
-      layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-      isClickable = true
-
-      relativeLayout {
-        addTopLRCorner(CornerSize.big, Spectrum.white)
-        // header
-        addView(header)
-        // content
-        contentLayout = relativeLayout {
-          id = ContainerID.content
-        }.lparams {
-          width = matchParent
-          height = 200.uiPX()
-          topMargin = HoneyUIUtils.getHeight(header)
-        }
-        lparams { alignParentBottom() }
-      }
-    }
-
-    // 背景防止点击的 `mask` 颜色动画
-    updateColorAnimation(Color.TRANSPARENT, GrayScale.Opacity2Black)
-
-  }
-
+	
+	val header = OverlayHeaderLayout(context)
+	private var overlayLayout: RelativeLayout
+	private lateinit var backgroundLayout: RelativeLayout
+	lateinit var contentLayout: RelativeLayout
+	
+	init {
+		id = ContainerID.overlay
+		// 内容的容器用来做动画
+		overlayLayout = relativeLayout {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+			isClickable = true
+			
+			backgroundLayout = relativeLayout {
+				addTopLRCorner(CornerSize.big, Spectrum.white)
+				// header
+				addView(header)
+				// content
+				contentLayout = relativeLayout {
+					id = ContainerID.content
+				}.lparams {
+					width = matchParent
+					height = 200.uiPX()
+					topMargin = HoneyUIUtils.getHeight(header)
+				}
+				lparams { alignParentBottom() }
+			}
+		}
+		// 背景防止点击的 `mask` 颜色动画
+		updateColorAnimation(Color.TRANSPARENT, GrayScale.Opacity2Black)
+	}
+	
+	fun hideBackgroundLayout() {
+		backgroundLayout.addTopLRCorner(CornerSize.big, Color.TRANSPARENT)
+		header.addTopLRCorner(CornerSize.big, Spectrum.white)
+	}
 }

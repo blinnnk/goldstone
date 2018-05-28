@@ -8,6 +8,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 
@@ -48,7 +49,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 
 	open fun onFragmentDetach() {
-		// Do Something
+		fragment.getMainActivity()?.showHomeFragment()
 	}
 
 	open fun onFragmentDestroy() {
@@ -145,13 +146,18 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			else -> BasicSize.overlayMinHeight
 		}
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight)
+			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight) {
+				if (targetHeight >= maxHeight) {
+					fragment.getMainActivity()?.hideHomeFragment()
+				}
+			}
 		}
 	}
 
 	fun setHeightMatchParent(callback: () -> Unit = {}) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero()) {
+				fragment.getMainActivity()?.hideHomeFragment()
 				callback()
 			}
 		}
@@ -167,7 +173,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 				recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
 				else -> BasicSize.overlayMinHeight
 			}
-			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight)
+			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight) {
+				if (realHeight >= maxHeight) {
+					fragment.getMainActivity()?.hideHomeFragment()
+				}
+			}
 		}
 	}
 

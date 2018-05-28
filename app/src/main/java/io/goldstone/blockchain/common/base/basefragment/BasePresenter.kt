@@ -7,10 +7,12 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.getScreenHeightWithoutStatusBar
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
 /**
@@ -47,7 +49,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	}
 
 	open fun onFragmentDestroy() {
-
+		fragment.getMainActivity()?.showHomeFragment()
 	}
 
 	fun recoveryFragmentHeight() {
@@ -56,11 +58,15 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 				fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
 			)
 		}
+		fragment.getMainActivity()?.hideHomeFragment()
 	}
 
 	fun updateHeight(height: Int) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(height)
+		}
+		if (height >= ScreenSize.Height) {
+			fragment.getMainActivity()?.hideHomeFragment()
 		}
 	}
 

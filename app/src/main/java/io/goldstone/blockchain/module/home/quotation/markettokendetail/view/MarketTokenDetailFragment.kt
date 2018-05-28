@@ -27,11 +27,11 @@ import org.jetbrains.anko.verticalLayout
  * @date 25/04/2018 6:52 AM
  * @author KaySaith
  */
-
 enum class MarketTokenDetailChartType(
 	val code: Int,
 	val info: String
 ) {
+	
 	Hour(0, "1hour"),
 	DAY(1, "1day"),
 	WEEK(2, "1week"),
@@ -39,19 +39,16 @@ enum class MarketTokenDetailChartType(
 }
 
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
-
+	
 	val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
 	}
-
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
-
 	private val menu by lazy { ButtonMenu(context!!) }
 	private val chartView by lazy { MarketTokenChart(context!!) }
 	private val priceHistroy by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }
-
 	override val presenter = MarketTokenDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -80,17 +77,17 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.updateChartByMenu(
 					chartView, MarketTokenDetailChartType.Hour.code
 				)
-
+				
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
 					}
 				}.into(this)
-
+				
 				priceHistroy.into(this)
 				tokenInfo.into(this)
 				tokenInformation.into(this)
-
+				
 				presenter.setCurrencyInf(
 					currencyInfo, tokenInformation, priceHistroy, tokenInfo
 				)
@@ -101,7 +98,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 			}
 		}
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
