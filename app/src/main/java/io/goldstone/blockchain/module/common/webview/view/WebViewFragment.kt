@@ -79,6 +79,11 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		}
 		setWebFragmentHeight()
 	}
+	
+	override fun onDetach() {
+		super.onDetach()
+		showParentLayout()
+	}
 
 	private fun setWebFragmentHeight() {
 		// 需要添加到 `BaseOverlayFragment` 下面
@@ -92,7 +97,13 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			it.overlayView.hideBackgroundLayout()
 		}
 	}
-
+	
+	private fun showParentLayout() {
+		getParentFragment<BaseOverlayFragment<*>>()?.let {
+			it.overlayView.showBackgroundLayout()
+		}
+	}
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?

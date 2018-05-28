@@ -4,20 +4,18 @@ import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AgreementView
-import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.component.RoundInput
-import io.goldstone.blockchain.common.component.WalletEditText
+import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -93,19 +91,15 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						it.showLoadingStatus(false)
 					}
 				}.into(this)
-
-
-				textView(QAText.whatIsMnemonic) {
-					textSize = fontSize(15)
-					typeface = GoldStoneFont.heavy(context)
-					layoutParams = LinearLayout.LayoutParams(
-						ScreenSize.Width, 30.uiPX()
-					).apply {
-						topMargin = 20.uiPX()
+				
+				
+				ExplanationTitle(context).apply {
+					text = QAText.whatIsMnemonic.setUnderline()
+				}.click {
+					getParentFragment<WalletImportFragment> {
+						presenter.showWebViewFragment(WebUrl.whatIsMnemonic, QAText.whatIsMnemonic)
 					}
-					textColor = Spectrum.blue
-					gravity = Gravity.CENTER
-				}
+				}.into(this)
 			}
 		}
 	}

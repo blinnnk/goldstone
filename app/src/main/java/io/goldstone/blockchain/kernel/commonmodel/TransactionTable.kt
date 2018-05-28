@@ -7,6 +7,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -73,9 +74,10 @@ data class TransactionTable(
 	var recordOwnerAddress: String,
 	var tokenReceiveAddress: String? = null,
 	var isPending: Boolean = false,
-	var logIndex: String = ""
+	var logIndex: String = "",
+	var chainID: String = GoldStoneApp.currentChain
 ) {
-
+	
 	/** 默认的 `constructor` */
 	constructor() : this(
 		0,
@@ -102,7 +104,7 @@ data class TransactionTable(
 		"",
 		""
 	)
-
+	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
 		0,
@@ -132,7 +134,7 @@ data class TransactionTable(
 		false,
 		data.logIndex
 	)
-
+	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: JSONObject) : this(
 		0,
@@ -159,7 +161,7 @@ data class TransactionTable(
 		"",
 		WalletTable.current.address
 	)
-
+	
 	companion object {
 		fun updateModelInfoFromChain(
 			transaction: TransactionTable,
@@ -177,18 +179,19 @@ data class TransactionTable(
 				this.recordOwnerAddress = WalletTable.current.address
 			}
 		}
-
+		
 		fun getTransactionListModelsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+				}) {
 				hold(it.map { TransactionListModel(it) }.toArrayList())
 			}
 		}
-
+		
 		fun getTransactionsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -199,7 +202,7 @@ data class TransactionTable(
 				hold(it.toArrayList())
 			}
 		}
-
+		
 		/**
 		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nounce` 值来生成
 		 * 最近可用的 `Nounce`
@@ -220,7 +223,7 @@ data class TransactionTable(
 				}
 			}
 		}
-
+		
 		private fun getLocalLatestNounce(hold: (Long?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.transactionDao().apply {
@@ -247,7 +250,7 @@ data class TransactionTable(
 				}
 			}
 		}
-
+		
 		fun getTransactionsByAddressAndSymbol(
 			address: String,
 			symbol: String,
@@ -260,7 +263,7 @@ data class TransactionTable(
 				hold(it.toArrayList())
 			}
 		}
-
+		
 		fun getMyLatestStartBlock(
 			address: String = WalletTable.current.address,
 			hold: (String) -> Unit
@@ -275,7 +278,7 @@ data class TransactionTable(
 				)
 			}
 		}
-
+		
 		fun deleteByAddress(
 			address: String,
 			callback: () -> Unit
@@ -288,7 +291,7 @@ data class TransactionTable(
 				callback()
 			}
 		}
-
+		
 		// 异步方法
 		fun deleteByTaxHash(taxHash: String) {
 			GoldStoneDataBase.database.transactionDao().apply {
@@ -299,7 +302,7 @@ data class TransactionTable(
 				}
 			}
 		}
-
+		
 		fun updateInputCodeByHash(
 			taxHash: String,
 			input: String,
@@ -314,7 +317,7 @@ data class TransactionTable(
 				}
 			}
 		}
-
+		
 		fun getTransactionByHash(
 			taxHash: String,
 			hold: (List<TransactionTable>) -> Unit
@@ -325,7 +328,7 @@ data class TransactionTable(
 				}
 			}
 		}
-
+		
 		fun getTransactionByHashAndReceivedStatus(
 			hash: String,
 			isReceived: Boolean,
@@ -343,35 +346,39 @@ data class TransactionTable(
 
 @Dao
 interface TransactionDao {
-
+	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
-	fun getTransactionsByAddress(walletAddress: String): List<TransactionTable>
-
-	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
-	fun getTransactionByTaxHash(taxHash: String): List<TransactionTable>
-
-	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
+	fun getTransactionsByAddress(walletAddress: String, chainID: String = GoldStoneApp.currentChain):
+		List<TransactionTable>
+	
+	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
+	fun getTransactionByTaxHash(taxHash: String, chainID: String = GoldStoneApp.currentChain):
+		List<TransactionTable>
+	
+	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive AND chainID LIKE :chainID")
 	fun getTransactionByTaxHashAndReceivedStatus(
 		taxHash: String,
-		isReceive: Boolean
+		isReceive: Boolean,
+		chainID: String = GoldStoneApp.currentChain
 	): TransactionTable?
-
+	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
 	fun getTransactionsByAddressAndSymbol(
 		walletAddress: String,
-		targetSymbol: String
+		targetSymbol: String,
+		chainID: String = GoldStoneApp.currentChain
 	): List<TransactionTable>
-
+	
 	@Insert
 	fun insert(token: TransactionTable)
-
+	
 	@Update
 	fun update(token: TransactionTable)
-
+	
 	@Delete
 	fun delete(token: TransactionTable)
 }

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter
 
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -8,9 +9,12 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.convertKeystoreToModel
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -59,7 +63,8 @@ class KeystoreImportPresenter(
 			}
 		} otherwise {
 			fragment.context?.alert(CreateWalletText.agreeRemind)
+			callback()
 		}
-
 	}
+	
 }
