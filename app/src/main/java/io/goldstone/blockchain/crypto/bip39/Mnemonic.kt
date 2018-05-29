@@ -34,7 +34,7 @@ object Mnemonic {
 		val pass = words.joinToString(" ")
 		val salt = "mnemonic$password"
 		val keyFactory =
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
 			else SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
 		val spec = PBEKeySpec(pass.toCharArray(), salt.toByteArray(), 2048, 512)
 		return keyFactory.generateSecret(spec).encoded
