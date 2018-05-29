@@ -4,6 +4,7 @@ import io.goldstone.blockchain.crypto.SecureRandomUtils.secureRandom
 import io.goldstone.blockchain.crypto.extensions.toBytesPadded
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.kecca.keccak
+import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
 import java.security.*
@@ -18,7 +19,7 @@ const val ADDRESS_LENGTH_IN_HEX = 40
 val PUBLIC_KEY_LENGTH_IN_HEX = PUBLIC_KEY_SIZE shl 1
 
 fun initializeCrypto() {
-	Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+	Security.insertProviderAt(BouncyCastleProvider(), 1)
 }
 
 /**
