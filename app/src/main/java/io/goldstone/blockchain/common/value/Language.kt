@@ -293,21 +293,21 @@ object ImportWalletText {
 	val mnemonicLengthAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The mnemonic is too short"
 		HoneyLanguage.Chinese.code -> "助记词不够长哦"
-		HoneyLanguage.Japanese.code -> "mnemonic lengh is not enough"
-		HoneyLanguage.Korean.code -> "mnemonic lengh is not enough"
-		HoneyLanguage.Russian.code -> "mnemonic lengh is not enough"
-		HoneyLanguage.TraditionalChinese.code -> "mnemonic lengh is not enough"
+		HoneyLanguage.Japanese.code -> "The mnemonic is too short"
+		HoneyLanguage.Korean.code -> "The mnemonic is too short"
+		HoneyLanguage.Russian.code -> "The mnemonic is too short"
+		HoneyLanguage.TraditionalChinese.code -> "The mnemonic is too short"
 		else -> ""
 	}
 
 	@JvmField
 	val pathAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "incorre"
-		HoneyLanguage.Chinese.code -> "incorre"
-		HoneyLanguage.Japanese.code -> "incorre"
-		HoneyLanguage.Korean.code -> "incorre"
-		HoneyLanguage.Russian.code -> "incorre"
-		HoneyLanguage.TraditionalChinese.code -> "incorre"
+		HoneyLanguage.English.code -> "invalid path"
+		HoneyLanguage.Chinese.code -> "路径格式不正确"
+		HoneyLanguage.Japanese.code -> "invalid path"
+		HoneyLanguage.Korean.code -> "invalid path"
+		HoneyLanguage.Russian.code -> "invalid path"
+		HoneyLanguage.TraditionalChinese.code -> "invalid path"
 		else -> ""
 	}
 
@@ -2175,34 +2175,34 @@ object QAText {
 
 	@JvmField
 	val whatIsKeystore = when (currentLanguage) {
-		HoneyLanguage.English.code -> "What is keystore?"
+		HoneyLanguage.English.code -> "What is a keystore?"
 		HoneyLanguage.Chinese.code -> "什么是 keystore?"
-		HoneyLanguage.Japanese.code -> "What is keystore?"
-		HoneyLanguage.Korean.code -> "What is keystore?"
-		HoneyLanguage.Russian.code -> "What is keystore?"
-		HoneyLanguage.TraditionalChinese.code -> "What is keystore?"
+		HoneyLanguage.Japanese.code -> "What is a keystore?"
+		HoneyLanguage.Korean.code -> "What is a keystore?"
+		HoneyLanguage.Russian.code -> "What is a keystore?"
+		HoneyLanguage.TraditionalChinese.code -> "What is a keystore?"
 		else -> ""
 	}
 
 	@JvmField
 	val whatIsWatchOnlyWallet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "What is watch only wallet?"
+		HoneyLanguage.English.code -> "What is a watch-only wallet?"
 		HoneyLanguage.Chinese.code -> "什么是观察钱包？"
-		HoneyLanguage.Japanese.code -> "What is watch only wallet?"
-		HoneyLanguage.Korean.code -> "What is watch only wallet?"
-		HoneyLanguage.Russian.code -> "What is watch only wallet?"
-		HoneyLanguage.TraditionalChinese.code -> "What is watch only wallet?"
+		HoneyLanguage.Japanese.code -> "What is a watch-only wallet?"
+		HoneyLanguage.Korean.code -> "What is a watch-only wallet?"
+		HoneyLanguage.Russian.code -> "What is a watch-only wallet?"
+		HoneyLanguage.TraditionalChinese.code -> "What is a watch-only wallet?"
 		else -> ""
 	}
 
 	@JvmField
 	val whatIsPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "What is private key?"
+		HoneyLanguage.English.code -> "What is a private key?"
 		HoneyLanguage.Chinese.code -> "什么是私钥？"
-		HoneyLanguage.Japanese.code -> "What is private key?"
-		HoneyLanguage.Korean.code -> "What is private key?"
-		HoneyLanguage.Russian.code -> "What is private key?"
-		HoneyLanguage.TraditionalChinese.code -> "What is private key?"
+		HoneyLanguage.Japanese.code -> "What is a private key?"
+		HoneyLanguage.Korean.code -> "What is a private key?"
+		HoneyLanguage.Russian.code -> "What is a private key?"
+		HoneyLanguage.TraditionalChinese.code -> "What is a private key?"
 		else -> ""
 	}
 }
