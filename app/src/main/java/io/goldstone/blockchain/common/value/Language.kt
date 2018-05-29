@@ -34,13 +34,13 @@ object CreateWalletText {
 
 	@JvmField
 	val passwordRules = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
-		HoneyLanguage.Chinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters."
+		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，并少于8位"
 		HoneyLanguage.Japanese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
 		HoneyLanguage.Korean.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
 		HoneyLanguage.Russian.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
 		HoneyLanguage.TraditionalChinese.code -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
-		else -> "Safe password must contains upper letter, lower letter and number together, the count of your password is 8 at least"
+		else -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters."
 	}
 
 	@JvmField
@@ -55,43 +55,43 @@ object CreateWalletText {
 	}
 	@JvmField
 	val agreement = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Agreement"
+		HoneyLanguage.English.code -> "User Agreement"
 		HoneyLanguage.Chinese.code -> "用户协议"
 		HoneyLanguage.Japanese.code -> "利用規約"
 		HoneyLanguage.Korean.code -> "사용자 동의서"
 		HoneyLanguage.Russian.code -> "Пользовательское соглашение"
 		HoneyLanguage.TraditionalChinese.code -> "用戶協議"
-		else -> "Agreement"
+		else -> "User Agreement"
 	}
 	@JvmField
 	val agreeRemind = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You need to agree the terms"
+		HoneyLanguage.English.code -> "Please read and agree to the terms"
 		HoneyLanguage.Chinese.code -> "请阅读并同意用户协议"
 		HoneyLanguage.Japanese.code -> "条件に同意する必要があります"
 		HoneyLanguage.Korean.code -> "이용 약관을 읽고 동의하십시오"
 		HoneyLanguage.Russian.code -> "Прочтите и согласитесь с пользовательским соглашением"
 		HoneyLanguage.TraditionalChinese.code -> "請閱讀並同意用戶協議"
-		else -> "You need to agree the terms"
+		else -> "Please read and agree to the terms"
 	}
 	@JvmField
 	val mnemonicBackupAttention = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Confirm your mnemonic words to remember your account"
-		HoneyLanguage.Chinese.code -> "确认一遍助记词，以确保您的备份正确"
+		HoneyLanguage.English.code -> "We do not save any record of our users' mnemonics, so please take good care of them! To minimize risk, it's best not to save them digitally. Maybe write it down, you know like your grandmother used to do!"
+		HoneyLanguage.Chinese.code -> "请将助记词抄写在安全的地方，不要保存到网络上也不要截屏以防被黑客盗走。"
 		HoneyLanguage.Japanese.code -> "ニーモニックを再度確認して、正しくバックアップするようにします"
 		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오"
 		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили"
 		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確"
-		else -> "Confirm your mnemonic words to remember your account"
+		else -> "We do not save any record of our users' mnemonics, so please take good care of them! To minimize risk, it's best not to save them digitally. Maybe write it down, you know like your grandmother used to do!"
 	}
 	@JvmField
 	val mnemonicConfirmationDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Confirm your mnemonic words to remember your account"
-		HoneyLanguage.Chinese.code -> "确认一遍助记词，以确保您的备份正确"
+		HoneyLanguage.English.code -> "Please click the mnemonic words in order. This makes sure that your backup is correct."
+		HoneyLanguage.Chinese.code -> "按顺序点选助记词中的单词，以确保您的备份正确。"
 		HoneyLanguage.Japanese.code -> "ニーモニックを再度確認して、正しくバックアップするようにします"
 		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오"
 		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили"
 		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確"
-		else -> "Confirm your mnemonic words to remember your account"
+		else -> "Please click the mnemonic words in order. This makes sure that your backup is correct."
 	}
 	@JvmField
 	val password = when (currentLanguage) {
@@ -169,23 +169,23 @@ object ImportWalletText {
 	}
 	@JvmField
 	val keystoreHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> " Enter your keystore here"
+		HoneyLanguage.English.code -> "Paste your keystore here "
 		HoneyLanguage.Chinese.code -> " 在此输入您的keystore"
 		HoneyLanguage.Japanese.code -> " キーストアをここに入力してください"
 		HoneyLanguage.Korean.code -> "여기에 키 스토어를 입력하십시오."
 		HoneyLanguage.Russian.code -> " Введите свое хранилище ключей здесь"
 		HoneyLanguage.TraditionalChinese.code -> " 在此輸入您的keystore密鑰庫"
-		else -> " Enter your keystore here"
+		else -> "Paste your keystore here "
 	}
 	@JvmField
 	val privateKeyHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> " Enter your private key here"
+		HoneyLanguage.English.code -> "Enter your private key here"
 		HoneyLanguage.Chinese.code -> " 在此输入您的私钥"
 		HoneyLanguage.Japanese.code -> " ここに秘密鍵を入力してください"
 		HoneyLanguage.Korean.code -> "여기에 비공개 키를 입력하십시오."
 		HoneyLanguage.Russian.code -> " Введите свой секретный ключ здесь"
 		HoneyLanguage.TraditionalChinese.code -> " 在此輸入您的私鑰"
-		else -> " Enter your private key here"
+		else -> "Enter your private key here"
 	}
 	@JvmField
 	val address = when (currentLanguage) {
@@ -199,17 +199,17 @@ object ImportWalletText {
 	}
 	@JvmField
 	val unvalidPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Unvalid Private Key"
+		HoneyLanguage.English.code -> "Invalid private keyy"
 		HoneyLanguage.Chinese.code -> " 这不是正确格式的私钥"
 		HoneyLanguage.Japanese.code -> "これは、秘密鍵の正しい形式ではありません"
 		HoneyLanguage.Korean.code -> "이것은 개인 키의 올바른 형식이 아닙니다."
 		HoneyLanguage.Russian.code -> "Недопустимый закрытый ключ"
 		HoneyLanguage.TraditionalChinese.code -> "這不是正確格式的私鑰"
-		else -> "Unvalid Private Key"
+		else -> "Invalid private key"
 	}
 	@JvmField
 	val existAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This address has already been imported"
+		HoneyLanguage.English.code -> "This address has already been imported "
 		HoneyLanguage.Chinese.code -> "这个地址已经导入过了"
 		HoneyLanguage.Japanese.code -> "このアドレスは既にインポートされています"
 		HoneyLanguage.Korean.code -> "이 주소는 이미 가져 왔습니다."
@@ -219,17 +219,17 @@ object ImportWalletText {
 	}
 	@JvmField
 	val exportKeystore = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter password and then click confirm button to get keystore"
-		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取keystore"
+		HoneyLanguage.English.code -> "Enter password and then click CONFIRM to get your keystore"
+		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取 KEYSTORE"
 		HoneyLanguage.Japanese.code -> "パスワードを入力し、[OK]ボタンをクリックしてキーストアを取得します"
 		HoneyLanguage.Korean.code -> "암호를 입력하고 확인 버튼을 클릭하여 키 저장소를 가져옵니다."
 		HoneyLanguage.Russian.code -> "Введите пароль и нажмите кнопку подтверждения, чтобы получить хранилище ключей."
 		HoneyLanguage.TraditionalChinese.code -> "輸入密碼，然後單擊確認按鈕以獲取keystore"
-		else -> "Enter password and then click confirm button to get keystore"
+		else -> "Enter password and then click CONFIRM to get your keystore"
 	}
 	@JvmField
 	val exportPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter password and then click confirm button to get private key"
+		HoneyLanguage.English.code -> "Enter password and then CLICK CONFIRM to get your private key"
 		HoneyLanguage.Chinese.code -> "输入密码，然后点击确认按钮获得私钥"
 		HoneyLanguage.Japanese.code -> "パスワードを入力して確認ボタンをクリックすると、秘密鍵が取得されます"
 		HoneyLanguage.Korean.code -> "비밀 번호를 입력하고 확인 버튼을 클릭하여 개인 키를 가져옵니다."
@@ -240,34 +240,34 @@ object ImportWalletText {
 
 	@JvmField
 	val exportWrongPassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter the correct password"
+		HoneyLanguage.English.code -> "Incorrect password, try again"
 		HoneyLanguage.Chinese.code -> "Enter the correct password"
 		HoneyLanguage.Japanese.code -> "Enter the correct password"
 		HoneyLanguage.Korean.code -> "Enter the correct password"
 		HoneyLanguage.Russian.code -> "Enter the correct password"
 		HoneyLanguage.TraditionalChinese.code -> "Enter the correct password"
-		else -> "Enter the correct password"
+		else -> "Incorrect password, try again"
 	}
 
 	@JvmField
 	val privateKeyAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "privateKey is not correct"
+		HoneyLanguage.English.code -> "Incorrect private key"
 		HoneyLanguage.Chinese.code -> "privateKey is not correct"
 		HoneyLanguage.Japanese.code -> "privateKey is not correct"
 		HoneyLanguage.Korean.code -> "privateKey is not correct"
 		HoneyLanguage.Russian.code -> "privateKey is not correct"
 		HoneyLanguage.TraditionalChinese.code -> "privateKey is not correct"
-		else -> "privateKey is not correct"
+		else -> "Incorrect private key"
 	}
 	@JvmField
 	val mnemonicAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "incorrect mnemonic please re-enter"
-		HoneyLanguage.Chinese.code -> "incorrect mnemonic please re-enter"
+		HoneyLanguage.English.code -> "Incorrect mnemonic format"
+		HoneyLanguage.Chinese.code -> "助记词格式不正确"
 		HoneyLanguage.Japanese.code -> "incorrect mnemonic please re-enter"
 		HoneyLanguage.Korean.code -> "incorrect mnemonic please re-enter"
 		HoneyLanguage.Russian.code -> "incorrect mnemonic please re-enter"
 		HoneyLanguage.TraditionalChinese.code -> "incorrect mnemonic please re-enter"
-		else -> "incorrect mnemonic please re-enter"
+		else -> "Incorrect mnemonic format"
 	}
 	@JvmField
 	val mnemonicLengthAlert = when (currentLanguage) {
@@ -291,26 +291,26 @@ object ImportWalletText {
 	}
 	@JvmField
 	val addressFromatAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "address isn't valid"
+		HoneyLanguage.English.code -> "Invalid address"
 		HoneyLanguage.Chinese.code -> "address isn't valid"
 		HoneyLanguage.Japanese.code -> "address isn't valid"
 		HoneyLanguage.Korean.code -> "address isn't valid"
 		HoneyLanguage.Russian.code -> "address isn't valid"
 		HoneyLanguage.TraditionalChinese.code -> "address isn't valid"
-		else -> "address isn't valid"
+		else -> "Invalid address"
 	}
 }
 
 object DialogText {
 	@JvmField
 	val backUpMnemonicSucceed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
+		HoneyLanguage.English.code -> "You have not backed up your mnemonic yet. It is extremely important that take care of your mnemonic. If you lose it, you will lose your digital assets."
 		HoneyLanguage.Chinese.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
 		HoneyLanguage.Japanese.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
 		HoneyLanguage.Korean.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
 		HoneyLanguage.Russian.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
 		HoneyLanguage.TraditionalChinese.code -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
-		else -> "You have already back un your mnemonic yet, Please take care it because we have no way to find it back, once you lost it please keep you digtal assets"
+		else -> "You have not backed up your mnemonic yet. It is extremely important that take care of your mnemonic. If you lose it, you will lose your digital assets."
 	}
 
 	@JvmField
@@ -337,13 +337,13 @@ object DialogText {
 
 	@JvmField
 	val networkTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Network Browken"
-		HoneyLanguage.Chinese.code -> "Network Browken"
+		HoneyLanguage.English.code -> "Network Unavailable"
+		HoneyLanguage.Chinese.code -> "无网络"
 		HoneyLanguage.Japanese.code -> "Network Browken"
 		HoneyLanguage.Korean.code -> "Network Browken"
 		HoneyLanguage.Russian.code -> "Network Browken"
 		HoneyLanguage.TraditionalChinese.code -> "Network Browken"
-		else -> "Network Browken"
+		else -> "Network Unavailable"
 	}
 
 	@JvmField
@@ -373,23 +373,23 @@ object WalletText {
 
 	@JvmField
 	val totalAssets = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Total assets"
+		HoneyLanguage.English.code -> "Total Assets"
 		HoneyLanguage.Chinese.code -> "钱包所有财产"
 		HoneyLanguage.Japanese.code -> "総資産"
 		HoneyLanguage.Korean.code -> "총자산"
 		HoneyLanguage.Russian.code -> "Итого активы"
 		HoneyLanguage.TraditionalChinese.code -> "總資產"
-		else -> "Total assets"
+		else -> "Total Assets"
 	}
 	@JvmField
 	val manage = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Manage My Wallets"
+		HoneyLanguage.English.code -> "MANAGE MY WALLETS"
 		HoneyLanguage.Chinese.code -> "管理我的钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを管理する"
 		HoneyLanguage.Korean.code -> "월렛 관리"
 		HoneyLanguage.Russian.code -> "Управление кошельками"
 		HoneyLanguage.TraditionalChinese.code -> "管理我的錢包"
-		else -> "Manage My Wallets"
+		else -> "MANAGE MY WALLETS"
 	}
 	@JvmField
 	val section = when (currentLanguage) {
@@ -489,23 +489,23 @@ object TransactionText {
 	}
 	@JvmField
 	val url = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Open A Url"
+		HoneyLanguage.English.code -> "Open URL"
 		HoneyLanguage.Chinese.code -> "从网址打开"
 		HoneyLanguage.Japanese.code -> "URLを開く"
 		HoneyLanguage.Korean.code -> "URL 열기"
 		HoneyLanguage.Russian.code -> "Открыть адрес"
 		HoneyLanguage.TraditionalChinese.code -> "從網址打開"
-		else -> "Open A Url"
+		else -> "Open URL"
 	}
 	@JvmField
 	val confirmTransaction = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Confirm transaction with your password then transaction will begin"
+		HoneyLanguage.English.code -> "Confirm transaction with your password"
 		HoneyLanguage.Chinese.code -> "输入您的密码以确认交易"
 		HoneyLanguage.Japanese.code -> "パスワードで取引を確認してください。"
 		HoneyLanguage.Korean.code -> "귀하의 비밀번호로 거래를 확인하십시오"
 		HoneyLanguage.Russian.code -> "подтвердите транзакцию с помощью своего пароля, тогда транзакция начнется"
 		HoneyLanguage.TraditionalChinese.code -> "輸入您的密碼以確認交易"
-		else -> "Confirm transaction with your password then transaction will begin"
+		else -> "Confirm transaction with your password"
 	}
 	@JvmField
 	val minerFee = when (currentLanguage) {

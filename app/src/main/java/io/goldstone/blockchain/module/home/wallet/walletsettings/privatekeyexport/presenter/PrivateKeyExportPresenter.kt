@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getPrivateKey
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
-import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast

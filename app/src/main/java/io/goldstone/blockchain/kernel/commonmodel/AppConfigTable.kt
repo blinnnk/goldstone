@@ -37,7 +37,7 @@ data class AppConfigTable(
 	var pushToken: String = "",
 	var chainID: String = ChainID.Main.id
 ) {
-
+ 
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
 			coroutinesTask({

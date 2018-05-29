@@ -11,8 +11,8 @@ object WebUrl {
 	const val terms = "$header/termAndConditions.html"
 	const val support = "$header/support.html"
 	const val aboutUs ="$header/aboutUs.html"
-	const val whatIsKeystore = "$header/privacy.html"
-	const val whatIsMnemonic = "$header/privacy.html"
-	const val whatIsPrivatekey = "$header/privacy.html"
-	const val whatIsWatchOnly = "$header/privacy.html"
+	const val whatIsKeystore = "$header/wiki/keystore/cn"
+	const val whatIsMnemonic = "$header/wiki/mnemonices/cn"
+	const val whatIsPrivatekey = "$header/wiki/privateKey/cn"
+	const val whatIsWatchOnly = "$header/wiki/watchOnlyWallet/cn"
 }

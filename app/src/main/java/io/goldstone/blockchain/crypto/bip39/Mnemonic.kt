@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.bip39
 
+import android.os.Build
 import io.goldstone.blockchain.crypto.bip32.ExtendedKey
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.extensions.sha256
@@ -22,17 +23,19 @@ object Mnemonic {
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	fun mnemonicToSeed(phrase: String, password: String = "") =
+	private fun mnemonicToSeed(phrase: String, password: String = "") =
 		mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
 	
 	/**
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	fun mnemonicToSeed(words: Array<String>, password: String = ""): ByteArray {
+	private fun mnemonicToSeed(words: Array<String>, password: String = ""): ByteArray {
 		val pass = words.joinToString(" ")
 		val salt = "mnemonic$password"
-		val keyFactory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
+		val keyFactory =
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+			else SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
 		val spec = PBEKeySpec(pass.toCharArray(), salt.toByteArray(), 2048, 512)
 		return keyFactory.generateSecret(spec).encoded
 	}
@@ -40,14 +43,14 @@ object Mnemonic {
 	/**
 	 * Converts a phrase (list of words) into a [ByteArray] entropy buffer according to the BIP39 spec
 	 */
-	fun mnemonicToEntropy(phrase: String): ByteArray {
+	private fun mnemonicToEntropy(phrase: String): ByteArray {
 		return mnemonicToEntropy(phrase.split(" ").toTypedArray())
 	}
 	
 	/**
 	 * Converts a list of words into a [ByteArray] entropy buffer according to the BIP39 spec
 	 */
-	fun mnemonicToEntropy(words: Array<String>): ByteArray {
+	private fun mnemonicToEntropy(words: Array<String>): ByteArray {
 		if (words.size % 3 > 0)
 			throw IllegalArgumentException("Word list size must be multiple of three words.")
 		
@@ -86,7 +89,7 @@ object Mnemonic {
 	/**
 	 * Converts an entropy buffer to a list of words according to the BIP39 spec
 	 */
-	fun entropyToMnemonic(entropy: ByteArray): String {
+	private fun entropyToMnemonic(entropy: ByteArray): String {
 		if (entropy.size % 4 > 0)
 			throw RuntimeException("Entropy not multiple of 32 bits.")
 		
@@ -131,7 +134,7 @@ object Mnemonic {
 	/**
 	 * Checks if a list of [words] is a valid encoding according to the BIP39 spec
 	 */
-	fun validateMnemonic(words: Array<String>) = try {
+	private fun validateMnemonic(words: Array<String>) = try {
 		mnemonicToEntropy(words)
 		true
 	} catch (e: Exception) {
