@@ -6,7 +6,6 @@ import android.widget.RelativeLayout
 import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.addTopLRCorner
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
@@ -43,7 +42,7 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 				}.lparams {
 					width = matchParent
 					height = 200.uiPX()
-					topMargin = HoneyUIUtils.getHeight(header)
+					topMargin = header.layoutParams.height
 				}
 				lparams { alignParentBottom() }
 			}

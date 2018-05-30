@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.util.HoneyUIUtils
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -280,7 +279,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	open fun showLoadingView(content: String) {
 		loadingView.setTextContent(content)
 		loadingView.visibility = View.VISIBLE
-		recyclerView.y = HoneyUIUtils.getHeight(loadingView).toFloat()
+		recyclerView.y = loadingView.layoutParams.height.toFloat()
 	}
 
 	open fun removeLoadingView() {

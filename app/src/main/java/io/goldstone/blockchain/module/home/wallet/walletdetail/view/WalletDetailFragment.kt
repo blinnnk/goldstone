@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -61,7 +60,7 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	}
 	
 	private var isShow = false
-	private val headerHeight by lazy { HoneyUIUtils.getHeight(slideHeader) }
+	private val headerHeight by lazy { slideHeader.layoutParams.height }
 	private var totalRange = 0
 	
 	override fun observingRecyclerViewVerticalOffset(

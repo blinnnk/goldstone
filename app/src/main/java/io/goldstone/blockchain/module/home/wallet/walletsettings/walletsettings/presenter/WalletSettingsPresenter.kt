@@ -178,6 +178,8 @@ class WalletSettingsPresenter(
 			contentLayout.updateHeightAnimation(contentHeight) {
 				if (contentHeight >= ScreenSize.Height) {
 					fragment.getMainActivity()?.hideHomeFragment()
+				} else {
+					fragment.getMainActivity()?.showHomeFragment()
 				}
 			}
 		}
