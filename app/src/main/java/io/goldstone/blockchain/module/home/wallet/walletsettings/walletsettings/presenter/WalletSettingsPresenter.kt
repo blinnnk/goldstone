@@ -32,15 +32,14 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
  * @date 25/03/2018 6:30 PM
  * @author KaySaith
  */
-
 class WalletSettingsPresenter(
 	override val fragment: WalletSettingsFragment
 ) : BaseOverlayPresenter<WalletSettingsFragment>() {
-
+	
 	override fun onFragmentViewCreated() {
 		showCurrentWalletInfo()
 	}
-
+	
 	fun showTargetFragmentByTitle(title: String) {
 		when (title) {
 			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
@@ -53,7 +52,7 @@ class WalletSettingsPresenter(
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
 		}
 	}
-
+	
 	fun showWalletSettingListFragment() {
 		fragment.apply {
 			customHeader = {
@@ -74,7 +73,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showHintEditorFragment() {
 		fragment.apply {
 			// 判断是否是只读钱包
@@ -99,7 +98,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -117,7 +116,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showPrivateKeyExportFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -128,7 +127,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showKeystoreExportFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -139,7 +138,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showQRCodeFragment() {
 		fragment.apply {
 			setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
@@ -148,7 +147,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showWalletNameEditorFragment() {
 		fragment.apply {
 			setNormalHeaderWithHeight(300.uiPX())
@@ -157,7 +156,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -168,7 +167,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun WalletSettingsFragment.setNormalHeaderWithHeight(contentHeight: Int) {
 		recoveryOverlayHeader()
 		header?.visibility = View.GONE
@@ -184,7 +183,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-
+	
 	private fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
@@ -194,5 +193,4 @@ class WalletSettingsPresenter(
 			avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
 		}
 	}
-
 }

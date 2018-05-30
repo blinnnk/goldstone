@@ -35,5 +35,6 @@ class HintPresenter(
 		super.onFragmentViewCreated()
 		// 初始化高度
 		updateHeight(250.uiPX())
+		
 	}
 }
