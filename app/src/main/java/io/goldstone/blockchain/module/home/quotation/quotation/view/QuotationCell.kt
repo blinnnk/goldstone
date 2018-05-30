@@ -87,9 +87,14 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout? = null
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
-		if (chartData.isNullOrEmpty()) {
-			return@observing
+		// 服务器不返回数据或格式错误的时候显示空线图
+		if (chartData.size <= 1) {
+			chartData = arrayListOf(
+				ChartPoint("", 0f),
+				ChartPoint("", 0f)
+			)
 		}
+		
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
