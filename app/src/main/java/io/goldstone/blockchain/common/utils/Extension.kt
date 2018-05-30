@@ -37,11 +37,9 @@ fun <T : View> T.click(callback: (T) -> Unit): T {
 	return this
 }
 
-fun Fragment.getMainActivity() =
-	activity as? MainActivity
+fun Fragment.getMainActivity() = activity as? MainActivity
 
-fun Context.getMainActivity() =
-	this as? MainActivity
+fun Context.getMainActivity() = this as? MainActivity
 
 fun Context.alert(message: String) {
 	alert(Appcompat, message).show()
