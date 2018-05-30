@@ -79,7 +79,7 @@ class WalletSettingsPresenter(
 			// 判断是否是只读钱包
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
 				// 恢复 `Header` 样式
-				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+				setNormalHeaderWithHeight(250.uiPX())
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
 				AppConfigTable.getAppConfig {
 					it?.apply {

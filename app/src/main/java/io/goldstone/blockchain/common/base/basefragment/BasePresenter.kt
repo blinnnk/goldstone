@@ -65,6 +65,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(height)
 		}
+		// 优化重汇
 		if (height >= ScreenSize.Height) {
 			fragment.getMainActivity()?.hideHomeFragment()
 		} else {
