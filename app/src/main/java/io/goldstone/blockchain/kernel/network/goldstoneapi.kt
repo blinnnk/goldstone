@@ -120,7 +120,7 @@ object GoldStoneAPI {
 		requestUncryptoData<TransactionTable>(
 			EtherScanApi.transactions(address, startBlock), "result"
 		) {
-			hold(toArrayList())
+			hold(map { TransactionTable(it) }.toArrayList())
 		}
 	}
 	

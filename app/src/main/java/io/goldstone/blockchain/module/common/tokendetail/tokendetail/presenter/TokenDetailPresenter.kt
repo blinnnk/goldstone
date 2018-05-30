@@ -125,15 +125,16 @@ class TokenDetailPresenter(
 
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
-		TransactionTable.getTransactionsByAddressAndSymbol(
-			WalletTable.current.address, fragment.token?.symbol!!
+		TransactionTable.getTransactionsByAddressAndContract(
+			WalletTable.current.address,
+			fragment.token?.contract.orEmpty()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
-				LogUtil.debug(this.javaClass.simpleName, "reason: Without Local Transaction Data")
+				LogUtil.debug(this.javaClass.simpleName, "reason: There isn't Local Transaction Data")
 			}
 		}
 	}
