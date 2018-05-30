@@ -149,6 +149,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight) {
 				if (targetHeight >= maxHeight) {
 					fragment.getMainActivity()?.hideHomeFragment()
+				} else {
+					fragment.getMainActivity()?.showHomeFragment()
 				}
 			}
 		}
@@ -176,6 +178,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight) {
 				if (realHeight >= maxHeight) {
 					fragment.getMainActivity()?.hideHomeFragment()
+				} else {
+					fragment.getMainActivity()?.showHomeFragment()
 				}
 			}
 		}

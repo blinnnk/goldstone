@@ -44,7 +44,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	@SuppressLint("SetJavaScriptEnabled")
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
-			hideParentLayout()
 			loading.apply {
 				indeterminateDrawable.setColorFilter(
 					HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY
@@ -67,6 +66,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				webViewClient = object : WebViewClient() {
 					override fun onPageFinished(view: WebView, url: String) {
 						removeView(loading)
+						hideParentLayout()
 					}
 				}
 			}

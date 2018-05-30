@@ -10,10 +10,10 @@ import io.goldstone.blockchain.crypto.toAddressCode
  * @date 31/03/2018 8:09 PM
  * @author KaySaith
  */
-
 object APIPath {
+	
 	/** GoldStone Basic Api Address */
-	private const val url = "https://goldstone-api-test.naonaola.com"
+	private const val url = "https://goldstone-api1.naonaola.com"
 	const val defaultTokenList = "$url/index/defaultCoinList"
 	const val getCoinInfo = "$url/index/searchToken?symbolOrContract="
 	const val getCurrencyRate = "$url/index/exchangeRate?currency="
@@ -25,12 +25,12 @@ object APIPath {
 	const val getPriceByAddress = "$url/index/priceByAddress"
 	const val getTokenDescription = "$url/market/coinDescription?symbol="
 	const val getUnreadCount = "$url/account/checkUnreadMessage"
-
 	/** Chain Address */
 	const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
 	const val ropstan = "https://eth-node-ropsten.naonaola.com/eth"
 	const val main = "https://eth-node-mainnet.naonaola.com/eth"
-
+	const val koven = "https://eth-node-kovan.goldstone.io/eth"
+	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
 	@JvmField
 	val getQuotationCurrencyChart: (
 		pair: String, period: String, size: Int
@@ -95,40 +95,49 @@ private val etherScanKeys = arrayListOf(
 )
 
 object EtherScanApi {
-
-	private val apikey: () -> String = { etherScanKeys.getRandom() }
-
-	private const val ropstanHeader = "http://api-ropsten.etherscan.io"
-	private const val mainHeader = "https://api.etherscan.io"
-	private const val mainLogHeader = "https://api.etherscan.io"
-	private const val mainRopstanHeader = "http://ropsten.etherscan.io"
 	
-	@JvmField val etherScanHeader: (chainID: String) -> String = {
-		when(it) {
+	private val apikey: () -> String = { etherScanKeys.getRandom() }
+	private const val mainHeader = "https://api.etherscan.io"
+	private const val ropstanHeader = "http://api-ropsten.etherscan.io"
+	private const val kovenHeader = "https://api-koven.etherscan.io"
+	private const val rinkebyHeader = "https://api-rinkeby.etherscan.io"
+	private const val mainLogHeader = "https://api.etherscan.io"
+	private const val kovenLogHeader = "http://koven.etherscan.io"
+	private const val ropstanLogHeader = "http://ropsten.etherscan.io"
+	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
+	@JvmField
+	val etherScanHeader: (chainID: String) -> String = {
+		when (it) {
 			ChainID.Main.id -> mainHeader
-			ChainID.Ropstan.id -> ropstanHeader
+			ChainID.Ropstan.id -> kovenHeader
 			ChainID.Kovan.id -> ropstanHeader
-			ChainID.Rinkeby.id -> ropstanHeader
+			ChainID.Rinkeby.id -> rinkebyHeader
 			else -> ropstanHeader
 		}
 	}
-	
-	@JvmField val etherScanLogHeader: (chainID: String) -> String = {
-		when(it) {
+	@JvmField
+	val etherScanLogHeader: (chainID: String) -> String = {
+		when (it) {
 			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropstan.id -> mainRopstanHeader
-			ChainID.Kovan.id -> mainRopstanHeader
-			ChainID.Rinkeby.id -> mainRopstanHeader
-			else -> mainRopstanHeader
+			ChainID.Ropstan.id -> ropstanLogHeader
+			ChainID.Kovan.id -> kovenLogHeader
+			ChainID.Rinkeby.id -> rinkebyLogHeader
+			else -> ropstanLogHeader
 		}
 	}
-	
-	
+	private val transactionDetailHeader: (currentChain: String) -> String = {
+		when (it) {
+			ChainID.Main.id -> "https://etherscan.io/tx/"
+			ChainID.Ropstan.id -> "https://ropsten.etherscan.io/tx/"
+			ChainID.Kovan.id -> "https://koven.etherscan.io/tx/"
+			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
+			else -> "https://etherscan.io/tx/"
+		}
+	}
 	@JvmField
 	val transactionDetail: (taxHash: String) -> String = {
-		"https://ropsten.etherscan.io/tx/$it"
+		"$transactionDetailHeader$it"
 	}
-
 	@JvmStatic
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
 		"${etherScanHeader(GoldStoneApp.currentChain)}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"

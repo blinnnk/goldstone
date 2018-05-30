@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view
 
+import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -39,10 +40,10 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		model?.let {
 			DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
 				localToken.isNotNull {
-					insertToMyToken(switch.isChecked, it)
+					insertToMyToken(switch, it)
 				} otherwise {
 					DefaultTokenTable.insertToken(it.apply { this.isDefault = switch.isChecked }) {
-						insertToMyToken(switch.isChecked, it)
+						insertToMyToken(switch, it)
 					}
 				}
 			}
@@ -51,11 +52,11 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		switch.preventDuplicateClicks()
 	}
 	
-	private fun insertToMyToken(isSelected: Boolean, model: DefaultTokenTable?) {
+	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		getMainActivity()?.apply {
 			model?.let {
-				DefaultTokenTable.updateTokenDefaultStatus(it.contract, isSelected) {
-					TokenManagementListPresenter.updateMyTokensInfoBy(isSelected, model.symbol)
+				DefaultTokenTable.updateTokenDefaultStatus(it.contract, switch.isChecked) {
+					TokenManagementListPresenter.updateMyTokensInfoBy(switch, model.symbol)
 				}
 			}
 		}

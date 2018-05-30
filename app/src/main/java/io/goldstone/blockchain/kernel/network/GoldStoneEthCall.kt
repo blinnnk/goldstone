@@ -287,8 +287,8 @@ object GoldStoneEthCall {
 		when (it) {
 			ChainID.Main.id -> APIPath.main
 			ChainID.Ropstan.id -> APIPath.ropstan
-			ChainID.Rinkeby.id -> APIPath.ropstan
-			ChainID.Kovan.id -> APIPath.ropstan
+			ChainID.Rinkeby.id -> APIPath.rinkeyb
+			ChainID.Kovan.id -> APIPath.koven
 			else -> APIPath.main
 		}
 	}
