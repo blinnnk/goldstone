@@ -24,10 +24,10 @@ class TokenDetailOverlayPresenter(
 	override val fragment: TokenDetailOverlayFragment
 ) : BaseOverlayPresenter<TokenDetailOverlayFragment>() {
 
-	fun showTokenDetailFragment(symbol: String?) {
+	fun showTokenDetailFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
 			addFragmentAndSetArgument<TokenDetailFragment>(ContainerID.content) {
-				putString(ArgumentKey.tokenDetail, symbol)
+				putSerializable(ArgumentKey.tokenDetail, token)
 			}
 		}
 	}

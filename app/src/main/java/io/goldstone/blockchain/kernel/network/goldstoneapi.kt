@@ -54,7 +54,10 @@ object GoldStoneAPI {
 	) {
 		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list", false, errorCallback) {
 			forEachOrEnd { token, isEnd ->
-				if (token.forceShow == TinyNumber.True.value) token.isUsed = true
+				if (token.forceShow == TinyNumber.True.value) {
+					token.isUsed = true
+					token.isDefault = true
+				}
 				if (isEnd) hold(toArrayList())
 			}
 		}
@@ -147,10 +150,13 @@ object GoldStoneAPI {
 		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
 	) {
 		RequestBody.create(
-			requestContentType, AesCrypto.encrypt("{\"pair_list\":$pairList}").orEmpty()
+			requestContentType,
+			AesCrypto.encrypt("{\"pair_list\":$pairList}").orEmpty()
 		).let {
 			postRequestGetJsonObject<QuotationSelectionLineChartModel>(
-				it, "data_list", APIPath.getCurrencyLineChartData
+				it,
+				"data_list",
+				APIPath.getCurrencyLineChartData
 			) {
 				hold(it.toArrayList())
 			}
@@ -256,7 +262,10 @@ object GoldStoneAPI {
 	
 	/**————————————————————— public network request method ———————————————————————*/
 	private val client =
-		OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS)
+		OkHttpClient
+			.Builder()
+			.connectTimeout(60, TimeUnit.SECONDS)
+			.readTimeout(90, TimeUnit.SECONDS)
 			.build()
 	
 	private inline fun <reified T> postRequestGetJsonObject(
@@ -282,14 +291,13 @@ object GoldStoneAPI {
 				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
-						val dataObject =
-							data?.toJsonObject()
-							?: JSONObject("")
+						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = dataObject[keyName].toString()
 						val gson = Gson()
 						val collectionType = object : TypeToken<Collection<T>>() {}.type
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
+						LogUtil.error(keyName, error)
 						GoldStoneCode.showErrorCodeReason(data, errorCallback)
 					}
 				}
@@ -383,10 +391,7 @@ object GoldStoneAPI {
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
-			OkHttpClient.Builder()
-				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
-				.build()
+			OkHttpClient.Builder().build()
 		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(
@@ -416,6 +421,7 @@ object GoldStoneAPI {
 					}
 				} catch (error: Exception) {
 					errorCallback()
+					LogUtil.error(keyName, error)
 					GoldStoneCode.showErrorCodeReason(data)
 				}
 			}

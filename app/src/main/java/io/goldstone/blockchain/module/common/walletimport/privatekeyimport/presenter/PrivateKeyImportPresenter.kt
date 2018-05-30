@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.removeStartAndEndValue
 import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.crypto.has0xPrefix
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -18,11 +19,10 @@ import org.web3j.crypto.WalletUtils
  * @date 23/03/2018 2:13 AM
  * @author KaySaith
  */
-
 class PrivateKeyImportPresenter(
 	override val fragment: PrivateKeyImportFragment
 ) : BasePresenter<PrivateKeyImportFragment>() {
-
+	
 	fun importWalletByPrivateKey(
 		privateKeyInput: EditText,
 		passwordInput: EditText,
@@ -50,7 +50,6 @@ class PrivateKeyImportPresenter(
 				callback()
 			}
 		) { passwordValue, walletName ->
-
 			importWallet(
 				privateKeyInput.text.toString(),
 				passwordValue,
@@ -61,9 +60,9 @@ class PrivateKeyImportPresenter(
 			)
 		}
 	}
-
+	
 	companion object {
-
+		
 		/**
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
 		 */
@@ -75,10 +74,12 @@ class PrivateKeyImportPresenter(
 			hint: String? = null,
 			callback: () -> Unit
 		) {
+			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
+			val formatPrivateKey = if (privateKey.has0xPrefix()) privateKey.substring(2, privateKey
+				.length) else privateKey
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
-			// 默认去除多余的空格
 			val currentPrivateKey =
-				(if (privateKey.length == 63) "0$privateKey" else privateKey)
+				(if (formatPrivateKey.length == 63) "0$formatPrivateKey" else formatPrivateKey)
 					.replaceWithPattern()
 					.replace("\n", "")
 					.removeStartAndEndValue(" ")
@@ -89,7 +90,8 @@ class PrivateKeyImportPresenter(
 				return
 			}
 			// 解析私钥并导入钱包
-			fragment.context?.getWalletByPrivateKey(currentPrivateKey, password
+			fragment.context?.getWalletByPrivateKey(
+				currentPrivateKey, password
 			) { address ->
 				address?.let {
 					WalletImportPresenter.insertWalletToDatabase(
@@ -102,6 +104,5 @@ class PrivateKeyImportPresenter(
 				}
 			}
 		}
-
 	}
 }

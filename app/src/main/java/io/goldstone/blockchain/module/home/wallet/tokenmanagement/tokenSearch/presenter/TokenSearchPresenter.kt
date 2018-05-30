@@ -45,6 +45,7 @@ class TokenSearchPresenter(
 					searchTokenByContractOrSymbol(it) {
 						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
+							fragment.removeLoadingView()
 						}
 					}
 				}
@@ -70,7 +71,6 @@ class TokenSearchPresenter(
 							isUsed = localTokens.any { it.symbol == serverToken.symbol }
 						}
 					}.let {
-						fragment.removeLoadingView()
 						hold(it.toArrayList())
 					}
 				}
@@ -97,10 +97,9 @@ class TokenSearchPresenter(
 								)
 							)
 						)
-						fragment.removeLoadingView()
 					}
 				} otherwise {
-					fragment.removeLoadingView()
+					hold(arrayListOf())
 				}
 			}
 		}

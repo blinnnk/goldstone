@@ -69,9 +69,14 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					title = CreateWalletText.hint
 				}.into(this)
 				
-				agreementView.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-				}.into(this)
+				agreementView
+					.apply {
+						setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
+					}.click {
+						getParentFragment<WalletImportFragment> {
+							presenter.showWebViewFragment(WebUrl.terms, ProfileText.terms)
+						}
+					}.into(this)
 				
 				confirmButton.apply {
 					setBlueStyle()

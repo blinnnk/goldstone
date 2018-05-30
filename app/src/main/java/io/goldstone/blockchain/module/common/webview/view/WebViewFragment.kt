@@ -34,13 +34,12 @@ import org.jetbrains.anko.*
  * @date 26/03/2018 8:11 PM
  * @author KaySaith
  */
-
 class WebViewFragment : BaseFragment<WebViewPresenter>() {
-
+	
 	private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
 	private val loading by lazy { ProgressBar(this.context, null, R.attr.progressBarStyleInverse) }
 	override val presenter = WebViewPresenter(this)
-
+	
 	@SuppressLint("SetJavaScriptEnabled")
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
@@ -55,52 +54,33 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 					y -= 30.uiPX()
 				}
 			}.into(this)
-
 			// 当 `webView`加载完毕后清楚 `loading`
 			webView {
+				alpha = 0.1f
 				settings.javaScriptEnabled = true
 				webViewClient = WebViewClient()
 				this.loadUrl(urlPath)
 				layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-
+				
 				webViewClient = object : WebViewClient() {
 					override fun onPageFinished(view: WebView, url: String) {
+						alpha = 1f
 						removeView(loading)
-						hideParentLayout()
 					}
 				}
 			}
-
 			// 如果长时间没加载到 最长 `8s` 超时删除 `loading`
 			8000L timeUpThen {
 				context?.apply { removeView(loading) }
 			}
-
 		}
 		setWebFragmentHeight()
 	}
 	
-	override fun onDetach() {
-		super.onDetach()
-		showParentLayout()
-	}
-
 	private fun setWebFragmentHeight() {
 		// 需要添加到 `BaseOverlayFragment` 下面
 		getParentFragment<BaseOverlayFragment<*>>()?.apply {
 			overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
-		}
-	}
-	
-	private fun hideParentLayout() {
-		getParentFragment<BaseOverlayFragment<*>>()?.let {
-			it.overlayView.hideBackgroundLayout()
-		}
-	}
-	
-	private fun showParentLayout() {
-		getParentFragment<BaseOverlayFragment<*>>()?.let {
-			it.overlayView.showBackgroundLayout()
 		}
 	}
 	
@@ -116,6 +96,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 					setBackEvent()
 				}
 			}
+			
 			is MainActivity -> {
 				currentActivity.backEvent = Runnable {
 					setBackEvent()
@@ -123,38 +104,37 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			}
 		}
 	}
-
+	
 	private fun setBackEvent() {
 		val parent = parentFragment
-		when(parent) {
+		when (parent) {
 			is TransactionFragment -> {
 				parent.headerTitle = TransactionText.detail
 				parent.presenter.popFragmentFrom<WebViewFragment>()
 				setWebFragmentHeight()
 			}
-
+			
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
 				parent.presenter.popFragmentFrom<WebViewFragment>()
 				setWebFragmentHeight()
 			}
-
+			
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<WebViewFragment>()
 				setWebFragmentHeight()
 			}
-
+			
 			is WalletGenerationFragment -> {
 				parent.headerTitle = CreateWalletText.create
 				parent.presenter.popFragmentFrom<WebViewFragment>()
 				setWebFragmentHeight()
 			}
-
+			
 			is ProfileOverlayFragment -> {
 				parent.presenter.removeSelfFromActivity()
 			}
 		}
 	}
-
 }

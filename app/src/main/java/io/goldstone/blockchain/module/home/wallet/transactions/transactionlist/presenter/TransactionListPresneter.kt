@@ -24,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -156,30 +157,35 @@ class TransactionListPresenter(
 				var chainData = ArrayList<TransactionTable>()
 				var logData = ArrayList<TransactionTable>()
 				override fun concurrentJobs() {
-					GoldStoneAPI.getTransactionListByAddress(startBlock) {
-						chainData = this
-						completeMark()
+					doAsync {
+						GoldStoneAPI.getTransactionListByAddress(startBlock) {
+							chainData = this
+							completeMark()
+						}
 					}
-					GoldStoneAPI.getERC20TokenIncomingTransaction(startBlock) {
-						// 把请求回来的数据转换成 `TransactionTable` 格式
-						logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
-						completeMark()
+					doAsync {
+						GoldStoneAPI.getERC20TokenIncomingTransaction(startBlock) {
+							// 把请求回来的数据转换成 `TransactionTable` 格式
+							logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
+							completeMark()
+						}
 					}
 				}
 				
 				override fun mergeCallBack() {
-					coroutinesTask({
-						               arrayListOf<TransactionTable>().apply {
-							               addAll(chainData)
-							               addAll(logData)
-						               }.filter {
-							               it.to.isNotEmpty() && it.value.toDouble() > 0.0
-						               }.distinctBy {
-							               it.hash
-						               }.sortedByDescending {
-							               it.timeStamp
-						               }.toArrayList()
-					               }) { newData ->
+					coroutinesTask(
+						{
+							arrayListOf<TransactionTable>().apply {
+								addAll(chainData)
+								addAll(logData)
+							}.filter {
+								it.to.isNotEmpty() && it.value.toDouble() > 0.0
+							}.distinctBy {
+								it.hash
+							}.sortedByDescending {
+								it.timeStamp
+							}.toArrayList()
+						}) { newData ->
 						if (newData.isEmpty()) {
 							hold(newData)
 						} else {
@@ -209,16 +215,23 @@ class TransactionListPresenter(
 					override var asyncCount: Int = size
 					override fun concurrentJobs() {
 						forEach { transactionTable ->
-							if (transactionTable.isERC20) {
-								GoldStoneEthCall
-									.getInputCodeByHash(transactionTable.hash) {
-										GoldStoneDataBase.database.transactionDao()
-											.insert(transactionTable.apply { input = it })
-										completeMark()
-									}
-							} else {
-								GoldStoneDataBase.database.transactionDao().insert(transactionTable)
-								completeMark()
+							doAsync {
+								if (transactionTable.isERC20) {
+									GoldStoneEthCall
+										.getInputCodeByHash(transactionTable.hash) {
+											GoldStoneDataBase
+												.database
+												.transactionDao()
+												.insert(transactionTable.apply { input = it })
+											completeMark()
+										}
+								} else {
+									GoldStoneDataBase
+										.database
+										.transactionDao()
+										.insert(transactionTable)
+									completeMark()
+								}
 							}
 						}
 					}

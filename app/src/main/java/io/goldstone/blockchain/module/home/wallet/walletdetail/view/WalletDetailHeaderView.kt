@@ -12,6 +12,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.RoundBorderButton
@@ -41,7 +42,13 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				UIUtils.generateAvatar(WalletTable.current.id)
 			)
 			else currentAccount.avatar.glideImage(avatar)
-			currentAccount.info.title.text = name
+			
+			currentAccount.info.title.text = object : FixTextLength() {
+				override var text = model?.name.orEmpty()
+				override val maxWidth = 30.uiPX().toFloat()
+				override val textSize: Float = fontSize(14)
+			}.getFixString()
+			
 			currentAccount.info.subtitle.text = address
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
 			manageButton.text = (WalletText.manage + " ($totalAccount)").toUpperCase()
@@ -154,5 +161,5 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			width - PaddingSize.device.toFloat(), height - sectionHeaderHeight.toFloat(), paint
 		)
 	}
-
 }
+

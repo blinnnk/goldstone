@@ -23,9 +23,8 @@ import org.jetbrains.anko.matchParent
  * @date 25/03/2018 5:12 PM
  * @author KaySaith
  */
-
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
-
+	
 	var model: DefaultTokenTable? by observing(null) {
 		model?.apply {
 			// 显示默认图判断
@@ -39,7 +38,6 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			switch.isChecked = isUsed
 		}
 	}
-
 	var searchModel: QuotationSelectionTable? by observing(null) {
 		searchModel?.apply {
 			tokenInfo.title.text = infoTitle
@@ -47,44 +45,38 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			switch.isChecked = isSelecting
 		}
 	}
-
 	val switch by lazy { HoneyBaseSwitch(context) }
-
 	private val tokenInfo by lazy { TwoLineTitles(context) }
 	protected val icon by lazy { SquareIcon(context) }
-
+	
 	init {
-
 		hasArrow = false
-
+		
 		this.addView(icon.apply {
 			setGrayStyle()
 			y = 16.uiPX().toFloat()
 		})
-
+		
 		this.addView(tokenInfo.apply { setBlackTitles() })
-
+		
 		this.addView(switch.apply {
 			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
 			setThemColor(Spectrum.green, Spectrum.lightGreen)
 		})
-
+		
 		tokenInfo.apply {
 			setCenterInVertical()
 			x += 40.uiPX()
 		}
-
+		
 		switch.apply {
 			setCenterInVertical()
 			setAlignParentRight()
 		}
-
+		
 		setGrayStyle()
-
 	}
-
-	fun getSymbol(): String = tokenInfo.title.text.toString()
-
+	
 	fun hideIcon() {
 		icon.visibility = View.GONE
 		tokenInfo.x = 0f

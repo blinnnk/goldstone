@@ -34,6 +34,7 @@ class MnemonicImportDetailPresenter(
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
+		
 		if (pathInput.text.isNotEmpty() && !isVaildPath(pathInput.text.toString())) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			callback()

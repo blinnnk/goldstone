@@ -196,9 +196,10 @@ data class TransactionTable(
 			address: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+				}) {
 				hold(it.toArrayList())
 			}
 		}
@@ -226,8 +227,10 @@ data class TransactionTable(
 		
 		private fun getLocalLatestNounce(hold: (Long?) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.transactionDao().apply {
-					getTransactionsByAddress(WalletTable.current.address).let {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getTransactionsByAddress(WalletTable.current.address).let {
 						GoldStoneAPI.context.runOnUiThread {
 							if (it.isEmpty()) {
 								hold(null)
@@ -247,7 +250,6 @@ data class TransactionTable(
 							}
 						}
 					}
-				}
 			}
 		}
 		
@@ -256,10 +258,13 @@ data class TransactionTable(
 			symbol: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao()
-					               .getTransactionsByAddressAndSymbol(address, symbol)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.transactionDao()
+						.getTransactionsByAddressAndSymbol(address, symbol)
+				}) {
 				hold(it.toArrayList())
 			}
 		}

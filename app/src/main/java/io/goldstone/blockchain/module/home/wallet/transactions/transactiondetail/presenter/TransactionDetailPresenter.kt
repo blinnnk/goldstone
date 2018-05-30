@@ -272,7 +272,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					receipt.blockNumber,
 					date,
-					EtherScanApi.singleTransactionHas(currentHash)
+					EtherScanApi.transactionDetail(currentHash)
 				)
 			}
 			
@@ -283,7 +283,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					"Waiting...",
 					date,
-					EtherScanApi.singleTransactionHas(currentHash)
+					EtherScanApi.transactionDetail(currentHash)
 				)
 			}
 		}

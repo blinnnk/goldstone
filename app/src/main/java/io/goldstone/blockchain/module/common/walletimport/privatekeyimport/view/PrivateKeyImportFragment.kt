@@ -3,18 +3,21 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -65,7 +68,13 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 				}.into(this)
 				
-				agreementView.into(this)
+				agreementView
+					.click {
+						getParentFragment<WalletImportFragment> {
+							presenter.showWebViewFragment(WebUrl.terms, ProfileText.terms)
+						}
+					}
+					.into(this)
 				
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
