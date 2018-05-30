@@ -9,6 +9,7 @@ import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -39,9 +40,8 @@ data class TransactionTable(
 	var nonce: String,
 	@SerializedName("blockHash")
 	var blockHash: String,
-	@Ignore
 	@SerializedName("transactionIndex")
-	private var transactionIndex: String,
+	var transactionIndex: String,
 	@SerializedName("from")
 	var fromAddress: String,
 	@SerializedName("to")
@@ -60,14 +60,12 @@ data class TransactionTable(
 	var input: String,
 	@SerializedName("contractAddress")
 	var contractAddress: String,
-	@Ignore
 	@SerializedName("cumulativeGasUsed")
-	private var cumulativeGasUsed: String,
+	var cumulativeGasUsed: String,
 	@SerializedName("gasUsed")
 	var gasUsed: String,
-	@Ignore
 	@SerializedName("confirmations")
-	private var confirmations: String,
+	var confirmations: String,
 	var isReceive: Boolean,
 	var isERC20: Boolean,
 	var symbol: String,
@@ -79,6 +77,7 @@ data class TransactionTable(
 ) {
 	
 	/** 默认的 `constructor` */
+	@Ignore
 	constructor() : this(
 		0,
 		"",
@@ -103,6 +102,32 @@ data class TransactionTable(
 		false,
 		"",
 		""
+	)
+	
+	constructor(data: TransactionTable) : this(
+		0,
+		data.blockNumber,
+		data.timeStamp,
+		data.hash,
+		data.nonce,
+		data.blockHash,
+		data.transactionIndex,
+		data.fromAddress,
+		data.to,
+		data.value,
+		data.gas,
+		data.gasPrice,
+		data.hasError,
+		data.txreceipt_status,
+		data.input,
+		if(CryptoUtils.isERC20TransferByInputCode(data.input)) data.to else CryptoValue.ethContract,
+		data.cumulativeGasUsed,
+		data.gasUsed,
+		data.confirmations,
+		data.fromAddress != WalletTable.current.address,
+		CryptoUtils.isERC20TransferByInputCode(data.input),
+		data.symbol,
+		WalletTable.current.address
 	)
 	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -253,9 +278,9 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getTransactionsByAddressAndSymbol(
-			address: String,
-			symbol: String,
+		fun getTransactionsByAddressAndContract(
+			walletAddress: String,
+			contract: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
 			coroutinesTask(
@@ -263,7 +288,7 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getTransactionsByAddressAndSymbol(address, symbol)
+						.getTransactionsByAddressAndContract(walletAddress, contract)
 				}) {
 				hold(it.toArrayList())
 			}
@@ -370,11 +395,11 @@ interface TransactionDao {
 	): TransactionTable?
 	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND symbol LIKE :targetSymbol AND chainID LIKE :chainID ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
-	fun getTransactionsByAddressAndSymbol(
+	fun getTransactionsByAddressAndContract(
 		walletAddress: String,
-		targetSymbol: String,
+		contract: String,
 		chainID: String = GoldStoneApp.currentChain
 	): List<TransactionTable>
 	
