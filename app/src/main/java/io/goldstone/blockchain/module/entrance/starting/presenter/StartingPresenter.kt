@@ -44,7 +44,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
 					.forEachOrEnd { token, isEnd ->
 						DefaultTokenTable(
-							token, token.get("force_show").toString().toInt() == TinyNumber.True.value
+							token,
+							token.get("force_show").toString().toInt() == TinyNumber.True.value
 						).let {
 							GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							context.runOnUiThread {

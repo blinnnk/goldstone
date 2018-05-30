@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.TokenDetailPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -22,7 +23,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
 
 	// 首页的 `cell` 点击进入详情界面传入的 `Symbol`
-	val symbol by lazy { arguments?.getString(ArgumentKey.tokenDetail) }
+	val token by lazy { arguments?.getSerializable(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
 
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)

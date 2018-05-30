@@ -17,6 +17,7 @@ import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
 import java.math.BigInteger
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -298,7 +299,11 @@ object GoldStoneEthCall {
 		errorCallback: () -> Unit = {},
 		hold: (String) -> Unit
 	) {
-		val client = OkHttpClient()
+		val client = OkHttpClient
+			.Builder()
+			.connectTimeout(60, TimeUnit.SECONDS)
+			.readTimeout(90, TimeUnit.SECONDS)
+			.build()
 		
 		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.currentChain)) {
 			client.newCall(it).enqueue(object : Callback {

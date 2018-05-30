@@ -12,19 +12,15 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
  * @date 27/03/2018 3:41 PM
  * @author KaySaith
  */
-
 class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresenter>() {
-
+	
 	var valueHeader: TwoLineTitles? = null
-
 	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
-
 	var confirmButton: RoundButton? = null
-
 	override val presenter = TokenDetailOverlayPresenter(this)
-
+	
 	override fun ViewGroup.initView() {
 		presenter.setValueHeader(token)
-		presenter.showTokenDetailFragment(token?.symbol)
+		presenter.showTokenDetailFragment(token)
 	}
 }

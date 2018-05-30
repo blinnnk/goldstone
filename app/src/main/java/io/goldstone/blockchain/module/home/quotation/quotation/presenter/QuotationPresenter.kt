@@ -50,9 +50,11 @@ class QuotationPresenter(
 			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
-			
 			selections.map { selection ->
-				val linechart = convertDataToChartData(selection.lineChartDay)
+				var linechart = arrayListOf<ChartPoint>()
+				if (!selection.lineChartDay.isBlank()) {
+					linechart = convertDataToChartData(selection.lineChartDay)
+				}
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
 				QuotationModel(
 					selection,
@@ -110,6 +112,7 @@ class QuotationPresenter(
 	}
 	
 	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
+		if (isEmpty()) return
 		sortedByDescending {
 			it.label.toLong()
 		}.let {
@@ -119,10 +122,7 @@ class QuotationPresenter(
 			 */
 			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
 				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
-					QuotationSelectionTable.updateLineChartDataBy(
-						pair,
-						newChart
-					) {
+					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
 						/** 防止服务器数据出错或不足, 可能导致的死循环 */
 						if (updateChartTimes!! > 0) {
 							updateData()
@@ -137,11 +137,12 @@ class QuotationPresenter(
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: () -> Unit) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
-		getPriceInfoBySocket(fragment.asyncData?.map { it.pair }?.toArrayList(),
-		                     {
-			                     currentSocket = it
-			                     callback()
-		                     }) {
+		getPriceInfoBySocket(
+			fragment.asyncData?.map { it.pair }?.toArrayList(),
+			{
+				currentSocket = it
+				callback()
+			}) {
 			fragment.updateAdapterDataset(it)
 		}
 	}
@@ -197,10 +198,10 @@ class QuotationPresenter(
 	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
 		val jsonarray = JSONArray(data)
 		(0 until jsonarray.length()).map {
-			val timeStamp = jsonarray.getJSONObject(it)["time"].toString().toLong()
+			val timeStamp = jsonarray.getJSONObject(it).safeGet("time").toLong()
 			ChartPoint(
 				timeStamp.toString(),
-				jsonarray.getJSONObject(it)["price"].toString().toFloat()
+				jsonarray.getJSONObject(it).safeGet("price").toFloat()
 			)
 		}.reversed().let {
 			return it.toArrayList()
@@ -209,7 +210,8 @@ class QuotationPresenter(
 	
 	companion object {
 		fun getPriceInfoBySocket(
-			pairList: ArrayList<String>?, holdSocket: (GoldStoneWebSocket) -> Unit,
+			pairList: ArrayList<String>?,
+			holdSocket: (GoldStoneWebSocket) -> Unit,
 			hold: (CurrencyPriceInfoModel) -> Unit
 		) {
 			/**

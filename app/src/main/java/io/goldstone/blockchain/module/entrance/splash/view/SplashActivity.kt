@@ -116,8 +116,8 @@ class SplashActivity : AppCompatActivity() {
 			GoldStoneApp.currencyCode = config.currencyCode
 			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
 				GoldStoneAPI.context.runOnUiThread {
-					callback()
 					this@SplashActivity.alert(AlertText.getRateFromServerError)
+					callback()
 				}
 			}) {
 				GoldStoneApp.currentRate = it

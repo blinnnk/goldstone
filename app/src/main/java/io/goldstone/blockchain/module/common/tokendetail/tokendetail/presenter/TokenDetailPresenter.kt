@@ -47,7 +47,7 @@ class TokenDetailPresenter(
 		// 详情页面直接全屏高度
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
-			updateEmptyCharData(fragment.symbol!!)
+			updateEmptyCharData(fragment.token?.symbol!!)
 			prepareTokenDetailData()
 		}
 	}
@@ -126,7 +126,7 @@ class TokenDetailPresenter(
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
 		TransactionTable.getTransactionsByAddressAndSymbol(
-			WalletTable.current.address, fragment.symbol!!
+			WalletTable.current.address, fragment.token?.symbol!!
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
@@ -145,7 +145,7 @@ class TokenDetailPresenter(
 				TransactionListPresenter.updateTransactions(this@loadDataFromChain, blockNumber) {
 					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-						it.find { it.symbol == symbol }.isNotNull {
+						it.find { it.contract == token?.contract }.isNotNull {
 							// 有数据后重新执行从数据库拉取数据
 							loadDataFromDatabaseOrElse()
 						} otherwise {
@@ -163,12 +163,12 @@ class TokenDetailPresenter(
 		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			data.prepareTokenHistoryBalance(symbol!!) {
+			data.prepareTokenHistoryBalance(token?.symbol!!) {
 				it.updateChartAndHeaderData()
 
 			}
 		} otherwise {
-			updateEmptyCharData(symbol!!)
+			updateEmptyCharData(token?.symbol!!)
 		}
 	}
 
@@ -176,9 +176,12 @@ class TokenDetailPresenter(
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
 		arrayListOf(
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""), TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
+			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
 	}

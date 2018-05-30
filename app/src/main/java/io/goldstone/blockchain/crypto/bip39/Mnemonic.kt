@@ -23,7 +23,7 @@ object Mnemonic {
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	private fun mnemonicToSeed(phrase: String, password: String = "") =
+	fun mnemonicToSeed(phrase: String, password: String = "") =
 		mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
 	
 	/**

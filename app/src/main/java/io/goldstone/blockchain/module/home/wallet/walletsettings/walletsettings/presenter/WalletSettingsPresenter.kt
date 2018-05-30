@@ -44,7 +44,7 @@ class WalletSettingsPresenter(
 	fun showTargetFragmentByTitle(title: String) {
 		when (title) {
 			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
-			WalletSettingsText.walletNameSettings -> showWalletNameEditorFragment()
+			WalletSettingsText.walletName -> showWalletNameEditorFragment()
 			WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
 			WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
 			WalletSettingsText.checkQRCode -> showQRCodeFragment()

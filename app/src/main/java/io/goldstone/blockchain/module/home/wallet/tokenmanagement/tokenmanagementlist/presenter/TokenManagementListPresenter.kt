@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -44,13 +45,13 @@ class TokenManagementListPresenter(
 				defaultTokens.forEachOrEnd { defaultToken, isEnd ->
 					val address = WalletTable.current.address
 					MyTokenTable.getTokensWith(address) { myTokens ->
-						defaultToken.isUsed = !myTokens.find { defaultToken.symbol == it.symbol }.isNull()
+						defaultToken.isUsed = !myTokens.find { defaultToken.contract == it.contract }.isNull()
 						if (isEnd) {
 							val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 							// 在主线程更新 `UI`
 							context?.runOnUiThread {
-								asyncData = sortedList
-								fragment.recyclerView.adapter.notifyDataSetChanged()
+								if (fragment.asyncData.isNull()) fragment.asyncData = sortedList
+								else diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(sortedList)
 							}
 						}
 					}
@@ -58,6 +59,7 @@ class TokenManagementListPresenter(
 			}
 		}
 	}
+	
 	
 	companion object {
 		

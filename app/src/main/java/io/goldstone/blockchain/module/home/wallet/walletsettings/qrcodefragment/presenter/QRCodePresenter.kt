@@ -8,8 +8,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.FileProvider
 import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
-import com.blinnnk.util.checkPermissionThen
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -59,7 +59,9 @@ open class QRCodePresenter(
 			fragment: Fragment,
 			hold: (Uri) -> Unit = {}
 		) {
-			fragment.activity?.checkPermissionThen(PermissionCategory.Write) {
+			object : CheckPermission(fragment.activity) {
+				override var permissionType = PermissionCategory.Write
+			}.start {
 				val size = (ScreenSize.Width * 0.8).toInt()
 				val barcodeEncoder = BarcodeEncoder()
 				val bitmap = barcodeEncoder.encodeBitmap(content, BarcodeFormat.QR_CODE, size, size)

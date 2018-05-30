@@ -97,7 +97,7 @@ data class WalletDetailCellModel(
 							override var asyncCount: Int = allTokens.size
 							override fun concurrentJobs() {
 								allTokens.forEach { token ->
-									localTokens.find { it.symbol == token.symbol }?.let { targetToken ->
+									localTokens.find { it.contract == token.contract }?.let { targetToken ->
 										if (targetToken.symbol == CryptoSymbol.eth) {
 											GoldStoneEthCall
 												.getEthBalance(walletAddress) {
