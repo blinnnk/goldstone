@@ -63,7 +63,6 @@ class SplashPresenter(val activity: SplashActivity) {
 		NetworkUtil.hasNetwork(activity) isTrue {
 			// update local `Tokens` info list
 			StartingPresenter.updateLocalDefaultTokens {
-				activity.alert("Get default tokens has error")
 				LogUtil.error(activity::javaClass.name)
 			}
 		}

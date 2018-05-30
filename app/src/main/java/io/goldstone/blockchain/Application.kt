@@ -62,8 +62,7 @@ class GoldStoneApp : Application() {
 		
 		var currentRate: Double = 1.0
 		var currencyCode: String = CountryCode.currentCurrency
-		var currentLanguage: Int? =
-			HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol)
+		var currentLanguage: Int? = HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol)
 		var currentChain = ChainID.Main.id
 		
 		private fun prepareAppConfig(callback: () -> Unit) {

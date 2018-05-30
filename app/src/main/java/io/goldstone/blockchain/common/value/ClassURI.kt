@@ -6,5 +6,5 @@ package io.goldstone.blockchain.common.value
  */
 
 object ClassURI {
-	val transactionDetail = "TransactionDetailFragment"
+	const val transactionDetail = "TransactionDetailFragment"
 }

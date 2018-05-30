@@ -6,11 +6,11 @@ package io.goldstone.blockchain.common.value
  */
 
 object WebUrl {
-	const val header = "http://www.goldstone.io"
-	const val privacy = "$header/privacy.html"
-	const val terms = "$header/termAndConditions.html"
-	const val support = "$header/support.html"
-	const val aboutUs ="$header/aboutUs.html"
+	const val header = "https://www.goldstone.io"
+	const val privacy = "$header/privacy"
+	const val terms = "$header/termAndConditions"
+	const val support = "$header/support"
+	const val aboutUs ="$header/aboutUs"
 	const val whatIsKeystore = "$header/wiki/keystore/cn"
 	const val whatIsMnemonic = "$header/wiki/mnemonices/cn"
 	const val whatIsPrivatekey = "$header/wiki/privateKey/cn"

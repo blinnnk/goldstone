@@ -42,7 +42,6 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-			
 			gradientView.into(this)
 			// Logo
 			imageView {

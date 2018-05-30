@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
+import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
@@ -60,13 +61,18 @@ class TokenManagementListPresenter(
 	
 	companion object {
 		
-		fun updateMyTokensInfoBy(isSelected: Boolean, symbol: String) {
-			if (isSelected) {
+		fun updateMyTokensInfoBy(switch: HoneyBaseSwitch, symbol: String) {
+			switch.isClickable = false
+			if (switch.isChecked) {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbol(symbol, WalletTable.current.address)
+				MyTokenTable.insertBySymbol(symbol, WalletTable.current.address) {
+					switch.isClickable = true
+				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteBySymbol(symbol, WalletTable.current.address)
+				MyTokenTable.deleteBySymbol(symbol, WalletTable.current.address) {
+					switch.isClickable = true
+				}
 			}
 		}
 	}

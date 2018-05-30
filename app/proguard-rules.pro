@@ -195,6 +195,7 @@
 # My Own Proguard
 -dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
 -dontwarn io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.**
+-dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
 
 # Kotlin 协程
 -keep class org.jetbrains.kotlinx.**
