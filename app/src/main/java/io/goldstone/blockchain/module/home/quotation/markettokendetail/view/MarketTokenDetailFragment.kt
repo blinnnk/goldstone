@@ -59,14 +59,14 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					}
 				}.into(this)
 				menu.titles = arrayListOf(
-					MarketTokenDetailChartType.Hour.info, MarketTokenDetailChartType.DAY.info,
-					MarketTokenDetailChartType.WEEK.info, MarketTokenDetailChartType.MONTH.info
+					MarketTokenDetailChartType.Hour.info,
+					MarketTokenDetailChartType.DAY.info,
+					MarketTokenDetailChartType.WEEK.info,
+					MarketTokenDetailChartType.MONTH.info
 				)
 				menu.getButton { button ->
 					button.onClick {
-						presenter.updateChartByMenu(
-							chartView, button.id
-						)
+						presenter.updateChartByMenu(chartView, button.id)
 						menu.selected(button.id)
 						button.preventDuplicateClicks()
 					}

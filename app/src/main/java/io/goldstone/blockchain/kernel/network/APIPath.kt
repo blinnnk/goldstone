@@ -31,13 +31,13 @@ object APIPath {
 	const val main = "https://eth-node-mainnet.naonaola.com/eth"
 	const val koven = "https://eth-node-kovan.goldstone.io/eth"
 	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
-	@JvmField
+	
 	val getQuotationCurrencyChart: (
 		pair: String, period: String, size: Int
 	) -> String = { pair, period, size ->
 		"$url/market/lineData?pair=$pair&period=$period&size=$size"
 	}
-	@JvmField
+	
 	val getQuotationCurrencyInfo: (pair: String) -> String = { pair ->
 		"$url/market/coinDetail?pair=$pair"
 	}
@@ -106,8 +106,8 @@ object EtherScanApi {
 	private const val kovanLogHeader = "http://kovan.etherscan.io"
 	private const val ropstanLogHeader = "http://ropsten.etherscan.io"
 	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
-	@JvmField
-	val etherScanHeader: (chainID: String) -> String = {
+	
+	private val etherScanHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainHeader
 			ChainID.Ropstan.id -> ropstanHeader
@@ -116,8 +116,8 @@ object EtherScanApi {
 			else -> ropstanHeader
 		}
 	}
-	@JvmField
-	val etherScanLogHeader: (chainID: String) -> String = {
+	
+	private val etherScanLogHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainLogHeader
 			ChainID.Ropstan.id -> ropstanLogHeader
@@ -135,24 +135,24 @@ object EtherScanApi {
 			else -> "https://etherscan.io/tx/"
 		}
 	}
-	@JvmField
+	
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(GoldStoneApp.currentChain)}$it"
 	}
-	@JvmStatic
+	
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
 		"${etherScanHeader(GoldStoneApp.currentChain)}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
-	@JvmStatic
+	
 	val transactionsByHash: (taxHash: String) -> String = {
 		"${etherScanHeader(GoldStoneApp.currentChain)}/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
 	}
 
-	@JvmStatic
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
 			"${etherScanLogHeader(GoldStoneApp.currentChain)}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
 		}
+	
 	@JvmStatic
 	val getTokenDefrayTransactiosingleTransactionHasn: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->

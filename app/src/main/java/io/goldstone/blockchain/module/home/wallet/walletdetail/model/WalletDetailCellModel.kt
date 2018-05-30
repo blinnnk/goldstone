@@ -29,10 +29,7 @@ data class WalletDetailCellModel(
 	var weight: Int = 0
 ) : Serializable {
 
-	constructor(
-		data: DefaultTokenTable,
-		balance: Double
-	) : this(
+	constructor(data: DefaultTokenTable, balance: Double) : this(
 		data.iconUrl,
 		data.symbol,
 		data.name,
