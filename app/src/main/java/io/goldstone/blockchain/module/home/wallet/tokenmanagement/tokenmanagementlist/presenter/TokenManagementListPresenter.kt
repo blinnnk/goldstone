@@ -35,6 +35,7 @@ class TokenManagementListPresenter(
 	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
+		setHeightMatchParent()
 		updateData()
 	}
 	
