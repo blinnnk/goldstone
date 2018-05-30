@@ -7,7 +7,6 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.HoneyUIUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
@@ -94,7 +93,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 							presenter.showImportWalletFragment()
 						}.into(this)
 					}.lparams {
-						height = (ScreenSize.Height * 0.135).toInt() + HoneyUIUtils.getHeight(importButton) * 2
+						height = (ScreenSize.Height * 0.135).toInt() + importButton.layoutParams.height * 2
 						alignParentBottom()
 						width = matchParent
 					}
