@@ -68,7 +68,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 		if (height >= ScreenSize.Height) {
 			fragment.getMainActivity()?.hideHomeFragment()
 		} else {
-			fragment.getMainActivity()?.showLoadingView()
+			fragment.getMainActivity()?.showHomeFragment()
 		}
 	}
 
