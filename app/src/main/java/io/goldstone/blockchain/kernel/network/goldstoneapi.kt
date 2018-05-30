@@ -233,7 +233,10 @@ object GoldStoneAPI {
 		size: Int,
 		hold: (ArrayList<ChartModel>) -> Unit
 	) {
-		requestData<ChartModel>(APIPath.getQuotationCurrencyChart(pair, period, size), "point_list") {
+		requestData<ChartModel>(
+			APIPath.getQuotationCurrencyChart(pair, period, size),
+			"point_list"
+		) {
 			hold(this.toArrayList())
 		}
 	}
@@ -346,18 +349,11 @@ object GoldStoneAPI {
 	) {
 		getcryptoGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
-				) {
+				override fun onFailure(call: Call, error: IOException) {
 					netWorkError()
 					LogUtil.error(keyName + "requestData", error)
 				}
-				
-				override fun onResponse(
-					call: Call,
-					response: Response
-				) {
+				override fun onResponse(call: Call, response: Response) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						val dataObject =
@@ -498,10 +494,7 @@ object GoldStoneCode {
 		}
 	}
 	
-	fun showErrorCodeReason(
-		data: String?,
-		errorCallback: () -> Unit = {}
-	) {
+	fun showErrorCodeReason(data: String?, errorCallback: () -> Unit = {}) {
 		data?.apply {
 			val code = JSONObject(this).safeGet("code")
 			if (code.isNotEmpty()) {

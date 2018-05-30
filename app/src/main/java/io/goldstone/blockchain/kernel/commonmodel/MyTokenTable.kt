@@ -59,9 +59,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(
-						symbol, address
-					).let {
+					getTokenBySymbolAndAddress(symbol, address).let {
 						it.isNull().isFalse {
 							delete(it)
 						}

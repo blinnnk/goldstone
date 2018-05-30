@@ -43,8 +43,7 @@ class TokenManagementListPresenter(
 			// 在异步线程更新数据
 			DefaultTokenTable.getDefaultTokens { defaultTokens ->
 				defaultTokens.forEachOrEnd { defaultToken, isEnd ->
-					val address = WalletTable.current.address
-					MyTokenTable.getTokensWith(address) { myTokens ->
+					MyTokenTable.getTokensWith { myTokens ->
 						defaultToken.isUsed = !myTokens.find { defaultToken.contract == it.contract }.isNull()
 						if (isEnd) {
 							val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()

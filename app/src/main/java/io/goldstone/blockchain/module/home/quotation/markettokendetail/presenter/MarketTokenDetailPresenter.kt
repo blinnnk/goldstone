@@ -47,10 +47,7 @@ class MarketTokenDetailPresenter(
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
 	
-	fun updateChartByMenu(
-		chartView: MarketTokenChart,
-		buttonID: Int
-	) {
+	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
 			MarketTokenDetailChartType.DAY.code -> MarketTokenDetailChartType.DAY.info
@@ -86,7 +83,7 @@ class MarketTokenDetailPresenter(
 						val jsonArray = JSONArray(data)
 						// 把数据转换成需要的格式
 						(0 until jsonArray.length()).map {
-							ChartModel(JSONObject(jsonArray[it].toString()))
+							ChartModel(JSONObject(jsonArray[it]?.toString()))
 						}.toArrayList().let {
 							val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLong().orElse(0)
 							/** 校验数据库的数据时间是否有效，是否需要更新 */
@@ -151,12 +148,12 @@ class MarketTokenDetailPresenter(
 		fragment.context?.apply {
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
-				chartData = data.sortedBy {
-					it.timestamp
-				}.map {
+				chartData = data.sortedBy { it.timestamp }.map {
 					Point(
 						DateUtils.formatDateTime(
-							this, it.timestamp.toLong(), dateType
+							this,
+							it.timestamp.toLong(),
+							dateType
 						), it.price.toFloat()
 					)
 				}.toArrayList()
@@ -225,7 +222,12 @@ class MarketTokenDetailPresenter(
 						fragment.context?.runOnUiThread {
 							val content = description.substring(0, maxCount(description)) + "..."
 							tokenInfo.setTokenDescription(content)
-							tokenInfo.updateHeightByText(content, tokenInfo.fontSize(14), 18.uiPX(), ScreenSize.widthWithPadding)
+							tokenInfo.updateHeightByText(
+								content,
+								tokenInfo.fontSize(14),
+								18.uiPX(),
+								ScreenSize.widthWithPadding
+							)
 						}
 						QuotationSelectionTable.updateDescription(
 							info.pair, description

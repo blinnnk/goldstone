@@ -102,9 +102,7 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun getSelectionByPair(
-			pair: String, hold: (QuotationSelectionTable?) -> Unit
-		) {
+		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable?) -> Unit) {
 			coroutinesTask({
 				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
 			}) {
