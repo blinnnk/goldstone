@@ -26,7 +26,7 @@ object APIPath {
 	const val getTokenDescription = "$url/market/coinDescription?symbol="
 	const val getUnreadCount = "$url/account/checkUnreadMessage"
 	/** Chain Address */
-	const val ropstan = "https://eth-node-ropsten.naonaola.com/eth"
+	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
 	const val main = "https://eth-node-mainnet.goldstone.io/eth"
 	const val koven = "https://eth-node-kovan.goldstone.io/eth"
 	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"

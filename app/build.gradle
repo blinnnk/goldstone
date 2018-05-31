@@ -16,7 +16,6 @@ android {
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
     vectorDrawables.useSupportLibrary = true
-
     manifestPlaceholders = [
       XG_ACCESS_ID : "2100282353",
       XG_ACCESS_KEY: "A9BWBA6J671X"
@@ -25,6 +24,11 @@ android {
       abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
     }
   }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
   buildTypes {
     debug {
       minifyEnabled false
@@ -39,6 +43,7 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+  buildToolsVersion '27.0.3'
 }
 
 dependencies {
@@ -61,8 +66,11 @@ dependencies {
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.2.9.5'
   // Crypto
-  implementation 'org.ethereum:geth:1.8.2'
+  implementation 'org.ethereum:geth:1.8.8'
   implementation 'org.web3j:core:3.3.1-android'
+  // Support PBKDF2withHmacSHA512 Below Api 26
+  implementation "com.madgag.spongycastle:core:1.58.0.0"
+  implementation "com.madgag.spongycastle:prov:1.58.0.0"
   // BlurView
   implementation 'com.github.mmin18:realtimeblurview:1.1.0'
   // Chart

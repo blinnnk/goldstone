@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.bip39
 
-import android.os.Build
 import io.goldstone.blockchain.crypto.bip32.ExtendedKey
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.extensions.sha256
@@ -23,8 +22,9 @@ object Mnemonic {
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	private fun mnemonicToSeed(phrase: String, password: String = "") =
-		mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
+	private fun mnemonicToSeed(phrase: String, password: String = ""): ByteArray {
+		return mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
+	}
 	
 	/**
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
@@ -33,9 +33,8 @@ object Mnemonic {
 	private fun mnemonicToSeed(words: Array<String>, password: String = ""): ByteArray {
 		val pass = words.joinToString(" ")
 		val salt = "mnemonic$password"
-		val keyFactory =
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-			else SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
+		
+		val keyFactory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
 		val spec = PBEKeySpec(pass.toCharArray(), salt.toByteArray(), 2048, 512)
 		return keyFactory.generateSecret(spec).encoded
 	}
