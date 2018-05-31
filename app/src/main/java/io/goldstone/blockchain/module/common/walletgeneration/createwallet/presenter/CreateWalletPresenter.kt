@@ -233,10 +233,7 @@ class CreateWalletPresenter(
 			}
 		}
 		
-		private fun List<DefaultTokenTable>.insertNewAccount(
-			address: String,
-			callback: () -> Unit
-		) {
+		private fun List<DefaultTokenTable>.insertNewAccount(address: String, callback: () -> Unit) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
@@ -281,9 +278,8 @@ class CreateWalletPresenter(
 					}
 				}
 				
-				override fun mergeCallBack() {
-					callback()
-				}
+				override fun mergeCallBack() = callback()
+				
 			}.start()
 		}
 		

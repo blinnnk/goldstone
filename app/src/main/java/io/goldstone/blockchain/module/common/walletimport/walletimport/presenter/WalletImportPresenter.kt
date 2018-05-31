@@ -80,8 +80,8 @@ class WalletImportPresenter(
 						XinGePushReceiver.registerWalletAddressForPush()
 					}
 				} otherwise {
-					callback()
 					fragment.context?.alert(ImportWalletText.existAddress)
+					callback()
 				}
 			}
 		}
