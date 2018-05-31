@@ -23,7 +23,7 @@ object Mnemonic {
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	fun mnemonicToSeed(phrase: String, password: String = "") =
+	private fun mnemonicToSeed(phrase: String, password: String = "") =
 		mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
 	
 	/**
@@ -34,7 +34,7 @@ object Mnemonic {
 		val pass = words.joinToString(" ")
 		val salt = "mnemonic$password"
 		val keyFactory =
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
 			else SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
 		val spec = PBEKeySpec(pass.toCharArray(), salt.toByteArray(), 2048, 512)
 		return keyFactory.generateSecret(spec).encoded
