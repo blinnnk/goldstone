@@ -298,7 +298,9 @@ class TransactionListPresenter(
 						} isFalse {
 							/** 不是 ERC20 币种直接默认为 `ETH` */
 							TransactionTable.updateModelInfoFromChain(
-								transaction, false, CryptoSymbol.eth,
+								transaction,
+								false,
+								CryptoSymbol.eth,
 								CryptoUtils.toCountByDecimal(transaction.value.toDouble()).toString(),
 								transaction.to
 							)

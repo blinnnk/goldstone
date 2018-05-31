@@ -33,8 +33,14 @@ data class MyTokenTable(
 	
 	companion object {
 		
-		fun insert(model: MyTokenTable) {
-			GoldStoneDataBase.database.myTokenDao().insert(model)
+		fun insert(model: MyTokenTable, address: String = WalletTable.current.address) {
+			GoldStoneDataBase.database.myTokenDao().apply {
+				// 防止重复添加
+				if(getTokenByContractAndAddress(model.contract, address).isNull()) {
+					insert(model)
+				}
+			}
+			
 		}
 		
 		fun getTokensWith(
@@ -57,9 +63,7 @@ data class MyTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					getTokenByContractAndAddress(contract, address).let {
-						it.isNull().isFalse {
-							delete(it)
-						}
+						it?.let { delete(it) }
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -72,13 +76,15 @@ data class MyTokenTable(
 			address: String,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.myTokenDao().apply {
-						getTokensBy(address).forEach { delete(it) }
+			doAsync {
+				GoldStoneDataBase.database.myTokenDao().apply {
+					getTokensBy(address).forEachOrEnd { item, isEnd ->
+						delete(item)
+						if (isEnd) {
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
 					}
-				}) {
-				callback()
+				}
 			}
 		}
 		
@@ -113,9 +119,7 @@ data class MyTokenTable(
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (symbol == CryptoSymbol.eth) {
 				GoldStoneEthCall.getEthBalance(ownerAddress) {
-					insert(
-						MyTokenTable(0, ownerAddress, symbol, it, CryptoValue.ethContract)
-					)
+					insert(MyTokenTable(0, ownerAddress, symbol, it, CryptoValue.ethContract))
 					callback(it)
 				}
 			} else {
@@ -161,7 +165,7 @@ data class MyTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					getTokenByContractAndAddress(contract, WalletTable.current.address).let {
-						update(it.apply { this.balance = balance })
+						it?.let { update(it.apply { this.balance = balance }) }
 					}
 				}
 			}
@@ -177,7 +181,7 @@ interface MyTokenDao {
 		contract: String,
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain
-	): MyTokenTable
+	): MyTokenTable?
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
 	fun getTokensBy(

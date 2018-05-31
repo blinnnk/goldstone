@@ -314,7 +314,6 @@ object GoldStoneEthCall {
 					response: Response
 				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
-					LogUtil.error("callEthBy data: $data")
 					try {
 						val dataObject =
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
