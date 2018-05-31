@@ -26,14 +26,15 @@ object APIPath {
 	const val getTokenDescription = "$url/market/coinDescription?symbol="
 	const val getUnreadCount = "$url/account/checkUnreadMessage"
 	/** Chain Address */
-	const val ropstanInfura = "https://ropsten.infura.io/QaK7ndbTdXqQNObSiKY8"
 	const val ropstan = "https://eth-node-ropsten.naonaola.com/eth"
-	const val main = "https://eth-node-mainnet.naonaola.com/eth"
+	const val main = "https://eth-node-mainnet.goldstone.io/eth"
 	const val koven = "https://eth-node-kovan.goldstone.io/eth"
 	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
 	
 	val getQuotationCurrencyChart: (
-		pair: String, period: String, size: Int
+		pair: String,
+		period: String,
+		size: Int
 	) -> String = { pair, period, size ->
 		"$url/market/lineData?pair=$pair&period=$period&size=$size"
 	}
