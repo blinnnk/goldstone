@@ -12,6 +12,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -23,8 +24,9 @@ import java.util.*
  */
 @Entity(tableName = "tokenBalance")
 data class TokenBalanceTable(
-	@PrimaryKey(autoGenerate = true) var id: Int,
-	var symbol: String,
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	var contract: String,
 	var date: Long,
 	var insertTime: Long,
 	var balance: Double,
@@ -33,14 +35,14 @@ data class TokenBalanceTable(
 
 	companion object {
 
-		fun getBalanceBySymbol(
-			address: String,
-			symbol: String,
+		fun getBalanceByContract(
+			contract: String,
+			address: String = WalletTable.current.address,
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
 			coroutinesTask({
 				GoldStoneDataBase.database.tokenBalanceDao()
-					.getTokenBalanceBySymbolAndAddress(address, symbol)
+					.getTokenBalanceByContractAndAddress(address, contract)
 			}) {
 				hold(it.toArrayList())
 			}
@@ -69,12 +71,12 @@ data class TokenBalanceTable(
 			}
 		}
 
-		fun insertOrUpdate(symbol: String, address: String, date: Long, balance: Double) {
+		fun insertOrUpdate(contract: String, address: String, date: Long, balance: Double) {
 			val addTime = System.currentTimeMillis()
 			GoldStoneDataBase.database.tokenBalanceDao().apply {
-				getBalanceByDate(date, address, symbol).let {
+				getBalanceByDate(date, address, contract).let {
 					it.isNull() isTrue {
-						insert(TokenBalanceTable(0, symbol, date, addTime, balance, address))
+						insert(TokenBalanceTable(0, contract, date, addTime, balance, address))
 					} otherwise {
 						it?.apply {
 							this.balance = balance
@@ -105,11 +107,11 @@ interface TokenBalanceDao {
 	@Query("SELECT * FROM tokenBalance WHERE address LIKE :address")
 	fun getTokenBalanceByAddress(address: String): List<TokenBalanceTable>
 
-	@Query("SELECT * FROM tokenBalance WHERE symbol LIKE :symbol AND address LIKE :address ORDER BY date DESC")
-	fun getTokenBalanceBySymbolAndAddress(address: String, symbol: String): List<TokenBalanceTable>
+	@Query("SELECT * FROM tokenBalance WHERE contract LIKE :contract AND address LIKE :address ORDER BY date DESC")
+	fun getTokenBalanceByContractAndAddress(address: String, contract: String): List<TokenBalanceTable>
 
-	@Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND symbol LIKE :symbol")
-	fun getBalanceByDate(date: Long, address: String, symbol: String): TokenBalanceTable?
+	@Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND contract LIKE :contract")
+	fun getBalanceByDate(date: Long, address: String, contract: String): TokenBalanceTable?
 
 	@Insert
 	fun insert(token: TokenBalanceTable)

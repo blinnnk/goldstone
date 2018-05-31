@@ -27,7 +27,7 @@ data class TransactionListModel(
 	val targetAddress: String,
 	val blockNumber: String,
 	val transactionHash: String,
-	val memo: String,
+	var memo: String?,
 	val minerFee: String,
 	val url: String,
 	val isPending: Boolean,
@@ -43,10 +43,19 @@ data class TransactionListModel(
 		data.value.toDouble(), // 转账个数
 		data.symbol,
 		data.isReceive,
-		DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_YEAR) + " " + DateUtils.formatDateTime(GoldStoneAPI.context, data.timeStamp.toLong() * 1000, FORMAT_SHOW_TIME), // 拼接时间
+		DateUtils.formatDateTime(
+			GoldStoneAPI.context,
+			data.timeStamp.toLong() * 1000,
+			FORMAT_SHOW_YEAR
+		) + " " + DateUtils.formatDateTime(
+			GoldStoneAPI.context,
+			data.timeStamp.toLong() * 1000,
+			FORMAT_SHOW_TIME
+		), // 拼接时间
 		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
-		data.hash, getMemoFromInputCode(data.input),
+		data.hash,
+		data.memo,
 		(data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
 		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
 		data.isPending,

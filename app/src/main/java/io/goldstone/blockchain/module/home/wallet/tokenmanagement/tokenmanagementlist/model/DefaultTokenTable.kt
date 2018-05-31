@@ -102,6 +102,25 @@ data class DefaultTokenTable(
 		else localData.safeGet("weight").toInt()
 	)
 	
+	constructor(
+		contract: String,
+		symbol: String,
+		decimals: Double
+	) : this(
+		0,
+		contract,
+		"",
+		symbol,
+		0,
+		0.0,
+		"",
+		decimals,
+		"",
+		false,
+		false,
+		0
+	)
+	
 	companion object {
 		
 		fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
@@ -173,7 +192,8 @@ data class DefaultTokenTable(
 			callback: () -> Unit
 		) {
 			coroutinesTask(
-				{ GoldStoneDataBase.database.defaultTokenDao().insert(token) }) {
+				{ GoldStoneDataBase.database.defaultTokenDao().insert(token) }
+			) {
 				callback()
 			}
 		}
