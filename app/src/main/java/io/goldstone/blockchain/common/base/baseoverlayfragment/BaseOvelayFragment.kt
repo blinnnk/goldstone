@@ -69,8 +69,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		}
 	}
 	
-	open fun setContentHeight(): Int =
-		minHeight
+	open fun setContentHeight(): Int = minHeight
 	
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
@@ -91,7 +90,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			overlayView.apply {
 				val maxHeight = context?.getRealScreenHeight().orZero()
 				/** 执行伸展动画 */
-				contentLayout.updateHeightAnimation(setContentHeight(), maxHeight)
+				contentLayout.updateHeightAnimation(setContentHeight(), maxHeight, 0)
 				/** 设置悬浮曾的 `Header` 初始状态 */
 				header.apply {
 					showBackButton(hasBackButton)

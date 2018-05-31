@@ -33,7 +33,6 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 			isClickable = true
 			
 			backgroundLayout = relativeLayout {
-				addTopLRCorner(CornerSize.big, Spectrum.white)
 				// header
 				addView(header)
 				// content
@@ -46,18 +45,18 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 				}
 				lparams { alignParentBottom() }
 			}
+
+			setRoundCorner()
 		}
 		// 背景防止点击的 `mask` 颜色动画
 		updateColorAnimation(Color.TRANSPARENT, GrayScale.Opacity2Black)
 	}
 	
-	fun hideBackgroundLayout() {
-		backgroundLayout.addTopLRCorner(CornerSize.big, Color.TRANSPARENT)
-		header.addTopLRCorner(CornerSize.big, Spectrum.white)
-	}
-	
-	fun showBackgroundLayout() {
-		backgroundLayout.addTopLRCorner(CornerSize.big, Spectrum.white)
-		header.addTopLRCorner(CornerSize.big, Color.TRANSPARENT)
+	fun setRoundCorner(status: Boolean = true) {
+		if (status) {
+			backgroundLayout.addTopLRCorner(CornerSize.big, Spectrum.white)
+		} else {
+			backgroundLayout.addTopLRCorner(0f, Spectrum.white)
+		}
 	}
 }
