@@ -352,23 +352,21 @@ class TransactionDetailPresenter(
 	private fun updateMyTokenBalanceByTransaction(callback: () -> Unit) {
 		GoldStoneEthCall
 			.getTransactionByHash(currentHash) { transaction ->
-			if (transaction.isERC20) {
-				val contract = transaction.to
-				GoldStoneEthCall.getTokenBalanceWithContract(
-					contract, WalletTable.current.address
-				) { balance ->
-					GoldStoneEthCall.getTokenSymbol(contract) { symbol ->
-						MyTokenTable.updateCurrentWalletBalanceWithSymbol(balance, symbol)
+				if (transaction.isERC20) {
+					val contract = transaction.to
+					GoldStoneEthCall.getTokenBalanceWithContract(
+						contract, WalletTable.current.address
+					) { balance ->
+						MyTokenTable.updateCurrentWalletBalanceWithContract(balance, contract)
+						callback()
+					}
+				} else {
+					GoldStoneEthCall.getEthBalance(WalletTable.current.address) {
+						MyTokenTable.updateCurrentWalletBalanceWithContract(it, CryptoValue.ethContract)
 						callback()
 					}
 				}
-			} else {
-				GoldStoneEthCall.getEthBalance(WalletTable.current.address) {
-					MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, CryptoSymbol.eth)
-					callback()
-				}
 			}
-		}
 	}
 	
 	/**
@@ -408,32 +406,32 @@ class TransactionDetailPresenter(
 	) {
 		GoldStoneEthCall
 			.getTransactionByHash(currentHash) { receipt ->
-			context?.runOnUiThread {
-				// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-				val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
-				CryptoUtils.isERC20TransferByInputCode(receipt.input) {
-					transactionInfo?.let {
-						prepareHeaderValueFromNotification(receipt, it, info.isReceived)
+				context?.runOnUiThread {
+					// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
+					val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
+					CryptoUtils.isERC20TransferByInputCode(receipt.input) {
+						transactionInfo?.let {
+							prepareHeaderValueFromNotification(receipt, it, info.isReceived)
+						}
+					} isFalse {
+						val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
+						updateHeaderValue(
+							count,
+							if (info.isReceived) receipt.fromAddress else receipt.to,
+							CryptoSymbol.eth,
+							false,
+							info.isReceived
+						)
 					}
-				} isFalse {
-					val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
-					updateHeaderValue(
-						count,
-						if (info.isReceived) receipt.fromAddress else receipt.to,
-						CryptoSymbol.eth,
-						false,
-						info.isReceived
-					)
-				}
-				
-				if (asyncData.isNull()) {
-					receipt.toAsyncData().let {
-						asyncData = it.toArrayList()
+					
+					if (asyncData.isNull()) {
+						receipt.toAsyncData().let {
+							asyncData = it.toArrayList()
+						}
 					}
+					callback()
 				}
-				callback()
 			}
-		}
 	}
 	
 	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
@@ -442,20 +440,20 @@ class TransactionDetailPresenter(
 		transaction: InputCodeData,
 		isReceive: Boolean
 	) {
-		DefaultTokenTable.getTokenByContractAddress(receipt.to) {
+		DefaultTokenTable.getTokenByContract(receipt.to) {
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall
 					.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
-					val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
-					updateHeaderValue(
-						count,
-						address,
-						symbol,
-						false,
-						isReceive
-					)
-				}
+						val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
+						updateHeaderValue(
+							count,
+							address,
+							symbol,
+							false,
+							isReceive
+						)
+					}
 			} otherwise {
 				val count = CryptoUtils.toCountByDecimal(
 					transaction.count,

@@ -7,6 +7,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -45,8 +46,8 @@ data class TokenBalanceTable(
 			}
 		}
 
-		fun getTodayBalance(address: String, symbol: String, callback: (Double) -> Unit) {
-			if (symbol == CryptoSymbol.eth) {
+		fun getTodayBalance(address: String, contract: String, callback: (Double) -> Unit) {
+			if (contract == CryptoValue.ethContract) {
 				doAsync {
 					GoldStoneEthCall.getEthBalance(address) { balance ->
 						GoldStoneAPI.context.runOnUiThread {
@@ -56,14 +57,12 @@ data class TokenBalanceTable(
 				}
 			} else {
 				doAsync {
-					DefaultTokenTable.getContractAddressBySymbol(symbol) { contractAddress ->
-						GoldStoneEthCall.getTokenCountWithDecimalByContract(
-							contractAddress,
-							address
-						) { balance ->
-							GoldStoneAPI.context.runOnUiThread {
-								callback(balance)
-							}
+					GoldStoneEthCall.getTokenCountWithDecimalByContract(
+						contract,
+						address
+					) { balance ->
+						GoldStoneAPI.context.runOnUiThread {
+							callback(balance)
 						}
 					}
 				}

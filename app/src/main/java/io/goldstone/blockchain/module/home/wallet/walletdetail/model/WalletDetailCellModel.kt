@@ -5,9 +5,9 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import java.io.Serializable
@@ -16,7 +16,6 @@ import java.io.Serializable
  * @date 23/03/2018 11:57 PM
  * @author KaySaith
  */
-
 data class WalletDetailCellModel(
 	var iconUrl: String = "",
 	var symbol: String = "",
@@ -28,7 +27,7 @@ data class WalletDetailCellModel(
 	var contract: String = "",
 	var weight: Int = 0
 ) : Serializable {
-
+	
 	constructor(data: DefaultTokenTable, balance: Double) : this(
 		data.iconUrl,
 		data.symbol,
@@ -36,13 +35,20 @@ data class WalletDetailCellModel(
 		data.decimals,
 		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
 		data.price,
-		CryptoUtils.formatDouble(CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)) * data.price),
+		CryptoUtils.formatDouble(
+			CryptoUtils.formatDouble(
+				balance / Math.pow(
+					10.0,
+					data.decimals
+				)
+			) * data.price
+		),
 		data.contract,
 		data.weight
 	)
-
+	
 	companion object {
-
+		
 		fun getLocalModels(
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
@@ -65,14 +71,14 @@ data class WalletDetailCellModel(
 								}
 							}
 						}
-
+						
 						override fun mergeCallBack() =
 							hold(tokenList)
 					}.start()
 				}
 			}
 		}
-
+		
 		fun getChainModels(
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
@@ -98,15 +104,17 @@ data class WalletDetailCellModel(
 										if (targetToken.symbol == CryptoSymbol.eth) {
 											GoldStoneEthCall
 												.getEthBalance(walletAddress) {
-												MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, targetToken.symbol)
-												tokenList.add(WalletDetailCellModel(targetToken, it))
-												completeMark()
-											}
+													MyTokenTable
+														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+													tokenList.add(WalletDetailCellModel(targetToken, it))
+													completeMark()
+												}
 										} else {
 											GoldStoneEthCall.getTokenBalanceWithContract(
 												targetToken.contract, walletAddress
 											) {
-												MyTokenTable.updateCurrentWalletBalanceWithSymbol(it, targetToken.symbol)
+												MyTokenTable
+													.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
 												tokenList.add(WalletDetailCellModel(targetToken, it))
 												completeMark()
 											}
@@ -114,7 +122,7 @@ data class WalletDetailCellModel(
 									}
 								}
 							}
-
+							
 							override fun mergeCallBack() {
 								hold(tokenList)
 							}
@@ -123,11 +131,11 @@ data class WalletDetailCellModel(
 				}
 			}
 		}
-
+		
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
 			map { it.contract }.toJsonArray {
 				GoldStoneAPI.getPriceByContractAddress(it, errorCallback = {
-					 callback()
+					callback()
 				}) { newPrices ->
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = size
@@ -139,6 +147,7 @@ data class WalletDetailCellModel(
 								}
 							}
 						}
+						
 						override fun mergeCallBack() =
 							callback()
 					}.start()

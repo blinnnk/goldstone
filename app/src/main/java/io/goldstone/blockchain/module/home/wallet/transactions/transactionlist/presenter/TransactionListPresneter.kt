@@ -262,7 +262,7 @@ class TransactionListPresenter(
 							var receiveAddress = ""
 							var count = 0.0
 							/** 首先从本地数据库检索 `contract` 对应的 `symbol` */
-							DefaultTokenTable.getTokenByContractAddress(contract) { tokenInfo ->
+							DefaultTokenTable.getTokenByContract(contract) { tokenInfo ->
 								transaction.logIndex.isNotEmpty() isTrue {
 									count = CryptoUtils.toCountByDecimal(
 										transaction.value.toDouble(), tokenInfo?.decimals.orElse(0.0)

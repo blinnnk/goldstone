@@ -43,21 +43,17 @@ import java.math.BigInteger
  * @date 2018/5/16 3:54 PM
  * @author KaySaith
  */
-
 class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
-
+	
 	private var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
-
 	private val prepareModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
 	}
-
 	private var currentMinnerType = MinerFeeType.Recommend.content
-
 	private val defaultGasPrices by lazy {
 		arrayListOf(
 			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei()), // cheap
@@ -65,9 +61,8 @@ class GasSelectionPresenter(
 			BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei()) // recommend
 		)
 	}
-
 	private var currentGasUsedInEth: Double? = null
-
+	
 	fun insertCustomGasData() {
 		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
 		currentMinnerType = MinerFeeType.Custom.content
@@ -78,7 +73,7 @@ class GasSelectionPresenter(
 		fragment.clearGasLayout()
 		generateGasSelections(fragment.getGasLayout())
 	}
-
+	
 	fun generateGasSelections(parent: LinearLayout) {
 		defaultGasPrices.forEachIndexed { index, minner ->
 			GasSelectionCell(parent.context).apply {
@@ -105,16 +100,16 @@ class GasSelectionPresenter(
 			}.into(parent)
 		}
 	}
-
+	
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
-				TokenDetailText.paymentValue, Bundle().apply {
-					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
-				})
+			                                                TokenDetailText.paymentValue, Bundle().apply {
+				putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
+			})
 		}
 	}
-
+	
 	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
 		val token = fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
@@ -124,8 +119,8 @@ class GasSelectionPresenter(
 		}
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			MyTokenTable.getBalanceWithSymbol(
-				token?.symbol!!, WalletTable.current.address, true
+			MyTokenTable.getBalanceWithContract(
+				token?.contract!!, WalletTable.current.address, true
 			) { balance ->
 				fragment.context?.runOnUiThread {
 					showAlertOrTransfer(balance, footer, callback)
@@ -133,12 +128,12 @@ class GasSelectionPresenter(
 			}
 		}
 	}
-
+	
 	private fun getTransferCount(): BigDecimal {
 		return prepareModel?.count?.toBigDecimal()
-			?: BigDecimal.ZERO
+		       ?: BigDecimal.ZERO
 	}
-
+	
 	/**
 	 * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
 	 * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
@@ -164,23 +159,23 @@ class GasSelectionPresenter(
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall
 						.sendRawTransaction(hexValue) { taxHash ->
-						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
-						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-						taxHash.isValidTaxHash() isTrue {
-							// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-							insertPendingDataToTransactionTable(toWalletAddress, raw!!, taxHash)
+							LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
+							// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+							taxHash.isValidTaxHash() isTrue {
+								// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+								insertPendingDataToTransactionTable(toWalletAddress, raw!!, taxHash)
+							}
+							// 主线程跳转到账目详情界面
+							fragment.context?.runOnUiThread {
+								goToTransactionDetailFragment(toWalletAddress, raw!!, taxHash)
+								callback()
+							}
 						}
-						// 主线程跳转到账目详情界面
-						fragment.context?.runOnUiThread {
-							goToTransactionDetailFragment(toWalletAddress, raw!!, taxHash)
-							callback()
-						}
-					}
 				}
 			}
 		}
 	}
-
+	
 	/**
 	 * 转账开始后跳转到转账监听界面
 	 */
@@ -208,7 +203,7 @@ class GasSelectionPresenter(
 			headerTitle = TokenDetailText.transferDetail
 		}
 	}
-
+	
 	private fun insertPendingDataToTransactionTable(
 		toWalletAddress: String,
 		raw: RawTransaction,
@@ -237,7 +232,7 @@ class GasSelectionPresenter(
 			}
 		}
 	}
-
+	
 	private fun getSelectedGasPrice(type: String): BigInteger {
 		return when (type) {
 			MinerFeeType.Fast.content -> BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei())
@@ -248,20 +243,20 @@ class GasSelectionPresenter(
 			else -> BigInteger.valueOf(MinerFeeType.Custom.value.scaleToGwei())
 		}
 	}
-
+	
 	private fun String.checkDecimalIsvalid(token: WalletDetailCellModel?): Boolean {
 		return when {
 			getDecimalCount().isNull() -> return true
-
+			
 			getDecimalCount().orZero() > token?.decimal.orElse(0.0) -> {
 				fragment.context?.alert(AlertText.transferWrongDecimal)
 				false
 			}
-
+			
 			else -> true
 		}
 	}
-
+	
 	private fun Context.showAlertOrTransfer(
 		balance: Double,
 		footer: GasSelectionFooter,
@@ -280,25 +275,25 @@ class GasSelectionPresenter(
 			}
 		}
 	}
-
+	
 	private fun showConfirmAttentionView(
 		footer: GasSelectionFooter,
 		callback: () -> Unit
 	) {
 		fragment.context?.showAlertView(TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(), true, {
-				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton { showLoadingStatus(false) }
-			}) {
+		                                CommonText.enterPassword.toUpperCase(), true, {
+			                                // 点击 `Alert` 取消按钮
+			                                footer.getConfirmButton { showLoadingStatus(false) }
+		                                }) {
 			transfer(it?.text.toString(), callback)
 		}
 	}
-
+	
 	private fun prepareGasLimit(gasPrice: Long): Long {
 		return if (gasPrice == MinerFeeType.Custom.value) gasFeeFromCustom()?.gasLimit.orElse(0)
 		else prepareModel?.gasLimit?.toLong().orElse(0)
 	}
-
+	
 	private fun getGasEthCount(info: String): Double {
 		return if (info.length > 3) {
 			info.replace(" ", "").substring(0, info.lastIndex - 3).toDouble()
@@ -306,18 +301,19 @@ class GasSelectionPresenter(
 			0.0
 		}
 	}
-
+	
 	private fun getGasCurrencyPrice(
 		info: String,
 		hold: (String) -> Unit
 	) {
-		DefaultTokenTable.getTokenBySymbol(CryptoSymbol.eth) {
+		DefaultTokenTable.getTokenByContract(CryptoSymbol.eth) {
 			hold(
-				"≈ " + (getGasEthCount(info) * it.price).formatCurrency() + " " + GoldStoneApp.currencyCode
+				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + GoldStoneApp
+					.currencyCode
 			)
 		}
 	}
-
+	
 	private fun updateGasSettings(container: LinearLayout) {
 		defaultGasPrices.forEachIndexed { index, minner ->
 			container.findViewById<GasSelectionCell>(index)?.let { cell ->
@@ -328,7 +324,7 @@ class GasSelectionPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
@@ -337,7 +333,7 @@ class GasSelectionPresenter(
 			}
 		}
 	}
-
+	
 	fun backEvent(fragment: TokenDetailOverlayFragment) {
 		fragment.apply {
 			presenter.setValueHeader(token)
