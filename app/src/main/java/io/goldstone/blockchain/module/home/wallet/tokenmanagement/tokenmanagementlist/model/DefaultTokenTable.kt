@@ -50,6 +50,7 @@ data class DefaultTokenTable(
 ) {
 	
 	/** 默认的 `constructor` */
+	@Ignore
 	constructor() : this(
 		0,
 		"",

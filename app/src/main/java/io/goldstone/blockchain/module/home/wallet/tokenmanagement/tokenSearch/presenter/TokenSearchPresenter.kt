@@ -5,9 +5,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
@@ -20,15 +20,14 @@ import org.jetbrains.anko.runOnUiThread
  * @date 27/03/2018 11:23 AM
  * @author KaySaith
  */
-
 class TokenSearchPresenter(
 	override val fragment: TokenSearchFragment
 ) : BaseRecyclerPresenter<TokenSearchFragment, DefaultTokenTable>() {
-
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
@@ -36,7 +35,7 @@ class TokenSearchPresenter(
 	) {
 		setHeightMatchParent()
 	}
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
@@ -52,14 +51,13 @@ class TokenSearchPresenter(
 			}
 		}
 	}
-
+	
 	private fun searchTokenByContractOrSymbol(
 		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
-
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-
+		
 		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
@@ -79,25 +77,29 @@ class TokenSearchPresenter(
 				isSearchingSymbol isFalse {
 					GoldStoneEthCall
 						.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
-						hold(
-							arrayListOf(
-								DefaultTokenTable(
-									0,
-									content,
-									"",
-									symbol,
-									TinyNumber.False.value,
-									0.0,
-									name,
-									decimal,
-									null,
-									false,
-									false,
-									0
+							if (symbol.isEmpty() || name.isEmpty()) {
+								hold(arrayListOf())
+							} else {
+								hold(
+									arrayListOf(
+										DefaultTokenTable(
+											0,
+											content,
+											"",
+											symbol,
+											TinyNumber.False.value,
+											0.0,
+											name,
+											decimal,
+											null,
+											false,
+											false,
+											0
+										)
+									)
 								)
-							)
-						)
-					}
+							}
+						}
 				} otherwise {
 					hold(arrayListOf())
 				}

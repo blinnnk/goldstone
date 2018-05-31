@@ -41,7 +41,9 @@ class TokenManagementPresenter(
 					showTokenSearchFragment()
 					showSearchInput {
 						popFragmentFrom<TokenSearchFragment>()
-						activity?.apply { SoftKeyboard.hide(this) }
+						activity?.apply {
+							SoftKeyboard.hide(this)
+						}
 					}
 				}
 			}

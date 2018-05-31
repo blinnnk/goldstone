@@ -31,6 +31,10 @@ class TokenManagementListFragment :
 		}
 	}
 	
+	override fun setSlideUpAnimation() {
+	
+	}
+	
 	override fun setSlideUpWithCellHeight() = 60.uiPX()
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {

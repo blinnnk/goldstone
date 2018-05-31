@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.support.v7.widget.RecyclerView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
@@ -11,6 +13,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -165,8 +169,10 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		}
 	}
 
+
 	open fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
+			if (setContentHeight() >= context?.getRealScreenHeight().orZero()) return
 			val recoveryHeight =
 				fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
 			val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()

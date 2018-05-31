@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.R
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -68,8 +69,8 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.height - 50.uiPX())
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 30
-			waveColor = Spectrum.opacity02White
-			setAnimDuration(12000)
+			waveColor = Color.parseColor("#FF265A80")
+			setAnimDuration(30000)
 			setAmplitudeRatio(50)
 			startAnimation()
 		}.into(this)

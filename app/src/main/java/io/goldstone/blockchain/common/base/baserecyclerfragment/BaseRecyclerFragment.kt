@@ -120,8 +120,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			it.isNull() isTrue {
 				presenter.updateParentContentLayoutHeight()
 			} otherwise {
-				presenter.updateParentContentLayoutHeight(
-					asyncData?.size.orZero(), it.orZero()
+				presenter.updateParentContentLayoutHeight(asyncData?.size.orZero(), it.orZero()
 				)
 			}
 		}
