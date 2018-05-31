@@ -67,8 +67,35 @@ class TransactionDetailPresenter(
 				isReceived,
 				hasError
 			)
-			fragment.asyncData = generateModels(this)
+			
 			currentHash = transactionHash
+			
+			if (symbol != CryptoSymbol.eth && memo.isNull()) {
+				fragment.showLoadingView("Load transaction detail information")
+				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
+					fragment.asyncData = generateModels(this.apply { memo = it })
+					updateHeaderValue(
+						count,
+						targetAddress,
+						symbol,
+						isPending,
+						isReceived,
+						hasError
+					)
+					fragment.removeLoadingView()
+				}
+			} else {
+				fragment.asyncData = generateModels(this)
+				updateHeaderValue(
+					count,
+					targetAddress,
+					symbol,
+					isPending,
+					isReceived,
+					hasError
+				)
+			}
+			
 			if (isPending) {
 				// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
 				observerTransaction()
@@ -434,7 +461,7 @@ class TransactionDetailPresenter(
 			}
 	}
 	
-	// 小函数, 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
+	// 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 	private fun prepareHeaderValueFromNotification(
 		receipt: TransactionTable,
 		transaction: InputCodeData,

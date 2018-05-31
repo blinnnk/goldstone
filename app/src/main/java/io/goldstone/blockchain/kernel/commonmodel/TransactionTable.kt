@@ -13,9 +13,11 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.getMemoFromInputCode
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -73,6 +75,7 @@ data class TransactionTable(
 	var tokenReceiveAddress: String? = null,
 	var isPending: Boolean = false,
 	var logIndex: String = "",
+	var memo: String? = null,
 	var chainID: String = GoldStoneApp.currentChain
 ) {
 	
@@ -120,7 +123,7 @@ data class TransactionTable(
 		data.hasError,
 		data.txreceipt_status,
 		data.input,
-		if(CryptoUtils.isERC20TransferByInputCode(data.input)) data.to else CryptoValue.ethContract,
+		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to else CryptoValue.ethContract,
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
@@ -298,14 +301,9 @@ data class TransactionTable(
 			address: String = WalletTable.current.address,
 			hold: (String) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-			               }) {
+			GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address).let {
 				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
-				hold(
-					(it.maxBy { it.blockNumber }?.blockNumber
-					 ?: "0") + 1
-				)
+				hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
 			}
 		}
 		
@@ -313,12 +311,15 @@ data class TransactionTable(
 			address: String,
 			callback: () -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao().apply {
-					               getTransactionsByAddress(address).forEach { delete(it) }
-				               }
-			               }) {
-				callback()
+			GoldStoneDataBase.database.transactionDao().apply {
+				getTransactionsByAddress(address).forEachOrEnd { item, isEnd ->
+					delete(item)
+					if (isEnd) {
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
 			}
 		}
 		
@@ -336,13 +337,34 @@ data class TransactionTable(
 		fun updateInputCodeByHash(
 			taxHash: String,
 			input: String,
-			callback: () -> Unit = {}
+			callback: () -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				getTransactionByTaxHash(taxHash).let {
 					it.forEachOrEnd { item, isEnd ->
 						update(item.apply { this.input = input })
 						if (isEnd) callback()
+					}
+				}
+			}
+		}
+		
+		fun updateTransactionMemoByHashAndReceiveStatus(
+			hash: String,
+			isReceive: Boolean,
+			callback: (memo: String) -> Unit
+		) {
+			TransactionTable.getTransactionByHashAndReceivedStatus(hash, isReceive) {
+				it?.let {
+					GoldStoneEthCall.apply {
+						getInputCodeByHash(hash) { input ->
+							val memo = getMemoFromInputCode(input)
+							GoldStoneDataBase.database.transactionDao().update(it.apply {
+								this.input = input
+								this.memo = memo
+							})
+							GoldStoneAPI.context.runOnUiThread { callback(memo) }
+						}
 					}
 				}
 			}
@@ -364,10 +386,11 @@ data class TransactionTable(
 			isReceived: Boolean,
 			hold: (TransactionTable?) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.transactionDao()
-					               .getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.transactionDao()
+						.getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
+				}) {
 				hold(it)
 			}
 		}

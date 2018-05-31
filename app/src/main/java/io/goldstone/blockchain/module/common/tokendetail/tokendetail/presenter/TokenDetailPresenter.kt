@@ -34,15 +34,14 @@ import org.jetbrains.anko.runOnUiThread
  * @date 27/03/2018 3:21 PM
  * @author KaySaith
  */
-
 class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
-
+	
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		loadDataFromDatabaseOrElse()
 	}
-
+	
 	override fun updateData() {
 		// 详情页面直接全屏高度
 		setHeightMatchParent {
@@ -51,7 +50,7 @@ class TokenDetailPresenter(
 			prepareTokenDetailData()
 		}
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
@@ -60,7 +59,7 @@ class TokenDetailPresenter(
 		// 详情页面直接全屏高度
 		setHeightMatchParent()
 	}
-
+	
 	fun showAddressSelectionFragment() {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
 			hasBackUpOrElse {
@@ -72,7 +71,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	fun showTransactionDetailFragment(model: TransactionListModel) {
 		val argument = Bundle().apply {
 			putSerializable(ArgumentKey.transactionFromList, model)
@@ -83,7 +82,7 @@ class TokenDetailPresenter(
 			)
 		}
 	}
-
+	
 	fun showDepositFragment() {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
 			hasBackUpOrElse {
@@ -95,7 +94,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun hasBackUpOrElse(callback: () -> Unit) {
 		WalletTable.getCurrentWallet {
 			it?.apply {
@@ -113,7 +112,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse {
@@ -122,7 +121,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
 		TransactionTable.getTransactionsByAddressAndContract(
@@ -138,7 +137,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun TokenDetailFragment.loadDataFromChain() {
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
@@ -159,20 +158,19 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
 		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
 		// 显示内存的数据后异步更新数据
 		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			data.prepareTokenHistoryBalance(token?.symbol!!) {
+			data.prepareTokenHistoryBalance(token?.contract!!) {
 				it.updateChartAndHeaderData()
-
 			}
 		} otherwise {
 			updateEmptyCharData(token?.symbol!!)
 		}
 	}
-
+	
 	private fun updateEmptyCharData(symbol: String) {
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
@@ -186,7 +184,7 @@ class TokenDetailPresenter(
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
 	}
-
+	
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 6
@@ -204,46 +202,49 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-
+	
 	// 计算出 `chartView` Y 轴的最大值
 	private val maxYValue: (ArrayList<Point>) -> Double = {
 		val maxValue = Math.ceil(it.maxBy { it.value }?.value!!.toDouble())
 		if (maxValue > 10) maxValue * 1.5 else maxValue + 5
 	}
-
+	
 	private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
-		symbol: String,
+		contract: String,
 		callback: (ArrayList<TokenBalanceTable>) -> Unit
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
 		TokenBalanceTable.getTodayBalance(
-			WalletTable.current.address, symbol
+			WalletTable.current.address, contract
 		) { todayBalance ->
 			// 计算过去7天的所有余额
 			generateHistoryBalance(todayBalance) { history ->
-				coroutinesTask({
-					history.forEachIndexed { index, data ->
-						TokenBalanceTable.insertOrUpdate(
-							symbol, WalletTable.current.address, data.date,
-							// 插入今日的余额数据
-							if (index == 0) todayBalance else data.balance
-						)
-					}
-				}) {
+				coroutinesTask(
+					{
+						history.forEachIndexed { index, data ->
+							TokenBalanceTable.insertOrUpdate(
+								contract,
+								WalletTable.current.address,
+								data.date,
+								// 插入今日的余额数据
+								if (index == 0) todayBalance else data.balance
+							)
+						}
+					}) {
 					// 更新数据完毕后在主线程从新从数据库获取数据
-					TokenBalanceTable.getBalanceBySymbol(WalletTable.current.address, symbol) {
+					TokenBalanceTable.getBalanceByContract(contract) {
 						callback(it)
 					}
 				}
 			}
 		}
 	}
-
+	
 	data class DateBalance(
 		val date: Long,
 		val balance: Double
 	)
-
+	
 	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,
 		callback: (ArrayList<DateBalance>) -> Unit
@@ -268,13 +269,10 @@ class TokenDetailPresenter(
 					}
 				}
 			}
-
-			override fun mergeCallBack() =
-				callback(balances)
+			
+			override fun mergeCallBack() = callback(balances)
 		}.start()
 	}
-
-	private fun modulusByReceiveStatus(isReceived: Boolean) =
-		if (isReceived) 1 else -1
-
+	
+	private fun modulusByReceiveStatus(isReceived: Boolean) = if (isReceived) 1 else -1
 }

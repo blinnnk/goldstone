@@ -162,8 +162,7 @@ class TransactionListPresenter(
 							chainData = this
 							completeMark()
 						}
-					}
-					doAsync {
+						
 						GoldStoneAPI.getERC20TokenIncomingTransaction(startBlock) {
 							// 把请求回来的数据转换成 `TransactionTable` 格式
 							logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
@@ -205,26 +204,51 @@ class TransactionListPresenter(
 			}
 		}
 		
+		private fun ArrayList<TransactionTable>.getUnkonwTokenInfoByTransactions(callback: () -> Unit) {
+			filter {
+				it.isERC20 && it.symbol.isEmpty()
+			}.distinctBy {
+				it.contractAddress
+			}.apply {
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = size
+					override fun concurrentJobs() {
+						forEach {
+							GoldStoneEthCall.apply {
+								getTokenSymbolAndDecimalByContract(it.contractAddress) { symbol, decimal ->
+									GoldStoneDataBase
+										.database
+										.defaultTokenDao()
+										.insert(DefaultTokenTable(it.contractAddress, symbol, decimal))
+									completeMark()
+								}
+							}
+						}
+					}
+					
+					override fun mergeCallBack() = callback()
+				}.start()
+			}
+		}
+		
 		private fun BaseRecyclerFragment<*, *>.filterCompletedData(
 			data: ArrayList<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			// 把拉取到的数据加工数据格式并插入本地数据库
-			completeTransactionInfo(data) {
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = size
-					override fun concurrentJobs() {
-						forEach { transactionTable ->
-							doAsync {
+			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
+			data.getUnkonwTokenInfoByTransactions {
+				// 把拉取到的数据加工数据格式并插入本地数据库
+				completeTransactionInfo(data) {
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount: Int = size
+						override fun concurrentJobs() {
+							forEach { transactionTable ->
 								if (transactionTable.isERC20) {
-									GoldStoneEthCall
-										.getInputCodeByHash(transactionTable.hash) {
-											GoldStoneDataBase
-												.database
-												.transactionDao()
-												.insert(transactionTable.apply { input = it })
-											completeMark()
-										}
+									GoldStoneDataBase
+										.database
+										.transactionDao()
+										.insert(transactionTable)
+									completeMark()
 								} else {
 									GoldStoneDataBase
 										.database
@@ -234,13 +258,13 @@ class TransactionListPresenter(
 								}
 							}
 						}
-					}
-					
-					override fun mergeCallBack() {
-						hold(map { TransactionListModel(it) }.toArrayList())
-						removeLoadingView()
-					}
-				}.start()
+						
+						override fun mergeCallBack() {
+							hold(map { TransactionListModel(it) }.toArrayList())
+							removeLoadingView()
+						}
+					}.start()
+				}
 			}
 		}
 		
@@ -265,32 +289,37 @@ class TransactionListPresenter(
 							DefaultTokenTable.getTokenByContract(contract) { tokenInfo ->
 								transaction.logIndex.isNotEmpty() isTrue {
 									count = CryptoUtils.toCountByDecimal(
-										transaction.value.toDouble(), tokenInfo?.decimals.orElse(0.0)
+										transaction.value.toDouble(),
+										tokenInfo?.decimals.orElse(0.0)
 									)
 									receiveAddress = transaction.to
 								} otherwise {
 									// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
 									val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
 									count = CryptoUtils.toCountByDecimal(
-										transactionInfo?.count.orElse(0.0), tokenInfo?.decimals.orElse(0.0)
+										transactionInfo?.count.orElse(0.0),
+										tokenInfo?.decimals.orElse(0.0)
 									)
 									receiveAddress = transactionInfo?.address!!
 								}
 								
 								tokenInfo.isNull() isTrue {
 									// 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
-									GoldStoneEthCall
-										.getTokenSymbolAndDecimalByContract(contract) { symbol, decimal ->
-											TransactionTable.updateModelInfoFromChain(
-												transaction, true, symbol, CryptoUtils.toCountByDecimal(
-												transaction.value.toDouble(), decimal
-											).toString(), receiveAddress
-											)
-											completeMark()
-										}
+									TransactionTable.updateModelInfoFromChain(
+										transaction,
+										true,
+										"",
+										transaction.value,
+										receiveAddress
+									)
+									completeMark()
 								} otherwise {
 									TransactionTable.updateModelInfoFromChain(
-										transaction, true, tokenInfo!!.symbol, count.toString(), receiveAddress
+										transaction,
+										true,
+										tokenInfo?.symbol!!,
+										count.toString(),
+										receiveAddress
 									)
 									completeMark()
 								}
