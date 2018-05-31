@@ -50,6 +50,7 @@ class PrivateKeyImportPresenter(
 				callback()
 			}
 		) { passwordValue, walletName ->
+			
 			importWallet(
 				privateKeyInput.text.toString(),
 				passwordValue,
@@ -75,8 +76,10 @@ class PrivateKeyImportPresenter(
 			callback: () -> Unit
 		) {
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
-			val formatPrivateKey = if (privateKey.has0xPrefix()) privateKey.substring(2, privateKey
-				.length) else privateKey
+			val formatPrivateKey = if (privateKey.has0xPrefix()) privateKey.substring(
+				2, privateKey
+				.length
+			) else privateKey
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			val currentPrivateKey =
 				(if (formatPrivateKey.length == 63) "0$formatPrivateKey" else formatPrivateKey)
@@ -90,9 +93,7 @@ class PrivateKeyImportPresenter(
 				return
 			}
 			// 解析私钥并导入钱包
-			fragment.context?.getWalletByPrivateKey(
-				currentPrivateKey, password
-			) { address ->
+			fragment.context?.getWalletByPrivateKey(currentPrivateKey, password) { address ->
 				address?.let {
 					WalletImportPresenter.insertWalletToDatabase(
 						fragment,

@@ -267,8 +267,8 @@ object GoldStoneAPI {
 	private val client =
 		OkHttpClient
 			.Builder()
-			.connectTimeout(60, TimeUnit.SECONDS)
-			.readTimeout(90, TimeUnit.SECONDS)
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(60, TimeUnit.SECONDS)
 			.build()
 	
 	private inline fun <reified T> postRequestGetJsonObject(
@@ -280,10 +280,7 @@ object GoldStoneAPI {
 	) {
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
-				) {
+				override fun onFailure(call: Call, error: IOException) {
 					errorCallback()
 					LogUtil.error(path, error)
 				}

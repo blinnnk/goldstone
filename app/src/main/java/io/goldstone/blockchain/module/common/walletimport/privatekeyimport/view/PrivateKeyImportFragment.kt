@@ -83,8 +83,12 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
-						privateKeyInput, passwordInput, repeatPassword, agreementView.radioButton.isChecked,
-						nameInput, passwordHintInput
+						privateKeyInput,
+						passwordInput,
+						repeatPassword,
+						agreementView.radioButton.isChecked,
+						nameInput,
+						passwordHintInput
 					) {
 						it.showLoadingStatus(false)
 					}
