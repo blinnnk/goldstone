@@ -124,27 +124,13 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun getTokenBySymbol(
-			symbol: String,
-			hold: (DefaultTokenTable) -> Unit
-		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao()
-						.getTokenBySymbol(symbol)
-				}) {
-				hold(it)
-			}
-		}
-		
-		fun getTokenByContractAddress(
-			contractAddress: String,
+		fun getTokenByContract(
+			contract: String,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.defaultTokenDao()
-						.getTokenByContract(contractAddress)
+					GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract)
 				}) {
 				hold(it)
 			}
@@ -182,19 +168,6 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun getContractAddressBySymbol(
-			symbol: String,
-			hold: (String) -> Unit
-		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao()
-						.getTokenBySymbol(symbol)
-				}) {
-				hold(it.contract)
-			}
-		}
-		
 		fun insertToken(
 			token: DefaultTokenTable,
 			callback: () -> Unit
@@ -215,9 +188,6 @@ interface DefaultTokenDao {
 	
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault")
 	fun getDefaultTokens(isDefault: Boolean = true): List<DefaultTokenTable>
-	
-	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol")
-	fun getTokenBySymbol(symbol: String): DefaultTokenTable
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContract(contract: String): DefaultTokenTable?

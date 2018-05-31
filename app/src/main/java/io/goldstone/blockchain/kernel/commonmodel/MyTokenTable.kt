@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -52,14 +49,14 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun deleteBySymbol(
-			symbol: String,
-			address: String,
+		fun deleteByContract(
+			contract: String,
+			address: String = WalletTable.current.address,
 			callback: () -> Unit = {}
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(symbol, address).let {
+					getTokenByContractAndAddress(contract, address).let {
 						it.isNull().isFalse {
 							delete(it)
 						}
@@ -85,76 +82,71 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun insertBySymbol(
+		fun insertBySymbolAndContract(
 			symbol: String,
-			ownerAddress: String,
-			callback: () -> Unit = {}
+			contract: String,
+			ownerAddress: String = WalletTable.current.address,
+			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.apply {
-						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-						myTokenDao().getTokensBy(ownerAddress).find { it.symbol == symbol }.isNull() isTrue {
-							getBalanceAndInsertWithSymbol(
-								symbol, ownerAddress
-							)
+			doAsync {
+				GoldStoneDataBase.database.apply {
+					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+					myTokenDao().getTokensBy(ownerAddress).find {
+						it.contract == contract
+					}.isNull() isTrue {
+						getBalanceAndInsertWithSymbolAndContract(symbol, contract, ownerAddress) {
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
 						}
 					}
-				}) {
-				callback()
+				}
 			}
 		}
 		
-		private fun getBalanceAndInsertWithSymbol(
+		private fun getBalanceAndInsertWithSymbolAndContract(
 			symbol: String,
+			contract: String,
 			ownerAddress: String,
-			callback: (balance: Double) -> Unit = {}
+			callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (symbol == CryptoSymbol.eth) {
 				GoldStoneEthCall.getEthBalance(ownerAddress) {
 					insert(
-						MyTokenTable(
-							0, ownerAddress, symbol, it, CryptoValue.ethContract
-						)
+						MyTokenTable(0, ownerAddress, symbol, it, CryptoValue.ethContract)
 					)
 					callback(it)
 				}
 			} else {
-				DefaultTokenTable.getTokenBySymbol(symbol) { token ->
-					GoldStoneEthCall.getTokenBalanceWithContract(
-						token.contract, ownerAddress
-					) {
-						insert(
-							MyTokenTable(
-								0, ownerAddress, symbol, it, token.contract
-							)
-						)
-						callback(it)
-					}
+				GoldStoneEthCall.getTokenBalanceWithContract(
+					contract, ownerAddress
+				) {
+					insert(MyTokenTable(0, ownerAddress, symbol, it, contract))
+					callback(it)
 				}
 			}
 		}
 		
-		fun getBalanceWithSymbol(
-			symbol: String,
+		fun getBalanceWithContract(
+			contract: String,
 			ownerAddress: String,
 			convertByDecimal: Boolean = false,
 			callback: (balance: Double) -> Unit = {}
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-			if (symbol == CryptoSymbol.eth) {
+			if (contract == CryptoValue.ethContract) {
 				GoldStoneEthCall.getEthBalance(ownerAddress) {
 					val balance = if (convertByDecimal) it.toEthCount() else it
 					callback(balance)
 				}
 			} else {
-				DefaultTokenTable.getTokenBySymbol(symbol) { token ->
+				DefaultTokenTable.getTokenByContract(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
-						token.contract, ownerAddress
+						token?.contract.orEmpty(), ownerAddress
 					) {
 						val balance = if (convertByDecimal) CryptoUtils.toCountByDecimal(
-							it, token.decimals
+							it, token?.decimals.orElse(0.0)
 						) else it
 						callback(balance)
 					}
@@ -162,13 +154,13 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun updateCurrentWalletBalanceWithSymbol(
+		fun updateCurrentWalletBalanceWithContract(
 			balance: Double,
-			symbol: String
+			contract: String
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenBySymbolAndAddress(symbol, WalletTable.current.address).let {
+					getTokenByContractAndAddress(contract, WalletTable.current.address).let {
 						update(it.apply { this.balance = balance })
 					}
 				}
@@ -180,9 +172,9 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 	
-	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
-	fun getTokenBySymbolAndAddress(
-		symbol: String,
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	fun getTokenByContractAndAddress(
+		contract: String,
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain
 	): MyTokenTable
@@ -192,9 +184,6 @@ interface MyTokenDao {
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain
 	): List<MyTokenTable>
-	
-	@Query("SELECT * FROM myTokens WHERE symbol LIKE :symbol AND chainID Like :chainID ")
-	fun getTokenBySymbol(symbol: String, chainID: String = GoldStoneApp.currentChain): MyTokenTable
 	
 	@Insert
 	fun insert(token: MyTokenTable)

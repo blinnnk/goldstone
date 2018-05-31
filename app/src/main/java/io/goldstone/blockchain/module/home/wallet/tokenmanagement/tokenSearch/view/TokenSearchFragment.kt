@@ -38,7 +38,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		}
 		
 		model?.let {
-			DefaultTokenTable.getTokenByContractAddress(it.contract) { localToken ->
+			DefaultTokenTable.getTokenByContract(it.contract) { localToken ->
 				localToken.isNotNull {
 					DefaultTokenTable.updateTokenDefaultStatus(it.contract, switch.isChecked) {
 						insertToMyToken(switch, it)
@@ -57,7 +57,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, model.symbol)
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, model.symbol, model.contract)
 			}
 		}
 	}

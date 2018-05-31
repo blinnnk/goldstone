@@ -87,39 +87,24 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout? = null
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
-		// 服务器不返回数据或格式错误的时候显示空线图
-		if (chartData.size <= 1) {
-			chartData = arrayListOf(
-				ChartPoint("", 0f),
-				ChartPoint("", 0f)
-			)
-		}
-		
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
-			setGrid(5, 7,
-			        Paint().apply {
-				        isAntiAlias = true
-				        style = Paint.Style.FILL; color = GrayScale.lightGray
-			        })
+			setGrid(5, 7, Paint().apply {
+				isAntiAlias = true
+				style = Paint.Style.FILL; color = GrayScale.lightGray
+			})
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
-			val maxValue =
-				chartData.max()?.value
-				?: 0f
-			val minValue =
-				chartData.min()?.value
-				?: 0f
+			val maxValue = chartData.max()?.value ?: 0f
+			val minValue = chartData.min()?.value ?: 0f
 			// 设定 `Y` 周波段
 			val stepDistance = generateStepDistance(
 				minValue.toDouble(), maxValue.toDouble()
 			)
 			val max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
 			val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
-			setAxisBorderValues(
-				min, max, stepDistance
-			)
+			setAxisBorderValues(min, max, stepDistance)
 			// 设定外界 `Border` 颜色
 			setAxisColor(Color.argb(0, 0, 0, 0))
 			// 设定外边的 `Border` 的粗细
@@ -154,12 +139,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			try {
 				notifyDataUpdate()
+				show()
 			} catch (error: Exception) {
 				LogUtil.error(this.javaClass.simpleName, error)
 			}
-			
-			setClickablePointRadius(30.uiPX().toFloat())
-			show()
 		}
 	}
 	
@@ -182,6 +165,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			chartView.apply {
 				id = ElementID.chartView
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+				setClickablePointRadius(30.uiPX().toFloat())
 				setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
 				y = 60.uiPX().toFloat()
 			}.into(this)

@@ -36,7 +36,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	}
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
-	private val logoSize = 175.uiPX()
+	private val logoSize = 160.uiPX()
 	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {

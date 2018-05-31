@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -59,8 +60,8 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	private var symbolPrice: Double = 0.0
 	private fun prepareSymbolPrice() {
 		getParentFragment<TokenDetailOverlayFragment> {
-			DefaultTokenTable.getTokenBySymbol(token?.symbol!!) {
-				symbolPrice = it.price
+			DefaultTokenTable.getTokenByContract(token?.contract!!) {
+				symbolPrice = it?.price.orElse(0.0)
 			}
 		}
 	}

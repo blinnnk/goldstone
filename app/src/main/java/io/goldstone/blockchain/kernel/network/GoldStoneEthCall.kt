@@ -220,7 +220,8 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
+			contentType,
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -246,7 +247,8 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}")
+			contentType,
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}")
 		).let {
 			callEthBy(it) { holdValue(it.toAscii()) }
 		}
@@ -256,7 +258,10 @@ object GoldStoneEthCall {
 		address: String,
 		holdValue: (Double) -> Unit = {}
 	) {
-		RequestBody.create(contentType, AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}")).let {
+		RequestBody.create(
+			contentType,
+			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}")
+		).let {
 			callEthBy(it) {
 				holdValue(it.hexToDecimal())
 			}
@@ -299,10 +304,7 @@ object GoldStoneEthCall {
 		
 		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.currentChain)) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
-				) {
+				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(this.javaClass.simpleName, error)
 				}
 				
@@ -312,6 +314,7 @@ object GoldStoneEthCall {
 					response: Response
 				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					LogUtil.error("callEthBy data: $data")
 					try {
 						val dataObject =
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))

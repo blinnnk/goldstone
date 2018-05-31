@@ -34,7 +34,6 @@ class MnemonicImportDetailPresenter(
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
-		
 		if (pathInput.text.isNotEmpty() && !isVaildPath(pathInput.text.toString())) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			callback()
@@ -89,7 +88,9 @@ class MnemonicImportDetailPresenter(
 		callback: () -> Unit
 	) {
 		fragment.context?.getWalletByMnemonic(
-			mnemonic, pathValue, password
+			mnemonic,
+			pathValue,
+			password
 		) { address ->
 			address?.let {
 				WalletImportPresenter.insertWalletToDatabase(
