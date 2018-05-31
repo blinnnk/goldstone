@@ -267,8 +267,8 @@ object GoldStoneAPI {
 	private val client =
 		OkHttpClient
 			.Builder()
-			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(60, TimeUnit.SECONDS)
+			.connectTimeout(60, TimeUnit.SECONDS)
+			.readTimeout(80, TimeUnit.SECONDS)
 			.build()
 	
 	private inline fun <reified T> postRequestGetJsonObject(
