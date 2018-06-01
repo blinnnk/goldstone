@@ -168,7 +168,6 @@ object GoldStoneEthCall {
 		data: String,
 		holdValue: (BigInteger) -> Unit = {}
 	) {
-		System.out.println("to$to+from$from+$data")
 		RequestBody.create(
 			contentType, AesCrypto.encrypt(
 			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetEstimateGas.method}\",  \"params\":[{\"to\": \"$to\", \"from\": \"$from\", \"data\": \"$data\"}],\"id\":1}"
@@ -315,7 +314,6 @@ object GoldStoneEthCall {
 					response: Response
 				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
-					System.out.println("_____$data")
 					try {
 						val dataObject =
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))

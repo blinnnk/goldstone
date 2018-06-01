@@ -10,6 +10,7 @@ import com.db.chart.model.Point
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -85,7 +86,7 @@ class MarketTokenDetailPresenter(
 						(0 until jsonArray.length()).map {
 							ChartModel(JSONObject(jsonArray[it]?.toString()))
 						}.toArrayList().let {
-							val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLong().orElse(0)
+							val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLongOrNull().orElse(0)
 							/** 校验数据库的数据时间是否有效，是否需要更新 */
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
 								isTrue {
@@ -148,15 +149,17 @@ class MarketTokenDetailPresenter(
 		fragment.context?.apply {
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
-				chartData = data.sortedBy { it.timestamp }.map {
-					Point(
-						DateUtils.formatDateTime(
-							this,
-							it.timestamp.toLongOrNull().orElse(0),
-							dateType
-						), it.price.toFloat()
-					)
-				}.toArrayList()
+				// 服务器抓取的数据返回有一定概率返回错误格式数据
+				chartData = try {
+					data.sortedBy { it.timestamp.toLongOrNull().orElse(0) }.map {
+						// 服务器抓取数据这里很容易返回格式不正确的数据, 使用 `try catch` 捕捉
+						val date = DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType)
+						Point(date, it.price.toFloat())
+					}.toArrayList()
+				} catch (error: Exception) {
+					LogUtil.error("updateChartUI", error)
+					return@runOnUiThread
+				}
 			}
 		}
 	}
