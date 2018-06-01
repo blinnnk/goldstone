@@ -50,9 +50,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	var asyncData: ArrayList<D>? by observing(null) {
 		recyclerView.adapter.apply {
 			isNull() isTrue {
-				setRecyclerViewAdapter(
-					recyclerView, asyncData
-				)
+				setRecyclerViewAdapter(recyclerView, asyncData)
 			} otherwise {
 				notifyDataSetChanged()
 			}

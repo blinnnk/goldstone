@@ -1,11 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
 import com.blinnnk.component.HoneyBaseSwitch
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
@@ -14,17 +18,24 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
+var memoryTokenData: ArrayList<DefaultTokenTable>? = null
+
 class TokenManagementListPresenter(
 	override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 	
 	override fun updateData() {
-		prepareMyDefaultTokens()
+		// 首先显示内存中的数据
+		if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
+		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
+		fragment.getParentFragment<TokenManagementFragment> {
+			afterSetHeightAnimation = Runnable { prepareMyDefaultTokens() }
+		}
 	}
 	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
-		updateData()
+		prepareMyDefaultTokens()
 	}
 	
 	private fun prepareMyDefaultTokens() {
@@ -44,8 +55,12 @@ class TokenManagementListPresenter(
 				
 				override fun mergeCallBack() {
 					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
-					if (fragment.asyncData.isNull()) fragment.asyncData = sortedList
-					else diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(sortedList)
+					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
+						memoryTokenData = sortedList
+						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
+					} else {
+						return
+					}
 				}
 			}.start()
 		}

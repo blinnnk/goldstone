@@ -8,10 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.getRealScreenHeight
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
@@ -70,6 +68,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	}
 	
 	open fun setContentHeight(): Int = minHeight
+	var afterSetHeightAnimation: Runnable? = null
 	
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
@@ -90,7 +89,9 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			overlayView.apply {
 				val maxHeight = context?.getRealScreenHeight().orZero()
 				/** 执行伸展动画 */
-				contentLayout.updateHeightAnimation(setContentHeight(), maxHeight, 0)
+				contentLayout.updateHeightAnimation(setContentHeight(), maxHeight, 0) {
+					AnimationDuration.Default timeUpThen { afterSetHeightAnimation?.run() }
+				}
 				/** 设置悬浮曾的 `Header` 初始状态 */
 				header.apply {
 					showBackButton(hasBackButton)
