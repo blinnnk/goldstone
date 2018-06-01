@@ -40,7 +40,7 @@ class KeystoreImportPresenter(
 						password.text.toString(),
 						DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
 					)?.let {
-						val walletName = 
+						val walletName =
 							if (nameInput.text.isEmpty()) "Wallet"
 							else nameInput.text.toString()
 						PrivateKeyImportPresenter.importWallet(
