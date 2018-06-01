@@ -69,7 +69,14 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setBlueStyle()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 			}.click {
-				presenter.updatePassword(oldPassword, newPassword, repeatPassword)
+				it.showLoadingStatus()
+				presenter.updatePassword(
+					oldPassword,
+					newPassword,
+					repeatPassword
+				) {
+					it.showLoadingStatus(false)
+				}
 			}.into(this)
 		}
 	}

@@ -24,7 +24,6 @@ class TokenManagementFragment : BaseOverlayFragment<TokenManagementPresenter>() 
 	override fun setContentHeight(): Int {
 		// 这个界面采用侵入式体验一直全屏
 		getMainActivity()?.hideHomeFragment()
-		overlayView.setRoundCorner(false)
 		return context?.getRealScreenHeight().orZero()
 	}
 }

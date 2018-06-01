@@ -152,7 +152,7 @@ class MarketTokenDetailPresenter(
 					Point(
 						DateUtils.formatDateTime(
 							this,
-							it.timestamp.toLong(),
+							it.timestamp.toLongOrNull().orElse(0),
 							dateType
 						), it.price.toFloat()
 					)

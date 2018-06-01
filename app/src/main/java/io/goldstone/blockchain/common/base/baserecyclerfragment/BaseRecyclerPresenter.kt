@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.support.v7.widget.RecyclerView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
@@ -13,74 +11,67 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
 
 /**
  * @date 23/03/2018 3:46 PM
  * @author KaySaith
  */
-
 abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPresenter<T, D>, D>, D> {
-
+	
 	abstract val fragment: T
-
+	
 	open fun updateData() {
 		// Do Something
 	}
-
+	
 	open fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
-
 	}
-
+	
 	/**
 	 * @description
 	 * 在依赖的 `Fragment` 的对应的生命周期提供的依赖方法
 	 * @param
 	 * [fragment] 这个就是依赖的 `Fragment` 实体
 	 * */
-
 	open fun onFragmentAttach() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentCreate() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentCreateView() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentDetach() {
 		fragment.getMainActivity()?.showHomeFragment()
 	}
-
+	
 	open fun onFragmentDestroy() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentViewCreated() {
 		// 当 `ViewCreated`后执行更新数据函数
 		updateData()
 	}
-
+	
 	open fun onFragmentShowFromHidden() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentResume() {
-
 	}
-
+	
 	open fun onFragmentHiddenChanged(isHidden: Boolean) {
-
 	}
-
+	
 	/** 获取依赖的 `Adapter` */
 	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
 		fragment.recyclerView.adapter as? T
-
+	
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(
 		newData: ArrayList<D>
@@ -103,7 +94,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-
+	
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapter<D, *>> diffAndUpdateSingleCellAdapterData(newData: ArrayList<D>) {
 		getAdapter<T>()?.apply {
@@ -124,7 +115,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-
+	
 	fun diffDataSetChanged(
 		oldData: ArrayList<D>,
 		newData: ArrayList<D>,
@@ -132,7 +123,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	) {
 		hold(oldData.getObjectMD5HexString() == newData.getObjectMD5HexString())
 	}
-
+	
 	/**
 	 * @description
 	 * 这个方法会在 [BaseRecyclerFragment] 中根据 `setSlideUpWithCellHeight` 的设定
@@ -150,7 +141,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			else -> BasicSize.overlayMinHeight
 		}
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight) {
+			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight, 0) {
 				if (targetHeight >= maxHeight) {
 					fragment.getMainActivity()?.hideHomeFragment()
 				} else {
@@ -159,7 +150,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-
+	
 	fun setHeightMatchParent(callback: () -> Unit = {}) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero()) {
@@ -168,8 +159,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-
-
+	
 	open fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			if (setContentHeight() >= context?.getRealScreenHeight().orZero()) return
@@ -181,7 +171,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 				recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
 				else -> BasicSize.overlayMinHeight
 			}
-			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight) {
+			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight, 0) {
 				if (realHeight >= maxHeight) {
 					fragment.getMainActivity()?.hideHomeFragment()
 				} else {
@@ -190,5 +180,4 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-
 }

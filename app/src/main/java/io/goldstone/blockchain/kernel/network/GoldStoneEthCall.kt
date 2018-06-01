@@ -71,7 +71,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		walletAddress: String
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenName(contractAddress) { name ->
 				getTokenDecimal(contractAddress) { decimal ->
 					getTokenTotalSupply(contractAddress) { totalSupply ->
@@ -90,7 +90,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		hold: (symbol: String, name: String, decimal: Double) -> Unit
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenName(contractAddress) { name ->
 				getTokenDecimal(contractAddress) { decimal ->
 					hold(symbol, name, decimal)
@@ -104,7 +104,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		hold: (symbol: String, decimal: Double) -> Unit
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenDecimal(contractAddress) { decimal ->
 				hold(symbol, decimal)
 			}
@@ -168,6 +168,7 @@ object GoldStoneEthCall {
 		data: String,
 		holdValue: (BigInteger) -> Unit = {}
 	) {
+		System.out.println("to$to+from$from+$data")
 		RequestBody.create(
 			contentType, AesCrypto.encrypt(
 			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetEstimateGas.method}\",  \"params\":[{\"to\": \"$to\", \"from\": \"$from\", \"data\": \"$data\"}],\"id\":1}"
@@ -215,7 +216,7 @@ object GoldStoneEthCall {
 	}
 	
 	@JvmStatic
-	fun getTokenSymbol(
+	fun getTokenSymbolByContract(
 		contractAddress: String,
 		holdValue: (String) -> Unit = {}
 	) {
@@ -314,6 +315,7 @@ object GoldStoneEthCall {
 					response: Response
 				) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					System.out.println("_____$data")
 					try {
 						val dataObject =
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
