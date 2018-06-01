@@ -210,6 +210,7 @@ class TransactionListPresenter(
 			}.distinctBy {
 				it.contractAddress
 			}.apply {
+				if (isEmpty()) callback()
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount = size
 					override fun concurrentJobs() {

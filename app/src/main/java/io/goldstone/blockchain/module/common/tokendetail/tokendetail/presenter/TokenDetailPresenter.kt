@@ -76,11 +76,12 @@ class TokenDetailPresenter(
 		val argument = Bundle().apply {
 			putSerializable(ArgumentKey.transactionFromList, model)
 		}
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<TransactionDetailFragment>(
+		fragment
+			.getParentFragment<TokenDetailOverlayFragment>()
+			?.presenter
+			?.showTargetFragment<TransactionDetailFragment>(
 				TransactionText.detail, TokenDetailText.tokenDetail, argument
 			)
-		}
 	}
 	
 	fun showDepositFragment() {

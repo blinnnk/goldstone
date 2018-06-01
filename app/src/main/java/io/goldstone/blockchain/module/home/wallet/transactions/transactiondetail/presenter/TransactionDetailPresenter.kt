@@ -70,7 +70,7 @@ class TransactionDetailPresenter(
 			
 			currentHash = transactionHash
 			
-			if (symbol != CryptoSymbol.eth && memo.isNull()) {
+			if (memo.isEmpty()) {
 				fragment.showLoadingView("Load transaction detail information")
 				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
 					fragment.asyncData = generateModels(this.apply { memo = it })

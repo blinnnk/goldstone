@@ -5,6 +5,7 @@ import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
@@ -75,7 +76,7 @@ data class TransactionTable(
 	var tokenReceiveAddress: String? = null,
 	var isPending: Boolean = false,
 	var logIndex: String = "",
-	var memo: String? = null,
+	var memo: String = "",
 	var chainID: String = GoldStoneApp.currentChain
 ) {
 	
@@ -307,19 +308,19 @@ data class TransactionTable(
 			}
 		}
 		
-		fun deleteByAddress(
-			address: String,
-			callback: () -> Unit
-		) {
+		fun deleteByAddress(address: String, callback: () -> Unit) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionsByAddress(address).forEachOrEnd { item, isEnd ->
-					delete(item)
-					if (isEnd) {
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+				val data = getAllTransactionsByAddress(address)
+				if (data.isEmpty()) {
+					GoldStoneAPI.context.runOnUiThread { callback() }
 				}
+				object : ConcurrentCombine() {
+					override var asyncCount: Int = data.size
+					override fun concurrentJobs() {
+						data.forEach { delete(it) }
+					}
+					override fun mergeCallBack() = callback()
+				}.start()
 			}
 		}
 		
@@ -405,6 +406,11 @@ interface TransactionDao {
 	)
 	fun getTransactionsByAddress(walletAddress: String, chainID: String = GoldStoneApp.currentChain):
 		List<TransactionTable>
+	
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
+	)
+	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
 	fun getTransactionByTaxHash(taxHash: String, chainID: String = GoldStoneApp.currentChain):

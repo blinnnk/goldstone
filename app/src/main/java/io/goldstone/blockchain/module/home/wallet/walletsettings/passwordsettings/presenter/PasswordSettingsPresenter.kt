@@ -21,19 +21,27 @@ class PasswordSettingsPresenter(
 ) : BasePresenter<PasswordSettingsFragment>() {
 
 	fun updatePassword(
-		oldPasswordInput: EditText, newPasswordInput: EditText, repeatPasswordInput: EditText
+		oldPasswordInput: EditText,
+		newPasswordInput: EditText,
+		repeatPasswordInput: EditText,
+		callback: () -> Unit
 	) {
 		CreateWalletPresenter.checkInputValue(
 			"",
 			newPasswordInput.text.toString(),
 			repeatPasswordInput.text.toString(),
 			true,
-			fragment.context
+			fragment.context,
+			{
+				// failed callback
+				callback()
+			}
 		) { password, _ ->
 			fragment.context?.updatePassword(
 				WalletTable.current.address, oldPasswordInput.text.toString(), password
 			) {
 				fragment.toast(CommonText.succeed)
+				callback()
 				fragment.getParentFragment<WalletSettingsFragment> {
 					presenter.showTargetFragmentByTitle(WalletSettingsText.walletSettings)
 				}

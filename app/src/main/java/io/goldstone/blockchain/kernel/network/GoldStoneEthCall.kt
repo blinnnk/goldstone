@@ -71,7 +71,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		walletAddress: String
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenName(contractAddress) { name ->
 				getTokenDecimal(contractAddress) { decimal ->
 					getTokenTotalSupply(contractAddress) { totalSupply ->
@@ -90,7 +90,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		hold: (symbol: String, name: String, decimal: Double) -> Unit
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenName(contractAddress) { name ->
 				getTokenDecimal(contractAddress) { decimal ->
 					hold(symbol, name, decimal)
@@ -104,7 +104,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		hold: (symbol: String, decimal: Double) -> Unit
 	) {
-		getTokenSymbol(contractAddress) { symbol ->
+		getTokenSymbolByContract(contractAddress) { symbol ->
 			getTokenDecimal(contractAddress) { decimal ->
 				hold(symbol, decimal)
 			}
@@ -215,7 +215,7 @@ object GoldStoneEthCall {
 	}
 	
 	@JvmStatic
-	fun getTokenSymbol(
+	fun getTokenSymbolByContract(
 		contractAddress: String,
 		holdValue: (String) -> Unit = {}
 	) {

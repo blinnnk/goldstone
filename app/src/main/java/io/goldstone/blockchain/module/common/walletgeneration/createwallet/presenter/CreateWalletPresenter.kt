@@ -65,7 +65,12 @@ class CreateWalletPresenter(
 		callback: () -> Unit
 	) {
 		checkInputValue(
-			nameText, passwordText, repeatPasswordText, isAgree, fragment.context, callback
+			nameText,
+			passwordText,
+			repeatPasswordText,
+			isAgree,
+			fragment.context,
+			callback
 		) { password, walletName ->
 			fragment.context?.generateWalletWith(
 				password, walletName, hintInput.text?.toString(), callback
@@ -239,9 +244,7 @@ class CreateWalletPresenter(
 				override fun concurrentJobs() {
 					forEach {
 						ChainID.getAllChainID().forEach { chainID ->
-							MyTokenTable.insert(
-								MyTokenTable(0, address, it.symbol, 0.0, it.contract, chainID)
-							)
+							MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0, it.contract, chainID))
 						}
 						completeMark()
 					}

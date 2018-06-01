@@ -27,7 +27,7 @@ data class TransactionListModel(
 	val targetAddress: String,
 	val blockNumber: String,
 	val transactionHash: String,
-	var memo: String?,
+	var memo: String,
 	val minerFee: String,
 	val url: String,
 	val isPending: Boolean,

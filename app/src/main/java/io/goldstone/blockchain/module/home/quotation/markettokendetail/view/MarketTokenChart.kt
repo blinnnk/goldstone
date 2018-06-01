@@ -31,11 +31,6 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 	private var chartColor = Spectrum.lightGreen
 	var chartData: ArrayList<Point> by observing(arrayListOf()) {
 
-		if (chartData.size <= 1) {
-			// 数据返回不对的时候, 增加 `0` 数据
-			chartData.add(Point("", 0f))
-		}
-
 		data.isNotEmpty() isTrue {
 			data.clear()
 		}

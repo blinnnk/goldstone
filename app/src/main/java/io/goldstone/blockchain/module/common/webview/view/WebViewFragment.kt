@@ -9,16 +9,14 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
-import com.blinnnk.animation.updateHeightAnimation
+import android.widget.RelativeLayout
 import com.blinnnk.extension.getRealScreenHeight
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
@@ -43,6 +41,8 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	@SuppressLint("SetJavaScriptEnabled")
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+			backgroundColor = Spectrum.white
 			loading.apply {
 				indeterminateDrawable.setColorFilter(
 					HoneyColor.Red, android.graphics.PorterDuff.Mode.MULTIPLY
@@ -71,17 +71,12 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			}
 			// 如果长时间没加载到 最长 `8s` 超时删除 `loading`
 			8000L timeUpThen {
-				context?.apply { removeView(loading) }
+				context?.apply {
+					removeView(loading)
+				}
 			}
 		}
-		setWebFragmentHeight()
-	}
-	
-	private fun setWebFragmentHeight() {
-		// 需要添加到 `BaseOverlayFragment` 下面
-		getParentFragment<BaseOverlayFragment<*>>()?.apply {
-			overlayView.contentLayout.updateHeightAnimation(activity?.getRealScreenHeight().orZero())
-		}
+		presenter.updateHeight(context?.getRealScreenHeight().orZero())
 	}
 	
 	override fun onViewCreated(
@@ -111,25 +106,21 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			is TransactionFragment -> {
 				parent.headerTitle = TransactionText.detail
 				parent.presenter.popFragmentFrom<WebViewFragment>()
-				setWebFragmentHeight()
 			}
 			
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
 				parent.presenter.popFragmentFrom<WebViewFragment>()
-				setWebFragmentHeight()
 			}
 			
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<WebViewFragment>()
-				setWebFragmentHeight()
 			}
 			
 			is WalletGenerationFragment -> {
 				parent.headerTitle = CreateWalletText.create
 				parent.presenter.popFragmentFrom<WebViewFragment>()
-				setWebFragmentHeight()
 			}
 			
 			is ProfileOverlayFragment -> {

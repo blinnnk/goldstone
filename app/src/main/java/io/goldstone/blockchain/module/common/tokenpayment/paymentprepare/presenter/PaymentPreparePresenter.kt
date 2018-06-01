@@ -25,18 +25,17 @@ import java.math.BigInteger
  * @date 2018/5/15 10:19 PM
  * @author KaySaith
  */
-
 class PaymentPreparePresenter(
 	override val fragment: PaymentPrepareFragment
 ) : BasePresenter<PaymentPrepareFragment>() {
-
+	
 	private var currentToken: WalletDetailCellModel? = null
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		setSymbol()
 	}
-
+	
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
@@ -45,8 +44,10 @@ class PaymentPreparePresenter(
 		} else {
 			getPaymentPrepareModel(count, fragment.getMemoContent()) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-					presenter.showTargetFragment<GasSelectionFragment>(TokenDetailText.customGas,
-						TokenDetailText.paymentValue, Bundle().apply {
+					presenter.showTargetFragment<GasSelectionFragment>(
+						TokenDetailText.customGas,
+						TokenDetailText.paymentValue,
+						Bundle().apply {
 							putSerializable(ArgumentKey.gasPrepareModel, model)
 						})
 					callback()
@@ -54,7 +55,7 @@ class PaymentPreparePresenter(
 			}
 		}
 	}
-
+	
 	/**
 	 * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommond` 的 `RawTransaction`
 	 */
@@ -67,7 +68,7 @@ class PaymentPreparePresenter(
 			generateTransaction(fragment.address!!, value, memo, it, hold)
 		}
 	}
-
+	
 	private fun generateTransaction(
 		toAddress: String,
 		value: Double,
@@ -81,7 +82,7 @@ class PaymentPreparePresenter(
 		// `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
 		if (currentToken?.symbol == CryptoSymbol.eth) {
 			to = toAddress
-			data = if (memo.isEmpty()) "" else memo.toHexCode() // Memo
+			data = if (memo.isEmpty()) "0x" else "0x" + memo.toHexCode() // Memo
 			countWithDecimal = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
 		} else {
 			to = currentToken!!.contract
@@ -92,7 +93,6 @@ class PaymentPreparePresenter(
 				countWithDecimal.toDataString() + // 数量
 				if (memo.isEmpty()) "" else memo.toHexCode() // Memo
 		}
-
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to, WalletTable.current.address, data
 		) { limit ->
@@ -104,7 +104,7 @@ class PaymentPreparePresenter(
 			)
 		}
 	}
-
+	
 	private fun setSymbol() {
 		fragment.getParentFragment<TokenDetailOverlayFragment> {
 			currentToken = token
@@ -114,7 +114,7 @@ class PaymentPreparePresenter(
 			)
 		}
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<TokenDetailOverlayFragment> {
 			overlayView.header.backButton.onClick {
@@ -122,12 +122,11 @@ class PaymentPreparePresenter(
 			}
 		}
 	}
-
+	
 	fun backEvent(fragment: TokenDetailOverlayFragment) {
 		fragment.apply {
 			headerTitle = TokenDetailText.address
 			presenter.popFragmentFrom<PaymentPrepareFragment>()
 		}
 	}
-
 }

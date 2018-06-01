@@ -78,7 +78,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokensBy(address).forEachOrEnd { item, isEnd ->
+					getAllTokensBy(address).forEachOrEnd { item, isEnd ->
 						delete(item)
 						if (isEnd) {
 							GoldStoneAPI.context.runOnUiThread { callback() }
@@ -187,6 +187,11 @@ interface MyTokenDao {
 	fun getTokensBy(
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain
+	): List<MyTokenTable>
+	
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
+	fun getAllTokensBy(
+		walletAddress: String
 	): List<MyTokenTable>
 	
 	@Insert
