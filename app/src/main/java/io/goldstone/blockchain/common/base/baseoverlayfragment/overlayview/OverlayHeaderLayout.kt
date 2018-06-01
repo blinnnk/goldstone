@@ -31,11 +31,9 @@ import org.jetbrains.anko.*
  * @date 22/03/2018 2:37 AM
  * @author KaySaith
  */
-
 class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
-
+	
 	var title: TextView
-
 	val closeButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.closeButton
@@ -43,7 +41,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setRightPosition()
 		}
 	}
-
 	val backButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.backButton
@@ -51,7 +48,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
-
 	private val addButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.addButton
@@ -59,7 +55,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
-
 	private val searchButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.searchButton
@@ -67,7 +62,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
-
 	private val scanButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.scanButton
@@ -75,20 +69,17 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setRightPosition()
 		}
 	}
-
 	private val searchInput by lazy {
 		EditTextWithButton(context)
 	}
-
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
-
+	
 	init {
-
 		setWillNotDraw(false)
-
+		
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, headerHeight)
-
+		
 		title = textView {
 			textColor = GrayScale.black
 			textSize = fontSize(15)
@@ -96,13 +87,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = RelativeLayout.LayoutParams(matchParent, headerHeight)
 		}
-
+		
 		paint.color = GrayScale.lightGray
 		paint.isAntiAlias = true
 		paint.style = Paint.Style.FILL
-
 	}
-
+	
 	fun showCloseButton(isShow: Boolean) {
 		findViewById<ImageView>(ElementID.closeButton).apply {
 			if (isShow) {
@@ -112,7 +102,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
+	
 	fun showScanButton(
 		isShow: Boolean,
 		action: () -> Unit = {}
@@ -127,7 +117,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
+	
 	fun showBackButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
@@ -146,7 +136,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
+	
 	fun showAddButton(
 		isShow: Boolean,
 		setClickEvent: () -> Unit = {}
@@ -170,11 +160,11 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
+	
 	fun setKeyboardConfirmEvent(action: EditText.() -> Unit) {
 		searchInput.onPressKeyboardEnterButton { action(searchInput.editText) }
 	}
-
+	
 	fun searchInputLinstener(action: (String) -> Unit) {
 		searchInput.editText.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(content: Editable?) {
@@ -182,7 +172,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 					action(content.toString())
 				}
 			}
-
+			
 			override fun beforeTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -190,7 +180,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				after: Int
 			) {
 			}
-
+			
 			override fun onTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -198,10 +188,9 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				count: Int
 			) {
 			}
-
 		})
 	}
-
+	
 	fun showSearchButton(
 		isShow: Boolean,
 		setClickEvent: () -> Unit = {}
@@ -214,20 +203,18 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			removeView(it)
 		}
 	}
-
+	
 	fun showSearchInput(
 		isShow: Boolean = true,
 		cancelEvent: () -> Unit = {}
 	) {
-
 		showCloseButton(!isShow)
-
+		
 		isShow.isFalse {
 			title.visibility = View.VISIBLE
 			searchInput.visibility = View.GONE
 			return
 		}
-
 		// 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
 		title.visibility = View.GONE
 		findViewById<EditTextWithButton>(ElementID.searchInput).let {
@@ -249,7 +236,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-
+	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		canvas?.drawLine(
@@ -258,19 +245,18 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		)
 		canvas?.save()
 	}
-
 }
 
 class HeaderIcon(context: Context) : ImageView(context) {
-
+	
 	private val iconSize = 30.uiPX()
-
+	
 	init {
 		setColorFilter(GrayScale.lightGray)
 		scaleType = ImageView.ScaleType.CENTER_INSIDE
 		addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
 	}
-
+	
 	fun setLeftPosition() {
 		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
 			topMargin = 18.uiPX()
@@ -278,7 +264,7 @@ class HeaderIcon(context: Context) : ImageView(context) {
 			alignParentLeft()
 		}
 	}
-
+	
 	fun setRightPosition() {
 		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
 			topMargin = 18.uiPX()
@@ -286,5 +272,4 @@ class HeaderIcon(context: Context) : ImageView(context) {
 			alignParentRight()
 		}
 	}
-
 }
