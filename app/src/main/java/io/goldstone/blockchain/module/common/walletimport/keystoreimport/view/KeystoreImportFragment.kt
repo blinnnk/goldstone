@@ -85,7 +85,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importKeystoreWallet(
-						keystoreEditText.text.toString(), passwordInput, nameInput,
+						keystoreEditText.text.toString(),
+						passwordInput,
+						nameInput,
 						agreementView.radioButton.isChecked, hintInput
 					) {
 						it.showLoadingStatus(false)
@@ -96,7 +98,10 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					text = QAText.whatIsKeystore.setUnderline()
 				}.click {
 					getParentFragment<WalletImportFragment> {
-						presenter.showWebViewFragment(WebUrl.whatIsKeystore, QAText.whatIsKeystore)
+						presenter.showWebViewFragment(
+							WebUrl.whatIsKeystore,
+							QAText.whatIsKeystore
+						)
 					}
 				}.into(this)
 			}

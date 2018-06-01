@@ -40,10 +40,13 @@ class KeystoreImportPresenter(
 						password.text.toString(),
 						DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
 					)?.let {
+						val walletName = 
+							if (nameInput.text.isEmpty()) "Wallet"
+							else nameInput.text.toString()
 						PrivateKeyImportPresenter.importWallet(
 							it.privateKey.toString(16),
 							password.text.toString(),
-							nameInput.text.toString(),
+							walletName,
 							fragment, hintInput.text?.toString()
 						) {
 							fragment.context?.runOnUiThread { callback() }
