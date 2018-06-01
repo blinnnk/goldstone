@@ -28,10 +28,23 @@ import org.jetbrains.anko.*
  */
 
 class EditTextWithButton(context: Context) : RelativeLayout(context) {
-
+	
+	var onTextCopy: Runnable? = null
+	var onTextCut: Runnable? = null
+	
+	val editText = object : EditText(context) {
+		override fun onTextContextMenuItem(id: Int): Boolean {
+			when (id) {
+				android.R.id.cut -> onTextCut?.run()
+				android.R.id.paste -> clearPasteStyle()
+				android.R.id.copy -> onTextCopy?.run()
+			}
+			return super.onTextContextMenuItem(id)
+		}
+	}
+	
 	private val button by lazy { TextView(context) }
-	val editText = EditText(context)
-
+	
 	init {
 		id = ElementID.searchInput
 		editText.apply {
@@ -49,6 +62,11 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 		}.into(this)
 		editText.setCenterInVertical()
 
+	}
+	
+	fun clearPasteStyle() {
+		editText.textColor = GrayScale.black
+		editText.textSize = fontSize(12)
 	}
 
 	fun setCancelButton(setClickEvent: () -> Unit = {}) {
