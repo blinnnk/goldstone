@@ -2,8 +2,11 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
+import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -31,6 +34,15 @@ data class MyTokenTable(
 	var chainID: String = GoldStoneApp.currentChain
 ) {
 	
+	constructor(data: DefaultTokenTable, address: String) : this(
+		0,
+		address,
+		data.symbol,
+		0.0,
+		data.contract,
+		data.chain_id
+	)
+	
 	companion object {
 		
 		fun insert(model: MyTokenTable, address: String = WalletTable.current.address) {
@@ -43,13 +55,13 @@ data class MyTokenTable(
 			
 		}
 		
-		fun getTokensWith(
+		fun getCurrentChainTokensWith(
 			walletAddress: String = WalletTable.current.address,
 			callback: (ArrayList<MyTokenTable>) -> Unit = {}
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.myTokenDao().getTokensBy(walletAddress)
+					GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(walletAddress)
 				}) {
 				callback(it.toArrayList())
 			}
@@ -72,19 +84,25 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun deleteByAddress(
-			address: String,
-			callback: () -> Unit = {}
-		) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					getAllTokensBy(address).forEachOrEnd { item, isEnd ->
-						delete(item)
-						if (isEnd) {
-							GoldStoneAPI.context.runOnUiThread { callback() }
+		fun deleteByAddress(address: String, callback: () -> Unit) {
+			GoldStoneDataBase.database.myTokenDao().apply {
+				val allTokens = getAllTokensBy(address)
+				if (allTokens.isEmpty()) {
+					GoldStoneAPI.context.runOnUiThread {
+						callback()
+					}
+					return
+				}
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = allTokens.size
+					override fun concurrentJobs() {
+						allTokens.forEach {
+							delete(it)
+							completeMark()
 						}
 					}
-				}
+					override fun mergeCallBack() = callback()
+				}.start()
 			}
 		}
 		
@@ -97,7 +115,7 @@ data class MyTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.apply {
 					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-					myTokenDao().getTokensBy(ownerAddress).find {
+					myTokenDao().getCurrentChainTokensBy(ownerAddress).find {
 						it.contract == contract
 					}.isNull() isTrue {
 						getBalanceAndInsertWithSymbolAndContract(symbol, contract, ownerAddress) {
@@ -184,7 +202,7 @@ interface MyTokenDao {
 	): MyTokenTable?
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
-	fun getTokensBy(
+	fun getCurrentChainTokensBy(
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain
 	): List<MyTokenTable>

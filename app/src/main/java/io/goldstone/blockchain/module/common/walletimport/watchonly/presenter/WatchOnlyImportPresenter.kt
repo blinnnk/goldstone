@@ -20,11 +20,10 @@ import org.web3j.crypto.WalletUtils
  * @date 23/03/2018 2:16 AM
  * @author KaySaith
  */
-
 class WatchOnlyImportPresenter(
 	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
-
+	
 	fun importWatchOnlyWallet(
 		addressInput: EditText,
 		nameInput: EditText,
@@ -37,14 +36,13 @@ class WatchOnlyImportPresenter(
 			callback()
 			return
 		}
-
 		val name = if (nameInput.text.toString().isEmpty()) "Wallet"
 		else nameInput.text.toString()
-
+		
 		WalletTable.getWalletByAddress(address) {
 			it.isNull() isTrue {
 				WalletTable.insert(WalletTable(0, name, address, true, null, true, 0.0, null, true)) {
-					CreateWalletPresenter.generateMyTokenInfo(address, false, {
+					CreateWalletPresenter.generateMyTokenInfo(address, {
 						LogUtil.error(this.javaClass.simpleName)
 						callback()
 					}) {

@@ -313,11 +313,15 @@ data class TransactionTable(
 				val data = getAllTransactionsByAddress(address)
 				if (data.isEmpty()) {
 					GoldStoneAPI.context.runOnUiThread { callback() }
+					return
 				}
 				object : ConcurrentCombine() {
 					override var asyncCount: Int = data.size
 					override fun concurrentJobs() {
-						data.forEach { delete(it) }
+						data.forEach {
+							delete(it)
+							completeMark()
+						}
 					}
 					override fun mergeCallBack() = callback()
 				}.start()

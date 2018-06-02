@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.common.walletimport.walletimport.presente
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.jump
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -70,7 +73,7 @@ class WalletImportPresenter(
 					// 在数据库记录钱包信息
 					WalletTable.insert(WalletTable(0, name, address, true, hint, false, 0.0, null, true)) {
 						// 创建钱包并获取默认的 `token` 信息
-						CreateWalletPresenter.generateMyTokenInfo(address, false, {
+						CreateWalletPresenter.generateMyTokenInfo(address, {
 							LogUtil.error("insertWalletToDatabase")
 							callback()
 						}) {
@@ -88,7 +91,6 @@ class WalletImportPresenter(
 	}
 	
 	fun showWebViewFragment(url: String, title: String) {
-		
 		fragment.headerTitle = title
 		
 		hideChildFragments()
@@ -133,5 +135,4 @@ class WalletImportPresenter(
 			}
 		}
 	}
-	
 }

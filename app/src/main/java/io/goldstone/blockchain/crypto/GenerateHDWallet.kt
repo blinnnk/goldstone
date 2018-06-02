@@ -150,10 +150,12 @@ fun Context.deleteAccount(
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	// If there is't account found then return
-	if (keyStore.accounts.size() == 0L) return
-
+	if (keyStore.accounts.size() == 0L) {
+		callback(true)
+		return
+	}
 	var targentAccountIndex: Long? = null
-
+	
 	(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
 		keyStore.accounts.get(index).address.hex.let {
 			if (it.equals(walletAddress, true)) {

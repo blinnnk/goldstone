@@ -10,7 +10,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
 import io.goldstone.blockchain.common.value.SystemUtils
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
@@ -52,14 +54,35 @@ object GoldStoneAPI {
 		errorCallback: () -> Unit = {},
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
-		requestData<DefaultTokenTable>(APIPath.defaultTokenList, "list", false, errorCallback) {
-			forEachOrEnd { token, isEnd ->
-				if (token.forceShow == TinyNumber.True.value) {
-					token.isUsed = true
-					token.isDefault = true
+		requestData<String>(APIPath.defaultTokenList, "data", true, errorCallback) {
+			val gson = Gson()
+			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
+			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
+			
+			object : ConcurrentAsyncCombine() {
+				override var asyncCount = ChainID.getAllChainID().size
+				
+				override fun concurrentJobs() {
+					ChainID.getAllChainID().forEach { chainID ->
+						allDefaultTokens +=
+							gson.fromJson<List<DefaultTokenTable>>(
+								JSONObject(this@requestData[0]).safeGet(chainID),
+								collectionType
+							).map {
+								it.apply {
+									it.chain_id = chainID
+									it.isDefault = true
+								}
+							}.apply {
+								completeMark()
+							}
+					}
 				}
-				if (isEnd) hold(toArrayList())
-			}
+				
+				override fun mergeCallBack() {
+					hold(allDefaultTokens)
+				}
+			}.start()
 		}
 	}
 	
@@ -218,8 +241,11 @@ object GoldStoneAPI {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
 		RequestBody.create(requestContentType, content).let {
-			postRequestGetJsonObject<TokenPriceModel>(it, "price_list", APIPath.getPriceByAddress,
-			                                          errorCallback = { errorCallback() }) {
+			postRequestGetJsonObject<TokenPriceModel>(
+				it,
+				"price_list",
+				APIPath.getPriceByAddress,
+				errorCallback = { errorCallback() }) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -267,8 +293,8 @@ object GoldStoneAPI {
 	private val client =
 		OkHttpClient
 			.Builder()
-			.connectTimeout(60, TimeUnit.SECONDS)
-			.readTimeout(80, TimeUnit.SECONDS)
+			.connectTimeout(30, TimeUnit.SECONDS)
+			.readTimeout(60, TimeUnit.SECONDS)
 			.build()
 	
 	private inline fun <reified T> postRequestGetJsonObject(
@@ -350,6 +376,7 @@ object GoldStoneAPI {
 					netWorkError()
 					LogUtil.error(keyName + "requestData", error)
 				}
+				
 				override fun onResponse(call: Call, response: Response) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {

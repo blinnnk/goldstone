@@ -8,6 +8,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -79,19 +80,33 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			doAsync {
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 					if (serverTokens.isNotEmpty()) {
-						serverTokens.forEach {
-							GoldStoneDataBase.database.defaultTokenDao().apply {
-								val localToken = getTokenByContract(it.contract)
-								if (localToken.isNull()) {
-									insert(it)
-								} else {
-									if (localToken!!.iconUrl != it.iconUrl) {
-										// 数据有变化直接更新服务器数据
-										update(localToken.apply { iconUrl = it.iconUrl })
+						DefaultTokenTable.getAllTokens {
+							if (it.isEmpty()) {
+								serverTokens.forEach {
+									GoldStoneDataBase.database.defaultTokenDao().insert(it)
+								}
+							} else {
+								serverTokens.forEach { serverToken ->
+									GoldStoneDataBase.database.defaultTokenDao().apply {
+										val localToken =
+											getAllTokens().find {
+												it.chain_id == serverToken.chain_id
+												&& it.contract == serverToken.contract
+											}
+										if (localToken.isNull()) {
+											insert(serverToken)
+										} else {
+											if (localToken!!.iconUrl != serverToken.iconUrl) {
+												// 数据有变化直接更新服务器数据
+												update(localToken.apply { iconUrl = serverToken.iconUrl })
+											}
+										}
 									}
 								}
+							
 							}
 						}
+						
 					}
 				}
 			}
