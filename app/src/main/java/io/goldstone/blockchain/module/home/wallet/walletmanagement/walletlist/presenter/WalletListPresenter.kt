@@ -43,7 +43,7 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getCurrentChainTokensWith(wallet.address) {
+							MyTokenTable.getCurrentChainTokensWithAddress(wallet.address) {
 								if (it.isEmpty()) {
 									completeMark()
 								} else {

@@ -26,12 +26,10 @@ import org.jetbrains.anko.scrollView
  * @date 2018/5/7 11:40 PM
  * @author KaySaith
  */
-
 class DepositFragment : BaseFragment<DepositPresenter>() {
-
+	
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
-
 	override val presenter = DepositPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -49,23 +47,23 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 				setShareEvent()
 			}
 			prepareSymbolPrice()
-
+			
 			inputView.inputTextListener {
 				inputView.updateCurrencyValue(symbolPrice * if (it.isEmpty()) 0.0 else it.toDouble())
 				presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
 			}
 		}
 	}
-
+	
 	private var symbolPrice: Double = 0.0
 	private fun prepareSymbolPrice() {
 		getParentFragment<TokenDetailOverlayFragment> {
-			DefaultTokenTable.getTokenByContract(token?.contract!!) {
+			DefaultTokenTable.getCurrentChainTokenByContract(token?.contract!!) {
 				symbolPrice = it?.price.orElse(0.0)
 			}
 		}
 	}
-
+	
 	private fun setConfirmButtonEvent() {
 		qrView.saveQRImageEvent = Runnable {
 			val value = inputView.getValue()
@@ -74,7 +72,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-
+	
 	private fun setShareEvent() {
 		qrView.shareEvent = Runnable {
 			val value = inputView.getValue()
@@ -83,21 +81,21 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-
+	
 	fun setQRImage(bitmap: Bitmap?) {
 		qrView.setQRImage(bitmap)
 	}
-
+	
 	fun setInputViewDescription(symbol: String) {
 		inputView.setHeaderSymbol(symbol)
 	}
-
+	
 	private fun setAddressText() {
 		WalletTable.getCurrentWalletAddress {
 			qrView.setAddressText(this)
 		}
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
