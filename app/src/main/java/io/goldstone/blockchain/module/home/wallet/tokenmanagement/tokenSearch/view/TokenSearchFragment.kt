@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.v
 
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -30,20 +31,27 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	}
 	
 	private fun TokenSearchCell.setMyTokenStatus() {
-		model?.let {
-			DefaultTokenTable.getCurrentChainTokenByContract(it.contract) { localToken ->
+		model?.let { searchToken ->
+			DefaultTokenTable.getCurrentChainTokenByContract(
+				searchToken.contract,
+				GoldStoneApp.currentChain
+			) { localToken ->
 				localToken.isNotNull {
-					insertToMyToken(switch, localToken)
+					DefaultTokenTable.updateTokenDefaultStatus(
+						localToken!!.contract,
+						switch.isChecked
+					) {
+						insertToMyToken(switch, localToken)
+					}
 				} otherwise {
-					DefaultTokenTable.insertToken(it.apply {
+					DefaultTokenTable.insertToken(searchToken.apply {
 						isDefault = switch.isChecked
 					}) {
-						insertToMyToken(switch, it)
+						insertToMyToken(switch, searchToken)
 					}
 				}
 			}
 		}
-		
 		switch.preventDuplicateClicks()
 	}
 	

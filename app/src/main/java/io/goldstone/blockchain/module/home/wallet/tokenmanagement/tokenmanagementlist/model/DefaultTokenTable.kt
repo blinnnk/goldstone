@@ -112,7 +112,8 @@ data class DefaultTokenTable(
 	constructor(
 		contract: String,
 		symbol: String,
-		decimals: Double
+		decimals: Double,
+		name: String
 	) : this(
 		0,
 		contract,
@@ -120,7 +121,7 @@ data class DefaultTokenTable(
 		symbol,
 		0,
 		0.0,
-		"",
+		name,
 		decimals,
 		"",
 		false,
@@ -160,6 +161,7 @@ data class DefaultTokenTable(
 		
 		fun getCurrentChainTokenByContract(
 			contract: String,
+			chainID: String = GoldStoneApp.currentChain,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
@@ -167,7 +169,7 @@ data class DefaultTokenTable(
 					GoldStoneDataBase
 						.database
 						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract)
+						.getCurrentChainTokenByContract(contract, chainID)
 				}) {
 				hold(it)
 			}
