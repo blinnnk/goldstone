@@ -41,12 +41,6 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 						insertToMyToken(switch, it)
 					}
 				}
-				// 更新缓存中的数据, 防止 `Recycler` 复用的时候 `switch` `UI` 样式变化
-				asyncData?.find {
-					it.contract.equals(model?.contract, true)
-				}?.let {
-					it.isUsed = switch.isChecked
-				}
 			}
 		}
 		
