@@ -81,7 +81,9 @@ class TransactionListPresenter(
 		}
 	}
 	
-	private fun TransactionListFragment.updateTransactionInAsync(localData: ArrayList<TransactionListModel>) {
+	private fun TransactionListFragment.updateTransactionInAsync(
+		localData: ArrayList<TransactionListModel>
+	) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
@@ -339,9 +341,7 @@ class TransactionListPresenter(
 					}
 				}
 				
-				override fun mergeCallBack() {
-					hold(data)
-				}
+				override fun mergeCallBack() = hold(data)
 			}.start()
 		}
 	}
