@@ -76,10 +76,7 @@ class PrivateKeyImportPresenter(
 			callback: () -> Unit
 		) {
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
-			val formatPrivateKey = if (privateKey.has0xPrefix()) privateKey.substring(
-				2, privateKey
-				.length
-			) else privateKey
+			val formatPrivateKey = privateKey.removePrefix("0x")
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			val currentPrivateKey =
 				(if (formatPrivateKey.length == 63) "0$formatPrivateKey" else formatPrivateKey)

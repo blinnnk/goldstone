@@ -164,7 +164,10 @@ data class DefaultTokenTable(
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokenByContract(contract)
+					GoldStoneDataBase
+						.database
+						.defaultTokenDao()
+						.getCurrentChainTokenByContract(contract)
 				}) {
 				hold(it)
 			}
@@ -173,7 +176,7 @@ data class DefaultTokenTable(
 		fun updateTokenPrice(
 			contract: String,
 			newPrice: Double,
-			callback: () -> Unit = {}
+			callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()

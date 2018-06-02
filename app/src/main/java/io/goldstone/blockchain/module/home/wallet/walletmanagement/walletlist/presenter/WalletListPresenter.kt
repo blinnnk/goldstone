@@ -45,6 +45,7 @@ class WalletListPresenter(
 							// 获取对应的钱包下的全部 `token`
 							MyTokenTable.getCurrentChainTokensWithAddress(wallet.address) {
 								if (it.isEmpty()) {
+									data.add(WalletListModel(wallet, 0.0))
 									completeMark()
 								} else {
 									// 计算当前钱包下的 `token` 对应的货币总资产

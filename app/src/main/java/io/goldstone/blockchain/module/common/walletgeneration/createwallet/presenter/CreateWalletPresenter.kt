@@ -227,12 +227,16 @@ class CreateWalletPresenter(
 			}
 		}
 		
-		private fun List<DefaultTokenTable>.insertNewAccount(address: String, callback: () -> Unit) {
+		private fun List<DefaultTokenTable>.insertNewAccount(
+			address: String,
+			callback: () -> Unit
+		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach {
-						MyTokenTable.insert(MyTokenTable(it, address))
+						// 创建新账号的默认 `Token` 会插入到所有链上的默认列表
+						MyTokenTable.insert(MyTokenTable(it, address), it.chain_id)
 						completeMark()
 					}
 				}
