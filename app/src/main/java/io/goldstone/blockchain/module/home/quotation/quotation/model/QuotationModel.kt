@@ -21,6 +21,7 @@ data class QuotationModel(
 	val pair: String = "",
 	val quoteSymbol: String = ""
 ): Serializable {
+	
 	constructor(
 		data: QuotationSelectionTable,
 		price: String,

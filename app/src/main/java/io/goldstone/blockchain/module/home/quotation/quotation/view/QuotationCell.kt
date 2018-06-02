@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
-import android.text.format.DateUtils
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -18,7 +17,9 @@ import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.numberDate
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.margin
@@ -86,7 +87,15 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private var chartLineColor = Spectrum.green
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout? = null
+	
+	
+	private var lastChartDataMD5: String? = null
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
+		val dataMD5 = chartData.getObjectMD5HexString()
+		if (lastChartDataMD5 == dataMD5) {
+			return@observing
+		}
+		lastChartDataMD5 = dataMD5
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
@@ -112,12 +121,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			val dataSet = LineSet()
 			dataSet.apply {
 				chartData.forEach {
-					addPoint(
-						Point(
-							DateUtils.formatDateTime(context, it.label.toLong(), DateUtils.FORMAT_NUMERIC_DATE),
-							it.value
-						)
-					)
+					addPoint(Point(numberDate(it.label.toLong()), it.value))
 				}
 				// 这个是线的颜色
 				color = chartLineColor

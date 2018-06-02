@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import com.blinnnk.extension.*
+import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
@@ -19,8 +20,6 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -39,8 +38,10 @@ class QuotationPresenter(
 	private var hasInitSocket = false
 	
 	override fun updateData() {
+		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
+		
 		// 如果内存有数据直接更新内存的数据
-		memoryData?.let { diffAndUpdateData(it) }
+		memoryData?.let { diffAndUpdateAdapterData<QuotationAdapter>(it) }
 		
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
@@ -68,7 +69,7 @@ class QuotationPresenter(
 				// 把数据存在内存里面方便下次打开使用
 				memoryData = it
 				// 更新 `UI`
-				diffAndUpdateData(it)
+				diffAndUpdateAdapterData<QuotationAdapter>(it)
 				// 设定 `Socket` 并执行
 				currentSocket.isNull() isTrue {
 					// 初始化 `Socket`
@@ -103,23 +104,12 @@ class QuotationPresenter(
 		}
 	}
 	
-	private fun diffAndUpdateData(data: ArrayList<QuotationModel>) {
-		fragment.asyncData.isNull() isTrue {
-			fragment.asyncData = data
-		} otherwise {
-			diffAndUpdateAdapterData<QuotationAdapter>(data)
-		}
-	}
-	
 	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
 		if (isEmpty()) return
 		sortedByDescending {
 			it.label.toLong()
 		}.let {
-			/**
-			 * 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件.
-			 * 本地的当天 `lineChart` 的值是通过长连接实时更新的.
-			 */
+			/** 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件. */
 			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
 				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
@@ -160,19 +150,15 @@ class QuotationPresenter(
 	}
 	
 	private fun QuotationFragment.updateAdapterDataset(data: CurrencyPriceInfoModel) {
-		doAsync {
-			var index: Int? = null
-			asyncData?.forEachOrEnd { item, isEnd ->
-				if (item.pair == data.pair) {
-					item.price = data.price
-					item.percent = data.percent
-					index = asyncData?.indexOf(item).orZero() + 1
+		coroutinesTask(
+			{
+				asyncData?.find { it.pair == data.pair }?.apply {
+					price = data.price
+					percent = data.percent
 				}
-				if (isEnd) {
-					context?.runOnUiThread {
-						index?.let { recyclerView.adapter.notifyItemChanged(it) }
-					}
-				}
+			}) {
+			it?.let {
+				recyclerView.adapter.notifyDataSetChanged()
 			}
 		}
 	}
