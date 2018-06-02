@@ -146,7 +146,7 @@ class TokenDetailPresenter(
 				TransactionListPresenter.updateTransactions(this@loadDataFromChain, blockNumber) {
 					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-						it.find { it.contract == token?.contract }.isNotNull {
+						it.find { it.contract.equals(token?.contract, true) }.isNotNull {
 							// 有数据后重新执行从数据库拉取数据
 							loadDataFromDatabaseOrElse()
 						} otherwise {

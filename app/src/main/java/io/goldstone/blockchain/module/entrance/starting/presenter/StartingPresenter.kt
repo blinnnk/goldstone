@@ -8,7 +8,6 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -91,7 +90,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 										val localToken =
 											getAllTokens().find {
 												it.chain_id == serverToken.chain_id
-												&& it.contract == serverToken.contract
+												&& it.contract.equals(serverToken.contract, true)
 											}
 										if (localToken.isNull()) {
 											insert(serverToken)
@@ -103,10 +102,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 										}
 									}
 								}
-							
 							}
 						}
-						
 					}
 				}
 			}

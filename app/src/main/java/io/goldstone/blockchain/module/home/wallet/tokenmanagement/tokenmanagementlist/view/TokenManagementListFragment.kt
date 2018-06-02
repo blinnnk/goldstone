@@ -25,7 +25,8 @@ class TokenManagementListFragment :
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
 			switch.onClick {
 				model?.let {
-					TokenManagementListPresenter.updateMyTokensInfoBy(switch, it.symbol, it.contract)
+					
+					TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
 				}
 			}
 		}

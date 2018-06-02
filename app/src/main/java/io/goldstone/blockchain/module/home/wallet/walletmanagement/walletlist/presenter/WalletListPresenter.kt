@@ -44,16 +44,22 @@ class WalletListPresenter(
 						forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
 							MyTokenTable.getCurrentChainTokensWith(wallet.address) {
-								// 计算当前钱包下的 `token` 对应的货币总资产
-								WalletListModel(wallet, it.sumByDouble { walletToken ->
-									val thisToken = allTokens.find { it.contract == walletToken.contract }!!
-									CryptoUtils.toCountByDecimal(
-										walletToken.balance,
-										thisToken.decimals
-									) * thisToken.price
-								}).let {
-									data.add(it)
+								if (it.isEmpty()) {
 									completeMark()
+								} else {
+									// 计算当前钱包下的 `token` 对应的货币总资产
+									WalletListModel(wallet, it.sumByDouble { walletToken ->
+										val thisToken = allTokens.find {
+											it.contract.equals(walletToken.contract, true)
+										}!!
+										CryptoUtils.toCountByDecimal(
+											walletToken.balance,
+											thisToken.decimals
+										) * thisToken.price
+									}).let {
+										data.add(it)
+										completeMark()
+									}
 								}
 							}
 						}
