@@ -40,7 +40,7 @@ class QuotationSearchPresenter(
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
 		isSelect: Boolean = true,
-		callback: () -> Unit = {}
+		callback: () -> Unit
 	) {
 		isSelect isTrue {
 			// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
@@ -87,10 +87,7 @@ class QuotationSearchPresenter(
 	}
 	
 	companion object {
-		fun getLineChartDataByPair(
-			pair: String,
-			hold: (String) -> Unit
-		) {
+		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(parameter) {
 				it.isNotEmpty() isTrue {
