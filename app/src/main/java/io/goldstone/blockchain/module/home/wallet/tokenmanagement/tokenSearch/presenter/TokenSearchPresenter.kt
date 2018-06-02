@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.LoadingText
@@ -62,7 +63,7 @@ class TokenSearchPresenter(
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getTokensWith(WalletTable.current.address) { localTokens ->
+				MyTokenTable.getCurrentChainTokensWith(WalletTable.current.address) { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
@@ -94,7 +95,8 @@ class TokenSearchPresenter(
 											null,
 											false,
 											false,
-											0
+											0,
+											GoldStoneApp.currentChain
 										)
 									)
 								)

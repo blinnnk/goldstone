@@ -9,24 +9,19 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
@@ -116,7 +111,7 @@ class CreateWalletPresenter(
 			generateWallet(password) { mnemonicCode, address ->
 				// 将基础的不存在安全问题的信息插入数据库
 				WalletTable.insert(WalletTable(0, name, address, true, hint)) {
-					generateMyTokenInfo(address, true, {
+					generateMyTokenInfo(address, {
 						LogUtil.error("generateWalletWith")
 					}) {
 						// 传递数据到下一个 `Fragment`
@@ -164,19 +159,18 @@ class CreateWalletPresenter(
 		 */
 		fun generateMyTokenInfo(
 			ownerAddress: String,
-			isNewAccount: Boolean = false,
 			errorCallback: () -> Unit,
 			callback: () -> Unit
 		) {
 			// 首先从本地查找数据
-			DefaultTokenTable.getTokens { localTokens ->
+			DefaultTokenTable.getAllTokens { localTokens ->
 				localTokens.isEmpty() isTrue {
 					// 本地没有数据从服务器获取数据
 					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-						serverTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
+						serverTokens.completeAddressInfo(ownerAddress, callback)
 					}
 				} otherwise {
-					localTokens.completeAddressInfo(ownerAddress, isNewAccount, callback)
+					localTokens.completeAddressInfo(ownerAddress, callback)
 				}
 			}
 		}
@@ -220,7 +214,6 @@ class CreateWalletPresenter(
 		
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			ownerAddress: String,
-			isNewAccount: Boolean,
 			callback: () -> Unit
 		) {
 			filter {
@@ -230,11 +223,7 @@ class CreateWalletPresenter(
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/
-				if (isNewAccount || !NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
-					insertNewAccount(ownerAddress, callback)
-				} else {
-					checkAddressBalanceThenInsert(ownerAddress, this, callback)
-				}
+				insertNewAccount(ownerAddress, callback)
 			}
 		}
 		
@@ -243,68 +232,13 @@ class CreateWalletPresenter(
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach {
-						ChainID.getAllChainID().forEach { chainID ->
-							MyTokenTable.insert(MyTokenTable(0, address, it.symbol, 0.0, it.contract, chainID))
-						}
+						MyTokenTable.insert(MyTokenTable(it, address))
 						completeMark()
 					}
 				}
 				
-				override fun mergeCallBack() =
-					callback()
-			}.start()
-		}
-		
-		private fun checkAddressBalanceThenInsert(
-			address: String,
-			data: List<DefaultTokenTable>,
-			callback: () -> Unit
-		) {
-			// 不是新建账号就检查余额
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = data.size
-				override fun concurrentJobs() {
-					data.forEach { tokenInfo ->
-						// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-						if (tokenInfo.symbol.equals(CryptoSymbol.eth, true)) {
-							GoldStoneEthCall.getEthBalance(address) {
-								insertMyTokenBalanceByChainID(address, tokenInfo, it)
-								completeMark()
-							}
-						} else {
-							GoldStoneEthCall
-								.getTokenBalanceWithContract(tokenInfo.contract, address) {
-									insertMyTokenBalanceByChainID(address, tokenInfo, it)
-									completeMark()
-								}
-						}
-					}
-				}
-				
 				override fun mergeCallBack() = callback()
-				
 			}.start()
-		}
-		
-		private fun insertMyTokenBalanceByChainID(
-			address: String,
-			tokenInfo: DefaultTokenTable,
-			balance: Double
-		) {
-			ChainID.getAllChainID().forEach { chainID ->
-				val currentBalance = if (GoldStoneApp.currentChain == chainID) balance else 0.0
-				MyTokenTable
-					.insert(
-						MyTokenTable(
-							0,
-							address,
-							tokenInfo.symbol,
-							currentBalance,
-							tokenInfo.contract,
-							chainID
-						)
-					)
-			}
 		}
 	}
 }

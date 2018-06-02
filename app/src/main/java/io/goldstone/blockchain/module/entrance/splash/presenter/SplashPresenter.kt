@@ -34,7 +34,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	
 	fun initDefaultTokenByNetWork(callback: () -> Unit) {
 		// if there isn't network init local token list
-		DefaultTokenTable.getTokens {
+		DefaultTokenTable.getAllTokens {
 			// 先判断是否插入本地的 `JSON` 数据
 			it.isEmpty() isTrue {
 				StartingPresenter.insertLocalTokens(activity) {

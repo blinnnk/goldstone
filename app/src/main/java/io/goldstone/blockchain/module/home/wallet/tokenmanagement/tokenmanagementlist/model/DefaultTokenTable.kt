@@ -5,6 +5,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
@@ -46,7 +47,9 @@ data class DefaultTokenTable(
 	@Ignore
 	var isUsed: Boolean = false,
 	@SerializedName("weight")
-	var weight: Int
+	var weight: Int,
+	@SerializedName("chain_id")
+	var chain_id: String
 ) {
 	
 	/** 默认的 `constructor` */
@@ -63,7 +66,8 @@ data class DefaultTokenTable(
 		"",
 		true,
 		false,
-		0
+		0,
+		GoldStoneApp.currentChain
 	)
 	
 	constructor(
@@ -81,7 +85,8 @@ data class DefaultTokenTable(
 		"",
 		isUsed,
 		isUsed,
-		data.weight
+		data.weight,
+		GoldStoneApp.currentChain
 	)
 	
 	constructor(
@@ -100,7 +105,8 @@ data class DefaultTokenTable(
 		localData.safeGet("is_default").toInt() == TinyNumber.True.value,
 		isUsed,
 		if (localData.safeGet("weight").isEmpty()) 0
-		else localData.safeGet("weight").toInt()
+		else localData.safeGet("weight").toInt(),
+		localData.safeGet("chain_id")
 	)
 	
 	constructor(
@@ -119,16 +125,25 @@ data class DefaultTokenTable(
 		"",
 		false,
 		false,
-		0
+		0,
+		GoldStoneApp.currentChain
 	)
 	
 	companion object {
 		
-		fun getTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.defaultTokenDao()
-						.getAllTokens()
+					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+				}) {
+				hold(it.toArrayList())
+			}
+		}
+		
+		fun getCurrentChainTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
 				}) {
 				hold(it.toArrayList())
 			}
@@ -137,8 +152,7 @@ data class DefaultTokenTable(
 		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.defaultTokenDao()
-						.getDefaultTokens()
+					GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
 				}) {
 				hold(it.toArrayList())
 			}
@@ -207,11 +221,23 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault")
-	fun getDefaultTokens(isDefault: Boolean = true): List<DefaultTokenTable>
+	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :chainID")
+	fun getCurrentChainTokens(chainID: String = GoldStoneApp.currentChain): List<DefaultTokenTable>
+	
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chain_id LIKE :chainID")
+	fun getDefaultTokens(
+		isDefault: Boolean = true,
+		chainID: String = GoldStoneApp.currentChain
+	): List<DefaultTokenTable>
+	
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chain_id LIKE :chainID")
+	fun getTokenByContract(
+		contract: String,
+		chainID: String = GoldStoneApp.currentChain
+	): DefaultTokenTable?
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-	fun getTokenByContract(contract: String): DefaultTokenTable?
+	fun getTokenByContractFromAllChains(contract: String): DefaultTokenTable?
 	
 	@Insert
 	fun insert(token: DefaultTokenTable)

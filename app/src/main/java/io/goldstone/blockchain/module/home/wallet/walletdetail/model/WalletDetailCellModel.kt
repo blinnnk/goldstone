@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -53,13 +53,13 @@ data class WalletDetailCellModel(
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			MyTokenTable.getTokensWith(walletAddress) { allTokens ->
+			MyTokenTable.getCurrentChainTokensWith(walletAddress) { allTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (allTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getTokensWith
+					return@getCurrentChainTokensWith
 				}
-				DefaultTokenTable.getTokens { localTokens ->
+				DefaultTokenTable.getAllTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
 						val tokenList = ArrayList<WalletDetailCellModel>()
 						override var asyncCount: Int = allTokens.size
@@ -86,35 +86,42 @@ data class WalletDetailCellModel(
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
 			// 获取我的钱包的 `Token` 列表
-			MyTokenTable.getTokensWith(walletAddress) { allTokens ->
+			MyTokenTable.getCurrentChainTokensWith(walletAddress) { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
-				if (allTokens.isEmpty()) {
+				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getTokensWith
+					return@getCurrentChainTokensWith
 				}
 				// 首先更新 `MyToken` 的 `Price`
-				allTokens.updateMyTokensPrices {
-					DefaultTokenTable.getTokens { localTokens ->
+				myTokens.updateMyTokensPrices {
+					DefaultTokenTable.getCurrentChainTokens { localTokens ->
 						object : ConcurrentAsyncCombine() {
 							val tokenList = ArrayList<WalletDetailCellModel>()
-							override var asyncCount: Int = allTokens.size
+							override var asyncCount: Int = myTokens.size
 							override fun concurrentJobs() {
-								allTokens.forEach { token ->
+								myTokens.forEach { token ->
 									localTokens.find { it.contract == token.contract }?.let { targetToken ->
-										if (targetToken.symbol == CryptoSymbol.eth) {
+										if (targetToken.contract == CryptoValue.ethContract) {
 											GoldStoneEthCall
 												.getEthBalance(walletAddress) {
 													MyTokenTable
-														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+														.updateCurrentWalletBalanceWithContract(
+															it,
+															targetToken.contract
+														)
 													tokenList.add(WalletDetailCellModel(targetToken, it))
 													completeMark()
 												}
 										} else {
 											GoldStoneEthCall.getTokenBalanceWithContract(
-												targetToken.contract, walletAddress
+												targetToken.contract,
+												walletAddress
 											) {
 												MyTokenTable
-													.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+													.updateCurrentWalletBalanceWithContract(
+														it,
+														targetToken.contract
+													)
 												tokenList.add(WalletDetailCellModel(targetToken, it))
 												completeMark()
 											}
@@ -148,8 +155,9 @@ data class WalletDetailCellModel(
 							}
 						}
 						
-						override fun mergeCallBack() =
+						override fun mergeCallBack() {
 							callback()
+						}
 					}.start()
 				}
 			}

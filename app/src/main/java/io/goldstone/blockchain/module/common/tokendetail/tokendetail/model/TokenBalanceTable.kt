@@ -6,6 +6,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -32,22 +33,22 @@ data class TokenBalanceTable(
 	var balance: Double,
 	var address: String
 ) {
-
+	
 	companion object {
-
+		
 		fun getBalanceByContract(
 			contract: String,
 			address: String = WalletTable.current.address,
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.tokenBalanceDao()
-					.getTokenBalanceByContractAndAddress(address, contract)
-			}) {
+				               GoldStoneDataBase.database.tokenBalanceDao()
+					               .getTokenBalanceByContractAndAddress(address, contract)
+			               }) {
 				hold(it.toArrayList())
 			}
 		}
-
+		
 		fun getTodayBalance(address: String, contract: String, callback: (Double) -> Unit) {
 			if (contract == CryptoValue.ethContract) {
 				doAsync {
@@ -70,7 +71,7 @@ data class TokenBalanceTable(
 				}
 			}
 		}
-
+		
 		fun insertOrUpdate(contract: String, address: String, date: Long, balance: Double) {
 			val addTime = System.currentTimeMillis()
 			GoldStoneDataBase.database.tokenBalanceDao().apply {
@@ -87,38 +88,50 @@ data class TokenBalanceTable(
 				}
 			}
 		}
-
+		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.tokenBalanceDao().apply {
-					getTokenBalanceByAddress(address).forEach { delete(it) }
+			GoldStoneDataBase.database.tokenBalanceDao().apply {
+				val balances = getTokenBalanceByAddress(address)
+				if (balances.isEmpty()) {
+					GoldStoneAPI.context.runOnUiThread { callback() }
+					return
 				}
-			}) {
-				callback()
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = balances.size
+					override fun concurrentJobs() {
+						balances.forEach {
+							delete(it)
+							completeMark()
+						}
+					}
+					override fun mergeCallBack() = callback()
+				}.start()
 			}
 		}
-
 	}
 }
 
 @Dao
 interface TokenBalanceDao {
-
+	
 	@Query("SELECT * FROM tokenBalance WHERE address LIKE :address")
 	fun getTokenBalanceByAddress(address: String): List<TokenBalanceTable>
-
+	
 	@Query("SELECT * FROM tokenBalance WHERE contract LIKE :contract AND address LIKE :address ORDER BY date DESC")
-	fun getTokenBalanceByContractAndAddress(address: String, contract: String): List<TokenBalanceTable>
-
+	fun getTokenBalanceByContractAndAddress(
+		address: String,
+		contract: String
+	): List<TokenBalanceTable>
+	
 	@Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND contract LIKE :contract")
 	fun getBalanceByDate(date: Long, address: String, contract: String): TokenBalanceTable?
-
+	
 	@Insert
 	fun insert(token: TokenBalanceTable)
-
+	
 	@Update
 	fun update(token: TokenBalanceTable)
-
+	
 	@Delete
 	fun delete(token: TokenBalanceTable)
 }

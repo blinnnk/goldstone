@@ -37,13 +37,13 @@ class WalletListPresenter(
 		// 获取全部本机钱包
 		WalletTable.getAll {
 			// 获取全部本地记录的 `Token` 信息
-			DefaultTokenTable.getTokens { allTokens ->
+			DefaultTokenTable.getCurrentChainTokens { allTokens ->
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount = size
 					override fun concurrentJobs() {
 						forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getTokensWith(wallet.address) {
+							MyTokenTable.getCurrentChainTokensWith(wallet.address) {
 								// 计算当前钱包下的 `token` 对应的货币总资产
 								WalletListModel(wallet, it.sumByDouble { walletToken ->
 									val thisToken = allTokens.find { it.contract == walletToken.contract }!!

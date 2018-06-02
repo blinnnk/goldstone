@@ -10,7 +10,8 @@
     "weight": 9000,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e4f2729b9e144450aa99165650bfb02b",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "TRON",
@@ -23,7 +24,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/46e92d717fe346c99ca2178f7af233e0",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "VeChain",
@@ -36,7 +38,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/42fa79545c4647af802b5eabec4f0285",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "OmiseGO",
@@ -49,7 +52,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2c72dff420fc4320bff89d2a80dc10df",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "Binance Coin",
@@ -62,7 +66,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4874e97dde684f919ac8af4ff98b2a4f",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Populous",
@@ -75,7 +80,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/ce467da3f5f74f369e4d48887ea1dd1d",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Bytom",
@@ -88,7 +94,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/51798734f7774f50aa6033410dccaf58",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Maker",
@@ -101,7 +108,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/ca64e79b0c2b469b8a82b1122a843ad5",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Zilliqa",
@@ -114,7 +122,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/390f6438a4404cabb1f5ae1c2eb2743b",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Aeternity",
@@ -127,7 +136,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e0da7ab482854a76a882965dddecd138",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Status",
@@ -140,7 +150,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/80736b4319ee4848a24437f1154aedbf",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Aion",
@@ -153,7 +164,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/554efbd650624d12be157ffd97ce2385",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Loopring",
@@ -166,7 +178,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/cec36703082f417ba2bf66403bcd87f6",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Golem",
@@ -179,7 +192,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/433be8afd21541a8b7f9c3f8e424ee56",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Augur",
@@ -192,7 +206,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/f2510fe860584d4eb92720a2523294cd",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "KuCoin Shares",
@@ -205,7 +220,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/b13b34c94ab040d194b232866d6fc384",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Waltonchain",
@@ -218,7 +234,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/83378e79cba8402193f9ec747bc5497c",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "QASH",
@@ -231,7 +248,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/68844e9ae6cb4a06802833422ea52213",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Veritaseum",
@@ -244,7 +262,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2e7893426e964790a6ed65254cccb90e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Dentacoin",
@@ -257,7 +276,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4e92566d3355444aa983a36f56d0a1db",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "FunFair",
@@ -270,7 +290,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/883f78dcb4e14f569554cd5548efcc04",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Nebulas",
@@ -283,7 +304,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/805f3baad3e247beaba0f9b3bfdaac18",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "SALT",
@@ -296,7 +318,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/d68d10739936428d8ee5063e2b21a84a",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "Storm",
@@ -309,7 +332,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/1792537d65db4cd68c3f71fd27ee2ae8",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Bancor",
@@ -322,7 +346,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/79bba78a932149879aef641f89e2acdc",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Request Network",
@@ -335,7 +360,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/74be1f903ad149a7bba7682be2dbb59e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Enigma",
@@ -348,7 +374,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a07f7c4d520a4cfe834c3bb4452533af",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "TenX",
@@ -361,7 +388,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/8be37f78701e4040895f903f669bf580",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Cindicator",
@@ -374,7 +402,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/592d8a6fb28b446bafbb3e731277a6e9",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Civic",
@@ -387,7 +416,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/43b79af61254428b854325a85efcd381",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "urlomi",
@@ -400,7 +430,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/79ea466719154af38887c5d30825797a",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Dent",
@@ -413,7 +444,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2d24497ba9ed46ed8f6a0d8f21717dd5",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Gnosis",
@@ -426,7 +458,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/063dd307a045429f8d07051addb5348d",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Monaco",
@@ -439,7 +472,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/eda62dccd4f240b495eca1129ce2b424",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Quantstamp",
@@ -452,7 +486,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/091791016bad4339b9827619e140fd06",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Decentraland",
@@ -465,7 +500,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/b20b1e76695a4680b3ed8582679ba4e9",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "iExec RLC",
@@ -478,7 +514,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/3220a8f3d7fa4512936775a2ecf216ca",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Loom Network",
@@ -491,7 +528,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a39343ae2ebe4188831baba53b0ceea0",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Genaro Network",
@@ -504,7 +542,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/f1790e923d5241e9934efcaddc0f06a9",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Po.et",
@@ -517,7 +556,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/38764116f9ad41c095b7df33fd5bf31e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Time New Bank",
@@ -530,7 +570,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/81aac035fae04834a179d1b795175bc0",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Dynamic Trading Rights",
@@ -543,7 +584,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/065cd22735e54d68b4ab1bdafc17471f",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "High Performance Blockchain",
@@ -556,7 +598,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/5d354bdaf9774a989da32e1b1641f811",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Arcblock",
@@ -569,7 +612,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/564a89e1082e4bbead7a1e6adbda5dde",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Santiment Network Token",
@@ -582,7 +626,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a96ce5a3e59441d792f88087e24cd172",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Raiden Network Token",
@@ -595,7 +640,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a477926c0e0444ee8591cd780b9c073d",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Metal",
@@ -608,7 +654,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4f57b3911214413e92d40c1513b030dd",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "SmartMesh",
@@ -621,7 +668,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9501b0d0b04747cab559571f52f2ccc3",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Genesis Vision",
@@ -634,7 +682,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/7170dac983214355b701751c993294d1",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Gifto",
@@ -647,7 +696,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/3a3876f00f7e46ebb24b9d4384872609",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "PayPie",
@@ -660,7 +710,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/77e0b8f9ff8f41a2b5d44d95603ec39d",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "BLOCKv",
@@ -673,7 +724,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2bf1111578b04fc59ec65756bfc5c479",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "CyberMiles",
@@ -686,7 +738,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/c01d8f651cde4347baf7614d59f524d1",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "AirSwap",
@@ -699,7 +752,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/97ec70b488f84699bfbecaf9d364636e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "ETHLend",
@@ -712,7 +766,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/563a890c787640f99cf79b16705305f0",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "IoT Chain",
@@ -725,7 +780,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4243be27a9b14c04bad6f5f7d3f507ab",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "OST",
@@ -738,7 +794,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e7d707ff9eeb446196f87e3981a9ae51",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "Streamr DATAcoin",
@@ -751,7 +808,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2cf9718216b74fb0a2213cc28a5b6d75",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "AdEx",
@@ -764,7 +822,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/56de60e5bb7c4a02bd9e737bb3a00d52",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "SophiaTX",
@@ -777,7 +836,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/bb1912dc8c6f4c598196b6103dca7702",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "SingularDTV",
@@ -790,7 +850,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/5341ffeef1294f08b24cfbe78634f506",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "UTRUST",
@@ -803,7 +864,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/7827e4f303874f7b9bf724c53875fe51",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Eidoo",
@@ -816,7 +878,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/45f8b71333f54844b299651096802e6e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "SpankChain",
@@ -829,7 +892,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/41cbccbf732e4309a0f0d4e6bd052e8e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Ambrosus",
@@ -842,7 +906,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/b735571c2f9c497bbed259eb61a7c159",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Telcoin",
@@ -855,7 +920,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/bea39705297f4b2d9a72f3106050a9b6",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Edgeless",
@@ -868,7 +934,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/8e85436b18af4c629b3daac86a941267",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Crypterium",
@@ -881,7 +948,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/bf8e82708adb414f8784f5763efca6ea",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "MediShares",
@@ -894,7 +962,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/d438742d58214e809312a938ea06fd94",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "AppCoins",
@@ -907,7 +976,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/1dffb2ee266e489fb2d3548c6cfffc33",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "district0x",
@@ -920,7 +990,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/5d9b19343a8347f79440250233f4f8d5",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Universa",
@@ -933,7 +1004,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2f4df0e055794fdf945625ab0b808694",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "VIBE",
@@ -946,7 +1018,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/d760c8ac7da747e78a66a9500cdef948",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Tierion",
@@ -959,7 +1032,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/aa7a51646bd54b98888ba09761091743",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "MobileGo",
@@ -972,7 +1046,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/576cdd3709284c8794bc57baebea918b",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Bread",
@@ -985,7 +1060,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/317b983c08c34022a75f61e70481c651",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Ormeus Coin",
@@ -998,7 +1074,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9a236b969c8c47519bb7c00ffe5f5fa8",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "KickCoin",
@@ -1011,7 +1088,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/6c14ef6c8636424e81b91017c7bf95a9",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "OriginTrail",
@@ -1024,7 +1102,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/f2a8cee122984b52a331f69b69fa4e25",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Presearch",
@@ -1037,7 +1116,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/aecddbea47c441439d375e03480de079",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Etherparty",
@@ -1050,7 +1130,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/fb0b56c0796946efa9ded9e7e156ad47",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "BlockMason Credit Protocol",
@@ -1063,7 +1144,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2a0443ddf13548aa9b71b824ec163f2f",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Rock",
@@ -1076,7 +1158,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9fe6e796e0b34e0696dbe78799b4b204",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Delphy",
@@ -1089,7 +1172,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9c38b09030254f55bcc2609167f8b873",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Blox",
@@ -1102,7 +1186,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e3a4a603d37e4cdbae448dc28c36c7ab",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Bottos",
@@ -1115,7 +1200,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9f7cf2a9a53e4ba898dba9db84da258b",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Viberate",
@@ -1128,7 +1214,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/f973740f0bd14f5e882af942a0c19e80",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Cofound.it",
@@ -1141,7 +1228,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9fd628d2a9a8416abdef3dbfe8d91d95",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Unikoin Gold",
@@ -1154,7 +1242,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/cb9fd774fb1e48ae9ee45960d29e9991",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Spectre.ai Dividend Token",
@@ -1167,7 +1256,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/fbab2869cb5847d9aa0a5db18bb683a2",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "TokenCard",
@@ -1180,7 +1270,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a9f04a143ecb40c28a0e2c11dba286ad",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Humaniq",
@@ -1193,7 +1284,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2cb5d16d982d4532bd98046e611587bb",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Decision Token",
@@ -1206,7 +1298,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/1f87968782c445c59a00a5a0bdb3a590",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Lunyr",
@@ -1219,7 +1312,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/6adeb007d53f42faac5fa1b472b596f6",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Havven",
@@ -1232,7 +1326,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/cd075b3ac58d44748615a164f4030912",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Bankex",
@@ -1245,7 +1340,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e30f1343f9564cbf8627c5afecea09d7",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "ATMChain",
@@ -1258,7 +1354,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/2845540293d0412dba3aa2d6d93f72c4",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Hive Project",
@@ -1271,7 +1368,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/98dd69bf5fea494b9d2841b66472e728",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Blockport",
@@ -1284,7 +1382,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e6f64bac0d254759a03fc8ea0d9ec684",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Blackmoon",
@@ -1297,7 +1396,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/f956b640448a4feeb8272786d990151e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Payfair",
@@ -1310,7 +1410,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4f2e5f663dd44de5af112555a085ea8e",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Centra",
@@ -1323,7 +1424,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/4b46614fe70041b5b95e33700cc78ab1",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Cobinhood",
@@ -1336,7 +1438,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/11ad213ef25440e79078666267c91cb7",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "IPChain",
@@ -1349,7 +1452,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e4a8e5119914469fbf2a6cfccb97b4bb",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Exchange Union",
@@ -1362,7 +1466,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/b75f77d4604f4d398a9cc8e661ce2287",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "UnlimitedIP",
@@ -1375,7 +1480,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/77573d6dced14b23ae2a1787a1fc879a",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Melon",
@@ -1388,7 +1494,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/a4c870118c8142818cb87b8a1162fb7b",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "TaaS",
@@ -1401,7 +1508,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/fe35dc02471940c19984e7e0188c3572",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "name": "Goldstone",
@@ -1414,7 +1522,8 @@
     "weight": 200,
     "force_show": 1,
     "url": "http://hunger.blinnnk.com/25af31df6eaf400680a06a2b814ef1aa",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   },
   {
     "name": "BigONE Token",
@@ -1427,7 +1536,8 @@
     "weight": 0,
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/412a66b286a94aec9b03bad5b984f4ab",
-    "is_default": 0
+    "is_default": 0,
+    "chain_id": "1"
   },
   {
     "symbol": "ETH",
@@ -1440,6 +1550,7 @@
     "weight": 10000,
     "force_show": 1,
     "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
-    "is_default": 1
+    "is_default": 1,
+    "chain_id": "1"
   }
 ]
