@@ -19,7 +19,6 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.numberDate
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.margin
@@ -87,15 +86,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private var chartLineColor = Spectrum.green
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout? = null
-	
-	
-	private var lastChartDataMD5: String? = null
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
-		val dataMD5 = chartData.getObjectMD5HexString()
-		if (lastChartDataMD5 == dataMD5) {
-			return@observing
-		}
-		lastChartDataMD5 = dataMD5
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格

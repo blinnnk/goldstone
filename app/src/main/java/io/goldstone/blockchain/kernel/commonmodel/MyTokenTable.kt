@@ -42,10 +42,15 @@ data class MyTokenTable(
 	
 	companion object {
 		
-		fun insert(model: MyTokenTable, address: String = WalletTable.current.address) {
+		fun insert(model: MyTokenTable, chainID: String = GoldStoneApp.currentChain) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
-				if (getTokenByContractAndAddress(model.contract, address).isNull()) {
+				if (getCurrentChainTokenByContractAndAddress(
+						model.contract,
+						model.ownerAddress,
+						chainID
+					).isNull()
+				) {
 					insert(model)
 				}
 			}
@@ -72,7 +77,7 @@ data class MyTokenTable(
 					GoldStoneDataBase
 						.database
 						.myTokenDao()
-						.getTokenByContractAndAddress(
+						.getCurrentChainTokenByContractAndAddress(
 							contract,
 							WalletTable.current.address
 						)
@@ -88,7 +93,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenByContractAndAddress(contract, address).let {
+					getCurrentChainTokenByContractAndAddress(contract, address).let {
 						it?.let { delete(it) }
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
@@ -206,7 +211,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getTokenByContractAndAddress(contract, WalletTable.current.address).let {
+					getCurrentChainTokenByContractAndAddress(contract, WalletTable.current.address).let {
 						it?.let { update(it.apply { this.balance = balance }) }
 					}
 				}
@@ -219,7 +224,7 @@ data class MyTokenTable(
 interface MyTokenDao {
 	
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
-	fun getTokenByContractAndAddress(
+	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
 		chainID: String = GoldStoneApp.currentChain

@@ -58,10 +58,8 @@ object GoldStoneAPI {
 			val gson = Gson()
 			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
 			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
-			
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = ChainID.getAllChainID().size
-				
 				override fun concurrentJobs() {
 					ChainID.getAllChainID().forEach { chainID ->
 						allDefaultTokens +=

@@ -30,23 +30,22 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	}
 	
 	private fun TokenSearchCell.setMyTokenStatus() {
-		// 更新缓存中的数据, 防止 `Recycler` 复用的时候 `switch` `UI` 样式变化
-		asyncData?.find {
-			it.contract.equals(model?.contract, true)
-		}?.let {
-			it.isUsed = switch.isChecked
-		}
-		
 		model?.let {
 			DefaultTokenTable.getCurrentChainTokenByContract(it.contract) { localToken ->
 				localToken.isNotNull {
-					DefaultTokenTable.updateTokenDefaultStatus(it.contract, switch.isChecked) {
-						insertToMyToken(switch, it)
-					}
+					insertToMyToken(switch, localToken)
 				} otherwise {
-					DefaultTokenTable.insertToken(it.apply { isDefault = switch.isChecked }) {
+					DefaultTokenTable.insertToken(it.apply {
+						isDefault = switch.isChecked
+					}) {
 						insertToMyToken(switch, it)
 					}
+				}
+				// 更新缓存中的数据, 防止 `Recycler` 复用的时候 `switch` `UI` 样式变化
+				asyncData?.find {
+					it.contract.equals(model?.contract, true)
+				}?.let {
+					it.isUsed = switch.isChecked
 				}
 			}
 		}
