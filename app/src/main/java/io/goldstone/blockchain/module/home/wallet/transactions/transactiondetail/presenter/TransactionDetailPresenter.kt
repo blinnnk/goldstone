@@ -189,7 +189,6 @@ class TransactionDetailPresenter(
 					overlayView.header.backButton.onClick {
 						headerTitle = TransactionText.detail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
-						setHeightMatchParent()
 					}
 				}
 				
@@ -197,7 +196,6 @@ class TransactionDetailPresenter(
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
-						setHeightMatchParent()
 					}
 				}
 				

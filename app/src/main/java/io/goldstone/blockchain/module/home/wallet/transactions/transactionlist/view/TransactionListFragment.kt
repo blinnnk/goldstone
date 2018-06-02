@@ -13,12 +13,11 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 24/03/2018 2:12 PM
  * @author KaySaith
  */
-
 class TransactionListFragment :
 	BaseRecyclerFragment<TransactionListPresenter, TransactionListModel>() {
-
+	
 	override val presenter = TransactionListPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionListModel>?
@@ -32,13 +31,11 @@ class TransactionListFragment :
 			}
 		}
 	}
-
-	override fun setSlideUpWithCellHeight() =
-		75.uiPX()
-
+	
+	override fun setSlideUpWithCellHeight() = 75.uiPX()
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
 	}
-
 }

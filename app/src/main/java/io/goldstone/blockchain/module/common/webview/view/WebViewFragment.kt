@@ -76,7 +76,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				}
 			}
 		}
-		presenter.updateHeight(context?.getRealScreenHeight().orZero())
 	}
 	
 	override fun onViewCreated(
@@ -97,6 +96,9 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 					setBackEvent()
 				}
 			}
+		}
+		if (parentFragment is ProfileOverlayFragment) {
+			presenter.updateHeight(context?.getRealScreenHeight().orZero())
 		}
 	}
 	

@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.content.Context
 import android.os.Bundle
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -119,12 +118,41 @@ class GasSelectionPresenter(
 		}
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!, WalletTable.current.address, true
-			) { balance ->
+			checkBalanceIsValid(token) {
 				fragment.context?.runOnUiThread {
-					showAlertOrTransfer(balance, footer, callback)
+					isTrue {
+						showConfirmAttentionView(footer, callback)
+					} otherwise {
+						footer.setCanUseStyle(false)
+						fragment.context?.alert(AlertText.balanceNotEnough)
+						callback()
+					}
 				}
+			}
+		}
+	}
+	
+	private fun checkBalanceIsValid(
+		token: WalletDetailCellModel?,
+		hold: Boolean.() -> Unit
+	) {
+		// 如果是 `ETH`转账刚好就是判断站长金额加上燃气费费用
+		if (token?.contract.equals(CryptoValue.ethContract, true)) {
+			MyTokenTable.getBalanceWithContract(
+				token?.contract!!,
+				WalletTable.current.address,
+				true
+			) {
+				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
+			}
+		} else {
+			// 如果当前站长不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
+			MyTokenTable.getBalanceWithContract(
+				CryptoValue.ethContract,
+				WalletTable.current.address,
+				true
+			) {
+				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
 		}
 	}
@@ -257,34 +285,16 @@ class GasSelectionPresenter(
 		}
 	}
 	
-	private fun Context.showAlertOrTransfer(
-		balance: Double,
-		footer: GasSelectionFooter,
-		callback: () -> Unit
-	) {
-		if (getTransferCount().toDouble() <= 0) {
-			callback()
-			alert(AlertText.emptyTransferValue)
-		} else {
-			if (balance > getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0)) {
-				footer.setCanUseStyle(true)
-				showConfirmAttentionView(footer, callback)
-			} else {
-				callback()
-				alert(AlertText.balanceNotEnough)
-			}
-		}
-	}
-	
 	private fun showConfirmAttentionView(
 		footer: GasSelectionFooter,
 		callback: () -> Unit
 	) {
-		fragment.context?.showAlertView(TransactionText.confirmTransaction,
-		                                CommonText.enterPassword.toUpperCase(), true, {
-			                                // 点击 `Alert` 取消按钮
-			                                footer.getConfirmButton { showLoadingStatus(false) }
-		                                }) {
+		fragment.context?.showAlertView(
+			TransactionText.confirmTransaction,
+			CommonText.enterPassword.toUpperCase(), true, {
+				// 点击 `Alert` 取消按钮
+				footer.getConfirmButton { showLoadingStatus(false) }
+			}) {
 			transfer(it?.text.toString(), callback)
 		}
 	}
@@ -306,7 +316,7 @@ class GasSelectionPresenter(
 		info: String,
 		hold: (String) -> Unit
 	) {
-		DefaultTokenTable.getCurrentChainTokenByContract(CryptoSymbol.eth) {
+		DefaultTokenTable.getCurrentChainTokenByContract(CryptoValue.ethContract) {
 			hold(
 				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + GoldStoneApp
 					.currencyCode
