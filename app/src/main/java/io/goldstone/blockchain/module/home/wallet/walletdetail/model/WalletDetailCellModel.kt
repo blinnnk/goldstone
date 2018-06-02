@@ -59,21 +59,22 @@ data class WalletDetailCellModel(
 					hold(arrayListOf())
 					return@getCurrentChainTokensWith
 				}
-				DefaultTokenTable.getAllTokens { localTokens ->
+				DefaultTokenTable.getCurrentChainTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
 						val tokenList = ArrayList<WalletDetailCellModel>()
 						override var asyncCount: Int = allTokens.size
 						override fun concurrentJobs() {
 							allTokens.forEach { token ->
-								localTokens.find { it.contract == token.contract }?.let { targetToken ->
+								localTokens.find { it.contract.equals(token.contract, true) }?.let { targetToken ->
 									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
-									completeMark()
 								}
+								completeMark()
 							}
 						}
 						
-						override fun mergeCallBack() =
+						override fun mergeCallBack() {
 							hold(tokenList)
+						}
 					}.start()
 				}
 			}
@@ -100,7 +101,7 @@ data class WalletDetailCellModel(
 							override var asyncCount: Int = myTokens.size
 							override fun concurrentJobs() {
 								myTokens.forEach { token ->
-									localTokens.find { it.contract == token.contract }?.let { targetToken ->
+									localTokens.find { it.contract.equals(token.contract, true) }?.let { targetToken ->
 										if (targetToken.contract == CryptoValue.ethContract) {
 											GoldStoneEthCall
 												.getEthBalance(walletAddress) {

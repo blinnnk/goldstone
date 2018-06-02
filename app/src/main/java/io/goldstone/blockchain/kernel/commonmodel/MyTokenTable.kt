@@ -2,12 +2,9 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
-import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toEthCount
@@ -31,7 +28,7 @@ data class MyTokenTable(
 	var symbol: String,
 	var balance: Double,
 	var contract: String,
-	var chainID: String = GoldStoneApp.currentChain
+	var chainID: String
 ) {
 	
 	constructor(data: DefaultTokenTable, address: String) : this(
@@ -48,11 +45,10 @@ data class MyTokenTable(
 		fun insert(model: MyTokenTable, address: String = WalletTable.current.address) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
-				if(getTokenByContractAndAddress(model.contract, address).isNull()) {
+				if (getTokenByContractAndAddress(model.contract, address).isNull()) {
 					insert(model)
 				}
 			}
-			
 		}
 		
 		fun getCurrentChainTokensWith(
@@ -101,6 +97,7 @@ data class MyTokenTable(
 							completeMark()
 						}
 					}
+					
 					override fun mergeCallBack() = callback()
 				}.start()
 			}
@@ -116,7 +113,7 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.apply {
 					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 					myTokenDao().getCurrentChainTokensBy(ownerAddress).find {
-						it.contract == contract
+						it.contract.equals(contract, true)
 					}.isNull() isTrue {
 						getBalanceAndInsertWithSymbolAndContract(symbol, contract, ownerAddress) {
 							GoldStoneAPI.context.runOnUiThread {
@@ -135,16 +132,25 @@ data class MyTokenTable(
 			callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-			if (symbol == CryptoSymbol.eth) {
+			if (contract == CryptoValue.ethContract) {
 				GoldStoneEthCall.getEthBalance(ownerAddress) {
-					insert(MyTokenTable(0, ownerAddress, symbol, it, CryptoValue.ethContract))
+					insert(
+						MyTokenTable(
+							0,
+							ownerAddress,
+							symbol,
+							it,
+							CryptoValue.ethContract,
+							GoldStoneApp.currentChain
+						)
+					)
 					callback(it)
 				}
 			} else {
 				GoldStoneEthCall.getTokenBalanceWithContract(
 					contract, ownerAddress
 				) {
-					insert(MyTokenTable(0, ownerAddress, symbol, it, contract))
+					insert(MyTokenTable(0, ownerAddress, symbol, it, contract, GoldStoneApp.currentChain))
 					callback(it)
 				}
 			}

@@ -206,10 +206,11 @@ data class DefaultTokenTable(
 			token: DefaultTokenTable,
 			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{ GoldStoneDataBase.database.defaultTokenDao().insert(token) }
-			) {
-				callback()
+			doAsync {
+				GoldStoneDataBase.database.defaultTokenDao().insert(token)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
 			}
 		}
 	}

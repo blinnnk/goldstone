@@ -26,23 +26,9 @@ import org.jetbrains.anko.*
  * @date 27/03/2018 12:15 PM
  * @author KaySaith
  */
-
 class EditTextWithButton(context: Context) : RelativeLayout(context) {
 	
-	var onTextCopy: Runnable? = null
-	var onTextCut: Runnable? = null
-	
-	val editText = object : EditText(context) {
-		override fun onTextContextMenuItem(id: Int): Boolean {
-			when (id) {
-				android.R.id.cut -> onTextCut?.run()
-				android.R.id.paste -> clearPasteStyle()
-				android.R.id.copy -> onTextCopy?.run()
-			}
-			return super.onTextContextMenuItem(id)
-		}
-	}
-	
+	val editText = EditText(context)
 	private val button by lazy { TextView(context) }
 	
 	init {
@@ -61,16 +47,9 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 		}.into(this)
 		editText.setCenterInVertical()
-
 	}
 	
-	fun clearPasteStyle() {
-		editText.textColor = GrayScale.black
-		editText.textSize = fontSize(12)
-	}
-
 	fun setCancelButton(setClickEvent: () -> Unit = {}) {
-
 		button.apply {
 			text = CommonText.cancel
 			textColor = GrayScale.midGray
@@ -79,16 +58,15 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(70.uiPX(), matchParent)
 			gravity = Gravity.CENTER
 		}.click { setClickEvent() }.into(this)
-
+		
 		button.apply {
 			setAlignParentRight()
 			setCenterInVertical()
 		}
 	}
-
+	
 	fun onPressKeyboardEnterButton(action: () -> Unit) {
 		editText.setOnKeyListener(OnKeyListener { _, keyCode, event ->
-
 			if (event.action == KeyEvent.ACTION_DOWN) {
 				when (keyCode) {
 					KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
@@ -96,7 +74,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 						SoftKeyboard.hide(context as Activity)
 						return@OnKeyListener true
 					}
-
+					
 					else -> {
 					}
 				}
@@ -104,5 +82,4 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			false
 		})
 	}
-
 }

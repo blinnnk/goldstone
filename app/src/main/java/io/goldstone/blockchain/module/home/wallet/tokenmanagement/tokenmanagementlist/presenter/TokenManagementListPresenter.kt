@@ -68,16 +68,16 @@ class TokenManagementListPresenter(
 	
 	companion object {
 		
-		fun updateMyTokensInfoBy(switch: HoneyBaseSwitch, symbol: String, contract: String) {
+		fun updateMyTokensInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
 			switch.isClickable = false
 			if (switch.isChecked) {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(symbol, contract) {
+				MyTokenTable.insertBySymbolAndContract(token.symbol, token.contract) {
 					switch.isClickable = true
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteByContract(contract) {
+				MyTokenTable.deleteByContract(token.contract) {
 					switch.isClickable = true
 				}
 			}
