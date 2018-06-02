@@ -51,7 +51,7 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun getCurrentChainTokensWith(
+		fun getCurrentChainTokensWithAddress(
 			walletAddress: String = WalletTable.current.address,
 			callback: (ArrayList<MyTokenTable>) -> Unit = {}
 		) {
@@ -60,6 +60,24 @@ data class MyTokenTable(
 					GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(walletAddress)
 				}) {
 				callback(it.toArrayList())
+			}
+		}
+		
+		fun getCurrentChainTokenByContract(
+			contract: String,
+			callback: (MyTokenTable?) -> Unit
+		) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.myTokenDao()
+						.getTokenByContractAndAddress(
+							contract,
+							WalletTable.current.address
+						)
+				}) {
+				callback(it)
 			}
 		}
 		
@@ -169,7 +187,7 @@ data class MyTokenTable(
 					callback(balance)
 				}
 			} else {
-				DefaultTokenTable.getTokenByContract(contract) { token ->
+				DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(), ownerAddress
 					) {

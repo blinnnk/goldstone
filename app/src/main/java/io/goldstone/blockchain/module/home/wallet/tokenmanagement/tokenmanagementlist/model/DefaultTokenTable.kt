@@ -158,13 +158,13 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun getTokenByContract(
+		fun getCurrentChainTokenByContract(
 			contract: String,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract)
+					GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokenByContract(contract)
 				}) {
 				hold(it)
 			}
@@ -178,7 +178,7 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenByContract(contract)?.let {
+						getCurrentChainTokenByContract(contract)?.let {
 							update(it.apply { price = newPrice })
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
@@ -194,7 +194,7 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenByContract(contract)?.let {
+						getCurrentChainTokenByContract(contract)?.let {
 							update(it.apply { this.isDefault = isDefault })
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
@@ -232,7 +232,7 @@ interface DefaultTokenDao {
 	): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chain_id LIKE :chainID")
-	fun getTokenByContract(
+	fun getCurrentChainTokenByContract(
 		contract: String,
 		chainID: String = GoldStoneApp.currentChain
 	): DefaultTokenTable?

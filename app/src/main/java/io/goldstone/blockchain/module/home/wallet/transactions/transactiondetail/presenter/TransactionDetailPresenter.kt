@@ -467,7 +467,7 @@ class TransactionDetailPresenter(
 		transaction: InputCodeData,
 		isReceive: Boolean
 	) {
-		DefaultTokenTable.getTokenByContract(receipt.to) {
+		DefaultTokenTable.getCurrentChainTokenByContract(receipt.to) {
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall

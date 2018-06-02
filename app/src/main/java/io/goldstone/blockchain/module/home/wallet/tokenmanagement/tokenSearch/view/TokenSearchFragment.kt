@@ -38,7 +38,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		}
 		
 		model?.let {
-			DefaultTokenTable.getTokenByContract(it.contract) { localToken ->
+			DefaultTokenTable.getCurrentChainTokenByContract(it.contract) { localToken ->
 				localToken.isNotNull {
 					DefaultTokenTable.updateTokenDefaultStatus(it.contract, switch.isChecked) {
 						insertToMyToken(switch, it)

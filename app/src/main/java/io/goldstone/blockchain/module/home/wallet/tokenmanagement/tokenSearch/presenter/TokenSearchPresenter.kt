@@ -63,7 +63,7 @@ class TokenSearchPresenter(
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getCurrentChainTokensWith(WalletTable.current.address) { localTokens ->
+				MyTokenTable.getCurrentChainTokensWithAddress(WalletTable.current.address) { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
@@ -76,32 +76,35 @@ class TokenSearchPresenter(
 			} otherwise {
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 				isSearchingSymbol isFalse {
-					GoldStoneEthCall
-						.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
-							if (symbol.isEmpty() || name.isEmpty()) {
-								hold(arrayListOf())
-							} else {
-								hold(
-									arrayListOf(
-										DefaultTokenTable(
-											0,
-											content,
-											"",
-											symbol,
-											TinyNumber.False.value,
-											0.0,
-											name,
-											decimal,
-											null,
-											false,
-											false,
-											0,
-											GoldStoneApp.currentChain
+					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
+					MyTokenTable.getCurrentChainTokenByContract(content) {
+						GoldStoneEthCall
+							.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
+								if (symbol.isEmpty() || name.isEmpty()) {
+									hold(arrayListOf())
+								} else {
+									hold(
+										arrayListOf(
+											DefaultTokenTable(
+												0,
+												content,
+												"",
+												symbol,
+												TinyNumber.False.value,
+												0.0,
+												name,
+												decimal,
+												null,
+												false,
+												!it.isNull(),
+												0,
+												GoldStoneApp.currentChain
+											)
 										)
 									)
-								)
+								}
 							}
-						}
+					}
 				} otherwise {
 					hold(arrayListOf())
 				}
