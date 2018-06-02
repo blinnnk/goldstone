@@ -216,11 +216,11 @@ class TransactionListPresenter(
 					override fun concurrentJobs() {
 						forEach {
 							GoldStoneEthCall.apply {
-								getTokenSymbolAndDecimalByContract(it.contractAddress) { symbol, decimal ->
+								getTokenInfoByContractAddress(it.contractAddress) { symbol, name, decimal ->
 									GoldStoneDataBase
 										.database
 										.defaultTokenDao()
-										.insert(DefaultTokenTable(it.contractAddress, symbol, decimal))
+										.insert(DefaultTokenTable(it.contractAddress, symbol, decimal, name))
 									completeMark()
 								}
 							}
