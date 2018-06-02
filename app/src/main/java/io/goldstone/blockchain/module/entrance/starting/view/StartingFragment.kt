@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.entrance.starting.view
 
+import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInHorizontal
@@ -20,6 +22,7 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
+import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.*
 
 /**
@@ -36,7 +39,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	}
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
-	private val logoSize = 160.uiPX()
+	private val waveView by lazy { WaveLoadingView(context!!) }
+	private val logoSize = 150.uiPX()
 	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
@@ -105,6 +109,17 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					}
 				}
 			}
+			
+			waveView.apply {
+				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+				setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
+				progressValue = 35
+				waveColor = Color.parseColor("#FF19769D")
+				setAnimDuration(30000)
+				setAmplitudeRatio(30)
+				startAnimation()
+			}.into(this)
+			
 		}
 	}
 }
