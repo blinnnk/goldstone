@@ -48,7 +48,6 @@ class GoldStoneApp : Application() {
 	
 	/**
 	 * Gets the default [Tracker] for this [Application].
-	 * @return tracker
 	 */
 	@Synchronized
 	fun getDefaultTracker(): Tracker? {

@@ -45,10 +45,7 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 		elevation = ShadowSize.Button
 		
 		arrowIcon
-			.apply {
-				y += 1.uiPX()
-				setWhiteSytle()
-			}
+			.apply { setWhiteSytle() }
 			.into(this)
 		arrowIcon.setAlignParentRight()
 		arrowIcon.setCenterInVertical()

@@ -97,7 +97,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
-		errorCallback: () -> Unit = {},
+		errorCallback: () -> Unit,
 		hold: (Double) -> Unit
 	) {
 		requestData<String>(APIPath.getCurrencyRate + symbols, "rate", true, errorCallback) {
@@ -292,7 +292,7 @@ object GoldStoneAPI {
 		OkHttpClient
 			.Builder()
 			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(60, TimeUnit.SECONDS)
+			.readTimeout(40, TimeUnit.SECONDS)
 			.build()
 	
 	private inline fun <reified T> postRequestGetJsonObject(

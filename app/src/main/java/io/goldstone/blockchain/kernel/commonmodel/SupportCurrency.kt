@@ -20,21 +20,25 @@ data class SupportCurrencyTable(
 	var id: Int,
 	var countrySymbol: String,
 	var currencySymbol: String,
-	var isUsed: Boolean
+	var isUsed: Boolean,
+	var rate: Double
 ) {
 	
-	@Ignore constructor() : this(
+	@Ignore
+	constructor() : this(
 		0,
 		"",
 		"",
-		false
+		false,
+		0.0
 	)
 	
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("countrySymbol"),
 		data.safeGet("currencySymbol"),
-		data.safeGet("isUsed").toBoolean()
+		data.safeGet("isUsed").toBoolean(),
+		data.safeGet("rate").toDouble()
 	)
 	
 	companion object {
@@ -55,10 +59,24 @@ data class SupportCurrencyTable(
 			}
 		}
 		
+		fun updateUsedRateValue(rate: Double) {
+			doAsync {
+				GoldStoneDataBase.database.currencyDao()
+					.apply {
+						getSupportCurrencies().find {
+							it.isUsed
+						}?.let {
+							update(it.apply { this.rate = rate })
+						}
+					}
+			}
+		}
+		
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
+				}) {
 				hold(it.toArrayList())
 			}
 		}
