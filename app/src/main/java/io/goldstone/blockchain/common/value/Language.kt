@@ -1645,7 +1645,7 @@ object QuotationText {
 
 	@JvmField
 	val addToken = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Search pairs"
+		HoneyLanguage.English.code -> "search"
 		HoneyLanguage.Chinese.code -> "管理"
 		HoneyLanguage.Japanese.code -> "管理"
 		HoneyLanguage.Korean.code -> "검색"

@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -41,9 +40,6 @@ class TokenManagementPresenter(
 					showTokenSearchFragment()
 					showSearchInput {
 						popFragmentFrom<TokenSearchFragment>()
-						activity?.apply {
-							SoftKeyboard.hide(this)
-						}
 					}
 				}
 			}
