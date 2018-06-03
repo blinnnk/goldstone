@@ -27,12 +27,23 @@ class ProfilePresenter(
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
 			val data = arrayListOf(
-				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, contactCount.size.toString()),
-				ProfileModel(R.drawable.currency_icon, ProfileText.currency, GoldStoneApp.currencyCode),
-				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
 				ProfileModel(
-					R.drawable.chain_icon, ProfileText.chain, ChainID.getChainNameByID
-				(GoldStoneApp.currentChain)
+					R.drawable.contacts_icon,
+					ProfileText.contacts,
+					contactCount.size.toString()
+				),
+				ProfileModel(
+					R.drawable.currency_icon, ProfileText.currency,
+					GoldStoneApp.getCurrencyCode()
+				),
+				ProfileModel(
+					R.drawable.language_icon, ProfileText.language,
+					getCurrentLanguageSymbol()
+				),
+				ProfileModel(
+					R.drawable.chain_icon,
+					ProfileText.chain,
+					ChainID.getChainNameByID(GoldStoneApp.getCurrentChain())
 				),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
@@ -78,5 +89,5 @@ class ProfilePresenter(
 	}
 	
 	private fun getCurrentLanguageSymbol() =
-		HoneyLanguage.getLanguageByCode(GoldStoneApp.currentLanguage.orZero())
+		HoneyLanguage.getLanguageByCode(GoldStoneApp.getCurrentLanguage())
 }

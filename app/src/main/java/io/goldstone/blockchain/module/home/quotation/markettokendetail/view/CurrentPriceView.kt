@@ -27,13 +27,13 @@ import org.jetbrains.anko.wrapContent
  * @date 25/04/2018 8:22 AM
  * @author KaySaith
  */
-
 data class CurrentPriceModel(
 	val currentPrice: Double = 0.0,
 	val baseCurrency: String = "",
 	val percent: String = "0.0",
 	val usdtPrice: Double = 1.0
 ) {
+	
 	constructor(
 		data: CurrencyPriceInfoModel,
 		symbol: String
@@ -45,14 +45,14 @@ data class CurrentPriceModel(
 
 @SuppressLint("SetTextI18n")
 class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
-
+	
 	var model: CurrentPriceModel by observing(CurrentPriceModel()) {
 		val value =
-			" ${model.baseCurrency}" + " ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${GoldStoneApp.currencyCode}"
+			" ${model.baseCurrency} ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${GoldStoneApp.getCurrencyCode()}"
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice}" + value, GrayScale.black, 12.uiPX(), true, false
 		)
-
+		
 		percent.text = model.percent + "%"
 		// 增减显示不同的颜色
 		if (model.percent.toDouble() < 0.0) {
@@ -60,18 +60,15 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		} else {
 			percent.textColor = Spectrum.green
 		}
-
 	}
-
 	private val priceTitles by lazy { TextView(context) }
 	private val percent by lazy { TextView(context) }
-
+	
 	init {
-
 		orientation = VERTICAL
 		title.text = QuotationText.currentPrice
 		showTopLine = true
-
+		
 		priceTitles.apply {
 			textColor = GrayScale.black
 			textSize = fontSize(24)
@@ -89,5 +86,4 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 			y -= 31.uiPX()
 		}.into(this)
 	}
-
 }

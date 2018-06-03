@@ -34,22 +34,21 @@ import org.jetbrains.anko.verticalLayout
  * @date 2018/5/15 10:22 PM
  * @author KaySaith
  */
-
 @SuppressLint("SetTextI18n")
 open class ValueInputView(context: Context) : RelativeLayout(context) {
-
+	
 	protected val gradientView by lazy { GradientView(context) }
 	protected val description by lazy { TextView(context) }
 	protected val valueInput by lazy { EditText(context) }
 	private val priceInfo by lazy { TextView(context) }
 	protected val gradientViewHeight = 170.uiPX()
-
+	
 	init {
 		this.addView(gradientView.apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, gradientViewHeight)
 			setStyle(GradientType.DarkGreenYellow, gradientViewHeight)
 		})
-
+		
 		verticalLayout {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, gradientViewHeight)
 			gravity = Gravity.CENTER
@@ -62,7 +61,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				typeface = GoldStoneFont.medium(context)
 				gravity = Gravity.CENTER
 			}.into(this)
-
+			
 			valueInput.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 				hint = "0.0"
@@ -76,12 +75,12 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				y -= 3.uiPX()
 			}.into(this)
-
+			
 			priceInfo.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
 					topMargin = -(18.uiPX())
 				}
-				text = "≈ 0.0 (${GoldStoneApp.currencyCode})"
+				text = "≈ 0.0 (${GoldStoneApp.getCurrencyCode()})"
 				textColor = Spectrum.opacity5White
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
@@ -89,7 +88,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 			}.into(this)
 		}
 	}
-
+	
 	fun updateCurrencyValue(value: Double) {
 		if (valueInput.text?.toString()?.toDoubleOrNull().isNull() && valueInput.text.isNotEmpty()) {
 			context?.alert(AlertText.transferUnvalidInputFromat)
@@ -98,13 +97,13 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 		}
 		val count = if (valueInput.text.isEmpty()) 0.0 else valueInput.text.toString().toDouble()
 		priceInfo.text =
-			"≈ ${(value * count).orElse(0.0).formatCurrency()} (${GoldStoneApp.currencyCode})"
+			"≈ ${(value * count).orElse(0.0).formatCurrency()} (${GoldStoneApp.getCurrencyCode()})"
 	}
-
+	
 	fun setInputValue(count: Double) {
 		valueInput.setText(count.toString())
 	}
-
+	
 	fun inputTextListener(hold: (String) -> Unit) {
 		valueInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
@@ -116,7 +115,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				}
 				text.apply { hold(toString()) }
 			}
-
+			
 			override fun beforeTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -124,7 +123,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				after: Int
 			) {
 			}
-
+			
 			override fun onTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -134,19 +133,17 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 			}
 		})
 	}
-
+	
 	fun setHeaderSymbol(symbol: String) {
 		description.text = "Send $symbol Count"
 	}
-
+	
 	fun getValue(): String {
 		return valueInput.text.toString()
 	}
-
+	
 	fun setFoucs() {
 		valueInput.requestFocus()
 		(context as? Activity)?.apply { SoftKeyboard.show(this, valueInput) }
 	}
-
-
 }

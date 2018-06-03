@@ -34,7 +34,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		model?.let { searchToken ->
 			DefaultTokenTable.getCurrentChainTokenByContract(
 				searchToken.contract,
-				GoldStoneApp.currentChain
+				GoldStoneApp.getCurrentChain()
 			) { localToken ->
 				localToken.isNotNull {
 					DefaultTokenTable.updateTokenDefaultStatus(

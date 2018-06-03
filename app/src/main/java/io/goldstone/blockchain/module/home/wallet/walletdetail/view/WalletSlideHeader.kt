@@ -26,11 +26,11 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
  */
 @SuppressLint("SetTextI18n")
 class WalletSlideHeader(context: Context) : SliderHeader(context) {
-
+	
 	val historyButton by lazy { CircleButton(context) }
 	val notifyButton by lazy { CircleButton(context) }
 	private val balance by lazy { TwoLineTitles(context) }
-
+	
 	init {
 		historyButton.apply {
 			title = WalletText.historyButton
@@ -38,28 +38,28 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			x += PaddingSize.device
 			y = 15.uiPX().toFloat()
 		}.into(this)
-
+		
 		historyButton.apply {
 			setCenterInVertical()
 		}
-
+		
 		notifyButton.apply {
 			title = WalletText.notifyButton
 			src = R.drawable.notifications_icon
 			x -= PaddingSize.device
 			y = 15.uiPX().toFloat()
 		}.into(this)
-
+		
 		notifyButton.apply {
 			setCenterInVertical()
 			setAlignParentRight()
 		}
-
+		
 		balance.apply {
 			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
 			subtitle.apply {
-				text = WalletText.totalAssets + " " + GoldStoneApp.currencyCode
+				text = WalletText.totalAssets + " " + GoldStoneApp.getCurrencyCode()
 				textSize = fontSize(12)
 			}
 			isCenter = true
@@ -67,29 +67,28 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			y -= 7.uiPX()
 		}.into(this)
 	}
-
+	
 	override fun onHeaderShowedStyle() {
 		super.onHeaderShowedStyle()
 		historyButton.setUnTransparent()
 		notifyButton.setUnTransparent()
-
+		
 		balance.apply {
 			setCenterInParent()
 			visibility = View.VISIBLE
 		}
-
+		
 		setBalanceValue(WalletTable.current.balance?.formatCurrency().orEmpty())
 	}
-
+	
 	override fun onHeaderHidesStyle() {
 		super.onHeaderHidesStyle()
 		historyButton.setDefaultStyle()
 		notifyButton.setDefaultStyle()
 		balance.visibility = View.GONE
 	}
-
+	
 	private fun setBalanceValue(value: String) {
 		balance.title.text = value
 	}
-
 }

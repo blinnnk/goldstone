@@ -32,4 +32,8 @@ object IntentKey {
 
 object SharesPreference {
 	const val registerPush = "registerPush"
+	const val rate = "rate"
+	const val currencyCode = "currencyCode"
+	const val currentChain = "currentChain"
+	const val currentLanguage = "currentLanguage"
 }

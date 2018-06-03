@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.v
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
@@ -22,25 +25,23 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.mo
  * @date 24/03/2018 8:58 PM
  * @author KaySaith
  */
-
 class WalletListCell(context: Context) : BaseValueCell(context) {
-
+	
 	var model: WalletListModel by observing(WalletListModel()) {
-
 		info.apply {
 			title.text = CryptoUtils.scaleTo16(model.addressName)
 			subtitle.text = CryptoUtils.scaleTo16(model.address)
 		}
-
+		
 		count?.apply {
 			title.text = model.count.formatCurrency()
-			subtitle.text = WalletText.totalAssets + " (${GoldStoneApp.currencyCode})"
+			subtitle.text = WalletText.totalAssets + " (${GoldStoneApp.getCurrencyCode()})"
 		}
-
+		
 		icon.apply {
 			glideImage(model.avatar)
 		}
-
+		
 		model.isWatchOnly isTrue {
 			if (signalIcon.isNull()) {
 				signalIcon = RoundIcon(context).apply {
@@ -52,9 +53,9 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 				signalIcon?.into(this)
 			}
 		}
-
+		
 		model.isUsing isTrue {
-			if(currentIcon.isNull()) {
+			if (currentIcon.isNull()) {
 				currentIcon = RoundIcon(context).apply {
 					src = R.drawable.current_icon
 					iconColor = Spectrum.green
@@ -65,19 +66,14 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 				currentIcon?.into(this)
 			}
 		}
-
 		// 圆角 `icon`
 		icon.addCorner(icon.layoutParams.height / 2, GrayScale.midGray)
-
 	}
-
 	private var signalIcon: RoundIcon? = null
 	private var currentIcon: RoundIcon? = null
-
+	
 	init {
 		setGrayStyle()
 		setValueStyle()
 	}
-
-
 }

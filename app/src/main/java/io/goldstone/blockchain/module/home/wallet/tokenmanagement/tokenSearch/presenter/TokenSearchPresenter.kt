@@ -98,7 +98,7 @@ class TokenSearchPresenter(
 												false,
 												!it.isNull(),
 												0,
-												GoldStoneApp.currentChain
+												GoldStoneApp.getCurrentChain()
 											)
 										)
 									)

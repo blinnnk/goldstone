@@ -16,7 +16,7 @@ class LanguageCell(context: Context) : BaseRadioCell(context) {
 
   var model: LanguageModel by observing(LanguageModel()) {
     title.text = model.name
-    checkedStatus = GoldStoneApp.currentLanguage == HoneyLanguage.getLanguageCode(model.name)
+    checkedStatus = GoldStoneApp.getCurrentLanguage() == HoneyLanguage.getLanguageCode(model.name)
   }
 
 }

@@ -143,7 +143,7 @@ fun Double.toGWeiValue(): String {
 }
 
 fun Double.formatCurrency(): String {
-	val rate = GoldStoneApp.currentRate
+	val rate = GoldStoneApp.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 3
 	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同

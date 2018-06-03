@@ -54,7 +54,7 @@ enum class HoneyLanguage(
 			}
 		}
 
-		fun getLanguageCodeBySymbol(symbol: String): Int {
+		fun getCodeBySymbol(symbol: String): Int {
 			return when (symbol.toUpperCase()) {
 				HoneyLanguage.English.symbol -> HoneyLanguage.English.code
 				HoneyLanguage.Chinese.symbol -> HoneyLanguage.Chinese.code

@@ -1,14 +1,9 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
 import android.widget.EditText
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.removeStartAndEndValue
-import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.getWalletByMnemonic

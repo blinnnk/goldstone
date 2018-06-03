@@ -24,9 +24,8 @@ import org.jetbrains.anko.imageResource
  * @date 23/03/2018 6:19 PM
  * @author KaySaith
  */
-
 class WalletDetailCell(context: Context) : BaseCell(context) {
-
+	
 	var model: WalletDetailCellModel? by observing(null) {
 		model?.apply {
 			if (iconUrl.isBlank()) {
@@ -38,29 +37,27 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name
 			valueInfo.title.text = count.formatCount()
-			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${GoldStoneApp.currencyCode})"
+			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${GoldStoneApp.getCurrencyCode()})"
 		}
 	}
-
 	private val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 	private val tokenInfo by lazy { TwoLineTitles(context) }
 	private val valueInfo by lazy { TwoLineTitles(context) }
-
+	
 	init {
-
 		icon.into(this)
 		tokenInfo.into(this)
 		valueInfo.into(this)
-
+		
 		tokenInfo.apply {
 			title.typeface = GoldStoneFont.heavy(context)
 			setCenterInVertical()
 			x += 50.uiPX()
 			y += 2.uiPX()
 		}
-
+		
 		icon.setCenterInVertical()
-
+		
 		valueInfo.apply {
 			title.typeface = GoldStoneFont.heavy(context)
 			setAlignParentRight()
@@ -69,12 +66,9 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			isFloatRight = true
 			y += 2.uiPX()
 		}
-		
-		
 	}
-
+	
 	fun getTokenInfo(): WalletDetailCellModel? {
 		return model
 	}
-
 }

@@ -19,11 +19,10 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
  * @date 27/03/2018 3:41 PM
  * @author KaySaith
  */
-
 class TokenDetailOverlayPresenter(
 	override val fragment: TokenDetailOverlayFragment
 ) : BaseOverlayPresenter<TokenDetailOverlayFragment>() {
-
+	
 	fun showTokenDetailFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
 			addFragmentAndSetArgument<TokenDetailFragment>(ContainerID.content) {
@@ -31,7 +30,7 @@ class TokenDetailOverlayPresenter(
 			}
 		}
 	}
-
+	
 	@SuppressLint("SetTextI18n")
 	fun setValueHeader(token: WalletDetailCellModel?) {
 		fragment.apply {
@@ -42,7 +41,9 @@ class TokenDetailOverlayPresenter(
 					valueHeader?.apply {
 						title.text = "MY ${token?.symbol}"
 						subtitle.text =
-							 CryptoUtils.scaleTo28("${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.currencyCode})")
+							CryptoUtils.scaleTo28(
+								"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.getCurrencyCode()})"
+							)
 						setBlackTitles()
 						isCenter = true
 					}?.into(this)
@@ -56,5 +57,4 @@ class TokenDetailOverlayPresenter(
 			}
 		}
 	}
-
 }

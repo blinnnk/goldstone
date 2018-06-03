@@ -19,24 +19,21 @@ import org.jetbrains.anko.verticalLayout
  * @date 25/04/2018 9:48 AM
  * @author KaySaith
  */
-
 @Suppress("DEPRECATION")
-
 class TokenInformation(context: Context) : TopBottomLineCell(context) {
-
+	
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		rank.setSubtitle(model.rankValue)
 		avalibaleSupply.setSubtitle(model.avaliableSupply)
 		// 服务器返回的是带 `,` 的字符串这里加工成 `Double`
 		marketCap.setSubtitle(
-			model.marketCap.formatCurrency() + " " + GoldStoneApp.currencyCode
+			model.marketCap.formatCurrency() + " " + GoldStoneApp.getCurrencyCode()
 		)
 	}
-
 	private val rank = GraySqualCell(context)
 	private val avalibaleSupply = GraySqualCell(context)
 	private val marketCap = GraySqualCell(context)
-
+	
 	init {
 		title.text = QuotationText.tokenInformation
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 200.uiPX())
@@ -44,13 +41,11 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 			rank.into(this)
 			avalibaleSupply.into(this)
 			marketCap.into(this)
-
+			
 			rank.setTitle("Rank")
 			avalibaleSupply.setTitle("Avaliable Supply")
 			marketCap.setTitle("Market Cap")
 			y -= 10.uiPX()
 		}.setAlignParentBottom()
-
 	}
-
 }

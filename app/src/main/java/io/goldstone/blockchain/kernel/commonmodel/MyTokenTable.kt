@@ -42,7 +42,7 @@ data class MyTokenTable(
 	
 	companion object {
 		
-		fun insert(model: MyTokenTable, chainID: String = GoldStoneApp.currentChain) {
+		fun insert(model: MyTokenTable, chainID: String = GoldStoneApp.getCurrentChain()) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
 				if (getCurrentChainTokenByContractAndAddress(
@@ -164,7 +164,7 @@ data class MyTokenTable(
 							symbol,
 							it,
 							CryptoValue.ethContract,
-							GoldStoneApp.currentChain
+							GoldStoneApp.getCurrentChain()
 						)
 					)
 					callback(it)
@@ -173,7 +173,16 @@ data class MyTokenTable(
 				GoldStoneEthCall.getTokenBalanceWithContract(
 					contract, ownerAddress
 				) {
-					insert(MyTokenTable(0, ownerAddress, symbol, it, contract, GoldStoneApp.currentChain))
+					insert(
+						MyTokenTable(
+							0,
+							ownerAddress,
+							symbol,
+							it,
+							contract,
+							GoldStoneApp.getCurrentChain()
+						)
+					)
 					callback(it)
 				}
 			}
@@ -227,13 +236,13 @@ interface MyTokenDao {
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): MyTokenTable?
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

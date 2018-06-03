@@ -3,13 +3,12 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 import android.support.v4.app.Fragment
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.removeStartAndEndValue
+import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.removeStartAndEndValue
-import io.goldstone.blockchain.common.utils.replaceWithPattern
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
-import io.goldstone.blockchain.crypto.has0xPrefix
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -32,7 +31,6 @@ class PrivateKeyImportPresenter(
 		hintInput: EditText,
 		callback: () -> Unit
 	) {
-		
 		privateKeyInput.text.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.privateKeyAlert)
 			callback()
@@ -50,7 +48,6 @@ class PrivateKeyImportPresenter(
 				callback()
 			}
 		) { passwordValue, walletName ->
-			
 			importWallet(
 				privateKeyInput.text.toString(),
 				passwordValue,

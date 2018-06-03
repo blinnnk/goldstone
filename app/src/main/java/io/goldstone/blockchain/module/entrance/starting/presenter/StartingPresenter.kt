@@ -65,7 +65,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 							SupportCurrencyTable(item).apply {
 								isUsed = true
 								// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-								GoldStoneApp.currentRate = rate
+								GoldStoneApp.updateCurrentRate(rate)
 							}
 						} else {
 							SupportCurrencyTable(item)

@@ -20,7 +20,7 @@ import org.jetbrains.anko.yesButton
 class LanguagePresenter(
 	override val fragment: LanguageFragment
 ) : BaseRecyclerPresenter<LanguageFragment, LanguageModel>() {
-
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf(
 			LanguageModel(HoneyLanguage.English.language),
@@ -30,7 +30,7 @@ class LanguagePresenter(
 			LanguageModel(HoneyLanguage.Korean.language)
 		)
 	}
-
+	
 	fun setLanguage(
 		language: String,
 		hold: Boolean.() -> Unit
@@ -50,7 +50,7 @@ class LanguagePresenter(
 			}.show()
 		}
 	}
-
+	
 	private fun updateLanguageValue(language: String) {
 		val code = when (language) {
 			HoneyLanguage.English.language -> HoneyLanguage.English.code
@@ -60,18 +60,18 @@ class LanguagePresenter(
 			HoneyLanguage.Korean.language -> HoneyLanguage.Korean.code
 			else -> HoneyLanguage.English.code
 		}
-
+		
 		AppConfigTable.updateLanguage(code) {
 			jumpAndReset()
 		}
 	}
-
+	
 	private fun jumpAndReset() {
+		
 		fragment.activity?.jump<SplashActivity>()
 		// 杀掉进程
 		android.os.Process.killProcess(android.os.Process.myPid())
 		System.exit(0)
 	}
-
 }
 

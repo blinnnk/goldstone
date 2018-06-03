@@ -218,7 +218,7 @@ class MarketTokenDetailPresenter(
 				}
 				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
 				if (description.isNullOrBlank() || !description?.substring(0, 2).equals(
-						HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()), true
+						HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()), true
 					)
 				) {
 					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->

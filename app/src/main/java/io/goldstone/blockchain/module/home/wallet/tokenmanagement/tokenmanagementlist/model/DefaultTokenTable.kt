@@ -67,7 +67,7 @@ data class DefaultTokenTable(
 		true,
 		false,
 		0,
-		GoldStoneApp.currentChain
+		GoldStoneApp.getCurrentChain()
 	)
 	
 	constructor(
@@ -86,7 +86,7 @@ data class DefaultTokenTable(
 		isUsed,
 		isUsed,
 		data.weight,
-		GoldStoneApp.currentChain
+		GoldStoneApp.getCurrentChain()
 	)
 	
 	constructor(
@@ -127,7 +127,7 @@ data class DefaultTokenTable(
 		false,
 		false,
 		0,
-		GoldStoneApp.currentChain
+		GoldStoneApp.getCurrentChain()
 	)
 	
 	companion object {
@@ -161,7 +161,7 @@ data class DefaultTokenTable(
 		
 		fun getCurrentChainTokenByContract(
 			contract: String,
-			chainID: String = GoldStoneApp.currentChain,
+			chainID: String = GoldStoneApp.getCurrentChain(),
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
@@ -228,18 +228,18 @@ interface DefaultTokenDao {
 	fun getAllTokens(): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :chainID")
-	fun getCurrentChainTokens(chainID: String = GoldStoneApp.currentChain): List<DefaultTokenTable>
+	fun getCurrentChainTokens(chainID: String = GoldStoneApp.getCurrentChain()): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chain_id LIKE :chainID")
 	fun getDefaultTokens(
 		isDefault: Boolean = true,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chain_id LIKE :chainID")
 	fun getCurrentChainTokenByContract(
 		contract: String,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): DefaultTokenTable?
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
