@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -54,6 +55,9 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
 			presenter.onFragmentShowFromHidden()
+			// 软件为了防止重汇会在有新的窗口全屏的时候隐藏主要的 `HomeFragment` 但是隐藏操作会
+			// 导致 `BackEvent` 在这里被重置, 这里判断在 `Parent` 为 `Null` 的时候不执行
+			if (parentFragment.isNull()) return
 			getMainActivity()?.apply {
 				backEvent = Runnable { setBackEvent(this, parentFragment) }
 			}

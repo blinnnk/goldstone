@@ -4,7 +4,6 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -33,9 +32,4 @@ class TransactionListFragment :
 	}
 	
 	override fun setSlideUpWithCellHeight() = 75.uiPX()
-	
-	override fun setBackEvent(mainActivity: MainActivity?) {
-		super.setBackEvent(mainActivity)
-		mainActivity?.backEvent = null
-	}
 }
