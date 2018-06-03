@@ -2019,7 +2019,7 @@ object ChainText {
 	}
 
 	@JvmField
-	val koven = when (currentLanguage) {
+	val kovan = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Kovan Testnet"
 		HoneyLanguage.Chinese.code -> "Kovan 测试网络"
 		HoneyLanguage.Japanese.code -> "Kovan Testnet"

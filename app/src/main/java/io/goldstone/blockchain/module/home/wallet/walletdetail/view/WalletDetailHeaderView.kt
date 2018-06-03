@@ -4,6 +4,7 @@ import android.R
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -104,6 +105,14 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}.into(this)
 		manageButton.setCenterInHorizontal()
 		manageButton.setAlignParentBottom()
+		val chainSign = View(context).apply {
+			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), 6.uiPX())
+			x = 12.uiPX().toFloat()
+			alpha = 0.8f
+			addCorner(10.uiPX(), EthereumNetColor.getCurrentChainColor())
+		}
+		chainSign.into(manageButton)
+		chainSign.setCenterInVertical()
 		
 		textView {
 			text = WalletText.section.toUpperCase()

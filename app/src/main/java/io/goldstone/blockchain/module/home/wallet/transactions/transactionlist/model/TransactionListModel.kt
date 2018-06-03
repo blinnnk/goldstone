@@ -1,16 +1,13 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
 
-import android.text.format.DateUtils
-import android.text.format.DateUtils.FORMAT_SHOW_TIME
-import android.text.format.DateUtils.FORMAT_SHOW_YEAR
 import com.blinnnk.util.HoneyDateUtil
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.toAscii
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.io.Serializable
 
 /**
@@ -43,15 +40,7 @@ data class TransactionListModel(
 		data.value.toDouble(), // 转账个数
 		data.symbol,
 		data.isReceive,
-		DateUtils.formatDateTime(
-			GoldStoneAPI.context,
-			data.timeStamp.toLong() * 1000,
-			FORMAT_SHOW_YEAR
-		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context,
-			data.timeStamp.toLong() * 1000,
-			FORMAT_SHOW_TIME
-		), // 拼接时间
+		TimeUtils.formatDate(data.timeStamp.toLong()), // 拼接时间
 		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
 		data.hash,
@@ -71,7 +60,7 @@ val getMemoFromInputCode: (inputCode: String) -> String = {
 		it.toAscii(false)
 	} else {
 		if (it.length > 138) {
-			it.substring(136, it.length).toAscii(false)
+			it.substring(137, it.length).toAscii(false)
 		} else "There isn't a memo"
 	}
 }
