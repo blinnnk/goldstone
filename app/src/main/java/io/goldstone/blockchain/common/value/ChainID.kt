@@ -4,8 +4,8 @@ package io.goldstone.blockchain.common.value
  * @date 2018/5/25 8:14 PM
  * @author KaySaith
  */
-
 enum class ChainID(val id: String) {
+	
 	Main("1"),
 	Ropstan("3"),
 	Rinkeby("4"),
@@ -25,7 +25,7 @@ enum class ChainID(val id: String) {
 			return when (chainID) {
 				Main.id -> ChainText.goldStoneMain
 				Ropstan.id -> ChainText.ropstan
-				Kovan.id -> ChainText.koven
+				Kovan.id -> ChainText.kovan
 				Rinkeby.id -> ChainText.rinkeby
 				else -> ChainText.goldStoneMain
 			}

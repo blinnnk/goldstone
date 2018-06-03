@@ -49,7 +49,8 @@ object GoldStoneEthCall {
 			                    SolidityCode.ethCall
 		                    ),
 		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall),
-		PendingFitler("eth_newFilter", SolidityCode.ethCall)
+		PendingFitler("eth_newFilter", SolidityCode.ethCall),
+		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall),
 	}
 	
 	@JvmStatic
@@ -135,6 +136,23 @@ object GoldStoneEthCall {
 		).let {
 			callEthBy(it) {
 				holdValue(JSONObject(it).safeGet("input"))
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getBlockTimeStampByBlockHash(
+		blockHash: String,
+		holdValue: (Long) -> Unit
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockByHash.method}\", \"params\":[\"$blockHash\", true], \"id\":1}"
+		)
+		).let {
+			callEthBy(it) {
+				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
+				holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
 			}
 		}
 	}
@@ -286,7 +304,7 @@ object GoldStoneEthCall {
 			ChainID.Main.id -> APIPath.main
 			ChainID.Ropstan.id -> APIPath.ropstan
 			ChainID.Rinkeby.id -> APIPath.rinkeyb
-			ChainID.Kovan.id -> APIPath.koven
+			ChainID.Kovan.id -> APIPath.kovan
 			else -> APIPath.main
 		}
 	}

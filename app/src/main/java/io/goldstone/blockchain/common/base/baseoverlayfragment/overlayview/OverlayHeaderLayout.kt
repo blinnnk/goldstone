@@ -9,7 +9,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -159,10 +158,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				}
 			}
 		}
-	}
-	
-	fun setKeyboardConfirmEvent(action: EditText.() -> Unit) {
-		searchInput.onPressKeyboardEnterButton { action(searchInput.editText) }
 	}
 	
 	fun searchInputLinstener(action: (String) -> Unit) {

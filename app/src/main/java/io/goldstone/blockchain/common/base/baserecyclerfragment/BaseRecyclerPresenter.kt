@@ -178,9 +178,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight, 0) {
 				if (realHeight >= maxHeight) {
-					AnimationDuration.Default timeUpThen {
-						fragment.getMainActivity()?.hideHomeFragment()
-					}
+					fragment.getMainActivity()?.hideHomeFragment()
 				} else {
 					fragment.getMainActivity()?.showHomeFragment()
 				}

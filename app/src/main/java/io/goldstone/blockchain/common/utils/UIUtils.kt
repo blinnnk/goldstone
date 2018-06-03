@@ -9,6 +9,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.R.drawable.*
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.util.regex.Pattern
 
 /**
@@ -81,6 +82,7 @@ fun String.removeStartAndEndValue(value: String = "\n"): String {
 	// 去除前后的空格或回车
 	return finalValue
 }
+
 // Time Utils
 fun Context.numberDate(timeStap: Long): String {
 	return DateUtils.formatDateTime(
@@ -96,4 +98,15 @@ fun View.numberDate(timeStap: Long): String {
 		timeStap,
 		DateUtils.FORMAT_NUMERIC_DATE
 	)
+}
+
+object TimeUtils {
+	// 将时间戳转化为界面显示的时间格式的工具
+	fun formatDate(timeStamp: Long): String {
+		return DateUtils.formatDateTime(
+			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_YEAR
+		) + " " + DateUtils.formatDateTime(
+			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
+		)
+	}
 }

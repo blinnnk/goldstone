@@ -22,7 +22,9 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 		when (title) {
 			QuotationText.management -> {
 				presenter.showQutationManagementFragment()
-				overlayView.header.showSearchButton(true) { presenter.showQutationSearchFragment() }
+				overlayView.header.showSearchButton(true) {
+					presenter.showQutationSearchFragment()
+				}
 			}
 			
 			else -> presenter.showMarketTokenDetailFragment(currencyInfo)

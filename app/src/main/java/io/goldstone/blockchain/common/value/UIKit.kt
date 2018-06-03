@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.view.View
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import org.jetbrains.anko.px2sp
 
 /**
@@ -12,8 +13,8 @@ import org.jetbrains.anko.px2sp
  * @description
  * Common interface parameters, including color, original size, etc.
  */
-
 object GrayScale {
+	
 	@JvmField
 	val black = Color.parseColor("#FF000000")
 	@JvmField
@@ -81,9 +82,23 @@ object Spectrum {
 	val opacity5White = Color.parseColor("#80FFFFFF")
 }
 
-object FontSize {
+object EthereumNetColor {
 	@JvmField
-	val header = 5.uiPX() + 1f
+	val main = Color.parseColor("#FF378588")
+	val ropstan = Color.parseColor("#FFD83553")
+	val kovan = Color.parseColor("#FF5F1C90")
+	val rinkeby = Color.parseColor("#FFE4B455")
+	
+	@JvmStatic
+	fun getCurrentChainColor(): Int {
+		return when (GoldStoneApp.currentChain) {
+			ChainID.Main.id -> main
+			ChainID.Ropstan.id -> ropstan
+			ChainID.Rinkeby.id -> rinkeby
+			ChainID.Kovan.id -> kovan
+			else -> main
+		}
+	}
 }
 
 object ShadowSize {

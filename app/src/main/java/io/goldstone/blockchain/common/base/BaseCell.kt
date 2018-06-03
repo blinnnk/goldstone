@@ -48,6 +48,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 		}
 		
 		this.addView(arrowIcon)
+		arrowIcon.x += 3.uiPX()
 		arrowIcon.setAlignParentRight()
 		arrowIcon.setCenterInVertical()
 	}

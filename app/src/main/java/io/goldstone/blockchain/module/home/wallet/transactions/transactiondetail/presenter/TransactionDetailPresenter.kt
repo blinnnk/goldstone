@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
@@ -12,7 +12,6 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -259,25 +258,19 @@ class TransactionDetailPresenter(
 		}
 	}
 	
-	// 将时间戳转化为界面显示的时间格式的工具
-	private fun formatDate(timeStamp: Long): String {
-		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_YEAR
-		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
-		)
-	}
-	
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
 	private fun generateModels(
 		receipt: Any? = null
 	): ArrayList<TransactionDetailModel> {
-		val minerFee = if (data.isNull()) dataFromList?.minerFee
-		else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
-		val date = if (data.isNull()) dataFromList?.date
-		else formatDate(data!!.timestamp / 1000)
-		val memo = if (data?.memo.isNull()) "There isn't a memo"
-		else data?.memo
+		val minerFee =
+			if (data.isNull()) dataFromList?.minerFee
+			else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
+		val date =
+			if (data.isNull()) dataFromList?.date
+			else TimeUtils.formatDate(data!!.timestamp / 1000)
+		val memo =
+			if (data?.memo.isNull()) "There isn't a memo"
+			else data?.memo
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
 				arrayListOf(
@@ -429,11 +422,13 @@ class TransactionDetailPresenter(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
-		GoldStoneEthCall
-			.getTransactionByHash(currentHash) { receipt ->
+		GoldStoneEthCall.getTransactionByHash(currentHash) { receipt ->
+			receipt.getTimestampAndInsertToDatabase { timestamp ->
 				context?.runOnUiThread {
 					// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-					val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(receipt.input)
+					val transactionInfo =
+						CryptoUtils.loadTransferInfoFromInputData(receipt.input)
+					
 					CryptoUtils.isERC20TransferByInputCode(receipt.input) {
 						transactionInfo?.let {
 							prepareHeaderValueFromNotification(receipt, it, info.isReceived)
@@ -451,12 +446,26 @@ class TransactionDetailPresenter(
 					
 					if (asyncData.isNull()) {
 						receipt.toAsyncData().let {
-							asyncData = it.toArrayList()
+							it[4].info = TimeUtils.formatDate(timestamp)
+							asyncData = it
 						}
 					}
 					callback()
 				}
 			}
+		}
+	}
+	
+	/**
+	 * JSON RPC `GetTransactionByHash` 获取不到 `Timestamp` 需要从 `Transaction` 里面首先获取
+	 * `Block Hash` 然后再发起新的 `JSON RPC` 获取  `Block` 的 `TimeStamp` 来完善交易信息.
+	 */
+	private fun TransactionTable.getTimestampAndInsertToDatabase(callback: (Long) -> Unit) {
+		GoldStoneEthCall.getBlockTimeStampByBlockHash(blockHash) {
+			this.timeStamp = it.toString()
+			GoldStoneDataBase.database.transactionDao().insert(this)
+			callback(it)
+		}
 	}
 	
 	// 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
@@ -469,7 +478,7 @@ class TransactionDetailPresenter(
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall
-					.getTokenInfoByContractAddress(receipt.to) { symbol, _, decimal ->
+					.getTokenSymbolAndDecimalByContract(receipt.to) { symbol, decimal ->
 						val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
 						updateHeaderValue(
 							count,
@@ -495,14 +504,17 @@ class TransactionDetailPresenter(
 		}
 	}
 	
-	// 从通知中心进入的, 使用 `web3` 获取的 `Transaction` 转换成标准的使用格式
+	/**
+	 * 从通知中心进入的, 使用获取的 `Transaction` 转换成标准的使用格式, 这里临时填写
+	 * `Timestamp` 数字会在准备详情界面的时候获取时间戳, 见 [getTimestampAndInsertToDatabase]
+	 */
 	private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		val receiptData = arrayListOf(
 			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(),
 			"There isn't a memo",
 			hash,
 			blockNumber,
-			formatDate(0),
+			TimeUtils.formatDate(0),
 			EtherScanApi.transactionsByHash(hash)
 		)
 		arrayListOf(
