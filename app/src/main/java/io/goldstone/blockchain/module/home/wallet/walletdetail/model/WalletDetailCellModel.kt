@@ -101,10 +101,24 @@ data class WalletDetailCellModel(
 							override var asyncCount: Int = myTokens.size
 							override fun concurrentJobs() {
 								myTokens.forEach { token ->
-									localTokens.find { it.contract.equals(token.contract, true) }?.let { targetToken ->
-										if (targetToken.contract == CryptoValue.ethContract) {
-											GoldStoneEthCall
-												.getEthBalance(walletAddress) {
+									localTokens.find { it.contract.equals(token.contract, true) }
+										?.let { targetToken ->
+											if (targetToken.contract == CryptoValue.ethContract) {
+												GoldStoneEthCall
+													.getEthBalance(walletAddress) {
+														MyTokenTable
+															.updateCurrentWalletBalanceWithContract(
+																it,
+																targetToken.contract
+															)
+														tokenList.add(WalletDetailCellModel(targetToken, it))
+														completeMark()
+													}
+											} else {
+												GoldStoneEthCall.getTokenBalanceWithContract(
+													targetToken.contract,
+													walletAddress
+												) {
 													MyTokenTable
 														.updateCurrentWalletBalanceWithContract(
 															it,
@@ -113,27 +127,12 @@ data class WalletDetailCellModel(
 													tokenList.add(WalletDetailCellModel(targetToken, it))
 													completeMark()
 												}
-										} else {
-											GoldStoneEthCall.getTokenBalanceWithContract(
-												targetToken.contract,
-												walletAddress
-											) {
-												MyTokenTable
-													.updateCurrentWalletBalanceWithContract(
-														it,
-														targetToken.contract
-													)
-												tokenList.add(WalletDetailCellModel(targetToken, it))
-												completeMark()
 											}
 										}
-									}
 								}
 							}
 							
-							override fun mergeCallBack() {
-								hold(tokenList)
-							}
+							override fun mergeCallBack() = hold(tokenList)
 						}.start()
 					}
 				}
@@ -146,7 +145,7 @@ data class WalletDetailCellModel(
 					callback()
 				}) { newPrices ->
 					object : ConcurrentAsyncCombine() {
-						override var asyncCount: Int = size
+						override var asyncCount: Int = newPrices.size
 						override fun concurrentJobs() {
 							newPrices.forEach {
 								// 同时更新缓存里面的数据
@@ -156,9 +155,7 @@ data class WalletDetailCellModel(
 							}
 						}
 						
-						override fun mergeCallBack() {
-							callback()
-						}
+						override fun mergeCallBack() = callback()
 					}.start()
 				}
 			}

@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.CommonCellSize
 import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -43,7 +42,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		}
 	}
 
-	private val icon by lazy { SquareIcon(context) }
+	private val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 	private val tokenInfo by lazy { TwoLineTitles(context) }
 	private val valueInfo by lazy { TwoLineTitles(context) }
 
@@ -56,7 +55,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		tokenInfo.apply {
 			title.typeface = GoldStoneFont.heavy(context)
 			setCenterInVertical()
-			x += CommonCellSize.iconPadding
+			x += 50.uiPX()
 			y += 2.uiPX()
 		}
 
@@ -70,7 +69,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			isFloatRight = true
 			y += 2.uiPX()
 		}
-
+		
+		
 	}
 
 	fun getTokenInfo(): WalletDetailCellModel? {

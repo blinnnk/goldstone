@@ -31,8 +31,7 @@ object UIUtils {
 	fun subtractThenHalf(
 		first: Int,
 		second: Int
-	) =
-		(first - second) / 2
+	) = (first - second) / 2
 	
 	fun generateAvatar(id: Int): Int {
 		val avatars = arrayListOf(

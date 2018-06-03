@@ -89,7 +89,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
 	fun setBigWhiteStyle() {
 		title.apply {
-			textSize = fontSize(21)
+			textSize = fontSize(24)
 			typeface = GoldStoneFont.heavy(context)
 			textColor = Spectrum.white
 		}

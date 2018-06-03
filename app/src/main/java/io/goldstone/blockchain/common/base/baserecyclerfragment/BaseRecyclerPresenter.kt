@@ -5,6 +5,7 @@ import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
@@ -143,7 +144,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight, 0) {
 				if (targetHeight >= maxHeight) {
-					fragment.getMainActivity()?.hideHomeFragment()
+					AnimationDuration.Default timeUpThen {
+						fragment.getMainActivity()?.hideHomeFragment()
+					}
 				} else {
 					fragment.getMainActivity()?.showHomeFragment()
 				}
@@ -154,7 +157,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	fun setHeightMatchParent(callback: () -> Unit = {}) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero()) {
-				fragment.getMainActivity()?.hideHomeFragment()
+				AnimationDuration.Default timeUpThen {
+					fragment.getMainActivity()?.hideHomeFragment()
+				}
 				callback()
 			}
 		}
@@ -173,7 +178,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight, 0) {
 				if (realHeight >= maxHeight) {
-					fragment.getMainActivity()?.hideHomeFragment()
+					AnimationDuration.Default timeUpThen {
+						fragment.getMainActivity()?.hideHomeFragment()
+					}
 				} else {
 					fragment.getMainActivity()?.showHomeFragment()
 				}

@@ -3,10 +3,8 @@ package io.goldstone.blockchain.common.base.basefragment
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.getScreenHeightWithoutStatusBar
-import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
@@ -58,7 +56,9 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 				fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
 			)
 		}
-		fragment.getMainActivity()?.hideHomeFragment()
+		AnimationDuration.Default timeUpThen {
+			fragment.getMainActivity()?.hideHomeFragment()
+		}
 	}
 
 	fun updateHeight(height: Int) {
@@ -67,7 +67,9 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 		}
 		// 优化重汇
 		if (height >= ScreenSize.Height) {
-			fragment.getMainActivity()?.hideHomeFragment()
+			AnimationDuration.Default timeUpThen {
+				fragment.getMainActivity()?.hideHomeFragment()
+			}
 		} else {
 			fragment.getMainActivity()?.showHomeFragment()
 		}

@@ -49,7 +49,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			
 			currentAccount.info.subtitle.text = address
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
-			manageButton.text = (WalletText.manage + " ($totalAccount)").toUpperCase()
+			manageButton.setTitle((WalletText.manage + " ($totalAccount)").toUpperCase())
 		}
 	}
 	val manageButton by lazy { RoundButtonWithIcon(context) }
@@ -134,12 +134,17 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	fun showLoadingView(status: Boolean) {
 		if (status && progressBar.isNull()) {
-			progressBar = ProgressBar(this.context, null, R.attr.progressBarStyleInverse).apply {
+			progressBar = ProgressBar(
+				this.context,
+				null,
+				R.attr.progressBarStyleInverse
+			).apply {
 				indeterminateDrawable.setColorFilter(
-					Spectrum.white, android.graphics.PorterDuff.Mode.MULTIPLY
+					Spectrum.white,
+					android.graphics.PorterDuff.Mode.MULTIPLY
 				)
 				layoutParams = RelativeLayout.LayoutParams(16.uiPX(), 16.uiPX())
-				x = WalletText.section.toUpperCase().measureTextWidth(16.uiPX().toFloat()) + 15.uiPX()
+				x = WalletText.section.toUpperCase().measureTextWidth(16.uiPX().toFloat()) + 16.uiPX()
 				y -= 12.uiPX()
 			}
 			progressBar?.into(this)
