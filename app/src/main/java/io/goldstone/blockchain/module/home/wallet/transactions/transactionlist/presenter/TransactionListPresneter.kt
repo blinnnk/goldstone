@@ -72,6 +72,7 @@ class TransactionListPresenter(
 		TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
 			if (it.isNotEmpty()) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 				localTransactions = it
 				removeLoadingView()
 			} else {
@@ -81,6 +82,7 @@ class TransactionListPresenter(
 				 **/
 				getTransactionDataFromEtherScan("0") {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 					localTransactions = it
 					removeLoadingView()
 				}

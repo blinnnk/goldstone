@@ -2,26 +2,31 @@
   {
     "countrySymbol": "CN",
     "currencySymbol": "CNY",
-    "isUsed": false
+    "isUsed": false,
+    "rate": 6.418
   },
   {
     "countrySymbol": "JP",
     "currencySymbol": "JPY",
-    "isUsed": false
+    "isUsed": false,
+    "rate": 109.53
   },
   {
     "countrySymbol": "KR",
     "currencySymbol": "KRW",
-    "isUsed": false
+    "isUsed": false,
+    "rate": 1070.63
   },
   {
     "countrySymbol": "US",
     "currencySymbol": "USD",
-    "isUsed": false
+    "isUsed": false,
+    "rate": 1.0
   },
   {
     "countrySymbol": "RU",
     "currencySymbol": "RUB",
-    "isUsed": false
+    "isUsed": false,
+    "rate": 62.1962
   }
 ]

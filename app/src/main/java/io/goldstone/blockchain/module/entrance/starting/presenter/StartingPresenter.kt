@@ -6,6 +6,7 @@ import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
@@ -61,7 +62,11 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
 					.forEachOrEnd { item, isEnd ->
 						val model = if (item.safeGet("currencySymbol") == CountryCode.currentCurrency) {
-							SupportCurrencyTable(item).apply { isUsed = true }
+							SupportCurrencyTable(item).apply {
+								isUsed = true
+								// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+								GoldStoneApp.currentRate = rate
+							}
 						} else {
 							SupportCurrencyTable(item)
 						}
