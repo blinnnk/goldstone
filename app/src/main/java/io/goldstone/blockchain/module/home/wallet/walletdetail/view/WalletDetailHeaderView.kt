@@ -108,7 +108,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		val chainSign = View(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), 6.uiPX())
 			x = 12.uiPX().toFloat()
-			alpha = 0.8f
+			alpha = 0.7f
 			addCorner(10.uiPX(), EthereumNetColor.getCurrentChainColor())
 		}
 		chainSign.into(manageButton)
