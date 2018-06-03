@@ -28,6 +28,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
+		fragment.getMainActivity()?.backEvent = null
 	}
 	
 	/**
