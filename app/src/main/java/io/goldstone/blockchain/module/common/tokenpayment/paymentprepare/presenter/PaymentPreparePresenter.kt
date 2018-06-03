@@ -80,7 +80,7 @@ class PaymentPreparePresenter(
 		val data: String
 		val to: String
 		// `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
-		if (currentToken?.symbol == CryptoSymbol.eth) {
+		if (currentToken?.contract.equals(CryptoValue.ethContract, true)) {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toHexCode() // Memo
 			countWithDecimal = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
@@ -94,11 +94,19 @@ class PaymentPreparePresenter(
 				if (memo.isEmpty()) "" else memo.toHexCode() // Memo
 		}
 		GoldStoneEthCall.getTransactionExecutedValue(
-			to, WalletTable.current.address, data
+			to,
+			WalletTable.current.address,
+			data
 		) { limit ->
 			hold(
 				PaymentPrepareModel(
-					nounce, limit, to, countWithDecimal, value, data, fragment.address!!,
+					nounce,
+					limit,
+					to,
+					countWithDecimal,
+					value,
+					data,
+					fragment.address!!,
 					fragment.getMemoContent()
 				)
 			)

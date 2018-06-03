@@ -68,7 +68,6 @@ class TransactionDetailPresenter(
 			)
 			
 			currentHash = transactionHash
-			
 			if (memo.isEmpty()) {
 				fragment.showLoadingView("Load transaction detail information")
 				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
@@ -149,18 +148,23 @@ class TransactionDetailPresenter(
 			}
 		}
 		// 如果没有拉取到 `Input Code` 这里再拉取并存入数据库
-		saveInputCodeByTaxHash(currentHash) {
-			fragment.asyncData!![1].info = getMemoFromInputCode(it)
+		saveInputCodeByTaxHash(currentHash) { input, isERC20 ->
+			fragment.asyncData!![1].info = getMemoFromInputCode(input, isERC20)
 		}
 	}
 	
-	private fun saveInputCodeByTaxHash(taxHash: String, callback: (String) -> Unit) {
+	private fun saveInputCodeByTaxHash(
+		taxHash: String,
+		callback: (input: String, isETHTransfer: Boolean) -> Unit
+	) {
 		doAsync {
 			TransactionTable.getTransactionByHash(taxHash) {
-				it.any { it.input.isEmpty() } isTrue {
-					GoldStoneEthCall.getInputCodeByHash(taxHash) {
-						TransactionTable.updateInputCodeByHash(taxHash, it) {
-							callback(it)
+				it.find { it.hash == taxHash }?.let { transaction ->
+					if (transaction.input.isEmpty()) {
+						GoldStoneEthCall.getInputCodeByHash(taxHash) {
+							TransactionTable.updateInputCodeByHash(taxHash, it) {
+								callback(it, transaction.isERC20)
+							}
 						}
 					}
 				}

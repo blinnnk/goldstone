@@ -200,14 +200,9 @@ class TransactionListPresenter(
 							hold(newData)
 						} else {
 							TransactionTable.getTransactionsByAddress(WalletTable.current.address) { localData ->
-								newData.forEachOrEnd { item, isEnd ->
-									if (localData.any { it.hash == item.hash }) {
-										newData.remove(item)
-									}
-									if (isEnd) {
-										hold(newData)
-									}
-								}
+								newData.dropWhile { data ->
+									localData.any { it.hash.equals(data.hash, true) }
+								}.let { hold(it.toArrayList()) }
 							}
 						}
 					}

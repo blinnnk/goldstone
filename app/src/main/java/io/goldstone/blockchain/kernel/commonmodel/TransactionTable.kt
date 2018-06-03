@@ -364,7 +364,7 @@ data class TransactionTable(
 				it?.let {
 					GoldStoneEthCall.apply {
 						getInputCodeByHash(hash) { input ->
-							val memo = getMemoFromInputCode(input)
+							val memo = getMemoFromInputCode(input, it.isERC20)
 							GoldStoneDataBase.database.transactionDao().update(it.apply {
 								this.input = input
 								this.memo = memo

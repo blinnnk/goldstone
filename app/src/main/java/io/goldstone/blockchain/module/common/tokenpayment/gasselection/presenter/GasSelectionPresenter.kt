@@ -255,6 +255,8 @@ class GasSelectionPresenter(
 				nonce = raw.nonce.toString()
 				to = raw.to
 				input = raw.data
+				contractAddress = token!!.contract
+				chainID = GoldStoneApp.getCurrentChain()
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
 			}

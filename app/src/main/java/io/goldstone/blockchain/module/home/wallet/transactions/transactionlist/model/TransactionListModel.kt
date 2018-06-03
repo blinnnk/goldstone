@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.toAscii
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -55,12 +54,12 @@ data class TransactionListModel(
 	)
 }
 
-val getMemoFromInputCode: (inputCode: String) -> String = {
-	if (it == SolidityCode.ethTransfer) {
-		it.toAscii(false)
+val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { input, isERC20 ->
+	if (!isERC20) {
+		input.toAscii(false)
 	} else {
-		if (it.length > 138) {
-			it.substring(137, it.length).toAscii(false)
+		if (input.length > 138) {
+			input.substring(137, input.length).toAscii(false)
 		} else "There isn't a memo"
 	}
 }
