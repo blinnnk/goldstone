@@ -64,7 +64,7 @@ dependencies {
     exclude group: 'com.google.android', module: 'android'
   }
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.2.9.7'
+  implementation 'com.blinnnk:honeyui:0.2.9.8'
   // Crypto
   implementation 'org.ethereum:geth:1.8.8'
   implementation 'org.web3j:core:3.3.1-android'

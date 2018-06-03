@@ -98,8 +98,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 					showCloseButton(hasCloseButton)
 				}
 			}
-			
-			hideTabBarToLessOverdraw()
 		}.view
 	}
 	
@@ -120,8 +118,12 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 				}
 			}
 		}
-		
 		presenter.onFragmentViewCreated()
+		
+		// 让出动画时间
+		150L timeUpThen {
+			hideTabBarToAvoidOverdraw()
+		}
 	}
 	
 	override fun onDetach() {
@@ -147,7 +149,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		}
 	}
 	
-	private fun hideTabBarToLessOverdraw() {
+	private fun hideTabBarToAvoidOverdraw() {
 		getMainActivity()?.getHomeFragment()?.hideTabbarView()
 	}
 	

@@ -320,7 +320,7 @@ object GoldStoneEthCall {
 			.readTimeout(90, TimeUnit.SECONDS)
 			.build()
 		
-		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.currentChain)) {
+		GoldStoneAPI.getcryptoRequest(body, currentChain(GoldStoneApp.getCurrentChain())) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(this.javaClass.simpleName, error)

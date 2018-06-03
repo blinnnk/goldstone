@@ -110,7 +110,7 @@ class PaymentPreparePresenter(
 			currentToken = token
 			fragment.setSymbolAndPrice(
 				currentToken?.symbol.orEmpty(),
-				currentToken?.price?.formatCurrency().orEmpty() + " " + GoldStoneApp.currencyCode
+				currentToken?.price?.formatCurrency().orEmpty() + " " + GoldStoneApp.getCurrencyCode()
 			)
 		}
 	}

@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.numberDate
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import com.db.chart.model.LineSet
@@ -17,7 +18,6 @@ import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.numberDate
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel

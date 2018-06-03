@@ -318,8 +318,7 @@ class GasSelectionPresenter(
 	) {
 		DefaultTokenTable.getCurrentChainTokenByContract(CryptoValue.ethContract) {
 			hold(
-				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + GoldStoneApp
-					.currencyCode
+				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + GoldStoneApp.getCurrencyCode()
 			)
 		}
 	}

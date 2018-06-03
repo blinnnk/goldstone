@@ -91,7 +91,7 @@ object EthereumNetColor {
 	
 	@JvmStatic
 	fun getCurrentChainColor(): Int {
-		return when (GoldStoneApp.currentChain) {
+		return when (GoldStoneApp.getCurrentChain()) {
 			ChainID.Main.id -> main
 			ChainID.Ropstan.id -> ropstan
 			ChainID.Rinkeby.id -> rinkeby

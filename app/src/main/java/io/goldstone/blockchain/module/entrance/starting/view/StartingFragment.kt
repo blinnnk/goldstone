@@ -119,7 +119,6 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				setAmplitudeRatio(30)
 				startAnimation()
 			}.into(this)
-			
 		}
 	}
 }

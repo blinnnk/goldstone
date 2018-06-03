@@ -40,7 +40,7 @@ class WalletSettingsListPresenter(
 	
 	override fun updateData() {
 		val balanceText =
-			WalletTable.current.balance?.formatCurrency() + " (${GoldStoneApp.currencyCode})"
+			WalletTable.current.balance?.formatCurrency() + " (${GoldStoneApp.getCurrencyCode()})"
 		WalletTable.getCurrentWallet { wallet ->
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.checkQRCode),

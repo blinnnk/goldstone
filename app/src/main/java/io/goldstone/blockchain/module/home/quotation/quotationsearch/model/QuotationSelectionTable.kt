@@ -3,12 +3,11 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.common.utils.toUpperCaseFirstLetter
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -47,6 +46,7 @@ data class QuotationSelectionTable(
 	var lineChartMonth: String? = "",
 	var lineChartHour: String? = ""
 ) : Serializable {
+	
 	constructor(
 		data: QuotationSelectionTable, lineChart: String
 	) : this(
@@ -67,9 +67,9 @@ data class QuotationSelectionTable(
 		data.lineChartMonth,
 		data.lineChartHour
 	)
-
+	
 	companion object {
-
+		
 		fun insertSelection(
 			table: QuotationSelectionTable, callback: () -> Unit
 		) {
@@ -83,7 +83,7 @@ data class QuotationSelectionTable(
 							insert(table.apply {
 								orderID = newOrderID
 								this.description = HoneyLanguage.getLanguageSymbol(
-									GoldStoneApp.currentLanguage.orZero()
+									GoldStoneApp.getCurrentLanguage()
 								) + description
 							})
 						}
@@ -92,7 +92,7 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun updateDescription(
 			pair: String, content: String
 		) {
@@ -100,22 +100,22 @@ data class QuotationSelectionTable(
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(pair)?.let {
 						update(it.apply {
-							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.currentLanguage.orZero()) +
+							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()) +
 								content
 						})
 					}
 				}
 			}
 		}
-
+		
 		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable?) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
-			}) {
+				               GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
+			               }) {
 				hold(it)
 			}
 		}
-
+		
 		fun removeSelectionBy(
 			pair: String,
 			callback: () -> Unit = {}
@@ -133,15 +133,16 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun getMySelections(hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections()
-			}) {
+				               GoldStoneDataBase.database.quotationSelectionDao()
+					               .getQuotationSelfSelections()
+			               }) {
 				hold(it.toArrayList())
 			}
 		}
-
+		
 		fun updateSelectionOrderIDBy(
 			fromPair: String, newOrderID: Double, callback: () -> Unit = {}
 		) {
@@ -158,7 +159,7 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun updateLineChartDataBy(
 			pair: String, lineChart: String, callback: () -> Unit = {}
 		) {
@@ -175,7 +176,7 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun updateLineChartWeekBy(
 			pair: String, chartData: String, callback: () -> Unit = {}
 		) {
@@ -192,7 +193,7 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun updateLineChartMontyBy(
 			pair: String, chartData: String, callback: () -> Unit = {}
 		) {
@@ -209,7 +210,7 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
+		
 		fun updateLineChartHourBy(
 			pair: String, chartData: String, callback: () -> Unit = {}
 		) {
@@ -226,28 +227,27 @@ data class QuotationSelectionTable(
 				}
 			}
 		}
-
 	}
 }
 
 @Dao
 interface QuotationSelectionDao {
-
+	
 	@Query("SELECT * FROM quotationSelection")
 	fun getQuotationSelfSelections(): List<QuotationSelectionTable>
-
+	
 	@Query("SELECT * FROM quotationSelection WHERE pair LIKE :pair")
 	fun getSelectionByPair(pair: String): QuotationSelectionTable?
-
+	
 	@Query("SELECT * FROM quotationSelection WHERE orderID LIKE :orderID")
 	fun getSelectionByOrderID(orderID: Int): QuotationSelectionTable?
-
+	
 	@Insert
 	fun insert(table: QuotationSelectionTable)
-
+	
 	@Update
 	fun update(table: QuotationSelectionTable)
-
+	
 	@Delete
 	fun delete(table: QuotationSelectionTable)
 }

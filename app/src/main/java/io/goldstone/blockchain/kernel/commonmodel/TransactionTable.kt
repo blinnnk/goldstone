@@ -77,7 +77,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = GoldStoneApp.currentChain
+	var chainID: String = GoldStoneApp.getCurrentChain()
 ) {
 	
 	/** 默认的 `constructor` */
@@ -323,6 +323,7 @@ data class TransactionTable(
 							completeMark()
 						}
 					}
+					
 					override fun mergeCallBack() = callback()
 				}.start()
 			}
@@ -408,7 +409,10 @@ interface TransactionDao {
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
-	fun getTransactionsByAddress(walletAddress: String, chainID: String = GoldStoneApp.currentChain):
+	fun getTransactionsByAddress(
+		walletAddress: String,
+		chainID: String = GoldStoneApp.getCurrentChain()
+	):
 		List<TransactionTable>
 	
 	@Query(
@@ -417,14 +421,14 @@ interface TransactionDao {
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
-	fun getTransactionByTaxHash(taxHash: String, chainID: String = GoldStoneApp.currentChain):
+	fun getTransactionByTaxHash(taxHash: String, chainID: String = GoldStoneApp.getCurrentChain()):
 		List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive AND chainID LIKE :chainID")
 	fun getTransactionByTaxHashAndReceivedStatus(
 		taxHash: String,
 		isReceive: Boolean,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): TransactionTable?
 	
 	@Query(
@@ -433,7 +437,7 @@ interface TransactionDao {
 	fun getTransactionsByAddressAndContract(
 		walletAddress: String,
 		contract: String,
-		chainID: String = GoldStoneApp.currentChain
+		chainID: String = GoldStoneApp.getCurrentChain()
 	): List<TransactionTable>
 	
 	@Insert

@@ -12,7 +12,9 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -53,6 +55,15 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 	
 	fun setTitle(text: String) {
 		titleView.text = text
-		layoutParams.width = text.measureTextWidth(16.uiPX().toFloat()).toInt()
+		layoutParams.width = text.measureTextWidth(fontSize(50)).toInt()  + retWidthDependsOnLanguage()
+	}
+	
+	private fun retWidthDependsOnLanguage(): Int {
+		return when(GoldStoneApp.getCurrentLanguage()) {
+			HoneyLanguage.Chinese.code -> 20.uiPX()
+			HoneyLanguage.Korean.code -> 20.uiPX()
+			HoneyLanguage.TraditionalChinese.code -> 20.uiPX()
+			else -> 0
+		}
 	}
 }

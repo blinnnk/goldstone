@@ -21,7 +21,6 @@ import org.jetbrains.anko.runOnUiThread
  * [deviceID] 这个 ID 是自身业务服务器和客户端用来做
  * 唯一校验的值, 不是常规意义的 `Device ID`
  */
-
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
@@ -32,17 +31,18 @@ data class AppConfigTable(
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
 	var isRegisteredAddresses: Boolean = false,
-	var language: Int = HoneyLanguage.getLanguageCodeBySymbol(CountryCode.currentLanguageSymbol),
+	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
 	var chainID: String = ChainID.Main.id
 ) {
- 
+	
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			coroutinesTask({
-				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.appConfigDao().getAppConfig()
+				}) {
 				it.isNotEmpty() isTrue {
 					hold(it[0])
 				} otherwise {
@@ -50,7 +50,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updatePinCode(
 			newPinCode: Int,
 			callback: () -> Unit
@@ -68,7 +68,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updatePushToken(token: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -78,7 +78,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updateRegisterAddressesStatus(
 			isRegistered: Boolean,
 			callback: () -> Unit = {}
@@ -96,25 +96,21 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updateRetryTimes(
-			times: Int,
-			callback: () -> Unit = {}
+			times: Int
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
 						it.isNotEmpty() isTrue {
 							update(it[0].apply { it[0].retryTimes = times })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
-							}
 						}
 					}
 				}
 			}
 		}
-
+		
 		fun setFrozenTime(
 			frozenTime: Long?,
 			callback: () -> Unit = {}
@@ -130,7 +126,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun setShowPinCodeStatus(
 			status: Boolean,
 			callback: () -> Unit
@@ -146,7 +142,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updateLanguage(
 			code: Int,
 			callback: () -> Unit
@@ -162,7 +158,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updateChainID(
 			chainID: String,
 			callback: () -> Unit
@@ -178,7 +174,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		fun updateCurrency(
 			code: String,
 			callback: () -> Unit
@@ -192,18 +188,28 @@ data class AppConfigTable(
 				}
 			}
 		}
-
+		
 		@SuppressLint("HardwareIds")
 		fun insertAppConfig(callback: () -> Unit) {
 			doAsync {
-				val goldStoneID = Settings.Secure.getString(
-					GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID
-				) + System.currentTimeMillis()
-				GoldStoneDataBase.database.appConfigDao().insert(
-					AppConfigTable(
-						0, null, false, null, 5, goldStoneID
+				val goldStoneID =
+					Settings.Secure.getString(
+						GoldStoneAPI.context.contentResolver,
+						Settings.Secure.ANDROID_ID
+					) + System.currentTimeMillis()
+				GoldStoneDataBase
+					.database
+					.appConfigDao()
+					.insert(
+						AppConfigTable(
+							0,
+							null,
+							false,
+							null,
+							5,
+							goldStoneID
+						)
 					)
-				)
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
@@ -212,16 +218,16 @@ data class AppConfigTable(
 
 @Dao
 interface AppConfigDao {
-
+	
 	@Query("SELECT * FROM appConfig")
 	fun getAppConfig(): List<AppConfigTable>
-
+	
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)
-
+	
 	@Update
 	fun update(appConfigTable: AppConfigTable)
-
+	
 	@Delete
 	fun delete(appConfigTable: AppConfigTable)
 }
