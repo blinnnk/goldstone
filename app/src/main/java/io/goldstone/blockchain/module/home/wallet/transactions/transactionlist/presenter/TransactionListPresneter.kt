@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.os.Bundle
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -39,8 +41,20 @@ class TransactionListPresenter(
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 	
 	override fun updateData() {
-		// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
-		fragment.initData()
+		fragment.showLoadingView(LoadingText.transactionData)
+		if (!localTransactions.isNull()) {
+			fragment.asyncData = localTransactions
+			/** show memory data and at the same time update the chain data in async thread */
+			fragment.updateTransactionInAsync(localTransactions!!)
+		} else {
+			// 先显示一个空数据
+			fragment.asyncData = arrayListOf()
+			// 不让 `UI` 觉得卡顿, 等动画执行完毕后再发起数据处理业务
+			AnimationDuration.Default timeUpThen {
+				// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
+				fragment.initData()
+			}
+		}
 	}
 	
 	fun showTransactionDetail(model: TransactionListModel?) {
@@ -55,27 +69,20 @@ class TransactionListPresenter(
 	}
 	
 	private fun TransactionListFragment.initData() {
-		showLoadingView(LoadingText.transactionData)
-		if (!localTransactions.isNull()) {
-			asyncData = localTransactions
-			/** show memory data and at the same time update the chain data in async thread */
-			updateTransactionInAsync(localTransactions!!)
-		} else {
-			TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
-				if (it.isNotEmpty()) {
-					asyncData = it
+		TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
+			if (it.isNotEmpty()) {
+				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+				localTransactions = it
+				removeLoadingView()
+			} else {
+				/**
+				 * if there is none data in local then `StartBlock 0`
+				 * and load data from `EtherScan`
+				 **/
+				getTransactionDataFromEtherScan("0") {
+					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 					localTransactions = it
 					removeLoadingView()
-				} else {
-					/**
-					 * if there is none data in local then `StartBlock 0`
-					 * and load data from `EtherScan`
-					 **/
-					getTransactionDataFromEtherScan("0") {
-						asyncData = it
-						localTransactions = it
-						removeLoadingView()
-					}
 				}
 			}
 		}
