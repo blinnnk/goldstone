@@ -55,7 +55,7 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 	
 	fun setTitle(text: String) {
 		titleView.text = text
-		layoutParams.width = text.measureTextWidth(fontSize(50)).toInt()  + retWidthDependsOnLanguage()
+		layoutParams.width = text.measureTextWidth(16.uiPX().toFloat()).toInt()  + retWidthDependsOnLanguage()
 	}
 	
 	private fun retWidthDependsOnLanguage(): Int {
