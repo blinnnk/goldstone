@@ -149,9 +149,8 @@ data class WalletDetailCellModel(
 						override fun concurrentJobs() {
 							newPrices.forEach {
 								// 同时更新缓存里面的数据
-								DefaultTokenTable.updateTokenPrice(it.contract, it.price) {
-									completeMark()
-								}
+								DefaultTokenTable.updateTokenPrice(it.contract, it.price)
+								completeMark()
 							}
 						}
 						

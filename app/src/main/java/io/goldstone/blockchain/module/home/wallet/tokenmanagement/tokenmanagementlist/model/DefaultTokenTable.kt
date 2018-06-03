@@ -178,7 +178,7 @@ data class DefaultTokenTable(
 		fun updateTokenPrice(
 			contract: String,
 			newPrice: Double,
-			callback: () -> Unit
+			callback: () -> Unit = {}
 		) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
