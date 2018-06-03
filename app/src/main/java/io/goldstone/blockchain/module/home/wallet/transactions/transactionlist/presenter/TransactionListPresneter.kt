@@ -118,8 +118,7 @@ class TransactionListPresenter(
 						localData.addAll(0, newData)
 						// save data into the memory for the next time showing speed
 						localTransactions = localData
-						asyncData = localTransactions
-						recyclerView.adapter.notifyDataSetChanged()
+						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
 						removeLoadingView()
 					}
 				}
@@ -195,17 +194,8 @@ class TransactionListPresenter(
 							}.sortedByDescending {
 								it.timeStamp
 							}.toArrayList()
-						}) { newData ->
-						if (newData.isEmpty()) {
-							hold(newData)
-						} else {
-							TransactionTable.getTransactionsByAddress(WalletTable.current.address) { localData ->
-								newData.dropWhile { data ->
-									localData.any { it.hash.equals(data.hash, true) }
-								}.let { hold(it.toArrayList()) }
-							}
-						}
-					}
+						}, hold
+					)
 				}
 			}
 		}
