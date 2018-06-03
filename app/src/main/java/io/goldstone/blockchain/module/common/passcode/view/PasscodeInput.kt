@@ -43,6 +43,7 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX())
 
 		titles.apply {
+			layoutParams = RelativeLayout.LayoutParams((ScreenSize.Width * 0.8f).toInt(), 200.uiPX())
 			setBigWhiteStyle()
 			titles.title.text = PincodeText.enterPincode
 			titles.subtitle.text = PincodeText.enterPincodeDescription

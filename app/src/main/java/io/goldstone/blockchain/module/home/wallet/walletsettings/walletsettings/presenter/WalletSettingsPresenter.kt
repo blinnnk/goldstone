@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.view.View
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
@@ -176,7 +177,9 @@ class WalletSettingsPresenter(
 			header.showCloseButton(false)
 			contentLayout.updateHeightAnimation(contentHeight) {
 				if (contentHeight >= ScreenSize.Height) {
-					fragment.getMainActivity()?.hideHomeFragment()
+					AnimationDuration.Default timeUpThen {
+						fragment.getMainActivity()?.hideHomeFragment()
+					}
 				} else {
 					fragment.getMainActivity()?.showHomeFragment()
 				}

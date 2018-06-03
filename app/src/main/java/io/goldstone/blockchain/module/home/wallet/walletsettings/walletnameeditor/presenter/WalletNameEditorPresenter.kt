@@ -31,6 +31,14 @@ class WalletNameEditorPresenter(
 			}
 		}
 	}
+	
+	fun shouCurrentNameHint(nameInput: EditText) {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				nameInput.hint = name
+			}
+		}
+	}
 
 	fun updateConfirmButtonStyle(nameInput: EditText) {
 		if (nameInput.text.isNotEmpty()) fragment.confirmButton.setBlueStyle()

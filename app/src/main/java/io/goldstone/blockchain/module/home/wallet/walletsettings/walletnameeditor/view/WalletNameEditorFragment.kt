@@ -26,14 +26,12 @@ import org.jetbrains.anko.verticalLayout
  * @date 26/03/2018 10:44 PM
  * @author KaySaith
  */
-
 class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
-
+	
 	val confirmButton by lazy { RoundButton(context!!) }
-
 	private val nameInput by lazy { RoundInput(context!!) }
 	override val presenter = WalletNameEditorPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -44,7 +42,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 					topMargin = 40.uiPX()
 					bottomMargin = 30.uiPX()
 				}
-
+				
 				addTextChangedListener(object : TextWatcher {
 					override fun beforeTextChanged(
 						p0: CharSequence?,
@@ -53,7 +51,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 						p3: Int
 					) {
 					}
-
+					
 					override fun onTextChanged(
 						p0: CharSequence?,
 						p1: Int,
@@ -61,13 +59,15 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 						p3: Int
 					) {
 					}
-
+					
 					override fun afterTextChanged(p0: Editable?) {
 						presenter.updateConfirmButtonStyle(nameInput)
 					}
 				})
 			}.into(this)
-
+			
+			presenter.shouCurrentNameHint(nameInput)
+			
 			confirmButton.apply {
 				text = CommonText.confirm
 				setGrayStyle()
@@ -76,7 +76,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 			}.into(this)
 		}
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
@@ -86,5 +86,4 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 			presenter.showWalletSettingListFragment()
 		}
 	}
-
 }

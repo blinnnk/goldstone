@@ -37,7 +37,6 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				setCenterInVertical()
 				setAlignParentRight()
 			}
-			arrowY = 0f
 		} else {
 			title.setAlignParentBottom()
 			icon.setAlignParentBottom()
@@ -49,7 +48,6 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				title.y -= 19.uiPX().toFloat()
 				icon.y -= 17.uiPX()
 				info.y -= 20.uiPX()
-				arrowY += 16.uiPX().toFloat()
 			}
 			hasLayouted = true
 		}
