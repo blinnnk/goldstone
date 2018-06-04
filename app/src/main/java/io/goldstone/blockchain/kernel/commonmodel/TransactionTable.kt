@@ -221,18 +221,6 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getTransactionsByAddress(
-			address: String,
-			hold: (ArrayList<TransactionTable>) -> Unit
-		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
-				}) {
-				hold(it.toArrayList())
-			}
-		}
-		
 		/**
 		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nounce` 值来生成
 		 * 最近可用的 `Nounce`
@@ -355,17 +343,21 @@ data class TransactionTable(
 			}
 		}
 		
-		fun updateTransactionMemoByHashAndReceiveStatus(
+		fun updateMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
+			chainID: String = GoldStoneApp.getCurrentChain(),
 			callback: (memo: String) -> Unit
 		) {
-			TransactionTable.getTransactionByHashAndReceivedStatus(hash, isReceive) {
-				it?.let {
-					GoldStoneEthCall.apply {
-						getInputCodeByHash(hash) { input ->
-							val memo = getMemoFromInputCode(input, it.isERC20)
-							GoldStoneDataBase.database.transactionDao().update(it.apply {
+			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) {
+				GoldStoneEthCall.apply {
+					getInputCodeByHash(hash, chainID) { input ->
+						val isErc20 = CryptoUtils.isERC20TransferByInputCode(input)
+						val memo = getMemoFromInputCode(input, isErc20)
+						if (it.isNull()) {
+							GoldStoneAPI.context.runOnUiThread { callback(memo) }
+						} else {
+							GoldStoneDataBase.database.transactionDao().update(it!!.apply {
 								this.input = input
 								this.memo = memo
 							})
@@ -387,14 +379,16 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getTransactionByHashAndReceivedStatus(
+		fun getByHashAndReceivedStatus(
 			hash: String,
 			isReceived: Boolean,
 			hold: (TransactionTable?) -> Unit
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.transactionDao()
+					GoldStoneDataBase
+						.database
+						.transactionDao()
 						.getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
 				}) {
 				hold(it)

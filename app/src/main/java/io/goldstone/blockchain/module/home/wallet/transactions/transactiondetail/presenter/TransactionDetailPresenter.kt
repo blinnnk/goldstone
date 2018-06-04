@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -70,7 +71,7 @@ class TransactionDetailPresenter(
 			currentHash = transactionHash
 			if (memo.isEmpty() && !isPending) {
 				fragment.showLoadingView("Load transaction detail information")
-				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
+				TransactionTable.updateMemoByHashAndReceiveStatus(transactionHash, isReceived) {
 					fragment.asyncData = generateModels(this.apply { memo = it })
 					updateHeaderValue(
 						count,
@@ -114,12 +115,13 @@ class TransactionDetailPresenter(
 		}
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 		notificationData?.let { transaction ->
+			System.out.println("tran ___$transaction")
 			currentHash = transaction.hash
 			/**
 			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
 			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 			 */
-			TransactionTable.getTransactionByHashAndReceivedStatus(
+			TransactionTable.getByHashAndReceivedStatus(
 				transaction.hash,
 				transaction.isReceived
 			) { localTransaction ->
@@ -127,7 +129,9 @@ class TransactionDetailPresenter(
 					// 如果本地没有数据从链上查询所有需要的数据
 					fragment.apply {
 						showLoadingView(LoadingText.transactionData)
+						System.out.println("hello 1")
 						updateTransactionByNotificationHash(transaction) {
+							System.out.println("hello 6")
 							removeLoadingView()
 						}
 					}
@@ -424,7 +428,9 @@ class TransactionDetailPresenter(
 		callback: () -> Unit
 	) {
 		GoldStoneEthCall.getTransactionByHash(currentHash, info.chainID) { receipt ->
-			receipt.getTimestampAndInsertToDatabase { timestamp ->
+			System.out.println("hello 2")
+			receipt.getTimestampAndInsertToDatabase(info.chainID) { timestamp ->
+				System.out.println("hello 3")
 				context?.runOnUiThread {
 					// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
 					val transactionInfo =
@@ -432,7 +438,7 @@ class TransactionDetailPresenter(
 					
 					CryptoUtils.isERC20TransferByInputCode(receipt.input) {
 						transactionInfo?.let {
-							prepareHeaderValueFromNotification(receipt, it, info.isReceived)
+							prepareHeaderValueFromNotification(receipt, it, info.isReceived, info.chainID)
 						}
 					} isFalse {
 						val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
@@ -444,11 +450,15 @@ class TransactionDetailPresenter(
 							info.isReceived
 						)
 					}
+					System.out.println("hello 3")
 					if (asyncData.isNull()) {
-						TransactionTable.updateTransactionMemoByHashAndReceiveStatus(
+						System.out.println("hello 4")
+						TransactionTable.updateMemoByHashAndReceiveStatus(
 							info.hash,
-							info.isReceived
+							info.isReceived,
+							info.chainID
 						) { memo ->
+							System.out.println("hello 5")
 							receipt.toAsyncData().let {
 								it[4].info = TimeUtils.formatDate(timestamp)
 								it[1].info = memo
@@ -466,8 +476,11 @@ class TransactionDetailPresenter(
 	 * JSON RPC `GetTransactionByHash` 获取不到 `Timestamp` 需要从 `Transaction` 里面首先获取
 	 * `Block Hash` 然后再发起新的 `JSON RPC` 获取  `Block` 的 `TimeStamp` 来完善交易信息.
 	 */
-	private fun TransactionTable.getTimestampAndInsertToDatabase(callback: (Long) -> Unit) {
-		GoldStoneEthCall.getBlockTimeStampByBlockHash(blockHash) {
+	private fun TransactionTable.getTimestampAndInsertToDatabase(
+		chainID: String = GoldStoneApp.getCurrentChain(),
+		callback: (Long) -> Unit
+	) {
+		GoldStoneEthCall.getBlockTimeStampByBlockHash(blockHash, chainID) {
 			this.timeStamp = it.toString()
 			GoldStoneDataBase.database.transactionDao().insert(this)
 			callback(it)
@@ -478,13 +491,14 @@ class TransactionDetailPresenter(
 	private fun prepareHeaderValueFromNotification(
 		receipt: TransactionTable,
 		transaction: InputCodeData,
-		isReceive: Boolean
+		isReceive: Boolean,
+		chainID: String
 	) {
 		DefaultTokenTable.getCurrentChainTokenByContract(receipt.to) {
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall
-					.getTokenSymbolAndDecimalByContract(receipt.to) { symbol, decimal ->
+					.getTokenSymbolAndDecimalByContract(receipt.to, chainID) { symbol, decimal ->
 						val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
 						updateHeaderValue(
 							count,
