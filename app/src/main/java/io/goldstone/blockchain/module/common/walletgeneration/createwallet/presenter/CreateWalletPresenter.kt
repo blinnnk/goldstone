@@ -184,13 +184,13 @@ class CreateWalletPresenter(
 			failedCallback: () -> Unit = {},
 			callback: (password: String, walletName: String) -> Unit
 		) {
-			isAgree isFalse {
-				context?.alert(CreateWalletText.agreeRemind)
+			if (password.isEmpty() || repeatPassword.isEmpty()) {
+				context?.alert(CreateWalletText.emptyRepeatPasswordAlert)
 				failedCallback()
 				return
 			}
-			if (repeatPassword.isEmpty()) {
-				context?.alert(CreateWalletText.emptyRepeatPasswordAlert)
+			isAgree isFalse {
+				context?.alert(CreateWalletText.agreeRemind)
 				failedCallback()
 				return
 			}
