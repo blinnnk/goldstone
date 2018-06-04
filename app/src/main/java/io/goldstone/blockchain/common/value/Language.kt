@@ -153,6 +153,15 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "請按順序輸入助記詞，詞間使用空格符間隔"
 		else -> ""
 	}
+	val keystoreIntro = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Keystore is a JSON encrypted private key file. You need to enter the wallet password corresponding to the keystore. You can change your password at any time after importing."
+		HoneyLanguage.Chinese.code -> "Keystore是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"
+		HoneyLanguage.Japanese.code -> "キーストアは、JSONで暗号化された秘密鍵ファイルです。 キーストアに対応するウォレット・パスワードを入力する必要があります。 インポート後はいつでもパスワードを変更できます。"
+		HoneyLanguage.Korean.code -> "Keystore는 JSON으로 암호화 된 개인 키 파일입니다. 키 스토어에 해당하는 지갑 암호를 입력해야합니다. 가져온 후에는 언제든지 비밀번호를 변경할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Keystore является зашифрованным файлом закрытого ключа JSON. Вам необходимо ввести пароль кошелька, соответствующий хранилищу ключей. Вы можете изменить свой пароль в любое время после импорта."
+		HoneyLanguage.TraditionalChinese.code -> "Keystore是一種JSON格式的加密私鑰文件。您需要輸入獲得Keystore時對應的錢包密碼。您可以在導入後隨時修改密碼。"
+		else -> ""
+	}
 	val keystoreHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Paste your keystore here"
 		HoneyLanguage.Chinese.code -> "在此输入您的keystore"
@@ -312,12 +321,12 @@ object DialogText {
 		else -> ""
 	}
 	val networkDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
-		HoneyLanguage.Chinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
-		HoneyLanguage.Japanese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
-		HoneyLanguage.Korean.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
-		HoneyLanguage.Russian.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
-		HoneyLanguage.TraditionalChinese.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.English.code -> "The current state of the network is not good. Please check. You can try turning on and off airplane mode to try to recover."
+		HoneyLanguage.Chinese.code -> "现在的网络状态不好，请检查。您可以尝试开启再关闭飞行模式来尝试恢复。"
+		HoneyLanguage.Japanese.code -> "ネットワークの現在の状態が良好ではありません。確認してください。 飛行機モードをオンまたはオフにして回復を試みることができます。"
+		HoneyLanguage.Korean.code -> "네트워크의 현재 상태가 좋지 않습니다. 확인하십시오. 비행기 모드를 켜고 끄고 복구를 시도 할 수 있습니다.An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Russian.code -> "Текущее состояние сети не очень хорошее. Пожалуйста, проверьте. Вы можете попробовать включить и выключить режим полета, чтобы попытаться восстановиться."
+		HoneyLanguage.TraditionalChinese.code -> "現在的網絡狀態不好，請檢查。您可以嘗試開啟再關閉飛行模式來嘗試恢復。"
 		else -> ""
 	}
 	val goToBackUp = when (currentLanguage) {
@@ -658,21 +667,21 @@ object CommonText {
 	@JvmField
 	val wrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Password"
-		HoneyLanguage.Chinese.code -> "Wrong Password"
-		HoneyLanguage.Japanese.code -> "Wrong Password"
-		HoneyLanguage.Korean.code -> "Wrong Password"
-		HoneyLanguage.Russian.code -> "Wrong Password"
-		HoneyLanguage.TraditionalChinese.code -> "Wrong Password"
+		HoneyLanguage.Chinese.code -> "密码错误"
+		HoneyLanguage.Japanese.code -> "間違ったパスワード"
+		HoneyLanguage.Korean.code -> "잘못된 비밀번호"
+		HoneyLanguage.Russian.code -> "Неправильный пароль"
+		HoneyLanguage.TraditionalChinese.code -> "密碼錯誤"
 		else -> ""
 	}
 	@JvmField
 	val succeed = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Success"
 		HoneyLanguage.Chinese.code -> "成功"
-		HoneyLanguage.Japanese.code -> "Succeed"
+		HoneyLanguage.Japanese.code -> "成功"
 		HoneyLanguage.Korean.code -> "성공"
-		HoneyLanguage.Russian.code -> "Succeed"
-		HoneyLanguage.TraditionalChinese.code -> "Succeed"
+		HoneyLanguage.Russian.code -> "успех"
+		HoneyLanguage.TraditionalChinese.code -> "成功"
 		else -> ""
 	}
 	@JvmField
@@ -687,7 +696,7 @@ object CommonText {
 	}
 	@JvmField
 	val create = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Create.toUpperCase()"
+		HoneyLanguage.English.code -> "CREATE"
 		HoneyLanguage.Chinese.code -> "添加"
 		HoneyLanguage.Japanese.code -> "追加"
 		HoneyLanguage.Korean.code -> "만들기"
@@ -707,7 +716,7 @@ object CommonText {
 	}
 	@JvmField
 	val next = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Next"
+		HoneyLanguage.English.code -> "NEXT"
 		HoneyLanguage.Chinese.code -> "下一步"
 		HoneyLanguage.Japanese.code -> "次へ"
 		HoneyLanguage.Korean.code -> "다음"
