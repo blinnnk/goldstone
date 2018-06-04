@@ -10,7 +10,6 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -81,8 +80,6 @@ class SplashActivity : AppCompatActivity() {
 			}.let {
 				setContentView(it)
 			}
-			// 打印必要数据在 `Debug` 的时候
-			LogUtil.debug(this.javaClass.simpleName, "Config: $this")
 			// 错开动画时间再执行数据请求
 			Duration.wave timeUpThen {
 				// Add currency data from local JSON file
@@ -118,7 +115,10 @@ class SplashActivity : AppCompatActivity() {
 				}
 			} otherwise {
 				config?.isRegisteredAddresses?.isFalse {
-					// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
+					/**
+					 * 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里
+					 * 检测并重新注册
+					 */
 					XinGePushReceiver.registerWalletAddressForPush()
 				}
 				config?.let(callback)

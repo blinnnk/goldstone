@@ -45,7 +45,8 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		data.memo,
-		(data.gasUsed.toDouble() * data.gasPrice.toDouble()).toEthValue(), // 计算燃气费使用情况
+		((data.gas.toDoubleOrNull() ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble()).toEthValue(), //
+		// 计算燃气费使用情况
 		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,

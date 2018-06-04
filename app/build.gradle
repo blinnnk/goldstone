@@ -24,11 +24,6 @@ android {
       abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
     }
   }
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
   buildTypes {
     debug {
       minifyEnabled true
