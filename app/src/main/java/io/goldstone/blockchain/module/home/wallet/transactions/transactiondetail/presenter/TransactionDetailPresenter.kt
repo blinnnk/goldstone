@@ -68,7 +68,6 @@ class TransactionDetailPresenter(
 			)
 			
 			currentHash = transactionHash
-			
 			if (memo.isEmpty() && !isPending) {
 				fragment.showLoadingView("Load transaction detail information")
 				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
@@ -408,15 +407,12 @@ class TransactionDetailPresenter(
 	}
 	
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-	private fun TransactionDetailFragment.getTransactionFromChain(
-		callback: () -> Unit = {}
-	) {
+	private fun TransactionDetailFragment.getTransactionFromChain() {
 		GoldStoneEthCall.getTransactionByHash(currentHash) {
 			context?.runOnUiThread {
 				asyncData?.clear()
 				asyncData?.addAll(generateModels(it))
 				recyclerView.adapter.notifyItemRangeChanged(1, 6)
-				callback()
 			}
 			// 成功获取数据后在异步线程更新数据库记录
 			updateDataInDatabase(it.blockNumber)
@@ -427,7 +423,7 @@ class TransactionDetailPresenter(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
-		GoldStoneEthCall.getTransactionByHash(currentHash) { receipt ->
+		GoldStoneEthCall.getTransactionByHash(currentHash, info.chainID) { receipt ->
 			receipt.getTimestampAndInsertToDatabase { timestamp ->
 				context?.runOnUiThread {
 					// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
@@ -448,11 +444,16 @@ class TransactionDetailPresenter(
 							info.isReceived
 						)
 					}
-					
 					if (asyncData.isNull()) {
-						receipt.toAsyncData().let {
-							it[4].info = TimeUtils.formatDate(timestamp)
-							asyncData = it
+						TransactionTable.updateTransactionMemoByHashAndReceiveStatus(
+							info.hash,
+							info.isReceived
+						) { memo ->
+							receipt.toAsyncData().let {
+								it[4].info = TimeUtils.formatDate(timestamp)
+								it[1].info = memo
+								asyncData = it
+							}
 						}
 					}
 					callback()

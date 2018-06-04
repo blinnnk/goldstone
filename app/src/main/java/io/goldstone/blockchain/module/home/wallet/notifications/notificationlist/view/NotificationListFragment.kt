@@ -15,12 +15,11 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 25/03/2018 1:48 AM
  * @author KaySaith
  */
-
 class NotificationListFragment :
 	BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
-
+	
 	override val presenter = NotificationListPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<NotificationTable>?
@@ -29,19 +28,18 @@ class NotificationListFragment :
 			onClick {
 				model?.apply {
 					presenter.showTransactionListDetailFragment(
-						NotificationTransactionInfo(transactionHash, isReceived)
+						NotificationTransactionInfo(transactionHash, chainID.toString(), isReceived)
 					)
 				}
 				preventDuplicateClicks()
 			}
 		}
 	}
-
+	
 	override fun setSlideUpWithCellHeight() = 75.uiPX()
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
 	}
-
 }

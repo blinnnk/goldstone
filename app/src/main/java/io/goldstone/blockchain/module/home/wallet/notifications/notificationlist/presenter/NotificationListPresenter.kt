@@ -21,7 +21,11 @@ import java.io.Serializable
  * @date 25/03/2018 1:49 AM
  * @author KaySaith
  */
-data class NotificationTransactionInfo(val hash: String, val isReceived: Boolean) : Serializable
+data class NotificationTransactionInfo(
+	val hash: String,
+	val chainID: String,
+	val isReceived: Boolean
+) : Serializable
 
 class NotificationListPresenter(
 	override val fragment: NotificationListFragment

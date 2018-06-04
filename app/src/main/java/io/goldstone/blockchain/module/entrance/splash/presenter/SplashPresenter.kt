@@ -6,7 +6,6 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
