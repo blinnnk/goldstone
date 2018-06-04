@@ -192,3 +192,7 @@ object WalletDetailSize {
 fun View.fontSize(defaultSize: Int): Float {
 	return px2sp((Resources.getSystem().displayMetrics.density * defaultSize).toInt())
 }
+
+object Duration {
+	const val wave = 1500L
+}

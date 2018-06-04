@@ -68,7 +68,8 @@ class TransactionDetailPresenter(
 			)
 			
 			currentHash = transactionHash
-			if (memo.isEmpty()  && !isPending) {
+			
+			if (memo.isEmpty() && !isPending) {
 				fragment.showLoadingView("Load transaction detail information")
 				TransactionTable.updateTransactionMemoByHashAndReceiveStatus(transactionHash, isReceived) {
 					fragment.asyncData = generateModels(this.apply { memo = it })
