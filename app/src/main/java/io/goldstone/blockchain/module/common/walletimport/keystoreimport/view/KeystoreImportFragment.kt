@@ -43,8 +43,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				lparams(matchParent, matchParent)
 				attentionView.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-					text =
-						"Kevin Federline has two kids with Britney Spears and four more with other women -- and if he's not spending his child support checks properly, that could pose some new problems for him in court."
+					text = ImportWalletText.keystoreIntro
 				}.into(this)
 				
 				keystoreEditText.apply {
