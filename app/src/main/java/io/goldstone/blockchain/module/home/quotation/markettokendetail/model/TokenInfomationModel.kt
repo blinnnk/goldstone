@@ -23,3 +23,14 @@ data class TokenInformationModel(
 		).toDouble() else 0.0
 	)
 }
+
+enum class MarketTokenDetailChartType(
+	val code: Int,
+	val info: String,
+	val display: String
+) {
+	Hour(0, "1hour", "HOUR"),
+	DAY(1, "1day", "DAY"),
+	WEEK(2, "1week", "WEEK"),
+	MONTH(3, "1month", "MONTH")
+}

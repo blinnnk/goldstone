@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel

@@ -12,9 +12,9 @@ import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
-import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -237,12 +237,18 @@ object GoldStoneAPI {
 	fun getNotificationList(
 		goldSonteID: String,
 		time: Long,
+		errorCallback: () -> Unit,
 		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"device\":\"$goldSonteID\",\"time\":$time}").orEmpty()
 		RequestBody.create(requestContentType, content).let {
-			postRequestGetJsonObject<NotificationTable>(it, "message_list", APIPath.getNotification) {
+			postRequestGetJsonObject<NotificationTable>(
+				it,
+				"message_list",
+				APIPath.getNotification,
+				errorCallback
+			) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -387,7 +393,7 @@ object GoldStoneAPI {
 		crossinline netWorkError: () -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
-		getcryptoGetRequest(api) {
+		getcryptGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					netWorkError()
@@ -494,7 +500,7 @@ object GoldStoneAPI {
 		}
 	}
 	
-	fun getcryptoGetRequest(
+	fun getcryptGetRequest(
 		api: String,
 		callback: (Request) -> Unit
 	) {
