@@ -189,7 +189,11 @@ class CreateWalletPresenter(
 				failedCallback()
 				return
 			}
-			
+			if (repeatPassword == "") {
+				context?.alert(CreateWalletText.emptyRepeatPasswordAlert)
+				failedCallback()
+				return
+			}
 			if (password != repeatPassword) {
 				context?.alert(CreateWalletText.passwordRepeatAlert)
 				failedCallback()

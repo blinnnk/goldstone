@@ -122,6 +122,15 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致"
 		else -> ""
 	}
+	val emptyRepeatPasswordAlert = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please repeat the password for confirmation"
+		HoneyLanguage.Chinese.code -> "请重复输入密码以作确认"
+		HoneyLanguage.Japanese.code -> "確認のためにパスワードを繰り返してください"
+		HoneyLanguage.Korean.code -> "확인을 위해 비밀번호를 반복하십시오."
+		HoneyLanguage.Russian.code -> "Повторите пароль для подтверждения"
+		HoneyLanguage.TraditionalChinese.code -> "請重複輸入密碼以作確認"
+		else -> ""
+	}
 	val name = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Name"
 		HoneyLanguage.Chinese.code -> "钱包名称"
