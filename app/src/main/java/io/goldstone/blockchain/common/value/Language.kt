@@ -113,6 +113,15 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "再次輸入密碼"
 		else -> ""
 	}
+	val passwordRepeatAlert = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The password entered twice is inconsistent"
+		HoneyLanguage.Chinese.code -> "两次输入的密码不一致"
+		HoneyLanguage.Japanese.code -> "2回入力したパスワードが矛盾しています"
+		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다."
+		HoneyLanguage.Russian.code -> "Пароль, введенный дважды, является непоследовательным"
+		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致"
+		else -> ""
+	}
 	val name = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Name"
 		HoneyLanguage.Chinese.code -> "钱包名称"
@@ -251,15 +260,6 @@ object ImportWalletText {
 		HoneyLanguage.Korean.code -> "니모닉 포맷 오류"
 		HoneyLanguage.Russian.code -> "不適切なニーモニック形式"
 		HoneyLanguage.TraditionalChinese.code -> "助憶口令格式不對哦"
-		else -> ""
-	}
-	val mnemonicLengthAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The mnemonic is too short"
-		HoneyLanguage.Chinese.code -> "助记词不够长哦"
-		HoneyLanguage.Japanese.code -> "ニーモニックが十分でない"
-		HoneyLanguage.Korean.code -> "니모닉 길이가 짧습니다"
-		HoneyLanguage.Russian.code -> "Мнемоника не достаточно длинная"
-		HoneyLanguage.TraditionalChinese.code -> "助憶口令長度不夠哦"
 		else -> ""
 	}
 	val pathAlert = when (currentLanguage) {
