@@ -3,15 +3,19 @@ package io.goldstone.blockchain.module.entrance.splash.presenter
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.doAsync
 
 /**
  * @date 30/03/2018 2:21 AM
@@ -54,6 +58,23 @@ class SplashPresenter(val activity: SplashActivity) {
 				StartingPresenter.insertLocalCurrency(activity, callback)
 			} otherwise {
 				callback()
+			}
+		}
+	}
+	
+	// 获取当前的汇率
+	fun updateCurrencyRateFromServer(
+		config: AppConfigTable
+	) {
+		doAsync {
+			GoldStoneApp.updateCurrencyCode(config.currencyCode)
+			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
+				LogUtil.error("Request of get currency rate has error")
+			}) {
+				// 更新内存中的值
+				GoldStoneApp.updateCurrentRate(it)
+				// 更新数据库的值
+				SupportCurrencyTable.updateUsedRateValue(it)
 			}
 		}
 	}

@@ -1,9 +1,7 @@
 package io.goldstone.blockchain.module.entrance.starting.view
 
-import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInHorizontal
@@ -11,8 +9,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.GradientType
-import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -32,20 +28,13 @@ import org.jetbrains.anko.*
 class StartingFragment : BaseFragment<StartingPresenter>() {
 	
 	override val presenter = StartingPresenter(this)
-	private val gradientView by lazy {
-		GradientView(context!!).apply {
-			setStyle(GradientType.Blue)
-		}
-	}
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
-	private val waveView by lazy { WaveLoadingView(context!!) }
 	private val logoSize = 150.uiPX()
 	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-			gradientView.into(this)
 			// Logo
 			imageView {
 				glideImage(R.drawable.logo)
@@ -102,23 +91,17 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						width = matchParent
 					}
 				} else {
-					LoadingView.addLoadingCircle(this@relativeLayout, 30.uiPX(), Spectrum.white) {
+					LoadingView.addLoadingCircle(
+						this@relativeLayout,
+						30.uiPX(),
+						Spectrum.white
+					) {
 						setAlignParentBottom()
 						setCenterInHorizontal()
 						y -= 100.uiPX()
 					}
 				}
 			}
-			
-			waveView.apply {
-				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-				setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
-				progressValue = 35
-				waveColor = Color.parseColor("#FF19769D")
-				setAnimDuration(30000)
-				setAmplitudeRatio(30)
-				startAnimation()
-			}.into(this)
 		}
 	}
 }

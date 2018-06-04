@@ -1,18 +1,24 @@
 package io.goldstone.blockchain.module.entrance.splash.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.ViewGroup
+import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.component.GradientType
+import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
-import org.jetbrains.anko.doAsync
+import me.itangqi.waveloadingview.WaveLoadingView
+import org.jetbrains.anko.matchParent
 
 /**
 ─────────────────────────────────────────────────────────────
@@ -49,6 +55,10 @@ class SplashActivity : AppCompatActivity() {
 	var backEvent: Runnable? = null
 	private val container by lazy { SplashContainer(this) }
 	private val presenter = SplashPresenter(this)
+	private val gradientView by lazy {
+		GradientView(this).apply { setStyle(GradientType.Blue) }
+	}
+	private val waveView by lazy { WaveLoadingView(this) }
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -56,10 +66,14 @@ class SplashActivity : AppCompatActivity() {
 		hideStatusBar()
 		
 		prepareAppConfig {
+			application.registerDeviceForPush()
+			
 			initLaunchLanguage(language)
 			setCurrentChainID(chainID)
 			
 			container.apply {
+				gradientView.into(this)
+				initWaveView()
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 				savedInstanceState.isNull {
 					addFragment<StartingFragment>(container.id)
@@ -69,13 +83,18 @@ class SplashActivity : AppCompatActivity() {
 			}
 			// 打印必要数据在 `Debug` 的时候
 			LogUtil.debug(this.javaClass.simpleName, "Config: $this")
-			// Add currency data from local JSON file
-			presenter.initSupportCurrencyList {
-				// insert support currency list from local json
-				updateCurrencyRateFromServer(this)
-				// check network to get default toke list
-				presenter.initDefaultTokenByNetWork {
-					presenter.hasAccountThenLogin()
+			// 错开动画时间再执行数据请求
+			Duration.wave timeUpThen {
+				// Add currency data from local JSON file
+				presenter.apply {
+					initSupportCurrencyList {
+						// insert support currency list from local json
+						updateCurrencyRateFromServer(this@prepareAppConfig)
+						// check network to get default toke list
+						initDefaultTokenByNetWork {
+							hasAccountThenLogin()
+						}
+					}
 				}
 			}
 		}
@@ -119,20 +138,15 @@ class SplashActivity : AppCompatActivity() {
 		GoldStoneApp.updateCurrentChain(id)
 	}
 	
-	// 获取当前的汇率
-	private fun updateCurrencyRateFromServer(
-		config: AppConfigTable
-	) {
-		doAsync {
-			GoldStoneApp.updateCurrencyCode(config.currencyCode)
-			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
-				LogUtil.error("Request of get currency rate has error")
-			}) {
-				// 更新内存中的值
-				GoldStoneApp.updateCurrentRate(it)
-				// 更新数据库的值
-				SupportCurrencyTable.updateUsedRateValue(it)
-			}
-		}
+	private fun ViewGroup.initWaveView() {
+		waveView.apply {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
+			progressValue = 35
+			waveColor = Color.parseColor("#FF19769D")
+			setAnimDuration(30000)
+			setAmplitudeRatio(30)
+			startAnimation()
+		}.into(this)
 	}
 }
