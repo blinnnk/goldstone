@@ -64,7 +64,7 @@ open class RoundInput(context: Context) : EditText(context) {
 		
 		leftPadding = 35.uiPX()
 		backgroundTintMode = PorterDuff.Mode.CLEAR
-		textColor = Spectrum.blue
+		textColor = GrayScale.black
 		typeface = GoldStoneFont.heavy(context)
 		textSize = fontSize(14)
 		setCursorColor(Spectrum.blue)
@@ -97,10 +97,12 @@ open class RoundInput(context: Context) : EditText(context) {
 			if (hasFocus) {
 				paint.color = Spectrum.blue
 				textPaint.color = Spectrum.blue
+				textColor = Spectrum.blue
 				invalidate()
 			} else {
 				paint.color = GrayScale.lightGray
 				textPaint.color = GrayScale.midGray
+				textColor = GrayScale.black
 				invalidate()
 			}
 		}

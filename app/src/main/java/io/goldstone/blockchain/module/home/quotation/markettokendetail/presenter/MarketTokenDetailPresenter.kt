@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter
 
 import android.text.format.DateUtils
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
@@ -9,12 +11,13 @@ import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
@@ -25,7 +28,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -99,6 +102,24 @@ class MarketTokenDetailPresenter(
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	fun showAllDescription(parent: ViewGroup) {
+		if (parent.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+			val overlay = ContentScrollOverlayView(parent.context)
+			overlay.into(parent)
+			overlay.setTitle("DESCRIPTION")
+			overlay.addContent {
+				QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
+					textView(it?.description) {
+						textColor = GrayScale.gray
+						textSize = fontSize(14)
+						typeface = GoldStoneFont.medium(context)
+						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					}
 				}
 			}
@@ -190,7 +211,7 @@ class MarketTokenDetailPresenter(
 		}
 	}
 	
-	fun setCurrencyInf(
+	fun setCurrencyInfo(
 		currencyInfo: QuotationModel?,
 		tokenInformation: TokenInformation,
 		priceHistroy: PriceHistoryView,
@@ -233,9 +254,7 @@ class MarketTokenDetailPresenter(
 								ScreenSize.widthWithPadding
 							)
 						}
-						QuotationSelectionTable.updateDescription(
-							info.pair, description
-						)
+						QuotationSelectionTable.updateDescription(info.pair, description)
 					}
 				} else {
 					tokenInfo.setTokenDescription(

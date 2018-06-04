@@ -21,20 +21,19 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import org.jetbrains.anko.relativeLayout
 
 class MainActivity : AppCompatActivity() {
-
+	
 	var backEvent: Runnable? = null
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
-
+	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
 		val application = application as GoldStoneApp
 		tracker = application.getDefaultTracker()
-
+		
 		hideStatusBar()
-
+		
 		relativeLayout {
 			id = ContainerID.main
 			savedInstanceState.isNull {
@@ -46,14 +45,14 @@ class MainActivity : AppCompatActivity() {
 		}
 		registerReceiver()
 	}
-
+	
 	private var currentIntent: Intent? = null
 	override fun onNewIntent(intent: Intent?) {
 		super.onNewIntent(intent)
 		// App 存在的时候记录 `Intent`
 		currentIntent = intent
 	}
-
+	
 	override fun onResume() {
 		super.onResume()
 		// Push 跳转
@@ -64,12 +63,12 @@ class MainActivity : AppCompatActivity() {
 			showTransactionDetailFragment(currentIntent)
 		}
 	}
-
+	
 	fun sendAnalyticsData(className: String) {
 		tracker?.setScreenName(className)
 		tracker?.send(HitBuilders.ScreenViewBuilder().build())
 	}
-
+	
 	fun showLoadingView() {
 		findViewById<RelativeLayout>(ContainerID.main)?.let { layout ->
 			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
@@ -78,18 +77,18 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-
+	
 	fun removeLoadingView() {
 		findViewById<RelativeLayout>(ContainerID.main)?.apply {
 			loadingView?.let { removeView(it) }
 		}
 	}
-
+	
 	override fun onDestroy() {
 		super.onDestroy()
 		unregisterReceiver(netWorkReceiver)
 	}
-
+	
 	override fun onBackPressed() {
 		if (backEvent.isNull()) {
 			super.onBackPressed()
@@ -97,9 +96,13 @@ class MainActivity : AppCompatActivity() {
 			backEvent?.run()
 		}
 	}
-
+	
 	fun getHomeFragment(): HomeFragment? {
 		return supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment
+	}
+	
+	fun getMainContainer(): RelativeLayout? {
+		return findViewById(ContainerID.main)
 	}
 	
 	fun hideHomeFragment() {
@@ -110,12 +113,12 @@ class MainActivity : AppCompatActivity() {
 	
 	fun showHomeFragment() {
 		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
-			if(it.isHidden) {
+			if (it.isHidden) {
 				supportFragmentManager?.beginTransaction()?.show(it)?.commit()
 			}
 		}
 	}
-
+	
 	/**
 	 * 接受到 `Push` 跳转到 `NotificationFragment`
 	 */
@@ -133,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 				currentIntent = null
 			}
 	}
-
+	
 	private fun registerReceiver() {
 		netWorkReceiver = ConnectionChangeReceiver()
 		val intentFilter = IntentFilter()
