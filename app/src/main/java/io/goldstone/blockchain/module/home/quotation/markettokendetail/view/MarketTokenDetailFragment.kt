@@ -9,6 +9,8 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -67,19 +69,28 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.updateChartByMenu(
 					chartView, MarketTokenDetailChartType.Hour.code
 				)
-				
+
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
 					}
 				}.into(this)
-				
+
 				priceHistroy.into(this)
-				tokenInfo.into(this)
+				tokenInfo
+					.click {
+						getMainActivity()?.getMainContainer()?.let {
+							presenter.showAllDescription(it)
+						}
+					}
+					.into(this)
 				tokenInformation.into(this)
-				
-				presenter.setCurrencyInf(
-					currencyInfo, tokenInformation, priceHistroy, tokenInfo
+
+				presenter.setCurrencyInfo(
+					currencyInfo,
+					tokenInformation,
+					priceHistroy,
+					tokenInfo
 				)
 			}.lparams {
 				width = ScreenSize.widthWithPadding
