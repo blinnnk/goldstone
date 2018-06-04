@@ -79,12 +79,12 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 				}
 				// 设定最大高度
 				onLayoutChange { _, _, top, _, bottom, _, _, _, _ ->
-					if (bottom - top > ScreenSize.fullHeight * 0.8) {
-						layoutParams.height = (ScreenSize.fullHeight * 0.8).toInt()
+					if (bottom - top > ScreenSize.fullHeight * 0.9) {
+						layoutParams.height = (ScreenSize.fullHeight * 0.9).toInt()
 					}
 				}
 			}
-			addCorner(CornerSize.default.toInt(), Spectrum.white)
+			addCorner(CornerSize.small, Spectrum.white)
 		}
 		container.setCenterInParent()
 	}
