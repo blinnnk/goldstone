@@ -103,10 +103,12 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenSymbolAndDecimalByContract(
 		contractAddress: String,
+		chainID: String = GoldStoneApp.getCurrentChain(),
+		errorCallback: () -> Unit = {},
 		hold: (symbol: String, decimal: Double) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress) { symbol ->
-			getTokenDecimal(contractAddress) { decimal ->
+		getTokenSymbolByContract(contractAddress, chainID, errorCallback) { symbol ->
+			getTokenDecimal(contractAddress, chainID, errorCallback) { decimal ->
 				hold(symbol, decimal)
 			}
 		}
@@ -127,6 +129,8 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
+		chainID: String = GoldStoneApp.getCurrentChain(),
+		errorCallback: () -> Unit = {},
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
@@ -134,7 +138,7 @@ object GoldStoneEthCall {
 			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
 		)
 		).let {
-			callEthBy(it) {
+			callEthBy(it, errorCallback, chainID) {
 				holdValue(JSONObject(it).safeGet("input"))
 			}
 		}
@@ -143,6 +147,8 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
+		chainID: String = GoldStoneApp.getCurrentChain(),
+		errorCallback: () -> Unit = {},
 		holdValue: (Long) -> Unit
 	) {
 		RequestBody.create(
@@ -150,7 +156,7 @@ object GoldStoneEthCall {
 			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockByHash.method}\", \"params\":[\"$blockHash\", true], \"id\":1}"
 		)
 		).let {
-			callEthBy(it) {
+			callEthBy(it, errorCallback, chainID) {
 				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
 				holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
 			}
@@ -240,6 +246,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenSymbolByContract(
 		contractAddress: String,
+		chainID: String = GoldStoneApp.getCurrentChain(),
 		errorCallback: () -> Unit = {},
 		holdValue: (String) -> Unit = {}
 	) {
@@ -247,13 +254,14 @@ object GoldStoneEthCall {
 			contentType,
 			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
 		).let {
-			callEthBy(it, errorCallback) { holdValue(it.toAscii()) }
+			callEthBy(it, errorCallback, chainID) { holdValue(it.toAscii()) }
 		}
 	}
 	
 	@JvmStatic
 	private fun getTokenDecimal(
 		contractAddress: String,
+		chainID: String = GoldStoneApp.getCurrentChain(),
 		errorCallback: () -> Unit = {},
 		holdValue: (Double) -> Unit
 	) {
@@ -262,7 +270,7 @@ object GoldStoneEthCall {
 			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
 		)
 		).let {
-			callEthBy(it, errorCallback) { holdValue(it.hexToDecimal()) }
+			callEthBy(it, errorCallback, chainID) { holdValue(it.hexToDecimal()) }
 		}
 	}
 	
@@ -328,7 +336,6 @@ object GoldStoneEthCall {
 			.connectTimeout(60, TimeUnit.SECONDS)
 			.readTimeout(90, TimeUnit.SECONDS)
 			.build()
-		
 		GoldStoneAPI.getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
