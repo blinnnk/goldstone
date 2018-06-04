@@ -26,7 +26,7 @@ data class NotificationTable(
 	@SerializedName("title")
 	val title: String = "",
 	@SerializedName("create_on")
-	val createTIme: Long = 0L,
+	val createTime: Long = 0L,
 	@SerializedName("hash")
 	val transactionHash: String = "",
 	@SerializedName("type")
@@ -42,7 +42,7 @@ data class NotificationTable(
 		0,
 		data.content,
 		data.title,
-		data.createTIme,
+		data.createTime,
 		data.transactionHash,
 		data.type,
 		data.isTo,
@@ -56,7 +56,7 @@ data class NotificationTable(
 				{
 					GoldStoneDataBase.database.notificationDao().getAllNotifications()
 				}) {
-				hold(it.sortedByDescending { it.createTIme }.toArrayList())
+				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}
 		

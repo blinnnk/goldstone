@@ -9,9 +9,12 @@ import com.blinnnk.uikit.AnimationDuration
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.component.ExplanationTitle
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -47,7 +50,14 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 	
 	open fun onFragmentDetach() {
-		fragment.getMainActivity()?.showHomeFragment()
+		val activit = fragment.activity
+		if (activit is MainActivity) {
+			try {
+				activit.showHomeFragment()
+			} catch (error: Exception) {
+				LogUtil.error("showHomeFragment", error)
+			}
+		}
 	}
 	
 	open fun onFragmentDestroy() {

@@ -115,7 +115,6 @@ class TransactionDetailPresenter(
 		}
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 		notificationData?.let { transaction ->
-			System.out.println("tran ___$transaction")
 			currentHash = transaction.hash
 			/**
 			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
@@ -129,9 +128,7 @@ class TransactionDetailPresenter(
 					// 如果本地没有数据从链上查询所有需要的数据
 					fragment.apply {
 						showLoadingView(LoadingText.transactionData)
-						System.out.println("hello 1")
-						updateTransactionByNotificationHash(transaction) {
-							System.out.println("hello 6")
+						updateByNotificationHash(transaction) {
 							removeLoadingView()
 						}
 					}
@@ -423,52 +420,54 @@ class TransactionDetailPresenter(
 		}
 	}
 	
-	private fun TransactionDetailFragment.updateTransactionByNotificationHash(
+	private fun TransactionDetailFragment.updateByNotificationHash(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
 		GoldStoneEthCall.getTransactionByHash(currentHash, info.chainID) { receipt ->
-			System.out.println("hello 2")
 			receipt.getTimestampAndInsertToDatabase(info.chainID) { timestamp ->
-				System.out.println("hello 3")
 				context?.runOnUiThread {
-					// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-					val transactionInfo =
-						CryptoUtils.loadTransferInfoFromInputData(receipt.input)
-					
-					CryptoUtils.isERC20TransferByInputCode(receipt.input) {
-						transactionInfo?.let {
-							prepareHeaderValueFromNotification(receipt, it, info.isReceived, info.chainID)
-						}
-					} isFalse {
-						val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
-						updateHeaderValue(
-							count,
-							if (info.isReceived) receipt.fromAddress else receipt.to,
-							CryptoSymbol.eth,
-							false,
-							info.isReceived
-						)
-					}
-					System.out.println("hello 3")
 					if (asyncData.isNull()) {
-						System.out.println("hello 4")
 						TransactionTable.updateMemoByHashAndReceiveStatus(
 							info.hash,
 							info.isReceived,
 							info.chainID
 						) { memo ->
-							System.out.println("hello 5")
 							receipt.toAsyncData().let {
 								it[4].info = TimeUtils.formatDate(timestamp)
 								it[1].info = memo
 								asyncData = it
+								updateHeaderFromNotification(receipt, info)
 							}
 						}
 					}
 					callback()
 				}
 			}
+		}
+	}
+	
+	private fun updateHeaderFromNotification(
+		receipt: TransactionTable,
+		info: NotificationTransactionInfo
+	) {
+		// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
+		val transactionInfo =
+			CryptoUtils.loadTransferInfoFromInputData(receipt.input)
+		
+		CryptoUtils.isERC20TransferByInputCode(receipt.input) {
+			transactionInfo?.let {
+				prepareHeaderValueFromNotification(receipt, it, info.isReceived, info.chainID)
+			}
+		} isFalse {
+			val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
+			updateHeaderValue(
+				count,
+				if (info.isReceived) receipt.fromAddress else receipt.to,
+				CryptoSymbol.eth,
+				false,
+				info.isReceived
+			)
 		}
 	}
 	
@@ -482,7 +481,6 @@ class TransactionDetailPresenter(
 	) {
 		GoldStoneEthCall.getBlockTimeStampByBlockHash(blockHash, chainID) {
 			this.timeStamp = it.toString()
-			GoldStoneDataBase.database.transactionDao().insert(this)
 			callback(it)
 		}
 	}

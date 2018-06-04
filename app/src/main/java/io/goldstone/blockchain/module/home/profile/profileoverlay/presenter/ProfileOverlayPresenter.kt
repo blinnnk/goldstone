@@ -25,10 +25,8 @@ class ProfileOverlayPresenter(
 	
 	override fun removeSelfFromActivity() {
 		super.removeSelfFromActivity()
-		fragment.getMainActivity()?.apply {
-			supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
-				findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.presenter?.updateData()
-			}
+		fragment.getMainActivity()?.getHomeFragment()?.apply {
+			findChildFragmentByTag<ProfileFragment>(FragmentTag.profile)?.presenter?.updateData()
 		}
 	}
 	

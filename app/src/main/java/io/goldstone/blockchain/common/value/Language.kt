@@ -706,6 +706,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val new = when (currentLanguage) {
+		HoneyLanguage.English.code -> "NEW"
+		HoneyLanguage.Chinese.code -> "NEW"
+		HoneyLanguage.Japanese.code -> "NEW"
+		HoneyLanguage.Korean.code -> "NEW"
+		HoneyLanguage.Russian.code -> "NEW"
+		HoneyLanguage.TraditionalChinese.code -> "NEW"
+		else -> ""
+	}
+	@JvmField
 	val next = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Next"
 		HoneyLanguage.Chinese.code -> "下一步"

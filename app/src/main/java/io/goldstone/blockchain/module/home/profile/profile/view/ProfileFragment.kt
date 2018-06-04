@@ -16,17 +16,15 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 25/03/2018 10:52 PM
  * @author KaySaith
  */
-
 class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
-
+	
 	private val slideHeader by lazy { ProfileSlideHeader(context!!) }
 	override val presenter = ProfilePresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ProfileModel>?
 	) {
-
 		recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
 			// 分配点击事件
 			item.apply {
@@ -38,38 +36,43 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 					item.layoutParams.height = 60.uiPX()
 					isCenterInVertical = true
 				}
-				onClick {
-					presenter.showTargetFragment(model.title)
-					preventDuplicateClicks()
+				if (position == asyncData?.size) {
+					upgradeEvent = Runnable {
+						presenter.showUpgradeDialog()
+					}
+				} else {
+					onClick {
+						presenter.showTargetFragment(model.title)
+						preventDuplicateClicks()
+					}
 				}
 			}
 		}
 	}
-
+	
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
 	}
-
+	
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
-
+	
 	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
 		}
-
+		
 		if (offset < headerHeight && isShow) {
 			slideHeader.onHeaderHidesStyle()
 			isShow = false
 		}
 	}
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		mainActivity?.getHomeFragment()?.apply {
 			presenter.showWalletDetailFragment()
 		}
 	}
-
 }

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
@@ -13,18 +14,20 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
-import io.goldstone.blockchain.common.value.SystemUtils
+import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.*
@@ -89,6 +92,24 @@ object GoldStoneAPI {
 	) {
 		requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
 			hold(toArrayList())
+		}
+	}
+	
+	@JvmStatic
+	fun getNewVersionOrElse(
+		hold: (VersionModel?) -> Unit
+	) {
+		requestData<String>(APIPath.getNewVersion, "", true) {
+			val data = JSONObject(this[0])
+			val hasNewVersion =
+				data.safeGet("has_new_version").toIntOrNull().orZero() == TinyNumber.True.value
+			GoldStoneAPI.context.runOnUiThread {
+				if (hasNewVersion) {
+					hold(VersionModel(JSONObject(data.safeGet("data"))))
+				} else {
+					hold(null)
+				}
+			}
 		}
 	}
 	
