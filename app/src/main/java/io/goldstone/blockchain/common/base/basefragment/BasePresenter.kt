@@ -10,46 +10,51 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**
  * @date 22/03/2018 2:58 AM
  * @author KaySaith
  */
-
 abstract class BasePresenter<out T : BaseFragment<*>> {
-
+	
 	abstract val fragment: T
-
+	
 	open fun onFragmentAttach() {
 		// Do Something When fragment Attach
 	}
-
+	
 	open fun onFragmentCreateView() {
 		// Do Something When fragment Attach
 	}
-
+	
 	open fun onFragmentViewCreated() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentDetach() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentResume() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentShowFromHidden() {
 		// Do Something
 	}
-
+	
 	open fun onFragmentDestroy() {
-		fragment.getMainActivity()?.showHomeFragment()
+		try {
+			fragment.getMainActivity()?.showHomeFragment()
+		} catch (error: Exception) {
+			LogUtil.error("BasePresenter showHomeFragment", error)
+		}
 	}
-
+	
 	fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(
@@ -60,7 +65,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 			fragment.getMainActivity()?.hideHomeFragment()
 		}
 	}
-
+	
 	fun updateHeight(height: Int) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
 			overlayView.contentLayout.updateHeightAnimation(height)
@@ -74,7 +79,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 			fragment.getMainActivity()?.showHomeFragment()
 		}
 	}
-
+	
 	// 当 `BaseFragment` 加载在 `BaseOverlayFragment` 的时候提供支持回退的加载卸载方法
 	inline fun <reified T : Fragment, reified Parent : BaseOverlayFragment<*>> showTargetFragment(
 		title: String,
@@ -100,5 +105,4 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 			}
 		}
 	}
-
 }

@@ -151,7 +151,7 @@ class WalletDetailPresenter(
 						val time = if (notifications.isEmpty()) goldStoneID.substring(
 							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
 						).toLong()
-						else notifications.maxBy { it.createTIme }?.createTIme.orElse(0)
+						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
 						GoldStoneAPI.getUnreadCount(goldStoneID, time) {
 							GoldStoneAPI.context.runOnUiThread {
 								if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {

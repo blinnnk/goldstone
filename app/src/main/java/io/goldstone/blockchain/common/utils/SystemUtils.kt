@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.value
+package io.goldstone.blockchain.common.utils
 
 import android.content.Context
 import android.content.pm.PackageInfo

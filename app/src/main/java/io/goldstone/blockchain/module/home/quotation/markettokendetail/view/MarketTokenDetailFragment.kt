@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
@@ -27,17 +28,6 @@ import org.jetbrains.anko.verticalLayout
  * @date 25/04/2018 6:52 AM
  * @author KaySaith
  */
-enum class MarketTokenDetailChartType(
-	val code: Int,
-	val info: String
-) {
-	
-	Hour(0, "1hour"),
-	DAY(1, "1day"),
-	WEEK(2, "1week"),
-	MONTH(3, "1month")
-}
-
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	
 	val currencyInfo by lazy {
@@ -59,10 +49,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					}
 				}.into(this)
 				menu.titles = arrayListOf(
-					MarketTokenDetailChartType.Hour.info,
-					MarketTokenDetailChartType.DAY.info,
-					MarketTokenDetailChartType.WEEK.info,
-					MarketTokenDetailChartType.MONTH.info
+					MarketTokenDetailChartType.Hour.display,
+					MarketTokenDetailChartType.DAY.display,
+					MarketTokenDetailChartType.WEEK.display,
+					MarketTokenDetailChartType.MONTH.display
 				)
 				menu.getButton { button ->
 					button.onClick {

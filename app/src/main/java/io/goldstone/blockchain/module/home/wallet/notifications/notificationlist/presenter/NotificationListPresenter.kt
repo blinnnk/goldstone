@@ -3,7 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
@@ -64,7 +66,7 @@ class NotificationListPresenter(
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView(LoadingText.notificationData)
 		NotificationTable.getAllNotifications { localData ->
-			val latestTime = localData.maxBy { it.createTIme }?.createTIme
+			val latestTime = localData.maxBy { it.createTime }?.createTime
 			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
 			fragment.asyncData.isNull() isFalse {
 				diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
@@ -82,7 +84,13 @@ class NotificationListPresenter(
 	
 	private fun updateDataFromServer(requestTime: Long) {
 		AppConfigTable.getAppConfig { config ->
-			GoldStoneAPI.getNotificationList(config?.goldStoneID.orEmpty(), requestTime) {
+			GoldStoneAPI.getNotificationList(
+				config?.goldStoneID.orEmpty(),
+				requestTime,
+				errorCallback = {
+					showServerErrorDialog()
+				}
+			) {
 				fragment.removeLoadingView()
 				it.isNotEmpty() isTrue {
 					NotificationTable.insertData(it.map { NotificationTable(it) }.toArrayList()) {
@@ -90,6 +98,20 @@ class NotificationListPresenter(
 					}
 				}
 			}
+		}
+	}
+	
+	private fun showServerErrorDialog() {
+		// error call back
+		GoldStoneDialog.show(fragment.context!!) {
+			showOnlyConfirmButton {
+				GoldStoneDialog.remove(fragment.context!!)
+			}
+			setContent(
+				"SERVER IS BUSY",
+				"a lot of requests are happening, please wait a moment, let little forg has a rest"
+			)
+			setImage(R.drawable.server_error_banner)
 		}
 	}
 }

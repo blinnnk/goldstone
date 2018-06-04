@@ -31,7 +31,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
       subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
     }
 
-    date.text = HoneyDateUtil.getSinceTime((model?.createTIme.orElse(0) / 1000).toString())
+    date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString())
 
     when (model?.type.orZero()) {
       NotificationType.Transaction.code -> {

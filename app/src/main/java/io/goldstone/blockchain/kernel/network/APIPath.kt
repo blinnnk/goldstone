@@ -25,6 +25,7 @@ object APIPath {
 	const val getPriceByAddress = "$url/index/priceByAddress"
 	const val getTokenDescription = "$url/market/coinDescription?symbol="
 	const val getUnreadCount = "$url/account/checkUnreadMessage"
+	const val getNewVersion = "$url/index/getNewVersion"
 	/** Chain Address */
 	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
 	const val main = "https://eth-node-mainnet.goldstone.io/eth"

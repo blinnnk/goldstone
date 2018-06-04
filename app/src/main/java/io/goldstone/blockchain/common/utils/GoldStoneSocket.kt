@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit
  * @date 2018/4/28 3:33 PM
  * @author KaySaith
  */
-
 abstract class GoldStoneWebSocket : WebSocketListener() {
+	
 	/**
 	 * 添加日志，需要观察长链接断的情况
 	 */
@@ -31,26 +31,26 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	private var reconnectCount = 0 // 重连次数
 	private var reconnectMaxCount = 10
 	private val minInterval: Long = 6000 // 重连最小时间间隔
-
 	private var webSocket: WebSocket? = null
-
+	
 	abstract fun onOpened()
-
+	
 	open fun getServerBack(content: JSONObject) {
 		// Do Something
 	}
-
+	
 	// 定时向服务器汇报状态的 `runnable`
 	private val pingRunnable = Runnable {
-		webSocket?.send(AesCrypto.encrypt("{\"t\": \"ping\", \"time\": ${System.currentTimeMillis()}}").orEmpty())
+		webSocket
+			?.send(AesCrypto.encrypt("{\"t\": \"ping\", \"time\": ${System.currentTimeMillis()}}").orEmpty())
 	}
-
+	
 	private fun reportStatus() {
 		// 每 `5s` 像服务器汇报一下链接状态
 		handlerPing.removeCallbacks(pingRunnable)
 		handlerPing.postDelayed(pingRunnable, 5000L)
 	}
-
+	
 	override fun onOpen(webSocket: WebSocket, response: Response) {
 		super.onOpen(webSocket, response)
 		this.webSocket = webSocket
@@ -60,7 +60,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 		reportStatus() // 第一次汇报状态
 		Log.v(tag, "onOpen")
 	}
-
+	
 	override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
 		super.onFailure(webSocket, t, response)
 		webSocket.close(normalCloseCode, null)
@@ -68,13 +68,13 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 		reconnectWebSocket()
 		Log.v(tag, "onFailure")
 	}
-
+	
 	override fun onClosing(webSocket: WebSocket?, code: Int, reason: String?) {
 		super.onClosing(webSocket!!, code, reason!!)
 		isConnected = false
 		Log.v(tag, "onClosing")
 	}
-
+	
 	override fun onMessage(webSocket: WebSocket?, text: String?) {
 		super.onMessage(webSocket!!, text!!)
 		val jsonObject = JSONObject(AesCrypto.decrypt(text))
@@ -84,18 +84,18 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 			reportStatus()
 		}
 	}
-
+	
 	override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
 		super.onClosed(webSocket, code, reason)
 		closeSocket()
 		isConnected = false
 		Log.v(tag, "onClosed")
 	}
-
+	
 	fun isSocketConnected(): Boolean {
 		return isConnected
 	}
-
+	
 	fun runSocket() {
 		closeSocket()
 		AppConfigTable.getAppConfig {
@@ -103,18 +103,18 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 				val client =
 					OkHttpClient.Builder()
 						.readTimeout(timeout, TimeUnit.MILLISECONDS)
-					.writeTimeout(timeout, TimeUnit.MILLISECONDS)
-					.connectTimeout(timeout, TimeUnit.MILLISECONDS)
-					.retryOnConnectionFailure(true)
-					.build()
-				GoldStoneAPI.getcryptoGetRequest(serverURL) {
+						.writeTimeout(timeout, TimeUnit.MILLISECONDS)
+						.connectTimeout(timeout, TimeUnit.MILLISECONDS)
+						.retryOnConnectionFailure(true)
+						.build()
+				GoldStoneAPI.getcryptGetRequest(serverURL) {
 					client?.newWebSocket(it, this)
 					client?.dispatcher()?.executorService()?.shutdown()
 				}
 			}
 		}
 	}
-
+	
 	private fun reconnectWebSocket() {
 		if (webSocket == null || !isConnected) {
 			closeSocket()
@@ -128,11 +128,11 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 			}
 		}
 	}
-
+	
 	private val runnable = Runnable {
 		runSocket()
 	}
-
+	
 	fun closeSocket() {
 		webSocket?.let {
 			// 取消订阅
@@ -141,10 +141,9 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 			webSocket = null
 		}
 	}
-
+	
 	fun sendMessage(message: String) {
 		webSocket?.send(AesCrypto.encrypt(message).orEmpty())
 	}
-
 }
 
