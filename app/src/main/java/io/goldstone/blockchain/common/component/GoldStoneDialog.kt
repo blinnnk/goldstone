@@ -29,9 +29,8 @@ import org.jetbrains.anko.*
  * @date 2018/5/19 11:45 AM
  * @author KaySaith
  */
-
 class GoldStoneDialog(context: Context) : RelativeLayout(context) {
-
+	
 	private val image by lazy { ImageView(context) }
 	private val content by lazy { TwoLineTitles(context) }
 	private val cancelButton by lazy {
@@ -39,13 +38,11 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			GoldStoneDialog.remove(context)
 		}
 	}
-
 	private val confirmButton by lazy {
 		DialogButton(context, CommonText.confirm)
 	}
-
 	private lateinit var buttonLayout: LinearLayout
-
+	
 	init {
 		id = ElementID.dialog
 		isClickable = true
@@ -53,7 +50,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		backgroundColor = GrayScale.Opacity5Black
 		updateAlphaAnimation(1f)
 		verticalLayout {
-			addCorner(5.uiPX(), Spectrum.white)
+			addCorner(CornerSize.small, Spectrum.white)
 			elevation = 40.uiPX().toFloat()
 			lparams(300.uiPX(), wrapContent)
 			image.apply {
@@ -73,11 +70,11 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}.setCenterInParent()
 	}
-
+	
 	fun <T> setImage(src: T) {
 		image.glideImage(src)
 	}
-
+	
 	fun setContent(
 		title: String,
 		subtitle: String
@@ -85,14 +82,14 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		content.title.text = title
 		content.subtitle.text = subtitle
 	}
-
+	
 	fun showOnlyConfirmButton(clickEvent: () -> Unit) {
 		buttonLayout.x = 210.uiPX().toFloat()
 		confirmButton.click {
 			clickEvent()
 		}.into(buttonLayout)
 	}
-
+	
 	fun showButtons(confirmTitle: String = CommonText.confirm, confirmEvent: () -> Unit) {
 		buttonLayout.x = 140.uiPX().toFloat()
 		cancelButton.into(buttonLayout)
@@ -101,11 +98,12 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			confirmEvent()
 		}.into(buttonLayout)
 	}
-
+	
 	inner class DialogButton(
 		context: Context,
 		title: String
 	) : TextView(context) {
+		
 		init {
 			gravity = Gravity.END or Gravity.CENTER_VERTICAL
 			text = title
@@ -116,7 +114,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
 		}
 	}
-
+	
 	companion object {
 		fun show(
 			context: Context,
@@ -136,7 +134,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 							}
 						}
 					}
-
+					
 					else -> {
 						it.findViewById<RelativeLayout>(ContainerID.main)?.apply {
 							// 防止重复添加
@@ -151,7 +149,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 			}
 		}
-
+		
 		fun remove(context: Context) {
 			(context as? Activity)?.let { activity ->
 				when (activity) {
@@ -162,7 +160,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 							}
 						}
 					}
-
+					
 					else -> {
 						activity.findViewById<RelativeLayout>(ContainerID.main)?.apply {
 							findViewById<GoldStoneDialog>(ElementID.dialog)?.let {

@@ -251,7 +251,8 @@ class MarketTokenDetailPresenter(
 								content,
 								tokenInfo.fontSize(14),
 								18.uiPX(),
-								ScreenSize.widthWithPadding
+								ScreenSize.widthWithPadding,
+								200.uiPX()
 							)
 						}
 						QuotationSelectionTable.updateDescription(info.pair, description)

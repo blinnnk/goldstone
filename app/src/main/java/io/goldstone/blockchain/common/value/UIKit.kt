@@ -119,6 +119,8 @@ object PaddingSize {
 
 object CornerSize {
 	@JvmField
+	val small = 5.uiPX()
+	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField
 	val middle = 15.uiPX().toFloat()

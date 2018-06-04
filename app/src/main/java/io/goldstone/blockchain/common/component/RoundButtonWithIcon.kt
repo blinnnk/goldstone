@@ -60,10 +60,10 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 	
 	private fun retWidthDependsOnLanguage(): Int {
 		return when(GoldStoneApp.getCurrentLanguage()) {
-			HoneyLanguage.Chinese.code -> 20.uiPX()
-			HoneyLanguage.Korean.code -> 20.uiPX()
-			HoneyLanguage.TraditionalChinese.code -> 20.uiPX()
-			else -> 0
+			HoneyLanguage.Chinese.code -> 30.uiPX()
+			HoneyLanguage.Korean.code -> 30.uiPX()
+			HoneyLanguage.TraditionalChinese.code -> 30.uiPX()
+			else -> 5.uiPX()
 		}
 	}
 }
