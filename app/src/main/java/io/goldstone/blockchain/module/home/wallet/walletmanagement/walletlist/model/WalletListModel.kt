@@ -22,7 +22,7 @@ data class WalletListModel(
 		data.name,
 		data.address,
 		balance,
-		UIUtils.generateAvatar(),
+		UIUtils.generateAvatar(data.id),
 		data.isWatchOnly,
 		data.isUsing
 	)

@@ -193,7 +193,7 @@ class WalletSettingsPresenter(
 				title.text = WalletTable.current.name
 				subtitle.text = WalletTable.current.address
 			}
-			avatarImage.glideImage(UIUtils.generateAvatar())
+			avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
 		}
 	}
 }
