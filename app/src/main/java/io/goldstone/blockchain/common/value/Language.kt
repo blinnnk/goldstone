@@ -33,12 +33,12 @@ object CreateWalletText {
 	}
 	@JvmField
 	val passwordRules = when (currentLanguage) {
-		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters."
+		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters"
 		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，并少于8位"
-		HoneyLanguage.Japanese.code -> "パスワードが複雑になればなるほど、財布はより安全になります。 あなたのパスワードを保持しません、慎重にバックアップしてください。"
+		HoneyLanguage.Japanese.code -> "もっと安全なパスワードを設定して、同時に英語の大書きと小書きと数字を含んで、8位より少ないです"
 		HoneyLanguage.Korean.code -> "더 안전한 비밀번호를 설정하고, 영문 대소문자와 숫자를 동시에 포함하되 최소 8자리 수여야 합니다"
 		HoneyLanguage.Russian.code -> "Чем сложнее пароль, тем более безопасен кошелек"
-		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管。"
+		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管"
 		else -> ""
 	}
 	val mnemonicBackUp = when (currentLanguage) {
@@ -71,25 +71,25 @@ object CreateWalletText {
 	val mnemonicBackupAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "We do not save any record of our users' mnemonics, so please take good care of them! To minimize risk, it's best not to save them digitally. Maybe write it down, you know like your grandmother used to do!"
 		HoneyLanguage.Chinese.code -> "请将助记词抄写在安全的地方，不要保存到网络上也不要截屏以防被黑客盗走。"
-		HoneyLanguage.Japanese.code -> "ニーモニックを再度確認して、正しくバックアップするようにします"
-		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오"
-		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили"
-		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確"
+		HoneyLanguage.Japanese.code -> "ニーモニックを再度確認して、正しくバックアップするようにします。"
+		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오."
+		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили."
+		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確。"
 		else -> ""
 	}
 	val mnemonicConfirmationDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please click the mnemonic words in order. This makes sure that your backup is correct."
 		HoneyLanguage.Chinese.code -> "按顺序点选助记词中的单词，以确保您的备份正确。"
-		HoneyLanguage.Japanese.code -> "ニーモニックを再度確認して、正しくバックアップするようにします"
-		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오"
-		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили"
-		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確"
+		HoneyLanguage.Japanese.code -> "助記詞の単語を順番に選んで、バックアップを確保します。"
+		HoneyLanguage.Korean.code -> "니모닉 단어를 확인하여 계정을 기억하십시오."
+		HoneyLanguage.Russian.code -> "Подтвердите мнемонику, чтобы убедиться, что вы правильно настроили."
+		HoneyLanguage.TraditionalChinese.code -> "確認一遍助憶口令，以確保您的備份正確。"
 		else -> ""
 	}
 	val password = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password"
 		HoneyLanguage.Chinese.code -> "钱包密码"
-		HoneyLanguage.Japanese.code -> "パスワード"
+		HoneyLanguage.Japanese.code -> "お財布のパスワード"
 		HoneyLanguage.Korean.code -> "지갑 비밀번호"
 		HoneyLanguage.Russian.code -> "Пароль кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "錢包密碼"
@@ -107,7 +107,7 @@ object CreateWalletText {
 	val repeatPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Repeat Password"
 		HoneyLanguage.Chinese.code -> "确认密码"
-		HoneyLanguage.Japanese.code -> "繰り返しパスワード"
+		HoneyLanguage.Japanese.code -> "パスワードを確認する"
 		HoneyLanguage.Korean.code -> "비밀번호 확인"
 		HoneyLanguage.Russian.code -> "Реальный пароль"
 		HoneyLanguage.TraditionalChinese.code -> "再次輸入密碼"
@@ -117,7 +117,7 @@ object CreateWalletText {
 		HoneyLanguage.English.code -> "The password entered twice is inconsistent"
 		HoneyLanguage.Chinese.code -> "两次输入的密码不一致"
 		HoneyLanguage.Japanese.code -> "2回入力したパスワードが矛盾しています"
-		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다."
+		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다"
 		HoneyLanguage.Russian.code -> "Пароль, введенный дважды, является непоследовательным"
 		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致"
 		else -> ""
@@ -126,7 +126,7 @@ object CreateWalletText {
 		HoneyLanguage.English.code -> "Please repeat the password for confirmation"
 		HoneyLanguage.Chinese.code -> "请重复输入密码以作确认"
 		HoneyLanguage.Japanese.code -> "確認のためにパスワードを繰り返してください"
-		HoneyLanguage.Korean.code -> "확인을 위해 비밀번호를 반복하십시오."
+		HoneyLanguage.Korean.code -> "확인을 위해 비밀번호를 반복하십시오"
 		HoneyLanguage.Russian.code -> "Повторите пароль для подтверждения"
 		HoneyLanguage.TraditionalChinese.code -> "請重複輸入密碼以作確認"
 		else -> ""
@@ -134,7 +134,7 @@ object CreateWalletText {
 	val name = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Name"
 		HoneyLanguage.Chinese.code -> "钱包名称"
-		HoneyLanguage.Japanese.code -> "ウォレット名"
+		HoneyLanguage.Japanese.code -> "財布の名前"
 		HoneyLanguage.Korean.code -> "지갑명칭"
 		HoneyLanguage.Russian.code -> "Название кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "錢包名稱"
@@ -166,8 +166,8 @@ object ImportWalletText {
 		HoneyLanguage.English.code -> "Enter your mnemonic, split with spaces"
 		HoneyLanguage.Chinese.code -> "按顺序输入助记词，使用空格间隔"
 		HoneyLanguage.Japanese.code -> "単語の間のスペースを使用してニーモニックを順番に入力してください"
-		HoneyLanguage.Korean.code -> "순서대로 니모닉 프레이즈(Mnemonic Phrase)를 입력하고 스페이스로 분리시키십시오."
-		HoneyLanguage.Russian.code -> "Введите свою мнемонику, разделите ее пробелами. Введите пароль."
+		HoneyLanguage.Korean.code -> "순서대로 니모닉 프레이즈(Mnemonic Phrase)를 입력하고 스페이스로 분리시키십시오"
+		HoneyLanguage.Russian.code -> "Введите свою мнемонику, разделите ее пробелами. Введите пароль"
 		HoneyLanguage.TraditionalChinese.code -> "請按順序輸入助記詞，詞間使用空格符間隔"
 		else -> ""
 	}
@@ -231,7 +231,7 @@ object ImportWalletText {
 		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取keystore"
 		HoneyLanguage.Japanese.code -> "パスワードを入力し、[OK]ボタンをクリックしてキーストアを取得します"
 		HoneyLanguage.Korean.code -> "비밀번호를 입력한후 확인 버튼을 클릭하여 keystore를 획득하십시오"
-		HoneyLanguage.Russian.code -> "Введите пароль и нажмите кнопку подтверждения, чтобы получить хранилище ключей."
+		HoneyLanguage.Russian.code -> "Введите пароль и нажмите кнопку подтверждения, чтобы получить хранилище ключей"
 		HoneyLanguage.TraditionalChinese.code -> "輸入密碼，然後單擊確認按鈕以獲取keystore"
 		else -> ""
 	}
@@ -249,7 +249,7 @@ object ImportWalletText {
 		HoneyLanguage.Chinese.code -> "请输入正确的密码"
 		HoneyLanguage.Japanese.code -> "正しいパスワードを入力してください"
 		HoneyLanguage.Korean.code -> "정확한 비밀번호를 입력하십시오"
-		HoneyLanguage.Russian.code -> "Неверный пароль, повторите попытку."
+		HoneyLanguage.Russian.code -> "Неверный пароль, повторите попытку"
 		HoneyLanguage.TraditionalChinese.code -> "請輸入正確的密碼"
 		else -> ""
 	}
@@ -274,7 +274,7 @@ object ImportWalletText {
 	val pathAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid path"
 		HoneyLanguage.Chinese.code -> "路径格式不正确"
-		HoneyLanguage.Japanese.code -> "不正なパス形式"
+		HoneyLanguage.Japanese.code -> "パスフォーマットが正しくない"
 		HoneyLanguage.Korean.code -> "로트 포맷 오류"
 		HoneyLanguage.Russian.code -> "Неверный формат пути"
 		HoneyLanguage.TraditionalChinese.code -> "路徑格式不正確"
@@ -283,7 +283,7 @@ object ImportWalletText {
 	val addressFromatAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid address"
 		HoneyLanguage.Chinese.code -> "地址格式不对"
-		HoneyLanguage.Japanese.code -> "Invalid address"
+		HoneyLanguage.Japanese.code -> "アドレスフォーマットが正しくない"
 		HoneyLanguage.Korean.code -> "주소 무효"
 		HoneyLanguage.Russian.code -> "Invalid address"
 		HoneyLanguage.TraditionalChinese.code -> "地址格式不正確"
@@ -305,7 +305,7 @@ object DialogText {
 	val backUpMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up Mnemonic"
 		HoneyLanguage.Chinese.code -> "备份助记词"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "ニーモニックをバックアップする"
 		HoneyLanguage.Korean.code -> "니모닉 백업"
 		HoneyLanguage.Russian.code -> "備份助記詞"
 		HoneyLanguage.TraditionalChinese.code -> ""
@@ -314,16 +314,16 @@ object DialogText {
 	val backUpMnemonicDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You have not backed up your mnemonic yet. It is extremely important that take care of your mnemonic. If you lose it, you will lose your digital assets."
 		HoneyLanguage.Chinese.code -> "你还没有备份您的钱包。GoldStone不会为您保存任何形式的私钥/助记词/keystore，一旦您忘记就无法找回。请您一定确保钱包妥善备份后再用这个钱包接收转账。"
-		HoneyLanguage.Japanese.code -> "出席パスワードバックアップの成功！"
+		HoneyLanguage.Japanese.code -> "まだ財布をバックアップしていません。 GoldStoneはあなたの秘密鍵/ニーモニック/キーストアのいかなる形式も保存しません。あなたがそれを忘れると、それを取得することはできません。 このウォレットを使用して送金を受け取る前に、ウォレットが適切にバックアップされていることを確認してください。"
 		HoneyLanguage.Korean.code -> "귀하의 지갑을 백업하지 않았습니다.                                                       GoldStone는 귀하의 임의의 형식의 개인키/니모닉/keystore를 저장하지 않으며, 일단 귀하께서 분실할 경우 찾을수 없습니다. 지갑을 정확히 백업한후 이 지갑으로 이체금액을 수령하십시오. "
-		HoneyLanguage.Russian.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Russian.code -> "An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood."
 		HoneyLanguage.TraditionalChinese.code -> "你還沒有備份您的錢包。GoldStone不會為您保存任何形式的私鑰/助記詞/密鑰庫，一旦您忘記就無法找回。“請您一定確保錢包妥善備份後再用這個錢包接收轉賬。"
 		else -> ""
 	}
 	val networkTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Network unavailable"
 		HoneyLanguage.Chinese.code -> "无网络"
-		HoneyLanguage.Japanese.code -> "Network Browken"
+		HoneyLanguage.Japanese.code -> "ネットワークなし"
 		HoneyLanguage.Korean.code -> "네트우크 무"
 		HoneyLanguage.Russian.code -> "Network Browken"
 		HoneyLanguage.TraditionalChinese.code -> "Network Browken"
@@ -341,7 +341,7 @@ object DialogText {
 	val goToBackUp = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up"
 		HoneyLanguage.Chinese.code -> "立即备份"
-		HoneyLanguage.Japanese.code -> "バックアップ"
+		HoneyLanguage.Japanese.code -> "今すぐバックアップする"
 		HoneyLanguage.Korean.code -> "백업"
 		HoneyLanguage.Russian.code -> "Резервное копирование"
 		HoneyLanguage.TraditionalChinese.code -> "立即備份"
@@ -375,7 +375,7 @@ object WalletText {
 	val section = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Tokens:"
 		HoneyLanguage.Chinese.code -> "我的资产:"
-		HoneyLanguage.Japanese.code -> "マイトークン:"
+		HoneyLanguage.Japanese.code -> "私の資産:"
 		HoneyLanguage.Korean.code -> "나의자산:"
 		HoneyLanguage.Russian.code -> "Мои токены:"
 		HoneyLanguage.TraditionalChinese.code -> "我的資產:"
@@ -385,7 +385,7 @@ object WalletText {
 	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Tokens"
 		HoneyLanguage.Chinese.code -> "添加其他Token"
-		HoneyLanguage.Japanese.code -> "トークンを追加する"
+		HoneyLanguage.Japanese.code -> "別のトークンを追加する"
 		HoneyLanguage.Korean.code -> "기타 Token 추가"
 		HoneyLanguage.Russian.code -> "Add More Tokens"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
@@ -405,7 +405,7 @@ object WalletText {
 	val wallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "wallet"
 		HoneyLanguage.Chinese.code -> "wallet"
-		HoneyLanguage.Japanese.code -> "wallet"
+		HoneyLanguage.Japanese.code -> "ウォレット"
 		HoneyLanguage.Korean.code -> "지갑"
 		HoneyLanguage.Russian.code -> "wallet"
 		HoneyLanguage.TraditionalChinese.code -> "wallet"
@@ -415,7 +415,7 @@ object WalletText {
 	val historyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "history"
 		HoneyLanguage.Chinese.code -> "history"
-		HoneyLanguage.Japanese.code -> "history"
+		HoneyLanguage.Japanese.code -> "歴史"
 		HoneyLanguage.Korean.code -> "거래기록"
 		HoneyLanguage.Russian.code -> "history"
 		HoneyLanguage.TraditionalChinese.code -> "history"
@@ -425,7 +425,7 @@ object WalletText {
 	val notifyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "notify"
 		HoneyLanguage.Chinese.code -> "notify"
-		HoneyLanguage.Japanese.code -> "notify"
+		HoneyLanguage.Japanese.code -> "お知らせ"
 		HoneyLanguage.Korean.code -> "notify"
 		HoneyLanguage.Russian.code -> "notify"
 		HoneyLanguage.TraditionalChinese.code -> "notify"
@@ -459,7 +459,7 @@ object TransactionText {
 	val etherScanTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Etherscan Details"
 		HoneyLanguage.Chinese.code -> "EtherScan详情"
-		HoneyLanguage.Japanese.code -> "EtherScanの詳細"
+		HoneyLanguage.Japanese.code -> "エーテルスキャンの詳細"
 		HoneyLanguage.Korean.code -> "EtherScan 구체상황"
 		HoneyLanguage.Russian.code -> "Подробное описание EtherScan"
 		HoneyLanguage.TraditionalChinese.code -> "EtherScan詳情"
@@ -479,7 +479,7 @@ object TransactionText {
 	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"
 		HoneyLanguage.Chinese.code -> "输入您的密码以确认交易"
-		HoneyLanguage.Japanese.code -> "パスワードで取引を確認してください。"
+		HoneyLanguage.Japanese.code -> "取引を確認するためにパスワードを入力してください"
 		HoneyLanguage.Korean.code -> "귀하의 비밀번호를 입력하여 거래를 확인하십시오"
 		HoneyLanguage.Russian.code -> "подтвердите транзакцию с помощью своего пароля, тогда транзакция начнется"
 		HoneyLanguage.TraditionalChinese.code -> "輸入您的密碼以確認交易"
@@ -563,7 +563,7 @@ object TokenDetailText {
 	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"
 		HoneyLanguage.Chinese.code -> "接收地址"
-		HoneyLanguage.Japanese.code -> "宛先"
+		HoneyLanguage.Japanese.code -> "受信アドレス"
 		HoneyLanguage.Korean.code -> "접수주소"
 		HoneyLanguage.Russian.code -> "Recipient Address"
 		HoneyLanguage.TraditionalChinese.code -> "接收地址"
@@ -603,7 +603,7 @@ object TokenDetailText {
 	val transferDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer Detail"
 		HoneyLanguage.Chinese.code -> "交易详情"
-		HoneyLanguage.Japanese.code -> "転送の詳細"
+		HoneyLanguage.Japanese.code -> "取引の詳細"
 		HoneyLanguage.Korean.code -> "거래 구체상황"
 		HoneyLanguage.Russian.code -> "Сведения о передаче"
 		HoneyLanguage.TraditionalChinese.code -> "交易詳情"
@@ -623,7 +623,7 @@ object TokenDetailText {
 	val tokenDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description"
 		HoneyLanguage.Chinese.code -> "代币详情"
-		HoneyLanguage.Japanese.code -> "トークンの詳細"
+		HoneyLanguage.Japanese.code -> "Tokenの詳細"
 		HoneyLanguage.Korean.code -> "Token 소개"
 		HoneyLanguage.Russian.code -> "Детали токена"
 		HoneyLanguage.TraditionalChinese.code -> "代幣詳情"
@@ -633,7 +633,7 @@ object TokenDetailText {
 	val transferToLocalWalletAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This will transfer value to an address already in one of your wallets. Are you sure?"
 		HoneyLanguage.Chinese.code -> "这个地址也在GoldStone钱包中。你确定要给这个地址转账吗？"
-		HoneyLanguage.Japanese.code -> "are you decide to transfer to this address which is existing in your local wallets?"
+		HoneyLanguage.Japanese.code -> "このアドレスは、GoldStoneウォレットにも記載されています。 このアドレスを転送してもよろしいですか？"
 		HoneyLanguage.Korean.code -> "이 주소 역시 GoldStone지갑에 포함되어 있습니다. 이 주소로 이체할까요？"
 		HoneyLanguage.Russian.code -> "are you decide to transfer to this address which is existing in your local wallets?"
 		HoneyLanguage.TraditionalChinese.code -> "這個地址也在Goldstone錢包中，你確定要給自己轉賬嗎？"
@@ -643,7 +643,7 @@ object TokenDetailText {
 	val transferToLocalWalletAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer Attention"
 		HoneyLanguage.Chinese.code -> "Transfer Attention"
-		HoneyLanguage.Japanese.code -> "Transfer Attention"
+		HoneyLanguage.Japanese.code -> "注意をそらす"
 		HoneyLanguage.Korean.code -> "Transfer Attention"
 		HoneyLanguage.Russian.code -> "Transfer Attention"
 		HoneyLanguage.TraditionalChinese.code -> "Transfer Attention"
@@ -653,7 +653,7 @@ object TokenDetailText {
 	val setTransferCountAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You have to set the transfer count"
 		HoneyLanguage.Chinese.code -> "You have to set the transfer count"
-		HoneyLanguage.Japanese.code -> "You have to set the transfer count"
+		HoneyLanguage.Japanese.code -> "転送回数を設定する必要があります"
 		HoneyLanguage.Korean.code -> "You have to set the transfer count"
 		HoneyLanguage.Russian.code -> "You have to set the transfer count"
 		HoneyLanguage.TraditionalChinese.code -> "You have to set the transfer count"
@@ -727,7 +727,7 @@ object CommonText {
 	val new = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NEW"
 		HoneyLanguage.Chinese.code -> "NEW"
-		HoneyLanguage.Japanese.code -> "NEW"
+		HoneyLanguage.Japanese.code -> "新しい"
 		HoneyLanguage.Korean.code -> "NEW"
 		HoneyLanguage.Russian.code -> "NEW"
 		HoneyLanguage.TraditionalChinese.code -> "NEW"
@@ -767,7 +767,7 @@ object CommonText {
 	val copyAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click to Copy Address"
 		HoneyLanguage.Chinese.code -> "点击复制地址"
-		HoneyLanguage.Japanese.code -> "コピー"
+		HoneyLanguage.Japanese.code -> "コピーアドレスをクリックします"
 		HoneyLanguage.Korean.code -> "클릭하여 주소 복제"
 		HoneyLanguage.Russian.code -> "Копировать адрес"
 		HoneyLanguage.TraditionalChinese.code -> "點擊複製地址"
@@ -797,7 +797,7 @@ object CommonText {
 	val delete = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Delete Wallet"
 		HoneyLanguage.Chinese.code -> "删除钱包"
-		HoneyLanguage.Japanese.code -> "削除"
+		HoneyLanguage.Japanese.code -> "ウォレットを削除"
 		HoneyLanguage.Korean.code -> "지갑 삭제"
 		HoneyLanguage.Russian.code -> "УДАЛИТЬ"
 		HoneyLanguage.TraditionalChinese.code -> "刪除錢包"
@@ -839,9 +839,9 @@ object AlertText {
 	}
 	@JvmField
 	val importWalletNetwork = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Network unavailable. Network is required to check the value of the importing wallet."
+		HoneyLanguage.English.code -> "Network unavailable. Network is required to check the value of the importing wallet"
 		HoneyLanguage.Chinese.code -> "没有检测到网络，导入钱包时需要网络环境查询您的货币余额"
-		HoneyLanguage.Japanese.code -> "ネットワークが見つかりません。ウォレットをインポートするとネットワークの価値を確認する必要があります"
+		HoneyLanguage.Japanese.code -> "ネットワークが検出されず、ウォレットをインポートする際に通貨残高を照会するためのネットワーク環境が必要"
 		HoneyLanguage.Korean.code -> "인터넷을 검색하지 못하였습니다, 지갑 도입시 온라인 환경에서 귀하의 화폐 잔고를 조회할 수 있습니다"
 		HoneyLanguage.Russian.code -> "Сеть не найдена, Импорт сети для кошелька, чтобы проверить ее значение"
 		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額"
@@ -849,9 +849,9 @@ object AlertText {
 	}
 	@JvmField
 	val balanceNotEnough = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Insufficient funds for transfer and gas fees."
+		HoneyLanguage.English.code -> "Insufficient funds for transfer and gas fees"
 		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与燃气费"
-		HoneyLanguage.Japanese.code -> "You haven't enough currency to transfer and gas fee"
+		HoneyLanguage.Japanese.code -> "お客様の口座残高は、振替額とガス費用をカバーするには不十分です"
 		HoneyLanguage.Korean.code -> "귀하의 계정 잔고 부족으로 이체 금액과 채굴수수료를 지불할 수 없습니다"
 		HoneyLanguage.Russian.code -> "You haven't enough currency to transfer and gas fee"
 		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
@@ -861,7 +861,7 @@ object AlertText {
 	val transferWrongDecimal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."
 		HoneyLanguage.Chinese.code -> "当前的token不支持你输入的小数位数，请修改金额重新提交"
-		HoneyLanguage.Japanese.code -> "現在のトークンは入力した小数点以下の桁数をサポートしていません。再送信する金額を変更してください"
+		HoneyLanguage.Japanese.code -> "現在のtokenは入力した小数点以下の桁数をサポートしていません。再送信する金額を変更してください"
 		HoneyLanguage.Korean.code -> "현재 token은 귀하께서 입력한 소수자리수를 지원하지 않습니다, 금액을 변경한후 다시 제출하십시오"
 		HoneyLanguage.Russian.code -> "Текущий токен не поддерживает количество введенных десятичных цифр, пожалуйста, измените сумму для повторной отправки"
 		HoneyLanguage.TraditionalChinese.code -> "當前的token不支持您輸入的小數位數，請修改金額重新提交"
@@ -871,7 +871,7 @@ object AlertText {
 	val emptyTransferValue = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please add a transfer amount"
 		HoneyLanguage.Chinese.code -> "你需要设置转账的金额"
-		HoneyLanguage.Japanese.code -> "振込額を追加してください"
+		HoneyLanguage.Japanese.code -> "あなたは、転送の量を設定する必要があります"
 		HoneyLanguage.Korean.code -> "이체 금액을 설정해야 합니다"
 		HoneyLanguage.Russian.code -> "Добавьте сумму перевода"
 		HoneyLanguage.TraditionalChinese.code -> "你需要设置转账的金额"
@@ -891,7 +891,7 @@ object AlertText {
 	val gasLimitValue = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Gas limit must bigger than estimate gas value"
 		HoneyLanguage.Chinese.code -> "矿工费上限不能低于预估值"
-		HoneyLanguage.Japanese.code -> "ガスの上限はガスの推定値より大きくなければならない"
+		HoneyLanguage.Japanese.code -> "鉱夫の手数料は、推定値を下回ることはできません"
 		HoneyLanguage.Korean.code -> "가스 한도는 예상 가스 가치보다 커야합니다."
 		HoneyLanguage.Russian.code -> "Газовый предел должен превышать оценку стоимости газа"
 		HoneyLanguage.TraditionalChinese.code -> "礦工費上限不能低於預估值"
@@ -921,7 +921,7 @@ object AlertText {
 	val switchLanguageConfirmText = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Change Language"
 		HoneyLanguage.Chinese.code -> "切换语言"
-		HoneyLanguage.Japanese.code -> "言語"
+		HoneyLanguage.Japanese.code -> "スイッチ言語"
 		HoneyLanguage.Korean.code -> "언어 변경"
 		HoneyLanguage.Russian.code -> "Изменить язык"
 		HoneyLanguage.TraditionalChinese.code -> "切換語言"
@@ -931,7 +931,7 @@ object AlertText {
 	val wrongKeyStorePassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invaild keystore format or password"
 		HoneyLanguage.Chinese.code -> "出错啦，请检查keystore或密码的格式是否正确"
-		HoneyLanguage.Japanese.code -> "無効なキーストア形式またはパスワード"
+		HoneyLanguage.Japanese.code -> "間違っている、キーストアまたはパスワードの形式が正しいことを確認してください"
 		HoneyLanguage.Korean.code -> "잘못된 키 저장소 형식 또는 암호"
 		HoneyLanguage.Russian.code -> "Недопустимый формат хранилища ключей или пароль"
 		HoneyLanguage.TraditionalChinese.code -> "出錯啦，請檢查keystore或密碼的格式是否正確"
@@ -955,7 +955,7 @@ object CurrentWalletText {
 	val Wallets = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallets"
 		HoneyLanguage.Chinese.code -> "钱包列表"
-		HoneyLanguage.Japanese.code -> "すべてのワォレット"
+		HoneyLanguage.Japanese.code -> "ウォレットリスト"
 		HoneyLanguage.Korean.code -> "지갑리스트"
 		HoneyLanguage.Russian.code -> "Все кошельки"
 		HoneyLanguage.TraditionalChinese.code -> "錢包列表"
@@ -969,7 +969,7 @@ object WatchOnlyText {
 	val enterDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter the address of the wallet to be observed"
 		HoneyLanguage.Chinese.code -> "请输入想观察的钱包地址"
-		HoneyLanguage.Japanese.code -> "観察されるウォレットのアドレスを入力してください"
+		HoneyLanguage.Japanese.code -> "観察したいウォレットのアドレスを入力してください"
 		HoneyLanguage.Korean.code -> "관찰하고 싶은 지갑 주소를 입력하세요."
 		HoneyLanguage.Russian.code -> "Введите адрес наблюдаемого кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "輸入要觀察的錢包地址"
@@ -1007,7 +1007,7 @@ object TokenManagementText {
 	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add Token"
 		HoneyLanguage.Chinese.code -> "添加其他币种"
-		HoneyLanguage.Japanese.code -> "トークンを追加"
+		HoneyLanguage.Japanese.code -> "別の通貨を追加"
 		HoneyLanguage.Korean.code -> "토큰 추가"
 		HoneyLanguage.Russian.code -> "Добавить токен"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他幣種"
@@ -1035,7 +1035,7 @@ object WalletSettingsText {
 	val copy = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click to Copy Address"
 		HoneyLanguage.Chinese.code -> "点击复制地址"
-		HoneyLanguage.Japanese.code -> "アドレスをコピーする"
+		HoneyLanguage.Japanese.code -> "コピーアドレスをクリックします"
 		HoneyLanguage.Korean.code -> "클릭하여 주소 복제"
 		HoneyLanguage.Russian.code -> "Копировать адрес"
 		HoneyLanguage.TraditionalChinese.code -> "點擊複製地址"
@@ -1085,7 +1085,7 @@ object WalletSettingsText {
 	val walletSettings = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Settings"
 		HoneyLanguage.Chinese.code -> "钱包设置"
-		HoneyLanguage.Japanese.code -> "ウォレット設定"
+		HoneyLanguage.Japanese.code -> "ウォレット名の設定"
 		HoneyLanguage.Korean.code -> "월렛 설정"
 		HoneyLanguage.Russian.code -> "Настройки кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "錢包設置"
@@ -1114,7 +1114,7 @@ object WalletSettingsText {
 	val hintAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "It is empty please enter some word"
 		HoneyLanguage.Chinese.code -> "It is empty please enter some word"
-		HoneyLanguage.Japanese.code -> "It is empty please enter some word"
+		HoneyLanguage.Japanese.code -> "それは空です、いくつかの単語を入力してください"
 		HoneyLanguage.Korean.code -> "It is empty please enter some word"
 		HoneyLanguage.Russian.code -> "It is empty please enter some word"
 		HoneyLanguage.TraditionalChinese.code -> "It is empty please enter some word"
@@ -1134,7 +1134,7 @@ object WalletSettingsText {
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Export Keystore"
 		HoneyLanguage.Chinese.code -> "导出keystore"
-		HoneyLanguage.Japanese.code -> "キーストアのエクスポート"
+		HoneyLanguage.Japanese.code -> "keystoreのエクスポート"
 		HoneyLanguage.Korean.code -> "keystore 도출"
 		HoneyLanguage.Russian.code -> "Экспортный Keystore"
 		HoneyLanguage.TraditionalChinese.code -> "導出 Keystore"
@@ -1144,7 +1144,7 @@ object WalletSettingsText {
 	val backUpMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up Your Mnemonic"
 		HoneyLanguage.Chinese.code -> "Back Up Your Mnemonic"
-		HoneyLanguage.Japanese.code -> "Back Up Your Mnemonic"
+		HoneyLanguage.Japanese.code -> "あなたのニーモニックをバックアップしてください"
 		HoneyLanguage.Korean.code -> "니모닉 백업"
 		HoneyLanguage.Russian.code -> "Back Up Your Mnemonic"
 		HoneyLanguage.TraditionalChinese.code -> "Back Up Your Mnemonic"
@@ -1164,7 +1164,7 @@ object WalletSettingsText {
 	val safeAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Safety Alert"
 		HoneyLanguage.Chinese.code -> "安全提示"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "安全に関するヒント"
 		HoneyLanguage.Korean.code -> "안전 제시"
 		HoneyLanguage.Russian.code -> ""
 		HoneyLanguage.TraditionalChinese.code -> "安全提醒"
@@ -1233,7 +1233,7 @@ object ProfileText {
 	val profile = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Profile"
 		HoneyLanguage.Chinese.code -> "个人主页"
-		HoneyLanguage.Japanese.code -> "プロフィール"
+		HoneyLanguage.Japanese.code -> "個人ホームページ"
 		HoneyLanguage.Korean.code -> "개인 홈"
 		HoneyLanguage.Russian.code -> "профиль"
 		HoneyLanguage.TraditionalChinese.code -> "個人檔案"
@@ -1263,7 +1263,7 @@ object ProfileText {
 	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Currency Settings"
 		HoneyLanguage.Chinese.code -> "货币"
-		HoneyLanguage.Japanese.code -> "自国通貨"
+		HoneyLanguage.Japanese.code -> "通貨"
 		HoneyLanguage.Korean.code -> "화폐"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
 		HoneyLanguage.TraditionalChinese.code -> "貨幣"
@@ -1303,7 +1303,7 @@ object ProfileText {
 	val support = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Support"
 		HoneyLanguage.Chinese.code -> "帮助中心"
-		HoneyLanguage.Japanese.code -> "Support"
+		HoneyLanguage.Japanese.code -> "ヘルプセンター"
 		HoneyLanguage.Korean.code -> "도움센터"
 		HoneyLanguage.Russian.code -> "Support"
 		HoneyLanguage.TraditionalChinese.code -> "Support"
@@ -1313,7 +1313,7 @@ object ProfileText {
 	val privacy = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Privacy Policy"
 		HoneyLanguage.Chinese.code -> "隐私条款"
-		HoneyLanguage.Japanese.code -> "Privacy Policy"
+		HoneyLanguage.Japanese.code -> "プライバシーポリシー"
 		HoneyLanguage.Korean.code -> "프라이버시 조항"
 		HoneyLanguage.Russian.code -> "Privacy Policy"
 		HoneyLanguage.TraditionalChinese.code -> "Privacy Policy"
@@ -1333,7 +1333,7 @@ object ProfileText {
 	val version = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Version"
 		HoneyLanguage.Chinese.code -> "软件版本"
-		HoneyLanguage.Japanese.code -> "バージョン"
+		HoneyLanguage.Japanese.code -> "ソフトウェアのバージョン"
 		HoneyLanguage.Korean.code -> "소프트웨어 버전"
 		HoneyLanguage.Russian.code -> "версия"
 		HoneyLanguage.TraditionalChinese.code -> "Version"
@@ -1386,9 +1386,9 @@ object EmptyText {
 	@JvmField
 	val tokenDetailSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No transaction history for this token"
-		HoneyLanguage.Chinese.code -> "在区块链上没有交易，所以您没有图表和记录信息。"
-		HoneyLanguage.Japanese.code -> "ブロックチェーンにはトランザクションはなく、チャートやレコードはありません。"
-		HoneyLanguage.Korean.code -> "블록체인에서 거래가 없으므로, 귀하한테 도표와 기록정보가 없습니다. "
+		HoneyLanguage.Chinese.code -> "在区块链上没有交易，所以您没有图表和记录信息"
+		HoneyLanguage.Japanese.code -> "ブロックチェーンにはトランザクションはなく、チャートやレコードはありません"
+		HoneyLanguage.Korean.code -> "블록체인에서 거래가 없으므로, 귀하한테 도표와 기록정보가 없습니다 "
 		HoneyLanguage.Russian.code -> "В блокчейне нет транзакций, поэтому у вас нет диаграмм и записей"
 		HoneyLanguage.TraditionalChinese.code -> "區塊鏈中沒有交易，所以您沒有圖表和記錄"
 		else -> ""
@@ -1397,7 +1397,7 @@ object EmptyText {
 	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
 		HoneyLanguage.Chinese.code -> "没有找到这个Token"
-		HoneyLanguage.Japanese.code -> "トークンが見つかりません"
+		HoneyLanguage.Japanese.code -> "Tokenが見つかりません"
 		HoneyLanguage.Korean.code -> "이 Token을 찾지 못하였습니다"
 		HoneyLanguage.Russian.code -> "Токен не найден"
 		HoneyLanguage.TraditionalChinese.code -> "沒有找到這個Token"
@@ -1407,7 +1407,7 @@ object EmptyText {
 	val searchSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time"
 		HoneyLanguage.Chinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
-		HoneyLanguage.Japanese.code -> "インタフェースの左上隅をクリックしてマーケット内のtokenを追加することで、リアルタイムの市場価格を見ることが出来ます。"
+		HoneyLanguage.Japanese.code -> "インタフェースの左上隅をクリックしてマーケット内のtokenを追加することで、リアルタイムの市場価格を見ることが出来ます"
 		HoneyLanguage.Korean.code -> "아직 거래 내역이 없습니다"
 		HoneyLanguage.Russian.code -> "Соответствующий токен не найден"
 		HoneyLanguage.TraditionalChinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
@@ -1436,8 +1436,8 @@ object EmptyText {
 	@JvmField
 	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
-		HoneyLanguage.Chinese.code -> "通貨の設定"
-		HoneyLanguage.Japanese.code -> "自国通貨"
+		HoneyLanguage.Chinese.code -> "货币设置"
+		HoneyLanguage.Japanese.code -> "通貨設定"
 		HoneyLanguage.Korean.code -> "좌측 상단 플러스 부호를 클릭하면 상용 연락처 주소를 추가할 수 있습니다"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
 		HoneyLanguage.TraditionalChinese.code -> "貨幣設置"
@@ -1471,7 +1471,7 @@ object QuotationText {
 	val market = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Markets"
 		HoneyLanguage.Chinese.code -> "市场行情"
-		HoneyLanguage.Japanese.code -> "通貨相場"
+		HoneyLanguage.Japanese.code -> "市場相場"
 		HoneyLanguage.Korean.code -> "시장시세"
 		HoneyLanguage.Russian.code -> "Рыночные котировки"
 		HoneyLanguage.TraditionalChinese.code -> "市場行情"
@@ -1481,7 +1481,7 @@ object QuotationText {
 	val management = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Markets"
 		HoneyLanguage.Chinese.code -> "自选管理"
-		HoneyLanguage.Japanese.code -> "マイグループ"
+		HoneyLanguage.Japanese.code -> "オプションの管理"
 		HoneyLanguage.Korean.code -> "셀프관리"
 		HoneyLanguage.Russian.code -> "Моя котировка"
 		HoneyLanguage.TraditionalChinese.code -> "自選管理"
@@ -1521,7 +1521,7 @@ object QuotationText {
 	val alarm = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Alerts"
 		HoneyLanguage.Chinese.code -> "价格提醒"
-		HoneyLanguage.Japanese.code -> "リマインダー"
+		HoneyLanguage.Japanese.code -> "価格リマインダー"
 		HoneyLanguage.Korean.code -> "가격알람"
 		HoneyLanguage.Russian.code -> "тревоги"
 		HoneyLanguage.TraditionalChinese.code -> "價格提醒"
@@ -1531,7 +1531,7 @@ object QuotationText {
 	val currentPrice = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current Price"
 		HoneyLanguage.Chinese.code -> "当前价格"
-		HoneyLanguage.Japanese.code -> "価格"
+		HoneyLanguage.Japanese.code -> "現在の価格"
 		HoneyLanguage.Korean.code -> "현재가격"
 		HoneyLanguage.Russian.code -> "Текущая цена"
 		HoneyLanguage.TraditionalChinese.code -> "時價"
@@ -1551,7 +1551,7 @@ object QuotationText {
 	val tokenDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description"
 		HoneyLanguage.Chinese.code -> "Token 简介"
-		HoneyLanguage.Japanese.code -> "トークンの説明"
+		HoneyLanguage.Japanese.code -> "Tokenの説明"
 		HoneyLanguage.Korean.code -> "Token 소개"
 		HoneyLanguage.Russian.code -> "Информация о токенах"
 		HoneyLanguage.TraditionalChinese.code -> "Token 簡介"
@@ -1561,7 +1561,7 @@ object QuotationText {
 	val tokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Information"
 		HoneyLanguage.Chinese.code -> "Token 信息"
-		HoneyLanguage.Japanese.code -> "トークン情報"
+		HoneyLanguage.Japanese.code -> "Token情報"
 		HoneyLanguage.Korean.code -> "Token 정보"
 		HoneyLanguage.Russian.code -> "Token Information"
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息"
@@ -1571,7 +1571,7 @@ object QuotationText {
 	val tokenDescriptionPlaceHolder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description Content"
 		HoneyLanguage.Chinese.code -> "Token 信息内容"
-		HoneyLanguage.Japanese.code -> "トークンの説明コンテンツ"
+		HoneyLanguage.Japanese.code -> "Tokenの説明コンテンツ"
 		HoneyLanguage.Korean.code -> "Token 정보내용"
 		HoneyLanguage.Russian.code -> "Описание токена"
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息內容"
@@ -1625,7 +1625,7 @@ object PincodeText {
 	val verifyAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please repeat the same PIN"
 		HoneyLanguage.Chinese.code -> "请再次输入一遍PIN码进行确认"
-		HoneyLanguage.Japanese.code -> "同じPINを繰り返してください"
+		HoneyLanguage.Japanese.code -> "確認のためPINをもう一度入力してください"
 		HoneyLanguage.Korean.code -> "같은 PIN을 중복하십시오"
 		HoneyLanguage.Russian.code -> "Повторите один и тот же PIN-код"
 		HoneyLanguage.TraditionalChinese.code -> "請再次輸入PIN碼確認"
@@ -1665,7 +1665,7 @@ object PincodeText {
 	val enterPincodeDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Set the PIN to protect privacy. Once you open GoldStone, you need to enter PIN to see your wallet "
 		HoneyLanguage.Chinese.code -> "设置锁屏密码保护隐私，一旦开启锁屏密码，每次打开GoldStone时需要输入锁屏密码才能查看钱包"
-		HoneyLanguage.Japanese.code -> "passcode to prote"
+		HoneyLanguage.Japanese.code -> "ロック画面のパスワードを設定すると、プライバシーを保護します。ロック画面のパスワードがオンになったら、GoldStoneを開くたびにウォレットを表示するには、画面のパスワードを入力する必要があります"
 		HoneyLanguage.Korean.code -> "passcode to prote"
 		HoneyLanguage.Russian.code -> "passcode to prote"
 		HoneyLanguage.TraditionalChinese.code -> "passcode to prote"
@@ -1739,7 +1739,7 @@ object PrepareTransferText {
 	val willSpending = when (currentLanguage) {
 		HoneyLanguage.English.code -> "WILL SPEND"
 		HoneyLanguage.Chinese.code -> "预计花费"
-		HoneyLanguage.Japanese.code -> "費やすだろう"
+		HoneyLanguage.Japanese.code -> "見積もり原価"
 		HoneyLanguage.Korean.code -> "예상 소비"
 		HoneyLanguage.Russian.code -> "ПОТРАЧУ"
 		HoneyLanguage.TraditionalChinese.code -> "預計花費"
@@ -1783,7 +1783,7 @@ object ContactText {
 	val emptyAddressAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter a wallet address"
 		HoneyLanguage.Chinese.code -> "请填写联系人钱包地址"
-		HoneyLanguage.Japanese.code -> "ウォレットのアドレを入力してください"
+		HoneyLanguage.Japanese.code -> "ウォレットのアドレスを入力してください"
 		HoneyLanguage.Korean.code -> "연락처 지갑주소를 입력하십시오"
 		HoneyLanguage.Russian.code -> "Введите адрес кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "請填寫聯繫人錢包地址"
@@ -1793,7 +1793,7 @@ object ContactText {
 	val wrongAddressFormat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect wallet address format"
 		HoneyLanguage.Chinese.code -> "钱包地址格式错误"
-		HoneyLanguage.Japanese.code -> "不正なウォレット・アドレス・フォーマット"
+		HoneyLanguage.Japanese.code -> "財布のアドレスのフォーマットエラー"
 		HoneyLanguage.Korean.code -> "지갑주소 포맷 오류"
 		HoneyLanguage.Russian.code -> "Неверный формат адреса кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "錢包地址格式有誤"
@@ -1803,7 +1803,7 @@ object ContactText {
 	val contactName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Contact Name"
 		HoneyLanguage.Chinese.code -> "联系人名称"
-		HoneyLanguage.Japanese.code -> "連絡先"
+		HoneyLanguage.Japanese.code -> "連絡先の名前"
 		HoneyLanguage.Korean.code -> "연락처 명칭"
 		HoneyLanguage.Russian.code -> "Контактное лицо"
 		HoneyLanguage.TraditionalChinese.code -> "聯繫人名稱"
@@ -1879,19 +1879,19 @@ object LoadingText {
 	
 	@JvmField
 	val searchingQuotation = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Searching token information..."
-		HoneyLanguage.Chinese.code -> "正在搜索Token信息..."
-		HoneyLanguage.Japanese.code -> "トークン情報検索中..."
-		HoneyLanguage.Korean.code -> "Token시세 검색..."
+		HoneyLanguage.English.code -> "Searching quotation information..."
+		HoneyLanguage.Chinese.code -> "正在搜索Quotation信息..."
+		HoneyLanguage.Japanese.code -> "Quotation情報検索中..."
+		HoneyLanguage.Korean.code -> "Quotation시세 검색..."
 		HoneyLanguage.Russian.code -> "Поиск информации токена ..."
-		HoneyLanguage.TraditionalChinese.code -> "正在檢索Token信息..."
+		HoneyLanguage.TraditionalChinese.code -> "正在檢索Quotation信息..."
 		else -> ""
 	}
 	@JvmField
 	val searchingToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Searching token information..."
 		HoneyLanguage.Chinese.code -> "正在搜索Token信息..."
-		HoneyLanguage.Japanese.code -> "トークン情報検索中..."
+		HoneyLanguage.Japanese.code -> "Token情報検索中..."
 		HoneyLanguage.Korean.code -> "Token시세 검색..."
 		HoneyLanguage.Russian.code -> "Поиск информации токена ..."
 		HoneyLanguage.TraditionalChinese.code -> "正在檢索Token信息..."
@@ -1901,7 +1901,7 @@ object LoadingText {
 	val transactionData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading transaction data..."
 		HoneyLanguage.Chinese.code -> "正在加载转账记录..."
-		HoneyLanguage.Japanese.code -> "トランザクションデータ読み込み中..."
+		HoneyLanguage.Japanese.code -> "転送記録を読み込んでいます..."
 		HoneyLanguage.Korean.code -> "이전 기록 로드중..."
 		HoneyLanguage.Russian.code -> "Загрузка данных транзакции ..."
 		HoneyLanguage.TraditionalChinese.code -> "正在加載轉賬記錄..."
@@ -1911,7 +1911,7 @@ object LoadingText {
 	val tokenData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading token data..."
 		HoneyLanguage.Chinese.code -> "正在加载token信息..."
-		HoneyLanguage.Japanese.code -> "Loading token data now"
+		HoneyLanguage.Japanese.code -> "Token情報を読み込んでいます..."
 		HoneyLanguage.Korean.code -> "Token정보 로드중..."
 		HoneyLanguage.Russian.code -> "Загрузка данных токена ..."
 		HoneyLanguage.TraditionalChinese.code -> "正在加載token信息..."
@@ -1956,7 +1956,7 @@ object QRText {
 		HoneyLanguage.English.code -> "Scan GoldStone QR Code"
 		HoneyLanguage.Chinese.code -> "扫描Goldstone的二维码"
 		HoneyLanguage.Japanese.code -> "スキャンGoldStoneのQRコード"
-		HoneyLanguage.Korean.code -> "GoldStone의 QR 코드 스캔"
+		HoneyLanguage.Korean.code -> "GoldStone 의 QR 코드 스캔"
 		HoneyLanguage.Russian.code -> "Сканирование GoldStone QR-код"
 		HoneyLanguage.TraditionalChinese.code -> "掃描GoldStone的二維碼"
 		else -> ""
@@ -1988,7 +1988,7 @@ object QAText {
 	val whatIsMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a mnemonic?"
 		HoneyLanguage.Chinese.code -> "什么是助记词？"
-		HoneyLanguage.Japanese.code -> "What is a mnemonic?"
+		HoneyLanguage.Japanese.code -> "ニーモニックとは何ですか？"
 		HoneyLanguage.Korean.code -> "니모닉이란？"
 		HoneyLanguage.Russian.code -> "What is a mnemonic?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是助憶口令?"
@@ -1997,7 +1997,7 @@ object QAText {
 	val whatIsGas = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a gas?"
 		HoneyLanguage.Chinese.code -> "什么是GAS？"
-		HoneyLanguage.Japanese.code -> "What is a gas?"
+		HoneyLanguage.Japanese.code -> "GASとは何ですか?"
 		HoneyLanguage.Korean.code -> "니모닉이란？"
 		HoneyLanguage.Russian.code -> "What is a gas?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是GAS?"
@@ -2006,7 +2006,7 @@ object QAText {
 	val whatIsKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a keystore?"
 		HoneyLanguage.Chinese.code -> "什么是 keystore?"
-		HoneyLanguage.Japanese.code -> "What is a keystore?"
+		HoneyLanguage.Japanese.code -> "keystoreとは何ですか？"
 		HoneyLanguage.Korean.code -> "keystore란？"
 		HoneyLanguage.Russian.code -> "What is a keystore?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是 keystore?"
@@ -2015,7 +2015,7 @@ object QAText {
 	val whatIsWatchOnlyWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a watch-only wallet?"
 		HoneyLanguage.Chinese.code -> "什么是观察钱包？"
-		HoneyLanguage.Japanese.code -> "What is a watch-only wallet?"
+		HoneyLanguage.Japanese.code -> "観測ウォレットとは何ですか？"
 		HoneyLanguage.Korean.code -> "관찰지갑이란？"
 		HoneyLanguage.Russian.code -> "What is a watch-only wallet?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是觀察錢包？"
@@ -2024,7 +2024,7 @@ object QAText {
 	val whatIsPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a private key?"
 		HoneyLanguage.Chinese.code -> "什么是私钥？"
-		HoneyLanguage.Japanese.code -> "What is private key?"
+		HoneyLanguage.Japanese.code -> "W秘密鍵とは何ですか？"
 		HoneyLanguage.Korean.code -> "개인키란？"
 		HoneyLanguage.Russian.code -> "What is private key?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是私鑰？"
@@ -2046,19 +2046,19 @@ object ImporMneubar {
 	}
 	@JvmField
 	val keystore = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Keystore"
-		HoneyLanguage.Chinese.code -> "Keystore"
-		HoneyLanguage.Japanese.code -> "Keystore"
-		HoneyLanguage.Korean.code -> "Keystore"
-		HoneyLanguage.Russian.code -> "Keystore"
-		HoneyLanguage.TraditionalChinese.code -> "Keystore"
+		HoneyLanguage.English.code -> "KEYSTORE"
+		HoneyLanguage.Chinese.code -> "KEYSTORE"
+		HoneyLanguage.Japanese.code -> "KEYSTORE"
+		HoneyLanguage.Korean.code -> "KEYSTORE"
+		HoneyLanguage.Russian.code -> "KEYSTORE"
+		HoneyLanguage.TraditionalChinese.code -> "KEYSTORE"
 		else -> ""
 	}
 	@JvmField
 	val privateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Private Key"
 		HoneyLanguage.Chinese.code -> "私钥"
-		HoneyLanguage.Japanese.code -> "개인키(Private Key)"
+		HoneyLanguage.Japanese.code -> "秘密鍵"
 		HoneyLanguage.Korean.code -> "개인키(Private Key)"
 		HoneyLanguage.Russian.code -> "Закрытый ключ"
 		HoneyLanguage.TraditionalChinese.code -> "私鑰"
@@ -2068,7 +2068,7 @@ object ImporMneubar {
 	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Watch-Only Wallet"
 		HoneyLanguage.Chinese.code -> "观察钱包"
-		HoneyLanguage.Japanese.code -> "確認電子ウォレット"
+		HoneyLanguage.Japanese.code -> "財布を観察する"
 		HoneyLanguage.Korean.code -> "지갑 관찰"
 		HoneyLanguage.Russian.code -> "Просмотр кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"

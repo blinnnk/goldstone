@@ -4,7 +4,6 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
-import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
@@ -23,17 +22,12 @@ enum class NotificationType(val code: Int) {
 data class NotificationTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
-	@SerializedName("content")
 	val content: String = "",
-	@SerializedName("title")
 	val title: String = "",
-	@SerializedName("create_on")
 	val createTime: Long = 0L,
-	@SerializedName("action_content")
+	val action: String = "",
 	val actionContent: String = "", // hash or weburl
-	@SerializedName("type")
 	val type: Int = 0,
-	@SerializedName("extra")
 	val extra: String? = ""
 ) {
 	
@@ -42,10 +36,22 @@ data class NotificationTable(
 		data.content,
 		data.title,
 		data.createTime,
+		data.action,
 		data.actionContent,
 		data.type,
 		data.extra
-		)
+	)
+	
+	constructor(data: JSONObject) : this(
+		0,
+		data.safeGet("content"),
+		data.safeGet("title"),
+		data.safeGet("create_on").toLong(),
+		data.safeGet("action"),
+		data.safeGet("action_content"),
+		data.safeGet("type").toInt(),
+		data.safeGet("extra")
+	)
 	
 	companion object {
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {

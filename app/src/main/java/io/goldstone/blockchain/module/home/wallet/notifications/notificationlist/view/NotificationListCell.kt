@@ -33,7 +33,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		
 		when (model?.type) {
 			NotificationType.Transaction.code -> {
-				if (NotificationTable.getReceiveStatus(model?.extra.orEmpty())!!) {
+				if (NotificationTable.getReceiveStatus(model?.extra?.toString().orEmpty())!!) {
 					setIconColor(Spectrum.green)
 					setIconResource(R.drawable.receive_icon)
 				} else {

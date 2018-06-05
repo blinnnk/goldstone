@@ -225,8 +225,15 @@ data class TransactionTable(
 		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nounce` 值来生成
 		 * 最近可用的 `Nounce`
 		 */
-		fun getLatestValidNounce(hold: (BigInteger) -> Unit) {
-			GoldStoneAPI.getTransactionListByAddress {
+		fun getLatestValidNounce(
+			errorCallback: (Exception) -> Unit,
+			hold: (BigInteger) -> Unit
+		) {
+			GoldStoneAPI.getTransactionListByAddress(
+				"0",
+				WalletTable.current.address,
+				errorCallback
+			) {
 				TransactionTable.getLocalLatestNounce { localNounce ->
 					val myLatestNonce = firstOrNull {
 						it.fromAddress.equals(WalletTable.current.address, true)

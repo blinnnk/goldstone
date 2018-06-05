@@ -9,11 +9,13 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
@@ -199,7 +201,10 @@ class CreateWalletPresenter(
 				failedCallback()
 				return
 			}
-			val walletName = if (name.isEmpty()) "Wallet" else name
+			val walletName =
+				if (name.isEmpty()) generateDefaultName()
+				else name
+			
 			doAsync {
 				password.checkPasswordInRules { _, reasons ->
 					context?.apply {

@@ -51,6 +51,11 @@ object GoldStoneEthCall {
 			                    SolidityCode.ethCall,
 			                    "GetTransactionByHash"
 		                    ),
+		GetTransactionReceiptByHash(
+			                           "eth_getTransactionReceipt",
+			                           SolidityCode.ethCall,
+			                           "GetTransactionReceiptByHash"
+		                           ),
 		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
 		PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
 		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
@@ -363,8 +368,8 @@ object GoldStoneEthCall {
 	) {
 		val client = OkHttpClient
 			.Builder()
-			.connectTimeout(60, TimeUnit.SECONDS)
-			.readTimeout(90, TimeUnit.SECONDS)
+			.connectTimeout(50, TimeUnit.SECONDS)
+			.readTimeout(70, TimeUnit.SECONDS)
 			.build()
 		GoldStoneAPI.getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -10,11 +11,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.imageView
-import org.jetbrains.anko.textColor
+import org.jetbrains.anko.*
 
 /**
  * @date 09/04/2018 6:52 PM
@@ -39,23 +37,19 @@ class EmptyView(context: Context) : LinearLayout(context) {
 	private val emptyViewHeight = ScreenSize.Width
 	
 	init {
+		
 		id = ElementID.emptyView
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		
-		layoutParams =
-			LinearLayout.LayoutParams(
-				(ScreenSize.Width * 0.6).toInt(),
-				emptyViewHeight
-			)
+		layoutParams = LinearLayout.LayoutParams(
+			(ScreenSize.Width * 0.6).toInt(),
+			emptyViewHeight
+		)
 		
 		icon = imageView {
 			scaleType = ImageView.ScaleType.FIT_XY
-			layoutParams =
-				LinearLayout.LayoutParams(
-					imageSize,
-					imageSize
-				)
+			layoutParams = LinearLayout.LayoutParams(imageSize, imageSize)
 		}
 		
 		introTitles.apply {
@@ -63,8 +57,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
 			y -= 30.uiPX()
 				.toFloat()
 			isCenter = true
-		}
-			.into(this)
+		}.into(this)
 	}
 	
 	fun setStyle(type: EmptyType) {
@@ -125,21 +118,16 @@ class EmptyView(context: Context) : LinearLayout(context) {
 			}
 			
 			EmptyType.Quotation -> {
-				y += 40.uiPX()
-				layoutParams = LinearLayout.LayoutParams(300.uiPX(), 300.uiPX())
-				icon.apply {
-					layoutParams = LinearLayout.LayoutParams(120.uiPX(), 120.uiPX())
-					addCorner(60.uiPX(), Spectrum.opacity3White)
-					imageResource = R.drawable.quotation_empty_icon
-					scaleType = ImageView.ScaleType.CENTER_INSIDE
-					alpha = 0.2f
-				}
-				introTitles.apply {
-					setOpacityWhiteStyle()
-					title.text = EmptyText.searchTitle
-					subtitle.text = EmptyText.searchSubtitle
-					y += 45.uiPX()
-				}
+				y = 100.uiPX().toFloat()
+				removeView(introTitles)
+				removeView(icon)
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+				BorderCardView(context).apply {
+					setTitles(
+						"ADD QUOTATION CHART",
+						"you can easy to watch tokens which \nyou are caring about and added from \ntarget exchange website"
+					)
+				}.into(this)
 			}
 		}
 	}

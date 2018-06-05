@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.Pa
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.support.v4.toast
 import org.web3j.utils.Convert
 import java.math.BigInteger
 
@@ -42,6 +43,7 @@ class PaymentPreparePresenter(
 			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
 			callback()
 		} else {
+			fragment.toast("wait a few seconds, It is calculating transaction gas information")
 			getPaymentPrepareModel(count, fragment.getMemoContent(), callback) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(
@@ -65,7 +67,10 @@ class PaymentPreparePresenter(
 		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
-		TransactionTable.getLatestValidNounce {
+		TransactionTable.getLatestValidNounce(
+			{
+				fragment.context?.alert(it.toString())
+			}) {
 			generateTransaction(fragment.address!!, value, memo, it, callback, hold)
 		}
 	}

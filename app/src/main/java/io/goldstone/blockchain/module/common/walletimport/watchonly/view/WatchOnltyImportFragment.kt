@@ -8,6 +8,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -51,6 +52,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 
 			nameInput.apply {
+				hint = UIUtils.generateDefaultName()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				title = CreateWalletText.name
 			}.into(this)

@@ -51,6 +51,10 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		}
 	}
 	
+	override fun emptyClickEvent() {
+		presenter.showQuotationManagement()
+	}
+	
 	override fun onResume() {
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)

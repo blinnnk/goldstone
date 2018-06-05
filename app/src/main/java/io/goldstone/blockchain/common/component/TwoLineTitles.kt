@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.util.TypedValue
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -87,14 +88,15 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.y += 5.uiPX()
 	}
 
-	fun setBigWhiteStyle() {
+	fun setBigWhiteStyle(titleSize: Int = 24, subtitleSize: Int = 12, lineSpace: Int = 0) {
 		title.apply {
-			textSize = fontSize(24)
+			textSize = fontSize(titleSize)
 			typeface = GoldStoneFont.heavy(context)
 			textColor = Spectrum.white
 		}
 		subtitle.apply {
-			textSize = fontSize(12)
+			setMargins<LinearLayout.LayoutParams> { topMargin = lineSpace }
+			textSize = fontSize(subtitleSize)
 			textColor = Spectrum.opacity5White
 			typeface = GoldStoneFont.medium(context)
 		}
