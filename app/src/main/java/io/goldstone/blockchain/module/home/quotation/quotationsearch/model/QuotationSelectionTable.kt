@@ -135,10 +135,11 @@ data class QuotationSelectionTable(
 		}
 		
 		fun getMySelections(hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.quotationSelectionDao()
-					               .getQuotationSelfSelections()
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.quotationSelectionDao()
+						.getQuotationSelfSelections()
+				}) {
 				hold(it.toArrayList())
 			}
 		}
