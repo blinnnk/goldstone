@@ -5,6 +5,7 @@ import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getKeystoreFile
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
@@ -35,7 +36,7 @@ class KeystoreExportPresenter(
 		WalletTable.getCurrentWallet {
 			doAsync {
 				fragment.context?.getKeystoreFile(it!!.address, passwordInput.text.toString(), {
-					hold("")
+					GoldStoneAPI.context.runOnUiThread { hold("") }
 				}) {
 					fragment.context?.runOnUiThread { hold(it) }
 				}

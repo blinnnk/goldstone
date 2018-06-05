@@ -19,7 +19,7 @@ import org.jetbrains.anko.support.v4.toast
 class PasswordSettingsPresenter(
 	override val fragment: PasswordSettingsFragment
 ) : BasePresenter<PasswordSettingsFragment>() {
-
+	
 	fun updatePassword(
 		oldPasswordInput: EditText,
 		newPasswordInput: EditText,
@@ -38,7 +38,10 @@ class PasswordSettingsPresenter(
 			}
 		) { password, _ ->
 			fragment.context?.updatePassword(
-				WalletTable.current.address, oldPasswordInput.text.toString(), password
+				WalletTable.current.address,
+				oldPasswordInput.text.toString(),
+				password,
+				callback
 			) {
 				fragment.toast(CommonText.succeed)
 				callback()
@@ -48,5 +51,4 @@ class PasswordSettingsPresenter(
 			}
 		}
 	}
-
 }

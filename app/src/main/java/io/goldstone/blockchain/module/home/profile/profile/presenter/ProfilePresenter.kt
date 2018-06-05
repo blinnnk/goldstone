@@ -107,7 +107,7 @@ class ProfilePresenter(
 					fragment.context?.alert("Application is downloading now")
 				}
 			}
-			setContent(newVersionDescription, newVersionName)
+			setContent(newVersionName, newVersionDescription)
 			setImage(R.drawable.version_banner)
 		}
 	}

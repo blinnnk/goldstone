@@ -1994,6 +1994,15 @@ object QAText {
 		HoneyLanguage.TraditionalChinese.code -> "什麼是助憶口令?"
 		else -> ""
 	}
+	val whatIsGas = when (currentLanguage) {
+		HoneyLanguage.English.code -> "What is a mnemonic?"
+		HoneyLanguage.Chinese.code -> "什么是助记词？"
+		HoneyLanguage.Japanese.code -> "What is a mnemonic?"
+		HoneyLanguage.Korean.code -> "니모닉이란？"
+		HoneyLanguage.Russian.code -> "What is a mnemonic?"
+		HoneyLanguage.TraditionalChinese.code -> "什麼是助憶口令?"
+		else -> ""
+	}
 	val whatIsKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What is a keystore?"
 		HoneyLanguage.Chinese.code -> "什么是 keystore?"
