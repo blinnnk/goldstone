@@ -20,10 +20,14 @@ abstract class TransactionStatusObserver {
 	open fun checkStatusByTransaction() {
 		doAsync {
 			GoldStoneEthCall
-				.getTransactionByHash(transactionHash, GoldStoneApp.getCurrentChain(), {
-					handler.removeCallbacks(reDo)
-					handler.postDelayed(reDo, 3000L)
-				}) {
+				.getTransactionByHash(
+					transactionHash,
+					GoldStoneApp.getCurrentChain(), {
+						handler.removeCallbacks(reDo)
+						handler.postDelayed(reDo, 3000L)
+					}, { _, _ ->
+						// error callback if need to do something
+					}) {
 					GoldStoneAPI.context.runOnUiThread {
 						getStatus(true)
 					}

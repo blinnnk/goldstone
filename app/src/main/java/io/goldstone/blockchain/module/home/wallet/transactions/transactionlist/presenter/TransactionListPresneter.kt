@@ -5,6 +5,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -212,7 +213,11 @@ class TransactionListPresenter(
 					override fun concurrentJobs() {
 						forEach {
 							GoldStoneEthCall.apply {
-								getTokenInfoByContractAddress(it.contractAddress) { symbol, name, decimal ->
+								getTokenInfoByContractAddress(
+									it.contractAddress,
+									GoldStoneApp.getCurrentChain(), { _, _ ->
+										// error callback if need do something
+									}) { symbol, name, decimal ->
 									GoldStoneDataBase
 										.database
 										.defaultTokenDao()

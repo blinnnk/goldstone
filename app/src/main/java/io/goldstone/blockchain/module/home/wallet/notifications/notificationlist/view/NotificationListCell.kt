@@ -21,48 +21,48 @@ import org.jetbrains.anko.textColor
  * @date 25/03/2018 1:49 AM
  * @author KaySaith
  */
-
 class NotificationListCell(context: Context) : BaseValueCell(context) {
-
-  var model: NotificationTable? by observing(null) {
-
-    info.apply {
-      title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
-      subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
-    }
-
-    date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString())
-
-    when (model?.type.orZero()) {
-      NotificationType.Transaction.code -> {
-        setIconColor(Spectrum.green)
-        setIconResource(R.drawable.transfer_icon)
-      }
-      NotificationType.System.code -> {
-        setIconColor(GrayScale.midGray)
-        setIconResource(R.drawable.system_message_icon)
-      }
-    }
-  }
-
-  private val date by lazy { TextView(context) }
-
-  init {
-    date
-      .apply {
-        textColor = GrayScale.midGray
-        textSize = fontSize(10)
-        typeface = GoldStoneFont.book(context)
-        x -= 30.uiPX()
-      }
-      .into(this)
-    date.apply {
-      setCenterInVertical()
-      setAlignParentRight()
-    }
-
-    setGrayStyle()
-
-  }
-
+	
+	var model: NotificationTable? by observing(null) {
+		info.apply {
+			title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
+			subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
+		}
+		
+		date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString())
+		
+		when (model?.type) {
+			NotificationType.Transaction.code -> {
+				if (NotificationTable.getReceiveStatus(model?.extra.orEmpty())!!) {
+					setIconColor(Spectrum.green)
+					setIconResource(R.drawable.receive_icon)
+				} else {
+					setIconColor(GrayScale.midGray)
+					setIconResource(R.drawable.transfer_icon)
+				}
+			}
+			NotificationType.System.code -> {
+				setIconColor(Spectrum.green)
+				setIconResource(R.drawable.system_notification_icon)
+			}
+		}
+	}
+	private val date by lazy { TextView(context) }
+	
+	init {
+		date
+			.apply {
+				textColor = GrayScale.midGray
+				textSize = fontSize(10)
+				typeface = GoldStoneFont.book(context)
+				x -= 30.uiPX()
+			}
+			.into(this)
+		date.apply {
+			setCenterInVertical()
+			setAlignParentRight()
+		}
+		
+		setGrayStyle()
+	}
 }

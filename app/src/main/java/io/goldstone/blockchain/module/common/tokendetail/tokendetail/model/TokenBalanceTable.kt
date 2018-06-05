@@ -6,15 +6,14 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
@@ -41,10 +40,11 @@ data class TokenBalanceTable(
 			address: String = WalletTable.current.address,
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.tokenBalanceDao()
-					               .getTokenBalanceByContractAndAddress(address, contract)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.tokenBalanceDao()
+						.getTokenBalanceByContractAndAddress(address, contract)
+				}) {
 				hold(it.toArrayList())
 			}
 		}
@@ -52,7 +52,9 @@ data class TokenBalanceTable(
 		fun getTodayBalance(address: String, contract: String, callback: (Double) -> Unit) {
 			if (contract == CryptoValue.ethContract) {
 				doAsync {
-					GoldStoneEthCall.getEthBalance(address) { balance ->
+					GoldStoneEthCall.getEthBalance(address, { _, _ ->
+						// error callback if need do something
+					}) { balance ->
 						GoldStoneAPI.context.runOnUiThread {
 							callback(balance.toEthCount())
 						}
@@ -62,8 +64,11 @@ data class TokenBalanceTable(
 				doAsync {
 					GoldStoneEthCall.getTokenCountWithDecimalByContract(
 						contract,
-						address
-					) { balance ->
+						address,
+						GoldStoneApp.getCurrentChain(),
+						{ _, _ ->
+							// do something when error callback
+						}) { balance ->
 						GoldStoneAPI.context.runOnUiThread {
 							callback(balance)
 						}
@@ -104,6 +109,7 @@ data class TokenBalanceTable(
 							completeMark()
 						}
 					}
+					
 					override fun mergeCallBack() = callback()
 				}.start()
 			}

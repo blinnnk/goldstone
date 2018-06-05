@@ -105,7 +105,9 @@ data class WalletDetailCellModel(
 										?.let { targetToken ->
 											if (targetToken.contract == CryptoValue.ethContract) {
 												GoldStoneEthCall
-													.getEthBalance(walletAddress) {
+													.getEthBalance(walletAddress, { _, _ ->
+														// do something when error callback
+													}) {
 														MyTokenTable
 															.updateCurrentWalletBalanceWithContract(
 																it,
@@ -117,13 +119,11 @@ data class WalletDetailCellModel(
 											} else {
 												GoldStoneEthCall.getTokenBalanceWithContract(
 													targetToken.contract,
-													walletAddress
-												) {
+													walletAddress, { _, _ ->
+														// do something when error callback
+													}) {
 													MyTokenTable
-														.updateCurrentWalletBalanceWithContract(
-															it,
-															targetToken.contract
-														)
+														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
 													tokenList.add(WalletDetailCellModel(targetToken, it))
 													completeMark()
 												}

@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
+import org.json.JSONObject
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -27,15 +29,12 @@ data class NotificationTable(
 	val title: String = "",
 	@SerializedName("create_on")
 	val createTime: Long = 0L,
-	@SerializedName("hash")
-	val transactionHash: String = "",
+	@SerializedName("action_content")
+	val actionContent: String = "", // hash or weburl
 	@SerializedName("type")
 	val type: Int = 0,
-	@SerializedName("from_or_to")
-	val isTo: Int = 1,
-	@SerializedName("chainid")
-	val chainID: Int = 1,
-	val isReceived: Boolean = false
+	@SerializedName("extra")
+	val extra: String? = ""
 ) {
 	
 	constructor(data: NotificationTable) : this(
@@ -43,12 +42,10 @@ data class NotificationTable(
 		data.content,
 		data.title,
 		data.createTime,
-		data.transactionHash,
+		data.actionContent,
 		data.type,
-		data.isTo,
-		data.chainID,
-		data.isTo == TinyNumber.True.value // `to` 是我收到
-	)
+		data.extra
+		)
 	
 	companion object {
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
@@ -58,6 +55,18 @@ data class NotificationTable(
 				}) {
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
+		}
+		
+		fun getChianID(extra: String): String {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("chainid")
+			} else ""
+		}
+		
+		fun getReceiveStatus(extra: String): Boolean? {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("from_or_to").toIntOrNull() == TinyNumber.True.value
+			} else null
 		}
 		
 		fun insertData(tables: ArrayList<NotificationTable>, callback: () -> Unit) {

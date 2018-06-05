@@ -32,10 +32,7 @@ class PasswordSettingsPresenter(
 			repeatPasswordInput.text.toString(),
 			true,
 			fragment.context,
-			{
-				// failed callback
-				callback()
-			}
+			callback // error callback
 		) { password, _ ->
 			fragment.context?.updatePassword(
 				WalletTable.current.address,

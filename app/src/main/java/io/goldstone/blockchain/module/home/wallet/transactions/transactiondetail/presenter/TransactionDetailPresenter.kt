@@ -6,6 +6,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
@@ -162,7 +163,11 @@ class TransactionDetailPresenter(
 			TransactionTable.getTransactionByHash(taxHash) {
 				it.find { it.hash == taxHash }?.let { transaction ->
 					if (transaction.input.isEmpty()) {
-						GoldStoneEthCall.getInputCodeByHash(taxHash) {
+						GoldStoneEthCall.getInputCodeByHash(
+							taxHash,
+							GoldStoneApp.getCurrentChain(), { error, reason ->
+								fragment.context?.alert(reason ?: error.toString())
+							}) {
 							TransactionTable.updateInputCodeByHash(taxHash, it) {
 								callback(it, transaction.isERC20)
 							}
@@ -374,17 +379,31 @@ class TransactionDetailPresenter(
 	
 	private fun updateMyTokenBalanceByTransaction(callback: () -> Unit) {
 		GoldStoneEthCall
-			.getTransactionByHash(currentHash) { transaction ->
+			.getTransactionByHash(
+				currentHash,
+				GoldStoneApp.getCurrentChain(),
+				{
+					// unfinish callback
+				},
+				{ error, reason ->
+					fragment.context?.alert(reason ?: error.toString())
+				}
+			) { transaction ->
 				if (transaction.isERC20) {
 					val contract = transaction.to
 					GoldStoneEthCall.getTokenBalanceWithContract(
-						contract, WalletTable.current.address
-					) { balance ->
+						contract,
+						WalletTable.current.address, { error, reason ->
+							fragment.context?.alert(reason ?: error.toString())
+						}) { balance ->
 						MyTokenTable.updateCurrentWalletBalanceWithContract(balance, contract)
 						callback()
 					}
 				} else {
-					GoldStoneEthCall.getEthBalance(WalletTable.current.address) {
+					GoldStoneEthCall.getEthBalance(
+						WalletTable.current.address, { error, reason ->
+						fragment.context?.alert(reason ?: error.toString())
+					}) {
 						MyTokenTable.updateCurrentWalletBalanceWithContract(it, CryptoValue.ethContract)
 						callback()
 					}
@@ -409,7 +428,16 @@ class TransactionDetailPresenter(
 	
 	// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
 	private fun TransactionDetailFragment.getTransactionFromChain() {
-		GoldStoneEthCall.getTransactionByHash(currentHash) {
+		GoldStoneEthCall.getTransactionByHash(
+			currentHash,
+			GoldStoneApp.getCurrentChain(),
+			{
+				// unfinish callback
+			},
+			{ error, reason ->
+				fragment.context?.alert(reason ?: error.toString())
+			}
+		) {
 			context?.runOnUiThread {
 				asyncData?.clear()
 				asyncData?.addAll(generateModels(it))
@@ -424,7 +452,16 @@ class TransactionDetailPresenter(
 		info: NotificationTransactionInfo,
 		callback: () -> Unit
 	) {
-		GoldStoneEthCall.getTransactionByHash(currentHash, info.chainID) { receipt ->
+		GoldStoneEthCall.getTransactionByHash(
+			currentHash,
+			info.chainID,
+			{
+				// unfinished callback
+			},
+			{ error, reason ->
+				fragment.context?.alert(reason ?: error.toString())
+			}
+		) { receipt ->
 			receipt.getTimestampAndInsertToDatabase(info.chainID) { timestamp ->
 				context?.runOnUiThread {
 					if (asyncData.isNull()) {
@@ -479,7 +516,13 @@ class TransactionDetailPresenter(
 		chainID: String = GoldStoneApp.getCurrentChain(),
 		callback: (Long) -> Unit
 	) {
-		GoldStoneEthCall.getBlockTimeStampByBlockHash(blockHash, chainID) {
+		GoldStoneEthCall.getBlockTimeStampByBlockHash(
+			blockHash,
+			chainID,
+			{ error, reason ->
+				fragment.context?.alert(reason ?: error.toString())
+			}
+		) {
 			this.timeStamp = it.toString()
 			callback(it)
 		}
@@ -496,7 +539,12 @@ class TransactionDetailPresenter(
 			val address = if (isReceive) receipt.fromAddress else transaction.address
 			it.isNull() isTrue {
 				GoldStoneEthCall
-					.getTokenSymbolAndDecimalByContract(receipt.to, chainID) { symbol, decimal ->
+					.getTokenSymbolAndDecimalByContract(
+						receipt.to,
+						chainID,
+						{ error, reason ->
+							fragment.context?.alert(reason ?: error.toString())
+						}) { symbol, decimal ->
 						val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
 						updateHeaderValue(
 							count,

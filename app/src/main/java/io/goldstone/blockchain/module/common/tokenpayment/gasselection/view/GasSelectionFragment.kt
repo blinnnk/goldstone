@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -13,7 +14,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
-import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -74,8 +75,12 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsGas.setUnderline()
 			}.click {
-				getParentFragment<WalletImportFragment> {
-					presenter.showWebViewFragment(WebUrl.whatIsGas, QAText.whatIsGas)
+				getParentFragment<TokenDetailOverlayFragment> {
+					presenter.showTargetFragment<WebViewFragment>(
+						QAText.whatIsGas,
+						TokenDetailText.customGas,
+						Bundle().apply { putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas) }
+					)
 				}
 			}.into(this)
 		}

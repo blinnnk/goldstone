@@ -102,7 +102,7 @@ class WalletImportPresenter(
 	
 	fun showWebViewFragment(url: String, title: String) {
 		fragment.headerTitle = title
-		
+		System.out.println("url$url")
 		hideChildFragments()
 		
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {

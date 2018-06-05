@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -79,7 +80,11 @@ class TokenSearchPresenter(
 					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
 					MyTokenTable.getCurrentChainTokenByContract(content) {
 						GoldStoneEthCall
-							.getTokenInfoByContractAddress(content) { symbol, name, decimal ->
+							.getTokenInfoByContractAddress(
+								content,
+								GoldStoneApp.getCurrentChain(), { error, reason ->
+									fragment.context?.alert(reason ?: error.toString())
+								}) { symbol, name, decimal ->
 								if (symbol.isEmpty() || name.isEmpty()) {
 									hold(arrayListOf())
 								} else {

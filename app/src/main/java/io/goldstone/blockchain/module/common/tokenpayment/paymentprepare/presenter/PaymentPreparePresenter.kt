@@ -42,7 +42,7 @@ class PaymentPreparePresenter(
 			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
 			callback()
 		} else {
-			getPaymentPrepareModel(count, fragment.getMemoContent()) { model ->
+			getPaymentPrepareModel(count, fragment.getMemoContent(), callback) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(
 						TokenDetailText.customGas,
@@ -62,10 +62,11 @@ class PaymentPreparePresenter(
 	private fun getPaymentPrepareModel(
 		value: Double,
 		memo: String,
+		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
 		TransactionTable.getLatestValidNounce {
-			generateTransaction(fragment.address!!, value, memo, it, hold)
+			generateTransaction(fragment.address!!, value, memo, it, callback, hold)
 		}
 	}
 	
@@ -74,6 +75,7 @@ class PaymentPreparePresenter(
 		value: Double,
 		memo: String,
 		nounce: BigInteger,
+		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
 		val countWithDecimal: BigInteger
@@ -96,8 +98,10 @@ class PaymentPreparePresenter(
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			WalletTable.current.address,
-			data
-		) { limit ->
+			data, { error, reason ->
+				fragment.context?.alert(reason ?: error.toString())
+				callback()
+			}) { limit ->
 			hold(
 				PaymentPrepareModel(
 					nounce,
