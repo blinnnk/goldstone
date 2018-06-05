@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.daysAgoInMills
@@ -144,7 +145,11 @@ class TokenDetailPresenter(
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-				TransactionListPresenter.updateTransactions(this@loadDataFromChain, blockNumber) {
+				TransactionListPresenter.updateTransactions(
+					this@loadDataFromChain,
+					blockNumber, {
+						context?.alert(it.toString())
+					}) {
 					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 						it.find { it.contract.equals(token?.contract, true) }.isNotNull {
@@ -219,7 +224,6 @@ class TokenDetailPresenter(
 		MyTokenTable.getCurrentChainTokenBalanceByContract(contract) { todayBalance ->
 			if (todayBalance.isNull()) return@getCurrentChainTokenBalanceByContract
 			// 计算过去7天的所有余额
-			
 			generateHistoryBalance(todayBalance!!) { history ->
 				coroutinesTask(
 					{

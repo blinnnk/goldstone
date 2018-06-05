@@ -4,6 +4,7 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.text.format.DateUtils
 import com.blinnnk.uikit.ScreenSize
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R.drawable.*
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
@@ -29,12 +30,41 @@ object UIUtils {
 		second: Int
 	) = (first - second) / 2
 	
-	fun generateAvatar(id: Int): Int {
+	fun generateAvatar(): Int {
 		val avatars = arrayListOf(
 			avatar_1, avatar_2, avatar_3, avatar_4, avatar_5, avatar_6, avatar_7, avatar_8, avatar_9,
 			avatar_10, avatar_11, avatar_12, avatar_13, avatar_14, avatar_15, avatar_16, avatar_17
 		)
-		return avatars[id % 15]
+		val walletID =
+			if (GoldStoneApp.getMaxWalletID() == 100) 0
+			else GoldStoneApp.getMaxWalletID() - 1
+		return avatars[walletID % 17]
+	}
+	
+	fun generateDefaultName(): String {
+		val name = arrayListOf(
+			"Owl",
+			"Bear",
+			"Elephant",
+			"Rhinoceros",
+			"Frog",
+			"Koala",
+			"Fox",
+			"Monkey",
+			"Giraffle",
+			"Penguin",
+			"Wolf",
+			"Bull",
+			"Leopard",
+			"Deer",
+			"Raccoon",
+			"Lion",
+			"Hippo"
+		)
+		val walletID =
+			if (GoldStoneApp.getMaxWalletID() == 100) 0
+			else GoldStoneApp.getMaxWalletID()
+		return name[walletID % 17]
 	}
 }
 

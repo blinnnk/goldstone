@@ -3,10 +3,12 @@ package io.goldstone.blockchain.module.entrance.starting.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.LoadingView
@@ -18,7 +20,6 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
-import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.*
 
 /**
@@ -63,6 +64,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 			}
 			
 			WalletTable.getAll {
+				// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
+				GoldStoneApp.updateMaxWalletID(maxBy { it.id }?.id.orZero())
 				// 本地没有钱包的情况下显示登录和导入按钮
 				if (isEmpty()) {
 					verticalLayout {

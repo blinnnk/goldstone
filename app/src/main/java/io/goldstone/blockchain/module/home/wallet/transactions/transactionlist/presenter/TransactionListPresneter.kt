@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
@@ -81,7 +82,9 @@ class TransactionListPresenter(
 				 * if there is none data in local then `StartBlock 0`
 				 * and load data from `EtherScan`
 				 **/
-				getTransactionDataFromEtherScan("0") {
+				getTransactionDataFromEtherScan("0", {
+					fragment.context?.alert(it.toString())
+				}) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 					localTransactions = it
@@ -99,7 +102,9 @@ class TransactionListPresenter(
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
 			?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-		getTransactionDataFromEtherScan(currentBlockNumber) { newData ->
+		getTransactionDataFromEtherScan(currentBlockNumber, {
+			fragment.context?.alert(it.toString())
+		}) { newData ->
 			/** chain data is empty then return and remove loading view */
 			if (newData.isEmpty()) {
 				removeLoadingView()
@@ -132,12 +137,13 @@ class TransactionListPresenter(
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun BaseRecyclerFragment<*, *>.getTransactionDataFromEtherScan(
 			startBlock: String,
+			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(getContext())) return
 			// 请求所有链上的数据
-			mergeNormalAndTokenIncomingTransactions(startBlock) {
+			mergeNormalAndTokenIncomingTransactions(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					filterCompletedData(it, hold)
@@ -153,13 +159,15 @@ class TransactionListPresenter(
 		fun updateTransactions(
 			fragment: BaseRecyclerFragment<*, *>,
 			startBlock: String,
+			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			fragment.getTransactionDataFromEtherScan(startBlock, hold)
+			fragment.getTransactionDataFromEtherScan(startBlock, errorCallback, hold)
 		}
 		
 		private fun mergeNormalAndTokenIncomingTransactions(
 			startBlock: String,
+			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
 			return object : ConcurrentAsyncCombine() {
@@ -167,14 +175,41 @@ class TransactionListPresenter(
 				// Get transaction data from `etherScan`
 				var chainData = ArrayList<TransactionTable>()
 				var logData = ArrayList<TransactionTable>()
+				var hasError = false
 				override fun concurrentJobs() {
 					doAsync {
-						GoldStoneAPI.getTransactionListByAddress(startBlock) {
+						GoldStoneAPI.getTransactionListByAddress(
+							startBlock,
+							WalletTable.current.address,
+							{
+								//error callback
+								// 只弹出一次错误信息
+								if (!hasError) {
+									errorCallback(it)
+									hasError = true
+								}
+								completeMark()
+								return@getTransactionListByAddress
+							}
+						) {
 							chainData = this
 							completeMark()
 						}
 						
-						GoldStoneAPI.getERC20TokenIncomingTransaction(startBlock) {
+						GoldStoneAPI.getERC20TokenIncomingTransaction(
+							startBlock,
+							WalletTable.current.address,
+							{
+								//error callback
+								// 只弹出一次错误信息
+								if (!hasError) {
+									errorCallback(it)
+									hasError = true
+								}
+								completeMark()
+								return@getERC20TokenIncomingTransaction
+							}
+						) {
 							// 把请求回来的数据转换成 `TransactionTable` 格式
 							logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
 							completeMark()

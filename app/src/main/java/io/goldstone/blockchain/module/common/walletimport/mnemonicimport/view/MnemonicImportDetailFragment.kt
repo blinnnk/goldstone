@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
+import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -10,6 +11,7 @@ import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
@@ -37,6 +39,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 	override val presenter = MnemonicImportDetailPresenter(this)
 
+	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -55,6 +58,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				}.into(this)
 
 				walletNameInput.apply {
+					hint = UIUtils.generateDefaultName()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)

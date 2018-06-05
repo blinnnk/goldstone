@@ -106,7 +106,7 @@ class NotificationListPresenter(
 			) {
 				fragment.removeLoadingView()
 				it.isNotEmpty() isTrue {
-					NotificationTable.insertData(it.map { NotificationTable(it) }.toArrayList()) {
+					NotificationTable.insertData(it) {
 						getDataFromDatabase()
 					}
 				}

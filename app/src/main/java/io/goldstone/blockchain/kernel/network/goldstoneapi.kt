@@ -32,6 +32,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -137,12 +138,14 @@ object GoldStoneAPI {
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
 		address: String = WalletTable.current.address,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
 		requestUncryptoData<ERC20TransactionModel>(
-			EtherScanApi.getTokenIncomingTransaction(
-				address, startBlock
-			), "result"
+			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
+			"result",
+			false,
+			errorCallback
 		) {
 			hold(toArrayList())
 		}
@@ -155,10 +158,14 @@ object GoldStoneAPI {
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
 		address: String = WalletTable.current.address,
+		errorCallback: (Exception) -> Unit,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUncryptoData<TransactionTable>(
-			EtherScanApi.transactions(address, startBlock), "result"
+			EtherScanApi.transactions(address, startBlock),
+			"result",
+			false,
+			errorCallback
 		) {
 			hold(map { TransactionTable(it) }.toArrayList())
 		}
@@ -243,14 +250,27 @@ object GoldStoneAPI {
 		// 加密 `Post` 请求
 		val content = AesCrypto.encrypt("{\"device\":\"$goldSonteID\",\"time\":$time}").orEmpty()
 		RequestBody.create(requestContentType, content).let {
-			postRequestGetJsonObject<NotificationTable>(
+			postRequestGetJsonObject<String>(
 				it,
 				"message_list",
 				APIPath.getNotification,
+				true,
 				errorCallback
 			) {
+				// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
+				val notificationData = arrayListOf<NotificationTable>()
+				val jsonarray = JSONArray(it[0])
 				GoldStoneAPI.context.runOnUiThread {
-					hold(it.toArrayList())
+					if (jsonarray.length() == 0) {
+						hold(arrayListOf())
+					} else {
+						(0 until jsonarray.length()).forEach {
+							notificationData.add(NotificationTable(JSONObject(jsonarray[it].toString())))
+							if (it == jsonarray.length() - 1) {
+								hold(notificationData)
+							}
+						}
+					}
 				}
 			}
 		}
@@ -324,6 +344,7 @@ object GoldStoneAPI {
 		body: RequestBody,
 		keyName: String,
 		path: String,
+		justData: Boolean = false,
 		noinline errorCallback: () -> Unit = {},
 		crossinline hold: (List<T>) -> Unit
 	) {
@@ -342,6 +363,10 @@ object GoldStoneAPI {
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = dataObject[keyName].toString()
+						if (justData) {
+							hold(listOf(jsonData as T))
+							return
+						}
 						val gson = Gson()
 						val collectionType = object : TypeToken<Collection<T>>() {}.type
 						hold(gson.fromJson(jsonData, collectionType))
@@ -430,7 +455,7 @@ object GoldStoneAPI {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: () -> Unit = {},
+		crossinline errorCallback: (Exception) -> Unit = {},
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
@@ -441,7 +466,7 @@ object GoldStoneAPI {
 				call: Call,
 				error: IOException
 			) {
-				errorCallback()
+				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 				LogUtil.error(keyName, error)
 			}
 			
@@ -463,7 +488,7 @@ object GoldStoneAPI {
 						hold(gson.fromJson(jsonData, collectionType))
 					}
 				} catch (error: Exception) {
-					errorCallback()
+					GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 					LogUtil.error(keyName, error)
 					GoldStoneCode.showErrorCodeReason(data)
 				}

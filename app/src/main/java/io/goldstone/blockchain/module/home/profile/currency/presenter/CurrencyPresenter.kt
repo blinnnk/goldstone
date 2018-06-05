@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.currency.presenter
 
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.Alert
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -23,17 +20,17 @@ import org.jetbrains.anko.yesButton
 class CurrencyPresenter(
 	override val fragment: CurrencyFragment
 ) : BaseRecyclerPresenter<CurrencyFragment, SupportCurrencyTable>() {
-
+	
 	override fun updateData() {
 		SupportCurrencyTable.getSupportCurrencies {
 			fragment.asyncData.isNull() isTrue {
-				fragment.asyncData = it
+				fragment.asyncData = it.distinctBy { it.currencySymbol }.toArrayList()
 			} otherwise {
 				diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(it)
 			}
 		}
 	}
-
+	
 	fun setCurrencyAlert(
 		code: String,
 		hold: Boolean.() -> Unit
@@ -50,7 +47,7 @@ class CurrencyPresenter(
 			}.show()
 		}
 	}
-
+	
 	private fun updateCurrencyValue(code: String) {
 		SupportCurrencyTable.updateUsedStatus(code) {
 			AppConfigTable.updateCurrency(code) {
@@ -58,5 +55,4 @@ class CurrencyPresenter(
 			}
 		}
 	}
-
 }

@@ -36,4 +36,6 @@ object SharesPreference {
 	const val currencyCode = "currencyCode"
 	const val currentChain = "currentChain"
 	const val currentLanguage = "currentLanguage"
+	const val walletCount = "walletCount"
+	const val maxWalletID = "maxWalletID"
 }

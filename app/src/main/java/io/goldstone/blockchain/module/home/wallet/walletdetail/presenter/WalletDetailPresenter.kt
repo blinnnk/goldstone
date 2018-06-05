@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -48,7 +49,11 @@ class WalletDetailPresenter(
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 查询钱包总数更新数字
-		WalletTable.apply { getAll { walletCount = size } }
+		WalletTable.apply {
+			getAll {
+				GoldStoneApp.updateWalletCount(size)
+			}
+		}
 		// 先初始化空数组再更新列表
 		if (fragment.asyncData.isNull()) {
 			fragment.asyncData = arrayListOf()
@@ -208,7 +213,7 @@ class WalletDetailPresenter(
 				WalletTable.current.name,
 				CryptoUtils.scaleAddress(WalletTable.current.address),
 				totalBalance.toString(),
-				WalletTable.walletCount.orZero()
+				GoldStoneApp.getWalletCount()
 			)
 		}
 	}

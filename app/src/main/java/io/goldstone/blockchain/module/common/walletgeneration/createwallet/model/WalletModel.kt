@@ -17,13 +17,13 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import java.io.Serializable
 import java.util.*
 
 /**
  * @date 29/03/2018 10:35 PM
  * @author KaySaith
  */
-
 @Entity(tableName = "wallet")
 data class WalletTable(
 	//@PrimaryKey autoGenerate 自增
@@ -36,32 +36,33 @@ data class WalletTable(
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
 	var hasBackUpMnemonic: Boolean = false
-) {
+) : Serializable {
+	
 	companion object {
-
+		
 		var current: WalletTable by observing(WalletTable(0, "", "", false)) {
 			// 每次切换账户需要清空放在内存里面的当前账户的信息.
 			localTransactions = null
 		}
-		var walletCount: Int? = null
-
+		
 		fun insert(
 			model: WalletTable,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { isUsing = false })
-					}
-					insert(model)
-				}.findWhichIsUsing(true)
-			}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.walletDao().apply {
+						findWhichIsUsing(true)?.let {
+							update(it.apply { isUsing = false })
+						}
+						insert(model)
+					}.findWhichIsUsing(true)
+				}) {
 				current.isWatchOnly = it?.isWatchOnly.orFalse()
 				callback()
 			}
 		}
-
+		
 		fun saveEncryptMnemonicIfUserSkip(
 			encryptMnemonic: String,
 			address: String = current.address,
@@ -78,7 +79,7 @@ data class WalletTable(
 				}
 			}
 		}
-
+		
 		fun deleteEncryptMnemonicAfterUserHasBackUp(
 			mnemonic: String,
 			callback: () -> Unit
@@ -101,67 +102,67 @@ data class WalletTable(
 				}
 			}
 		}
-
+		
 		fun getAll(callback: ArrayList<WalletTable>.() -> Unit = {}) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			}) {
+				               GoldStoneDataBase.database.walletDao().getAllWallets()
+			               }) {
 				callback(it.toArrayList())
 			}
 		}
-
+		
 		fun getAllAddresses(callback: ArrayList<String>.() -> Unit = {}) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			}) {
+				               GoldStoneDataBase.database.walletDao().getAllWallets()
+			               }) {
 				callback(it.map { it.address }.toArrayList())
 			}
 		}
-
+		
 		fun getCurrentWallet(hold: (WalletTable?) -> Unit) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-					balance = current.balance
-				}
-			}) { hold(it) }
+				               GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
+					               balance = current.balance
+				               }
+			               }) { hold(it) }
 		}
-
+		
 		fun getCurrentWalletAddress(hold: String.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				hold(it!!.address)
 			}
 		}
-
+		
 		fun updateName(
 			newName: String,
 			callback: () -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { name = newName })
-					}
-				}
-			}) {
+				               GoldStoneDataBase.database.walletDao().apply {
+					               findWhichIsUsing(true)?.let {
+						               update(it.apply { name = newName })
+					               }
+				               }
+			               }) {
 				callback()
 			}
 		}
-
+		
 		fun updateHint(
 			newHint: String,
 			callback: () -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { hint = newHint })
-					}
-				}
-			}) {
+				               GoldStoneDataBase.database.walletDao().apply {
+					               findWhichIsUsing(true)?.let {
+						               update(it.apply { hint = newHint })
+					               }
+				               }
+			               }) {
 				callback()
 			}
 		}
-
+		
 		fun switchCurrentWallet(
 			walletAddress: String,
 			callback: (WalletTable?) -> Unit
@@ -181,7 +182,7 @@ data class WalletTable(
 				}
 			}
 		}
-
+		
 		fun deleteCurrentWallet(callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
@@ -200,7 +201,7 @@ data class WalletTable(
 				}
 			}
 		}
-
+		
 		fun isWatchOnlyWalletShowAlertOrElse(
 			context: Context,
 			callback: () -> Unit
@@ -211,14 +212,14 @@ data class WalletTable(
 			}
 			callback()
 		}
-
+		
 		fun getWalletByAddress(
 			address: String,
 			callback: (WalletTable?) -> Unit
 		) {
 			coroutinesTask({
-				GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
-			}) {
+				               GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
+			               }) {
 				callback(it)
 			}
 		}
@@ -227,21 +228,22 @@ data class WalletTable(
 
 @Dao
 interface WalletDao {
+	
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
-
+	
 	@Query("SELECT * FROM wallet WHERE address LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
-
+	
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>
-
+	
 	@Insert
 	fun insert(wallet: WalletTable)
-
+	
 	@Delete
 	fun delete(wallet: WalletTable)
-
+	
 	@Update
 	fun update(wallet: WalletTable)
 }

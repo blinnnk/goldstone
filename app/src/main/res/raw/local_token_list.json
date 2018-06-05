@@ -1516,14 +1516,14 @@
     "total_supply": 798839838,
     "symbol": "GS",
     "type": 100,
-    "price": "153.21",
+    "price": "0",
     "address": "0x867cbb1662ac004c7bde725de680fe81a169163c",
     "decimals": 6,
     "weight": 200,
     "force_show": 1,
     "url": "http://hunger.blinnnk.com/25af31df6eaf400680a06a2b814ef1aa",
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "3"
   },
   {
     "name": "BigONE Token",
@@ -1544,7 +1544,7 @@
     "total_supply": 99590740,
     "address": "0x0",
     "type": 0,
-    "price": "695.39",
+    "price": "610",
     "decimals": 18,
     "name": "Ethereum",
     "weight": 10000,
@@ -1552,5 +1552,47 @@
     "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
     "is_default": 1,
     "chain_id": "1"
+  },
+  {
+    "symbol": "ETH",
+    "total_supply": 99590740,
+    "address": "0x0",
+    "type": 0,
+    "price": "0",
+    "decimals": 18,
+    "name": "Ethereum",
+    "weight": 10000,
+    "force_show": 1,
+    "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
+    "is_default": 1,
+    "chain_id": "3"
+  },
+  {
+    "symbol": "ETH",
+    "total_supply": 99590740,
+    "address": "0x0",
+    "type": 0,
+    "price": "0",
+    "decimals": 18,
+    "name": "Ethereum",
+    "weight": 10000,
+    "force_show": 1,
+    "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
+    "is_default": 1,
+    "chain_id": "4"
+  },
+  {
+    "symbol": "ETH",
+    "total_supply": 99590740,
+    "address": "0x0",
+    "type": 0,
+    "price": "0",
+    "decimals": 18,
+    "name": "Ethereum",
+    "weight": 10000,
+    "force_show": 1,
+    "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
+    "is_default": 1,
+    "chain_id": "5"
   }
 ]

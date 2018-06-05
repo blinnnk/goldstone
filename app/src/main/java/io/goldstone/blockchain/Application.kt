@@ -75,5 +75,17 @@ class GoldStoneApp : Application() {
 		
 		fun updateCurrentRate(rate: Double) =
 			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.rate, rate.toFloat())
+		
+		fun getWalletCount(): Int =
+			GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.walletCount)
+		
+		fun updateWalletCount(count: Int) =
+			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)
+		
+		fun getMaxWalletID(): Int =
+			GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+		
+		fun updateMaxWalletID(id: Int) =
+			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)
 	}
 }
