@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.matchParent
@@ -37,7 +38,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull()) currentAccount.avatar.glideImage(
-				UIUtils.generateAvatar()
+				UIUtils.generateAvatar(WalletTable.current.id)
 			)
 			else currentAccount.avatar.glideImage(avatar)
 			

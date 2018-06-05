@@ -717,7 +717,7 @@ object CommonText {
 	val cancel = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CANCEL"
 		HoneyLanguage.Chinese.code -> "取消"
-		HoneyLanguage.Japanese.code -> "キャンセル"
+		HoneyLanguage.Japanese.code -> "閉じる"
 		HoneyLanguage.Korean.code -> "취소"
 		HoneyLanguage.Russian.code -> "ОТМЕНА"
 		HoneyLanguage.TraditionalChinese.code -> "取消"
@@ -1233,7 +1233,7 @@ object ProfileText {
 	val profile = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Profile"
 		HoneyLanguage.Chinese.code -> "个人主页"
-		HoneyLanguage.Japanese.code -> "個人ホームページ"
+		HoneyLanguage.Japanese.code -> "個人"
 		HoneyLanguage.Korean.code -> "개인 홈"
 		HoneyLanguage.Russian.code -> "профиль"
 		HoneyLanguage.TraditionalChinese.code -> "個人檔案"
@@ -1333,7 +1333,7 @@ object ProfileText {
 	val version = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Version"
 		HoneyLanguage.Chinese.code -> "软件版本"
-		HoneyLanguage.Japanese.code -> "ソフトウェアのバージョン"
+		HoneyLanguage.Japanese.code -> "バージョン"
 		HoneyLanguage.Korean.code -> "소프트웨어 버전"
 		HoneyLanguage.Russian.code -> "версия"
 		HoneyLanguage.TraditionalChinese.code -> "Version"
@@ -1342,8 +1342,8 @@ object ProfileText {
 	@JvmField
 	val shareApp = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Share GoldStone"
-		HoneyLanguage.Chinese.code -> "分享GoldStone"
-		HoneyLanguage.Japanese.code -> "共有GoldStone"
+		HoneyLanguage.Chinese.code -> "分享 GoldStone"
+		HoneyLanguage.Japanese.code -> "共有 GoldStone"
 		HoneyLanguage.Korean.code -> "공유 GoldStone"
 		HoneyLanguage.Russian.code -> "Поделиться GoldStone"
 		HoneyLanguage.TraditionalChinese.code -> "分享GoldStone"
@@ -1353,7 +1353,7 @@ object ProfileText {
 	val pinCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "PIN"
 		HoneyLanguage.Chinese.code -> "PIN"
-		HoneyLanguage.Japanese.code -> "ピンコード"
+		HoneyLanguage.Japanese.code -> "PIN"
 		HoneyLanguage.Korean.code -> "PIN"
 		HoneyLanguage.Russian.code -> "Контактный код"
 		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
@@ -1604,7 +1604,7 @@ object PincodeText {
 	@JvmField
 	val description = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a 4-digit PIN"
-		HoneyLanguage.Chinese.code -> "输入四位密码密码"
+		HoneyLanguage.Chinese.code -> "输入四位密码"
 		HoneyLanguage.Japanese.code -> "4桁のパスワードを入力してください"
 		HoneyLanguage.Korean.code -> "4자리 비밀번호 입력"
 		HoneyLanguage.Russian.code -> "Введите четыре битовых шифра кода"
