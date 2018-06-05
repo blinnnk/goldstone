@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view
 
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
@@ -27,9 +28,17 @@ class NotificationListFragment :
 		recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
 			onClick {
 				model?.apply {
-					presenter.showTransactionListDetailFragment(
-						NotificationTransactionInfo(transactionHash, chainID.toString(), isReceived)
-					)
+					if (type == 1) {
+						presenter.showWebFragment(title, actionContent)
+					} else {
+						presenter.showTransactionListDetailFragment(
+							NotificationTransactionInfo(
+								actionContent,
+								NotificationTable.getChianID(extra.orEmpty()),
+								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse()
+							)
+						)
+					}
 				}
 				preventDuplicateClicks()
 			}

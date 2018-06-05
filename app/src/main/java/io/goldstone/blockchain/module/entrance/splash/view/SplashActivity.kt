@@ -69,7 +69,6 @@ class SplashActivity : AppCompatActivity() {
 			
 			initLaunchLanguage(language)
 			setCurrentChainID(chainID)
-			
 			container.apply {
 				gradientView.into(this)
 				initWaveView()

@@ -34,7 +34,7 @@ import org.jetbrains.anko.textColor
 class QuotationCell(context: Context) : LinearLayout(context) {
 	
 	var model: QuotationModel by observing(QuotationModel()) {
-		tokenInfo.title.text = model.symbol
+		tokenInfo.title.text = model.pairDisplay.toUpperCase()
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
 			model.quoteSymbol.toUpperCase(), model.quoteSymbol.toUpperCase() + " " + model.price,

@@ -212,11 +212,15 @@ fun Context.registerDevice(
 		AppConfigTable.getAppConfig { config ->
 			config?.apply {
 				GoldStoneAPI.registerDevice(
-					HoneyLanguage.getLanguageSymbol(language).toLowerCase(), token, goldStoneID, isChina,
-					TinyNumber.True.value, config.chainID.toInt(),
+					HoneyLanguage.getLanguageSymbol(language).toLowerCase(),
+					token,
+					goldStoneID,
+					isChina,
+					0,
+					config.chainID.toInt(),
 					{
 						// Error Callback
-						LogUtil.error(this.javaClass.simpleName)
+						LogUtil.error("registerDevice")
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}

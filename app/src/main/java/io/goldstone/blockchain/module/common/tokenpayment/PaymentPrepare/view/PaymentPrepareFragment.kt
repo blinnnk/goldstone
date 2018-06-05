@@ -60,12 +60,9 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				verticalLayout {
 					gravity = Gravity.CENTER_HORIZONTAL
 					lparams(matchParent, matchParent)
-
 					addView(inputView.apply {
-						backgroundColor = Color.RED
 						if (count > 0) {
 							setInputValue(count)
-							confirmButton.setBlueStyle(20.uiPX())
 						}
 					})
 
@@ -128,6 +125,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 							it.showLoadingStatus(false)
 						}
 					}.into(this)
+					
+					// 扫描二维码进入后的样式判断
+					if (count > 0) {
+						confirmButton.setBlueStyle(20.uiPX())
+					}
 				}
 			}
 		}

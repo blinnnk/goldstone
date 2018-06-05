@@ -86,6 +86,29 @@ data class MyTokenTable(
 			}
 		}
 		
+		fun getCurrentChainTokenBalanceByContract(
+			contract: String,
+			callback: (Double?) -> Unit
+		) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.myTokenDao()
+						.getCurrentChainTokenByContractAndAddress(
+							contract,
+							WalletTable.current.address
+						)
+				}) { token ->
+				if (token.isNull()) callback(null)
+				else {
+					DefaultTokenTable.getCurrentChainTokenByContract(contract) {
+						callback(CryptoUtils.toCountByDecimal(token!!.balance, it!!.decimals))
+					}
+				}
+			}
+		}
+		
 		fun deleteByContract(
 			contract: String,
 			address: String = WalletTable.current.address,
@@ -156,7 +179,9 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress) {
+				GoldStoneEthCall.getEthBalance(ownerAddress, { _, _ ->
+					// error callback if need alert
+				}) {
 					insert(
 						MyTokenTable(
 							0,
@@ -171,7 +196,10 @@ data class MyTokenTable(
 				}
 			} else {
 				GoldStoneEthCall.getTokenBalanceWithContract(
-					contract, ownerAddress
+					contract,
+					ownerAddress, { _, _ ->
+						// error callback if need alert
+					}
 				) {
 					insert(
 						MyTokenTable(
@@ -196,14 +224,19 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress) {
+				GoldStoneEthCall.getEthBalance(ownerAddress, { _, _ ->
+					// error callback if need alert
+				}) {
 					val balance = if (convertByDecimal) it.toEthCount() else it
 					callback(balance)
 				}
 			} else {
 				DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
-						token?.contract.orEmpty(), ownerAddress
+						token?.contract.orEmpty(),
+						ownerAddress, { _, _ ->
+						// error callback if need do something
+						}
 					) {
 						val balance = if (convertByDecimal) CryptoUtils.toCountByDecimal(
 							it, token?.decimals.orElse(0.0)

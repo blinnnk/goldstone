@@ -1,20 +1,20 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.ExplanationTitle
 import io.goldstone.blockchain.common.component.GraySqualCell
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.PrepareTransferText
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -26,38 +26,35 @@ import org.jetbrains.anko.wrapContent
  * @date 2018/5/16 3:53 PM
  * @author KaySaith
  */
-
 class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
-
+	
 	private val footer by lazy {
 		GasSelectionFooter(context!!)
 	}
 	private val spendingCell by lazy { GraySqualCell(context!!) }
-
 	private lateinit var gasLayout: LinearLayout
-
 	override val presenter = GasSelectionPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-
+			
 			spendingCell.apply {
 				setTitle(PrepareTransferText.willSpending)
 			}.into(this)
-
+			
 			spendingCell.setMargins<LinearLayout.LayoutParams> {
 				topMargin = 30.uiPX()
 				bottomMargin = 20.uiPX()
 			}
-
+			
 			gasLayout = verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, wrapContent)
 				presenter.generateGasSelections(this)
 			}
-
+			
 			footer.apply {
 				getCustomButton {
 					onClick {
@@ -74,21 +71,33 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 					}
 				}
 			}.into(this)
+			
+			ExplanationTitle(context).apply {
+				text = QAText.whatIsGas.setUnderline()
+			}.click {
+				getParentFragment<TokenDetailOverlayFragment> {
+					presenter.showTargetFragment<WebViewFragment>(
+						QAText.whatIsGas,
+						TokenDetailText.customGas,
+						Bundle().apply { putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas) }
+					)
+				}
+			}.into(this)
 		}
 	}
-
+	
 	fun clearGasLayout() {
 		gasLayout.removeAllViews()
 	}
-
+	
 	fun getGasLayout(): LinearLayout {
 		return gasLayout
 	}
-
+	
 	fun setSpendingValue(value: String) {
 		spendingCell.setSubtitle(value)
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
@@ -97,5 +106,4 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 			presenter.backEvent(it)
 		}
 	}
-
 }

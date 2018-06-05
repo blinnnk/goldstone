@@ -33,7 +33,6 @@ import org.jetbrains.anko.verticalLayout
 class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 
 	val minLimit by lazy { arguments?.getLong(ArgumentKey.gasLimit) }
-
 	private val gasPriceInput by lazy { RoundInput(context!!) }
 	private val gasLimitInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }

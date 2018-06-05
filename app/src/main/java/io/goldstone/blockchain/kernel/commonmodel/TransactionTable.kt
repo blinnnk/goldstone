@@ -351,7 +351,9 @@ data class TransactionTable(
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) {
 				GoldStoneEthCall.apply {
-					getInputCodeByHash(hash, chainID) { input ->
+					getInputCodeByHash(hash, chainID, { _, _ ->
+						// error callback if need do something
+					}) { input ->
 						val isErc20 = CryptoUtils.isERC20TransferByInputCode(input)
 						val memo = getMemoFromInputCode(input, isErc20)
 						if (it.isNull()) {

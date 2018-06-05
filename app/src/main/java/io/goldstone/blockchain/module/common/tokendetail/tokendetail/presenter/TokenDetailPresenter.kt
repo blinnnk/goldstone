@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
@@ -215,11 +216,11 @@ class TokenDetailPresenter(
 		callback: (ArrayList<TokenBalanceTable>) -> Unit
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
-		TokenBalanceTable.getTodayBalance(
-			WalletTable.current.address, contract
-		) { todayBalance ->
+		MyTokenTable.getCurrentChainTokenBalanceByContract(contract) { todayBalance ->
+			if (todayBalance.isNull()) return@getCurrentChainTokenBalanceByContract
 			// 计算过去7天的所有余额
-			generateHistoryBalance(todayBalance) { history ->
+			
+			generateHistoryBalance(todayBalance!!) { history ->
 				coroutinesTask(
 					{
 						history.forEachIndexed { index, data ->

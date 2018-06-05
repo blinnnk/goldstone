@@ -186,7 +186,9 @@ class GasSelectionPresenter(
 					val hexValue = Numeric.toHexString(signedMessage)
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall
-						.sendRawTransaction(hexValue) { taxHash ->
+						.sendRawTransaction(hexValue, { error, reason ->
+							fragment.context?.alert(reason ?: error.toString())
+						}) { taxHash ->
 							LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 							// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 							taxHash.isValidTaxHash() isTrue {

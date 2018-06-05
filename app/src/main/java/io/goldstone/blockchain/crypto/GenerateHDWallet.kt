@@ -137,6 +137,7 @@ fun Context.getPrivateKey(
 				hold(it.privateKey.toString(16))
 			}
 		} catch (error: Exception) {
+			errorCallback()
 			LogUtil.error("getPrivateKey", error)
 		}
 	}
@@ -185,9 +186,10 @@ fun Context.updatePassword(
 	walletAddress: String,
 	oldPassword: String,
 	newPassword: String,
+	errorCallback: () -> Unit = {},
 	callback: () -> Unit
 ) {
-	getPrivateKey(walletAddress, oldPassword) { privateKey ->
+	getPrivateKey(walletAddress, oldPassword, errorCallback) { privateKey ->
 		deleteAccount(walletAddress, oldPassword) {
 			getWalletByPrivateKey(privateKey, newPassword) {
 				callback()

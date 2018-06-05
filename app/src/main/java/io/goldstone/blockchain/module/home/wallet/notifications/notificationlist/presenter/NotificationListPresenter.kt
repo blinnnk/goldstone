@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
@@ -63,6 +64,18 @@ class NotificationListPresenter(
 		}
 	}
 	
+	fun showWebFragment(title: String, url: String) {
+		fragment.getParentFragment<NotificationFragment>()?.apply {
+			presenter.showTargetFragment<WebViewFragment>(
+				title,
+				NotificationText.notification,
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, url)
+				})
+		}
+		setHeightMatchParent()
+	}
+	
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView(LoadingText.notificationData)
 		NotificationTable.getAllNotifications { localData ->
@@ -87,7 +100,7 @@ class NotificationListPresenter(
 			GoldStoneAPI.getNotificationList(
 				config?.goldStoneID.orEmpty(),
 				requestTime,
-				errorCallback = {
+				{
 					showServerErrorDialog()
 				}
 			) {

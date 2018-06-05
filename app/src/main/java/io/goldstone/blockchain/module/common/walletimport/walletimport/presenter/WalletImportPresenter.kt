@@ -71,17 +71,19 @@ class WalletImportPresenter(
 			WalletTable.getWalletByAddress(address) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
-					WalletTable.insert(WalletTable(
-						0,
-						name,
-						address,
-						true,
-						hint,
-						false,
-						0.0,
-						null,
-						true
-					)) {
+					WalletTable.insert(
+						WalletTable(
+							0,
+							name,
+							address,
+							true,
+							hint,
+							false,
+							0.0,
+							null,
+							true
+						)
+					) {
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, {
 							LogUtil.error("insertWalletToDatabase")
@@ -102,7 +104,6 @@ class WalletImportPresenter(
 	
 	fun showWebViewFragment(url: String, title: String) {
 		fragment.headerTitle = title
-		
 		hideChildFragments()
 		
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
