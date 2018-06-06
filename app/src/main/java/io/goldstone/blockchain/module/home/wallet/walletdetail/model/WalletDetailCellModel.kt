@@ -1,8 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
+import android.content.Context
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
+import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -81,6 +85,7 @@ data class WalletDetailCellModel(
 		}
 		
 		fun getChainModels(
+			context: Context,
 			walletAddress: String = WalletTable.current.address,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
@@ -104,23 +109,28 @@ data class WalletDetailCellModel(
 									localTokens.find { it.contract.equals(token.contract, true) }
 										?.let { targetToken ->
 											if (targetToken.contract == CryptoValue.ethContract) {
-												GoldStoneEthCall
-													.getEthBalance(walletAddress, { _, _ ->
-														// do something when error callback
+												GoldStoneEthCall.getEthBalance(
+													walletAddress,
+													{ error, reason ->
+														if (reason == ErrorTag.chain) {
+															GoldStoneDialog.showChainErrorDialog(context)
+														}
+														LogUtil.error("updateMyTokensPrices", error)
 													}) {
-														MyTokenTable
-															.updateCurrentWalletBalanceWithContract(
-																it,
-																targetToken.contract
-															)
-														tokenList.add(WalletDetailCellModel(targetToken, it))
-														completeMark()
-													}
+													MyTokenTable
+														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+													tokenList.add(WalletDetailCellModel(targetToken, it))
+													completeMark()
+												}
 											} else {
 												GoldStoneEthCall.getTokenBalanceWithContract(
 													targetToken.contract,
-													walletAddress, { _, _ ->
-														// do something when error callback
+													walletAddress,
+													{ error, reason ->
+														if (reason == ErrorTag.chain) {
+															GoldStoneDialog.showChainErrorDialog(context)
+														}
+														LogUtil.error("updateMyTokensPrices", error)
 													}) {
 													MyTokenTable
 														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)

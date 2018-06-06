@@ -81,6 +81,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						TokenDetailText.customGas,
 						Bundle().apply { putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas) }
 					)
+					presenter.recoverHeader()
 				}
 			}.into(this)
 		}

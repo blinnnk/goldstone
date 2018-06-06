@@ -222,10 +222,10 @@ data class TransactionTable(
 		}
 		
 		/**
-		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nounce` 值来生成
-		 * 最近可用的 `Nounce`
+		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nonce` 值来生成
+		 * 最近可用的 `nonce`
 		 */
-		fun getLatestValidNounce(
+		fun getLatestValidNonce(
 			errorCallback: (Exception) -> Unit,
 			hold: (BigInteger) -> Unit
 		) {
@@ -234,14 +234,14 @@ data class TransactionTable(
 				WalletTable.current.address,
 				errorCallback
 			) {
-				TransactionTable.getLocalLatestNounce { localNounce ->
+				TransactionTable.getLocalLatestNonce { localNonce ->
 					val myLatestNonce = firstOrNull {
 						it.fromAddress.equals(WalletTable.current.address, true)
 					}?.nonce?.toLong()
-					val chainNounce = if (myLatestNonce.isNull()) 0L
+					val chainNonce = if (myLatestNonce.isNull()) 0L
 					else myLatestNonce!! + 1
 					BigInteger.valueOf(
-						max(chainNounce, if (localNounce.isNull()) 0 else localNounce!! + 1)
+						max(chainNonce, if (localNonce.isNull()) 0 else localNonce!! + 1)
 					).let {
 						hold(it)
 					}
@@ -249,7 +249,7 @@ data class TransactionTable(
 			}
 		}
 		
-		private fun getLocalLatestNounce(hold: (Long?) -> Unit) {
+		private fun getLocalLatestNonce(hold: (Long?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase
 					.database

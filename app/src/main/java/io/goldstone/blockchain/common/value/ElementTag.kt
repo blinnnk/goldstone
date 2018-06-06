@@ -30,3 +30,7 @@ object LogTag {
 	const val error = "ERROR"
 	const val debug = "DEBUG"
 }
+
+object ErrorTag {
+	const val chain = "chainError"
+}

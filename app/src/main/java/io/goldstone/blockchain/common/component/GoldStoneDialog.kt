@@ -18,6 +18,8 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
@@ -83,8 +85,12 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		content.subtitle.text = subtitle
 	}
 	
-	fun showOnlyConfirmButton(clickEvent: () -> Unit) {
+	fun showOnlyConfirmButton(
+		buttonTitle: String = CommonText.confirm,
+		clickEvent: () -> Unit
+	) {
 		buttonLayout.x = 210.uiPX().toFloat()
+		confirmButton.text = buttonTitle
 		confirmButton.click {
 			clickEvent()
 		}.into(buttonLayout)
@@ -169,6 +175,19 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 						}
 					}
 				}
+			}
+		}
+		
+		fun showChainErrorDialog(context: Context) {
+			GoldStoneDialog.show(context) {
+				showOnlyConfirmButton("Got It") {
+					GoldStoneDialog.remove(context)
+				}
+				setImage(R.drawable.node_error_banner)
+				setContent(
+					ChainID.getChainNameByID(GoldStoneApp.getCurrentChain()) + " ERROR",
+					"there are some errors on this chain, please search more information on internet"
+				)
 			}
 		}
 	}

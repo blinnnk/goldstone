@@ -10,6 +10,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import okhttp3.*
@@ -59,6 +60,7 @@ object GoldStoneEthCall {
 		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
 		PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
 		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
+		GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
 	}
 	
 	@JvmStatic
@@ -143,6 +145,25 @@ object GoldStoneEthCall {
 				LogUtil.error(Method.GetTransactionByHash.display, error)
 			}, chainID) {
 				holdValue(JSONObject(it).safeGet("input"))
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getBlockNumber(
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		holdValue: (Int) -> Unit
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockNumber.method}\", \"params\":[], \"id\":83}"
+		)
+		).let {
+			callEthBy(it, { error, reason ->
+				errorCallback(error, reason)
+				LogUtil.error(Method.GetBlockNumber.display, error)
+			}) {
+				holdValue(it.hexToDecimal().toInt())
 			}
 		}
 	}
@@ -408,7 +429,11 @@ object GoldStoneEthCall {
 		val errorData: String
 		if (hasError == true) {
 			errorData = JSONObject(data).safeGet("error")
-		} else return ""
+		} else {
+			val code = JSONObject(data).safeGet("code").toInt()
+			return if (code == -10) ErrorTag.chain
+			else ""
+		}
 		return when {
 			data.isNullOrBlank() -> return ""
 			errorData.isNotEmpty() -> JSONObject(errorData).safeGet("message")

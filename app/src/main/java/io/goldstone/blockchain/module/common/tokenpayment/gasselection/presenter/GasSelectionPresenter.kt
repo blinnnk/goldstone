@@ -8,6 +8,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
@@ -141,7 +142,13 @@ class GasSelectionPresenter(
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
 				WalletTable.current.address,
-				true
+				true,
+				{ error, reason ->
+					if (reason == ErrorTag.chain) {
+						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
+					}
+					LogUtil.error("checkBalanceIsValid", error)
+				}
 			) {
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
@@ -150,7 +157,13 @@ class GasSelectionPresenter(
 			MyTokenTable.getBalanceWithContract(
 				CryptoValue.ethContract,
 				WalletTable.current.address,
-				true
+				true,
+				{ error, reason ->
+					if (reason == ErrorTag.chain) {
+						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
+					}
+					LogUtil.error("checkBalanceIsValid", error)
+				}
 			) {
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
@@ -174,7 +187,7 @@ class GasSelectionPresenter(
 			) { privateKey ->
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
-						nounce, getSelectedGasPrice(currentMinnerType),
+						nonce, getSelectedGasPrice(currentMinnerType),
 						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinnerType).toLong())),
 						toAddress, countWithDecimal, inputData
 					)
@@ -344,6 +357,8 @@ class GasSelectionPresenter(
 			overlayView.header.showBackButton(true) {
 				backEvent(this@apply)
 			}
+			// 有可能从 `WebViewFragment` 返回 需要重新恢复 `ValueHeader`
+			presenter.setValueHeader(token)
 		}
 	}
 	

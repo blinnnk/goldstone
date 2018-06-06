@@ -2046,12 +2046,12 @@ object ImporMneubar {
 	}
 	@JvmField
 	val keystore = when (currentLanguage) {
-		HoneyLanguage.English.code -> "KEYSTORE"
-		HoneyLanguage.Chinese.code -> "KEYSTORE"
-		HoneyLanguage.Japanese.code -> "KEYSTORE"
-		HoneyLanguage.Korean.code -> "KEYSTORE"
-		HoneyLanguage.Russian.code -> "KEYSTORE"
-		HoneyLanguage.TraditionalChinese.code -> "KEYSTORE"
+		HoneyLanguage.English.code -> "Keystore"
+		HoneyLanguage.Chinese.code -> "Keystore"
+		HoneyLanguage.Japanese.code -> "Keystore"
+		HoneyLanguage.Korean.code -> "Keystore"
+		HoneyLanguage.Russian.code -> "Keystore"
+		HoneyLanguage.TraditionalChinese.code -> "Keystore"
 		else -> ""
 	}
 	@JvmField
