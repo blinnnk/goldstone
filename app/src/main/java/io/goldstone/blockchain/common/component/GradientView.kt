@@ -54,10 +54,10 @@ class GradientView(context: Context) : View(context) {
 			)
 			GradientType.CrystalGreen -> LinearGradient(
 				0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(), intArrayOf(
-				Color.parseColor("#FF008489"),
-				Color.parseColor("#FF006C78"),
-				Color.parseColor("#FF016974"),
-				Color.parseColor("#FF008489")
+				Color.parseColor("#FF368279"),
+				Color.parseColor("#FF327b84"),
+				Color.parseColor("#FF2c7397"),
+				Color.parseColor("#FF2c7397")
 			), floatArrayOf(0f, 0.3f, 0.8f, 1f), Shader.TileMode.MIRROR
 			)
 			GradientType.PinkToYellow -> setGradientColor(

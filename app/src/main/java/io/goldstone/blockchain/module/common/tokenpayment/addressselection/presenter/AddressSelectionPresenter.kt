@@ -23,17 +23,16 @@ import org.web3j.crypto.WalletUtils
  * @date 28/03/2018 9:24 AM
  * @author KaySaith
  */
-
 class AddressSelectionPresenter(
 	override val fragment: AddressSelectionFragment
 ) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
-
+	
 	override fun updateData() {
 		updateAddressList {
 			fragment.updateHeaderViewStatus()
 		}
 	}
-
+	
 	override fun updateParentContentLayoutHeight(
 		dataCount: Int?,
 		cellHeight: Int,
@@ -42,7 +41,7 @@ class AddressSelectionPresenter(
 		// 详情页面直接全屏高度
 		setHeightMatchParent()
 	}
-
+	
 	fun showPaymentPrepareFragmentByQRCode(result: String) {
 		val minERC20ResultLength = 100
 		val content = result.orEmpty()
@@ -51,23 +50,18 @@ class AddressSelectionPresenter(
 			fragment.context?.alert(QRText.unvalidQRCodeAlert)
 			return
 		}
-
 		// 单纯的地址二维码
 		if (content.length == CryptoValue.bip39AddressLength) {
 			showPaymentPrepareFragment(content)
 			return
 		}
-
 		// 校验信息
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token?.let {
 			if (content.length > CryptoValue.bip39AddressLength) {
-
 				val amount = "amount"
 				val token = "token"
 				val ethContract = "0x0"
-
 				var transaferCount = 0.0
-
 				// 准备 `Count` 信息, 如果包含有 `amount` 关键字
 				if (content.contains(amount)) {
 					// 含有 `contract` 和不含有的解析 `amount` 的方式不同
@@ -77,26 +71,25 @@ class AddressSelectionPresenter(
 						content.substring(50, content.length).toDoubleOrNull().orElse(0.0)
 					}
 				}
-
 				// 准备 `Contract` 信息, 如果包含有 `token` 关键字就是 `ERC20` 否则是 `ETH`
 				val contract = if (content.contains(token) && content.length >= minERC20ResultLength) {
 					content.substring(content.length - CryptoValue.bip39AddressLength, content.length)
 				} else {
 					ethContract
 				}
-
+				
 				if (contract.isNotEmpty() && it.contract != contract) {
 					fragment.context?.alert(QRText.unvalidContract)
 					return
 				}
-
+				
 				showPaymentPrepareFragment(
 					content.substring(0, CryptoValue.bip39AddressLength), transaferCount
 				)
 			}
 		}
 	}
-
+	
 	fun showPaymentPrepareFragment(
 		address: String,
 		count: Double = 0.0
@@ -121,7 +114,7 @@ class AddressSelectionPresenter(
 			}
 		}
 	}
-
+	
 	private fun goToPaymentPrepareFragment(
 		address: String,
 		count: Double = 0.0
@@ -144,19 +137,21 @@ class AddressSelectionPresenter(
 			headerTitle = TokenDetailText.transferDetail
 		}
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			overlayView.header.showBackButton(true) {
-				presenter.setValueHeader(token)
-				presenter.popFragmentFrom<AddressSelectionFragment>()
-				setHeightMatchParent()
+			if (!isFromQuickTransfer) {
+				overlayView.header.showBackButton(true) {
+					presenter.setValueHeader(token)
+					presenter.popFragmentFrom<AddressSelectionFragment>()
+					setHeightMatchParent()
+				}
 			}
 		}
 	}
-
+	
 	private fun updateAddressList(callback: () -> Unit) {
 		ContactTable.getAllContacts {
 			it.isEmpty() isTrue {
@@ -171,5 +166,4 @@ class AddressSelectionPresenter(
 			callback()
 		}
 	}
-
 }

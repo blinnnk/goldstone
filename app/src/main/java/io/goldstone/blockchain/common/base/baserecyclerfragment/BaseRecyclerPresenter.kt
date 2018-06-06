@@ -166,7 +166,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	
 	fun setHeightMatchParent(callback: () -> Unit = {}) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero()) {
+			val fullHeight = context?.getRealScreenHeight().orZero()
+			overlayView.contentLayout.updateHeightAnimation(fullHeight, fullHeight, 0) {
 				AnimationDuration.Default timeUpThen {
 					fragment.getMainActivity()?.hideHomeFragment()
 				}

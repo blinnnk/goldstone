@@ -1,16 +1,17 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
+import android.view.ViewGroup
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
@@ -20,16 +21,18 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
-import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.topPadding
 
 /**
  * @date 23/03/2018 3:45 PM
@@ -51,6 +54,8 @@ class WalletDetailPresenter(
 		// 查询钱包总数更新数字
 		WalletTable.apply {
 			getAll {
+				// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
+				GoldStoneApp.updateMaxWalletID(maxBy { it.id }?.id.orZero())
 				GoldStoneApp.updateWalletCount(size)
 			}
 		}
@@ -74,6 +79,34 @@ class WalletDetailPresenter(
 		}
 	}
 	
+	fun showTransferSelectionOverlay(isShowAddress: Boolean) {
+		fragment.getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
+				overlay.into(this)
+				overlay.setTitle("Token Selection")
+				overlay.addContent {
+					topPadding = 10.uiPX()
+					prepareMyTokenList(isShowAddress)
+				}
+			}
+		}
+	}
+	
+	private fun ViewGroup.prepareMyTokenList(isShowAddress: Boolean) {
+		MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
+			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
+				defaultTokens.filter { default ->
+					myTokens.any { it.contract.equals(default.contract, true) }
+				}.let {
+					val tokenList = TokenSelectionRecyclerView(context)
+					tokenList.into(this)
+					tokenList.setAdapter(it.toArrayList(), isShowAddress)
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
@@ -88,14 +121,6 @@ class WalletDetailPresenter(
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.transaction) isFalse {
 				addFragment<TransactionFragment>(ContainerID.main, FragmentTag.transaction)
-			}
-		}
-	}
-	
-	fun showWalletListFragment() {
-		fragment.activity?.apply {
-			findIsItExist(FragmentTag.walletManagement) isFalse {
-				addFragment<WalletManagementFragment>(ContainerID.main, FragmentTag.walletManagement)
 			}
 		}
 	}

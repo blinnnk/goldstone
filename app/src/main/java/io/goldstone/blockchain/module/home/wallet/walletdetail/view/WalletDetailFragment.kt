@@ -27,14 +27,21 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 	) {
 		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
 			onClick {
-				getTokenInfo()?.apply { presenter.showMyTokenDetailFragment(this) }
+				model?.apply {
+					presenter.showMyTokenDetailFragment(this)
+				}
 				preventDuplicateClicks()
 			}
 		}) {
 			headerView = this
 			currentAccount.onClick { presenter.showWalletSettingsFragment() }
-			manageButton.onClick { presenter.showWalletListFragment() }
 			addTokenButton.onClick { presenter.showTokenManagementFragment() }
+			sendButton.onClick {
+				presenter.showTransferSelectionOverlay(true)
+			}
+			depositButton.onClick {
+				presenter.showTransferSelectionOverlay(false)
+			}
 		}
 	}
 	

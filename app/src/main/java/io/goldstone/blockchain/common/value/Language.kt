@@ -363,12 +363,12 @@ object WalletText {
 	}
 	@JvmField
 	val manage = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MANAGE MY WALLETS"
-		HoneyLanguage.Chinese.code -> "管理我的钱包"
+		HoneyLanguage.English.code -> "MANAGE"
+		HoneyLanguage.Chinese.code -> "管理钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを管理する"
 		HoneyLanguage.Korean.code -> "나의지갑 관리하기"
 		HoneyLanguage.Russian.code -> "Управление кошельками"
-		HoneyLanguage.TraditionalChinese.code -> "管理我的錢包"
+		HoneyLanguage.TraditionalChinese.code -> "管理錢包"
 		else -> ""
 	}
 	@JvmField
@@ -821,6 +821,28 @@ object CommonText {
 		HoneyLanguage.Korean.code -> "빠름"
 		HoneyLanguage.Russian.code -> "FAST"
 		HoneyLanguage.TraditionalChinese.code -> "快速"
+		else -> ""
+	}
+	
+	@JvmField
+	val send = when (currentLanguage) {
+		HoneyLanguage.English.code -> "SEND"
+		HoneyLanguage.Chinese.code -> "SEND"
+		HoneyLanguage.Japanese.code -> "SEND"
+		HoneyLanguage.Korean.code -> "SEND"
+		HoneyLanguage.Russian.code -> "SEND"
+		HoneyLanguage.TraditionalChinese.code -> "SEND"
+		else -> ""
+	}
+	
+	@JvmField
+	val deposit = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DEPOSIT"
+		HoneyLanguage.Chinese.code -> "DEPOSIT"
+		HoneyLanguage.Japanese.code -> "DEPOSIT"
+		HoneyLanguage.Korean.code -> "DEPOSIT"
+		HoneyLanguage.Russian.code -> "DEPOSIT"
+		HoneyLanguage.TraditionalChinese.code -> "DEPOSIT"
 		else -> ""
 	}
 }

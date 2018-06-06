@@ -28,13 +28,11 @@ import org.jetbrains.anko.textColor
  * @date 28/03/2018 9:24 AM
  * @author KaySaith
  */
-
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
-
+	
 	private val buttonHeight = 50.uiPX()
 	private var viewHeight = 0
 	private var keyboardHeight = 0
-
 	private val confirmButton by lazy {
 		TextView(context).apply {
 			text = CommonText.confirm
@@ -47,9 +45,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
 		}
 	}
-
 	override val presenter = AddressSelectionPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
@@ -58,7 +55,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			clickEvent = Runnable { presenter.showPaymentPrepareFragment(model.address) }
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -68,7 +65,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		setScanButtonStatus {
 			QRCodePresenter.scanQRCode(this)
 		}
-
+		
 		wrapper.keyboardHeightListener {
 			if (keyboardHeight != it) {
 				viewHeight = ScreenSize.heightWithOutHeader - it
@@ -77,12 +74,12 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-
+	
 	override fun onDestroyView() {
 		super.onDestroyView()
 		setScanButtonStatus(false)
 	}
-
+	
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (hidden) {
@@ -93,7 +90,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-
+	
 	/**
 	 * 扫描二维码后接受信息用的函数
 	 */
@@ -109,7 +106,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			presenter.showPaymentPrepareFragmentByQRCode(it.contents)
 		}
 	}
-
+	
 	fun updateHeaderViewStatus() {
 		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) {
 			it?.setFocusStatus()
@@ -132,23 +129,22 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			headerTitle = TokenDetailText.tokenDetail
 			presenter.popFragmentFrom<AddressSelectionFragment>()
 		}
 	}
-
+	
 	private fun setScanButtonStatus(
 		isShow: Boolean = true,
 		callback: () -> Unit = {}
 	) {
 		getParentFragment<TokenDetailOverlayFragment> {
-			overlayView.header.showScanButton(isShow) {
+			overlayView.header.showScanButton(isShow, isFromQuickTransfer) {
 				callback()
 			}
 		}
 	}
-
 }

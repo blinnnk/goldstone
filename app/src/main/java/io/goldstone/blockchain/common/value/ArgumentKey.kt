@@ -24,6 +24,8 @@ object ArgumentKey {
 	const val gasEditor = "gasEditor"
 	const val gasLimit = "gasLimit"
 	const val gasPrepareModel = "gasPrepareModel"
+	const val fromQuickTransfer = "fromQuickTransfer"
+	const val fromQuickDeposit = "fromQuickDeposit"
 }
 
 object IntentKey {

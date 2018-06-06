@@ -4,8 +4,6 @@ import android.R
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
-import android.view.View
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -14,8 +12,8 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.component.RoundButtonWithIcon
+import io.goldstone.blockchain.common.component.StoneButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
@@ -24,10 +22,7 @@ import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import me.itangqi.waveloadingview.WaveLoadingView
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 4:21 PM
@@ -50,16 +45,16 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			
 			currentAccount.info.subtitle.text = address
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
-			manageButton.setTitle((WalletText.manage + " ($totalAccount)").toUpperCase())
 		}
 	}
-	val manageButton by lazy { RoundButtonWithIcon(context) }
-	val addTokenButton by lazy { RoundBorderButton(context) }
+	val addTokenButton by lazy { RoundButtonWithIcon(context) }
 	val currentAccount by lazy { CurrentAccountView(context) }
 	private val waveView by lazy { WaveLoadingView(context) }
 	private var progressBar: ProgressBar? = null
 	private val balanceTitle by lazy { TextView(context) }
-	private val sectionHeaderHeight = 50.uiPX()
+	private val sectionHeaderHeight = 25.uiPX()
+	val sendButton by lazy { StoneButton(context) }
+	val depositButton by lazy { StoneButton(context) }
 	
 	init {
 		setWillNotDraw(false)
@@ -100,19 +95,30 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setCenterInParent()
 		}
 		
-		manageButton.apply {
-			y -= sectionHeaderHeight + 25.uiPX()
-		}.into(this)
-		manageButton.setCenterInHorizontal()
-		manageButton.setAlignParentBottom()
-		val chainSign = View(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), 6.uiPX())
-			x = 12.uiPX().toFloat()
-			alpha = 0.7f
-			addCorner(10.uiPX(), EthereumNetColor.getCurrentChainColor())
+		relativeLayout {
+			lparams {
+				width = matchParent
+				height = 80.uiPX()
+				alignParentBottom()
+				y -= sectionHeaderHeight
+			}
+			
+			sendButton.apply {
+				text = CommonText.send
+			}.into(this)
+			sendButton.setMargins<RelativeLayout.LayoutParams> {
+				leftMargin = 15.uiPX()
+			}
+			
+			depositButton.apply {
+				text = CommonText.deposit
+			}.into(this)
+			depositButton.setMargins<RelativeLayout.LayoutParams> {
+				rightMargin = 15.uiPX()
+			}
+			
+			depositButton.setAlignParentRight()
 		}
-		chainSign.into(manageButton)
-		chainSign.setCenterInVertical()
 		
 		textView {
 			text = WalletText.section.toUpperCase()
@@ -126,18 +132,16 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}
 		
 		addTokenButton.apply {
-			themeColor = Spectrum.white
-			text = WalletText.addToken
-			layoutParams = LinearLayout.LayoutParams(125.uiPX(), 24.uiPX())
-			touchColor = Spectrum.yellow
+			setTitle(WalletText.addToken.toUpperCase())
 			x -= PaddingSize.device
 			y -= 10.uiPX()
 		}.into(this)
 		
 		addTokenButton.apply {
+			removeIcon()
+			layoutParams.height = 24.uiPX()
 			setAlignParentRight()
 			setAlignParentBottom()
-			setAdjustWidth()
 		}
 	}
 	

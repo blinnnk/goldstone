@@ -15,10 +15,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.ArrowIconView
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.rightPadding
@@ -64,7 +61,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 				PaddingSize.device.toFloat(),
 				0f,
 				(width - PaddingSize.device).toFloat(),
-				BorderSize.default,
+				BorderSize.bold,
 				paint
 			)
 		}

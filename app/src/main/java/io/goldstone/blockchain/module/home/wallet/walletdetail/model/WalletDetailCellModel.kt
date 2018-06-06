@@ -40,12 +40,7 @@ data class WalletDetailCellModel(
 		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
 		data.price,
 		CryptoUtils.formatDouble(
-			CryptoUtils.formatDouble(
-				balance / Math.pow(
-					10.0,
-					data.decimals
-				)
-			) * data.price
+			CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)) * data.price
 		),
 		data.contract,
 		data.weight
@@ -141,6 +136,7 @@ data class WalletDetailCellModel(
 										}
 								}
 							}
+							
 							override fun mergeCallBack() = hold(tokenList)
 						}.start()
 					}

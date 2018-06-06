@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.base.baseInfocell
 
 import android.content.Context
 import android.widget.ImageView
-import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
@@ -11,8 +10,6 @@ import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.imageResource
 

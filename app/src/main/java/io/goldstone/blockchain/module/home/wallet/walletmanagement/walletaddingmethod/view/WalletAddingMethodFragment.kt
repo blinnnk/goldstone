@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.presenter.WalletAddingMethodPresenter
-import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletmanagement.view.WalletManagementFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
 
 /**
@@ -76,21 +76,11 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
-		super.onViewCreated(view, savedInstanceState)
-		getParentFragment<WalletManagementFragment> {
-			overlayView.header.showAddButton(false)
-		}
-	}
-
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
 	) {
-		getParentFragment<WalletManagementFragment> {
+		getParentFragment<WalletSettingsFragment> {
 			headerTitle = CurrentWalletText.Wallets
 			presenter.popFragmentFrom<WalletAddingMethodFragment>()
 		}

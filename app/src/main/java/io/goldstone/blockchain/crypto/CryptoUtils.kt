@@ -16,46 +16,45 @@ import java.util.*
  * @date 01/04/2018 7:54 PM
  * @author KaySaith
  */
-
 data class InputCodeData(val type: String, val address: String, val count: Double)
 
 object CryptoUtils {
-
+	
 	fun scaleAddress(address: String): String {
-		return if(address.isEmpty()) ""
+		return if (address.isEmpty()) ""
 		else address.substring(0, 5) + " ··· " + address.substring(address.length - 5, address.length)
 	}
-
+	
 	fun scaleTo9(address: String): String {
 		return if (address.length < 9) address
 		else address.substring(0, 9) + "···"
 	}
-
+	
 	fun scaleTo16(address: String): String {
 		return if (address.length < 16) address
 		else address.substring(0, 16) + "···"
 	}
-
+	
 	fun scaleTo28(address: String): String {
 		return if (address.length < 28) address
 		else address.substring(0, 28) + "···"
 	}
-
+	
 	fun scaleMiddleAddress(address: String): String {
 		return if (address.length == CryptoValue.bip39AddressLength) address.substring(
 			0, 14
 		) + " ··· " + address.substring(address.length - 14, address.length)
 		else "wrong address"
 	}
-
+	
 	fun formatDouble(value: Double): Double {
 		return DecimalFormat("0.000").format(value).toDouble()
 	}
-
+	
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
 		return value / Math.pow(10.0, if (decimal < 4) 18.0 else decimal)
 	}
-
+	
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
 		var count: Double
@@ -73,11 +72,11 @@ object CryptoUtils {
 			return null
 		}
 	}
-
+	
 	fun isERC20Transfer(transactionTable: TransactionTable, hold: () -> Unit): Boolean {
 		return if (transactionTable.input.length >= 138 && isTransferInputCode(transactionTable.input)
-			// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
-			|| transactionTable.logIndex.isNotEmpty()
+		           // 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
+		           || transactionTable.logIndex.isNotEmpty()
 		) {
 			hold()
 			true
@@ -85,7 +84,7 @@ object CryptoUtils {
 			false
 		}
 	}
-
+	
 	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
 		return if (inputCode.length >= 138 && isTransferInputCode(inputCode)) {
 			hold()
@@ -94,7 +93,7 @@ object CryptoUtils {
 			false
 		}
 	}
-
+	
 	fun getTargetDayInMills(distanceSinceToday: Int = 0): Long {
 		val calendar = Calendar.getInstance()
 		val year = calendar.get(Calendar.YEAR)
@@ -104,15 +103,15 @@ object CryptoUtils {
 		calendar.set(year, month, date)
 		return calendar.timeInMillis
 	}
-
+	
 	val dateInDay: (Long) -> String = {
 		DateUtils.formatDateTime(GoldStoneAPI.context, it, DateUtils.FORMAT_NO_YEAR)
 	}
-
+	
 	private fun toHexValue(value: String): String {
 		return "0x$value"
 	}
-
+	
 	private fun isTransferInputCode(inputCode: String) = inputCode.length > 10 && inputCode.substring(
 		0, SolidityCode.contractTransfer.length
 	) == SolidityCode.contractTransfer
@@ -151,17 +150,9 @@ fun Double.formatCurrency(): String {
 	return prefix + formatEditor.format(this * rate)
 }
 
-fun Double.formatCount(): String {
+fun Double.formatCount(count: Int = 5): String {
 	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 5
-	val value = formatEditor.format(this).toDouble()
-	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
-	return prefix + formatEditor.format(this)
-}
-
-fun Double.formatHex(): String {
-	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 3
+	formatEditor.maximumFractionDigits = count
 	val value = formatEditor.format(this).toDouble()
 	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
 	return prefix + formatEditor.format(this)
@@ -180,8 +171,8 @@ fun String.toMills(timeType: TimeType = TimeType.Second): Long {
 	return when (timeType) {
 		TimeType.Second -> this.toLong() * 1000L
 		TimeType.Minute -> this.toLong() * 1000L * 60L
-		TimeType.Hour   -> this.toLong() * 1000L * 60L * 60L
-		TimeType.Day    -> this.toLong() * 1000L * 60L * 60L * 12L
+		TimeType.Hour -> this.toLong() * 1000L * 60L * 60L
+		TimeType.Day -> this.toLong() * 1000L * 60L * 60L * 12L
 	}
 }
 
