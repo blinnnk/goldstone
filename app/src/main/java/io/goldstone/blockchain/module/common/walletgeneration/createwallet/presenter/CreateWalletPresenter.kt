@@ -9,7 +9,6 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -52,7 +51,9 @@ class CreateWalletPresenter(
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
 		}
 		showTargetFragment<WebViewFragment, WalletGenerationFragment>(
-			CreateWalletText.agreement, CreateWalletText.mnemonicBackUp, argument
+			CreateWalletText.agreement,
+			CreateWalletText.mnemonicBackUp,
+			argument
 		)
 	}
 	
@@ -70,7 +71,10 @@ class CreateWalletPresenter(
 			callback
 		) { password, walletName ->
 			fragment.context?.generateWalletWith(
-				password, walletName, hintInput.text?.toString(), callback
+				password,
+				walletName,
+				hintInput.text?.toString(),
+				callback
 			)
 		}
 	}
@@ -96,7 +100,7 @@ class CreateWalletPresenter(
 	}
 	
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
-		if (nameText.count() * passwordText.count() * repeatPasswordText.count() != 0) {
+		if (passwordText.count() * repeatPasswordText.count() != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
 		} else {
 			confirmButton.setGrayStyle(20.uiPX())

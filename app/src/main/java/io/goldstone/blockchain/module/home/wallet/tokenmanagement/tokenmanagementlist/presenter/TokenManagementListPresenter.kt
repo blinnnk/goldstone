@@ -38,6 +38,14 @@ class TokenManagementListPresenter(
 		}
 	}
 	
+	override fun updateParentContentLayoutHeight(
+		dataCount: Int?,
+		cellHeight: Int,
+		maxHeight: Int
+	) {
+		setHeightMatchParent()
+	}
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		prepareMyDefaultTokens()

@@ -34,3 +34,7 @@ object LogTag {
 object ErrorTag {
 	const val chain = "chainError"
 }
+
+object ValueTag {
+	const val emptyPrice = "--"
+}

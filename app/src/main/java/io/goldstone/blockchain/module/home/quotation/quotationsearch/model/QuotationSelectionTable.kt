@@ -4,7 +4,6 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
@@ -58,7 +57,7 @@ data class QuotationSelectionTable(
 		data.pair,
 		data.market,
 		data.name,
-		data.pairDisplay + " " + data.market.toUpperCaseFirstLetter(),
+		data.pairDisplay + " " + data.market,
 		data.orderID,
 		lineChart,
 		data.isSelecting,

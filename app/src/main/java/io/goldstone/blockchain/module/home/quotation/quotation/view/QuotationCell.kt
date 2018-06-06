@@ -13,12 +13,12 @@ import com.blinnnk.uikit.numberDate
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import com.db.chart.model.LineSet
-import com.db.chart.model.Point
 import com.db.chart.view.LineChartView
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.margin
@@ -85,20 +85,21 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private var chartColor = Spectrum.lightGreen
 	private var chartLineColor = Spectrum.green
 	private val chartView = LineChartView(context)
-	private var cellLayout: RelativeLayout? = null
+	private var cellLayout: RelativeLayout
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
-		System.out.println("_______$chartData and ${chartData.size}")
-		// 服务器返回的市场数据经常出现空的或数据不正确的这里容错
-		if (chartData.size < 2) {
-			if (chartData.isEmpty()) {
-				chartData = arrayListOf(
-					ChartPoint(System.currentTimeMillis().toString(), 0f),
-					ChartPoint(System.currentTimeMillis().toString(), 0f)
+		if (chartData.isEmpty()) {
+			if (model.price != ValueTag.emptyPrice) {
+				chartData.addAll(
+					arrayListOf(
+						ChartPoint(1.daysAgoInMills().toString(), 0f),
+						ChartPoint(0.daysAgoInMills().toString(), model.price.toFloat())
+					)
 				)
 			} else {
-				chartData.add(0, ChartPoint(System.currentTimeMillis().toString(), 0f))
+				return@observing
 			}
 		}
+		
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
@@ -108,7 +109,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			})
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
-			val maxValue = chartData.max()?.value ?: 0f
+			val maxValue = chartData.max()?.value ?: 1f
 			val minValue = chartData.min()?.value ?: 0f
 			// 设定 `Y` 周波段
 			val stepDistance = generateStepDistance(
@@ -123,6 +124,16 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			setAxisThickness(0f)
 			val dataSet = LineSet()
 			dataSet.apply {
+				chartData.forEach {
+					dataSet.addPoint(numberDate(it.label.toLong()), it.value)
+				}
+				// 比对如果最后一个不是今天那么把当前长连接的价格插入表格
+				if (chartData.last().label.toLong() != 0.daysAgoInMills()) {
+					dataSet.addPoint(
+						numberDate(0.daysAgoInMills()),
+						model.price.toFloatOrNull() ?: chartData.last().value
+					)
+				}
 				// 这个是线的颜色
 				color = chartLineColor
 				// 渐变色彩
@@ -138,19 +149,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				setTypeface(GoldStoneFont.heavy(context))
 				setFontSize(9.uiPX())
 			}
-			
-			chartData.forEachOrEnd { item, isEnd ->
-				dataSet.addPoint(Point(numberDate(item.label.toLong()), item.value))
-				if (isEnd) {
-					addData(dataSet)
-					try {
-						notifyDataUpdate()
-						System.out.println("data ${dataSet.size()}")
-						show()
-					} catch (error: Exception) {
-						LogUtil.error(this.javaClass.simpleName, error)
-					}
-				}
+			addData(dataSet)
+			try {
+				notifyDataUpdate()
+				show()
+			} catch (error: Exception) {
+				LogUtil.error(this.javaClass.simpleName, error)
 			}
 		}
 	}

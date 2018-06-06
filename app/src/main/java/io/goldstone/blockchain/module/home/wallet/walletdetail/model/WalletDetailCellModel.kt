@@ -141,7 +141,6 @@ data class WalletDetailCellModel(
 										}
 								}
 							}
-							
 							override fun mergeCallBack() = hold(tokenList)
 						}.start()
 					}

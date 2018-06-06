@@ -27,7 +27,8 @@ class LanguagePresenter(
 			LanguageModel(HoneyLanguage.Chinese.language),
 			LanguageModel(HoneyLanguage.Japanese.language),
 			LanguageModel(HoneyLanguage.Russian.language),
-			LanguageModel(HoneyLanguage.Korean.language)
+			LanguageModel(HoneyLanguage.Korean.language),
+			LanguageModel(HoneyLanguage.TraditionalChinese.language)
 		)
 	}
 	
@@ -58,6 +59,7 @@ class LanguagePresenter(
 			HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
 			HoneyLanguage.Russian.language -> HoneyLanguage.Russian.code
 			HoneyLanguage.Korean.language -> HoneyLanguage.Korean.code
+			HoneyLanguage.TraditionalChinese.language -> HoneyLanguage.TraditionalChinese.code
 			else -> HoneyLanguage.English.code
 		}
 		

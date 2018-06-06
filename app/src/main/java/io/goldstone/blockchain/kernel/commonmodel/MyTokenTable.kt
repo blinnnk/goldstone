@@ -233,7 +233,6 @@ data class MyTokenTable(
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (contract == CryptoValue.ethContract) {
 				GoldStoneEthCall.getEthBalance(ownerAddress, { error, reason ->
-					System.out.println("reason $reason")
 					errorCallback(error, reason)
 				}) {
 					val balance = if (convertByDecimal) it.toEthCount() else it
@@ -244,7 +243,7 @@ data class MyTokenTable(
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerAddress, { _, _ ->
-						// error callback if need do something
+							// error callback if need do something
 						}
 					) {
 						val balance = if (convertByDecimal) CryptoUtils.toCountByDecimal(
