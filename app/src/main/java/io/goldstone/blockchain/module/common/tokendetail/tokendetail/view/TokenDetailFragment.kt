@@ -19,15 +19,13 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 27/03/2018 3:20 PM
  * @author KaySaith
  */
-
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
-
+	
 	// 首页的 `cell` 点击进入详情界面传入的 `Symbol`
 	val token by lazy { arguments?.getSerializable(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
-
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionListModel>?
@@ -41,13 +39,13 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 			}
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-
+		
 		footer.into(wrapper)
 		footer.apply {
 			setAlignParentBottom()
@@ -55,10 +53,9 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 			receivedButton.onClick { presenter.showDepositFragment() }
 		}
 	}
-
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
 	}
-
 }

@@ -43,7 +43,7 @@ class PaymentPreparePresenter(
 			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
 			callback()
 		} else {
-			fragment.toast("wait a few seconds, It is calculating transaction gas information")
+			fragment.toast("wait a few seconds, Calculating transaction gas info now")
 			getPaymentPrepareModel(count, fragment.getMemoContent(), callback) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(
@@ -67,7 +67,7 @@ class PaymentPreparePresenter(
 		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
-		TransactionTable.getLatestValidNounce(
+		TransactionTable.getLatestValidNonce(
 			{
 				fragment.context?.alert(it.toString())
 			}) {
@@ -79,7 +79,7 @@ class PaymentPreparePresenter(
 		toAddress: String,
 		value: Double,
 		memo: String,
-		nounce: BigInteger,
+		nonce: BigInteger,
 		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
@@ -109,7 +109,7 @@ class PaymentPreparePresenter(
 			}) { limit ->
 			hold(
 				PaymentPrepareModel(
-					nounce,
+					nonce,
 					limit,
 					to,
 					countWithDecimal,

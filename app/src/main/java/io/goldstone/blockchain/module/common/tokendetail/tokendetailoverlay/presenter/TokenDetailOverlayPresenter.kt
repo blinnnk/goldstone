@@ -57,4 +57,11 @@ class TokenDetailOverlayPresenter(
 			}
 		}
 	}
+	
+	fun recoverHeader() {
+		fragment.apply {
+			overlayView.header.title.visibility = View.VISIBLE
+			valueHeader?.visibility = View.GONE
+		}
+	}
 }

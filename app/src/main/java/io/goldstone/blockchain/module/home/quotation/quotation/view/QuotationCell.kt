@@ -87,6 +87,18 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout? = null
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
+		System.out.println("_______$chartData and ${chartData.size}")
+		// 服务器返回的市场数据经常出现空的或数据不正确的这里容错
+		if (chartData.size < 2) {
+			if (chartData.isEmpty()) {
+				chartData = arrayListOf(
+					ChartPoint(System.currentTimeMillis().toString(), 0f),
+					ChartPoint(System.currentTimeMillis().toString(), 0f)
+				)
+			} else {
+				chartData.add(0, ChartPoint(System.currentTimeMillis().toString(), 0f))
+			}
+		}
 		chartView.apply {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
@@ -111,9 +123,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			setAxisThickness(0f)
 			val dataSet = LineSet()
 			dataSet.apply {
-				chartData.forEach {
-					addPoint(Point(numberDate(it.label.toLong()), it.value))
-				}
 				// 这个是线的颜色
 				color = chartLineColor
 				// 渐变色彩
@@ -130,13 +139,18 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				setFontSize(9.uiPX())
 			}
 			
-			addData(dataSet)
-			
-			try {
-				notifyDataUpdate()
-				show()
-			} catch (error: Exception) {
-				LogUtil.error(this.javaClass.simpleName, error)
+			chartData.forEachOrEnd { item, isEnd ->
+				dataSet.addPoint(Point(numberDate(item.label.toLong()), item.value))
+				if (isEnd) {
+					addData(dataSet)
+					try {
+						notifyDataUpdate()
+						System.out.println("data ${dataSet.size()}")
+						show()
+					} catch (error: Exception) {
+						LogUtil.error(this.javaClass.simpleName, error)
+					}
+				}
 			}
 		}
 	}

@@ -9,7 +9,7 @@ import java.math.BigInteger
  */
 
 data class PaymentPrepareModel(
-	val nounce: BigInteger,
+	val nonce: BigInteger,
 	val gasLimit: BigInteger,
 	val toAddress: String,
 	val countWithDecimal: BigInteger,

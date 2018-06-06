@@ -174,7 +174,7 @@ class GasSelectionPresenter(
 			) { privateKey ->
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
-						nounce, getSelectedGasPrice(currentMinnerType),
+						nonce, getSelectedGasPrice(currentMinnerType),
 						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinnerType).toLong())),
 						toAddress, countWithDecimal, inputData
 					)
@@ -344,6 +344,8 @@ class GasSelectionPresenter(
 			overlayView.header.showBackButton(true) {
 				backEvent(this@apply)
 			}
+			// 有可能从 `WebViewFragment` 返回 需要重新恢复 `ValueHeader`
+			presenter.setValueHeader(token)
 		}
 	}
 	

@@ -39,10 +39,8 @@ class QuotationPresenter(
 	
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let { diffAndUpdateAdapterData<QuotationAdapter>(it) }
-		
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
 			if (selectionMD5 == selections.getObjectMD5HexString()) {

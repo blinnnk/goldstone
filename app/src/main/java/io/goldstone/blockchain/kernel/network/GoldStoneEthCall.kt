@@ -59,6 +59,7 @@ object GoldStoneEthCall {
 		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
 		PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
 		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
+		GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
 	}
 	
 	@JvmStatic
@@ -143,6 +144,25 @@ object GoldStoneEthCall {
 				LogUtil.error(Method.GetTransactionByHash.display, error)
 			}, chainID) {
 				holdValue(JSONObject(it).safeGet("input"))
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getBlockNumber(
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		holdValue: (Int) -> Unit
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockNumber.method}\", \"params\":[], \"id\":83}"
+		)
+		).let {
+			callEthBy(it, { error, reason ->
+				errorCallback(error, reason)
+				LogUtil.error(Method.GetBlockNumber.display, error)
+			}) {
+				holdValue(it.hexToDecimal().toInt())
 			}
 		}
 	}
