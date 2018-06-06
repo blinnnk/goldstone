@@ -99,9 +99,10 @@ class WalletDetailPresenter(
 				defaultTokens.filter { default ->
 					myTokens.any { it.contract.equals(default.contract, true) }
 				}.let {
+					val data = it.sortedByDescending { it.weight }.toArrayList()
 					val tokenList = TokenSelectionRecyclerView(context)
 					tokenList.into(this)
-					tokenList.setAdapter(it.toArrayList(), isShowAddress)
+					tokenList.setAdapter(data, isShowAddress)
 				}
 			}
 		}
