@@ -113,6 +113,7 @@ class MarketTokenDetailPresenter(
 			val overlay = ContentScrollOverlayView(parent.context)
 			overlay.into(parent)
 			overlay.setTitle("DESCRIPTION")
+			overlay.setContentPadding()
 			overlay.addContent {
 				QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
 					textView(it?.description) {

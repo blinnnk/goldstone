@@ -77,6 +77,11 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 		setGrayStyle()
 	}
 	
+	fun showArrow() {
+		removeView(switch)
+		hasArrow = true
+	}
+	
 	fun hideIcon() {
 		icon.visibility = View.GONE
 		tokenInfo.x = 0f

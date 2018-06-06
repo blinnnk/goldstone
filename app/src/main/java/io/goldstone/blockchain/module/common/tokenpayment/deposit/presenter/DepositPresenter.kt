@@ -25,6 +25,7 @@ class DepositPresenter(
 			fragment.setInputViewDescription(token?.symbol.orEmpty())
 		}
 		generateQRCode()
+		recoveryFragmentHeight()
 	}
 
 	fun generateQRCode(amount: Double = 0.0, callback: () -> Unit = {}) {

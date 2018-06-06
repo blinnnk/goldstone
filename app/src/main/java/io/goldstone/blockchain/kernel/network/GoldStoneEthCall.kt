@@ -430,7 +430,10 @@ object GoldStoneEthCall {
 		if (hasError == true) {
 			errorData = JSONObject(data).safeGet("error")
 		} else {
-			val code = JSONObject(data).safeGet("code").toInt()
+			val code =
+				if (data?.contains("code") == true)
+					JSONObject(data).get("code")?.toString()?.toIntOrNull()
+				else null
 			return if (code == -10) ErrorTag.chain
 			else ""
 		}

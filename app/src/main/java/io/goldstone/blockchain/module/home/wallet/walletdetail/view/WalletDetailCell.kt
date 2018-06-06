@@ -42,7 +42,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name
 			valueInfo.title.text = count.formatCount()
-			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${GoldStoneApp.getCurrencyCode()})"
+			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() +
+				" (${GoldStoneApp.getCurrencyCode()})"
 		}
 	}
 	private val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
@@ -71,9 +72,5 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			isFloatRight = true
 			y += 2.uiPX()
 		}
-	}
-	
-	fun getTokenInfo(): WalletDetailCellModel? {
-		return model
 	}
 }

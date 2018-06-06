@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -11,6 +13,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**
  * @date 24/03/2018 8:50 PM
@@ -29,6 +32,16 @@ class WalletListPresenter(
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) {
 			fragment.activity?.jump<SplashActivity>()
+		}
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		fragment.getParentFragment<WalletSettingsFragment> {
+			overlayView.header.showAddButton(false)
+			overlayView.header.showBackButton(true) {
+				headerTitle = WalletSettingsText.walletSettings
+				presenter.showWalletSettingListFragment()
+			}
 		}
 	}
 	

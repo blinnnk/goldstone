@@ -73,7 +73,6 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 				scrollView {
 					lparams(matchParent, wrapContent)
 					contentLayout = verticalLayout {
-						setPadding(20.uiPX(), 10.uiPX(), 20.uiPX(), 20.uiPX())
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					}
 				}
@@ -87,6 +86,15 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			addCorner(CornerSize.small, Spectrum.white)
 		}
 		container.setCenterInParent()
+	}
+	
+	fun setContentPadding(
+		left: Int = 20.uiPX(),
+		top: Int = 10.uiPX(),
+		right: Int = 20.uiPX(),
+		bottom: Int = 20.uiPX()
+	) {
+		contentLayout.setPadding(left, top, right, bottom)
 	}
 	
 	fun setTitle(text: String) {

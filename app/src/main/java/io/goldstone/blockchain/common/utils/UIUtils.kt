@@ -61,7 +61,7 @@ object UIUtils {
 		val walletID =
 			if (GoldStoneApp.getMaxWalletID() == 100) 0
 			else GoldStoneApp.getMaxWalletID()
-		return name[walletID % 17]
+		return name[(walletID) % 17]
 	}
 }
 

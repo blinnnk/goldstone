@@ -61,7 +61,7 @@ fun String.hexToDecimal(): Double {
 }
 
 fun String.toDecimalFromHex(): String {
-	return hexToDecimal().formatHex()
+	return hexToDecimal().formatCount(3)
 }
 
 fun String.hexToLong(): Long {

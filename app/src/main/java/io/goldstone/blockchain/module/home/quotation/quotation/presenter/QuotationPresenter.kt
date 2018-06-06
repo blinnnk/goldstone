@@ -5,10 +5,7 @@ import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -40,7 +37,10 @@ class QuotationPresenter(
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
 		// 如果内存有数据直接更新内存的数据
-		memoryData?.let { diffAndUpdateAdapterData<QuotationAdapter>(it) }
+		memoryData?.let {
+			diffAndUpdateAdapterData<QuotationAdapter>(it)
+		}
+		
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
 			if (selectionMD5 == selections.getObjectMD5HexString()) {
@@ -49,6 +49,7 @@ class QuotationPresenter(
 			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
+			
 			selections.map { selection ->
 				var linechart = arrayListOf<ChartPoint>()
 				if (!selection.lineChartDay.isBlank()) {
@@ -57,7 +58,7 @@ class QuotationPresenter(
 				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
 				QuotationModel(
 					selection,
-					"--",
+					ValueTag.emptyPrice,
 					"0",
 					linechart
 				)

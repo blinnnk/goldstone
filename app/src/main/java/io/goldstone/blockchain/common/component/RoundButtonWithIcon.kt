@@ -44,7 +44,7 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(0, viewHeight)
 		backgroundColor = Color.WHITE
 		addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square, viewHeight / 2f)
-		elevation = ShadowSize.Button
+		elevation = 5.uiPX().toFloat()
 		
 		arrowIcon
 			.apply { setWhiteSytle() }
@@ -56,6 +56,11 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 	fun setTitle(text: String) {
 		titleView.text = text
 		layoutParams.width = text.measureTextWidth(16.uiPX().toFloat()).toInt()  + retWidthDependsOnLanguage()
+	}
+	
+	fun removeIcon() {
+		layoutParams.width -= 5.uiPX()
+		removeView(arrowIcon)
 	}
 	
 	private fun retWidthDependsOnLanguage(): Int {

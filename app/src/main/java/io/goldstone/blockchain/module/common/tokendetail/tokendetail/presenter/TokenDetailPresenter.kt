@@ -5,14 +5,15 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
@@ -23,8 +24,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -63,14 +62,14 @@ class TokenDetailPresenter(
 	}
 	
 	fun showAddressSelectionFragment() {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			hasBackUpOrElse {
-				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-					presenter.showTargetFragment<AddressSelectionFragment>(
-						TokenDetailText.address, TokenDetailText.tokenDetail
-					)
-				}
-			}
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.showAddressSelectionFragment()
+		}
+	}
+	
+	fun showDepositFragment() {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.showDepositFragment()
 		}
 	}
 	
@@ -84,36 +83,6 @@ class TokenDetailPresenter(
 			?.showTargetFragment<TransactionDetailFragment>(
 				TransactionText.detail, TokenDetailText.tokenDetail, argument
 			)
-	}
-	
-	fun showDepositFragment() {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			hasBackUpOrElse {
-				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-					presenter.showTargetFragment<DepositFragment>(
-						TokenDetailText.deposit, TokenDetailText.tokenDetail
-					)
-				}
-			}
-		}
-	}
-	
-	private fun hasBackUpOrElse(callback: () -> Unit) {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				hasBackUpMnemonic isFalse {
-					GoldStoneDialog.show(fragment.context!!) {
-						showButtons(DialogText.goToBackUp) { }
-						setImage(R.drawable.succeed_banner)
-						setContent(
-							DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
-						)
-					}
-				} otherwise {
-					callback()
-				}
-			}
-		}
 	}
 	
 	private fun prepareTokenDetailData() {

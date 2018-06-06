@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 
 import android.view.ViewGroup
+import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.TwoLineTitles
@@ -15,12 +16,24 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
 class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresenter>() {
 	
 	var valueHeader: TwoLineTitles? = null
-	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
+	val token by lazy {
+		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
+	}
+	val isFromQuickTransfer by lazy {
+		arguments?.getBoolean(ArgumentKey.fromQuickTransfer).orFalse()
+	}
+	private val isFromQuickDeposit by lazy {
+		arguments?.getBoolean(ArgumentKey.fromQuickDeposit).orFalse()
+	}
 	var confirmButton: RoundButton? = null
 	override val presenter = TokenDetailOverlayPresenter(this)
 	
 	override fun ViewGroup.initView() {
 		presenter.setValueHeader(token)
-		presenter.showTokenDetailFragment(token)
+		when {
+			isFromQuickTransfer -> presenter.showAddressSelectionFragment(true)
+			isFromQuickDeposit -> presenter.showDepositFragment(true)
+			else -> presenter.showTokenDetailFragment(token)
+		}
 	}
 }

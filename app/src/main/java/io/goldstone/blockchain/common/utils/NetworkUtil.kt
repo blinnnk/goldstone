@@ -18,9 +18,8 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
  * @date 2018/5/3 3:33 PM
  * @author KaySaith
  */
-
 object NetworkUtil {
-
+	
 	fun hasNetworkWithAlert(
 		context: Context? = null,
 		alertText: String = "thiere isn't network found"
@@ -31,17 +30,17 @@ object NetworkUtil {
 		if (!status) context?.alert(alertText)
 		return status
 	}
-
+	
 	fun hasNetwork(context: Context? = null): Boolean {
 		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 		val activeNetwork = cm?.activeNetworkInfo
 		return activeNetwork != null && activeNetwork.isConnectedOrConnecting
 	}
-
 }
 
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
+	
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(
 		context: Context,
@@ -55,7 +54,9 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 			}
 		} otherwise {
 			GoldStoneDialog.show(context) {
-				showButtons { }
+				showOnlyConfirmButton {
+					GoldStoneDialog.remove(context)
+				}
 				setImage(R.drawable.network_browken_banner)
 				setContent(
 					DialogText.networkTitle, DialogText.networkDescription
