@@ -1,14 +1,19 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
+import android.content.Context
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
@@ -68,11 +73,24 @@ class TokenManagementListPresenter(
 	
 	companion object {
 		
-		fun updateMyTokensInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
+		fun updateMyTokensInfoBy(
+			switch: HoneyBaseSwitch,
+			token: DefaultTokenTable,
+			context: Context
+		) {
 			switch.isClickable = false
 			if (switch.isChecked) {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(token.symbol, token.contract) {
+				MyTokenTable.insertBySymbolAndContract(
+					token.symbol,
+					token.contract,
+					WalletTable.current.address,
+					{ error, reason ->
+						if (reason.equals(ErrorTag.chain, true)) {
+							GoldStoneDialog.showChainErrorDialog(context)
+						}
+						LogUtil.error("updateMyTokensInfoBy, error: $reason", error)
+					}) {
 					switch.isClickable = true
 				}
 			} else {

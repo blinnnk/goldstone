@@ -153,6 +153,7 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			ownerAddress: String = WalletTable.current.address,
+			errorCallback: (error: Exception?, reason: String?) -> Unit,
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -161,7 +162,12 @@ data class MyTokenTable(
 					myTokenDao().getCurrentChainTokensBy(ownerAddress).find {
 						it.contract.equals(contract, true)
 					}.isNull() isTrue {
-						getBalanceAndInsertWithSymbolAndContract(symbol, contract, ownerAddress) {
+						getBalanceAndInsertWithSymbolAndContract(
+							symbol,
+							contract,
+							ownerAddress,
+							errorCallback
+						) {
 							GoldStoneAPI.context.runOnUiThread {
 								callback()
 							}
@@ -175,12 +181,13 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			ownerAddress: String,
+			errorCallback: (error: Exception?, reason: String?) -> Unit,
 			callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress, { _, _ ->
-					// error callback if need alert
+				GoldStoneEthCall.getEthBalance(ownerAddress, { error, reason ->
+					errorCallback(error, reason)
 				}) {
 					insert(
 						MyTokenTable(
@@ -220,12 +227,14 @@ data class MyTokenTable(
 			contract: String,
 			ownerAddress: String,
 			convertByDecimal: Boolean = false,
+			errorCallback: (error: Exception?, reason: String?) -> Unit,
 			callback: (balance: Double) -> Unit = {}
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress, { _, _ ->
-					// error callback if need alert
+				GoldStoneEthCall.getEthBalance(ownerAddress, { error, reason ->
+					System.out.println("reason $reason")
+					errorCallback(error, reason)
 				}) {
 					val balance = if (convertByDecimal) it.toEthCount() else it
 					callback(balance)

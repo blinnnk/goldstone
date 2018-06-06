@@ -26,7 +26,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 27/03/2018 3:27 AM
  * @author KaySaith
  * @description
- * 这个界面由两个入场场景公用, 分别是账单列表进入或转账完成进入, `fragment` 承担了两种身份
+ * 这个界面由三个入场景公用, 分别是账单列表，转账完成或通知中心进入, `fragment` 承担了多重身份
  * 固再次需要注意.
  */
 class TransactionDetailPresenter(

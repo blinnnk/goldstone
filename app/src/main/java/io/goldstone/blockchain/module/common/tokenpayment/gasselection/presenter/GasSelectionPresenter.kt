@@ -8,6 +8,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
@@ -141,7 +142,13 @@ class GasSelectionPresenter(
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
 				WalletTable.current.address,
-				true
+				true,
+				{ error, reason ->
+					if (reason == ErrorTag.chain) {
+						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
+					}
+					LogUtil.error("checkBalanceIsValid", error)
+				}
 			) {
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
@@ -150,7 +157,13 @@ class GasSelectionPresenter(
 			MyTokenTable.getBalanceWithContract(
 				CryptoValue.ethContract,
 				WalletTable.current.address,
-				true
+				true,
+				{ error, reason ->
+					if (reason == ErrorTag.chain) {
+						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
+					}
+					LogUtil.error("checkBalanceIsValid", error)
+				}
 			) {
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}

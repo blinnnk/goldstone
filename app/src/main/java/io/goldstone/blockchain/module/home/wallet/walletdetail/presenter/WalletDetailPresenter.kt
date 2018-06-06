@@ -65,7 +65,8 @@ class WalletDetailPresenter(
 			getLocalModels { it ->
 				updateUIByData(it)
 				// 再检查链上的最新价格和数量
-				getChainModels {
+				getChainModels(fragment.context!!)
+				{
 					updateUIByData(it)
 					fragment.removeMiniLoadingView()
 				}

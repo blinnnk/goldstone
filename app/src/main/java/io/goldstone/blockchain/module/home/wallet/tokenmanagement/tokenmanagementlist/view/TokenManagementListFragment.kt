@@ -25,15 +25,11 @@ class TokenManagementListFragment :
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
 			switch.onClick {
 				model?.let {
-					
-					TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
+					TokenManagementListPresenter
+						.updateMyTokensInfoBy(switch, it, this@TokenManagementListFragment.context!!)
 				}
 			}
 		}
-	}
-	
-	override fun setSlideUpAnimation() {
-	
 	}
 	
 	override fun setSlideUpWithCellHeight() = 60.uiPX()

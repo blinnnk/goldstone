@@ -10,6 +10,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import okhttp3.*
@@ -428,7 +429,11 @@ object GoldStoneEthCall {
 		val errorData: String
 		if (hasError == true) {
 			errorData = JSONObject(data).safeGet("error")
-		} else return ""
+		} else {
+			val code = JSONObject(data).safeGet("code").toInt()
+			return if (code == -10) ErrorTag.chain
+			else ""
+		}
 		return when {
 			data.isNullOrBlank() -> return ""
 			errorData.isNotEmpty() -> JSONObject(errorData).safeGet("message")

@@ -58,7 +58,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it, this)
 			}
 		}
 	}
