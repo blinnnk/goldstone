@@ -5,6 +5,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toEthCount
@@ -152,8 +153,8 @@ data class MyTokenTable(
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: String,
-			ownerAddress: String = WalletTable.current.address,
 			errorCallback: (error: Exception?, reason: String?) -> Unit,
+			ownerAddress: String = WalletTable.current.address,
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -162,12 +163,29 @@ data class MyTokenTable(
 					myTokenDao().getCurrentChainTokensBy(ownerAddress).find {
 						it.contract.equals(contract, true)
 					}.isNull() isTrue {
-						getBalanceAndInsertWithSymbolAndContract(
-							symbol,
-							contract,
-							ownerAddress,
-							errorCallback
-						) {
+						if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+							getBalanceAndInsertWithSymbolAndContract(
+								symbol,
+								contract,
+								ownerAddress,
+								errorCallback
+							) {
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
+							}
+						} else {
+							insert(
+								MyTokenTable(
+									0,
+									ownerAddress,
+									symbol,
+									0.0,
+									contract,
+									GoldStoneApp.getCurrentChain()
+								)
+							)
+							// 没有网络不用检查间隔直接插入数据库
 							GoldStoneAPI.context.runOnUiThread {
 								callback()
 							}

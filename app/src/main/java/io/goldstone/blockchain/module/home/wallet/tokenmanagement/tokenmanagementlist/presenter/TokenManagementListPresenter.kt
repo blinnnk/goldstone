@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
@@ -92,7 +91,6 @@ class TokenManagementListPresenter(
 				MyTokenTable.insertBySymbolAndContract(
 					token.symbol,
 					token.contract,
-					WalletTable.current.address,
 					{ error, reason ->
 						if (reason.equals(ErrorTag.chain, true)) {
 							GoldStoneDialog.showChainErrorDialog(context)

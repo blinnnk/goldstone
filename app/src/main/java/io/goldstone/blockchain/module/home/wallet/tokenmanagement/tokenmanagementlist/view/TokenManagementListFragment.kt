@@ -26,7 +26,11 @@ class TokenManagementListFragment :
 			switch.onClick {
 				model?.let {
 					TokenManagementListPresenter
-						.updateMyTokensInfoBy(switch, it, this@TokenManagementListFragment.context!!)
+						.updateMyTokensInfoBy(
+							switch,
+							it,
+							this@TokenManagementListFragment.context!!
+						)
 				}
 			}
 		}
