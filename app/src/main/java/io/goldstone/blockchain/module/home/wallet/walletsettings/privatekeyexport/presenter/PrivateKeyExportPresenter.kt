@@ -33,7 +33,7 @@ class PrivateKeyExportPresenter(
 		WalletTable.getCurrentWallet {
 			doAsync {
 				fragment.context?.getPrivateKey(it!!.address, passwordInput.text.toString(), {
-					hold("")
+					fragment.context?.runOnUiThread { hold("") }
 				}) {
 					fragment.context?.runOnUiThread { hold(it) }
 				}

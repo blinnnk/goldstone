@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**
  * @date 22/03/2018 2:58 AM
@@ -57,9 +56,8 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	
 	fun recoveryFragmentHeight() {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(
-				fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-			)
+			val finalHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
+			overlayView.contentLayout.updateHeightAnimation(finalHeight, finalHeight, 0)
 		}
 		AnimationDuration.Default timeUpThen {
 			fragment.getMainActivity()?.hideHomeFragment()
@@ -68,7 +66,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	
 	fun updateHeight(height: Int) {
 		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(height)
+			overlayView.contentLayout.updateHeightAnimation(height, height, 0)
 		}
 		// 优化重汇
 		if (height >= ScreenSize.Height) {

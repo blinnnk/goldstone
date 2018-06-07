@@ -25,7 +25,7 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
 class PinCodeEditorPresenter(
 	override val fragment: PinCodeEditorFragment
 ) : BasePresenter<PinCodeEditorFragment>() {
-
+	
 	fun setShowPinCodeStatus(
 		status: Boolean,
 		callback: (Boolean) -> Unit = {}
@@ -43,7 +43,7 @@ class PinCodeEditorPresenter(
 			}
 		}
 	}
-
+	
 	fun resetPinCode(
 		newPinCode: EditText,
 		repeatPinCode: EditText,
@@ -53,31 +53,32 @@ class PinCodeEditorPresenter(
 			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
-
+		
 		if (newPinCode.text.length > Count.pinCode || repeatPinCode.text.length > Count.pinCode) {
 			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
-
+		
 		if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
 			fragment.context?.alert(PincodeText.verifyAlert)
 			return
 		}
-
+		
 		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
 			fragment.context?.alert(CommonText.succeed)
 			setShowPinCodeStatus(true)
 			switch.isChecked = true
 		}
 	}
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<ProfileOverlayFragment> {
-			overlayView.contentLayout.updateHeightAnimation(380.uiPX())
+			val height = 380.uiPX()
+			overlayView.contentLayout.updateHeightAnimation(height, height, 0)
 		}
 	}
-
+	
 	fun showPinCodeFragment() {
 		fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
 			//

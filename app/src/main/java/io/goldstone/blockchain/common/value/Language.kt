@@ -845,6 +845,28 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "DEPOSIT"
 		else -> ""
 	}
+	
+	@JvmField
+	val from = when (currentLanguage) {
+		HoneyLanguage.English.code -> "From"
+		HoneyLanguage.Chinese.code -> "From"
+		HoneyLanguage.Japanese.code -> "From"
+		HoneyLanguage.Korean.code -> "From"
+		HoneyLanguage.Russian.code -> "From"
+		HoneyLanguage.TraditionalChinese.code -> "From"
+		else -> ""
+	}
+	
+	@JvmField
+	val to = when (currentLanguage) {
+		HoneyLanguage.English.code -> "To"
+		HoneyLanguage.Chinese.code -> "To"
+		HoneyLanguage.Japanese.code -> "To"
+		HoneyLanguage.Korean.code -> "To"
+		HoneyLanguage.Russian.code -> "To"
+		HoneyLanguage.TraditionalChinese.code -> "To"
+		else -> ""
+	}
 }
 
 object AlertText {

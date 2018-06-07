@@ -51,7 +51,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		HeaderIcon(context).apply {
 			id = ElementID.addButton
 			imageResource = R.drawable.add_icon
-			setRightPosition()
+			setLeftPosition()
 		}
 	}
 	private val searchButton by lazy {
@@ -140,11 +140,13 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	
 	fun showAddButton(
 		isShow: Boolean,
+		isLeft: Boolean = true,
 		setClickEvent: () -> Unit = {}
 	) {
 		findViewById<ImageView>(ElementID.addButton).let {
 			it.isNull() isTrue {
 				isShow isTrue {
+					if (!isLeft) addButton.setRightPosition()
 					addButton.click {
 						setClickEvent()
 					}.into(this)

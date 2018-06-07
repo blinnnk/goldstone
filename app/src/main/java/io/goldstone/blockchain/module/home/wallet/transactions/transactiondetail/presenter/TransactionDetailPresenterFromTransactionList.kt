@@ -5,11 +5,13 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.PrepareTransferText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -93,7 +95,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
-				receipt.transactionHash,
+				WalletTable.current.address.toUpperCase(),
+				receipt.transactionHash.toUpperCase(),
 				receipt.blockNumber,
 				receipt.date,
 				receipt.url
@@ -104,7 +107,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				currentHash,
+				WalletTable.current.address.toUpperCase(),
+				currentHash.toUpperCase(),
 				receipt.blockNumber,
 				date,
 				EtherScanApi.transactionDetail(currentHash)
@@ -115,7 +119,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				currentHash,
+				WalletTable.current.address.toUpperCase(),
+				currentHash.toUpperCase(),
 				"Waiting...",
 				date,
 				EtherScanApi.transactionDetail(currentHash)
@@ -125,6 +130,7 @@ fun TransactionDetailPresenter.generateModels(
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
+		PrepareTransferText.from,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

@@ -69,12 +69,6 @@ fun TransactionDetailPresenter.updateHeaderValueFromNotification() {
 	}
 }
 
-fun TransactionDetailPresenter.convertDataToAsynData(
-	table: TransactionTable
-): ArrayList<TransactionDetailModel> {
-	return table.toAsyncData()
-}
-
 // 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 fun TransactionDetailPresenter.prepareHeaderValueFromNotification(
 	receipt: TransactionTable,
@@ -143,7 +137,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 						info.isReceived,
 						info.chainID
 					) { memo ->
-						convertDataToAsynData(receipt).let {
+						receipt.toAsyncData().let {
 							it[4].info = TimeUtils.formatDate(timestamp)
 							it[1].info = memo
 							fragment.asyncData = it

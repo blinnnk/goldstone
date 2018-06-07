@@ -10,10 +10,13 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.toast
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import java.io.File
@@ -22,7 +25,6 @@ import java.io.File
  * @date 29/03/2018 4:25 PM
  * @author KaySaith
  */
-
 fun Context.generateWallet(
 	password: String,
 	holdAddress: (mnemonicCode: String, address: String) -> Unit
@@ -189,10 +191,20 @@ fun Context.updatePassword(
 	errorCallback: () -> Unit = {},
 	callback: () -> Unit
 ) {
-	getPrivateKey(walletAddress, oldPassword, errorCallback) { privateKey ->
-		deleteAccount(walletAddress, oldPassword) {
-			getWalletByPrivateKey(privateKey, newPassword) {
-				callback()
+	toast("Modify password will re-generate your keystore, this will takes a little time, please Wait patiently")
+	doAsync {
+		getPrivateKey(walletAddress, oldPassword, {
+			runOnUiThread {
+				errorCallback()
+				alert(CommonText.wrongPassword)
+			}
+		}) { privateKey ->
+			deleteAccount(walletAddress, oldPassword) {
+				getWalletByPrivateKey(privateKey, newPassword) {
+					GoldStoneAPI.context.runOnUiThread {
+						callback()
+					}
+				}
 			}
 		}
 	}

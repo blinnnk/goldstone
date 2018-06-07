@@ -7,16 +7,15 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
+import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.IntentKey
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
 
@@ -142,6 +141,11 @@ class MainActivity : AppCompatActivity() {
 		val intentFilter = IntentFilter()
 		intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
 		registerReceiver(netWorkReceiver, intentFilter)
+	}
+	
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		super.onActivityResult(requestCode, resultCode, data)
+		this.saveDataToSharedPreferences(SharesPreference.activityIsResult, TinyNumber.True.value)
 	}
 }
 

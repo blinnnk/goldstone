@@ -36,9 +36,12 @@ class TransactionDetailAdapter(
 		position: Int
 	) {
 		model = data
-		updateHeightByText(data.info, fontSize(14), ScreenSize.widthWithPadding, 200.uiPX())
+		updateHeightByText(data.info, fontSize(12), ScreenSize.widthWithPadding, 200.uiPX())
 		if (model.description == TransactionText.url) {
 			setContentColor(Spectrum.darkBlue)
+			// 会按照单词折行,
+			// 所以额外补贴
+			layoutParams.height += 20.uiPX()
 		}
 		hold(this)
 	}

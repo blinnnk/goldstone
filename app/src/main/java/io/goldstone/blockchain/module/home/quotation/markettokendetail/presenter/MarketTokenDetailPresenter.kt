@@ -47,7 +47,8 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
-			overlayView.contentLayout.updateHeightAnimation(context?.getRealScreenHeight().orZero())
+			val finalHeight = context?.getRealScreenHeight().orZero()
+			overlayView.contentLayout.updateHeightAnimation(finalHeight, finalHeight, 0)
 		}
 		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
 	}
