@@ -234,7 +234,6 @@ data class TransactionTable(
 		) {
 			GoldStoneAPI.getTransactionListByAddress(
 				"0",
-				WalletTable.current.address,
 				errorCallback
 			) {
 				TransactionTable.getLocalLatestNonce { localNonce ->

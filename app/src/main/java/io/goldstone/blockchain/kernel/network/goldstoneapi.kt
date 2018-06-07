@@ -157,8 +157,8 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
-		address: String = WalletTable.current.address,
 		errorCallback: (Exception) -> Unit,
+		address: String = WalletTable.current.address,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUncryptoData<TransactionTable>(
