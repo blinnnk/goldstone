@@ -68,7 +68,6 @@ class WalletImportPresenter(
 			hint: String?,
 			callback: () -> Unit
 		) {
-			System.out.println("hello 10")
 			WalletTable.getWalletByAddress(address) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
@@ -85,13 +84,11 @@ class WalletImportPresenter(
 							true
 						)
 					) {
-						System.out.println("hello 13")
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(address, {
 							LogUtil.error("insertWalletToDatabase")
 							callback()
 						}) {
-							System.out.println("hello 16")
 							fragment.activity?.jump<SplashActivity>()
 						}
 						// 注册钱包地址用于发送 `Push`

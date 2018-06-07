@@ -81,7 +81,6 @@ fun Context.getWalletByPrivateKey(
 	password: String,
 	hold: (address: String?) -> Unit
 ) {
-	System.out.println("hello 6")
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	/** Generate Keystore */
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -96,14 +95,12 @@ fun Context.getWalletByPrivateKey(
 		privateKey.length == 63 -> "0" + currentPrivateKey.toString(16)
 		else -> currentPrivateKey.toString(16)
 	}
-	System.out.println("hello 7")
 	/** Import Private Key to Keystore */
 	try {
 		keyStore.importECDSAKey(keyString.hexToByteArray(), password)
 	} catch (error: Exception) {
 		println(error)
 	}
-	System.out.println("hello 8")
 	hold(address)
 }
 
