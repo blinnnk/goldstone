@@ -5,6 +5,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.PrepareTransferText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
@@ -130,7 +131,7 @@ fun TransactionDetailPresenter.generateModels(
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
-		PrepareTransferText.from,
+		CommonText.from,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

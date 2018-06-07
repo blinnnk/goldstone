@@ -17,32 +17,31 @@ import java.io.Serializable
  * @date 2018/5/8 3:22 PM
  * @author KaySaith
  */
-
-data class GasFee(
-	var gasLimit: Long,
-	val gasPrice: Long
-) : Serializable
+data class GasFee(var gasLimit: Long, val gasPrice: Long) : Serializable
 
 class GasEditorPresenter(
 	override val fragment: GasEditorFragment
 ) : BasePresenter<GasEditorFragment>() {
-
+	
 	fun confirmGasCustom(gasPrice: Long, gasLimit: Long) {
 		if (gasPrice <= 0 || gasLimit <= 0) {
 			fragment.context?.alert(AlertText.gasEditorEmpty)
 			return
 		}
-
+		
 		if (gasLimit < fragment.minLimit ?: 21000) {
 			fragment.context?.alert("${AlertText.gasLimitValue} ${fragment.minLimit ?: 21000}")
 			return
 		}
-
+		
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			childFragmentManager.fragments.forEach {
 				if (it is GasSelectionFragment) {
 					MinerFeeType.Custom.value = gasPrice
-					it.arguments?.putSerializable(ArgumentKey.gasEditor, GasFee(gasLimit, gasPrice))
+					it.arguments?.putSerializable(
+						ArgumentKey.gasEditor,
+						GasFee(gasLimit, gasPrice)
+					)
 					it.presenter.insertCustomGasData()
 				}
 				presenter.popFragmentFrom<GasEditorFragment>()
@@ -50,10 +49,9 @@ class GasEditorPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.activity?.let { SoftKeyboard.hide(it) }
 	}
-
 }

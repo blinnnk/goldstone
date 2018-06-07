@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
@@ -38,8 +39,17 @@ data class CurrentPriceModel(
 		data: CurrencyPriceInfoModel,
 		symbol: String
 	) : this(
-		data.price.toDouble(), symbol, data.percent,
+		data.price.toDouble(),
+		symbol,
+		data.percent,
 		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0)
+	)
+	
+	constructor(data: QuotationModel) : this(
+		data.price.toDoubleOrNull().orElse(0.0),
+		data.symbol,
+		data.percent,
+		1.0
 	)
 }
 

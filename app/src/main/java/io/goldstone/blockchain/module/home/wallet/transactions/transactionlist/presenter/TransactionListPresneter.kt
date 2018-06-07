@@ -168,7 +168,6 @@ class TransactionListPresenter(
 					doAsync {
 						GoldStoneAPI.getTransactionListByAddress(
 							startBlock,
-							WalletTable.current.address,
 							{
 								//error callback
 								// 只弹出一次错误信息
@@ -225,34 +224,43 @@ class TransactionListPresenter(
 		}
 		
 		private fun ArrayList<TransactionTable>.getUnkonwTokenInfoByTransactions(callback: () -> Unit) {
-			filter {
-				it.isERC20 && it.symbol.isEmpty()
-			}.distinctBy {
-				it.contractAddress
-			}.apply {
-				if (isEmpty()) callback()
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount = size
-					override fun concurrentJobs() {
-						forEach {
-							GoldStoneEthCall.apply {
-								getTokenInfoByContractAddress(
-									it.contractAddress,
-									GoldStoneApp.getCurrentChain(), { _, _ ->
-										// error callback if need do something
-									}) { symbol, name, decimal ->
-									GoldStoneDataBase
-										.database
-										.defaultTokenDao()
-										.insert(DefaultTokenTable(it.contractAddress, symbol, decimal, name))
-									completeMark()
+			DefaultTokenTable.getCurrentChainTokens { localTokens ->
+				filter {
+					it.isERC20 && it.symbol.isEmpty()
+				}.distinctBy {
+					it.contractAddress
+				}.filterNot { unknowData ->
+					localTokens.any {
+						it.contract.equals(unknowData.contractAddress, true)
+					}
+				}.apply {
+					if (isEmpty()) {
+						callback()
+						return@getCurrentChainTokens
+					}
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount = size
+						override fun concurrentJobs() {
+							forEach {
+								GoldStoneEthCall.apply {
+									getTokenInfoByContractAddress(
+										it.contractAddress,
+										GoldStoneApp.getCurrentChain(), { _, _ ->
+											// error callback if need do something
+										}) { symbol, name, decimal ->
+										GoldStoneDataBase
+											.database
+											.defaultTokenDao()
+											.insert(DefaultTokenTable(it.contractAddress, symbol, decimal, name))
+										completeMark()
+									}
 								}
 							}
 						}
-					}
-					
-					override fun mergeCallBack() = callback()
-				}.start()
+						
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
 		}
 		

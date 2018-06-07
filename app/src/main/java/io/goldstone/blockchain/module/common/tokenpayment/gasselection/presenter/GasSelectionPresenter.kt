@@ -47,13 +47,13 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 	
+	var currentMinnerType = MinerFeeType.Recommend.content
 	private var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
 	private val prepareModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
 	}
-	private var currentMinnerType = MinerFeeType.Recommend.content
 	private val defaultGasPrices by lazy {
 		arrayListOf(
 			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei()), // cheap
@@ -79,10 +79,12 @@ class GasSelectionPresenter(
 			GasSelectionCell(parent.context).apply {
 				id = index
 				model = GasSelectionModel(
-					minner.toString().toDouble(), prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
+					index,
+					minner.toString().toDouble(),
+					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
 					currentMinnerType
 				)
-				if (model.isSelected) {
+				if (model.currentType == currentMinnerType) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -346,7 +348,9 @@ class GasSelectionPresenter(
 		defaultGasPrices.forEachIndexed { index, minner ->
 			container.findViewById<GasSelectionCell>(index)?.let { cell ->
 				cell.model = GasSelectionModel(
-					minner.toDouble(), prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
+					index,
+					minner.toDouble(),
+					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
 					currentMinnerType
 				)
 			}

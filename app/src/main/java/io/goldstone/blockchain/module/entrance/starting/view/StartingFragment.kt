@@ -29,14 +29,14 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	override val presenter = StartingPresenter(this)
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
-	private val logoSize = 150.uiPX()
+	private val logoSize = 180.uiPX()
 	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
 			// Logo
 			imageView {
-				glideImage(R.drawable.logo)
+				glideImage(R.drawable.gold_stone_logo)
 			}.lparams {
 				width = logoSize
 				height = logoSize

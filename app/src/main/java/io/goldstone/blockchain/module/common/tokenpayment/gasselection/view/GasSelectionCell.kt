@@ -27,7 +27,7 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 		info.title.text = model.count
 		info.subtitle.text = model.info
 		feeTypeDescription.text = model.type
-		radioButton.isChecked = model.isSelected
+		radioButton.isChecked = model.type == model.currentType
 	}
 
 	private val radioButton by lazy { HoneyRadioButton(context) }

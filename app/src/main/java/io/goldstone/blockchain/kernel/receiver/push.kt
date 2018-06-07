@@ -174,7 +174,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 @SuppressLint("HardwareIds")
 fun Application.registerDeviceForPush() {
 	// 为测试方便设置，发布上线时设置为 `false`
-	XGPushConfig.enableDebug(this, true)
+	XGPushConfig.enableDebug(this, false)
 	XGPushConfig.enableOtherPush(this, true)
 	XGPushConfig.setMzPushAppId(this, PushKey.appID)
 	XGPushConfig.setMzPushAppKey(this, PushKey.appKey)

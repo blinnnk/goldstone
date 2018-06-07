@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.entrance.starting.presenter
 import android.content.Context
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.GoldStoneApp
@@ -61,15 +60,16 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
 					.forEachOrEnd { item, isEnd ->
-						val model = if (item.safeGet("currencySymbol") == CountryCode.currentCurrency) {
-							SupportCurrencyTable(item).apply {
-								isUsed = true
-								// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-								GoldStoneApp.updateCurrentRate(rate)
+						val model =
+							if (item.safeGet("currencySymbol") == CountryCode.currentCurrency) {
+								SupportCurrencyTable(item).apply {
+									isUsed = true
+									// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+									GoldStoneApp.updateCurrentRate(rate)
+								}
+							} else {
+								SupportCurrencyTable(item)
 							}
-						} else {
-							SupportCurrencyTable(item)
-						}
 						
 						GoldStoneDataBase.database.currencyDao().insert(model)
 						
@@ -83,33 +83,50 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fun updateLocalDefaultTokens(errorCallback: () -> Unit) {
 			doAsync {
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-					if (serverTokens.isNotEmpty()) {
-						DefaultTokenTable.getAllTokens {
-							if (it.isEmpty()) {
-								serverTokens.forEach {
-									GoldStoneDataBase.database.defaultTokenDao().insert(it)
-								}
-							} else {
-								serverTokens.forEach { serverToken ->
-									GoldStoneDataBase.database.defaultTokenDao().apply {
-										val localToken =
-											getAllTokens().find {
-												it.chain_id == serverToken.chain_id
-												&& it.contract.equals(serverToken.contract, true)
-											}
-										if (localToken.isNull()) {
-											insert(serverToken)
-										} else {
-											if (localToken!!.iconUrl != serverToken.iconUrl) {
-												// 数据有变化直接更新服务器数据
-												update(localToken.apply { iconUrl = serverToken.iconUrl })
-											}
-										}
-									}
-								}
+					// 没有网络数据直接返回
+					if (serverTokens.isEmpty()) return@getDefaultTokens
+					DefaultTokenTable.getAllTokens { localTokens ->
+						// 开一个线程更新图片
+						serverTokens.updateLocalTokenIcon(localTokens)
+						// 移除掉一样的数据
+						serverTokens.filterNot { server ->
+							localTokens.any { local ->
+								local.chain_id == server.chain_id
+								&& local.contract.equals(server.contract, true)
+							}
+						}.apply {
+							if (isEmpty()) return@getAllTokens
+							// 如果还有不一样的网络数据插入数据库
+							forEach {
+								GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							}
 						}
 					}
+				}
+			}
+		}
+		
+		fun ArrayList<DefaultTokenTable>.updateLocalTokenIcon(
+			localTokens: ArrayList<DefaultTokenTable>
+		) {
+			filter { server ->
+				localTokens.any { local ->
+					local.chain_id == server.chain_id
+					&& local.contract.equals(server.contract, true)
+					&& local.iconUrl != server.iconUrl
+				}
+			}.apply {
+				if (isEmpty()) return
+				forEach { server ->
+					GoldStoneDataBase
+						.database
+						.defaultTokenDao()
+						.apply {
+							getTokenByContractFromAllChains(server.contract)
+								?.let {
+									update(it.apply { iconUrl = server.iconUrl })
+								}
+						}
 				}
 			}
 		}

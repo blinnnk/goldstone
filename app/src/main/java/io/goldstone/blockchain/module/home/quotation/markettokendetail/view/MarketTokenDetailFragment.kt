@@ -69,13 +69,17 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.updateChartByMenu(
 					chartView, MarketTokenDetailChartType.Hour.code
 				)
-
+				
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
 					}
 				}.into(this)
-
+				// 显示从上个界面带进来的值防止出现空数据
+				currencyInfo?.let {
+					currentPriceInfo.model = CurrentPriceModel(it)
+				}
+				
 				priceHistroy.into(this)
 				tokenInfo
 					.click {
@@ -85,7 +89,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					}
 					.into(this)
 				tokenInformation.into(this)
-
+				
 				presenter.setCurrencyInfo(
 					currencyInfo,
 					tokenInformation,
