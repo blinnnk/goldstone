@@ -196,6 +196,7 @@
 -dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
 -dontwarn io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.**
 -dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
+-dontwarn io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.**
 
 # Kotlin 协程
 -keep class org.jetbrains.kotlinx.**
@@ -230,6 +231,14 @@
 -dontwarn com.google.android.gms.**
 -keep class com.google.android.gms.** { *; }
 
+# Jackson
+-keep @com.fasterxml.jackson.annotation.JsonIgnoreProperties class * { *; }
+-keep class com.fasterxml.** { *; }
+-keep class org.codehaus.** { *; }
+-keepnames class com.fasterxml.jackson.** { *; }
+-keepclassmembers public final enum com.fasterxml.jackson.annotation.JsonAutoDetect$Visibility {
+    public static final com.fasterxml.jackson.annotation.JsonAutoDetect$Visibility *;
+}
 # Kotlin
 -keep class kotlin.** { *; }
 -keep class kotlin.Metadata { *; }

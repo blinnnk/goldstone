@@ -219,10 +219,12 @@ data class WalletTable(
 			address: String,
 			callback: (WalletTable?) -> Unit
 		) {
+			System.out.println("hello11")
 			coroutinesTask(
 				{
 					GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
 				}) {
+				System.out.println("hello 12")
 				callback(it)
 			}
 		}
