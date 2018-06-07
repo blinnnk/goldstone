@@ -36,7 +36,6 @@ class PrivateKeyImportPresenter(
 			callback()
 			return
 		}
-		System.out.println("hello 1")
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),
@@ -44,12 +43,10 @@ class PrivateKeyImportPresenter(
 			isAgree,
 			fragment.context,
 			{
-				System.out.println("hello 2")
 				// Failed callback
 				callback()
 			}
 		) { passwordValue, walletName ->
-			System.out.println("hello 3")
 			importWallet(
 				privateKeyInput.text.toString(),
 				passwordValue,
@@ -74,7 +71,6 @@ class PrivateKeyImportPresenter(
 			hint: String? = null,
 			callback: () -> Unit
 		) {
-			System.out.println("hello 4")
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
 			val formatPrivateKey = privateKey.removePrefix("0x")
 			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
@@ -83,18 +79,15 @@ class PrivateKeyImportPresenter(
 					.replaceWithPattern()
 					.replace("\n", "")
 					.removeStartAndEndValue(" ")
-			System.out.println("hello 5")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
 				callback()
 				return
 			}
-			System.out.println("hello 6")
 			// 解析私钥并导入钱包
 			fragment.context?.getWalletByPrivateKey(currentPrivateKey, password) { address ->
 				address?.let {
-					System.out.println("hello 9")
 					WalletImportPresenter.insertWalletToDatabase(
 						fragment,
 						it,
