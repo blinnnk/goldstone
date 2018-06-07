@@ -8,9 +8,9 @@ android {
   signingConfigs {
     release {
       storeFile file('/Users/saithkay/goldstoneAndroidKeystore')
-      storePassword 'goldStone20180322'
-      keyAlias 'key0'
-      keyPassword 'goldStone20180322'
+      storePassword signingKeystorePassword
+      keyAlias signingKeystoreAlias
+      keyPassword signingKeystorePassword
     }
   }
   compileSdkVersion 28
@@ -26,7 +26,7 @@ android {
     vectorDrawables.useSupportLibrary = true
     manifestPlaceholders = [
       XG_ACCESS_ID : "2100282353",
-      XG_ACCESS_KEY: "A9BWBA6J671X"
+      XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
       abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
