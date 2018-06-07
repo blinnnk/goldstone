@@ -27,10 +27,7 @@ class QuotationOverlayPresenter(
 	
 	fun showMarketTokenDetailFragment(model: QuotationModel?) {
 		fragment.addFragmentAndSetArgument<MarketTokenDetailFragment>(ContainerID.content) {
-			putSerializable(
-				ArgumentKey.quotationCurrencyDetail,
-				model
-			)
+			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
 		}
 	}
 	

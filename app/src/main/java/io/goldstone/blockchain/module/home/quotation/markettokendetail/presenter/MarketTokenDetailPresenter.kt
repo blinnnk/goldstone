@@ -51,7 +51,9 @@ class MarketTokenDetailPresenter(
 			val finalHeight = context?.getRealScreenHeight().orZero()
 			overlayView.contentLayout.updateHeightAnimation(finalHeight, finalHeight, 0)
 		}
-		fragment.currencyInfo?.apply { updateCurrencyPriceInfo() }
+		fragment.currencyInfo?.apply {
+			updateCurrencyPriceInfo()
+		}
 	}
 	
 	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
@@ -236,6 +238,7 @@ class MarketTokenDetailPresenter(
 							.database
 							.quotationSelectionDao()
 							.update(it.apply {
+								availableSupply = tokenData.avaliableSupply.toDoubleOrNull().orElse(0.0)
 								exchange = tokenData.exchange
 								website = tokenData.website
 								whitePaper = tokenData.whitePaper
@@ -321,8 +324,6 @@ class MarketTokenDetailPresenter(
 	private var currentSocket: GoldStoneWebSocket? = null
 	
 	private fun QuotationModel.updateCurrencyPriceInfo() {
-		// 传默认值
-		fragment.currentPriceInfo.model = CurrentPriceModel()
 		// 长连接获取数据
 		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair), {
 			currentSocket = it

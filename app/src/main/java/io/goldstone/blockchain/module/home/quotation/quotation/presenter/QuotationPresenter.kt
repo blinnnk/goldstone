@@ -124,14 +124,18 @@ class QuotationPresenter(
 	}
 	
 	private var currentSocket: GoldStoneWebSocket? = null
-	private fun setSocket(callback: () -> Unit) {
+	fun setSocket(
+		holdData: CurrencyPriceInfoModel.() -> Unit = {},
+		callback: (GoldStoneWebSocket?) -> Unit = {}
+	) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(
 			fragment.asyncData?.map { it.pair }?.toArrayList(),
 			{
 				currentSocket = it
-				callback()
+				callback(it)
 			}) {
+			holdData(it)
 			fragment.updateAdapterDataset(it)
 		}
 	}
@@ -173,10 +177,7 @@ class QuotationPresenter(
 	
 	fun showMarketTokenDetailFragment(model: QuotationModel) {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-			putSerializable(
-				ArgumentKey.quotationOverlayInfo,
-				model
-			)
+			putSerializable(ArgumentKey.quotationOverlayInfo, model)
 		}
 	}
 	
@@ -215,7 +216,10 @@ class QuotationPresenter(
 			}.apply(holdSocket)
 		}
 		
-		fun getQuotationFragment(activity: MainActivity?, callback: QuotationFragment.() -> Unit) {
+		fun getQuotationFragment(
+			activity: MainActivity?,
+			callback: QuotationFragment.() -> Unit
+		) {
 			activity?.apply {
 				supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
 					findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.let {
