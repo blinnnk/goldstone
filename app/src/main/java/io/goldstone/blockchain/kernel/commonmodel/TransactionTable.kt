@@ -215,7 +215,10 @@ data class TransactionTable(
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address)
+					GoldStoneDataBase
+						.database
+						.transactionDao()
+						.getTransactionsByAddress(address)
 				}) {
 				hold(it.map { TransactionListModel(it) }.toArrayList())
 			}
@@ -415,8 +418,7 @@ interface TransactionDao {
 	fun getTransactionsByAddress(
 		walletAddress: String,
 		chainID: String = GoldStoneApp.getCurrentChain()
-	):
-		List<TransactionTable>
+	): List<TransactionTable>
 	
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"

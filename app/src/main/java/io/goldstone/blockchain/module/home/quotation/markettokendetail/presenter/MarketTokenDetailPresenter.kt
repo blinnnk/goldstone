@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
@@ -220,13 +221,62 @@ class MarketTokenDetailPresenter(
 		tokenInfo: TokenInfoView
 	) {
 		currencyInfo?.let { info ->
-			GoldStoneAPI.getQuotationCurrencyInfo(info.pair) {
-				fragment.context?.runOnUiThread {
-					tokenInformation.model = TokenInformationModel(it, info.symbol)
-					priceHistroy.model = PriceHistoryModel(it, info.quoteSymbol)
+			// 首先展示数据库数据
+			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
+				tokenInformation.model = tokenData
+				priceHistroy.model = priceData
+			}
+			// 在更新网络数据, 更新界面并更新数据库
+			getCurrencyInfoFromServer(info) { tokenData, priceData ->
+				tokenInformation.model = tokenData
+				priceHistroy.model = priceData
+				QuotationSelectionTable.getSelectionByPair(info.pair) {
+					it?.apply {
+						GoldStoneDataBase
+							.database
+							.quotationSelectionDao()
+							.update(it.apply {
+								exchange = tokenData.exchange
+								website = tokenData.website
+								whitePaper = tokenData.whitePaper
+								socialMedia = tokenData.socialMedia
+								startDate = tokenData.startDate
+								high24 = priceData.dayHighest
+								low24 = priceData.dayLow
+								highTotal = priceData.totalHighest
+								lowTotal = priceData.totalLow
+							})
+					}
 				}
 			}
 			loadDescriptionFromLocalOrServer(info, tokenInfo)
+		}
+	}
+	
+	private fun getCurrencyInfoFromServer(
+		info: QuotationModel,
+		hold: (
+			tokenData: TokenInformationModel,
+			priceData: PriceHistoryModel
+		) -> Unit
+	) {
+		GoldStoneAPI.getQuotationCurrencyInfo(info.pair) { serverData ->
+			val tokenData = TokenInformationModel(serverData, info.symbol)
+			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
+			hold(tokenData, priceData)
+		}
+	}
+	
+	private fun getCurrencyInfoFromDatabase(
+		info: QuotationModel,
+		hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
+	) {
+		QuotationSelectionTable.getSelectionByPair(info.pair) {
+			it?.let {
+				val tokenData = TokenInformationModel(it, info.symbol)
+				val priceData = PriceHistoryModel(it, info.symbol)
+				hold(tokenData, priceData)
+			}
 		}
 	}
 	

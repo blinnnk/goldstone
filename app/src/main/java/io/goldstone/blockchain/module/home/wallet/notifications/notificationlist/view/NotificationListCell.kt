@@ -55,6 +55,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 					setIconColor(Spectrum.green)
 					setIconResource(R.drawable.system_notification_icon)
 					info.subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
+					ownerSignIcon.visibility = View.GONE
 				}
 			}
 		}

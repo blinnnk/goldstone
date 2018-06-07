@@ -43,11 +43,24 @@ data class QuotationSelectionTable(
 	var description: String? = null,
 	var lineChartWeek: String? = "",
 	var lineChartMonth: String? = "",
-	var lineChartHour: String? = ""
+	var lineChartHour: String? = "",
+	var website: String = "",
+	var whitePaper: String = "",
+	var exchange: String = "",
+	var socialMedia: String = "",
+	var startDate: String = "",
+	var marketCap: Double = 0.0,
+	var rank: String = "",
+	var highTotal: String = "",
+	var lowTotal: String = "",
+	var high24: String = "",
+	var low24: String = "",
+	var availableSupply: Double = 0.0
 ) : Serializable {
 	
 	constructor(
-		data: QuotationSelectionTable, lineChart: String
+		data: QuotationSelectionTable,
+		lineChart: String
 	) : this(
 		0,
 		data.marketID,
@@ -92,15 +105,13 @@ data class QuotationSelectionTable(
 			}
 		}
 		
-		fun updateDescription(
-			pair: String, content: String
-		) {
+		fun updateDescription(pair: String, content: String) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					getSelectionByPair(pair)?.let {
 						update(it.apply {
-							description = HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()) +
-								content
+							description =
+								HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()) + content
 						})
 					}
 				}
@@ -108,9 +119,10 @@ data class QuotationSelectionTable(
 		}
 		
 		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable?) -> Unit) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
+				}) {
 				hold(it)
 			}
 		}
@@ -136,7 +148,9 @@ data class QuotationSelectionTable(
 		fun getMySelections(hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.quotationSelectionDao()
+					GoldStoneDataBase
+						.database
+						.quotationSelectionDao()
 						.getQuotationSelfSelections()
 				}) {
 				hold(it.toArrayList())
