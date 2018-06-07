@@ -8,8 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.base.HoneyBaseAdapter
-import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
@@ -53,14 +51,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			isNull() isTrue {
 				setRecyclerViewAdapter(recyclerView, asyncData)
 			} otherwise {
-				val adapter = recyclerView.adapter
-				if (adapter is HoneyBaseAdapter<*, *>) {
-					adapter.dataSet.clear()
-					setRecyclerViewAdapter(recyclerView, asyncData)
-				} else if (adapter is HoneyBaseAdapterWithHeaderAndFooter<*, *, *, *>) {
-					adapter.dataSet.clear()
-					setRecyclerViewAdapter(recyclerView, asyncData)
-				}
+				notifyDataSetChanged()
 			}
 		}
 		

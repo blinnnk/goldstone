@@ -35,27 +35,18 @@ import org.jetbrains.anko.runOnUiThread
  * @date 24/03/2018 2:12 PM
  * @author KaySaith
  */
-// save data in memory for the next showing speed
-var localTransactions: ArrayList<TransactionListModel>? = null
-
 class TransactionListPresenter(
 	override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 	
 	override fun updateData() {
 		fragment.showLoadingView(LoadingText.transactionData)
-		if (!localTransactions.isNull()) {
-			fragment.asyncData = localTransactions
-			/** show memory data and at the same time update the chain data in async thread */
-			fragment.updateTransactionInAsync(localTransactions!!)
-		} else {
-			// 先显示一个空数据
-			fragment.asyncData = arrayListOf()
-			// 不让 `UI` 觉得卡顿, 等动画执行完毕后再发起数据处理业务
-			AnimationDuration.Default timeUpThen {
-				// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
-				fragment.initData()
-			}
+		// 先显示一个空数据
+		fragment.asyncData = arrayListOf()
+		// 不让 `UI` 觉得卡顿, 等动画执行完毕后再发起数据处理业务
+		AnimationDuration.Default timeUpThen {
+			// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
+			fragment.initData()
 		}
 	}
 	
@@ -73,11 +64,10 @@ class TransactionListPresenter(
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
 			if (it.isNotEmpty()) {
-				fragment.asyncData = it
-				fragment.recyclerView.adapter.notifyDataSetChanged()
+				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
-				localTransactions = it
-				removeLoadingView()
+				// 异步更新网络数据
+				fragment.updateTransactionInAsync(it)
 			} else {
 				/**
 				 * if there is none data in local then `StartBlock 0`
@@ -86,10 +76,8 @@ class TransactionListPresenter(
 				getTransactionDataFromEtherScan("0", {
 					fragment.context?.alert(it.toString())
 				}) {
-					fragment.asyncData = it
-					fragment.recyclerView.adapter.notifyDataSetChanged()
+					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
-					localTransactions = it
 					removeLoadingView()
 				}
 			}
@@ -124,8 +112,6 @@ class TransactionListPresenter(
 					// when finish update ui in UI thread
 					context?.runOnUiThread {
 						localData.addAll(0, newData)
-						// save data into the memory for the next time showing speed
-						localTransactions = localData
 						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
 						removeLoadingView()
 					}
