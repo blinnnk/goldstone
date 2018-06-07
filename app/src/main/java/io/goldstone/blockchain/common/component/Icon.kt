@@ -35,7 +35,7 @@ class SquareIcon(
 		SquareIcon.Companion.Style.Big -> 36.uiPX()
 	}
 	private val imageSize = when (style) {
-		SquareIcon.Companion.Style.Small -> 20.uiPX()
+		SquareIcon.Companion.Style.Small -> 24.uiPX()
 		SquareIcon.Companion.Style.Big -> 28.uiPX()
 	}
 	private val cornerSize = when (style) {

@@ -5,11 +5,19 @@ apply plugin: 'kotlin-platform-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-  compileSdkVersion 27
+  signingConfigs {
+    release {
+      storeFile file('/Users/saithkay/goldstoneAndroidKeystore')
+      storePassword 'goldStone20180322'
+      keyAlias 'key0'
+      keyPassword 'goldStone20180322'
+    }
+  }
+  compileSdkVersion 28
   defaultConfig {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
-    targetSdkVersion 27
+    targetSdkVersion 28
     versionCode 1
     versionName "BETA 1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -24,11 +32,12 @@ android {
       abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
     }
   }
+
   buildTypes {
     debug {
-      minifyEnabled false
-      zipAlignEnabled false
-      shrinkResources false
+      minifyEnabled true
+      zipAlignEnabled true
+      shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
     release {
@@ -36,13 +45,14 @@ android {
       zipAlignEnabled true
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
     }
   }
-  buildToolsVersion '27.0.3'
 }
 
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
+  //noinspection GradleCompatible
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation 'com.android.support.constraint:constraint-layout:1.1.1'
   testImplementation 'junit:junit:4.12'
@@ -53,6 +63,7 @@ dependencies {
   annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
   kapt 'com.github.bumptech.glide:compiler:4.7.1'
   // Recycler View
+  //noinspection GradleCompatible
   implementation 'com.android.support:recyclerview-v7:27.1.1'
   // Anko
   implementation('org.jetbrains.anko:anko:0.10.5') {
@@ -64,8 +75,8 @@ dependencies {
   implementation 'org.ethereum:geth:1.8.8'
   implementation 'org.web3j:core:3.3.1-android'
   // Support PBKDF2withHmacSHA512 Below Api 26
-  implementation "com.madgag.spongycastle:core:1.58.0.0"
-  implementation "com.madgag.spongycastle:prov:1.58.0.0"
+  implementation 'com.madgag.spongycastle:core:1.58.0.0'
+  implementation 'com.madgag.spongycastle:prov:1.58.0.0'
   // BlurView
   implementation 'com.github.mmin18:realtimeblurview:1.1.0'
   // Chart

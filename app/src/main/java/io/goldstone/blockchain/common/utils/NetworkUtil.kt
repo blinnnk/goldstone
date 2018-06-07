@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.common.utils
 
 import android.annotation.SuppressLint

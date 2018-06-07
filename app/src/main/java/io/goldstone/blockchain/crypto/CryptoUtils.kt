@@ -25,11 +25,6 @@ object CryptoUtils {
 		else address.substring(0, 5) + " ··· " + address.substring(address.length - 5, address.length)
 	}
 	
-	fun scaleTo9(address: String): String {
-		return if (address.length < 9) address
-		else address.substring(0, 9) + "···"
-	}
-	
 	fun scaleTo16(address: String): String {
 		return if (address.length < 16) address
 		else address.substring(0, 16) + "···"
