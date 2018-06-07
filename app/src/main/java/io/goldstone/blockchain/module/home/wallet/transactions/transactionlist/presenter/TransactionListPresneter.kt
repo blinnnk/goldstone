@@ -73,7 +73,8 @@ class TransactionListPresenter(
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
 			if (it.isNotEmpty()) {
-				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+				fragment.asyncData = it
+				fragment.recyclerView.adapter.notifyDataSetChanged()
 				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 				localTransactions = it
 				removeLoadingView()
@@ -85,7 +86,8 @@ class TransactionListPresenter(
 				getTransactionDataFromEtherScan("0", {
 					fragment.context?.alert(it.toString())
 				}) {
-					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+					fragment.asyncData = it
+					fragment.recyclerView.adapter.notifyDataSetChanged()
 					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 					localTransactions = it
 					removeLoadingView()
