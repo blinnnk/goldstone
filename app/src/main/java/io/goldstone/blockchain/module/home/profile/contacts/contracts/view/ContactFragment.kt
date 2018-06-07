@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 26/03/2018 1:37 PM

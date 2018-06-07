@@ -40,4 +40,5 @@ object SharesPreference {
 	const val currentLanguage = "currentLanguage"
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"
+	const val activityIsResult = "activityIsResult"
 }

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.presenter
 
 import android.view.View
-import android.widget.RelativeLayout
 import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
@@ -9,7 +8,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.RoundBorderButton
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -31,7 +29,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameedito
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsHeader
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
-import org.jetbrains.anko.wrapContent
 
 /**
  * @date 25/03/2018 6:30 PM
@@ -94,7 +91,7 @@ class WalletSettingsPresenter(
 	private fun showWalletListFragment() {
 		fragment.apply {
 			headerTitle = WalletText.wallet
-			overlayView.header.showAddButton(true) {
+			overlayView.header.showAddButton(true, false) {
 				showWalletAddingMethodFragment()
 			}
 			setNormalHeaderWithHeight(0)
@@ -211,7 +208,7 @@ class WalletSettingsPresenter(
 			header.showBackButton(true) { showWalletSettingListFragment() }
 			header.showCloseButton(false)
 			if (contentHeight != 0) {
-				contentLayout.updateHeightAnimation(contentHeight) {
+				contentLayout.updateHeightAnimation(contentHeight, contentHeight, 0) {
 					if (contentHeight >= ScreenSize.Height) {
 						AnimationDuration.Default timeUpThen {
 							fragment.getMainActivity()?.hideHomeFragment()

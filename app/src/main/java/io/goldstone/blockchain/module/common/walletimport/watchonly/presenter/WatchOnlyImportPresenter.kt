@@ -36,7 +36,7 @@ class WatchOnlyImportPresenter(
 			callback()
 			return
 		}
-		val name = if (nameInput.text.toString().isEmpty()) "Wallet"
+		val name = if (nameInput.text.toString().isEmpty()) nameInput.hint.toString()
 		else nameInput.text.toString()
 		
 		WalletTable.getWalletByAddress(address) {

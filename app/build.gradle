@@ -26,9 +26,9 @@ android {
   }
   buildTypes {
     debug {
-      minifyEnabled true
-      zipAlignEnabled true
-      shrinkResources true
+      minifyEnabled false
+      zipAlignEnabled false
+      shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
     release {
@@ -44,7 +44,7 @@ android {
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   implementation 'com.android.support:appcompat-v7:27.1.1'
-  implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+  implementation 'com.android.support.constraint:constraint-layout:1.1.1'
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -81,10 +81,9 @@ dependencies {
   implementation 'com.google.zxing:core:3.3.2'
   // 信鸽 Push
   implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
-  // wup包
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
-  // mid包
   implementation 'com.tencent.mid:mid:4.0.6-release'
+  implementation 'com.tencent.xinge:xgmz:3.2.2-release'
   // Google Analytics
   implementation 'com.google.android.gms:play-services-analytics:16.0.0'
   // Wave Animation

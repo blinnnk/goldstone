@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
@@ -48,7 +49,10 @@ class TokenDetailPresenter(
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
 			updateEmptyCharData(fragment.token?.symbol!!)
-			prepareTokenDetailData()
+			// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
+			AnimationDuration.Default timeUpThen {
+				prepareTokenDetailData()
+			}
 		}
 	}
 	

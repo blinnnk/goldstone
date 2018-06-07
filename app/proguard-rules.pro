@@ -215,6 +215,8 @@
 # Xin Ge
 -keep class com.tencent.android.tpush.**  {*;}
 -keep class com.tencent.mid.**  {*;}
+-dontwarn com.meizu.cloud.pushsdk.**
+-keep class com.meizu.cloud.pushsdk.**{*;}
 
 # Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule

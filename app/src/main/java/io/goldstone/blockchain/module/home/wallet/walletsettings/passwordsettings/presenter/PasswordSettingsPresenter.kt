@@ -38,7 +38,10 @@ class PasswordSettingsPresenter(
 				WalletTable.current.address,
 				oldPasswordInput.text.toString(),
 				password,
-				callback
+				{
+					//error callback
+					callback()
+				}
 			) {
 				fragment.toast(CommonText.succeed)
 				callback()

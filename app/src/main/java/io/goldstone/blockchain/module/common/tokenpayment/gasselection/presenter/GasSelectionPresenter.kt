@@ -155,7 +155,7 @@ class GasSelectionPresenter(
 		} else {
 			// 如果当前站长不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			MyTokenTable.getBalanceWithContract(
-				CryptoValue.ethContract,
+				token?.contract.orEmpty(),
 				WalletTable.current.address,
 				true,
 				{ error, reason ->
@@ -200,7 +200,9 @@ class GasSelectionPresenter(
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall
 						.sendRawTransaction(hexValue, { error, reason ->
-							fragment.context?.alert(reason ?: error.toString())
+							fragment.context?.apply {
+								runOnUiThread { alert(reason ?: error.toString()) }
+							}
 						}) { taxHash ->
 							LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 							// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
