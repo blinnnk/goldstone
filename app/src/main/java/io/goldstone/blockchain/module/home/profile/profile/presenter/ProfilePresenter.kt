@@ -10,7 +10,6 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
@@ -46,11 +45,13 @@ class ProfilePresenter(
 					contactCount.size.toString()
 				),
 				ProfileModel(
-					R.drawable.currency_icon, ProfileText.currency,
+					R.drawable.currency_icon,
+					ProfileText.currency,
 					Config.getCurrencyCode()
 				),
 				ProfileModel(
-					R.drawable.language_icon, ProfileText.language,
+					R.drawable.language_icon,
+					ProfileText.language,
 					getCurrentLanguageSymbol()
 				),
 				ProfileModel(
@@ -162,5 +163,5 @@ class ProfilePresenter(
 	}
 	
 	private fun getCurrentLanguageSymbol() =
-		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguage())
+		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguageCode())
 }

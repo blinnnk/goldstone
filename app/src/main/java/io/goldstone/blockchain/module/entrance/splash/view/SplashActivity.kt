@@ -130,7 +130,7 @@ class SplashActivity : AppCompatActivity() {
 	 * set and displaying the interface from the database.
 	 */
 	private fun initLaunchLanguage(code: Int) {
-		Config.updateCurrentLanguage(code)
+		Config.updateCurrentLanguageCode(code)
 	}
 	
 	private fun setCurrentChainID(id: String) {

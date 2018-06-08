@@ -150,10 +150,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				AppConfigTable.getAppConfig { config ->
 					// 把地址转换成 `JsonArray` 格式
 					toJsonArray {
-						GoldStoneAPI.registerWalletAddress(it, config?.goldStoneID.orEmpty(), {
-							// 网络有问题的时候或其他错误的时候标记注册失败
-							AppConfigTable.updateRegisterAddressesStatus(false)
-						}) {
+						GoldStoneAPI.registerWalletAddress(
+							it,
+							config?.goldStoneID.orEmpty(),
+							{
+								// 网络有问题的时候或其他错误的时候标记注册失败
+								AppConfigTable.updateRegisterAddressesStatus(false)
+							}
+						) {
 							GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
 								isSucceed isTrue {
 									AppConfigTable.updateRegisterAddressesStatus(true)

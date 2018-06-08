@@ -8,10 +8,13 @@ import com.blinnnk.extension.toUpperCaseFirstLetter
  * @date 21/03/2018 7:34 PM
  * @author KaySaith
  */
-private val currentLanguage = Config.getCurrentLanguage()
+private val currentLanguage =
+	if (HoneyLanguage.currentLanguageIsSupported()) Config.getCurrentLanguageCode()
+	else HoneyLanguage.English.code
 
 object CreateWalletText {
-	@JvmField val attention = when (currentLanguage) {
+	@JvmField
+	val attention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password strength is critical for the security of your wallet. We will be unable to recover your password, so make sure save it yourself, and in a very secure way!"
 		HoneyLanguage.Chinese.code -> "越强的密码越安全，请尽量设置更复杂的密码。我们不会为您保管密码，请您谨慎保管。"
 		HoneyLanguage.Japanese.code -> "パスワードが複雑になればなるほど、財布はより安全になります。 あなたのパスワードを保持しません、慎重にバックアップしてください。"
@@ -20,7 +23,8 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管。"
 		else -> ""
 	}
-	@JvmField val create = when (currentLanguage) {
+	@JvmField
+	val create = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Start a New Wallet"
 		HoneyLanguage.Chinese.code -> "创建钱包"
 		HoneyLanguage.Japanese.code -> "ウォレット作成"
@@ -29,7 +33,8 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "產生錢包"
 		else -> ""
 	}
-	@JvmField val passwordRules = when (currentLanguage) {
+	@JvmField
+	val passwordRules = when (currentLanguage) {
 		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters"
 		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，并少于8位"
 		HoneyLanguage.Japanese.code -> "もっと安全なパスワードを設定して、同時に英語の大書きと小書きと数字を含んで、8位より少ないです"
@@ -176,7 +181,7 @@ object CreateWalletText {
 }
 
 object ImportWalletText {
-
+	
 	val importWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import Wallet"
 		HoneyLanguage.Chinese.code -> "导入钱包"
@@ -222,7 +227,8 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "在此輸入您的私鑰"
 		else -> ""
 	}
-	@JvmField val address = when (currentLanguage) {
+	@JvmField
+	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Address"
 		HoneyLanguage.Chinese.code -> "钱包地址"
 		HoneyLanguage.Japanese.code -> "ウォレットアドレス"
@@ -315,7 +321,7 @@ object ImportWalletText {
 }
 
 object DialogText {
-
+	
 	val backUpMnemonicSucceed = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You have backed up your Mnemonics backed up!"
 		HoneyLanguage.Chinese.code -> "助记词备份成功！"
@@ -373,8 +379,9 @@ object DialogText {
 }
 
 object WalletText {
-
-	@JvmField val totalAssets = when (currentLanguage) {
+	
+	@JvmField
+	val totalAssets = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Assets"
 		HoneyLanguage.Chinese.code -> "钱包所有财产"
 		HoneyLanguage.Japanese.code -> "総資産"
@@ -383,7 +390,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "總資產"
 		else -> ""
 	}
-	@JvmField val manage = when (currentLanguage) {
+	@JvmField
+	val manage = when (currentLanguage) {
 		HoneyLanguage.English.code -> "MANAGE"
 		HoneyLanguage.Chinese.code -> "管理钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを管理する"
@@ -392,7 +400,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "管理錢包"
 		else -> ""
 	}
-	@JvmField val section = when (currentLanguage) {
+	@JvmField
+	val section = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Tokens:"
 		HoneyLanguage.Chinese.code -> "我的资产:"
 		HoneyLanguage.Japanese.code -> "私の資産:"
@@ -401,7 +410,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "我的資產:"
 		else -> ""
 	}
-	@JvmField val addToken = when (currentLanguage) {
+	@JvmField
+	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Tokens"
 		HoneyLanguage.Chinese.code -> "添加Token"
 		HoneyLanguage.Japanese.code -> "追加する"
@@ -410,7 +420,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
 		else -> ""
 	}
-	@JvmField val addWallet = when (currentLanguage) {
+	@JvmField
+	val addWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add Wallet"
 		HoneyLanguage.Chinese.code -> "添加钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを追加"
@@ -419,7 +430,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "添加錢包"
 		else -> ""
 	}
-	@JvmField val wallet = when (currentLanguage) {
+	@JvmField
+	val wallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet"
 		HoneyLanguage.Chinese.code -> "钱包"
 		HoneyLanguage.Japanese.code -> "ウォレット"
@@ -428,7 +440,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包"
 		else -> ""
 	}
-	@JvmField val historyButton = when (currentLanguage) {
+	@JvmField
+	val historyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "History"
 		HoneyLanguage.Chinese.code -> "记录"
 		HoneyLanguage.Japanese.code -> "記録"
@@ -437,7 +450,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "記錄"
 		else -> ""
 	}
-	@JvmField val notifyButton = when (currentLanguage) {
+	@JvmField
+	val notifyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Notifications"
 		HoneyLanguage.Chinese.code -> "通知"
 		HoneyLanguage.Japanese.code -> "通知"
@@ -446,7 +460,8 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "通知"
 		else -> ""
 	}
-	@JvmField val tokenDetailHeaderText = when (currentLanguage) {
+	@JvmField
+	val tokenDetailHeaderText = when (currentLanguage) {
 		HoneyLanguage.English.code -> "MY"
 		HoneyLanguage.Chinese.code -> "我的"
 		HoneyLanguage.Japanese.code -> "私の"
@@ -455,12 +470,12 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "我的"
 		else -> ""
 	}
-
 }
 
 object TransactionText {
-
-	@JvmField val transaction = when (currentLanguage) {
+	
+	@JvmField
+	val transaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction History"
 		HoneyLanguage.Chinese.code -> "交易历史"
 		HoneyLanguage.Japanese.code -> "取引履歴"
@@ -469,7 +484,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "交易歷史"
 		else -> ""
 	}
-	@JvmField val detail = when (currentLanguage) {
+	@JvmField
+	val detail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Details"
 		HoneyLanguage.Chinese.code -> "交易详情"
 		HoneyLanguage.Japanese.code -> "取引の詳細"
@@ -478,7 +494,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "交易明細"
 		else -> ""
 	}
-	@JvmField val etherScanTransaction = when (currentLanguage) {
+	@JvmField
+	val etherScanTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Etherscan Details"
 		HoneyLanguage.Chinese.code -> "EtherScan详情"
 		HoneyLanguage.Japanese.code -> "エーテルスキャンの詳細"
@@ -487,7 +504,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "EtherScan詳情"
 		else -> ""
 	}
-	@JvmField val url = when (currentLanguage) {
+	@JvmField
+	val url = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Open URL"
 		HoneyLanguage.Chinese.code -> "从网址打开"
 		HoneyLanguage.Japanese.code -> "URLを開く"
@@ -496,7 +514,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "從網址打開"
 		else -> ""
 	}
-	@JvmField val confirmTransaction = when (currentLanguage) {
+	@JvmField
+	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"
 		HoneyLanguage.Chinese.code -> "输入您的密码以确认交易"
 		HoneyLanguage.Japanese.code -> "取引を確認するためにパスワードを入力してください"
@@ -505,7 +524,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入您的密碼以確認交易"
 		else -> ""
 	}
-	@JvmField val minerFee = when (currentLanguage) {
+	@JvmField
+	val minerFee = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Miner Fee"
 		HoneyLanguage.Chinese.code -> "矿工费"
 		HoneyLanguage.Japanese.code -> "鉱夫料"
@@ -514,7 +534,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "礦工費"
 		else -> ""
 	}
-	@JvmField val memo = when (currentLanguage) {
+	@JvmField
+	val memo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Memo"
 		HoneyLanguage.Chinese.code -> "备注"
 		HoneyLanguage.Japanese.code -> "メモ"
@@ -523,7 +544,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "메모"
 		else -> ""
 	}
-	@JvmField val transactionHash = when (currentLanguage) {
+	@JvmField
+	val transactionHash = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Hash"
 		HoneyLanguage.Chinese.code -> "交易编号(Hash)"
 		HoneyLanguage.Japanese.code -> "トランザクションハッシュ"
@@ -532,7 +554,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "交易編號(Hash)"
 		else -> ""
 	}
-	@JvmField val blockNumber = when (currentLanguage) {
+	@JvmField
+	val blockNumber = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Block Height"
 		HoneyLanguage.Chinese.code -> "区块高度"
 		HoneyLanguage.Japanese.code -> "ブロック高さ"
@@ -541,7 +564,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "區塊高度"
 		else -> ""
 	}
-	@JvmField val transactionDate = when (currentLanguage) {
+	@JvmField
+	val transactionDate = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Date"
 		HoneyLanguage.Chinese.code -> "交易日期"
 		HoneyLanguage.Japanese.code -> "取引日"
@@ -550,7 +574,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "交易日期"
 		else -> ""
 	}
-	@JvmField val gasLimit = when (currentLanguage) {
+	@JvmField
+	val gasLimit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Gas Limit"
 		HoneyLanguage.Chinese.code -> "燃气费上限"
 		HoneyLanguage.Japanese.code -> "ガスリミット"
@@ -559,7 +584,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "燃氣費上限"
 		else -> ""
 	}
-	@JvmField val gasPrice = when (currentLanguage) {
+	@JvmField
+	val gasPrice = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Gas Price (Gwei)"
 		HoneyLanguage.Chinese.code -> "燃气单价"
 		HoneyLanguage.Japanese.code -> "ガス単価"
@@ -568,7 +594,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "燃氣單價"
 		else -> ""
 	}
-	@JvmField val noMemo = when (currentLanguage) {
+	@JvmField
+	val noMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't a memo."
 		HoneyLanguage.Chinese.code -> "没有备注信息。"
 		HoneyLanguage.Japanese.code -> "メモはありません。"
@@ -577,7 +604,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "沒有備註信息。"
 		else -> ""
 	}
-	@JvmField val receivedFrom = when (currentLanguage) {
+	@JvmField
+	val receivedFrom = when (currentLanguage) {
 		HoneyLanguage.English.code -> " received from "
 		HoneyLanguage.Chinese.code -> " 接受自 "
 		HoneyLanguage.Japanese.code -> " 受け取りました，送信先は　"
@@ -586,7 +614,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> " 接收自 "
 		else -> ""
 	}
-	@JvmField val sentTo = when (currentLanguage) {
+	@JvmField
+	val sentTo = when (currentLanguage) {
 		HoneyLanguage.English.code -> " sent to "
 		HoneyLanguage.Chinese.code -> " 发送至 "
 		HoneyLanguage.Japanese.code -> " 送りました，宛先は　"
@@ -595,7 +624,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "  發送至 "
 		else -> ""
 	}
-	@JvmField val transferResultReceived = when (currentLanguage) {
+	@JvmField
+	val transferResultReceived = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Received "
 		HoneyLanguage.Chinese.code -> "入账 "
 		HoneyLanguage.Japanese.code -> ""
@@ -604,7 +634,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "入賬 "
 		else -> ""
 	}
-	@JvmField val transferResultFrom = when (currentLanguage) {
+	@JvmField
+	val transferResultFrom = when (currentLanguage) {
 		HoneyLanguage.English.code -> " from"
 		HoneyLanguage.Chinese.code -> ", 来自"
 		HoneyLanguage.Japanese.code -> " を受け取りました, 送信者は"
@@ -613,7 +644,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> ", 來自"
 		else -> ""
 	}
-	@JvmField val transferResultSent = when (currentLanguage) {
+	@JvmField
+	val transferResultSent = when (currentLanguage) {
 		HoneyLanguage.English.code -> " Sent"
 		HoneyLanguage.Chinese.code -> "转出"
 		HoneyLanguage.Japanese.code -> ""
@@ -622,7 +654,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "轉出"
 		else -> ""
 	}
-	@JvmField val transferResultTo = when (currentLanguage) {
+	@JvmField
+	val transferResultTo = when (currentLanguage) {
 		HoneyLanguage.English.code -> " to"
 		HoneyLanguage.Chinese.code -> " 至"
 		HoneyLanguage.Japanese.code -> " を送りました, 宛先は"
@@ -631,7 +664,8 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "至"
 		else -> ""
 	}
-	@JvmField val confirmedBlocks = when (currentLanguage) {
+	@JvmField
+	val confirmedBlocks = when (currentLanguage) {
 		HoneyLanguage.English.code -> "6 blocks have comfirmed"
 		HoneyLanguage.Chinese.code -> "6 个区块已经确认了本次转账"
 		HoneyLanguage.Japanese.code -> "6 ブロックがこの転送を確認しました"
@@ -643,8 +677,9 @@ object TransactionText {
 }
 
 object TokenDetailText {
-
-	@JvmField val address = when (currentLanguage) {
+	
+	@JvmField
+	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"
 		HoneyLanguage.Chinese.code -> "接收地址"
 		HoneyLanguage.Japanese.code -> "受信者アドレス"
@@ -653,7 +688,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "接收地址"
 		else -> ""
 	}
-	@JvmField val deposit = when (currentLanguage) {
+	@JvmField
+	val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Deposit"
 		HoneyLanguage.Chinese.code -> "接收"
 		HoneyLanguage.Japanese.code -> "受信"
@@ -662,7 +698,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "接收"
 		else -> ""
 	}
-	@JvmField val customGas = when (currentLanguage) {
+	@JvmField
+	val customGas = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Gas Editor"
 		HoneyLanguage.Chinese.code -> "自定义燃气费"
 		HoneyLanguage.Japanese.code -> "カスタムガス料金"
@@ -671,7 +708,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "自定義燃氣費"
 		else -> ""
 	}
-	@JvmField val paymentValue = when (currentLanguage) {
+	@JvmField
+	val paymentValue = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Payment Value"
 		HoneyLanguage.Chinese.code -> "实际价值"
 		HoneyLanguage.Japanese.code -> "実際の値"
@@ -680,7 +718,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "實際價值"
 		else -> ""
 	}
-	@JvmField val transferDetail = when (currentLanguage) {
+	@JvmField
+	val transferDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer Detail"
 		HoneyLanguage.Chinese.code -> "交易详情"
 		HoneyLanguage.Japanese.code -> "取引の詳細"
@@ -689,7 +728,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "交易詳情"
 		else -> ""
 	}
-	@JvmField val customMiner = when (currentLanguage) {
+	@JvmField
+	val customMiner = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom miner fee"
 		HoneyLanguage.Chinese.code -> "自定义矿工费"
 		HoneyLanguage.Japanese.code -> "カスタム鉱夫料金"
@@ -698,7 +738,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "自定義礦工費"
 		else -> ""
 	}
-	@JvmField val tokenDetail = when (currentLanguage) {
+	@JvmField
+	val tokenDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description"
 		HoneyLanguage.Chinese.code -> "代币详情"
 		HoneyLanguage.Japanese.code -> "Tokenの詳細"
@@ -707,7 +748,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "代幣詳情"
 		else -> ""
 	}
-	@JvmField val transferToLocalWalletAlertDescription = when (currentLanguage) {
+	@JvmField
+	val transferToLocalWalletAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This will transfer value to an address already in one of your wallets. Are you sure?"
 		HoneyLanguage.Chinese.code -> "这个地址也在GoldStone钱包中。你确定要给这个地址转账吗？"
 		HoneyLanguage.Japanese.code -> "このアドレスは、GoldStoneウォレットにも記載されています。 このアドレスを転送してもよろしいですか？"
@@ -716,7 +758,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "這個地址也在Goldstone錢包中，你確定要給自己轉賬嗎？"
 		else -> ""
 	}
-	@JvmField val transferToLocalWalletAlertTitle = when (currentLanguage) {
+	@JvmField
+	val transferToLocalWalletAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Alert"
 		HoneyLanguage.Chinese.code -> "转账提示"
 		HoneyLanguage.Japanese.code -> "取引のヒント"
@@ -728,8 +771,9 @@ object TokenDetailText {
 }
 
 object CommonText {
-
-	@JvmField val confirm = when (currentLanguage) {
+	
+	@JvmField
+	val confirm = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CONFIRM"
 		HoneyLanguage.Chinese.code -> "确认"
 		HoneyLanguage.Japanese.code -> "確認"
@@ -738,7 +782,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "確認"
 		else -> ""
 	}
-	@JvmField val wrongPassword = when (currentLanguage) {
+	@JvmField
+	val wrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Password"
 		HoneyLanguage.Chinese.code -> "密码错误"
 		HoneyLanguage.Japanese.code -> "間違ったパスワード"
@@ -747,7 +792,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "密碼錯誤"
 		else -> ""
 	}
-	@JvmField val succeed = when (currentLanguage) {
+	@JvmField
+	val succeed = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Success"
 		HoneyLanguage.Chinese.code -> "成功"
 		HoneyLanguage.Japanese.code -> "成功"
@@ -756,7 +802,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "成功"
 		else -> ""
 	}
-	@JvmField val skip = when (currentLanguage) {
+	@JvmField
+	val skip = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up Later"
 		HoneyLanguage.Chinese.code -> "稍后备份"
 		HoneyLanguage.Japanese.code -> "後でバックアップする"
@@ -765,7 +812,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "稍後備份"
 		else -> ""
 	}
-	@JvmField val create = when (currentLanguage) {
+	@JvmField
+	val create = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CREATE"
 		HoneyLanguage.Chinese.code -> "添加"
 		HoneyLanguage.Japanese.code -> "追加"
@@ -774,7 +822,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "添加"
 		else -> ""
 	}
-	@JvmField val cancel = when (currentLanguage) {
+	@JvmField
+	val cancel = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CANCEL"
 		HoneyLanguage.Chinese.code -> "取消"
 		HoneyLanguage.Japanese.code -> "閉じる"
@@ -783,7 +832,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "取消"
 		else -> ""
 	}
-	@JvmField val new = when (currentLanguage) {
+	@JvmField
+	val new = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NEW"
 		HoneyLanguage.Chinese.code -> "新版本"
 		HoneyLanguage.Japanese.code -> "新しい"
@@ -792,7 +842,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "새 버전"
 		else -> ""
 	}
-	@JvmField val next = when (currentLanguage) {
+	@JvmField
+	val next = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NEXT"
 		HoneyLanguage.Chinese.code -> "下一步"
 		HoneyLanguage.Japanese.code -> "次へ"
@@ -801,7 +852,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "下一步"
 		else -> ""
 	}
-	@JvmField val saveToAlbum = when (currentLanguage) {
+	@JvmField
+	val saveToAlbum = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SAVE TO ALBUM"
 		HoneyLanguage.Chinese.code -> "保存到相册"
 		HoneyLanguage.Japanese.code -> "アルバムに保存"
@@ -810,7 +862,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "保存到相簿"
 		else -> ""
 	}
-	@JvmField val shareQRImage = when (currentLanguage) {
+	@JvmField
+	val shareQRImage = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Share QR Image"
 		HoneyLanguage.Chinese.code -> "分享二维码"
 		HoneyLanguage.Japanese.code -> "QRコードを共有する"
@@ -819,7 +872,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "分享二維碼"
 		else -> ""
 	}
-	@JvmField val copyAddress = when (currentLanguage) {
+	@JvmField
+	val copyAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click to Copy Address"
 		HoneyLanguage.Chinese.code -> "点击复制地址"
 		HoneyLanguage.Japanese.code -> "コピーアドレスをクリックします"
@@ -828,7 +882,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "點擊複製地址"
 		else -> ""
 	}
-	@JvmField val startImporting = when (currentLanguage) {
+	@JvmField
+	val startImporting = when (currentLanguage) {
 		HoneyLanguage.English.code -> "START IMPORTING"
 		HoneyLanguage.Chinese.code -> "开始导入"
 		HoneyLanguage.Japanese.code -> "インポートを開始する"
@@ -837,7 +892,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "開始導入"
 		else -> ""
 	}
-	@JvmField val enterPassword = when (currentLanguage) {
+	@JvmField
+	val enterPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Password"
 		HoneyLanguage.Chinese.code -> "输入钱包密码"
 		HoneyLanguage.Japanese.code -> "パスワードを入力してください"
@@ -846,7 +902,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入錢包密碼"
 		else -> ""
 	}
-	@JvmField val delete = when (currentLanguage) {
+	@JvmField
+	val delete = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Delete Wallet"
 		HoneyLanguage.Chinese.code -> "删除钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを削除"
@@ -855,7 +912,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "刪除錢包"
 		else -> ""
 	}
-	@JvmField val slow = when (currentLanguage) {
+	@JvmField
+	val slow = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SLOW"
 		HoneyLanguage.Chinese.code -> "慢"
 		HoneyLanguage.Japanese.code -> "遅い"
@@ -864,7 +922,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "慢"
 		else -> ""
 	}
-	@JvmField val fast = when (currentLanguage) {
+	@JvmField
+	val fast = when (currentLanguage) {
 		HoneyLanguage.English.code -> "FAST"
 		HoneyLanguage.Chinese.code -> "快速"
 		HoneyLanguage.Japanese.code -> "速い"
@@ -873,8 +932,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "快速"
 		else -> ""
 	}
-
-	@JvmField val send = when (currentLanguage) {
+	@JvmField
+	val send = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SEND"
 		HoneyLanguage.Chinese.code -> "转出"
 		HoneyLanguage.Japanese.code -> "転送する"
@@ -883,8 +942,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "轉出"
 		else -> ""
 	}
-
-	@JvmField val deposit = when (currentLanguage) {
+	@JvmField
+	val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEPOSIT"
 		HoneyLanguage.Chinese.code -> "存入"
 		HoneyLanguage.Japanese.code -> "デポジット"
@@ -893,8 +952,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "存入"
 		else -> ""
 	}
-
-	@JvmField val from = when (currentLanguage) {
+	@JvmField
+	val from = when (currentLanguage) {
 		HoneyLanguage.English.code -> "FROM"
 		HoneyLanguage.Chinese.code -> "发送者"
 		HoneyLanguage.Japanese.code -> "送信者"
@@ -903,8 +962,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "發送者"
 		else -> ""
 	}
-
-	@JvmField val to = when (currentLanguage) {
+	@JvmField
+	val to = when (currentLanguage) {
 		HoneyLanguage.English.code -> "TO"
 		HoneyLanguage.Chinese.code -> "发送至"
 		HoneyLanguage.Japanese.code -> "送信先"
@@ -913,7 +972,8 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "發送至"
 		else -> ""
 	}
-	@JvmField val upgrade = when (currentLanguage) {
+	@JvmField
+	val upgrade = when (currentLanguage) {
 		HoneyLanguage.English.code -> "UPGRADE"
 		HoneyLanguage.Chinese.code -> "升级版本"
 		HoneyLanguage.Japanese.code -> "アップグレード"
@@ -925,8 +985,9 @@ object CommonText {
 }
 
 object AlertText {
-
-	@JvmField val watchOnly = when (currentLanguage) {
+	
+	@JvmField
+	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current wallet is watch-only. This operation is not allowed."
 		HoneyLanguage.Chinese.code -> "这是观察钱包，无法进行转账交易。"
 		HoneyLanguage.Japanese.code -> "これは観測ウォレットであり、トランザクションを転送できません。"
@@ -935,7 +996,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "這是觀察錢包，無法進行轉賬交易。"
 		else -> ""
 	}
-	@JvmField val importWalletNetwork = when (currentLanguage) {
+	@JvmField
+	val importWalletNetwork = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Network unavailable. Network is required to check the value of the importing wallet"
 		HoneyLanguage.Chinese.code -> "没有检测到网络，导入钱包时需要网络环境查询您的货币余额"
 		HoneyLanguage.Japanese.code -> "ネットワークが検出されず、ウォレットをインポートする際に通貨残高を照会するためのネットワーク環境が必要"
@@ -944,7 +1006,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額"
 		else -> ""
 	}
-	@JvmField val balanceNotEnough = when (currentLanguage) {
+	@JvmField
+	val balanceNotEnough = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Insufficient funds for transfer and gas fees"
 		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与燃气费"
 		HoneyLanguage.Japanese.code -> "お客様の口座残高は、振替額とガス費用をカバーするには不十分です"
@@ -953,7 +1016,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
 		else -> ""
 	}
-	@JvmField val transferWrongDecimal = when (currentLanguage) {
+	@JvmField
+	val transferWrongDecimal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."
 		HoneyLanguage.Chinese.code -> "当前的token不支持你输入的小数位数，请修改金额重新提交"
 		HoneyLanguage.Japanese.code -> "現在のtokenは入力した小数点以下の桁数をサポートしていません。再送信する金額を変更してください"
@@ -962,7 +1026,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "當前的token不支持您輸入的小數位數，請修改金額重新提交"
 		else -> ""
 	}
-	@JvmField val emptyTransferValue = when (currentLanguage) {
+	@JvmField
+	val emptyTransferValue = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please add a transfer amount"
 		HoneyLanguage.Chinese.code -> "你需要设置转账的金额"
 		HoneyLanguage.Japanese.code -> "あなたは、転送の量を設定する必要があります"
@@ -971,7 +1036,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "你需要设置转账的金额"
 		else -> ""
 	}
-	@JvmField val gasEditorEmpty = when (currentLanguage) {
+	@JvmField
+	val gasEditorEmpty = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a gas price and gas limit"
 		HoneyLanguage.Chinese.code -> "请设置燃气费的单价与上限"
 		HoneyLanguage.Japanese.code -> "ガス料金の単価と上限を設定してください"
@@ -980,7 +1046,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "請設置燃氣費的單價與上限"
 		else -> ""
 	}
-	@JvmField val gasLimitValue = when (currentLanguage) {
+	@JvmField
+	val gasLimitValue = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Gas limit must bigger than estimate gas value"
 		HoneyLanguage.Chinese.code -> "矿工费上限不能低于预估值"
 		HoneyLanguage.Japanese.code -> "鉱夫の手数料は、推定値を下回ることはできません"
@@ -989,7 +1056,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "礦工費上限不能低於預估值"
 		else -> ""
 	}
-	@JvmField val transferUnvalidInputFromat = when (currentLanguage) {
+	@JvmField
+	val transferUnvalidInputFromat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect value format, please check again"
 		HoneyLanguage.Chinese.code -> "请输入正确的金额"
 		HoneyLanguage.Japanese.code -> "正しい金額を入力してください"
@@ -998,7 +1066,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "請輸入正確的金額"
 		else -> ""
 	}
-	@JvmField val switchLanguage = when (currentLanguage) {
+	@JvmField
+	val switchLanguage = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Once you selected it, application will be rebooted and just wait several seconds. Are You Sure To Switch Language Settings?"
 		HoneyLanguage.Chinese.code -> "一旦你选择切换语言，应用程序将被重新启动，并等待几秒钟。 你确定要切换货币设置吗？"
 		HoneyLanguage.Japanese.code -> "言語の切り替えを選択すると、アプリケーションが再起動され、数秒待つことになります。 通貨設定を変更してもよろしいですか？"
@@ -1007,7 +1076,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "一旦你選擇切換語言，應用程序將被重新啟動，並等待幾秒鐘。你確定要切換貨幣設置嗎？"
 		else -> ""
 	}
-	@JvmField val switchLanguageConfirmText = when (currentLanguage) {
+	@JvmField
+	val switchLanguageConfirmText = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Change Language"
 		HoneyLanguage.Chinese.code -> "切换语言"
 		HoneyLanguage.Japanese.code -> "スイッチ言語"
@@ -1016,7 +1086,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "切換語言"
 		else -> ""
 	}
-	@JvmField val wrongKeyStorePassword = when (currentLanguage) {
+	@JvmField
+	val wrongKeyStorePassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invaild keystore format or password"
 		HoneyLanguage.Chinese.code -> "出错啦，请检查keystore或密码的格式是否正确"
 		HoneyLanguage.Japanese.code -> "間違っている、キーストアまたはパスワードの形式が正しいことを確認してください"
@@ -1025,7 +1096,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "出錯啦，請檢查keystore或密碼的格式是否正確"
 		else -> ""
 	}
-	@JvmField val getRateFromServerError = when (currentLanguage) {
+	@JvmField
+	val getRateFromServerError = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Something wrong happened, cannot get currency rate now"
 		HoneyLanguage.Chinese.code -> "出错了，暂时无法获取汇率信息"
 		HoneyLanguage.Japanese.code -> "間違ったことが起こった、今や通貨レートを得ることができない"
@@ -1034,7 +1106,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "發生了錯誤，現在無法獲得貨幣匯率"
 		else -> ""
 	}
-	@JvmField val getTransactionErrorPrefix = when (currentLanguage) {
+	@JvmField
+	val getTransactionErrorPrefix = when (currentLanguage) {
 		HoneyLanguage.English.code -> "An error occurred getting transaction records from Ethereum"
 		HoneyLanguage.Chinese.code -> "从以太坊"
 		HoneyLanguage.Japanese.code -> ""
@@ -1043,7 +1116,8 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "從以太坊"
 		else -> ""
 	}
-	@JvmField val getTransactionErrorSuffix = when (currentLanguage) {
+	@JvmField
+	val getTransactionErrorSuffix = when (currentLanguage) {
 		HoneyLanguage.English.code -> ""
 		HoneyLanguage.Chinese.code -> "获取转账记录时发生了错误"
 		HoneyLanguage.Japanese.code -> "から転送レコードを取得中にエラーが発生しました。"
@@ -1055,8 +1129,9 @@ object AlertText {
 }
 
 object CurrentWalletText {
-
-	@JvmField val Wallets = when (currentLanguage) {
+	
+	@JvmField
+	val Wallets = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallets"
 		HoneyLanguage.Chinese.code -> "钱包列表"
 		HoneyLanguage.Japanese.code -> "ウォレットリスト"
@@ -1068,8 +1143,9 @@ object CurrentWalletText {
 }
 
 object WatchOnlyText {
-
-	@JvmField val enterDescription = when (currentLanguage) {
+	
+	@JvmField
+	val enterDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter the address of the wallet to be observed"
 		HoneyLanguage.Chinese.code -> "请输入想观察的钱包地址"
 		HoneyLanguage.Japanese.code -> "観察したいウォレットのアドレスを入力してください"
@@ -1078,7 +1154,8 @@ object WatchOnlyText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入要觀察的錢包地址"
 		else -> ""
 	}
-	@JvmField val intro = when (currentLanguage) {
+	@JvmField
+	val intro = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
 		HoneyLanguage.Chinese.code -> "使用观察钱包, 您无需导入私钥，只需要输入钱包地址, 就能查看该地址下所有余额与转账信息。"
 		HoneyLanguage.Japanese.code -> "ウォッチウォレットを使用すると、秘密鍵をインポートする必要はありません。すべての残高を確認し、そのアドレスに情報を転送するには、ウォレットアドレスを入力する必要があります。"
@@ -1090,8 +1167,9 @@ object WatchOnlyText {
 }
 
 object NotificationText {
-
-	@JvmField val notification = when (currentLanguage) {
+	
+	@JvmField
+	val notification = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Notifications"
 		HoneyLanguage.Chinese.code -> "通知中心"
 		HoneyLanguage.Japanese.code -> "通知センター"
@@ -1103,8 +1181,9 @@ object NotificationText {
 }
 
 object TokenManagementText {
-
-	@JvmField val addToken = when (currentLanguage) {
+	
+	@JvmField
+	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add Token"
 		HoneyLanguage.Chinese.code -> "添加其他币种"
 		HoneyLanguage.Japanese.code -> "別の通貨を追加"
@@ -1116,8 +1195,9 @@ object TokenManagementText {
 }
 
 object Alert {
-
-	@JvmField val selectCurrency = when (currentLanguage) {
+	
+	@JvmField
+	val selectCurrency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Once you've selected this, you'll need to wait a moment while we restart the app. Are you sure you'd like to switch currency settings?"
 		HoneyLanguage.Chinese.code -> "一旦你选择切换货币，应用程序将被重新启动，并等待几秒钟。 你确定要切换货币设置吗？"
 		HoneyLanguage.Japanese.code -> "通貨の切り替えを選択すると、アプリケーションが再起動され、数秒待つことになります。 通貨設定を変更してもよろしいですか？"
@@ -1129,8 +1209,9 @@ object Alert {
 }
 
 object WalletSettingsText {
-
-	@JvmField val copy = when (currentLanguage) {
+	
+	@JvmField
+	val copy = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click to Copy Address"
 		HoneyLanguage.Chinese.code -> "点击复制地址"
 		HoneyLanguage.Japanese.code -> "コピーアドレスをクリックします"
@@ -1139,7 +1220,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "點擊複製地址"
 		else -> ""
 	}
-	@JvmField val checkQRCode = when (currentLanguage) {
+	@JvmField
+	val checkQRCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Check QR Code"
 		HoneyLanguage.Chinese.code -> "查看二维码"
 		HoneyLanguage.Japanese.code -> "QRコードをチェックする"
@@ -1148,7 +1230,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "查看二維碼"
 		else -> ""
 	}
-	@JvmField val balance = when (currentLanguage) {
+	@JvmField
+	val balance = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Balance"
 		HoneyLanguage.Chinese.code -> "余额"
 		HoneyLanguage.Japanese.code -> "残高"
@@ -1157,7 +1240,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "余额"
 		else -> ""
 	}
-	@JvmField val walletName = when (currentLanguage) {
+	@JvmField
+	val walletName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Name"
 		HoneyLanguage.Chinese.code -> "钱包名称"
 		HoneyLanguage.Japanese.code -> "ウォレット名"
@@ -1166,7 +1250,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包名稱"
 		else -> ""
 	}
-	@JvmField val walletNameSettings = when (currentLanguage) {
+	@JvmField
+	val walletNameSettings = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Name Your Wallet"
 		HoneyLanguage.Chinese.code -> "钱包名称设置"
 		HoneyLanguage.Japanese.code -> "ウォレット設定"
@@ -1175,7 +1260,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包名稱設置"
 		else -> ""
 	}
-	@JvmField val walletSettings = when (currentLanguage) {
+	@JvmField
+	val walletSettings = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Settings"
 		HoneyLanguage.Chinese.code -> "钱包设置"
 		HoneyLanguage.Japanese.code -> "ウォレット名の設定"
@@ -1184,7 +1270,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包設置"
 		else -> ""
 	}
-	@JvmField val passwordSettings = when (currentLanguage) {
+	@JvmField
+	val passwordSettings = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Change Password"
 		HoneyLanguage.Chinese.code -> "修改密码"
 		HoneyLanguage.Japanese.code -> "パスワードを変更する"
@@ -1193,7 +1280,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "修改密碼"
 		else -> ""
 	}
-	@JvmField val hint = when (currentLanguage) {
+	@JvmField
+	val hint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password Hint"
 		HoneyLanguage.Chinese.code -> "密码提示"
 		HoneyLanguage.Japanese.code -> "パスワードのヒント"
@@ -1211,7 +1299,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "寫點什麼"
 		else -> ""
 	}
-	@JvmField val exportPrivateKey = when (currentLanguage) {
+	@JvmField
+	val exportPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Export Private Key"
 		HoneyLanguage.Chinese.code -> "导出私钥"
 		HoneyLanguage.Japanese.code -> "秘密鍵のエクスポート"
@@ -1220,7 +1309,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "導出金鑰"
 		else -> ""
 	}
-	@JvmField val exportKeystore = when (currentLanguage) {
+	@JvmField
+	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Export Keystore"
 		HoneyLanguage.Chinese.code -> "导出keystore"
 		HoneyLanguage.Japanese.code -> "keystoreのエクスポート"
@@ -1229,7 +1319,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "導出 Keystore"
 		else -> ""
 	}
-	@JvmField val backUpMnemonic = when (currentLanguage) {
+	@JvmField
+	val backUpMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up Your Mnemonics"
 		HoneyLanguage.Chinese.code -> "请备份助记词"
 		HoneyLanguage.Japanese.code -> "ニーモニックをバックアップ"
@@ -1238,7 +1329,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "備份助憶口令"
 		else -> ""
 	}
-	@JvmField val backUpMnemonicGotBefore = when (currentLanguage) {
+	@JvmField
+	val backUpMnemonicGotBefore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the mnemonic words in order, so as to ensure that your backup is correct."
 		HoneyLanguage.Chinese.code -> "按顺序点选助记词中的单词，以确保您的备份正确。"
 		HoneyLanguage.Japanese.code -> "順序に従ってニーモニックの文字を選択し、正確にバックアップをするようにしてください。"
@@ -1247,7 +1339,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "请按顺序点选助憶口令中的單詞，以確保您的備份正確。"
 		else -> ""
 	}
-	@JvmField val safeAttention = when (currentLanguage) {
+	@JvmField
+	val safeAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Safety Alert"
 		HoneyLanguage.Chinese.code -> "安全提示"
 		HoneyLanguage.Japanese.code -> "安全に関するヒント"
@@ -1256,7 +1349,8 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "安全提醒"
 		else -> ""
 	}
-	@JvmField val delete = when (currentLanguage) {
+	@JvmField
+	val delete = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Delete Wallet"
 		HoneyLanguage.Chinese.code -> "删除钱包"
 		HoneyLanguage.Japanese.code -> "ウォレットを削除"
@@ -1313,8 +1407,9 @@ object WalletSettingsText {
 }
 
 object ProfileText {
-
-	@JvmField val profile = when (currentLanguage) {
+	
+	@JvmField
+	val profile = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Profile"
 		HoneyLanguage.Chinese.code -> "个人主页"
 		HoneyLanguage.Japanese.code -> "個人"
@@ -1323,7 +1418,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "個人檔案"
 		else -> ""
 	}
-	@JvmField val contacts = when (currentLanguage) {
+	@JvmField
+	val contacts = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Contacts"
 		HoneyLanguage.Chinese.code -> "通讯录"
 		HoneyLanguage.Japanese.code -> "連絡先"
@@ -1332,7 +1428,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "通訊簿"
 		else -> ""
 	}
-	@JvmField val contactsInput = when (currentLanguage) {
+	@JvmField
+	val contactsInput = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add Contact"
 		HoneyLanguage.Chinese.code -> "添加联系人"
 		HoneyLanguage.Japanese.code -> "連絡先を追加"
@@ -1341,7 +1438,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "添加聯繫人"
 		else -> ""
 	}
-	@JvmField val currency = when (currentLanguage) {
+	@JvmField
+	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Currency Settings"
 		HoneyLanguage.Chinese.code -> "货币"
 		HoneyLanguage.Japanese.code -> "通貨"
@@ -1350,7 +1448,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "貨幣"
 		else -> ""
 	}
-	@JvmField val hint = when (currentLanguage) {
+	@JvmField
+	val hint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password Hint"
 		HoneyLanguage.Chinese.code -> "密码提示"
 		HoneyLanguage.Japanese.code -> "パスワードのヒント"
@@ -1359,7 +1458,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "密碼提示"
 		else -> ""
 	}
-	@JvmField val language = when (currentLanguage) {
+	@JvmField
+	val language = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Language"
 		HoneyLanguage.Chinese.code -> "语言"
 		HoneyLanguage.Japanese.code -> "言語"
@@ -1368,7 +1468,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "語言"
 		else -> ""
 	}
-	@JvmField val aboutUs = when (currentLanguage) {
+	@JvmField
+	val aboutUs = when (currentLanguage) {
 		HoneyLanguage.English.code -> "About Us"
 		HoneyLanguage.Chinese.code -> "关于我们"
 		HoneyLanguage.Japanese.code -> "チーム紹介"
@@ -1377,7 +1478,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "關於我們"
 		else -> ""
 	}
-	@JvmField val support = when (currentLanguage) {
+	@JvmField
+	val support = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Support"
 		HoneyLanguage.Chinese.code -> "帮助中心"
 		HoneyLanguage.Japanese.code -> "ヘルプセンター"
@@ -1386,7 +1488,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "聯繫我們"
 		else -> ""
 	}
-	@JvmField val privacy = when (currentLanguage) {
+	@JvmField
+	val privacy = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Privacy Policy"
 		HoneyLanguage.Chinese.code -> "隐私条款"
 		HoneyLanguage.Japanese.code -> "プライバシーポリシー"
@@ -1395,7 +1498,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "隱私政策"
 		else -> ""
 	}
-	@JvmField val terms = when (currentLanguage) {
+	@JvmField
+	val terms = when (currentLanguage) {
 		HoneyLanguage.English.code -> "User Agreement"
 		HoneyLanguage.Chinese.code -> "用户协议"
 		HoneyLanguage.Japanese.code -> "利用規約"
@@ -1404,7 +1508,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "用戶協議"
 		else -> ""
 	}
-	@JvmField val version = when (currentLanguage) {
+	@JvmField
+	val version = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Version"
 		HoneyLanguage.Chinese.code -> "软件版本"
 		HoneyLanguage.Japanese.code -> "バージョン"
@@ -1413,7 +1518,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "Version"
 		else -> ""
 	}
-	@JvmField val shareApp = when (currentLanguage) {
+	@JvmField
+	val shareApp = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Share GoldStone"
 		HoneyLanguage.Chinese.code -> "分享 GoldStone"
 		HoneyLanguage.Japanese.code -> "共有 GoldStone"
@@ -1422,7 +1528,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "分享GoldStone"
 		else -> ""
 	}
-	@JvmField val pinCode = when (currentLanguage) {
+	@JvmField
+	val pinCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "PIN"
 		HoneyLanguage.Chinese.code -> "PIN"
 		HoneyLanguage.Japanese.code -> "PIN"
@@ -1431,7 +1538,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
 		else -> ""
 	}
-	@JvmField val chain = when (currentLanguage) {
+	@JvmField
+	val chain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Chain Node"
 		HoneyLanguage.English.code -> "Select Chain Node"
 		HoneyLanguage.Chinese.code -> "选择节点"
@@ -1441,8 +1549,8 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "選擇節點"
 		else -> ""
 	}
-
-	@JvmField val shareContent = when (currentLanguage) {
+	@JvmField
+	val shareContent = when (currentLanguage) {
 		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
 		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
 		HoneyLanguage.Japanese.code -> "GoldStone\n安全で、使いやすく、速く\nhttps://goldstone.io"
@@ -1454,7 +1562,8 @@ object ProfileText {
 }
 
 object EmptyText {
-	@JvmField val transferToAddress = when (currentLanguage) {
+	@JvmField
+	val transferToAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter an wallet address or select a contact below"
 		HoneyLanguage.Chinese.code -> "输入钱包地址或选择一个联系人"
 		HoneyLanguage.Japanese.code -> "ウォレットアドレスを入力するか、下の連絡先を選択してください"
@@ -1463,7 +1572,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入錢包地址或選擇一個聯繫人"
 		else -> ""
 	}
-	@JvmField val searchInput = when (currentLanguage) {
+	@JvmField
+	val searchInput = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token name or contract address"
 		HoneyLanguage.Chinese.code -> "搜索Token名称或合约地址"
 		HoneyLanguage.Japanese.code -> "トークン名またはアドレス"
@@ -1472,7 +1582,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "搜索Token名稱或合約地址"
 		else -> ""
 	}
-	@JvmField val tokenDetailTitle = when (currentLanguage) {
+	@JvmField
+	val tokenDetailTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No token transactions found"
 		HoneyLanguage.Chinese.code -> "还没有任何交易记录"
 		HoneyLanguage.Japanese.code -> "トランザクション履歴はまだありません"
@@ -1481,7 +1592,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
-	@JvmField val tokenDetailSubtitle = when (currentLanguage) {
+	@JvmField
+	val tokenDetailSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No transaction history for this token"
 		HoneyLanguage.Chinese.code -> "在区块链上没有交易，所以您没有图表和记录信息"
 		HoneyLanguage.Japanese.code -> "ブロックチェーンにはトランザクションはなく、チャートやレコードはありません"
@@ -1490,7 +1602,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "區塊鏈中沒有交易，所以您沒有圖表和記錄"
 		else -> ""
 	}
-	@JvmField val searchTitle = when (currentLanguage) {
+	@JvmField
+	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
 		HoneyLanguage.Chinese.code -> "没有找到这个Token"
 		HoneyLanguage.Japanese.code -> "Tokenが見つかりません"
@@ -1499,7 +1612,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "沒有找到這個Token"
 		else -> ""
 	}
-	@JvmField val searchSubtitle = when (currentLanguage) {
+	@JvmField
+	val searchSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time"
 		HoneyLanguage.Chinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
 		HoneyLanguage.Japanese.code -> "インタフェースの左上隅をクリックしてマーケット内のtokenを追加することで、リアルタイムの市場価格を見ることが出来ます"
@@ -1508,7 +1622,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
 		else -> ""
 	}
-	@JvmField val contractTitle = when (currentLanguage) {
+	@JvmField
+	val contractTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Empty Contact List"
 		HoneyLanguage.Chinese.code -> "通讯录里空空的"
 		HoneyLanguage.Japanese.code -> "まだ連絡がありません"
@@ -1517,7 +1632,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "通訊簿里沒有記錄"
 		else -> ""
 	}
-	@JvmField val contractSubtitle = when (currentLanguage) {
+	@JvmField
+	val contractSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
 		HoneyLanguage.Chinese.code -> "點擊左上角加號，可以添加常用聯繫人的地址"
 		HoneyLanguage.Japanese.code -> "左上隅のプラス記号をクリックして、共通の連絡先のアドレスを追加します"
@@ -1526,7 +1642,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "點擊左上角加號，可以添加常用聯繫人的地址"
 		else -> ""
 	}
-	@JvmField val currency = when (currentLanguage) {
+	@JvmField
+	val currency = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
 		HoneyLanguage.Chinese.code -> "货币设置"
 		HoneyLanguage.Japanese.code -> "通貨設定"
@@ -1535,7 +1652,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "貨幣設置"
 		else -> ""
 	}
-	@JvmField val language = when (currentLanguage) {
+	@JvmField
+	val language = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Language"
 		HoneyLanguage.Chinese.code -> "语言"
 		HoneyLanguage.Japanese.code -> "言语"
@@ -1544,7 +1662,8 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "語言"
 		else -> ""
 	}
-	@JvmField val aboutUs = when (currentLanguage) {
+	@JvmField
+	val aboutUs = when (currentLanguage) {
 		HoneyLanguage.English.code -> "About Us"
 		HoneyLanguage.Chinese.code -> "关于我们"
 		HoneyLanguage.Japanese.code -> "チーム情報"
@@ -1556,8 +1675,9 @@ object EmptyText {
 }
 
 object QuotationText {
-
-	@JvmField val market = when (currentLanguage) {
+	
+	@JvmField
+	val market = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Markets"
 		HoneyLanguage.Chinese.code -> "市场行情"
 		HoneyLanguage.Japanese.code -> "市場相場"
@@ -1566,7 +1686,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "市場行情"
 		else -> ""
 	}
-	@JvmField val management = when (currentLanguage) {
+	@JvmField
+	val management = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Markets".toUpperCase()
 		HoneyLanguage.Chinese.code -> "自选管理"
 		HoneyLanguage.Japanese.code -> "オプションの管理"
@@ -1575,7 +1696,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "自選管理"
 		else -> ""
 	}
-	@JvmField val tokenDetail = when (currentLanguage) {
+	@JvmField
+	val tokenDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Token"
 		HoneyLanguage.Chinese.code -> "市场交易对"
 		HoneyLanguage.Japanese.code -> "市場取引のペア"
@@ -1584,7 +1706,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "市場交易對"
 		else -> ""
 	}
-	@JvmField val search = when (currentLanguage) {
+	@JvmField
+	val search = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Search pairs"
 		HoneyLanguage.Chinese.code -> "搜索"
 		HoneyLanguage.Japanese.code -> "検索"
@@ -1593,7 +1716,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "搜索"
 		else -> ""
 	}
-	@JvmField val addToken = when (currentLanguage) {
+	@JvmField
+	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Manage"
 		HoneyLanguage.Chinese.code -> "管理"
 		HoneyLanguage.Japanese.code -> "追加"
@@ -1602,7 +1726,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "管理"
 		else -> ""
 	}
-	@JvmField val alarm = when (currentLanguage) {
+	@JvmField
+	val alarm = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Alerts"
 		HoneyLanguage.Chinese.code -> "价格提醒"
 		HoneyLanguage.Japanese.code -> "価格リマインダー"
@@ -1611,7 +1736,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "價格提醒"
 		else -> ""
 	}
-	@JvmField val currentPrice = when (currentLanguage) {
+	@JvmField
+	val currentPrice = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current Price"
 		HoneyLanguage.Chinese.code -> "当前价格"
 		HoneyLanguage.Japanese.code -> "現在の価格"
@@ -1620,7 +1746,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "時價"
 		else -> ""
 	}
-	@JvmField val priceHistory = when (currentLanguage) {
+	@JvmField
+	val priceHistory = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Price History"
 		HoneyLanguage.Chinese.code -> "价格历史"
 		HoneyLanguage.Japanese.code -> "価格履歴"
@@ -1629,7 +1756,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "價格歷史"
 		else -> ""
 	}
-	@JvmField val tokenDescription = when (currentLanguage) {
+	@JvmField
+	val tokenDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description"
 		HoneyLanguage.Chinese.code -> "Token 简介"
 		HoneyLanguage.Japanese.code -> "Tokenの説明"
@@ -1638,7 +1766,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "Token 簡介"
 		else -> ""
 	}
-	@JvmField val tokenInformation = when (currentLanguage) {
+	@JvmField
+	val tokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Information"
 		HoneyLanguage.Chinese.code -> "Token 信息"
 		HoneyLanguage.Japanese.code -> "Token情報"
@@ -1647,7 +1776,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息"
 		else -> ""
 	}
-	@JvmField val tokenDescriptionPlaceHolder = when (currentLanguage) {
+	@JvmField
+	val tokenDescriptionPlaceHolder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description Content"
 		HoneyLanguage.Chinese.code -> "Token 信息内容"
 		HoneyLanguage.Japanese.code -> "Tokenの説明コンテンツ"
@@ -1656,8 +1786,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息內容"
 		else -> ""
 	}
-
-	@JvmField val highAndLow = when (currentLanguage) {
+	@JvmField
+	val highAndLow = when (currentLanguage) {
 		HoneyLanguage.English.code -> "HIGH / LOW"
 		HoneyLanguage.Chinese.code -> "最高/最低"
 		HoneyLanguage.Japanese.code -> "最高/最低"
@@ -1666,7 +1796,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "最高 / 最低"
 		else -> ""
 	}
-	@JvmField val rank = when (currentLanguage) {
+	@JvmField
+	val rank = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rank"
 		HoneyLanguage.Chinese.code -> "排名"
 		HoneyLanguage.Japanese.code -> "ランク"
@@ -1675,7 +1806,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "排名"
 		else -> ""
 	}
-	@JvmField val totalSupply = when (currentLanguage) {
+	@JvmField
+	val totalSupply = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Supply"
 		HoneyLanguage.Chinese.code -> "总供应量"
 		HoneyLanguage.Japanese.code -> "総供給"
@@ -1684,7 +1816,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "總供應量"
 		else -> ""
 	}
-	@JvmField val marketCap = when (currentLanguage) {
+	@JvmField
+	val marketCap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Cap"
 		HoneyLanguage.Chinese.code -> "流通市值"
 		HoneyLanguage.Japanese.code -> "時価総額"
@@ -1693,7 +1826,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "流通市值"
 		else -> ""
 	}
-	@JvmField val addQuotationChartPlaceholderTitle = when (currentLanguage) {
+	@JvmField
+	val addQuotationChartPlaceholderTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ADD QUOTATION CHART"
 		HoneyLanguage.Chinese.code -> "添加你感兴趣的Token行情"
 		HoneyLanguage.Japanese.code -> "Tokenの見積り表を追加"
@@ -1702,7 +1836,8 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "添加你感興趣的Token行情"
 		else -> ""
 	}
-	@JvmField val addQuotationChartPlaceholderSubtitle = when (currentLanguage) {
+	@JvmField
+	val addQuotationChartPlaceholderSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Search and add a real-time\n token pricing chart from\n exchanges."
 		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势哦"
 		HoneyLanguage.Japanese.code -> "市場から気になるトークンを検索して\n追加すると、リアルタイムの\n価格動向を見ることができます"
@@ -1714,8 +1849,9 @@ object QuotationText {
 }
 
 object PincodeText {
-
-	@JvmField val pincode = when (currentLanguage) {
+	
+	@JvmField
+	val pincode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pin Code"
 		HoneyLanguage.Chinese.code -> "PIN码"
 		HoneyLanguage.Japanese.code -> "PINコード"
@@ -1724,7 +1860,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
 		else -> ""
 	}
-	@JvmField val repeat = when (currentLanguage) {
+	@JvmField
+	val repeat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Repeat PIN"
 		HoneyLanguage.Chinese.code -> "重复PIN码"
 		HoneyLanguage.Japanese.code -> "PINの繰り返し"
@@ -1733,7 +1870,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "重複PIN碼"
 		else -> ""
 	}
-	@JvmField val description = when (currentLanguage) {
+	@JvmField
+	val description = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a 4-digit PIN"
 		HoneyLanguage.Chinese.code -> "输入四位密码"
 		HoneyLanguage.Japanese.code -> "4桁のパスワードを入力してください"
@@ -1742,7 +1880,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入四位密碼密碼"
 		else -> ""
 	}
-	@JvmField val countAlert = when (currentLanguage) {
+	@JvmField
+	val countAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please Enter four bit ciphers"
 		HoneyLanguage.Chinese.code -> "请输入四位数字"
 		HoneyLanguage.Japanese.code -> "4ビットの暗号を入力してください"
@@ -1751,7 +1890,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "請輸入四位數字"
 		else -> ""
 	}
-	@JvmField val verifyAlert = when (currentLanguage) {
+	@JvmField
+	val verifyAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please repeat the same PIN"
 		HoneyLanguage.Chinese.code -> "请再次输入一遍PIN码进行确认"
 		HoneyLanguage.Japanese.code -> "確認のためPINをもう一度入力してください"
@@ -1760,7 +1900,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "請再次輸入PIN碼確認"
 		else -> ""
 	}
-	@JvmField val turnOnAttention = when (currentLanguage) {
+	@JvmField
+	val turnOnAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a PIN"
 		HoneyLanguage.Chinese.code -> "请先设置PIN码"
 		HoneyLanguage.Japanese.code -> "PINを設定してください"
@@ -1769,7 +1910,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "請先設置PIN碼"
 		else -> ""
 	}
-	@JvmField val show = when (currentLanguage) {
+	@JvmField
+	val show = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Show PIN"
 		HoneyLanguage.Chinese.code -> "显示PIN码"
 		HoneyLanguage.Japanese.code -> "PINを表示する"
@@ -1778,7 +1920,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
 		else -> ""
 	}
-	@JvmField val enterPincode = when (currentLanguage) {
+	@JvmField
+	val enterPincode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter PIN"
 		HoneyLanguage.Chinese.code -> "输入PIN码"
 		HoneyLanguage.Japanese.code -> "PINを入力"
@@ -1787,7 +1930,8 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入PIN碼"
 		else -> ""
 	}
-	@JvmField val enterPincodeDescription = when (currentLanguage) {
+	@JvmField
+	val enterPincodeDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Set the PIN to protect privacy. Once you open GoldStone, you need to enter PIN to see your wallet "
 		HoneyLanguage.Chinese.code -> "设置锁屏密码保护隐私，一旦开启锁屏密码，每次打开GoldStone时需要输入锁屏密码才能查看钱包"
 		HoneyLanguage.Japanese.code -> "ロック画面のパスワードを設定すると、プライバシーを保護します。ロック画面のパスワードがオンになったら、GoldStoneを開くたびにウォレットを表示するには、画面のパスワードを入力する必要があります"
@@ -1799,7 +1943,8 @@ object PincodeText {
 }
 
 object PrepareTransferText {
-	@JvmField val sendAmountPrefix = when (currentLanguage) {
+	@JvmField
+	val sendAmountPrefix = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Send"
 		HoneyLanguage.Chinese.code -> ""
 		HoneyLanguage.Japanese.code -> ""
@@ -1808,7 +1953,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
-	@JvmField val sendAmountSuffix = when (currentLanguage) {
+	@JvmField
+	val sendAmountSuffix = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Amount"
 		HoneyLanguage.Chinese.code -> "转出数量"
 		HoneyLanguage.Japanese.code -> "送出数量"
@@ -1817,7 +1963,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "轉出數量"
 		else -> ""
 	}
-	@JvmField val memoInformation = when (currentLanguage) {
+	@JvmField
+	val memoInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Memo Information"
 		HoneyLanguage.Chinese.code -> "备注信息"
 		HoneyLanguage.Japanese.code -> "メモ情報"
@@ -1826,7 +1973,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "備註信息"
 		else -> ""
 	}
-	@JvmField val memo = when (currentLanguage) {
+	@JvmField
+	val memo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Memo"
 		HoneyLanguage.Chinese.code -> "备注"
 		HoneyLanguage.Japanese.code -> "メモ"
@@ -1835,7 +1983,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "備註"
 		else -> ""
 	}
-	@JvmField val addAMemo = when (currentLanguage) {
+	@JvmField
+	val addAMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add a Memo"
 		HoneyLanguage.Chinese.code -> "添加备注"
 		HoneyLanguage.Japanese.code -> "メモを追加する"
@@ -1844,7 +1993,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "添加備註"
 		else -> ""
 	}
-	@JvmField val price = when (currentLanguage) {
+	@JvmField
+	val price = when (currentLanguage) {
 		HoneyLanguage.English.code -> "UNIT PRICE"
 		HoneyLanguage.Chinese.code -> "单价"
 		HoneyLanguage.Japanese.code -> "単価"
@@ -1853,7 +2003,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "單價"
 		else -> ""
 	}
-	@JvmField val currentPrice = when (currentLanguage) {
+	@JvmField
+	val currentPrice = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current Price"
 		HoneyLanguage.Chinese.code -> "当前价"
 		HoneyLanguage.Japanese.code -> "現在の価格"
@@ -1862,7 +2013,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "時價"
 		else -> ""
 	}
-	@JvmField val accountInfo = when (currentLanguage) {
+	@JvmField
+	val accountInfo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Information"
 		HoneyLanguage.Chinese.code -> "账户信息"
 		HoneyLanguage.Japanese.code -> "口座情報"
@@ -1871,7 +2023,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "帳戶信息"
 		else -> ""
 	}
-	@JvmField val willSpending = when (currentLanguage) {
+	@JvmField
+	val willSpending = when (currentLanguage) {
 		HoneyLanguage.English.code -> "WILL SPEND"
 		HoneyLanguage.Chinese.code -> "预计花费"
 		HoneyLanguage.Japanese.code -> "見積もり原価"
@@ -1880,7 +2033,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "預計花費"
 		else -> ""
 	}
-	@JvmField val send = when (currentLanguage) {
+	@JvmField
+	val send = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SEND TO"
 		HoneyLanguage.Chinese.code -> "发送至"
 		HoneyLanguage.Japanese.code -> "送信先"
@@ -1889,7 +2043,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "發送至"
 		else -> ""
 	}
-	@JvmField val from = when (currentLanguage) {
+	@JvmField
+	val from = when (currentLanguage) {
 		HoneyLanguage.English.code -> "FROM"
 		HoneyLanguage.Chinese.code -> "发送者"
 		HoneyLanguage.Japanese.code -> "送信者"
@@ -1898,7 +2053,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "發送者"
 		else -> ""
 	}
-	@JvmField val recommend = when (currentLanguage) {
+	@JvmField
+	val recommend = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recommend"
 		HoneyLanguage.Chinese.code -> "推荐"
 		HoneyLanguage.Japanese.code -> "おすすめ"
@@ -1907,7 +2063,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "推薦"
 		else -> ""
 	}
-	@JvmField val cheap = when (currentLanguage) {
+	@JvmField
+	val cheap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Cheap"
 		HoneyLanguage.Chinese.code -> "便宜"
 		HoneyLanguage.Japanese.code -> "安い"
@@ -1916,7 +2073,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "便宜"
 		else -> ""
 	}
-	@JvmField val fast = when (currentLanguage) {
+	@JvmField
+	val fast = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Fast"
 		HoneyLanguage.Chinese.code -> "快速"
 		HoneyLanguage.Japanese.code -> "速い"
@@ -1925,7 +2083,8 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "快速"
 		else -> ""
 	}
-	@JvmField val customize = when (currentLanguage) {
+	@JvmField
+	val customize = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Customize"
 		HoneyLanguage.Chinese.code -> "自定义"
 		HoneyLanguage.Japanese.code -> "カスタマイズする"
@@ -1937,8 +2096,9 @@ object PrepareTransferText {
 }
 
 object ContactText {
-
-	@JvmField val emptyNameAlert = when (currentLanguage) {
+	
+	@JvmField
+	val emptyNameAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter a contact name"
 		HoneyLanguage.Chinese.code -> "请填写联系人名称"
 		HoneyLanguage.Japanese.code -> "連絡先の名前を入力してください"
@@ -1947,7 +2107,8 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "請填寫聯繫人名稱"
 		else -> ""
 	}
-	@JvmField val emptyAddressAlert = when (currentLanguage) {
+	@JvmField
+	val emptyAddressAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter a wallet address"
 		HoneyLanguage.Chinese.code -> "请填写联系人钱包地址"
 		HoneyLanguage.Japanese.code -> "ウォレットのアドレスを入力してください"
@@ -1956,7 +2117,8 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "請填寫聯繫人錢包地址"
 		else -> ""
 	}
-	@JvmField val wrongAddressFormat = when (currentLanguage) {
+	@JvmField
+	val wrongAddressFormat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect wallet address format"
 		HoneyLanguage.Chinese.code -> "钱包地址格式错误"
 		HoneyLanguage.Japanese.code -> "財布のアドレスのフォーマットエラー"
@@ -1965,7 +2127,8 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包地址格式有誤"
 		else -> ""
 	}
-	@JvmField val contactName = when (currentLanguage) {
+	@JvmField
+	val contactName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Contact Name"
 		HoneyLanguage.Chinese.code -> "联系人名称"
 		HoneyLanguage.Japanese.code -> "連絡先の名前"
@@ -1974,7 +2137,8 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "聯繫人名稱"
 		else -> ""
 	}
-	@JvmField val hint = when (currentLanguage) {
+	@JvmField
+	val hint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter address that you want to store"
 		HoneyLanguage.Chinese.code -> "在此输入您希望保存的钱包地址"
 		HoneyLanguage.Japanese.code -> "保存したいアドレスを入力してください"
@@ -1986,8 +2150,9 @@ object ContactText {
 }
 
 object ChainText {
-
-	@JvmField val goldStoneMain = when (currentLanguage) {
+	
+	@JvmField
+	val goldStoneMain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Main (Gold Stone)"
 		HoneyLanguage.Chinese.code -> "Main (Gold Stone)"
 		HoneyLanguage.Japanese.code -> "Main (Gold Stone)"
@@ -1996,7 +2161,8 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "Main (Gold Stone)"
 		else -> ""
 	}
-	@JvmField val infuraMain = when (currentLanguage) {
+	@JvmField
+	val infuraMain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Main (Infura)"
 		HoneyLanguage.Chinese.code -> "Main (Infura)"
 		HoneyLanguage.Japanese.code -> "Main (Infura)"
@@ -2005,7 +2171,8 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "Main (Infura)"
 		else -> ""
 	}
-	@JvmField val ropstan = when (currentLanguage) {
+	@JvmField
+	val ropstan = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ropstan Testnet"
 		HoneyLanguage.Chinese.code -> "Ropstan 测试网络"
 		HoneyLanguage.Japanese.code -> "Ropstan テストネット"
@@ -2014,7 +2181,8 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "Ropstan 測試網絡"
 		else -> ""
 	}
-	@JvmField val kovan = when (currentLanguage) {
+	@JvmField
+	val kovan = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Kovan Testnet"
 		HoneyLanguage.Chinese.code -> "Kovan 测试网络"
 		HoneyLanguage.Japanese.code -> "Kovan テストネット"
@@ -2023,7 +2191,8 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "Kovan 測試網絡"
 		else -> ""
 	}
-	@JvmField val rinkeby = when (currentLanguage) {
+	@JvmField
+	val rinkeby = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rinkeby Testnet"
 		HoneyLanguage.Chinese.code -> "Rinkeby 测试网络"
 		HoneyLanguage.Japanese.code -> "Rinkeby テストネット"
@@ -2035,8 +2204,9 @@ object ChainText {
 }
 
 object LoadingText {
-
-	@JvmField val getTokenInformation = when (currentLanguage) {
+	
+	@JvmField
+	val getTokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Getting Token information from Ethereum..."
 		HoneyLanguage.Chinese.code -> "正在从以太坊获取Token信息，马上就好"
 		HoneyLanguage.Japanese.code -> "Ethereumからのトークン情報を取得..."
@@ -2045,7 +2215,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在從以太坊獲取Token信息，馬上就好"
 		else -> ""
 	}
-	@JvmField val calculateGas = when (currentLanguage) {
+	@JvmField
+	val calculateGas = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Estimating gas costs..."
 		HoneyLanguage.Chinese.code -> "正在估算燃气费用，马上就好"
 		HoneyLanguage.Japanese.code -> "ガスコストの見積もり..."
@@ -2054,7 +2225,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在估算燃氣費用，馬上就好"
 		else -> ""
 	}
-	@JvmField val calculating = when (currentLanguage) {
+	@JvmField
+	val calculating = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Calculating..."
 		HoneyLanguage.Chinese.code -> "正在计算..."
 		HoneyLanguage.Japanese.code -> "計算中..."
@@ -2063,7 +2235,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在計算..."
 		else -> ""
 	}
-	@JvmField val searchingQuotation = when (currentLanguage) {
+	@JvmField
+	val searchingQuotation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Searching token information..."
 		HoneyLanguage.Chinese.code -> "正在搜索Token信息..."
 		HoneyLanguage.Japanese.code -> "Token情報検索中..."
@@ -2072,7 +2245,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在檢索Token信息..."
 		else -> ""
 	}
-	@JvmField val searchingToken = when (currentLanguage) {
+	@JvmField
+	val searchingToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Searching token information..."
 		HoneyLanguage.Chinese.code -> "正在搜索Token信息..."
 		HoneyLanguage.Japanese.code -> "Token情報検索中..."
@@ -2081,7 +2255,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在檢索Token信息..."
 		else -> ""
 	}
-	@JvmField val transactionData = when (currentLanguage) {
+	@JvmField
+	val transactionData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading transaction data..."
 		HoneyLanguage.Chinese.code -> "正在加载转账记录..."
 		HoneyLanguage.Japanese.code -> "転送記録を読み込んでいます..."
@@ -2090,7 +2265,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在加載轉賬記錄..."
 		else -> ""
 	}
-	@JvmField val tokenData = when (currentLanguage) {
+	@JvmField
+	val tokenData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading token data..."
 		HoneyLanguage.Chinese.code -> "正在加载token信息..."
 		HoneyLanguage.Japanese.code -> "Token情報を読み込んでいます..."
@@ -2099,7 +2275,8 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在加載token信息..."
 		else -> ""
 	}
-	@JvmField val notificationData = when (currentLanguage) {
+	@JvmField
+	val notificationData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading notifications..."
 		HoneyLanguage.Chinese.code -> "正在加载通知信息..."
 		HoneyLanguage.Japanese.code -> "通知の読み込み中..."
@@ -2111,8 +2288,9 @@ object LoadingText {
 }
 
 object QRText {
-
-	@JvmField val savedAttention = when (currentLanguage) {
+	
+	@JvmField
+	val savedAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR code has been saved to album"
 		HoneyLanguage.Chinese.code -> "二维码已保存至相册"
 		HoneyLanguage.Japanese.code -> "アルバムに保存されたQRコード"
@@ -2121,7 +2299,8 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "二維碼已保存至手機相冊"
 		else -> ""
 	}
-	@JvmField val shareQRTitle = when (currentLanguage) {
+	@JvmField
+	val shareQRTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SHARE QR IMAGE"
 		HoneyLanguage.Chinese.code -> "分享二维码"
 		HoneyLanguage.Japanese.code -> "QRコードを共有する"
@@ -2130,7 +2309,8 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "分享二維碼"
 		else -> ""
 	}
-	@JvmField val screenText = when (currentLanguage) {
+	@JvmField
+	val screenText = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Scan GoldStone QR Code"
 		HoneyLanguage.Chinese.code -> "扫描Goldstone的二维码"
 		HoneyLanguage.Japanese.code -> "スキャンGoldStoneのQRコード"
@@ -2139,7 +2319,8 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "掃描GoldStone的二維碼"
 		else -> ""
 	}
-	@JvmField val unvalidQRCodeAlert = when (currentLanguage) {
+	@JvmField
+	val unvalidQRCodeAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid QR code"
 		HoneyLanguage.Chinese.code -> "未识别到有效的二维码图片"
 		HoneyLanguage.Japanese.code -> "無効なQRコード"
@@ -2148,7 +2329,8 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "未識別到有效的二維碼圖片"
 		else -> ""
 	}
-	@JvmField val unvalidContract = when (currentLanguage) {
+	@JvmField
+	val unvalidContract = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Inconsistent currency. The QR code scanned is not that of the current token, please change the transfer token, or change the scanned QR code."
 		HoneyLanguage.Chinese.code -> "货币不一致。您所扫描的不是当前Token的二维码，请您更换token进行转账，或者更换扫描的二维码。"
 		HoneyLanguage.Japanese.code -> "通貨に一貫性がありません。 現在のトークンのQRコードをスキャンしていません。転送するか、スキャンしたQRコードを変更するには、トークンを変更してください。"
@@ -2160,7 +2342,7 @@ object QRText {
 }
 
 object QAText {
-
+	
 	val whatIsMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "What are mnemonics?"
 		HoneyLanguage.Chinese.code -> "什么是助记词？"
@@ -2209,8 +2391,9 @@ object QAText {
 }
 
 object ImporMneubar {
-
-	@JvmField val mnemonic = when (currentLanguage) {
+	
+	@JvmField
+	val mnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic"
 		HoneyLanguage.Chinese.code -> "助记词"
 		HoneyLanguage.Japanese.code -> "ニーモニック"
@@ -2219,7 +2402,8 @@ object ImporMneubar {
 		HoneyLanguage.TraditionalChinese.code -> "助憶口令"
 		else -> ""
 	}
-	@JvmField val keystore = when (currentLanguage) {
+	@JvmField
+	val keystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Keystore"
 		HoneyLanguage.Chinese.code -> "Keystore"
 		HoneyLanguage.Japanese.code -> "Keystore"
@@ -2228,7 +2412,8 @@ object ImporMneubar {
 		HoneyLanguage.TraditionalChinese.code -> "Keystore"
 		else -> ""
 	}
-	@JvmField val privateKey = when (currentLanguage) {
+	@JvmField
+	val privateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Private Key"
 		HoneyLanguage.Chinese.code -> "私钥"
 		HoneyLanguage.Japanese.code -> "秘密鍵"
@@ -2237,7 +2422,8 @@ object ImporMneubar {
 		HoneyLanguage.TraditionalChinese.code -> "私鑰"
 		else -> ""
 	}
-	@JvmField val watchOnly = when (currentLanguage) {
+	@JvmField
+	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Watch-Only Wallet"
 		HoneyLanguage.Chinese.code -> "观察钱包"
 		HoneyLanguage.Japanese.code -> "財布を観察する"
@@ -2249,7 +2435,7 @@ object ImporMneubar {
 }
 
 object SplashText {
-
+	
 	val slogan = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The safest, most useful wallet in the world"
 		HoneyLanguage.Chinese.code -> "好用又安全的区块链钱包"
@@ -2259,7 +2445,8 @@ object SplashText {
 		HoneyLanguage.TraditionalChinese.code -> "好用又安全的區塊鏈錢包"
 		else -> ""
 	}
-	@JvmField val goldStone = when (currentLanguage) {
+	@JvmField
+	val goldStone = when (currentLanguage) {
 		HoneyLanguage.English.code -> "GOLD STONE"
 		HoneyLanguage.Chinese.code -> "GOLD STONE"
 		HoneyLanguage.Japanese.code -> "GOLD STONE"
@@ -2271,7 +2458,8 @@ object SplashText {
 }
 
 object DateAndTimeText {
-	@JvmField val hour = when (currentLanguage) {
+	@JvmField
+	val hour = when (currentLanguage) {
 		HoneyLanguage.English.code -> "HOUR"
 		HoneyLanguage.Chinese.code -> "小时"
 		HoneyLanguage.Japanese.code -> "時間"
@@ -2280,7 +2468,8 @@ object DateAndTimeText {
 		HoneyLanguage.TraditionalChinese.code -> "小時"
 		else -> ""
 	}
-	@JvmField val day = when (currentLanguage) {
+	@JvmField
+	val day = when (currentLanguage) {
 		HoneyLanguage.English.code -> "HOUR"
 		HoneyLanguage.Chinese.code -> "日"
 		HoneyLanguage.Japanese.code -> "日"
@@ -2289,7 +2478,8 @@ object DateAndTimeText {
 		HoneyLanguage.TraditionalChinese.code -> "日"
 		else -> ""
 	}
-	@JvmField val week = when (currentLanguage) {
+	@JvmField
+	val week = when (currentLanguage) {
 		HoneyLanguage.English.code -> "WEEK"
 		HoneyLanguage.Chinese.code -> "周"
 		HoneyLanguage.Japanese.code -> "週"
@@ -2298,7 +2488,8 @@ object DateAndTimeText {
 		HoneyLanguage.TraditionalChinese.code -> "周"
 		else -> ""
 	}
-	@JvmField val month = when (currentLanguage) {
+	@JvmField
+	val month = when (currentLanguage) {
 		HoneyLanguage.English.code -> "MONTH"
 		HoneyLanguage.Chinese.code -> "月"
 		HoneyLanguage.Japanese.code -> "月"
@@ -2307,7 +2498,8 @@ object DateAndTimeText {
 		HoneyLanguage.TraditionalChinese.code -> "月"
 		else -> ""
 	}
-	@JvmField val hours = when (currentLanguage) {
+	@JvmField
+	val hours = when (currentLanguage) {
 		HoneyLanguage.English.code -> "24 Hours"
 		HoneyLanguage.Chinese.code -> "24 小时"
 		HoneyLanguage.Japanese.code -> "24 時間"
@@ -2316,7 +2508,8 @@ object DateAndTimeText {
 		HoneyLanguage.TraditionalChinese.code -> "24 小時"
 		else -> ""
 	}
-	@JvmField val total = when (currentLanguage) {
+	@JvmField
+	val total = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total"
 		HoneyLanguage.Chinese.code -> "全部"
 		HoneyLanguage.Japanese.code -> "すべて"
@@ -2328,8 +2521,9 @@ object DateAndTimeText {
 }
 
 object WalletNameText {
-
-	@JvmField val Owl = when (currentLanguage) {
+	
+	@JvmField
+	val Owl = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Owl"
 		HoneyLanguage.Chinese.code -> "猫头鹰"
 		HoneyLanguage.Japanese.code -> "フクロウ"
@@ -2338,8 +2532,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "貓頭鷹"
 		else -> ""
 	}
-
-	@JvmField val Bear = when (currentLanguage) {
+	@JvmField
+	val Bear = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bear"
 		HoneyLanguage.Chinese.code -> "熊老大"
 		HoneyLanguage.Japanese.code -> "くま"
@@ -2348,8 +2542,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "熊老大"
 		else -> ""
 	}
-
-	@JvmField val Elephant = when (currentLanguage) {
+	@JvmField
+	val Elephant = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Elephant"
 		HoneyLanguage.Chinese.code -> "象先生"
 		HoneyLanguage.Japanese.code -> "象"
@@ -2358,8 +2552,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "象先生"
 		else -> ""
 	}
-
-	@JvmField val Rhinoceros = when (currentLanguage) {
+	@JvmField
+	val Rhinoceros = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rhinoceros"
 		HoneyLanguage.Chinese.code -> "红犀牛"
 		HoneyLanguage.Japanese.code -> "Rhinoceros"
@@ -2368,8 +2562,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "红犀牛"
 		else -> ""
 	}
-
-	@JvmField val Frog = when (currentLanguage) {
+	@JvmField
+	val Frog = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Frog"
 		HoneyLanguage.Chinese.code -> "青蛙"
 		HoneyLanguage.Japanese.code -> "カエル"
@@ -2378,8 +2572,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "青蛙"
 		else -> ""
 	}
-
-	@JvmField val Koala = when (currentLanguage) {
+	@JvmField
+	val Koala = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Koala"
 		HoneyLanguage.Chinese.code -> "考拉宝宝"
 		HoneyLanguage.Japanese.code -> "コアラ"
@@ -2388,8 +2582,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "考拉寶寶"
 		else -> ""
 	}
-
-	@JvmField val Fox = when (currentLanguage) {
+	@JvmField
+	val Fox = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Fox"
 		HoneyLanguage.Chinese.code -> "火狐狸"
 		HoneyLanguage.Japanese.code -> "狐"
@@ -2398,8 +2592,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "火狐狸"
 		else -> ""
 	}
-
-	@JvmField val Monkey = when (currentLanguage) {
+	@JvmField
+	val Monkey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Monkey"
 		HoneyLanguage.Chinese.code -> "猕猴"
 		HoneyLanguage.Japanese.code -> "モンキー"
@@ -2408,8 +2602,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "獼猴"
 		else -> ""
 	}
-
-	@JvmField val Giraffle = when (currentLanguage) {
+	@JvmField
+	val Giraffle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Giraffle"
 		HoneyLanguage.Chinese.code -> "长颈鹿"
 		HoneyLanguage.Japanese.code -> "キリン"
@@ -2418,8 +2612,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "長頸鹿"
 		else -> ""
 	}
-
-	@JvmField val Penguin = when (currentLanguage) {
+	@JvmField
+	val Penguin = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Penguin"
 		HoneyLanguage.Chinese.code -> "企鹅"
 		HoneyLanguage.Japanese.code -> "ペンギン"
@@ -2428,8 +2622,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "企鵝"
 		else -> ""
 	}
-
-	@JvmField val Wolf = when (currentLanguage) {
+	@JvmField
+	val Wolf = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wolf"
 		HoneyLanguage.Chinese.code -> "小灰狼"
 		HoneyLanguage.Japanese.code -> "狼"
@@ -2438,8 +2632,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "小灰狼"
 		else -> ""
 	}
-
-	@JvmField val Bull = when (currentLanguage) {
+	@JvmField
+	val Bull = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bull"
 		HoneyLanguage.Chinese.code -> "牛魔王"
 		HoneyLanguage.Japanese.code -> "ブル"
@@ -2448,8 +2642,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "牛魔王"
 		else -> ""
 	}
-
-	@JvmField val Leopard = when (currentLanguage) {
+	@JvmField
+	val Leopard = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Leopard"
 		HoneyLanguage.Chinese.code -> "黑豹"
 		HoneyLanguage.Japanese.code -> "ヒョウ"
@@ -2458,8 +2652,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "黑豹"
 		else -> ""
 	}
-
-	@JvmField val Deer = when (currentLanguage) {
+	@JvmField
+	val Deer = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Deer"
 		HoneyLanguage.Chinese.code -> "梅花鹿"
 		HoneyLanguage.Japanese.code -> "鹿"
@@ -2468,8 +2662,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "梅花鹿"
 		else -> ""
 	}
-
-	@JvmField val Raccoon = when (currentLanguage) {
+	@JvmField
+	val Raccoon = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Raccoon"
 		HoneyLanguage.Chinese.code -> "小浣熊"
 		HoneyLanguage.Japanese.code -> "ラクーン"
@@ -2478,8 +2672,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "小浣熊"
 		else -> ""
 	}
-
-	@JvmField val Lion = when (currentLanguage) {
+	@JvmField
+	val Lion = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Lion"
 		HoneyLanguage.Chinese.code -> "狮子王"
 		HoneyLanguage.Japanese.code -> "ライオン"
@@ -2488,8 +2682,8 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "獅子王"
 		else -> ""
 	}
-
-	@JvmField val Hippo = when (currentLanguage) {
+	@JvmField
+	val Hippo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Hippo"
 		HoneyLanguage.Chinese.code -> "河马"
 		HoneyLanguage.Japanese.code -> "カバ"
@@ -2498,6 +2692,5 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "河馬君"
 		else -> ""
 	}
-
 }
 

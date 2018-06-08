@@ -4,20 +4,25 @@ package io.goldstone.blockchain.common.value
  * @date 2018/5/24 12:45 AM
  * @author KaySaith
  */
-
 enum class HoneyLanguage(
 	val code: Int,
 	val language: String,
 	val symbol: String
 ) {
+	
 	English(0, "English", "EN"),
 	Chinese(1, "Chinese", "ZH"),
-	Japanese(2, "Japanese", "JP"),
+	Japanese(2, "Japanese", "JA"),
 	Russian(3, "Russian", "RU"),
 	Korean(4, "Korean", "KR"),
 	TraditionalChinese(5, "TraditionalChinese", "TC");
-
+	
 	companion object {
+		
+		fun currentLanguageIsSupported(): Boolean {
+			return Config.getCurrentLanguageCode() in 0 .. 5
+		}
+		
 		fun getLanguageCode(language: String): Int {
 			return when (language) {
 				HoneyLanguage.English.language -> HoneyLanguage.English.code
@@ -29,7 +34,7 @@ enum class HoneyLanguage(
 				else -> 100
 			}
 		}
-
+		
 		fun getLanguageByCode(code: Int): String {
 			return when (code) {
 				HoneyLanguage.English.code -> HoneyLanguage.English.language
@@ -41,7 +46,7 @@ enum class HoneyLanguage(
 				else -> ""
 			}
 		}
-
+		
 		fun getLanguageSymbol(code: Int): String {
 			return when (code) {
 				HoneyLanguage.English.code -> HoneyLanguage.English.symbol
@@ -53,7 +58,7 @@ enum class HoneyLanguage(
 				else -> ""
 			}
 		}
-
+		
 		fun getCodeBySymbol(symbol: String): Int {
 			return when (symbol.toUpperCase()) {
 				HoneyLanguage.English.symbol -> HoneyLanguage.English.code
@@ -64,6 +69,10 @@ enum class HoneyLanguage(
 				HoneyLanguage.TraditionalChinese.symbol -> HoneyLanguage.TraditionalChinese.code
 				else -> 100
 			}
+		}
+		
+		fun getCurrentSymbol(): String {
+			return HoneyLanguage.getLanguageSymbol(Config.getCurrentLanguageCode())
 		}
 	}
 }

@@ -11,10 +11,10 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  * @author KaySaith
  */
 object Config {
-	fun getCurrentLanguage(): Int =
+	fun getCurrentLanguageCode(): Int =
 		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentLanguage)
 	
-	fun updateCurrentLanguage(languageCode: Int) =
+	fun updateCurrentLanguageCode(languageCode: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
 			SharesPreference.currentLanguage,
 			languageCode

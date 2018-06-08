@@ -7,7 +7,6 @@ import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -31,9 +30,8 @@ import java.util.*
  * @date 27/03/2018 3:20 PM
  * @author KaySaith
  */
-
 class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
-
+	
 	private val chartView = LineChartView(context)
 	private var maxY = 100f
 	private var unitY = 10f
@@ -42,24 +40,22 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			data.isNotEmpty() isTrue { data.clear() }
 			// 设定背景的网格
 			setGrid(5, 10,
-				Paint().apply { isAntiAlias = true; style = Paint.Style.FILL; color = GrayScale.lightGray })
+			        Paint().apply {
+				        isAntiAlias = true; style = Paint.Style.FILL; color =
+				        GrayScale.lightGray
+			        })
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
 			// 设定 `Y` 周波段
-			if (chartData?.max().orElse(0.0) == 0 && chartData?.min().orElse(0.0) == 0) {
-				val maxValue = chartData?.max()?.value ?: 0f
-				val minValue = chartData?.min()?.value ?: 0f
-				QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
-					setAxisBorderValues(min, max, step)
-				}
-			} else {
-				setAxisBorderValues(0f, maxY, unitY)
+			val maxValue = chartData?.max()?.value ?: 0f
+			val minValue = chartData?.min()?.value ?: 0f
+			QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
+				setAxisBorderValues(min, max, step)
 			}
 			// 设定外界 `Border` 颜色
 			setAxisColor(Color.argb(0, 0, 0, 0))
 			// 设定外边的 `Border` 的粗细
 			setAxisThickness(0f)
-
 			val dataSet = LineSet()
 			dataSet.apply {
 				chartData?.forEach { addPoint(it) }
@@ -82,26 +78,25 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 				setTypeface(GoldStoneFont.heavy(context))
 				setFontSize(9.uiPX())
 			}
-
+			
 			addData(dataSet)
-
+			
 			setClickablePointRadius(30.uiPX().toFloat())
 			setOnEntryClickListener { _, entryIndex, _ ->
 				context.toast(chartData!![entryIndex].value.toString())
 			}
-
+			
 			try {
 				notifyDataUpdate()
 			} catch (error: Exception) {
 				LogUtil.error(this.javaClass.simpleName, error)
 			}
-
 			val animation = Animation(1000)
 			animation.setInterpolator(OvershootInterpolator())
 			show(animation)
 		}
 	}
-
+	
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
 		chartView.apply {
@@ -109,7 +104,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
 		}.into(this)
 	}
-
+	
 	fun setCharData(
 		data: ArrayList<Point>,
 		maxY: Float,
