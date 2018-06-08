@@ -47,7 +47,7 @@ class ProfilePresenter(
 				),
 				ProfileModel(
 					R.drawable.currency_icon, ProfileText.currency,
-					GoldStoneApp.getCurrencyCode()
+					Config.getCurrencyCode()
 				),
 				ProfileModel(
 					R.drawable.language_icon, ProfileText.language,
@@ -56,7 +56,7 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.chain_icon,
 					ProfileText.chain,
-					ChainID.getChainNameByID(GoldStoneApp.getCurrentChain())
+					ChainID.getChainNameByID(Config.getCurrentChain())
 				),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
@@ -162,5 +162,5 @@ class ProfilePresenter(
 	}
 	
 	private fun getCurrentLanguageSymbol() =
-		HoneyLanguage.getLanguageByCode(GoldStoneApp.getCurrentLanguage())
+		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguage())
 }

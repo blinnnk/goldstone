@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
@@ -17,7 +17,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/6/6 3:59 PM
@@ -66,10 +65,8 @@ fun TransactionDetailPresenter.saveInputCodeByTaxHash(
 				if (transaction.input.isEmpty()) {
 					GoldStoneEthCall.getInputCodeByHash(
 						taxHash,
-						GoldStoneApp.getCurrentChain(), { error, reason ->
-							fragment.context?.runOnUiThread {
-								alert(reason ?: error.toString())
-							}
+						Config.getCurrentChain(), { error, reason ->
+							LogUtil.error("saveInputCodeByTaxHash $reason", error)
 						}) {
 						TransactionTable.updateInputCodeByHash(taxHash, it) {
 							callback(it, transaction.isERC20)

@@ -3,13 +3,8 @@ package io.goldstone.blockchain
 import android.annotation.SuppressLint
 import android.app.Application
 import com.blinnnk.extension.isNull
-import com.blinnnk.util.getDoubleFromSharedPreferences
-import com.blinnnk.util.getIntFromSharedPreferences
-import com.blinnnk.util.getStringFromSharedPreferences
-import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
-import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -45,47 +40,5 @@ class GoldStoneApp : Application() {
 			tracker = sAnalytics?.newTracker(R.xml.global_tracker)
 		}
 		return tracker
-	}
-	
-	companion object {
-		
-		fun getCurrentLanguage(): Int =
-			GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentLanguage)
-		
-		fun updateCurrentLanguage(languageCode: Int) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(
-				SharesPreference.currentLanguage,
-				languageCode
-			)
-		
-		fun getCurrentChain(): String =
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
-		
-		fun updateCurrentChain(chainID: String) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain, chainID)
-		
-		fun getCurrencyCode(): String =
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)
-		
-		fun updateCurrencyCode(code: String) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currencyCode, code)
-		
-		fun getCurrentRate(): Double =
-			GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.rate)
-		
-		fun updateCurrentRate(rate: Double) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.rate, rate.toFloat())
-		
-		fun getWalletCount(): Int =
-			GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.walletCount)
-		
-		fun updateWalletCount(count: Int) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)
-		
-		fun getMaxWalletID(): Int =
-			GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
-		
-		fun updateMaxWalletID(id: Int) =
-			GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)
 	}
 }

@@ -34,6 +34,7 @@ class PasswordSettingsPresenter(
 			fragment.context,
 			callback // error callback
 		) { password, _ ->
+			// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 			fragment.context?.updatePassword(
 				WalletTable.current.address,
 				oldPasswordInput.text.toString(),

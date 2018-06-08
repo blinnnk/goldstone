@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.toAddressCode
 
@@ -41,6 +41,74 @@ object APIPath {
 	val getQuotationCurrencyInfo: (pair: String) -> String = { pair ->
 		"$url/market/coinDetail?pair=$pair"
 	}
+}
+
+object EtherScanApi {
+	
+	private val apikey: () -> String = { etherScanKeys.getRandom() }
+	private const val mainHeader = "https://api.etherscan.io"
+	private const val ropstanHeader = "https://api-ropsten.etherscan.io"
+	private const val kovanHeader = "https://api-kovan.etherscan.io"
+	private const val rinkebyHeader = "https://api-rinkeby.etherscan.io"
+	private const val mainLogHeader = "https://api.etherscan.io"
+	private const val kovanLogHeader = "https://kovan.etherscan.io"
+	private const val ropstanLogHeader = "https://ropsten.etherscan.io"
+	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
+	private val etherScanHeader: (chainID: String) -> String = {
+		when (it) {
+			ChainID.Main.id -> mainHeader
+			ChainID.Ropstan.id -> ropstanHeader
+			ChainID.Kovan.id -> kovanHeader
+			ChainID.Rinkeby.id -> rinkebyHeader
+			else -> ropstanHeader
+		}
+	}
+	private val etherScanLogHeader: (chainID: String) -> String = {
+		when (it) {
+			ChainID.Main.id -> mainLogHeader
+			ChainID.Ropstan.id -> ropstanLogHeader
+			ChainID.Kovan.id -> kovanLogHeader
+			ChainID.Rinkeby.id -> rinkebyLogHeader
+			else -> ropstanLogHeader
+		}
+	}
+	private val transactionDetailHeader: (currentChain: String) -> String = {
+		when (it) {
+			ChainID.Main.id -> "https://etherscan.io/tx/"
+			ChainID.Ropstan.id -> "https://ropsten.etherscan.io/tx/"
+			ChainID.Kovan.id -> "https://kovan.etherscan.io/tx/"
+			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
+			else -> "https://etherscan.io/tx/"
+		}
+	}
+	val transactionDetail: (taxHash: String) -> String = {
+		"${transactionDetailHeader(Config.getCurrentChain())}$it"
+	}
+	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
+		"${etherScanHeader(Config.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
+	}
+	val transactionsByHash: (taxHash: String) -> String = {
+		"${etherScanHeader(Config.getCurrentChain())}/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
+	}
+	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
+		{ address, startBlock ->
+			"${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
+		}
+	@JvmStatic
+	val getTokenDefrayTransactiosingleTransactionHasn: (address: String, startBlock: String) -> String =
+		{ address, startBlock ->
+			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}"
+		}
+	@JvmStatic
+	val getAllTokenTransaction: (address: String, startBlock: String) -> String =
+		{ address, startBlock ->
+			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}&topic1_2_opr=or&topic2=${address.toAddressCode()}"
+		}
+	@JvmStatic
+	val getTokenTransactionBetween: (sendAddress: String, receiveAddress: String, startBlock: String) -> String =
+		{ sendAddress, receiveAddress, startBlock ->
+			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${sendAddress.toAddressCode()}&topic2=${receiveAddress.toAddressCode()}"
+		}
 }
 
 // `EtherScan` 对 `Key` 的限制很大, 用随机的办法临时解决, 降低测试的时候出问题的概率
@@ -331,71 +399,3 @@ private val etherScanKeys = arrayListOf(
 	"21VDD8YWDHFY4SGM9X4RY9386E7DRW7GWM",
 	"BJYQFJS8YEJ7VUFJF433VTXN7Z1K4IBY4H"
 )
-
-object EtherScanApi {
-	
-	private val apikey: () -> String = { etherScanKeys.getRandom() }
-	private const val mainHeader = "https://api.etherscan.io"
-	private const val ropstanHeader = "http://api-ropsten.etherscan.io"
-	private const val kovanHeader = "https://api-kovan.etherscan.io"
-	private const val rinkebyHeader = "https://api-rinkeby.etherscan.io"
-	private const val mainLogHeader = "https://api.etherscan.io"
-	private const val kovanLogHeader = "http://kovan.etherscan.io"
-	private const val ropstanLogHeader = "http://ropsten.etherscan.io"
-	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
-	private val etherScanHeader: (chainID: String) -> String = {
-		when (it) {
-			ChainID.Main.id -> mainHeader
-			ChainID.Ropstan.id -> ropstanHeader
-			ChainID.Kovan.id -> kovanHeader
-			ChainID.Rinkeby.id -> rinkebyHeader
-			else -> ropstanHeader
-		}
-	}
-	private val etherScanLogHeader: (chainID: String) -> String = {
-		when (it) {
-			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropstan.id -> ropstanLogHeader
-			ChainID.Kovan.id -> kovanLogHeader
-			ChainID.Rinkeby.id -> rinkebyLogHeader
-			else -> ropstanLogHeader
-		}
-	}
-	private val transactionDetailHeader: (currentChain: String) -> String = {
-		when (it) {
-			ChainID.Main.id -> "https://etherscan.io/tx/"
-			ChainID.Ropstan.id -> "https://ropsten.etherscan.io/tx/"
-			ChainID.Kovan.id -> "https://kovan.etherscan.io/tx/"
-			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
-			else -> "https://etherscan.io/tx/"
-		}
-	}
-	val transactionDetail: (taxHash: String) -> String = {
-		"${transactionDetailHeader(GoldStoneApp.getCurrentChain())}$it"
-	}
-	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
-		"${etherScanHeader(GoldStoneApp.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
-	}
-	val transactionsByHash: (taxHash: String) -> String = {
-		"${etherScanHeader(GoldStoneApp.getCurrentChain())}/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
-	}
-	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
-		{ address, startBlock ->
-			"${etherScanLogHeader(GoldStoneApp.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getTokenDefrayTransactiosingleTransactionHasn: (address: String, startBlock: String) -> String =
-		{ address, startBlock ->
-			"$${etherScanLogHeader(GoldStoneApp.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getAllTokenTransaction: (address: String, startBlock: String) -> String =
-		{ address, startBlock ->
-			"$${etherScanLogHeader(GoldStoneApp.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}&topic1_2_opr=or&topic2=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getTokenTransactionBetween: (sendAddress: String, receiveAddress: String, startBlock: String) -> String =
-		{ sendAddress, receiveAddress, startBlock ->
-			"$${etherScanLogHeader(GoldStoneApp.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${sendAddress.toAddressCode()}&topic2=${receiveAddress.toAddressCode()}"
-		}
-}

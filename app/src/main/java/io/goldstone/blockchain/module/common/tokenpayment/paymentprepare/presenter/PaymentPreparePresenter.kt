@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -127,7 +127,7 @@ class PaymentPreparePresenter(
 			currentToken = token
 			fragment.setSymbolAndPrice(
 				currentToken?.symbol.orEmpty(),
-				currentToken?.price?.formatCurrency().orEmpty() + " " + GoldStoneApp.getCurrencyCode()
+				currentToken?.price?.formatCurrency().orEmpty() + " " + Config.getCurrencyCode()
 			)
 		}
 	}

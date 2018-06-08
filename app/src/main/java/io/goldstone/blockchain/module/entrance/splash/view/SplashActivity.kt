@@ -6,10 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -130,11 +130,11 @@ class SplashActivity : AppCompatActivity() {
 	 * set and displaying the interface from the database.
 	 */
 	private fun initLaunchLanguage(code: Int) {
-		GoldStoneApp.updateCurrentLanguage(code)
+		Config.updateCurrentLanguage(code)
 	}
 	
 	private fun setCurrentChainID(id: String) {
-		GoldStoneApp.updateCurrentChain(id)
+		Config.updateCurrentChain(id)
 	}
 	
 	private fun ViewGroup.initWaveView() {

@@ -8,7 +8,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toDecimalFromHex
@@ -77,7 +77,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = GoldStoneApp.getCurrentChain()
+	var chainID: String = Config.getCurrentChain()
 ) {
 	
 	/** 默认的 `constructor` */
@@ -355,7 +355,7 @@ data class TransactionTable(
 		fun updateMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
-			chainID: String = GoldStoneApp.getCurrentChain(),
+			chainID: String = Config.getCurrentChain(),
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) {
@@ -416,7 +416,7 @@ interface TransactionDao {
 	)
 	fun getTransactionsByAddress(
 		walletAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): List<TransactionTable>
 	
 	@Query(
@@ -425,23 +425,22 @@ interface TransactionDao {
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
-	fun getTransactionByTaxHash(taxHash: String, chainID: String = GoldStoneApp.getCurrentChain()):
+	fun getTransactionByTaxHash(taxHash: String, chainID: String = Config.getCurrentChain()):
 		List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive AND chainID LIKE :chainID")
 	fun getTransactionByTaxHashAndReceivedStatus(
 		taxHash: String,
 		isReceive: Boolean,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): TransactionTable?
 	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC"
 	)
 	fun getTransactionsByAddressAndContract(
 		walletAddress: String,
-		contract: String,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		contract: String
 	): List<TransactionTable>
 	
 	@Insert

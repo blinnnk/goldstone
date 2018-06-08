@@ -15,10 +15,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 21/04/2018 3:58 PM
  * @author KaySaith
  */
-
 class QuotationManagementFragment :
 	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
-
+	
 	override val presenter = QuotationManagementPresenter(this)
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
@@ -27,20 +26,21 @@ class QuotationManagementFragment :
 		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
 			cell.switch.onClick {
 				cell.searchModel?.apply {
+					asyncData?.find { it.pair == pair }?.isSelecting = cell.switch.isChecked
 					QuotationSelectionTable.removeSelectionBy(pair)
 				}
 			}
 		}
 	}
-
+	
 	override fun onResume() {
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
-
+	
 	override fun setSlideUpWithCellHeight() =
 		QuotationSize.cellHeight
-
+	
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
@@ -52,5 +52,4 @@ class QuotationManagementFragment :
 			}
 		}
 	}
-
 }

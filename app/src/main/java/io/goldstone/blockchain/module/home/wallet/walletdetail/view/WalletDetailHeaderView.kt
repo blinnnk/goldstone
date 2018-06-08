@@ -85,7 +85,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.into(this)
 			
-			textView(WalletText.totalAssets + " (${GoldStoneApp.getCurrencyCode()})") {
+			textView(WalletText.totalAssets + " (${Config.getCurrencyCode()})") {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.light(context)
 				textColor = Spectrum.opacity5White

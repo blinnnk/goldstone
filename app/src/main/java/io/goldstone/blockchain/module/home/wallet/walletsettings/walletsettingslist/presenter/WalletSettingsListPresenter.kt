@@ -5,12 +5,12 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -40,7 +40,7 @@ class WalletSettingsListPresenter(
 	
 	override fun updateData() {
 		val balanceText =
-			WalletTable.current.balance?.formatCurrency() + " (${GoldStoneApp.getCurrencyCode()})"
+			WalletTable.current.balance?.formatCurrency() + " (${Config.getCurrencyCode()})"
 		WalletTable.getCurrentWallet { wallet ->
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.checkQRCode),

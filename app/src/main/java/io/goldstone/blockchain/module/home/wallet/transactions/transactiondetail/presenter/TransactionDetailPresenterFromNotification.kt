@@ -1,22 +1,22 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import com.blinnnk.extension.*
-import io.goldstone.blockchain.GoldStoneApp
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.InputCodeData
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.runOnUiThread
@@ -72,47 +72,20 @@ fun TransactionDetailPresenter.updateHeaderValueFromNotification() {
 // 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 fun TransactionDetailPresenter.prepareHeaderValueFromNotification(
 	receipt: TransactionTable,
-	transaction: InputCodeData,
-	isReceive: Boolean,
-	chainID: String
+	toAddress: String,
+	value: Double,
+	isReceive: Boolean
 ) {
-	DefaultTokenTable.getCurrentChainTokenByContract(receipt.to) {
-		val address = if (isReceive) receipt.fromAddress else transaction.address
-		it.isNull() isTrue {
-			GoldStoneEthCall
-				.getTokenSymbolAndDecimalByContract(
-					receipt.to,
-					chainID,
-					{ error, reason ->
-						fragment.context?.alert(reason ?: error.toString())
-					}) { symbol, decimal ->
-					val count = CryptoUtils.toCountByDecimal(transaction.count, decimal)
-					updateHeaderValue(
-						TransactionHeaderModel(
-							count,
-							address,
-							symbol,
-							false,
-							isReceive
-						)
-					)
-				}
-		} otherwise {
-			val count = CryptoUtils.toCountByDecimal(
-				transaction.count,
-				it?.decimals.orElse(0.0)
-			)
-			updateHeaderValue(
-				TransactionHeaderModel(
-					count,
-					address,
-					it?.symbol.orEmpty(),
-					false,
-					isReceive
-				)
-			)
-		}
-	}
+	val address = if (isReceive) receipt.fromAddress else toAddress
+	updateHeaderValue(
+		TransactionHeaderModel(
+			value,
+			address,
+			notificationData?.symbol.orEmpty(),
+			false,
+			isReceive
+		)
+	)
 }
 
 fun TransactionDetailPresenter.updateByNotificationHash(
@@ -131,18 +104,19 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	) { receipt ->
 		receipt.getTimestampAndInsertToDatabase(fragment, info.chainID) { timestamp ->
 			fragment.context?.runOnUiThread {
-				if (fragment.asyncData.isNull()) {
-					TransactionTable.updateMemoByHashAndReceiveStatus(
-						info.hash,
-						info.isReceived,
-						info.chainID
-					) { memo ->
-						receipt.toAsyncData().let {
-							it[4].info = TimeUtils.formatDate(timestamp)
-							it[1].info = memo
-							fragment.asyncData = it
-							updateHeaderFromNotification(receipt, info)
+				TransactionTable.updateMemoByHashAndReceiveStatus(
+					info.hash,
+					info.isReceived,
+					info.chainID
+				) { memo ->
+					receipt.toAsyncData().let {
+						it[4].info = TimeUtils.formatDate(timestamp)
+						it[1].info = memo
+						fragment.apply {
+							if (asyncData.isNull()) asyncData = it
+							else presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
 						}
+						updateHeaderFromNotification(receipt, info)
 					}
 				}
 				callback()
@@ -157,7 +131,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
  */
 private fun TransactionTable.getTimestampAndInsertToDatabase(
 	fragment: TransactionDetailFragment,
-	chainID: String = GoldStoneApp.getCurrentChain(),
+	chainID: String = Config.getCurrentChain(),
 	callback: (Long) -> Unit
 ) {
 	GoldStoneEthCall.getBlockTimeStampByBlockHash(
@@ -180,22 +154,12 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(
 	val transactionInfo =
 		CryptoUtils.loadTransferInfoFromInputData(receipt.input)
 	
-	CryptoUtils.isERC20TransferByInputCode(receipt.input) {
-		transactionInfo?.let {
-			prepareHeaderValueFromNotification(receipt, it, info.isReceived, info.chainID)
-		}
-	} isFalse {
-		val count = CryptoUtils.toCountByDecimal(receipt.value.toDouble(), 18.0)
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				if (info.isReceived) receipt.fromAddress else receipt.to,
-				CryptoSymbol.eth,
-				false,
-				info.isReceived
-			)
-		)
-	}
+	prepareHeaderValueFromNotification(
+		receipt,
+		transactionInfo?.address ?: receipt.to,
+		notificationData?.value.orElse(0.0),
+		info.isReceived
+	)
 }
 
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {

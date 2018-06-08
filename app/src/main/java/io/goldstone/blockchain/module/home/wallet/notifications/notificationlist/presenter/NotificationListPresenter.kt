@@ -27,7 +27,9 @@ import java.io.Serializable
 data class NotificationTransactionInfo(
 	val hash: String,
 	val chainID: String,
-	val isReceived: Boolean
+	val isReceived: Boolean,
+	val symbol: String,
+	val value: Double
 ) : Serializable
 
 class NotificationListPresenter(

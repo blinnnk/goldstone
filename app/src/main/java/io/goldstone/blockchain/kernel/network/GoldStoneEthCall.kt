@@ -10,6 +10,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -80,7 +81,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		hold: (
 			symbol: String,
@@ -100,7 +101,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenSymbolAndDecimalByContract(
 		contractAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		hold: (symbol: String, decimal: Double) -> Unit
 	) {
@@ -117,7 +118,7 @@ object GoldStoneEthCall {
 	fun getTokenCountWithDecimalByContract(
 		contractAddress: String,
 		walletAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		hold: (Double) -> Unit
 	) {
@@ -131,7 +132,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (String) -> Unit = {}
 	) {
@@ -171,7 +172,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (Long) -> Unit
 	) {
@@ -185,7 +186,9 @@ object GoldStoneEthCall {
 				LogUtil.error(Method.GetBlockByHash.display, error)
 			}, chainID) {
 				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
-				holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
+				else {
+					holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
+				}
 			}
 		}
 	}
@@ -193,7 +196,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTransactionByHash(
 		hash: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		unfinishedCallback: () -> Unit = {},
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (TransactionTable) -> Unit
@@ -285,7 +288,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	private fun getTokenSymbolByContract(
 		contractAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (String) -> Unit = {}
 	) {
@@ -303,7 +306,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	private fun getTokenDecimal(
 		contractAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (Double) -> Unit
 	) {
@@ -384,7 +387,7 @@ object GoldStoneEthCall {
 	private fun callEthBy(
 		body: RequestBody,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = GoldStoneApp.getCurrentChain(),
+		chainID: String = Config.getCurrentChain(),
 		hold: (String) -> Unit
 	) {
 		val client = OkHttpClient
@@ -395,7 +398,7 @@ object GoldStoneEthCall {
 		GoldStoneAPI.getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
-					errorCallback(error, null)
+					errorCallback(error, "Call Ethereum Failured")
 				}
 				
 				@SuppressLint("SetTextI18n")
@@ -417,7 +420,7 @@ object GoldStoneEthCall {
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
-						errorCallback(error, null)
+						errorCallback(error, "onResponse Error")
 					}
 				}
 			})

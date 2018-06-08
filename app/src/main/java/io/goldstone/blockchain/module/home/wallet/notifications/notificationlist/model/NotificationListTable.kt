@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
@@ -67,6 +68,18 @@ data class NotificationTable(
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("chainid")
 			} else ""
+		}
+		
+		fun getSymbol(extra: String): String {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("symbol")
+			} else ""
+		}
+		
+		fun getValue(extra: String): Double {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("value").toDoubleOrNull().orElse(0.0)
+			} else 0.0
 		}
 		
 		fun getReceiveStatus(extra: String): Boolean? {

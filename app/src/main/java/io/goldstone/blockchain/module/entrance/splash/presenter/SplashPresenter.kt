@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.entrance.splash.presenter
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -66,12 +66,12 @@ class SplashPresenter(val activity: SplashActivity) {
 		config: AppConfigTable
 	) {
 		doAsync {
-			GoldStoneApp.updateCurrencyCode(config.currencyCode)
+			Config.updateCurrencyCode(config.currencyCode)
 			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
 				LogUtil.error("Request of get currency rate has error")
 			}) {
 				// 更新内存中的值
-				GoldStoneApp.updateCurrentRate(it)
+				Config.updateCurrentRate(it)
 				// 更新数据库的值
 				SupportCurrencyTable.updateUsedRateValue(it)
 			}

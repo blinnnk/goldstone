@@ -7,13 +7,13 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.crypto.formatCurrency
@@ -43,7 +43,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			tokenInfo.subtitle.text = name
 			valueInfo.title.text = count.formatCount()
 			valueInfo.subtitle.text = "≈ " + currency.formatCurrency() +
-				" (${GoldStoneApp.getCurrencyCode()})"
+				" (${Config.getCurrencyCode()})"
 		}
 	}
 	private val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
