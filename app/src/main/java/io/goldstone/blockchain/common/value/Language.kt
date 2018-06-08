@@ -1639,6 +1639,43 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息內容"
 		else -> ""
 	}
+
+	@JvmField val highAndLow = when (currentLanguage) {
+		HoneyLanguage.English.code -> "HIGH / LOW"
+		HoneyLanguage.Chinese.code -> "最高/最低"
+		HoneyLanguage.Japanese.code -> "最高/最低"
+		HoneyLanguage.Korean.code -> "최고 / 최저"
+		HoneyLanguage.Russian.code -> "Высокая/Низкий".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "最高 / 最低"
+		else -> ""
+	}
+	@JvmField val rank = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Rank"
+		HoneyLanguage.Chinese.code -> "排名"
+		HoneyLanguage.Japanese.code -> "ランク"
+		HoneyLanguage.Korean.code -> "순위"
+		HoneyLanguage.Russian.code -> "ранг".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "排名"
+		else -> ""
+	}
+	@JvmField val totalSupply = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Total Supply"
+		HoneyLanguage.Chinese.code -> "总供应量"
+		HoneyLanguage.Japanese.code -> "総供給"
+		HoneyLanguage.Korean.code -> "총 공급"
+		HoneyLanguage.Russian.code -> "Общее снабжение".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "總供應量"
+		else -> ""
+	}
+	@JvmField val marketCap = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Market Cap"
+		HoneyLanguage.Chinese.code -> "流通市值"
+		HoneyLanguage.Japanese.code -> "時価総額"
+		HoneyLanguage.Korean.code -> "시가 총액"
+		HoneyLanguage.Russian.code -> "Рынок".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "流通市值"
+		else -> ""
+	}
 	@JvmField val addQuotationChartPlaceholderTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ADD QUOTATION CHART"
 		HoneyLanguage.Chinese.code -> "添加你感兴趣的Token行情"
@@ -2212,6 +2249,63 @@ object SplashText {
 		HoneyLanguage.Korean.code -> "GOLD STONE"
 		HoneyLanguage.Russian.code -> "GOLD STONE"
 		HoneyLanguage.TraditionalChinese.code -> "GOLD STONE"
+		else -> ""
+	}
+}
+
+object DateAndTimeText {
+	@JvmField val hour = when (currentLanguage) {
+		HoneyLanguage.English.code -> "HOUR"
+		HoneyLanguage.Chinese.code -> "小时"
+		HoneyLanguage.Japanese.code -> "時間"
+		HoneyLanguage.Korean.code -> "시간"
+		HoneyLanguage.Russian.code -> "ЧАС".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "小時"
+		else -> ""
+	}
+	@JvmField val day = when (currentLanguage) {
+		HoneyLanguage.English.code -> "HOUR"
+		HoneyLanguage.Chinese.code -> "日"
+		HoneyLanguage.Japanese.code -> "日"
+		HoneyLanguage.Korean.code -> "주간"
+		HoneyLanguage.Russian.code -> "день".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "日"
+		else -> ""
+	}
+	@JvmField val week = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WEEK"
+		HoneyLanguage.Chinese.code -> "周"
+		HoneyLanguage.Japanese.code -> "週"
+		HoneyLanguage.Korean.code -> "주"
+		HoneyLanguage.Russian.code -> "НЕДЕЛЯ".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "周"
+		else -> ""
+	}
+	@JvmField val month = when (currentLanguage) {
+		HoneyLanguage.English.code -> "MONTH"
+		HoneyLanguage.Chinese.code -> "月"
+		HoneyLanguage.Japanese.code -> "月"
+		HoneyLanguage.Korean.code -> "달"
+		HoneyLanguage.Russian.code -> "месяц".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "月"
+		else -> ""
+	}
+	@JvmField val hours = when (currentLanguage) {
+		HoneyLanguage.English.code -> "24 Hours"
+		HoneyLanguage.Chinese.code -> "24 小时"
+		HoneyLanguage.Japanese.code -> "24 時間"
+		HoneyLanguage.Korean.code -> "24 시간"
+		HoneyLanguage.Russian.code -> "24 ${"часа".toUpperCaseFirstLetter()}"
+		HoneyLanguage.TraditionalChinese.code -> "24 小時"
+		else -> ""
+	}
+	@JvmField val total = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Total"
+		HoneyLanguage.Chinese.code -> "全部"
+		HoneyLanguage.Japanese.code -> "すべて"
+		HoneyLanguage.Korean.code -> "모두"
+		HoneyLanguage.Russian.code -> "полный".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "全部"
 		else -> ""
 	}
 }

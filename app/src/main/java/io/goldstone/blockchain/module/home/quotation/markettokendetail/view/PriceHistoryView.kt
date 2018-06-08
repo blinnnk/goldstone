@@ -9,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.component.TopBottomLineCell
+import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.jetbrains.anko.matchParent
@@ -65,8 +66,8 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 		title.text = QuotationText.priceHistory
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		
-		dayPrice.setPriceTitle("24 Hours")
-		totalPrice.setPriceTitle("Total")
+		dayPrice.setPriceTitle(DateAndTimeText.hours)
+		totalPrice.setPriceTitle(DateAndTimeText.total)
 		
 		verticalLayout {
 			dayPrice.into(this)
