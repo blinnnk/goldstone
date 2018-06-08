@@ -80,14 +80,16 @@ class WalletDetailPresenter(
 	}
 	
 	fun showTransferSelectionOverlay(isShowAddress: Boolean) {
-		fragment.getMainActivity()?.getMainContainer()?.apply {
-			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
-				val overlay = ContentScrollOverlayView(context)
-				overlay.into(this)
-				overlay.setTitle("Token Selection")
-				overlay.addContent {
-					topPadding = 10.uiPX()
-					prepareMyTokenList(isShowAddress)
+		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
+			fragment.getMainActivity()?.getMainContainer()?.apply {
+				if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+					val overlay = ContentScrollOverlayView(context)
+					overlay.into(this)
+					overlay.setTitle("Token Selection")
+					overlay.addContent {
+						topPadding = 10.uiPX()
+						prepareMyTokenList(isShowAddress)
+					}
 				}
 			}
 		}

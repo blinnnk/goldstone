@@ -155,7 +155,7 @@ class ProfilePresenter(
 		val intent = Intent(Intent.ACTION_SEND)
 		intent.putExtra(
 			Intent.EXTRA_TEXT,
-			"GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+			ProfileText.shareContent
 		)
 		intent.type = "text/plain"
 		fragment.context?.startActivity(Intent.createChooser(intent, "share"))
