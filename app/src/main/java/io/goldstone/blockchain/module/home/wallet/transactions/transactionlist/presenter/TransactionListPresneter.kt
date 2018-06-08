@@ -5,13 +5,14 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -73,9 +74,14 @@ class TransactionListPresenter(
 				 * if there is none data in local then `StartBlock 0`
 				 * and load data from `EtherScan`
 				 **/
-				getTransactionDataFromEtherScan("0", {
-					fragment.context?.alert(it.toString())
-				}) {
+				getTransactionDataFromEtherScan(
+					fragment,
+					"0",
+					{
+						// ToDo 等自定义的 `Alert` 完成后应当友好提示
+						LogUtil.error("error in getTransactionDataFromEtherScan $it")
+					}
+				) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 					removeLoadingView()
@@ -92,9 +98,16 @@ class TransactionListPresenter(
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
 			?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-		getTransactionDataFromEtherScan(currentBlockNumber, {
-			fragment.context?.alert(it.toString())
-		}) { newData ->
+		getTransactionDataFromEtherScan(
+			fragment,
+			currentBlockNumber,
+			{
+				// ToDo 等自定义的 `Alert` 完成后应当友好提示
+				fragment.context
+					?.alert("Find errors when get transaction records from ethereum ${Config.getCurrentLanguage()}")
+				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
+			}
+		) { newData ->
 			/** chain data is empty then return and remove loading view */
 			if (newData.isEmpty()) {
 				removeLoadingView()
@@ -123,34 +136,26 @@ class TransactionListPresenter(
 	companion object {
 		
 		// 默认拉取全部的 `EtherScan` 的交易数据
-		private fun BaseRecyclerFragment<*, *>.getTransactionDataFromEtherScan(
-			startBlock: String,
-			errorCallback: (Exception) -> Unit,
-			hold: (ArrayList<TransactionListModel>) -> Unit
-		) {
-			// 没有网络直接返回
-			if (!NetworkUtil.hasNetworkWithAlert(getContext())) return
-			// 请求所有链上的数据
-			mergeNormalAndTokenIncomingTransactions(startBlock, errorCallback) {
-				it.isNotEmpty() isTrue {
-					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
-					filterCompletedData(it, hold)
-				} otherwise {
-					this.getContext()?.runOnUiThread {
-						// if data is empty then return an empty array
-						hold(arrayListOf())
-					}
-				}
-			}.start()
-		}
-		
-		fun updateTransactions(
+		fun getTransactionDataFromEtherScan(
 			fragment: BaseRecyclerFragment<*, *>,
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			fragment.getTransactionDataFromEtherScan(startBlock, errorCallback, hold)
+			// 没有网络直接返回
+			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
+			// 请求所有链上的数据
+			mergeNormalAndTokenIncomingTransactions(startBlock, errorCallback) {
+				it.isNotEmpty() isTrue {
+					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
+					fragment.filterCompletedData(it, hold)
+				} otherwise {
+					fragment.getContext()?.runOnUiThread {
+						// if data is empty then return an empty array
+						hold(arrayListOf())
+					}
+				}
+			}.start()
 		}
 		
 		private fun mergeNormalAndTokenIncomingTransactions(
@@ -169,14 +174,12 @@ class TransactionListPresenter(
 						GoldStoneAPI.getTransactionListByAddress(
 							startBlock,
 							{
-								//error callback
 								// 只弹出一次错误信息
 								if (!hasError) {
 									errorCallback(it)
 									hasError = true
 								}
 								completeMark()
-								return@getTransactionListByAddress
 							}
 						) {
 							chainData = this
@@ -194,7 +197,6 @@ class TransactionListPresenter(
 									hasError = true
 								}
 								completeMark()
-								return@getERC20TokenIncomingTransaction
 							}
 						) {
 							// 把请求回来的数据转换成 `TransactionTable` 格式
@@ -245,7 +247,7 @@ class TransactionListPresenter(
 								GoldStoneEthCall.apply {
 									getTokenInfoByContractAddress(
 										it.contractAddress,
-										GoldStoneApp.getCurrentChain(), { _, _ ->
+										Config.getCurrentChain(), { _, _ ->
 											// error callback if need do something
 										}) { symbol, name, decimal ->
 										GoldStoneDataBase

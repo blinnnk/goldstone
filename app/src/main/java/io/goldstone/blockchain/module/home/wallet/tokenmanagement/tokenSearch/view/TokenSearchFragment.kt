@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.v
 
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TokenManagementText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
@@ -34,7 +34,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		model?.let { searchToken ->
 			DefaultTokenTable.getCurrentChainTokenByContract(
 				searchToken.contract,
-				GoldStoneApp.getCurrentChain()
+				Config.getCurrentChain()
 			) { localToken ->
 				localToken.isNotNull {
 					DefaultTokenTable.updateTokenDefaultStatus(

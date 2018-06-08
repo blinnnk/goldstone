@@ -5,9 +5,9 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -65,7 +65,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								SupportCurrencyTable(item).apply {
 									isUsed = true
 									// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-									GoldStoneApp.updateCurrentRate(rate)
+									Config.updateCurrentRate(rate)
 								}
 							} else {
 								SupportCurrencyTable(item)

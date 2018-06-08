@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.findChildFragmentByTag
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -35,7 +35,7 @@ abstract class TransactionStatusObserver {
 			GoldStoneEthCall
 				.getTransactionByHash(
 					transactionHash,
-					GoldStoneApp.getCurrentChain(),
+					Config.getCurrentChain(),
 					{
 						removeObserver()
 						handler.postDelayed(reDo, 6000L)
@@ -153,7 +153,7 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(callbac
 	GoldStoneEthCall
 		.getTransactionByHash(
 			currentHash,
-			GoldStoneApp.getCurrentChain(),
+			Config.getCurrentChain(),
 			{
 				// unfinish callback
 			},

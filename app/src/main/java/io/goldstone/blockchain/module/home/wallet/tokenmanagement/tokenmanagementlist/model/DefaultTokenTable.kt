@@ -6,6 +6,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
@@ -67,7 +68,7 @@ data class DefaultTokenTable(
 		true,
 		false,
 		0,
-		GoldStoneApp.getCurrentChain()
+		Config.getCurrentChain()
 	)
 	
 	constructor(
@@ -86,7 +87,7 @@ data class DefaultTokenTable(
 		isUsed,
 		isUsed,
 		data.weight,
-		GoldStoneApp.getCurrentChain()
+		Config.getCurrentChain()
 	)
 	
 	constructor(
@@ -127,7 +128,7 @@ data class DefaultTokenTable(
 		false,
 		false,
 		0,
-		GoldStoneApp.getCurrentChain()
+		Config.getCurrentChain()
 	)
 	
 	companion object {
@@ -161,7 +162,7 @@ data class DefaultTokenTable(
 		
 		fun getCurrentChainTokenByContract(
 			contract: String,
-			chainID: String = GoldStoneApp.getCurrentChain(),
+			chainID: String = Config.getCurrentChain(),
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
@@ -228,18 +229,18 @@ interface DefaultTokenDao {
 	fun getAllTokens(): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :chainID")
-	fun getCurrentChainTokens(chainID: String = GoldStoneApp.getCurrentChain()): List<DefaultTokenTable>
+	fun getCurrentChainTokens(chainID: String = Config.getCurrentChain()): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chain_id LIKE :chainID")
 	fun getDefaultTokens(
 		isDefault: Boolean = true,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chain_id LIKE :chainID")
 	fun getCurrentChainTokenByContract(
 		contract: String,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): DefaultTokenTable?
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")

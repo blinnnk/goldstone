@@ -3,9 +3,9 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toEthCount
@@ -43,7 +43,7 @@ data class MyTokenTable(
 	
 	companion object {
 		
-		fun insert(model: MyTokenTable, chainID: String = GoldStoneApp.getCurrentChain()) {
+		fun insert(model: MyTokenTable, chainID: String = Config.getCurrentChain()) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
 				if (getCurrentChainTokenByContractAndAddress(
@@ -182,7 +182,7 @@ data class MyTokenTable(
 									symbol,
 									0.0,
 									contract,
-									GoldStoneApp.getCurrentChain()
+									Config.getCurrentChain()
 								)
 							)
 							// 没有网络不用检查间隔直接插入数据库
@@ -214,7 +214,7 @@ data class MyTokenTable(
 							symbol,
 							it,
 							CryptoValue.ethContract,
-							GoldStoneApp.getCurrentChain()
+							Config.getCurrentChain()
 						)
 					)
 					callback(it)
@@ -233,7 +233,7 @@ data class MyTokenTable(
 							symbol,
 							it,
 							contract,
-							GoldStoneApp.getCurrentChain()
+							Config.getCurrentChain()
 						)
 					)
 					callback(it)
@@ -295,13 +295,13 @@ interface MyTokenDao {
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): MyTokenTable?
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
-		chainID: String = GoldStoneApp.getCurrentChain()
+		chainID: String = Config.getCurrentChain()
 	): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

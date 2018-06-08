@@ -118,11 +118,14 @@ class TokenDetailPresenter(
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-				TransactionListPresenter.updateTransactions(
+				TransactionListPresenter.getTransactionDataFromEtherScan(
 					this@loadDataFromChain,
-					blockNumber, {
-						context?.alert(it.toString())
-					}) {
+					blockNumber,
+					{
+						// ToDo 等自定义的 `Alert` 完成后应当友好提示
+						LogUtil.error("error in getTransactionDataFromEtherScan $it")
+					}
+				) {
 					context?.runOnUiThread {
 						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 						it.find { it.contract.equals(token?.contract, true) }.isNotNull {

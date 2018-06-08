@@ -4,7 +4,6 @@ import android.view.ViewGroup
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.coroutinesTask
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -55,8 +54,8 @@ class WalletDetailPresenter(
 		WalletTable.apply {
 			getAll {
 				// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
-				GoldStoneApp.updateMaxWalletID(maxBy { it.id }?.id.orZero())
-				GoldStoneApp.updateWalletCount(size)
+				Config.updateMaxWalletID(maxBy { it.id }?.id.orZero())
+				Config.updateWalletCount(size)
 			}
 		}
 		// 先初始化空数组再更新列表
@@ -242,7 +241,7 @@ class WalletDetailPresenter(
 				WalletTable.current.name,
 				CryptoUtils.scaleAddress(WalletTable.current.address),
 				totalBalance.toString(),
-				GoldStoneApp.getWalletCount()
+				Config.getWalletCount()
 			)
 		}
 	}

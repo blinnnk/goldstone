@@ -182,9 +182,10 @@ object GoldStoneAPI {
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
-			requestContentType, AesCrypto.encrypt(
-			"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID}"
-		).orEmpty()
+			requestContentType,
+			AesCrypto.encrypt(
+				"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID}"
+			).orEmpty()
 		).let {
 			postRequest(it, APIPath.registerDevice, errorCallback) {
 				hold(it)
@@ -462,10 +463,7 @@ object GoldStoneAPI {
 			OkHttpClient.Builder().build()
 		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
-			override fun onFailure(
-				call: Call,
-				error: IOException
-			) {
+			override fun onFailure(call: Call, error: IOException) {
 				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 				LogUtil.error(keyName, error)
 			}

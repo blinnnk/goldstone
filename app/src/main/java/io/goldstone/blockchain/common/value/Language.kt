@@ -2,13 +2,11 @@
 
 package io.goldstone.blockchain.common.value
 
-import io.goldstone.blockchain.GoldStoneApp
-
 /**
  * @date 21/03/2018 7:34 PM
  * @author KaySaith
  */
-private val currentLanguage = GoldStoneApp.getCurrentLanguage()
+private val currentLanguage = Config.getCurrentLanguage()
 
 object CreateWalletText {
 	@JvmField
@@ -823,7 +821,6 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "快速"
 		else -> ""
 	}
-	
 	@JvmField
 	val send = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SEND"
@@ -834,7 +831,6 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "SEND"
 		else -> ""
 	}
-	
 	@JvmField
 	val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEPOSIT"
@@ -845,7 +841,6 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "DEPOSIT"
 		else -> ""
 	}
-	
 	@JvmField
 	val from = when (currentLanguage) {
 		HoneyLanguage.English.code -> "From"
@@ -856,7 +851,6 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "From"
 		else -> ""
 	}
-	
 	@JvmField
 	val to = when (currentLanguage) {
 		HoneyLanguage.English.code -> "To"
@@ -1413,7 +1407,6 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "選擇節點"
 		else -> ""
 	}
-	
 	@JvmField
 	val shareContent = when (currentLanguage) {
 		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"

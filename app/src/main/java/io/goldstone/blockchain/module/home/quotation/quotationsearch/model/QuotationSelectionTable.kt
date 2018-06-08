@@ -7,6 +7,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -95,7 +96,7 @@ data class QuotationSelectionTable(
 							insert(table.apply {
 								orderID = newOrderID
 								this.description = HoneyLanguage.getLanguageSymbol(
-									GoldStoneApp.getCurrentLanguage()
+									Config.getCurrentLanguage()
 								) + description
 							})
 						}
@@ -111,7 +112,7 @@ data class QuotationSelectionTable(
 					getSelectionByPair(pair)?.let {
 						update(it.apply {
 							description =
-								HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()) + content
+								HoneyLanguage.getLanguageSymbol(Config.getCurrentLanguage()) + content
 						})
 					}
 				}

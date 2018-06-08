@@ -18,7 +18,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
@@ -185,7 +184,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 				setImage(R.drawable.node_error_banner)
 				setContent(
-					ChainID.getChainNameByID(GoldStoneApp.getCurrentChain()) + " ERROR",
+					ChainID.getChainNameByID(Config.getCurrentChain()) + " ERROR",
 					"there are some errors on this chain, please search more information on internet"
 				)
 			}

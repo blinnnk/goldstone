@@ -6,8 +6,8 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -65,7 +65,7 @@ data class TokenBalanceTable(
 					GoldStoneEthCall.getTokenCountWithDecimalByContract(
 						contract,
 						address,
-						GoldStoneApp.getCurrentChain(),
+						Config.getCurrentChain(),
 						{ _, _ ->
 							// do something when error callback
 						}) { balance ->

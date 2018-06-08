@@ -9,7 +9,6 @@ import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -295,7 +294,7 @@ class MarketTokenDetailPresenter(
 				}
 				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
 				if (description.isNullOrBlank() || !description?.substring(0, 2).equals(
-						HoneyLanguage.getLanguageSymbol(GoldStoneApp.getCurrentLanguage()), true
+						HoneyLanguage.getLanguageSymbol(Config.getCurrentLanguage()), true
 					)
 				) {
 					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->

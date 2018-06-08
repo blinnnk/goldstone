@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.view.View
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.GoldStoneApp
 import org.jetbrains.anko.px2sp
 
 /**
@@ -91,7 +90,7 @@ object EthereumNetColor {
 	
 	@JvmStatic
 	fun getCurrentChainColor(): Int {
-		return when (GoldStoneApp.getCurrentChain()) {
+		return when (Config.getCurrentChain()) {
 			ChainID.Main.id -> main
 			ChainID.Ropstan.id -> ropstan
 			ChainID.Rinkeby.id -> rinkeby

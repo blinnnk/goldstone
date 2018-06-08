@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -33,7 +33,7 @@ fun TransactionDetailPresenter.updateHeaderValueFromTransferFragment() {
 fun TransactionDetailPresenter.getTransactionFromChain() {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		GoldStoneApp.getCurrentChain(),
+		Config.getCurrentChain(),
 		{
 			// unfinish callback
 		},

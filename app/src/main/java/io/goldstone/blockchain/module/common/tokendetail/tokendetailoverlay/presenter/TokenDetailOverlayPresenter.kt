@@ -5,15 +5,11 @@ import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.DialogText
-import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -49,7 +45,7 @@ class TokenDetailOverlayPresenter(
 						title.text = "MY ${token?.symbol}"
 						subtitle.text =
 							CryptoUtils.scaleTo28(
-								"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${GoldStoneApp.getCurrencyCode()})"
+								"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${Config.getCurrencyCode()})"
 							)
 						setBlackTitles()
 						isCenter = true

@@ -4,8 +4,8 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.text.format.DateUtils
 import com.blinnnk.uikit.ScreenSize
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R.drawable.*
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**
@@ -59,8 +59,8 @@ object UIUtils {
 			"Hippo"
 		)
 		val walletID =
-			if (GoldStoneApp.getMaxWalletID() == 100) 0
-			else GoldStoneApp.getMaxWalletID()
+			if (Config.getMaxWalletID() == 100) 0
+			else Config.getMaxWalletID()
 		return name[(walletID) % 17]
 	}
 }

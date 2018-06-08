@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -82,7 +82,7 @@ class TokenSearchPresenter(
 						GoldStoneEthCall
 							.getTokenInfoByContractAddress(
 								content,
-								GoldStoneApp.getCurrentChain(), { error, reason ->
+								Config.getCurrentChain(), { error, reason ->
 									fragment.context?.alert(reason ?: error.toString())
 								}) { symbol, name, decimal ->
 								if (symbol.isEmpty() || name.isEmpty()) {
@@ -103,7 +103,7 @@ class TokenSearchPresenter(
 												false,
 												!it.isNull(),
 												0,
-												GoldStoneApp.getCurrentChain()
+												Config.getCurrentChain()
 											)
 										)
 									)

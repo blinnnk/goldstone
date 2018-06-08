@@ -191,7 +191,6 @@ fun Context.updatePassword(
 	errorCallback: () -> Unit = {},
 	callback: () -> Unit
 ) {
-	toast("Modify password will re-generate your keystore, this will takes a little time, please Wait patiently")
 	doAsync {
 		getPrivateKey(walletAddress, oldPassword, {
 			runOnUiThread {

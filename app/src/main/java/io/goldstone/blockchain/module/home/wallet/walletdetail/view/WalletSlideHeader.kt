@@ -8,12 +8,12 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.common.value.fontSize
@@ -59,7 +59,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
 			subtitle.apply {
-				text = WalletText.totalAssets + " " + GoldStoneApp.getCurrencyCode()
+				text = WalletText.totalAssets + " " + Config.getCurrencyCode()
 				textSize = fontSize(12)
 			}
 			isCenter = true

@@ -6,7 +6,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.*
@@ -275,7 +274,7 @@ class GasSelectionPresenter(
 				to = raw.to
 				input = raw.data
 				contractAddress = token!!.contract
-				chainID = GoldStoneApp.getCurrentChain()
+				chainID = Config.getCurrentChain()
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
 			}
@@ -339,7 +338,7 @@ class GasSelectionPresenter(
 	) {
 		DefaultTokenTable.getCurrentChainTokenByContract(CryptoValue.ethContract) {
 			hold(
-				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + GoldStoneApp.getCurrencyCode()
+				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
 			)
 		}
 	}

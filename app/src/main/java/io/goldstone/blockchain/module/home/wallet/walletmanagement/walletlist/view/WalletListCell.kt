@@ -8,11 +8,11 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletText
@@ -35,7 +35,7 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 		
 		count?.apply {
 			title.text = model.count.formatCurrency()
-			subtitle.text = WalletText.totalAssets + " (${GoldStoneApp.getCurrencyCode()})"
+			subtitle.text = WalletText.totalAssets + " (${Config.getCurrencyCode()})"
 		}
 		
 		icon.apply {

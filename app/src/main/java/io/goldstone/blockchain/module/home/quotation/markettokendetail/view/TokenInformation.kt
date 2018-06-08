@@ -6,9 +6,9 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.component.TopBottomLineCell
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -27,7 +27,7 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 		avalibaleSupply.setSubtitle(model.avaliableSupply)
 		// 服务器返回的是带 `,` 的字符串这里加工成 `Double`
 		marketCap.setSubtitle(
-			model.marketCap.formatCurrency() + " " + GoldStoneApp.getCurrencyCode()
+			model.marketCap.formatCurrency() + " " + Config.getCurrencyCode()
 		)
 	}
 	private val rank = GraySqualCell(context)

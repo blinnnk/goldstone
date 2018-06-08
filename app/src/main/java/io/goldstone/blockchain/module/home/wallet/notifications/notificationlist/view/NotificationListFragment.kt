@@ -34,8 +34,10 @@ class NotificationListFragment :
 						presenter.showTransactionListDetailFragment(
 							NotificationTransactionInfo(
 								actionContent,
-								NotificationTable.getChianID(extra?.toString().orEmpty()),
-								NotificationTable.getReceiveStatus(extra?.toString().orEmpty()).orFalse()
+								NotificationTable.getChianID(extra.orEmpty()),
+								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse(),
+								NotificationTable.getSymbol(extra.orEmpty()),
+								NotificationTable.getValue(extra.orEmpty())
 							)
 						)
 					}
