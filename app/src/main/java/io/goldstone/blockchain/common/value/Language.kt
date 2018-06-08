@@ -2,11 +2,13 @@
 
 package io.goldstone.blockchain.common.value
 
+import io.goldstone.blockchain.GoldStoneApp
+
 /**
  * @date 21/03/2018 7:34 PM
  * @author KaySaith
  */
-private val currentLanguage = Config.getCurrentLanguage()
+private val currentLanguage = GoldStoneApp.getCurrentLanguage()
 
 object CreateWalletText {
 	@JvmField val attention = when (currentLanguage) {
@@ -169,7 +171,7 @@ object ImportWalletText {
 	val keystoreIntro = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Keystore is a JSON encrypted private key file. You need to enter the wallet password corresponding to the keystore. You can change your password at any time after importing."
 		HoneyLanguage.Chinese.code -> "Keystore是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"
-		HoneyLanguage.Japanese.code -> "キーストアは、JSONで暗号化された秘密鍵ファイルです。 キーストアに対応するウォレット・パスワードを入力する必要があります。 インポート後はいつでもパスワードを変更できます。"
+		HoneyLanguage.Japanese.code -> "キーストアは、JSONで暗号化された秘密鍵ファイルです。 キーストアに対応するウォレット·パスワードを入力する必要があります。 インポート後はいつでもパスワードを変更できます。"
 		HoneyLanguage.Korean.code -> "Keystore는 JSON으로 암호화 된 개인 키 파일입니다. 키 스토어에 해당하는 지갑 암호를 입력해야합니다. 가져온 후에는 언제든지 비밀번호를 변경할 수 있습니다."
 		HoneyLanguage.Russian.code -> "Keystore является зашифрованным файлом закрытого ключа JSON. Вам необходимо ввести пароль кошелька, соответствующий хранилищу ключей. Вы можете изменить свой пароль в любое время после импорта."
 		HoneyLanguage.TraditionalChinese.code -> "Keystore是一種JSON格式的加密私鑰文件。您需要輸入獲得Keystore時對應的錢包密碼。您可以在導入後隨時修改密碼。"
@@ -417,6 +419,16 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "通知"
 		else -> ""
 	}
+	@JvmField val tokenDetailHeaderText = when (currentLanguage) {
+		HoneyLanguage.English.code -> "MY"
+		HoneyLanguage.Chinese.code -> "我的"
+		HoneyLanguage.Japanese.code -> "私の"
+		HoneyLanguage.Korean.code -> "내"
+		HoneyLanguage.Russian.code -> "Мои"
+		HoneyLanguage.TraditionalChinese.code -> "我的"
+		else -> ""
+	}
+
 }
 
 object TransactionText {
@@ -772,8 +784,7 @@ object CommonText {
 		else -> ""
 	}
 
-	@JvmField
-	val send = when (currentLanguage) {
+	@JvmField val send = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SEND"
 		HoneyLanguage.Chinese.code -> "转出"
 		HoneyLanguage.Japanese.code -> "転送する"
@@ -782,7 +793,7 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "轉出"
 		else -> ""
 	}
-	
+
 	@JvmField val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEPOSIT"
 		HoneyLanguage.Chinese.code -> "存入"
@@ -1246,7 +1257,7 @@ object ProfileText {
 		HoneyLanguage.Japanese.code -> "チーム紹介"
 		HoneyLanguage.Korean.code -> "당사소개"
 		HoneyLanguage.Russian.code -> "О КОМПАНИИ"
-		HoneyLanguage.TraditionalChinese.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "關於我們"
 		else -> ""
 	}
 	@JvmField val support = when (currentLanguage) {
@@ -1254,8 +1265,8 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "帮助中心"
 		HoneyLanguage.Japanese.code -> "ヘルプセンター"
 		HoneyLanguage.Korean.code -> "도움센터"
-		HoneyLanguage.Russian.code -> "Support"
-		HoneyLanguage.TraditionalChinese.code -> "Support"
+		HoneyLanguage.Russian.code -> "Поддержка"
+		HoneyLanguage.TraditionalChinese.code -> "聯繫我們"
 		else -> ""
 	}
 	@JvmField val privacy = when (currentLanguage) {
@@ -1263,8 +1274,8 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "隐私条款"
 		HoneyLanguage.Japanese.code -> "プライバシーポリシー"
 		HoneyLanguage.Korean.code -> "프라이버시 조항"
-		HoneyLanguage.Russian.code -> "Privacy Policy"
-		HoneyLanguage.TraditionalChinese.code -> "Privacy Policy"
+		HoneyLanguage.Russian.code -> "Политика конфиденциальности"
+		HoneyLanguage.TraditionalChinese.code -> "隱私政策"
 		else -> ""
 	}
 	@JvmField val terms = when (currentLanguage) {
@@ -1304,23 +1315,26 @@ object ProfileText {
 		else -> ""
 	}
 	@JvmField val chain = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Select Chain Node"
-		HoneyLanguage.Chinese.code -> "选择节点"
-		HoneyLanguage.Japanese.code -> "チェーンノードの選択"
+			<<<<<<< HEAD
+		HoneyLanguage.English.code -> "Chain Node"
+			=======
+			HoneyLanguage.English.code -> "Select Chain Node"
+			>>>>>>> 7fd05e2ee11a184c4adf07aa4fa531ffc7fe0d77
+			HoneyLanguage.Chinese.code -> "选择节点"
+		HoneyLanguage.Japanese.code -> "チェーンノード"
 		HoneyLanguage.Korean.code -> "노드선택"
-		HoneyLanguage.Russian.code -> "Выберите Chain Node"
+		HoneyLanguage.Russian.code -> "Цепной узел"
 		HoneyLanguage.TraditionalChinese.code -> "選擇節點"
 		else -> ""
 	}
 
-	@JvmField
-	val shareContent = when (currentLanguage) {
+	@JvmField val shareContent = when (currentLanguage) {
 		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
-		HoneyLanguage.Chinese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
-		HoneyLanguage.Japanese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
-		HoneyLanguage.Korean.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
-		HoneyLanguage.Russian.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
-		HoneyLanguage.TraditionalChinese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
+		HoneyLanguage.Japanese.code -> "GoldStone\n安全で、使いやすく、速く\nhttps://goldstone.io"
+		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://goldstone.io"
+		HoneyLanguage.Russian.code -> "GoldStone\nБезопасный, простой в использовании, быстрый\nhttps://goldstone.io"
+		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
 		else -> ""
 	}
 }
@@ -1417,7 +1431,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "市场行情"
 		HoneyLanguage.Japanese.code -> "市場相場"
 		HoneyLanguage.Korean.code -> "시장시세"
-		HoneyLanguage.Russian.code -> "Рыночные котировки"
+		HoneyLanguage.Russian.code -> "Рынки"
 		HoneyLanguage.TraditionalChinese.code -> "市場行情"
 		else -> ""
 	}
@@ -1525,7 +1539,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势哦"
 		HoneyLanguage.Japanese.code -> "市場から気になるトークンを検索して\n追加すると、リアルタイムの\n価格動向を見ることができます"
 		HoneyLanguage.Korean.code -> "주요 시장의 거래 쌍에서 관심있는\n 토큰을 검색하고 추가하면 실시간\n 가격 동향을 볼 수 있습니다."
-		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.Russian.code -> "Поиск и добавление в реальном\n времени Схема ценообразования\n токенов обменов."
 		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢哦"
 		else -> ""
 	}
@@ -1993,7 +2007,7 @@ object SplashText {
 		HoneyLanguage.Chinese.code -> "好用又安全的区块链钱包"
 		HoneyLanguage.Japanese.code -> "使いやすい安全なブロックチェーンウォレット"
 		HoneyLanguage.Korean.code -> "사용하기 편리하고 안전한 블록체인 지갑"
-		HoneyLanguage.Russian.code -> "Простой в использовании и надежный блокчлинный кошелек"
+		HoneyLanguage.Russian.code -> "Безопасный, простой в использовании, быстрый"
 		HoneyLanguage.TraditionalChinese.code -> "好用又安全的區塊鏈錢包"
 		else -> ""
 	}
