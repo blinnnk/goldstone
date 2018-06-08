@@ -20,10 +20,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.AlertText
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.formatCurrency
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.matchParent
@@ -135,7 +132,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setHeaderSymbol(symbol: String) {
-		description.text = "Send $symbol Count"
+		description.text = "${PrepareTransferText.sendAmountPrefix} $symbol ${PrepareTransferText.sendAmountSuffix}"
 	}
 	
 	fun getValue(): String {

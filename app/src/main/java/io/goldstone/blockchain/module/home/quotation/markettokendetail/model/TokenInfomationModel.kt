@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.model
 
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.json.JSONObject
 
@@ -56,8 +57,8 @@ enum class MarketTokenDetailChartType(
 	val display: String
 ) {
 	
-	Hour(0, "1hour", "HOUR"),
-	DAY(1, "1day", "DAY"),
-	WEEK(2, "1week", "WEEK"),
-	MONTH(3, "1month", "MONTH")
+	Hour(0, "1hour", DateAndTimeText.hour),
+	DAY(1, "1day", DateAndTimeText.day),
+	WEEK(2, "1week", DateAndTimeText.week),
+	MONTH(3, "1month", DateAndTimeText.month)
 }

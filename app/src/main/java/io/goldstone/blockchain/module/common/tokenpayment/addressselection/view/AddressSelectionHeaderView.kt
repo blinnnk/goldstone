@@ -11,13 +11,12 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.EmptyText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 /**
@@ -38,7 +37,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 		addressInput
 			.apply {
 				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-				hint = "Enter an wallet address or select a contacts below"
+				hint = EmptyText.transferToAddress
 				textSize = fontSize(15)
 				textColor = Spectrum.white
 				hintTextColor = Spectrum.opacity5White
@@ -58,17 +57,10 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 		addressInput.requestFocus()
 	}
 	
-	private var hasInputted = false
 	fun getInputStatus(hold: (hasInput: Boolean, address: String?) -> Unit) {
 		addressInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(char: Editable?) {
 				hold(char?.length.orZero() > 0, char?.toString())
-				if (!hasInputted) {
-					(context as? MainActivity)?.let {
-						SoftKeyboard.show(it, addressInput)
-						hasInputted = true
-					}
-				}
 			}
 			
 			override fun beforeTextChanged(char: CharSequence?, start: Int, count: Int, after: Int) {}

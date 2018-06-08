@@ -34,7 +34,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 	init {
 		id = ElementID.searchInput
 		editText.apply {
-			hint = "search contracts address or token name"
+			hint = EmptyText.searchInput
 			textSize = fontSize(12)
 			textColor = GrayScale.black
 			hintTextColor = GrayScale.midGray

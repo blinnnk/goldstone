@@ -165,7 +165,7 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
 		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(),
-		"There isn't a memo",
+		TransactionText.noMemo,
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(0),
