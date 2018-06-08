@@ -101,7 +101,7 @@ class ProfilePresenter(
 	
 	fun showUpgradeDialog() {
 		GoldStoneDialog.show(fragment.context!!) {
-			showButtons("UPGRADE") {
+			showButtons(CommonText.upgrade) {
 				downloadNewVersion {
 					GoldStoneDialog.remove(fragment.context!!)
 					fragment.context?.alert("Application is downloading now")

@@ -42,9 +42,9 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 			avalibaleSupply.into(this)
 			marketCap.into(this)
 			
-			rank.setTitle("Rank")
-			avalibaleSupply.setTitle("Avaliable Supply")
-			marketCap.setTitle("Market Cap")
+			rank.setTitle(QuotationText.rank)
+			avalibaleSupply.setTitle(QuotationText.totalSupply)
+			marketCap.setTitle(QuotationText.marketCap)
 			y -= 10.uiPX()
 		}.setAlignParentBottom()
 	}

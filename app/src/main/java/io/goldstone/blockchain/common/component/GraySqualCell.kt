@@ -13,9 +13,8 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -76,7 +75,7 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 	fun setPriceTitle(text: String) {
 		title.text =
 			CustomTargetTextStyle(
-				"HIGH / LOW", "$text  HIGH / LOW", GrayScale.black, 9.uiPX(), true, false
+				QuotationText.highAndLow, "$text ${QuotationText.highAndLow}", GrayScale.black, 9.uiPX(), true, false
 			)
 	}
 
