@@ -22,7 +22,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 	val isFromQuickTransfer by lazy {
 		arguments?.getBoolean(ArgumentKey.fromQuickTransfer).orFalse()
 	}
-	private val isFromQuickDeposit by lazy {
+	val isFromQuickDeposit by lazy {
 		arguments?.getBoolean(ArgumentKey.fromQuickDeposit).orFalse()
 	}
 	var confirmButton: RoundButton? = null
