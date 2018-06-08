@@ -403,10 +403,10 @@ object WalletText {
 	}
 	@JvmField val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Tokens"
-		HoneyLanguage.Chinese.code -> "添加其他Token"
-		HoneyLanguage.Japanese.code -> "別のトークンを追加する"
+		HoneyLanguage.Chinese.code -> "添加Token"
+		HoneyLanguage.Japanese.code -> "追加する"
 		HoneyLanguage.Korean.code -> "기타 Token 추가"
-		HoneyLanguage.Russian.code -> "Add More Tokens"
+		HoneyLanguage.Russian.code -> "Добавить токены"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
 		else -> ""
 	}
@@ -1866,8 +1866,8 @@ object PrepareTransferText {
 		HoneyLanguage.English.code -> "Customize"
 		HoneyLanguage.Chinese.code -> "自定义"
 		HoneyLanguage.Japanese.code -> "カスタマイズする"
-		HoneyLanguage.Korean.code -> "사용자 정의\n"
-		HoneyLanguage.Russian.code -> "изготовленный на заказ\n"
+		HoneyLanguage.Korean.code -> "사용자 정의"
+		HoneyLanguage.Russian.code -> "изготовленный на заказ"
 		HoneyLanguage.TraditionalChinese.code -> "自定義"
 		else -> ""
 	}
