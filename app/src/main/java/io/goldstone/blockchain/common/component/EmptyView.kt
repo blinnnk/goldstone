@@ -124,8 +124,8 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				BorderCardView(context).apply {
 					setTitles(
-						"ADD QUOTATION CHART",
-						"you can easy to watch tokens which \nyou are caring about and added from \ntarget exchange website"
+						QuotationText.addQuotationChartPlaceholderTitle,
+						QuotationText.addQuotationChartPlaceholderSubtitle
 					)
 				}.into(this)
 			}

@@ -24,7 +24,7 @@ object NetworkUtil {
 	
 	fun hasNetworkWithAlert(
 		context: Context? = null,
-		alertText: String = "thiere isn't network found"
+		alertText: String = DialogText.networkDescription
 	): Boolean {
 		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 		val activeNetwork = cm?.activeNetworkInfo
