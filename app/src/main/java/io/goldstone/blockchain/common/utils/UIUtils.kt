@@ -7,6 +7,7 @@ import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R.drawable.*
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.common.value.WalletNameText
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -40,23 +41,23 @@ object UIUtils {
 	
 	fun generateDefaultName(): String {
 		val name = arrayListOf(
-			"Owl",
-			"Bear",
-			"Elephant",
-			"Rhinoceros",
-			"Frog",
-			"Koala",
-			"Fox",
-			"Monkey",
-			"Giraffle",
-			"Penguin",
-			"Wolf",
-			"Bull",
-			"Leopard",
-			"Deer",
-			"Raccoon",
-			"Lion",
-			"Hippo"
+			WalletNameText.Owl,
+			WalletNameText.Bear,
+			WalletNameText.Elephant,
+			WalletNameText.Rhinoceros,
+			WalletNameText.Frog,
+			WalletNameText.Koala,
+			WalletNameText.Fox,
+			WalletNameText.Monkey,
+			WalletNameText.Giraffle,
+			WalletNameText.Penguin,
+			WalletNameText.Wolf,
+			WalletNameText.Bull,
+			WalletNameText.Leopard,
+			WalletNameText.Deer,
+			WalletNameText.Raccoon,
+			WalletNameText.Lion,
+			WalletNameText.Hippo
 		)
 		val walletID =
 			if (GoldStoneApp.getMaxWalletID() == 100) 0
