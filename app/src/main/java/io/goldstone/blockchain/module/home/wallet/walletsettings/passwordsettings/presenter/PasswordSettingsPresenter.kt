@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettin
 
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -24,6 +25,7 @@ class PasswordSettingsPresenter(
 		oldPasswordInput: EditText,
 		newPasswordInput: EditText,
 		repeatPasswordInput: EditText,
+		passwordHint: EditText,
 		callback: () -> Unit
 	) {
 		CreateWalletPresenter.checkInputValue(
@@ -44,6 +46,13 @@ class PasswordSettingsPresenter(
 					callback()
 				}
 			) {
+				// Update User Password Hint
+				passwordHint.text.toString().apply {
+					isNotEmpty() isTrue {
+						WalletTable.updateHint(this)
+					}
+				}
+				
 				fragment.toast(CommonText.succeed)
 				callback()
 				fragment.getParentFragment<WalletSettingsFragment> {

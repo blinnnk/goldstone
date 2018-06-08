@@ -16,7 +16,6 @@ import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.toast
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import java.io.File
@@ -118,8 +117,10 @@ fun Context.getKeystoreFile(
 				try {
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
-					errorCallback()
-					runOnUiThread { alert(CommonText.wrongPassword) }
+					runOnUiThread {
+						errorCallback()
+						alert(CommonText.wrongPassword)
+					}
 					LogUtil.error("getKeystoreFile", error)
 				}
 			}
@@ -139,7 +140,7 @@ fun Context.getPrivateKey(
 				hold(it.privateKey.toString(16))
 			}
 		} catch (error: Exception) {
-			errorCallback()
+			GoldStoneAPI.context.runOnUiThread { errorCallback() }
 			LogUtil.error("getPrivateKey", error)
 		}
 	}

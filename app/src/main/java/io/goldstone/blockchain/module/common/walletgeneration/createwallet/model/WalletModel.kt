@@ -151,7 +151,7 @@ data class WalletTable(
 		
 		fun updateHint(
 			newHint: String,
-			callback: () -> Unit
+			callback: () -> Unit = {}
 		) {
 			coroutinesTask(
 				{
