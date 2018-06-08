@@ -71,11 +71,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 	) {
 		MyTokenTable.getCurrentChainTokenBalanceByContract(token.contract) {
 			// 准备数据
-			val model = WalletDetailCellModel(
-				token, it.orElse(0.0)
-			).apply {
-				count = it?.formatCount(3)?.toDouble().orElse(0.0)
-			}
+			val model = WalletDetailCellModel(token, it.orElse(0.0), true)
 			// 显示 `ContentOverlay`
 			(context as? MainActivity)?.apply {
 				getMainContainer()?.apply {

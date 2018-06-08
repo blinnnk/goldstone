@@ -73,7 +73,8 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				presenter.updatePassword(
 					oldPassword,
 					newPassword,
-					repeatPassword
+					repeatPassword,
+					passwordHint
 				) {
 					it.showLoadingStatus(false)
 				}

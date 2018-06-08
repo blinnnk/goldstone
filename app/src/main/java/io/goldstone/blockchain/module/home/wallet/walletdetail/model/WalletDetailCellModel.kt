@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 import android.content.Context
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -9,6 +10,7 @@ import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -32,21 +34,29 @@ data class WalletDetailCellModel(
 	var weight: Int = 0
 ) : Serializable {
 	
-	constructor(data: DefaultTokenTable, balance: Double) : this(
+	constructor(data: DefaultTokenTable, balance: Double, countHasDecimal: Boolean = false) : this(
 		data.iconUrl,
 		data.symbol,
 		data.name,
 		data.decimals,
-		CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)),
+		countHasDecimal.convertBalance(balance, data.decimals),
 		data.price,
 		CryptoUtils.formatDouble(
-			CryptoUtils.formatDouble(balance / Math.pow(10.0, data.decimals)) * data.price
+			countHasDecimal.convertBalance(balance, data.decimals) * data.price
 		),
 		data.contract,
 		data.weight
 	)
 	
 	companion object {
+		
+		fun Boolean.convertBalance(balance: Double, decimal: Double): Double {
+			return if (this) {
+				balance.formatCount(3).toDoubleOrNull().orElse(0.0)
+			} else {
+				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
+			}
+		}
 		
 		fun getLocalModels(
 			walletAddress: String = WalletTable.current.address,
@@ -146,9 +156,7 @@ data class WalletDetailCellModel(
 		
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
 			map { it.contract }.toJsonArray {
-				GoldStoneAPI.getPriceByContractAddress(it, errorCallback = {
-					callback()
-				}) { newPrices ->
+				GoldStoneAPI.getPriceByContractAddress(it, callback) { newPrices ->
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = newPrices.size
 						override fun concurrentJobs() {

@@ -30,12 +30,10 @@ import org.jetbrains.anko.verticalLayout
  * @date 24/04/2018 10:54 AM
  * @author KaySaith
  */
-
 class HintFragment : BaseFragment<HintPresenter>() {
-
+	
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-
 	override val presenter = HintPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
@@ -47,7 +45,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 					topMargin = 30.uiPX()
 				}
 			}.into(this)
-
+			
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				setBlueStyle()
@@ -57,7 +55,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 			}.into(this)
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -75,11 +73,12 @@ class HintFragment : BaseFragment<HintPresenter>() {
 						}
 					}
 				}
+				
 				hintInput.hint = this.hint
 			}
 		}
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
