@@ -29,6 +29,7 @@ object ElementID {
 	const val scanButton = 20014
 	const val buttonLoading = 20015
 	const val contentScrollview = 20016
+	const val mask = 20017
 }
 
 object ViewPagerID {
