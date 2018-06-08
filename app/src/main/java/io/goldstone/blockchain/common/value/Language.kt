@@ -1413,6 +1413,17 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "選擇節點"
 		else -> ""
 	}
+	
+	@JvmField
+	val shareContent = when (currentLanguage) {
+		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.Chinese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.Japanese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.Korean.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.Russian.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		HoneyLanguage.TraditionalChinese.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://goldstone.io"
+		else -> ""
+	}
 }
 
 object EmptyText {

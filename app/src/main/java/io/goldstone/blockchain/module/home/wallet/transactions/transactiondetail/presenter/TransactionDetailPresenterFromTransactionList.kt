@@ -6,7 +6,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.PrepareTransferText
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/6/6 3:59 PM
@@ -66,7 +67,9 @@ fun TransactionDetailPresenter.saveInputCodeByTaxHash(
 					GoldStoneEthCall.getInputCodeByHash(
 						taxHash,
 						GoldStoneApp.getCurrentChain(), { error, reason ->
-							fragment.context?.alert(reason ?: error.toString())
+							fragment.context?.runOnUiThread {
+								alert(reason ?: error.toString())
+							}
 						}) {
 						TransactionTable.updateInputCodeByHash(taxHash, it) {
 							callback(it, transaction.isERC20)
@@ -91,8 +94,10 @@ fun TransactionDetailPresenter.generateModels(
 	val memo =
 		if (data?.memo.isNull()) "There isn't a memo"
 		else data?.memo
+	var isReceive: Boolean? = null
 	val receiptData = when (receipt) {
 		is TransactionListModel -> {
+			isReceive = receipt.isReceived
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
@@ -105,6 +110,7 @@ fun TransactionDetailPresenter.generateModels(
 		}
 		
 		is TransactionTable -> {
+			isReceive = receipt.isReceive
 			arrayListOf(
 				minerFee,
 				memo,
@@ -131,7 +137,7 @@ fun TransactionDetailPresenter.generateModels(
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
-		CommonText.from,
+		(if (isReceive == true) CommonText.to else CommonText.from) + " " + ImportWalletText.address,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

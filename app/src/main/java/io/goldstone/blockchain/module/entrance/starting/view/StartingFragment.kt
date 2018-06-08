@@ -54,11 +54,11 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				
 				textView(SplashText.slogan) {
 					textSize = fontSize(12)
-					typeface = GoldStoneFont.light(context)
+					typeface = GoldStoneFont.medium(context)
 				}
 			}.lparams {
 				centerHorizontally()
-				topMargin = (ScreenSize.Height * 0.22).toInt() + logoSize + 30.uiPX()
+				topMargin = (ScreenSize.Height * 0.22).toInt() + logoSize
 			}
 			
 			WalletTable.getAll {
