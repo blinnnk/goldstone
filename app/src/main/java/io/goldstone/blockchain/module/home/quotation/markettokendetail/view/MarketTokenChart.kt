@@ -29,12 +29,14 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 	private var chartLineColor = Spectrum.green
 	private var chartColor = Spectrum.lightGreen
 	var chartData: ArrayList<Point> by observing(arrayListOf()) {
-		if (data.isNotEmpty()) {
-			data.clear()
-		}
+		if (chartData.isEmpty()) return@observing
 		// 当只有一条数据的时候插入一条数据画出曲线
 		if (chartData.size == 1) {
 			chartData.add(0, Point("0", 0f))
+		}
+		
+		if (data.isNotEmpty()) {
+			data.clear()
 		}
 		val dataSet = LineSet()
 		dataSet.apply {
@@ -54,12 +56,9 @@ class MarketTokenChart(context: Context) : LineChartView(context) {
 			setFontSize(8.uiPX())
 			val maxValue = chartData.max()?.value ?: 0f
 			val minValue = chartData.min()?.value ?: 0f
-			// 设定 `Y` 周波段
-			val stepDistance =
-				QuotationCell.generateStepDistance(minValue.toDouble(), maxValue.toDouble())
-			val max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
-			val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
-			setAxisBorderValues(min, max, stepDistance)
+			QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
+				setAxisBorderValues(min, max, step)
+			}
 		}
 		addData(dataSet)
 		

@@ -101,7 +101,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		parent: Fragment?
 	) {
 		getParentFragment<TokenDetailOverlayFragment> {
-			if (isFromQuickTransfer || isFromQuickDeposit) {
+			if (isFromQuickDeposit) {
 				presenter.removeSelfFromActivity()
 			} else {
 				headerTitle = TokenDetailText.tokenDetail

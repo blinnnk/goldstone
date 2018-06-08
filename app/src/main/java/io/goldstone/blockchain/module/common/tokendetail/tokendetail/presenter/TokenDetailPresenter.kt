@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TokenDetailText
@@ -48,7 +47,6 @@ class TokenDetailPresenter(
 		// 详情页面直接全屏高度
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
-			updateEmptyCharData(fragment.token?.symbol!!)
 			// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
 			AnimationDuration.Default timeUpThen {
 				prepareTokenDetailData()

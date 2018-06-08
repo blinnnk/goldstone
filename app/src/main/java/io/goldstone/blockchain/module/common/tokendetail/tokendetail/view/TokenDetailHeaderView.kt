@@ -7,6 +7,7 @@ import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TokenDetailSize
+import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationCell
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
@@ -44,7 +46,15 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			// 设定便捷字体颜色
 			setLabelsColor(GrayScale.midGray)
 			// 设定 `Y` 周波段
-			setAxisBorderValues(0f, maxY, unitY)
+			if (chartData?.max().orElse(0.0) == 0 && chartData?.min().orElse(0.0) == 0) {
+				val maxValue = chartData?.max()?.value ?: 0f
+				val minValue = chartData?.min()?.value ?: 0f
+				QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
+					setAxisBorderValues(min, max, step)
+				}
+			} else {
+				setAxisBorderValues(0f, maxY, unitY)
+			}
 			// 设定外界 `Border` 颜色
 			setAxisColor(Color.argb(0, 0, 0, 0))
 			// 设定外边的 `Border` 的粗细

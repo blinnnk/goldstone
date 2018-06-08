@@ -52,7 +52,9 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		asyncData: ArrayList<ContactTable>?
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			clickEvent = Runnable { presenter.showPaymentPrepareFragment(model.address) }
+			clickEvent = Runnable {
+				presenter.showPaymentPrepareFragment(model.address)
+			}
 		}
 	}
 	
@@ -130,13 +132,6 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		}
 	}
 	
-	override fun setBackEvent(mainActivity: MainActivity?) {
-		getParentFragment<TokenDetailOverlayFragment> {
-			headerTitle = TokenDetailText.tokenDetail
-			presenter.popFragmentFrom<AddressSelectionFragment>()
-		}
-	}
-	
 	private fun setScanButtonStatus(
 		isShow: Boolean = true,
 		callback: () -> Unit = {}
@@ -144,6 +139,17 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		getParentFragment<TokenDetailOverlayFragment> {
 			overlayView.header.showScanButton(isShow, isFromQuickTransfer) {
 				callback()
+			}
+		}
+	}
+	
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			if (isFromQuickTransfer) {
+				presenter.removeSelfFromActivity()
+			} else {
+				headerTitle = TokenDetailText.tokenDetail
+				presenter.popFragmentFrom<AddressSelectionFragment>()
 			}
 		}
 	}

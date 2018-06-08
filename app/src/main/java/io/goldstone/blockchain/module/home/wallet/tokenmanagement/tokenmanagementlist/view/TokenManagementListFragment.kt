@@ -24,11 +24,18 @@ class TokenManagementListFragment :
 	) {
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
 			switch.onClick {
-				model?.let {
+				model?.let { model ->
+					// 更新内存数据防止上下滑动导致的复用问题
+					asyncData?.find {
+						it.contract == model.contract
+					}?.apply {
+						isUsed = switch.isChecked
+					}
+					// 更新数据库
 					TokenManagementListPresenter
 						.updateMyTokensInfoBy(
 							switch,
-							it,
+							model,
 							this@TokenManagementListFragment.context!!
 						)
 				}
