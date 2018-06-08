@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -45,7 +46,9 @@ class TokenDetailOverlayPresenter(
 						title.text = "MY ${token?.symbol}"
 						subtitle.text =
 							CryptoUtils.scaleTo28(
-								"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${Config.getCurrencyCode()})"
+								"${token?.count} ${token?.symbol} ≈ ${token?.currency?.formatCurrency()} " +
+								"(${Config.getCurrencyCode
+								()})"
 							)
 						setBlackTitles()
 						isCenter = true

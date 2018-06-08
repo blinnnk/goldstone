@@ -110,6 +110,9 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 					id = ElementID.mask
 					backgroundColor = Color.TRANSPARENT
 					isClickable = true
+					onClick {
+						this@apply.context.alert("Confirming transfer now please wait a momnet")
+					}
 					layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 				}.into(container)
 			}

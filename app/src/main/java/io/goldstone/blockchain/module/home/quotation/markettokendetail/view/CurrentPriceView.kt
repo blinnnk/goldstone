@@ -25,7 +25,7 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 data class CurrentPriceModel(
-	val currentPrice: Double = 0.0,
+	val currentPrice: Float = 0f,
 	val baseCurrency: String = "",
 	val percent: String = "0.0",
 	val usdtPrice: Double = 1.0
@@ -35,14 +35,14 @@ data class CurrentPriceModel(
 		data: CurrencyPriceInfoModel,
 		symbol: String
 	) : this(
-		data.price.toDouble(),
+		data.price.toFloat(),
 		symbol,
 		data.percent,
 		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0)
 	)
 	
 	constructor(data: QuotationModel) : this(
-		data.price.toDoubleOrNull().orElse(0.0),
+		data.price.toFloatOrNull().orElse(0f),
 		data.symbol,
 		data.percent,
 		1.0
@@ -56,7 +56,7 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		val value =
 			" ${model.baseCurrency} ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${Config.getCurrencyCode()}"
 		priceTitles.text = CustomTargetTextStyle(
-			value, "${model.currentPrice}" + value, GrayScale.black, 12.uiPX(), true, false
+			value, "${model.currentPrice.toBigDecimal()}" + value, GrayScale.black, 12.uiPX(), true, false
 		)
 		
 		percent.text = model.percent + "%"

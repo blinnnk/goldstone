@@ -111,13 +111,9 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			setLabelsColor(GrayScale.midGray)
 			val maxValue = chartData.max()?.value ?: 1f
 			val minValue = chartData.min()?.value ?: 0f
-			// 设定 `Y` 周波段
-			val stepDistance = generateStepDistance(
-				minValue.toDouble(), maxValue.toDouble()
-			)
-			val max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
-			val min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
-			setAxisBorderValues(min, max, stepDistance)
+			QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
+				setAxisBorderValues(min, max, step)
+			}
 			// 设定外界 `Border` 颜色
 			setAxisColor(Color.argb(0, 0, 0, 0))
 			// 设定外边的 `Border` 的粗细
@@ -186,7 +182,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 	
 	companion object {
-		fun generateStepDistance(
+		private fun generateStepDistance(
 			minValue: Double,
 			maxValue: Double
 		): Float {
@@ -194,6 +190,27 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			val roughStep = (maxValue - minValue) / stepsCount
 			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
 			return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
+		}
+		
+		fun getChardGridValue(
+			maxValue: Float,
+			minValue: Float,
+			hold: (min: Float, max: Float, step: Float) -> Unit
+		) {
+			val max: Float
+			val min: Float
+			val stepDistance: Float
+			if (maxValue < 1f) {
+				min = 0f
+				max = maxValue * 1.5f
+				stepDistance = max / 5f
+			} else {
+				stepDistance =
+					QuotationCell.generateStepDistance(minValue.toDouble(), maxValue.toDouble())
+				max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
+				min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
+			}
+			hold(min, max, stepDistance)
 		}
 	}
 }

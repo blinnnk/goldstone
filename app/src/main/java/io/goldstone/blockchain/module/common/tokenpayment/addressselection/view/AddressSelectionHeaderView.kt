@@ -11,61 +11,68 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 /**
  * @date 28/03/2018 9:44 AM
  * @author KaySaith
  */
-
 class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
-
-  private val addressInput = EditText(context)
-  private val gradientView = GradientView(context)
-
-  init {
-
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 80.uiPX())
-    gradientView
-      .apply { setStyle(GradientType.DarkGreenYellow, 80.uiPX()) }
-      .into(this)
-
-    addressInput
-      .apply {
-        layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-        hint = "Enter an wallet address or select a contacts below"
-        textSize = fontSize(15)
-        textColor = Spectrum.white
-        hintTextColor = Spectrum.opacity5White
-        layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-        leftPadding = 20.uiPX()
-        rightPadding = 20.uiPX()
-        setCursorColor(Spectrum.blue)
-        backgroundTintMode = PorterDuff.Mode.CLEAR
-        gravity = Gravity.CENTER
-        typeface = GoldStoneFont.medium(context)
-      }
-      .into(this)
-  }
-
-  fun setFocusStatus() {
-    addressInput.hintTextColor = Spectrum.opacity1White
-    addressInput.requestFocus()
-  }
-
-  fun getInputStatus(hold: (hasInput: Boolean, address: String?) -> Unit) {
-    addressInput.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(char: Editable?) {
-        hold(char?.length.orZero() > 0, char?.toString())
-      }
-      override fun beforeTextChanged(char: CharSequence?, start: Int, count: Int, after: Int) { }
-      override fun onTextChanged(char: CharSequence?, start: Int, before: Int, count: Int) { }
-    })
-  }
-
+	
+	private val addressInput = EditText(context)
+	private val gradientView = GradientView(context)
+	
+	init {
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 80.uiPX())
+		gradientView
+			.apply { setStyle(GradientType.DarkGreenYellow, 80.uiPX()) }
+			.into(this)
+		
+		addressInput
+			.apply {
+				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+				hint = "Enter an wallet address or select a contacts below"
+				textSize = fontSize(15)
+				textColor = Spectrum.white
+				hintTextColor = Spectrum.opacity5White
+				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+				leftPadding = 20.uiPX()
+				rightPadding = 20.uiPX()
+				setCursorColor(Spectrum.blue)
+				backgroundTintMode = PorterDuff.Mode.CLEAR
+				gravity = Gravity.CENTER
+				typeface = GoldStoneFont.medium(context)
+			}
+			.into(this)
+	}
+	
+	fun setFocusStatus() {
+		addressInput.hintTextColor = Spectrum.opacity1White
+		addressInput.requestFocus()
+	}
+	
+	private var hasInputted = false
+	fun getInputStatus(hold: (hasInput: Boolean, address: String?) -> Unit) {
+		addressInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(char: Editable?) {
+				hold(char?.length.orZero() > 0, char?.toString())
+				if (!hasInputted) {
+					(context as? MainActivity)?.let {
+						SoftKeyboard.show(it, addressInput)
+						hasInputted = true
+					}
+				}
+			}
+			
+			override fun beforeTextChanged(char: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(char: CharSequence?, start: Int, before: Int, count: Int) {}
+		})
+	}
 }

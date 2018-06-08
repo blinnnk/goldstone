@@ -20,7 +20,9 @@ data class CurrencyPriceInfoModel(
 	val usdtPrice: String?
 ) {
 	constructor(data: JSONObject) : this(
-		data.safeGet("pair"), data.safeGet("price"), data.safeGet("percent"),
+		data.safeGet("pair"),
+		data.safeGet("price"),
+		data.safeGet("percent"),
 		data.safeGet("quote_price")
 	)
 }
