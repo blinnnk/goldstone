@@ -11,10 +11,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -104,7 +101,7 @@ class TransactionListPresenter(
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
 				fragment.context
-					?.alert("Find errors when get transaction records from ethereum ${Config.getCurrentLanguage()}")
+					?.alert("${AlertText.getTransactionErrorPrefix} ${Config.getCurrentChain()} ${AlertText.getTransactionErrorSuffix}")
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
 			}
 		) { newData ->

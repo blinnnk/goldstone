@@ -1034,7 +1034,24 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "發生了錯誤，現在無法獲得貨幣匯率"
 		else -> ""
 	}
-
+	@JvmField val getTransactionErrorPrefix = when (currentLanguage) {
+		HoneyLanguage.English.code -> "An error occurred getting transaction records from Ethereum"
+		HoneyLanguage.Chinese.code -> "从以太坊"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> "거래 알림"
+		HoneyLanguage.Russian.code -> "Произошла ошибка получения записи переноса от"
+		HoneyLanguage.TraditionalChinese.code -> "從以太坊"
+		else -> ""
+	}
+	@JvmField val getTransactionErrorSuffix = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "获取转账记录时发生了错误"
+		HoneyLanguage.Japanese.code -> "から転送レコードを取得中にエラーが発生しました。"
+		HoneyLanguage.Korean.code -> "에서 이전 기록을 가져 오는 중에 오류가 발생했습니다."
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "獲取轉賬記錄時發生了錯誤"
+		else -> ""
+	}
 }
 
 object CurrentWalletText {
