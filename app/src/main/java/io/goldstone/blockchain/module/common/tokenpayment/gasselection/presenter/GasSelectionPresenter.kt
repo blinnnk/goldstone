@@ -184,7 +184,12 @@ class GasSelectionPresenter(
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(
-				WalletTable.current.address, password, callback
+				WalletTable.current.address,
+				password,
+				{
+					fragment.context?.alert(CommonText.wrongPassword)
+					callback()
+				}
 			) { privateKey ->
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
@@ -313,7 +318,9 @@ class GasSelectionPresenter(
 			TransactionText.confirmTransaction,
 			CommonText.enterPassword.toUpperCase(), true, {
 				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton { showLoadingStatus(false) }
+				footer.getConfirmButton {
+					showLoadingStatus(false)
+				}
 			}) {
 			transfer(it?.text.toString(), callback)
 		}
