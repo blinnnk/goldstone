@@ -1311,8 +1311,8 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "通讯录"
 		HoneyLanguage.Japanese.code -> "連絡先"
 		HoneyLanguage.Korean.code -> "전화번호부"
-		HoneyLanguage.Russian.code -> "контакты"
-		HoneyLanguage.TraditionalChinese.code -> "聯繫人"
+		HoneyLanguage.Russian.code -> "контакты".toUpperCaseFirstLetter()
+		HoneyLanguage.TraditionalChinese.code -> "通訊簿"
 		else -> ""
 	}
 	@JvmField val contactsInput = when (currentLanguage) {
