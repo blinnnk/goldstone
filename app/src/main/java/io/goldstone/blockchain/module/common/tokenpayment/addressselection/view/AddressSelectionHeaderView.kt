@@ -14,8 +14,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 
 /**
@@ -38,7 +37,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
     addressInput
       .apply {
         layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-        hint = "Enter an wallet address or select a contacts below"
+        hint = EmptyText.transferToAddress
         textSize = fontSize(15)
         textColor = Spectrum.white
         hintTextColor = Spectrum.opacity5White
