@@ -207,7 +207,9 @@ data class AppConfigTable(
 							false,
 							null,
 							5,
-							goldStoneID
+							goldStoneID,
+							false,
+							HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }

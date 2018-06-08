@@ -190,7 +190,6 @@ class GasSelectionPresenter(
 				WalletTable.current.address,
 				password,
 				{
-					fragment.context?.alert(CommonText.wrongPassword)
 					callback()
 					fragment.showMaskView(false)
 				}

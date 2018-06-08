@@ -63,7 +63,7 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 	}
 	
 	private fun retWidthDependsOnLanguage(): Int {
-		return when(Config.getCurrentLanguage()) {
+		return when(Config.getCurrentLanguageCode()) {
 			HoneyLanguage.Chinese.code -> 30.uiPX()
 			HoneyLanguage.Korean.code -> 30.uiPX()
 			HoneyLanguage.TraditionalChinese.code -> 30.uiPX()

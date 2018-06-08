@@ -23,7 +23,7 @@ object CountryCode {
 		)
 	val japan =
 		Locale(
-			"jp",
+			"ja",
 			"JP"
 		)
 	val russia =

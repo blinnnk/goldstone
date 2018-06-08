@@ -14,21 +14,22 @@ object WebUrl {
 	}
 	const val header = "https://www.goldstone.io"
 	@JvmStatic
-	val privacy = "$header/${webLanguage(Config.getCurrentLanguage())}/privacy"
+	val privacy = "$header/${webLanguage(Config.getCurrentLanguageCode())}/privacy"
 	@JvmStatic
-	val terms = "$header/${webLanguage(Config.getCurrentLanguage())}/termAndConditions"
+	val terms = "$header/${webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
 	@JvmStatic
-	val support = "$header/${webLanguage(Config.getCurrentLanguage())}/support"
+	val support = "$header/${webLanguage(Config.getCurrentLanguageCode())}/support"
 	@JvmStatic
-	val aboutUs = "$header/${webLanguage(Config.getCurrentLanguage())}/aboutUs"
+	val aboutUs = "$header/${webLanguage(Config.getCurrentLanguageCode())}/aboutUs"
 	@JvmStatic
-	var whatIsKeystore = "$header/wiki/${webLanguage(Config.getCurrentLanguage())}/keystore"
+	var whatIsKeystore = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/keystore"
 	@JvmStatic
-	val whatIsMnemonic = "$header/wiki/${webLanguage(Config.getCurrentLanguage())}/mnemonics"
+	val whatIsMnemonic = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/mnemonics"
 	@JvmStatic
-	val whatIsPrivatekey = "$header/wiki/${webLanguage(Config.getCurrentLanguage())}/privateKey"
+	val whatIsPrivatekey = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/privateKey"
 	@JvmStatic
-	val whatIsWatchOnly = "$header/wiki/${webLanguage(Config.getCurrentLanguage())}/watchOnlyWallet"
+	val whatIsWatchOnly =
+		"$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/watchOnlyWallet"
 	@JvmStatic
-	val whatIsGas = "$header/wiki/${webLanguage(Config.getCurrentLanguage())}/gas"
+	val whatIsGas = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/gas"
 }

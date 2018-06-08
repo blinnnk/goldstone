@@ -182,35 +182,30 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 	
 	companion object {
-		private fun generateStepDistance(
-			minValue: Double,
-			maxValue: Double
-		): Float {
-			val stepsCount = 5   //代表希望分成几个阶段
-			val roughStep = (maxValue - minValue) / stepsCount
-			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
-			return (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
-		}
-		
 		fun getChardGridValue(
 			maxValue: Float,
 			minValue: Float,
 			hold: (min: Float, max: Float, step: Float) -> Unit
 		) {
-			val max: Float
-			val min: Float
-			val stepDistance: Float
-			if (maxValue < 1f) {
-				min = 0f
-				max = maxValue * 1.5f
-				stepDistance = max / 5f
+			val stepsCount = 5   //代表希望分成几个阶段
+			val max: Double = if (maxValue == minValue) {
+				if (maxValue == 0f)
+					(stepsCount - 1).toDouble()
+				else maxValue + Math.abs(maxValue * 0.5)
 			} else {
-				stepDistance =
-					QuotationCell.generateStepDistance(minValue.toDouble(), maxValue.toDouble())
-				max = (1f + Math.floor((maxValue / stepDistance).toDouble()).toFloat()) * stepDistance
-				min = Math.floor(minValue.toDouble() / stepDistance).toFloat() * stepDistance
+				maxValue.toDouble()
 			}
-			hold(min, max, stepDistance)
+			val min: Double = if (maxValue == minValue) {
+				maxValue - Math.abs(maxValue * 0.5)
+			} else {
+				minValue.toDouble()
+			}
+			val roughStep = (max - min) / (stepsCount - 1)
+			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
+			val step = (Math.ceil(roughStep / stepLevel) * stepLevel)
+			val minChartHeight = Math.floor(min / step).toFloat() * step
+			val maxChartHeight = (1.0 + Math.floor(max / step)).toFloat() * step
+			hold(minChartHeight.toFloat(), maxChartHeight.toFloat(), step.toFloat())
 		}
 	}
 }

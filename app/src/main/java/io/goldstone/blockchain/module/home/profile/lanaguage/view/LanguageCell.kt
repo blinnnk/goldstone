@@ -15,6 +15,6 @@ class LanguageCell(context: Context) : BaseRadioCell(context) {
 	
 	var model: LanguageModel by observing(LanguageModel()) {
 		title.text = model.name
-		checkedStatus = Config.getCurrentLanguage() == HoneyLanguage.getLanguageCode(model.name)
+		checkedStatus = Config.getCurrentLanguageCode() == HoneyLanguage.getLanguageCode(model.name)
 	}
 }
