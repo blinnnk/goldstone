@@ -1347,7 +1347,7 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "语言"
 		HoneyLanguage.Japanese.code -> "言語"
 		HoneyLanguage.Korean.code -> "언어"
-		HoneyLanguage.Russian.code -> "язык"
+		HoneyLanguage.Russian.code -> "язык".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "語言"
 		else -> ""
 	}
