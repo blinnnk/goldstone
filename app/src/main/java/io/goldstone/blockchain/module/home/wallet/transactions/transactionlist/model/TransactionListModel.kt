@@ -8,6 +8,7 @@ import io.goldstone.blockchain.crypto.toAscii
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
+import io.goldstone.blockchain.common.value.TransactionText
 import java.io.Serializable
 
 /**
@@ -59,16 +60,16 @@ data class TransactionListModel(
 val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { input, isERC20 ->
 	if (!isERC20) {
 		if (input.equals(SolidityCode.ethTransfer, true)) {
-			"There isn't a memo"
+			TransactionText.noMemo
 		} else {
 			input.toAscii(false)
 		}
 	} else {
 		if (input.length > 138) {
 			input.substring(137, input.length).toAscii(false)
-		} else "There isn't a memo"
+		} else TransactionText.noMemo
 	}
 }
 private val descriptionText: (isReceive: Boolean) -> String = {
-	if (it) " incoming from " else " send from "
+	if (it) TransactionText.receivedFrom else TransactionText.sentTo
 }

@@ -5,9 +5,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -40,7 +38,7 @@ class PaymentPreparePresenter(
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
-			fragment.context?.alert(TokenDetailText.setTransferCountAlert)
+			fragment.context?.alert(AlertText.emptyTransferValue)
 			callback()
 		} else {
 			fragment.toast("wait a few seconds, Calculating transaction gas info now")

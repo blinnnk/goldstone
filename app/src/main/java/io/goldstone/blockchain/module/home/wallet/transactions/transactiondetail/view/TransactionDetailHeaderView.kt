@@ -19,10 +19,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.TransactionSize
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
@@ -85,7 +82,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	@SuppressLint("SetTextI18n")
 	fun updateConformationBar(confirmedCount: Int) {
 		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = "$confirmedCount / 6 Block Has Confirmed"
+		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks}"
 		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
 	}
 	
@@ -93,9 +90,9 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	fun setIconStyle(
 		headerModel: TransactionHeaderModel
 	) {
-		val type = if (headerModel.isReceive) "Received " else "Send "
+		val type = if (headerModel.isReceive) TransactionText.transferResultReceived else TransactionText.transferResultSent
 		info.title.text =
-			"$type${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive) "From" else "To"}"
+			"$type${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive) TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address
 		
 		if (headerModel.isError) {

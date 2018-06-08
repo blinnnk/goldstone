@@ -42,7 +42,7 @@ class TokenDetailOverlayPresenter(
 				customHeader = {
 					valueHeader = TwoLineTitles(context)
 					valueHeader?.apply {
-						title.text = "MY ${token?.symbol}"
+						title.text = "${WalletText.tokenDetailHeaderText} ${token?.symbol}"
 						subtitle.text =
 							CryptoUtils.scaleTo28(
 								"${token?.count} ${token?.symbol} ≈ ${token?.currency} (${Config.getCurrencyCode()})"
