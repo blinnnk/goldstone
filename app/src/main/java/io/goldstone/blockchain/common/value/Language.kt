@@ -913,6 +913,15 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "發送至"
 		else -> ""
 	}
+	@JvmField val upgrade = when (currentLanguage) {
+		HoneyLanguage.English.code -> "UPGRADE"
+		HoneyLanguage.Chinese.code -> "升级版本"
+		HoneyLanguage.Japanese.code -> "アップグレード"
+		HoneyLanguage.Korean.code -> "업그레이드"
+		HoneyLanguage.Russian.code -> "ОТПРАВИТЬ"
+		HoneyLanguage.TraditionalChinese.code -> "升級版本"
+		else -> ""
+	}
 }
 
 object AlertText {
@@ -1750,7 +1759,7 @@ object PrepareTransferText {
 		HoneyLanguage.Chinese.code -> "转出数量"
 		HoneyLanguage.Japanese.code -> "送出数量"
 		HoneyLanguage.Korean.code -> "수량 전송"
-		HoneyLanguage.Russian.code -> "номер перевода"
+		HoneyLanguage.Russian.code -> "номер перевода".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "轉出數量"
 		else -> ""
 	}
@@ -1982,6 +1991,24 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在從以太坊獲取Token信息，馬上就好"
 		else -> ""
 	}
+	@JvmField val calculateGas = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Estimating gas costs..."
+		HoneyLanguage.Chinese.code -> "正在估算燃气费用，马上就好"
+		HoneyLanguage.Japanese.code -> "ガスコストの見積もり..."
+		HoneyLanguage.Korean.code -> "바로 가스 비용 견적..."
+		HoneyLanguage.Russian.code -> "Оценка стоимости газа сразу..."
+		HoneyLanguage.TraditionalChinese.code -> "正在估算燃氣費用，馬上就好"
+		else -> ""
+	}
+	@JvmField val calculating = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Calculating..."
+		HoneyLanguage.Chinese.code -> "正在计算..."
+		HoneyLanguage.Japanese.code -> "計算中..."
+		HoneyLanguage.Korean.code -> "계산 중..."
+		HoneyLanguage.Russian.code -> "Расчет..."
+		HoneyLanguage.TraditionalChinese.code -> "正在計算..."
+		else -> ""
+	}
 	@JvmField val searchingQuotation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Searching token information..."
 		HoneyLanguage.Chinese.code -> "正在搜索Token信息..."
@@ -2081,7 +2108,7 @@ object QRText {
 object QAText {
 
 	val whatIsMnemonic = when (currentLanguage) {
-		HoneyLanguage.English.code -> "What is mnemonic?"
+		HoneyLanguage.English.code -> "What are mnemonics?"
 		HoneyLanguage.Chinese.code -> "什么是助记词？"
 		HoneyLanguage.Japanese.code -> "ニーモニックとは何ですか？"
 		HoneyLanguage.Korean.code -> "니모닉이란 무엇인가요？"

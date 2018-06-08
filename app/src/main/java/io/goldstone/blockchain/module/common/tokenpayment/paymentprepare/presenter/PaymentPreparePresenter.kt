@@ -41,7 +41,7 @@ class PaymentPreparePresenter(
 			fragment.context?.alert(AlertText.emptyTransferValue)
 			callback()
 		} else {
-			fragment.toast("wait a few seconds, Calculating transaction gas info now")
+			fragment.toast(LoadingText.calculateGas)
 			getPaymentPrepareModel(count, fragment.getMemoContent(), callback) { model ->
 				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(

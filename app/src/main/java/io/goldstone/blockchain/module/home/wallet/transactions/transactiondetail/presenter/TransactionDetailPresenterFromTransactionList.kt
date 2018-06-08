@@ -4,10 +4,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -89,7 +86,7 @@ fun TransactionDetailPresenter.generateModels(
 		if (data.isNull()) dataFromList?.date
 		else TimeUtils.formatDate(data!!.timestamp / 1000)
 	val memo =
-		if (data?.memo.isNull()) "There isn't a memo"
+		if (data?.memo.isNull()) TransactionText.noMemo
 		else data?.memo
 	var isReceive: Boolean? = null
 	val receiptData = when (receipt) {

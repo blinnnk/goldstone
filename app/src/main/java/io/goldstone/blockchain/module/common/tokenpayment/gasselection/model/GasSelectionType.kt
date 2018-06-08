@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
+import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.crypto.toGWeiValue
 import io.goldstone.blockchain.crypto.toGasValue
@@ -12,8 +14,8 @@ import io.goldstone.blockchain.crypto.toGwei
 data class GasSelectionModel(
 	val id: Int = 0,
 	val count: String = "0.000 ETH",
-	val info: String = "≈ 0.00 Gwei (Gas Price) * 0.000 (Gas Limit)",
-	var type: String = "calculating",
+	val info: String = "≈ 0.00 Gwei (${TransactionText.gasPrice}) * 0.000 (${TransactionText.gasLimit})",
+	var type: String = LoadingText.calculating,
 	var currentType: String = ""
 ) {
 	
@@ -25,7 +27,7 @@ data class GasSelectionModel(
 	) : this(
 		id,
 		(gWei * gasLimit).toEthValue(), // count 转换过的
-		"≈ ${gWei.toGWeiValue()} Gwei (Gas Price) * ${gasLimit.toGasValue()} (Gas Limit)",
+		"≈ ${gWei.toGWeiValue()} Gwei (${TransactionText.gasPrice}) * ${gasLimit.toGasValue()} (${TransactionText.gasLimit})",
 		calculateType(id, gWei),
 		currentType
 	)
