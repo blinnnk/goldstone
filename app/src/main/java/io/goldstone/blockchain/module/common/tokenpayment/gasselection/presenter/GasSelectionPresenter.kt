@@ -112,10 +112,12 @@ class GasSelectionPresenter(
 	}
 	
 	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
+		fragment.showMaskView(true)
 		val token = fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsvalid(token)) {
 			callback()
+			fragment.showMaskView(false)
 			return
 		}
 		// 检查网络并执行转账操作
@@ -128,6 +130,7 @@ class GasSelectionPresenter(
 						footer.setCanUseStyle(false)
 						fragment.context?.alert(AlertText.balanceNotEnough)
 						callback()
+						fragment.showMaskView(false)
 					}
 				}
 			}
@@ -189,6 +192,7 @@ class GasSelectionPresenter(
 				{
 					fragment.context?.alert(CommonText.wrongPassword)
 					callback()
+					fragment.showMaskView(false)
 				}
 			) { privateKey ->
 				prepareModel?.apply {
@@ -207,7 +211,11 @@ class GasSelectionPresenter(
 					GoldStoneEthCall
 						.sendRawTransaction(hexValue, { error, reason ->
 							fragment.context?.apply {
-								runOnUiThread { alert(reason ?: error.toString()) }
+								runOnUiThread {
+									alert(reason ?: error.toString())
+									callback()
+									fragment.showMaskView(false)
+								}
 							}
 						}) { taxHash ->
 							LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
@@ -220,6 +228,7 @@ class GasSelectionPresenter(
 							fragment.context?.runOnUiThread {
 								goToTransactionDetailFragment(toWalletAddress, raw!!, taxHash)
 								callback()
+								fragment.showMaskView(false)
 							}
 						}
 				}
@@ -316,11 +325,14 @@ class GasSelectionPresenter(
 	) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(), true, {
+			CommonText.enterPassword.toUpperCase(),
+			true,
+			{
 				// 点击 `Alert` 取消按钮
 				footer.getConfirmButton {
 					showLoadingStatus(false)
 				}
+				fragment.showMaskView(false)
 			}) {
 			transfer(it?.text.toString(), callback)
 		}
