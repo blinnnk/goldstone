@@ -13,7 +13,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -100,7 +99,7 @@ class PaymentPreparePresenter(
 		}
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
-			WalletTable.current.address,
+			Config.getCurrentAddress(),
 			data, { error, reason ->
 				fragment.context?.alert(reason ?: error.toString())
 				callback()

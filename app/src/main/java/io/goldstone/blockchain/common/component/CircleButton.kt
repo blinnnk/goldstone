@@ -58,7 +58,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		}
 	}
 
-	private var viewSize = Size(30.uiPX(), 65.uiPX())
+	private var viewSize = Size(32.uiPX(), 65.uiPX())
 	private var iconSize = 30.uiPX()
 
 	private var redotView: TextView? = null
@@ -88,7 +88,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		}
 	}
 
-	fun setStyleParameter(
+	private fun setStyleParameter(
 		viewSize: Size = this.viewSize,
 		iconSize: Int = this.iconSize,
 		backgroundColor: Int = Spectrum.opacity2White,
@@ -104,7 +104,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		icon.setCenterInParent()
 	}
 
-	fun setTitleStyle(
+	private fun setTitleStyle(
 		titleSize: Float = fontSize(9),
 		color: Int = Spectrum.white,
 		typeFace: Typeface = GoldStoneFont.medium(context)

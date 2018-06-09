@@ -14,12 +14,12 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
@@ -137,7 +137,7 @@ object GoldStoneAPI {
 	
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
-		address: String = WalletTable.current.address,
+		address: String = Config.getCurrentAddress(),
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
@@ -158,7 +158,7 @@ object GoldStoneAPI {
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
 		errorCallback: (Exception) -> Unit,
-		address: String = WalletTable.current.address,
+		address: String = Config.getCurrentAddress(),
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUncryptoData<TransactionTable>(

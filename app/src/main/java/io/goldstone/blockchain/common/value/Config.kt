@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.common.value
 
-import com.blinnnk.util.getDoubleFromSharedPreferences
-import com.blinnnk.util.getIntFromSharedPreferences
-import com.blinnnk.util.getStringFromSharedPreferences
-import com.blinnnk.util.saveDataToSharedPreferences
+import com.blinnnk.util.*
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**
@@ -11,14 +8,48 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  * @author KaySaith
  */
 object Config {
+	
+	fun getCurrentAddress(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentAddress)
+	
+	fun updateCurrentAddress(address: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentAddress, address)
+	
+	fun getCurrentName(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentName)
+	
+	fun updateCurrentName(name: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentName, name)
+	
+	fun getCurrentID(): Int =
+		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentID)
+	
+	fun updateCurrentID(id: Int) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentID, id)
+	
+	fun getCurrentIsWatchOnlyOrNot(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.currentIsWatchOrNot)
+	
+	fun updateCurrentIsWatchOnlyOrNot(isWatchOnly: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.currentIsWatchOrNot,
+			isWatchOnly
+		)
+	
+	fun getCurrentBalance(): Double =
+		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.currentBalance)
+	
+	fun updateCurrentBalance(balance: Double) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.currentBalance,
+			balance.toFloat()
+		)
+	
 	fun getCurrentLanguageCode(): Int =
 		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentLanguage)
 	
 	fun updateCurrentLanguageCode(languageCode: Int) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.currentLanguage,
-			languageCode
-		)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLanguage, languageCode)
 	
 	fun getCurrentChain(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)

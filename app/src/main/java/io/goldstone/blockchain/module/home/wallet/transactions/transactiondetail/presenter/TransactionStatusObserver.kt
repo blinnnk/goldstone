@@ -12,7 +12,6 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
@@ -165,7 +164,7 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(callbac
 				val contract = transaction.to
 				GoldStoneEthCall.getTokenBalanceWithContract(
 					contract,
-					WalletTable.current.address, { error, reason ->
+					Config.getCurrentAddress(), { error, reason ->
 						fragment.context?.alert(reason ?: error.toString())
 					}) { balance ->
 					MyTokenTable.updateCurrentWalletBalanceWithContract(balance, contract)
@@ -173,7 +172,7 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(callbac
 				}
 			} else {
 				GoldStoneEthCall.getEthBalance(
-					WalletTable.current.address, { error, reason ->
+					Config.getCurrentAddress(), { error, reason ->
 					fragment.context?.alert(reason ?: error.toString())
 				}) {
 					MyTokenTable.updateCurrentWalletBalanceWithContract(it, CryptoValue.ethContract)

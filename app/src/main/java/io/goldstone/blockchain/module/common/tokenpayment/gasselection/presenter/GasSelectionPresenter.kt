@@ -24,7 +24,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -145,7 +144,7 @@ class GasSelectionPresenter(
 		if (token?.contract.equals(CryptoValue.ethContract, true)) {
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
-				WalletTable.current.address,
+				Config.getCurrentAddress(),
 				true,
 				{ error, reason ->
 					if (reason == ErrorTag.chain) {
@@ -160,7 +159,7 @@ class GasSelectionPresenter(
 			// 如果当前站长不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			MyTokenTable.getBalanceWithContract(
 				token?.contract.orEmpty(),
-				WalletTable.current.address,
+				Config.getCurrentAddress(),
 				true,
 				{ error, reason ->
 					if (reason == ErrorTag.chain) {
@@ -187,7 +186,7 @@ class GasSelectionPresenter(
 		doAsync {
 			// 获取当前账户的私钥
 			fragment.context?.getPrivateKey(
-				WalletTable.current.address,
+				Config.getCurrentAddress(),
 				password,
 				{
 					callback()
@@ -274,13 +273,13 @@ class GasSelectionPresenter(
 				symbol = token!!.symbol
 				timeStamp =
 					(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
-				fromAddress = WalletTable.current.address
+				fromAddress = Config.getCurrentAddress()
 				value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token!!.decimal).formatCount()
 				hash = taxHash
 				gasPrice = getSelectedGasPrice(currentMinnerType).toString()
 				gasUsed = raw.gasLimit.toString()
 				isPending = true
-				recordOwnerAddress = WalletTable.current.address
+				recordOwnerAddress = Config.getCurrentAddress()
 				tokenReceiveAddress = toWalletAddress
 				isERC20 = token!!.symbol == CryptoSymbol.eth
 				nonce = raw.nonce.toString()

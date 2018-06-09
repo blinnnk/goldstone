@@ -224,10 +224,10 @@ class WalletSettingsPresenter(
 	private fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
-				title.text = WalletTable.current.name
-				subtitle.text = WalletTable.current.address
+				title.text = Config.getCurrentName()
+				subtitle.text = Config.getCurrentAddress()
 			}
-			avatarImage.glideImage(UIUtils.generateAvatar(WalletTable.current.id))
+			avatarImage.glideImage(UIUtils.generateAvatar(Config.getCurrentID()))
 		}
 	}
 }

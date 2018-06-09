@@ -18,7 +18,6 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -33,18 +32,25 @@ import org.jetbrains.anko.runOnUiThread
  * @date 24/03/2018 2:12 PM
  * @author KaySaith
  */
+var memoryTransactionListData: ArrayList<TransactionListModel>? = null
+
 class TransactionListPresenter(
 	override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
 	
 	override fun updateData() {
 		fragment.showLoadingView(LoadingText.transactionData)
-		// 先显示一个空数据
-		fragment.asyncData = arrayListOf()
-		// 不让 `UI` 觉得卡顿, 等动画执行完毕后再发起数据处理业务
-		AnimationDuration.Default timeUpThen {
-			// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
-			fragment.initData()
+		if (memoryTransactionListData.isNull()) {
+			// 先显示一个空数据
+			fragment.asyncData = arrayListOf()
+			// 不让 `UI` 觉得卡顿, 等动画执行完毕后再发起数据处理业务
+			AnimationDuration.Default timeUpThen {
+				// 如果内存中没有数据那么, 先展示界面动画在加载数据, 防止线程堆积导致的界面卡顿.
+				fragment.initData()
+			}
+		} else {
+			fragment.asyncData = memoryTransactionListData
+			fragment.updateTransactionInAsync(memoryTransactionListData!!)
 		}
 	}
 	
@@ -53,18 +59,22 @@ class TransactionListPresenter(
 			Bundle().apply {
 				putSerializable(ArgumentKey.transactionFromList, model)
 				presenter.showTargetFragment<TransactionDetailFragment>(
-					TransactionText.detail, TransactionText.transaction, this
+					TransactionText.detail,
+					TransactionText.transaction,
+					this
 				)
 			}
 		}
 	}
 	
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getTransactionListModelsByAddress(WalletTable.current.address) {
+		TransactionTable.getTransactionListModelsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
-				// 异步更新网络数据
+				// Save a copy into memory for imporving the speed of next time to view
+				memoryTransactionListData = it
+				// Check and update the new data from chain in async thread
 				fragment.updateTransactionInAsync(it)
 			} else {
 				/**
@@ -76,7 +86,7 @@ class TransactionListPresenter(
 					"0",
 					{
 						// ToDo 等自定义的 `Alert` 完成后应当友好提示
-						LogUtil.error("error in getTransactionDataFromEtherScan $it")
+						LogUtil.error("Error When GetTransactionDataFromEtherScan $it")
 					}
 				) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
@@ -139,6 +149,7 @@ class TransactionListPresenter(
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
+			System.out.println("hello 2")
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
@@ -160,6 +171,7 @@ class TransactionListPresenter(
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
+			System.out.println("hello 3")
 			return object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = 2
 				// Get transaction data from `etherScan`
@@ -185,7 +197,7 @@ class TransactionListPresenter(
 						
 						GoldStoneAPI.getERC20TokenIncomingTransaction(
 							startBlock,
-							WalletTable.current.address,
+							Config.getCurrentAddress(),
 							{
 								//error callback
 								// 只弹出一次错误信息
@@ -204,6 +216,7 @@ class TransactionListPresenter(
 				}
 				
 				override fun mergeCallBack() {
+					System.out.println("hello 4")
 					coroutinesTask(
 						{
 							arrayListOf<TransactionTable>().apply {
@@ -267,6 +280,7 @@ class TransactionListPresenter(
 			data: ArrayList<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
+			System.out.println("hello 5")
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
 			data.getUnkonwTokenInfoByTransactions {
 				// 把拉取到的数据加工数据格式并插入本地数据库
@@ -308,6 +322,7 @@ class TransactionListPresenter(
 			data: ArrayList<TransactionTable>,
 			hold: ArrayList<TransactionTable>.() -> Unit
 		) {
+			System.out.println("hello 6")
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = data.size
 				override fun concurrentJobs() {

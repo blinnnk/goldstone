@@ -5,6 +5,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.updatePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -38,7 +39,7 @@ class PasswordSettingsPresenter(
 		) { password, _ ->
 			// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 			fragment.context?.updatePassword(
-				WalletTable.current.address,
+				Config.getCurrentAddress(),
 				oldPasswordInput.text.toString(),
 				password,
 				{

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.memoryTransactionListData
 import org.jetbrains.anko.doAsync
 
 /**
@@ -27,12 +29,20 @@ class SplashPresenter(val activity: SplashActivity) {
 			isNotEmpty() isTrue {
 				WalletTable.getCurrentWallet {
 					it?.apply {
-						WalletTable.current = it
+						Config.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
+						Config.updateCurrentID(it.id)
+						Config.updateCurrentBalance(it.balance.orElse(0.0))
+						Config.updateCurrentName(it.name)
+						Config.updateCurrentAddress(it.address)
 						activity.jump<MainActivity>()
 					}
 				}
 			}
 		}
+	}
+	
+	fun cleanMemoryDataLastAccount() {
+		memoryTransactionListData = null
 	}
 	
 	fun initDefaultTokenByNetWork(callback: () -> Unit) {

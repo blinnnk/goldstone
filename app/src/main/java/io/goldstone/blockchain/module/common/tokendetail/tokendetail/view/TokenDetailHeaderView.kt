@@ -50,7 +50,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			val maxValue = chartData?.max()?.value ?: 0f
 			val minValue = chartData?.min()?.value ?: 0f
 			QuotationCell.getChardGridValue(maxValue, minValue) { min, max, step ->
-				setAxisBorderValues(min, max, step)
+				setAxisBorderValues(min * 0.6f, max, step)
 			}
 			// 设定外界 `Border` 颜色
 			setAxisColor(Color.argb(0, 0, 0, 0))

@@ -4,12 +4,14 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -95,7 +97,7 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
-				WalletTable.current.address.toUpperCase(),
+				Config.getCurrentAddress().toUpperCase(),
 				receipt.transactionHash.toUpperCase(),
 				receipt.blockNumber,
 				receipt.date,
@@ -108,7 +110,7 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				WalletTable.current.address.toUpperCase(),
+				Config.getCurrentAddress().toUpperCase(),
 				currentHash.toUpperCase(),
 				receipt.blockNumber,
 				date,
@@ -120,7 +122,7 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				WalletTable.current.address.toUpperCase(),
+				Config.getCurrentAddress().toUpperCase(),
 				currentHash.toUpperCase(),
 				"Waiting...",
 				date,

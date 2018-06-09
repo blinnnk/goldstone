@@ -40,12 +40,12 @@ class WalletSettingsListPresenter(
 	
 	override fun updateData() {
 		val balanceText =
-			WalletTable.current.balance?.formatCurrency() + " (${Config.getCurrencyCode()})"
+			Config.getCurrentBalance().formatCurrency() + " (${Config.getCurrencyCode()})"
 		WalletTable.getCurrentWallet { wallet ->
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.checkQRCode),
 				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
-				WalletSettingsListModel(WalletSettingsText.walletName, WalletTable.current.name),
+				WalletSettingsListModel(WalletSettingsText.walletName, Config.getCurrentName()),
 				WalletSettingsListModel(WalletSettingsText.hint, "······"),
 				WalletSettingsListModel(WalletSettingsText.passwordSettings),
 				WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
@@ -77,7 +77,7 @@ class WalletSettingsListPresenter(
 		fragment.context?.showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
-			!WalletTable.current.isWatchOnly
+			!Config.getCurrentIsWatchOnlyOrNot()
 		) {
 			deleteWalletData(it?.text.toString())
 		}
@@ -86,12 +86,10 @@ class WalletSettingsListPresenter(
 	private fun deleteWalletData(password: String) {
 		fragment.getMainActivity()?.showLoadingView()
 		// get current wallet address
-		WalletTable.current.apply {
-			if (isWatchOnly) {
-				deleteWatchOnlyWallet(address)
-			} else {
-				fragment.deleteRoutineWallet(address, password)
-			}
+		if (Config.getCurrentIsWatchOnlyOrNot()) {
+			deleteWatchOnlyWallet(Config.getCurrentAddress())
+		} else {
+			fragment.deleteRoutineWallet(Config.getCurrentAddress(), password)
 		}
 	}
 	
