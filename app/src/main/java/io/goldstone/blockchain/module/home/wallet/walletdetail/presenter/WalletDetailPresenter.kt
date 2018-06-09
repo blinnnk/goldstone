@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
-import android.view.ViewGroup
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.coroutinesTask
@@ -79,31 +78,51 @@ class WalletDetailPresenter(
 	}
 	
 	fun showTransferSelectionOverlay(isShowAddress: Boolean) {
+		// Check current wallet is watch only or not
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.getMainActivity()?.getMainContainer()?.apply {
-				if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
-					val overlay = ContentScrollOverlayView(context)
-					overlay.into(this)
-					overlay.setTitle("Token Selection")
-					overlay.addContent {
-						topPadding = 10.uiPX()
-						prepareMyTokenList(isShowAddress)
+			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
+				// Check current wallet has more than on token or not
+				MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
+					// Jump directly if there is only one type of token
+					if (myTokens.size == 1) {
+						defaultTokens.find {
+							it.contract.equals(myTokens.first().contract, true)
+						}?.let {
+							isShowAddress isTrue {
+								TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
+							} otherwise {
+								TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
+							}
+						}
+					} else {
+						fragment.showSelectionListOverlayView(myTokens, defaultTokens, isShowAddress)
 					}
 				}
 			}
 		}
 	}
 	
-	private fun ViewGroup.prepareMyTokenList(isShowAddress: Boolean) {
-		MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
-			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
-				defaultTokens.filter { default ->
-					myTokens.any { it.contract.equals(default.contract, true) }
-				}.let {
-					val data = it.sortedByDescending { it.weight }.toArrayList()
-					val tokenList = TokenSelectionRecyclerView(context)
-					tokenList.into(this)
-					tokenList.setAdapter(data, isShowAddress)
+	private fun WalletDetailFragment.showSelectionListOverlayView(
+		myTokens: ArrayList<MyTokenTable>,
+		defaultTokens: ArrayList<DefaultTokenTable>,
+		isShowAddress: Boolean
+	) {
+		// Prepare token list and show content scroll overlay view
+		getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
+				overlay.into(this)
+				overlay.setTitle("Token Selection")
+				overlay.addContent {
+					topPadding = 10.uiPX()
+					defaultTokens.filter { default ->
+						myTokens.any { it.contract.equals(default.contract, true) }
+					}.let {
+						val data = it.sortedByDescending { it.weight }.toArrayList()
+						val tokenList = TokenSelectionRecyclerView(context)
+						tokenList.into(this)
+						tokenList.setAdapter(data, isShowAddress)
+					}
 				}
 			}
 		}
@@ -234,12 +253,12 @@ class WalletDetailPresenter(
 	private fun WalletDetailFragment.updateHeaderValue() {
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
-		WalletTable.current.balance = totalBalance
+		Config.updateCurrentBalance(totalBalance.orElse(0.0))
 		recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
 			it?.model = WalletDetailHeaderModel(
 				null,
-				WalletTable.current.name,
-				CryptoUtils.scaleAddress(WalletTable.current.address),
+				Config.getCurrentName(),
+				CryptoUtils.scaleAddress(Config.getCurrentAddress()),
 				totalBalance.toString(),
 				Config.getWalletCount()
 			)

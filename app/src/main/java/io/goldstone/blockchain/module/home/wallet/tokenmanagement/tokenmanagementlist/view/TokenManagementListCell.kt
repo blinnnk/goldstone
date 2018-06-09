@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.imageResource
@@ -28,10 +29,10 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 	var model: DefaultTokenTable? by observing(null) {
 		model?.apply {
 			// 显示默认图判断
-			if (iconUrl.isBlank()) {
-				icon.image.imageResource = R.drawable.default_token
-			} else {
-				icon.image.glideImage(iconUrl)
+			when {
+				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
+				symbol == CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
+				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name

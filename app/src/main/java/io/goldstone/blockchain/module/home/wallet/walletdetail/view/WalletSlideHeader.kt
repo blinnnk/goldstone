@@ -13,12 +13,8 @@ import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.WalletText
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.formatCurrency
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
  * @date 24/03/2018 12:50 AM
@@ -59,7 +55,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
 			subtitle.apply {
-				text = WalletText.totalAssets + " " + Config.getCurrencyCode()
+				text = setBalanceInfo()
 				textSize = fontSize(12)
 			}
 			isCenter = true
@@ -78,7 +74,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			visibility = View.VISIBLE
 		}
 		
-		setBalanceValue(WalletTable.current.balance?.formatCurrency().orEmpty())
+		setBalanceValue(Config.getCurrentBalance().formatCurrency())
 	}
 	
 	override fun onHeaderHidesStyle() {
@@ -90,5 +86,16 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 	
 	private fun setBalanceValue(value: String) {
 		balance.title.text = value
+	}
+	
+	companion object {
+		fun setBalanceInfo(): String {
+			return if (Config.getCurrentChain() == ChainID.Main.id) {
+				WalletText.totalAssets + " " + Config.getCurrencyCode()
+			} else {
+				ChainID.getChainNameByID(Config.getCurrentChain()) +
+				" · " + WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
+			}
+		}
 	}
 }

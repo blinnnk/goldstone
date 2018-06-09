@@ -13,7 +13,6 @@ import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
@@ -37,7 +36,7 @@ data class TokenBalanceTable(
 		
 		fun getBalanceByContract(
 			contract: String,
-			address: String = WalletTable.current.address,
+			address: String = Config.getCurrentAddress(),
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
 			coroutinesTask(

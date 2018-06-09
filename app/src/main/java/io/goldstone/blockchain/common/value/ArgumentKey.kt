@@ -41,4 +41,9 @@ object SharesPreference {
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"
 	const val activityIsResult = "activityIsResult"
+	const val currentAddress = "currentAddress"
+	const val currentName = "currentName"
+	const val currentBalance = "currentBalance"
+	const val currentID = "currentID"
+	const val currentIsWatchOrNot = "currentIsWatchOrNot"
 }

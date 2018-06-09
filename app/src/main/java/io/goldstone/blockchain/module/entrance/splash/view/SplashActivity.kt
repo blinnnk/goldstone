@@ -89,6 +89,7 @@ class SplashActivity : AppCompatActivity() {
 						// check network to get default toke list
 						initDefaultTokenByNetWork {
 							hasAccountThenLogin()
+							cleanMemoryDataLastAccount()
 						}
 					}
 				}

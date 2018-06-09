@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.getMemoFromInputCode
@@ -124,14 +123,15 @@ data class TransactionTable(
 		data.hasError,
 		data.txreceipt_status,
 		data.input,
-		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to else CryptoValue.ethContract,
+		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
+		else CryptoValue.ethContract,
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
-		data.fromAddress != WalletTable.current.address,
+		data.fromAddress != Config.getCurrentAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
-		WalletTable.current.address
+		Config.getCurrentAddress()
 	)
 	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -158,7 +158,7 @@ data class TransactionTable(
 		data.isReceive,
 		true,
 		data.symbol,
-		WalletTable.current.address,
+		Config.getCurrentAddress(),
 		data.to,
 		false,
 		data.logIndex
@@ -185,13 +185,14 @@ data class TransactionTable(
 		"",
 		"",
 		"",
-		data.safeGet("from") != WalletTable.current.address,
+		data.safeGet("from") != Config.getCurrentAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		WalletTable.current.address
+		Config.getCurrentAddress()
 	)
 	
 	companion object {
+		
 		fun updateModelInfoFromChain(
 			transaction: TransactionTable,
 			isERC20: Boolean,
@@ -200,12 +201,12 @@ data class TransactionTable(
 			tokenReceiveAddress: String?
 		) {
 			transaction.apply {
-				this.isReceive = WalletTable.current.address.equals(tokenReceiveAddress, true)
+				this.isReceive = Config.getCurrentAddress().equals(tokenReceiveAddress, true)
 				this.isERC20 = isERC20
 				this.symbol = symbol
 				this.value = value
 				this.tokenReceiveAddress = tokenReceiveAddress
-				this.recordOwnerAddress = WalletTable.current.address
+				this.recordOwnerAddress = Config.getCurrentAddress()
 			}
 		}
 		
@@ -238,7 +239,7 @@ data class TransactionTable(
 			) {
 				TransactionTable.getLocalLatestNonce { localNonce ->
 					val myLatestNonce = firstOrNull {
-						it.fromAddress.equals(WalletTable.current.address, true)
+						it.fromAddress.equals(Config.getCurrentAddress(), true)
 					}?.nonce?.toLong()
 					val chainNonce = if (myLatestNonce.isNull()) 0L
 					else myLatestNonce!! + 1
@@ -256,7 +257,7 @@ data class TransactionTable(
 				GoldStoneDataBase
 					.database
 					.transactionDao()
-					.getTransactionsByAddress(WalletTable.current.address).let {
+					.getTransactionsByAddress(Config.getCurrentAddress()).let {
 						GoldStoneAPI.context.runOnUiThread {
 							if (it.isEmpty()) {
 								hold(null)
@@ -296,7 +297,7 @@ data class TransactionTable(
 		}
 		
 		fun getMyLatestStartBlock(
-			address: String = WalletTable.current.address,
+			address: String = Config.getCurrentAddress(),
 			hold: (String) -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address).let {
@@ -425,7 +426,10 @@ interface TransactionDao {
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
-	fun getTransactionByTaxHash(taxHash: String, chainID: String = Config.getCurrentChain()):
+	fun getTransactionByTaxHash(
+		taxHash: String,
+		chainID: String = Config.getCurrentChain()
+	):
 		List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive AND chainID LIKE :chainID")

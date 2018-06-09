@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -43,9 +42,9 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 			model?.let { token ->
 				onClick {
 					if (isShowAddressList) {
-						showTransferAddressFragment(token)
+						showTransferAddressFragment(this@TokenSelectionRecyclerView.context, token)
 					} else {
-						showDepositFragment(token)
+						showDepositFragment(this@TokenSelectionRecyclerView.context, token)
 					}
 					preventDuplicateClicks()
 				}
@@ -53,39 +52,46 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 		}
 	}
 	
-	private fun showDepositFragment(token: DefaultTokenTable) {
-		prepareContentOverlay(token) {
-			putBoolean(ArgumentKey.fromQuickDeposit, true)
+	companion object {
+		
+		fun showTransferAddressFragment(
+			context: Context?,
+			token: DefaultTokenTable
+		) {
+			prepareContentOverlay(context, token) {
+				putBoolean(ArgumentKey.fromQuickTransfer, true)
+			}
 		}
-	}
-	
-	private fun showTransferAddressFragment(token: DefaultTokenTable) {
-		prepareContentOverlay(token) {
-			putBoolean(ArgumentKey.fromQuickTransfer, true)
+		
+		fun showDepositFragment(context: Context?, token: DefaultTokenTable) {
+			prepareContentOverlay(context, token) {
+				putBoolean(ArgumentKey.fromQuickDeposit, true)
+			}
 		}
-	}
-	
-	private fun prepareContentOverlay(
-		token: DefaultTokenTable,
-		putArgument: Bundle.() -> Unit
-	) {
-		MyTokenTable.getCurrentChainTokenBalanceByContract(token.contract) {
-			// 准备数据
-			val model = WalletDetailCellModel(token, it.orElse(0.0), true)
-			// 显示 `ContentOverlay`
-			(context as? MainActivity)?.apply {
-				getMainContainer()?.apply {
-					findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
-						removeView(it)
+		
+		private fun prepareContentOverlay(
+			context: Context?,
+			token: DefaultTokenTable,
+			putArgument: Bundle.() -> Unit
+		) {
+			MyTokenTable.getCurrentChainTokenBalanceByContract(token.contract) {
+				// 准备数据
+				val model = WalletDetailCellModel(token, it.orElse(0.0), true)
+				// 显示 `ContentOverlay`
+				(context as? MainActivity)?.apply {
+					getMainContainer()?.apply {
+						findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
+							removeView(it)
+						}
 					}
-				}
-				findIsItExist(FragmentTag.tokenDetail) isFalse {
-					addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-						ContainerID.main,
-						FragmentTag.tokenDetail
-					) {
-						putSerializable(ArgumentKey.tokenDetail, model)
-						putArgument(this)
+					findIsItExist(FragmentTag.tokenDetail) isFalse {
+						addFragmentAndSetArguments<TokenDetailOverlayFragment>(
+							ContainerID.main,
+							FragmentTag.tokenDetail
+						) {
+							putSerializable(ArgumentKey.tokenDetail, model)
+							putArgument(this)
+						}
 					}
 				}
 			}

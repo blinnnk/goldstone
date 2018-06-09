@@ -12,7 +12,6 @@ import io.goldstone.blockchain.crypto.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -58,7 +57,7 @@ data class MyTokenTable(
 		}
 		
 		fun getCurrentChainTokensWithAddress(
-			walletAddress: String = WalletTable.current.address,
+			walletAddress: String = Config.getCurrentAddress(),
 			callback: (ArrayList<MyTokenTable>) -> Unit = {}
 		) {
 			coroutinesTask(
@@ -80,7 +79,7 @@ data class MyTokenTable(
 						.myTokenDao()
 						.getCurrentChainTokenByContractAndAddress(
 							contract,
-							WalletTable.current.address
+							Config.getCurrentAddress()
 						)
 				}) {
 				callback(it)
@@ -98,7 +97,7 @@ data class MyTokenTable(
 						.myTokenDao()
 						.getCurrentChainTokenByContractAndAddress(
 							contract,
-							WalletTable.current.address
+							Config.getCurrentAddress()
 						)
 				}) { token ->
 				if (token.isNull()) callback(null)
@@ -112,7 +111,7 @@ data class MyTokenTable(
 		
 		fun deleteByContract(
 			contract: String,
-			address: String = WalletTable.current.address,
+			address: String = Config.getCurrentAddress(),
 			callback: () -> Unit = {}
 		) {
 			doAsync {
@@ -154,7 +153,7 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			errorCallback: (error: Exception?, reason: String?) -> Unit,
-			ownerAddress: String = WalletTable.current.address,
+			ownerAddress: String = Config.getCurrentAddress(),
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -279,7 +278,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getCurrentChainTokenByContractAndAddress(contract, WalletTable.current.address).let {
+					getCurrentChainTokenByContractAndAddress(contract, Config.getCurrentAddress()).let {
 						it?.let { update(it.apply { this.balance = balance }) }
 					}
 				}

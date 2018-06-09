@@ -182,6 +182,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 	
 	companion object {
+		
 		fun getChardGridValue(
 			maxValue: Float,
 			minValue: Float,
@@ -208,4 +209,5 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			hold(minChartHeight.toFloat(), maxChartHeight.toFloat(), step.toFloat())
 		}
 	}
+	
 }

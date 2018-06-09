@@ -10,7 +10,6 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -64,7 +63,7 @@ class TokenSearchPresenter(
 		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getCurrentChainTokensWithAddress(WalletTable.current.address) { localTokens ->
+				MyTokenTable.getCurrentChainTokensWithAddress(Config.getCurrentAddress()) { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {

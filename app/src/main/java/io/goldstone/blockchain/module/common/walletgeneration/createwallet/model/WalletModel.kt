@@ -7,8 +7,8 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -40,8 +40,6 @@ data class WalletTable(
 	
 	companion object {
 		
-		var current: WalletTable by observing(WalletTable(0, "", "", false))
-		
 		fun insert(
 			model: WalletTable,
 			callback: () -> Unit = {}
@@ -55,14 +53,14 @@ data class WalletTable(
 						insert(model)
 					}.findWhichIsUsing(true)
 				}) {
-				current.isWatchOnly = it?.isWatchOnly.orFalse()
+				Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
 				callback()
 			}
 		}
 		
 		fun saveEncryptMnemonicIfUserSkip(
 			encryptMnemonic: String,
-			address: String = current.address,
+			address: String = Config.getCurrentAddress(),
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -122,7 +120,7 @@ data class WalletTable(
 			coroutinesTask(
 				{
 					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-						balance = current.balance
+						balance = Config.getCurrentBalance()
 					}
 				}) { hold(it) }
 		}
@@ -177,7 +175,6 @@ data class WalletTable(
 					getWalletByAddress(walletAddress)?.let {
 						update(it.apply { it.isUsing = true })
 						GoldStoneAPI.context.runOnUiThread {
-							current = it
 							callback(it)
 						}
 					}
@@ -195,7 +192,7 @@ data class WalletTable(
 						} otherwise {
 							update(it.first().apply { isUsing = true })
 							GoldStoneAPI.context.runOnUiThread {
-								current.isWatchOnly = it.first().isWatchOnly.orFalse()
+								Config.updateCurrentIsWatchOnlyOrNot(it.first().isWatchOnly.orFalse())
 								callback()
 							}
 						}
@@ -208,7 +205,7 @@ data class WalletTable(
 			context: Context,
 			callback: () -> Unit
 		) {
-			current.isWatchOnly.isTrue {
+			Config.getCurrentIsWatchOnlyOrNot() isTrue {
 				context.alert(Appcompat, AlertText.watchOnly).show()
 				return
 			}

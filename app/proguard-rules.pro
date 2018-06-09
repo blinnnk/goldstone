@@ -239,6 +239,7 @@
 -keepclassmembers public final enum com.fasterxml.jackson.annotation.JsonAutoDetect$Visibility {
     public static final com.fasterxml.jackson.annotation.JsonAutoDetect$Visibility *;
 }
+
 # Kotlin
 -keep class kotlin.** { *; }
 -keep class kotlin.Metadata { *; }

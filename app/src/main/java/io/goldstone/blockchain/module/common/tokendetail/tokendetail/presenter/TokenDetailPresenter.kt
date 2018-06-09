@@ -10,10 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TokenDetailText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.daysAgoInMills
 import io.goldstone.blockchain.crypto.toMills
@@ -24,7 +21,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
@@ -47,6 +43,7 @@ class TokenDetailPresenter(
 		// 详情页面直接全屏高度
 		setHeightMatchParent {
 			fragment.asyncData = arrayListOf()
+			updateEmptyCharData(fragment.token?.symbol.orEmpty())
 			// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
 			AnimationDuration.Default timeUpThen {
 				prepareTokenDetailData()
@@ -99,7 +96,7 @@ class TokenDetailPresenter(
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
 		TransactionTable.getTransactionsByAddressAndContract(
-			WalletTable.current.address,
+			Config.getCurrentAddress(),
 			fragment.token?.contract.orEmpty()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
@@ -115,6 +112,7 @@ class TokenDetailPresenter(
 	private fun TokenDetailFragment.loadDataFromChain() {
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
+				System.out.println("hello 1 $blockNumber")
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
 				TransactionListPresenter.getTransactionDataFromEtherScan(
 					this@loadDataFromChain,
@@ -124,12 +122,14 @@ class TokenDetailPresenter(
 						LogUtil.error("error in getTransactionDataFromEtherScan $it")
 					}
 				) {
-					context?.runOnUiThread {
-						// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-						it.find { it.contract.equals(token?.contract, true) }.isNotNull {
-							// 有数据后重新执行从数据库拉取数据
-							loadDataFromDatabaseOrElse()
-						} otherwise {
+					// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
+					it.find {
+						it.contract.equals(token?.contract, true)
+					}.isNotNull {
+						// 有数据后重新执行从数据库拉取数据
+						loadDataFromDatabaseOrElse()
+					} otherwise {
+						context?.runOnUiThread {
 							// 链上和本地都没有数据就更新一个空数组作为默认
 							updateChartBy(arrayListOf())
 							fragment.removeLoadingView()
@@ -204,7 +204,7 @@ class TokenDetailPresenter(
 						history.forEachIndexed { index, data ->
 							TokenBalanceTable.insertOrUpdate(
 								contract,
-								WalletTable.current.address,
+								Config.getCurrentAddress(),
 								data.date,
 								// 插入今日的余额数据
 								if (index == 0) todayBalance else data.balance
