@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -117,6 +118,8 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 				}.into(container)
 			}
 		} else {
+			// When transfer is end that recovery custom miner gas price value
+			MinerFeeType.Custom.value = 0
 			container.findViewById<View>(ElementID.mask)?.let {
 				container.removeView(it)
 			}

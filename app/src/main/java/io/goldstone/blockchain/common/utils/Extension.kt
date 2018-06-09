@@ -24,11 +24,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 21/03/2018 11:12 PM
  * @author KaySaith
  */
-
 /**
  * `View` 的便捷链式调用的方法
  * */
-
 fun <T : View> T.click(callback: (T) -> Unit): T {
 	onClick {
 		callback(this@click)
@@ -90,5 +88,11 @@ fun String.getDecimalCount(): Int? {
 		length - integerPlaces - 1
 	} else {
 		null
+	}
+}
+
+fun String.trimAfterColonSYmbol(): String {
+	return toString().trimStart {
+		it.toString().startsWith(":", true)
 	}
 }

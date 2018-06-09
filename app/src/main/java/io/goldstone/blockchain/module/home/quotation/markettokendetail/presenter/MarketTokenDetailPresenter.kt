@@ -11,10 +11,7 @@ import com.blinnnk.util.getParentFragment
 import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.daysAgoInMills
@@ -135,7 +132,10 @@ class MarketTokenDetailPresenter(
 		period: String,
 		dateType: Int
 	) {
-		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8) {
+		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8, {
+			// Show the error exception to user
+			fragment.context?.alert(it.toString().trimAfterColonSYmbol())
+		}) {
 			// 把数据更新到数据库
 			it.updateChartDataInDatabaseBy(period, pair)
 			// 更新 `UI` 界面
@@ -262,7 +262,13 @@ class MarketTokenDetailPresenter(
 			priceData: PriceHistoryModel
 		) -> Unit
 	) {
-		GoldStoneAPI.getQuotationCurrencyInfo(info.pair) { serverData ->
+		GoldStoneAPI.getQuotationCurrencyInfo(
+			info.pair,
+			{
+				// Show error information to user
+				fragment.context?.alert(it.toString().trimAfterColonSYmbol())
+			}
+		) { serverData ->
 			val tokenData = TokenInformationModel(serverData, info.symbol)
 			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
 			hold(tokenData, priceData)
@@ -297,7 +303,12 @@ class MarketTokenDetailPresenter(
 					description.isNullOrBlank()
 					|| !description?.substring(0, 2).equals(HoneyLanguage.getCurrentSymbol(), true)
 				) {
-					GoldStoneAPI.getQuotationCurrencyDescription(info.symbol) { description ->
+					GoldStoneAPI.getQuotationCurrencyDescription(
+						info.symbol,
+						{
+							LogUtil.error("getQuotationCurrencyDescription", it)
+						}
+					) { description ->
 						fragment.context?.runOnUiThread {
 							val content = description.substring(0, maxCount(description)) + "..."
 							tokenInfo.setTokenDescription(content)

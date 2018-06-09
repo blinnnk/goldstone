@@ -37,10 +37,10 @@ class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletD
 			currentAccount.onClick { presenter.showWalletSettingsFragment() }
 			addTokenButton.onClick { presenter.showTokenManagementFragment() }
 			sendButton.onClick {
-				presenter.showTransferSelectionOverlay(true)
+				presenter.setQuickTransferEvent(true)
 			}
 			depositButton.onClick {
-				presenter.showTransferSelectionOverlay(false)
+				presenter.setQuickTransferEvent(false)
 			}
 		}
 	}

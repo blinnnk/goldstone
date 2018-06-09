@@ -220,15 +220,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			it.isNull() isTrue {
 				searchInput.apply {
 					setCancelButton {
-						showSearchInput(false)
-						// 先取消键盘在执行取消时间
-						SoftKeyboard.hide(context as Activity)
 						// 取消搜索后自动清空搜索框里面的内容
 						searchInput.editText.text.clear()
+						SoftKeyboard.hide(context as Activity)
 						// 等待键盘完全收起后在执行动作防止页面抖动
-						50L timeUpThen {
-							cancelEvent()
-						}
+						cancelEvent()
+						showSearchInput(false)
 					}
 					AnimationDuration.Default timeUpThen {
 						editText.requestFocus()

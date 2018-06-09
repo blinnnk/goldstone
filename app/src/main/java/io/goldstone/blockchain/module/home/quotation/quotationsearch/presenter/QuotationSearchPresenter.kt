@@ -5,6 +5,8 @@ import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.trimAfterColonSYmbol
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -58,7 +60,13 @@ class QuotationSearchPresenter(
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(symbol) { searchList ->
+		GoldStoneAPI.getMarketSearchList(
+			symbol,
+			{
+				// Show error information to user
+				fragment.context?.alert(it.toString().trimAfterColonSYmbol())
+			}
+		) { searchList ->
 			// 获取本地自己选中的列表
 			QuotationSelectionTable.getMySelections { selectedList ->
 				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
