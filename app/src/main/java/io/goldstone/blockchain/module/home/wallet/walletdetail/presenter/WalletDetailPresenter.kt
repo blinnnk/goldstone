@@ -77,52 +77,23 @@ class WalletDetailPresenter(
 		}
 	}
 	
-	fun showTransferSelectionOverlay(isShowAddress: Boolean) {
+	fun setQuickTransferEvent(isShowAddress: Boolean) {
 		// Check current wallet is watch only or not
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
-				// Check current wallet has more than on token or not
-				MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
-					// Jump directly if there is only one type of token
-					if (myTokens.size == 1) {
-						defaultTokens.find {
-							it.contract.equals(myTokens.first().contract, true)
-						}?.let {
-							isShowAddress isTrue {
-								TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
-							} otherwise {
-								TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
-							}
+			MyTokenTable.getCurrentChainDefaultAndMyTokens { myTokens, defaultTokens ->
+				// Jump directly if there is only one type of token
+				if (myTokens.size == 1) {
+					defaultTokens.find {
+						it.contract.equals(myTokens.first().contract, true)
+					}?.let {
+						isShowAddress isTrue {
+							TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
+						} otherwise {
+							TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
 						}
-					} else {
-						fragment.showSelectionListOverlayView(myTokens, defaultTokens, isShowAddress)
 					}
-				}
-			}
-		}
-	}
-	
-	private fun WalletDetailFragment.showSelectionListOverlayView(
-		myTokens: ArrayList<MyTokenTable>,
-		defaultTokens: ArrayList<DefaultTokenTable>,
-		isShowAddress: Boolean
-	) {
-		// Prepare token list and show content scroll overlay view
-		getMainActivity()?.getMainContainer()?.apply {
-			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
-				val overlay = ContentScrollOverlayView(context)
-				overlay.into(this)
-				overlay.setTitle("Token Selection")
-				overlay.addContent {
-					topPadding = 10.uiPX()
-					defaultTokens.filter { default ->
-						myTokens.any { it.contract.equals(default.contract, true) }
-					}.let {
-						val data = it.sortedByDescending { it.weight }.toArrayList()
-						val tokenList = TokenSelectionRecyclerView(context)
-						tokenList.into(this)
-						tokenList.setAdapter(data, isShowAddress)
-					}
+				} else {
+					fragment.showSelectionListOverlayView(myTokens, defaultTokens, isShowAddress)
 				}
 			}
 		}
@@ -213,6 +184,32 @@ class WalletDetailPresenter(
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	private fun WalletDetailFragment.showSelectionListOverlayView(
+		myTokens: ArrayList<MyTokenTable>,
+		defaultTokens: ArrayList<DefaultTokenTable>,
+		isShowAddress: Boolean
+	) {
+		// Prepare token list and show content scroll overlay view
+		getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
+				overlay.into(this)
+				overlay.setTitle("Token Selection")
+				overlay.addContent {
+					topPadding = 10.uiPX()
+					defaultTokens.filter { default ->
+						myTokens.any { it.contract.equals(default.contract, true) }
+					}.let {
+						val data = it.sortedByDescending { it.weight }.toArrayList()
+						val tokenList = TokenSelectionRecyclerView(context)
+						tokenList.into(this)
+						tokenList.setAdapter(data, isShowAddress)
 					}
 				}
 			}

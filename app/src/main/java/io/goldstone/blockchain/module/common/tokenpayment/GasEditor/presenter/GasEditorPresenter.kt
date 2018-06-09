@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
@@ -29,8 +30,10 @@ class GasEditorPresenter(
 			return
 		}
 		
-		if (gasLimit < fragment.minLimit ?: 21000) {
-			fragment.context?.alert("${AlertText.gasLimitValue} ${fragment.minLimit ?: 21000}")
+		if (gasLimit < fragment.minLimit ?: CryptoValue.ethMinGasLimit) {
+			fragment.context?.alert(
+				"${AlertText.gasLimitValue} ${fragment.minLimit ?: CryptoValue.ethMinGasLimit}"
+			)
 			return
 		}
 		

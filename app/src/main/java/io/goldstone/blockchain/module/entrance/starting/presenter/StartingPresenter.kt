@@ -80,7 +80,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 		
-		fun updateLocalDefaultTokens(errorCallback: () -> Unit) {
+		fun updateLocalDefaultTokens(errorCallback: (Exception) -> Unit) {
 			doAsync {
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 					// 没有网络数据直接返回

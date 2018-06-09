@@ -149,7 +149,6 @@ class TransactionListPresenter(
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			System.out.println("hello 2")
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
@@ -171,7 +170,6 @@ class TransactionListPresenter(
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
-			System.out.println("hello 3")
 			return object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = 2
 				// Get transaction data from `etherScan`
@@ -216,7 +214,6 @@ class TransactionListPresenter(
 				}
 				
 				override fun mergeCallBack() {
-					System.out.println("hello 4")
 					coroutinesTask(
 						{
 							arrayListOf<TransactionTable>().apply {
@@ -280,7 +277,6 @@ class TransactionListPresenter(
 			data: ArrayList<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			System.out.println("hello 5")
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
 			data.getUnkonwTokenInfoByTransactions {
 				// 把拉取到的数据加工数据格式并插入本地数据库
@@ -322,7 +318,6 @@ class TransactionListPresenter(
 			data: ArrayList<TransactionTable>,
 			hold: ArrayList<TransactionTable>.() -> Unit
 		) {
-			System.out.println("hello 6")
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = data.size
 				override fun concurrentJobs() {

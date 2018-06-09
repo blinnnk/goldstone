@@ -87,6 +87,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	private val chartView = LineChartView(context)
 	private var cellLayout: RelativeLayout
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
+		
 		if (chartData.isEmpty()) {
 			if (model.price != ValueTag.emptyPrice) {
 				chartData.addAll(
@@ -124,7 +125,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 					dataSet.addPoint(numberDate(it.label.toLong()), it.value)
 				}
 				// 比对如果最后一个不是今天那么把当前长连接的价格插入表格
-				if (chartData.last().label.toLong() != 0.daysAgoInMills()) {
+				if (chartData.last().label.toLong() != 0.daysAgoInMills() && chartData.size < 8) {
 					dataSet.addPoint(
 						numberDate(0.daysAgoInMills()),
 						model.price.toFloatOrNull() ?: chartData.last().value

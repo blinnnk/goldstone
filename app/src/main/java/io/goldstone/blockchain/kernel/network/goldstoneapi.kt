@@ -20,6 +20,7 @@ import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
@@ -53,7 +54,7 @@ object GoldStoneAPI {
 	 */
 	@JvmStatic
 	fun getDefaultTokens(
-		errorCallback: () -> Unit = {},
+		errorCallback: (Exception) -> Unit = {},
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		requestData<String>(APIPath.defaultTokenList, "data", true, errorCallback) {
@@ -89,18 +90,29 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCoinInfoBySymbolFromGoldStone(
 		symbols: String,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
-		requestData<TokenSearchModel>(APIPath.getCoinInfo + symbols, "list") {
+		requestData<TokenSearchModel>(
+			APIPath.getCoinInfo + symbols,
+			"list",
+			errorCallback = errorCallback
+		) {
 			hold(toArrayList())
 		}
 	}
 	
 	@JvmStatic
 	fun getNewVersionOrElse(
+		errorCallback: (Exception) -> Unit = {},
 		hold: (VersionModel?) -> Unit
 	) {
-		requestData<String>(APIPath.getNewVersion, "", true) {
+		requestData<String>(
+			APIPath.getNewVersion,
+			"",
+			true,
+			errorCallback
+		) {
 			val data = JSONObject(this[0])
 			val hasNewVersion =
 				data.safeGet("has_new_version").toIntOrNull().orZero() == TinyNumber.True.value
@@ -117,20 +129,51 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
-		errorCallback: () -> Unit,
+		errorCallback: (Exception) -> Unit,
 		hold: (Double) -> Unit
 	) {
-		requestData<String>(APIPath.getCurrencyRate + symbols, "rate", true, errorCallback) {
+		requestData<String>(
+			APIPath.getCurrencyRate + symbols,
+			"rate",
+			true,
+			errorCallback
+		) {
 			this[0].isNotNull { hold(this[0].toDouble()) }
+		}
+	}
+	
+	@JvmStatic
+	fun getShareContent(
+		errorCallback: (Exception) -> Unit,
+		hold: (ShareContentModel) -> Unit
+	) {
+		// Get server copywriting when user click share software button everytime
+		// this is an important behavior so it need to set a short connect timeout value
+		val timeOutValue = 3L
+		requestData<String>(
+			APIPath.getShareContent,
+			"data",
+			true,
+			errorCallback,
+			timeOutValue
+		) {
+			this[0].isNotNull {
+				hold(ShareContentModel(JSONObject(this[0])))
+			}
 		}
 	}
 	
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<QuotationSelectionTable>) -> Unit
 	) {
-		requestData<QuotationSelectionTable>(APIPath.marketSearch + pair, "pair_list") {
+		requestData<QuotationSelectionTable>(
+			APIPath.marketSearch + pair,
+			"pair_list",
+			errorCallback = errorCallback
+		) {
 			hold(toArrayList())
 		}
 	}
@@ -178,7 +221,7 @@ object GoldStoneAPI {
 		isChina: Int,
 		isAndroid: Int,
 		chainID: Int,
-		errorCallback: () -> Unit,
+		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
@@ -195,6 +238,7 @@ object GoldStoneAPI {
 	
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
+		errorCallback: (Exception) -> Unit = {},
 		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
 	) {
 		RequestBody.create(
@@ -204,7 +248,8 @@ object GoldStoneAPI {
 			postRequestGetJsonObject<QuotationSelectionLineChartModel>(
 				it,
 				"data_list",
-				APIPath.getCurrencyLineChartData
+				APIPath.getCurrencyLineChartData,
+				errorCallback = errorCallback
 			) {
 				hold(it.toArrayList())
 			}
@@ -214,14 +259,14 @@ object GoldStoneAPI {
 	fun registerWalletAddress(
 		addressList: JsonArray,
 		deviceID: String,
-		netWorkError: () -> Unit = {},
+		errorCallback: (Exception) -> Unit = {},
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
 			requestContentType,
 			AesCrypto.encrypt("{\"address_list\":$addressList,\"device\":\"$deviceID\"}").orEmpty()
 		).let {
-			postRequest(it, APIPath.updateAddress, netWorkError) {
+			postRequest(it, APIPath.updateAddress, errorCallback) {
 				hold(it)
 			}
 		}
@@ -230,13 +275,17 @@ object GoldStoneAPI {
 	fun getUnreadCount(
 		deviceID: String,
 		time: Long,
-		netWorkError: () -> Unit = {},
+		errorCallback: (Exception) -> Unit = {},
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
 			requestContentType, AesCrypto.encrypt("{\"device\":\"$deviceID\",\"time\":$time}").orEmpty()
 		).let {
-			postRequest(it, APIPath.getUnreadCount, netWorkError) {
+			postRequest(
+				it,
+				APIPath.getUnreadCount,
+				errorCallback
+			) {
 				hold(JSONObject(it).safeGet("count"))
 			}
 		}
@@ -245,7 +294,7 @@ object GoldStoneAPI {
 	fun getNotificationList(
 		goldSonteID: String,
 		time: Long,
-		errorCallback: () -> Unit,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
 		// 加密 `Post` 请求
@@ -279,7 +328,7 @@ object GoldStoneAPI {
 	
 	fun getPriceByContractAddress(
 		addressList: JsonArray,
-		errorCallback: () -> Unit,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenPriceModel>) -> Unit
 	) {
 		// 加密 `Post` 请求
@@ -289,7 +338,8 @@ object GoldStoneAPI {
 				it,
 				"price_list",
 				APIPath.getPriceByAddress,
-				errorCallback = { errorCallback() }) {
+				errorCallback = errorCallback
+			) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
 				}
@@ -301,11 +351,13 @@ object GoldStoneAPI {
 		pair: String,
 		period: String,
 		size: Int,
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<ChartModel>) -> Unit
 	) {
 		requestData<ChartModel>(
 			APIPath.getQuotationCurrencyChart(pair, period, size),
-			"point_list"
+			"point_list",
+			errorCallback = errorCallback
 		) {
 			hold(this.toArrayList())
 		}
@@ -313,19 +365,29 @@ object GoldStoneAPI {
 	
 	fun getQuotationCurrencyInfo(
 		pair: String,
+		errorCallback: (Exception) -> Unit,
 		hold: (JSONObject) -> Unit
 	) {
-		requestData<String>(APIPath.getQuotationCurrencyInfo(pair), "", true) {
+		requestData<String>(
+			APIPath.getQuotationCurrencyInfo(pair),
+			"",
+			true,
+			errorCallback
+		) {
 			hold(JSONObject(this[0]))
 		}
 	}
 	
 	fun getQuotationCurrencyDescription(
 		symbol: String,
+		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getTokenDescription + symbol, "", true
+			APIPath.getTokenDescription + symbol,
+			"",
+			true,
+			errorCallback
 		) {
 			this[0].let {
 				hold(JSONObject(it).safeGet("description"))
@@ -334,25 +396,27 @@ object GoldStoneAPI {
 	}
 	
 	/**————————————————————— public network request method ———————————————————————*/
-	private val client =
-		OkHttpClient
-			.Builder()
-			.connectTimeout(30, TimeUnit.SECONDS)
-			.readTimeout(40, TimeUnit.SECONDS)
-			.build()
-	
 	private inline fun <reified T> postRequestGetJsonObject(
 		body: RequestBody,
 		keyName: String,
 		path: String,
 		justData: Boolean = false,
-		noinline errorCallback: () -> Unit = {},
+		noinline errorCallback: (Exception) -> Unit,
 		crossinline hold: (List<T>) -> Unit
 	) {
+		val client =
+			OkHttpClient
+				.Builder()
+				.connectTimeout(20, TimeUnit.SECONDS)
+				.readTimeout(30, TimeUnit.SECONDS)
+				.build()
+		
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
-					errorCallback()
+					GoldStoneAPI.context.runOnUiThread {
+						errorCallback(error)
+					}
 					LogUtil.error(path, error)
 				}
 				
@@ -373,7 +437,11 @@ object GoldStoneAPI {
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
 						LogUtil.error(keyName, error)
-						GoldStoneCode.showErrorCodeReason(data, errorCallback)
+						GoldStoneCode.showErrorCodeReason(data, {
+							GoldStoneAPI.context.runOnUiThread {
+								errorCallback(error)
+							}
+						})
 					}
 				}
 			})
@@ -383,23 +451,26 @@ object GoldStoneAPI {
 	private fun postRequest(
 		body: RequestBody,
 		path: String,
-		netWorkError: () -> Unit = {},
+		netWorkError: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
+		val client =
+			OkHttpClient
+				.Builder()
+				.connectTimeout(20, TimeUnit.SECONDS)
+				.readTimeout(30, TimeUnit.SECONDS)
+				.build()
+		
 		getcryptoRequest(body, path) {
 			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(
-					call: Call,
-					error: IOException
-				) {
+				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
-					netWorkError()
+					GoldStoneAPI.context.runOnUiThread {
+						netWorkError(error)
+					}
 				}
 				
-				override fun onResponse(
-					call: Call,
-					response: Response
-				) {
+				override fun onResponse(call: Call, response: Response) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
 						hold(data.orEmpty())
@@ -416,13 +487,23 @@ object GoldStoneAPI {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline netWorkError: () -> Unit = {},
+		crossinline errorCallback: (Exception) -> Unit,
+		maxConnectTime: Long = 20,
 		crossinline hold: List<T>.() -> Unit
 	) {
+		val client =
+			OkHttpClient
+				.Builder()
+				.connectTimeout(maxConnectTime, TimeUnit.SECONDS)
+				.readTimeout(30, TimeUnit.SECONDS)
+				.build()
+		
 		getcryptGetRequest(api) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
-					netWorkError()
+					GoldStoneAPI.context.runOnUiThread {
+						errorCallback(error)
+					}
 					LogUtil.error(keyName + "requestData", error)
 				}
 				
@@ -441,7 +522,9 @@ object GoldStoneAPI {
 							hold(gson.fromJson(jsonData, collectionType))
 						}
 					} catch (error: Exception) {
-						netWorkError()
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback(error)
+						}
 						GoldStoneCode.showErrorCodeReason(data)
 						LogUtil.error("$keyName requestData", error)
 					}

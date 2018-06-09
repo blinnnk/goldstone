@@ -60,10 +60,17 @@ class TokenSearchPresenter(
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		
 		fragment.showLoadingView(LoadingText.searchingToken)
-		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content) { result ->
+		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(content, {
+			// Usually this kinds of Exception will be connect to the service Timeout
+			fragment.context?.alert(
+				it.toString().trimStart {
+					it.toString().startsWith(":", true)
+				}
+			)
+		}) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getCurrentChainTokensWithAddress(Config.getCurrentAddress()) { localTokens ->
+				MyTokenTable.getCurrentChainTokensWithAddress { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {

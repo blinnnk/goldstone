@@ -111,6 +111,7 @@ class GasSelectionPresenter(
 	}
 	
 	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
+		// Prevent user click the other button at this time
 		fragment.showMaskView(true)
 		val token = fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
@@ -337,7 +338,8 @@ class GasSelectionPresenter(
 	}
 	
 	private fun prepareGasLimit(gasPrice: Long): Long {
-		return if (gasPrice == MinerFeeType.Custom.value) gasFeeFromCustom()?.gasLimit.orElse(0)
+		return if (gasPrice == MinerFeeType.Custom.value)
+			gasFeeFromCustom()?.gasLimit.orElse(0)
 		else prepareModel?.gasLimit?.toLong().orElse(0)
 	}
 	

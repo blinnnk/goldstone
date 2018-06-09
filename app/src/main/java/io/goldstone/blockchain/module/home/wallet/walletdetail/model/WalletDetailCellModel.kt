@@ -156,7 +156,10 @@ data class WalletDetailCellModel(
 		
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
 			map { it.contract }.toJsonArray {
-				GoldStoneAPI.getPriceByContractAddress(it, callback) { newPrices ->
+				GoldStoneAPI.getPriceByContractAddress(it, {
+					callback()
+					LogUtil.error("updateMyTokensPrices", it)
+				}) { newPrices ->
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = newPrices.size
 						override fun concurrentJobs() {

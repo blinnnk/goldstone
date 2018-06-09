@@ -73,7 +73,7 @@ data class AppConfigTable(
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						it[0].pushToken = token
+						update(it[0].apply { pushToken = token })
 					}
 				}
 			}

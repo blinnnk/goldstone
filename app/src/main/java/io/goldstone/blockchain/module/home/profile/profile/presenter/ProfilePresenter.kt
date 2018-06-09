@@ -13,6 +13,7 @@ import com.blinnnk.util.PermissionCategory
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
@@ -154,12 +155,27 @@ class ProfilePresenter(
 	
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
-		intent.putExtra(
-			Intent.EXTRA_TEXT,
-			ProfileText.shareContent
-		)
-		intent.type = "text/plain"
-		fragment.context?.startActivity(Intent.createChooser(intent, "share"))
+		fun getShareContentThenShowView(content: String) {
+			intent.putExtra(
+				Intent.EXTRA_TEXT,
+				content
+			)
+			intent.type = "text/plain"
+			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
+		}
+		GoldStoneAPI.getShareContent(
+			{
+				LogUtil.error("showShareChooser", it)
+				getShareContentThenShowView(ProfileText.shareContent)
+			}
+		) {
+			val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
+				ProfileText.shareContent
+			} else {
+				"${it.title}\n${it.content}\n${it.url}"
+			}
+			getShareContentThenShowView(shareText)
+		}
 	}
 	
 	private fun getCurrentLanguageSymbol() =

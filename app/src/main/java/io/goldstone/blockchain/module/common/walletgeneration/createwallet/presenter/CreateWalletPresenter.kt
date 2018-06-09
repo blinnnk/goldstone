@@ -165,7 +165,7 @@ class CreateWalletPresenter(
 		 */
 		fun generateMyTokenInfo(
 			ownerAddress: String,
-			errorCallback: () -> Unit,
+			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
 		) {
 			// 首先从本地查找数据

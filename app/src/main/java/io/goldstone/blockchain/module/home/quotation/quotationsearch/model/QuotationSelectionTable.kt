@@ -6,6 +6,7 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -83,7 +84,8 @@ data class QuotationSelectionTable(
 	companion object {
 		
 		fun insertSelection(
-			table: QuotationSelectionTable, callback: () -> Unit
+			table: QuotationSelectionTable,
+			callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
@@ -91,7 +93,12 @@ data class QuotationSelectionTable(
 					getQuotationSelfSelections().let {
 						val currentID = it.maxBy { it.orderID }?.orderID
 						val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
-						GoldStoneAPI.getQuotationCurrencyDescription(table.baseSymnbol) { description ->
+						GoldStoneAPI.getQuotationCurrencyDescription(
+							table.baseSymnbol,
+							{
+								LogUtil.error("insertSelection", it)
+							}
+						) { description ->
 							insert(table.apply {
 								orderID = newOrderID
 								this.description = HoneyLanguage.getLanguageSymbol(

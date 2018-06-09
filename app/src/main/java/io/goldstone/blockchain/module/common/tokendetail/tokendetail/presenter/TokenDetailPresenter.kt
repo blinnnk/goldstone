@@ -112,7 +112,6 @@ class TokenDetailPresenter(
 	private fun TokenDetailFragment.loadDataFromChain() {
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
-				System.out.println("hello 1 $blockNumber")
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
 				TransactionListPresenter.getTransactionDataFromEtherScan(
 					this@loadDataFromChain,

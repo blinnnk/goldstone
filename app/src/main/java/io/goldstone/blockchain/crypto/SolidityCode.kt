@@ -25,6 +25,7 @@ object CryptoValue {
 	const val taxHashLength = 66
 	// GoldStone 业务约定的值
 	const val ethContract = "0x0"
+	const val ethMinGasLimit = 21000L
 }
 
 object CryptoSymbol {

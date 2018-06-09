@@ -68,6 +68,20 @@ data class MyTokenTable(
 			}
 		}
 		
+		fun getCurrentChainDefaultAndMyTokens(
+			hold: (
+				myTokens: ArrayList<MyTokenTable>,
+				defaultTokens: ArrayList<DefaultTokenTable>
+			) -> Unit
+		) {
+			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
+				// Check current wallet has more than on token or not
+				MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
+					hold(myTokens, defaultTokens)
+				}
+			}
+		}
+		
 		fun getCurrentChainTokenByContract(
 			contract: String,
 			callback: (MyTokenTable?) -> Unit
