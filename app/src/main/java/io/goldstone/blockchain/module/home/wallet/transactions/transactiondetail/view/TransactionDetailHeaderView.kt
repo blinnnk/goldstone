@@ -92,7 +92,8 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	) {
 		val type = if (headerModel.isReceive) TransactionText.transferResultReceived else TransactionText.transferResultSent
 		info.title.text =
-			"$type${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive) TransactionText.transferResultFrom else TransactionText.transferResultTo}"
+			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
+				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address
 		
 		if (headerModel.isError) {

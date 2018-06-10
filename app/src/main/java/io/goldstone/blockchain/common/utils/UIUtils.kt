@@ -6,8 +6,8 @@ import android.text.format.DateUtils
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.R.drawable.*
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.common.value.WalletNameText
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**
  * @date 21/03/2018 9:07 PM

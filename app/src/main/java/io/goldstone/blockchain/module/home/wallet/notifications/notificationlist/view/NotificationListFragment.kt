@@ -37,7 +37,8 @@ class NotificationListFragment :
 								NotificationTable.getChianID(extra.orEmpty()),
 								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse(),
 								NotificationTable.getSymbol(extra.orEmpty()),
-								NotificationTable.getValue(extra.orEmpty())
+								NotificationTable.getValue(extra.orEmpty()),
+								createTime
 							)
 						)
 					}

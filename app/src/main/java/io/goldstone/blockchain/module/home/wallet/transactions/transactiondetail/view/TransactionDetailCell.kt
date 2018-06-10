@@ -23,23 +23,22 @@ import org.jetbrains.anko.wrapContent
  * @date 27/03/2018 3:27 AM
  * @author KaySaith
  */
-
 open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
-
+	
 	var model: TransactionDetailModel by observing(TransactionDetailModel()) {
 		description.text = model.description
-		info.text = if (model.info.isEmpty()) "Get Information" else model.info
+		info.text =
+			if (model.info.isEmpty()) "There isn't a memo.."
+			else model.info
 	}
-
 	private val description = TextView(context)
 	private val info = TextView(context)
-
+	
 	init {
-
 		this.setWillNotDraw(false)
-
+		
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.cellHeight)
-
+		
 		verticalLayout {
 			x = PaddingSize.device.toFloat()
 			description.apply {
@@ -50,7 +49,7 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 					topMargin = 15.uiPX()
 				}
 			}.into(this)
-
+			
 			info.apply {
 				textSize = fontSize(14)
 				textColor = GrayScale.black
@@ -58,35 +57,35 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 				y += 2.uiPX()
 			}.into(this)
-
 		}.let {
 			setCenterInVertical()
 		}
-
 	}
-
+	
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		color = GrayScale.lightGray
 		style = Paint.Style.FILL
 	}
-
+	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-
+		
 		canvas?.drawLine(
-			PaddingSize.device.toFloat(), height - BorderSize.default, (width - PaddingSize.device).toFloat(),
-			height - BorderSize.default, paint
+			PaddingSize.device.toFloat(),
+			height - BorderSize.default,
+			(width - PaddingSize.device).toFloat(),
+			height - BorderSize.default,
+			paint
 		)
 	}
-
+	
 	fun setContentColor(color: Int) {
 		info.textColor = color
 		info.text =
 			if (info.text.length > 130) (info.text.substring(0, 130) + "...").setUnderline()
 			else info.text.toString().setUnderline()
 	}
-
 }
 
 

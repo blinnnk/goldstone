@@ -1,13 +1,14 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -210,7 +211,7 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getTransactionListModelsByAddress(
+		fun getListModelsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
@@ -280,7 +281,7 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getTransactionsByAddressAndContract(
+		fun getByAddressAndContract(
 			walletAddress: String,
 			contract: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -290,7 +291,7 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getTransactionsByAddressAndContract(walletAddress, contract)
+						.getByAddressAndContract(walletAddress, contract)
 				}) {
 				hold(it.toArrayList())
 			}
@@ -338,42 +339,34 @@ data class TransactionTable(
 			}
 		}
 		
-		fun updateInputCodeByHash(
-			taxHash: String,
-			input: String,
-			callback: () -> Unit
-		) {
-			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash).let {
-					it.forEachOrEnd { item, isEnd ->
-						update(item.apply { this.input = input })
-						if (isEnd) callback()
-					}
-				}
-			}
-		}
-		
-		fun updateMemoByHashAndReceiveStatus(
+		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
 			chainID: String = Config.getCurrentChain(),
 			callback: (memo: String) -> Unit
 		) {
-			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) {
-				GoldStoneEthCall.apply {
-					getInputCodeByHash(hash, chainID, { _, _ ->
-						// error callback if need do something
-					}) { input ->
-						val isErc20 = CryptoUtils.isERC20TransferByInputCode(input)
-						val memo = getMemoFromInputCode(input, isErc20)
-						if (it.isNull()) {
-							GoldStoneAPI.context.runOnUiThread { callback(memo) }
-						} else {
-							GoldStoneDataBase.database.transactionDao().update(it!!.apply {
+			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
+				if (transaction.isNull() || transaction?.memo?.isNotEmpty() == true) {
+					callback(transaction?.memo.orEmpty())
+				} else {
+					GoldStoneEthCall.apply {
+						getInputCodeByHash(
+							hash,
+							chainID,
+							{ error, reason ->
+								reason?.let { context.alert(it) }
+								LogUtil.error("getByHashAndReceivedStatus", error)
+							}
+						) { input ->
+							val isErc20 = CryptoUtils.isERC20TransferByInputCode(input)
+							val memo = getMemoFromInputCode(input, isErc20)
+							GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
 								this.input = input
 								this.memo = memo
 							})
-							GoldStoneAPI.context.runOnUiThread { callback(memo) }
+							GoldStoneAPI.context.runOnUiThread {
+								callback(memo)
+							}
 						}
 					}
 				}
@@ -398,10 +391,8 @@ data class TransactionTable(
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getTransactionByTaxHashAndReceivedStatus(hash, isReceived)
+					GoldStoneDataBase.database.transactionDao()
+						.getByTaxHashAndReceivedStatus(hash, isReceived)
 				}) {
 				hold(it)
 			}
@@ -425,24 +416,22 @@ interface TransactionDao {
 	)
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 	
-	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND chainID LIKE :chainID")
+	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
 	fun getTransactionByTaxHash(
-		taxHash: String,
-		chainID: String = Config.getCurrentChain()
+		taxHash: String
 	):
 		List<TransactionTable>
 	
-	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive AND chainID LIKE :chainID")
-	fun getTransactionByTaxHashAndReceivedStatus(
+	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
+	fun getByTaxHashAndReceivedStatus(
 		taxHash: String,
-		isReceive: Boolean,
-		chainID: String = Config.getCurrentChain()
+		isReceive: Boolean
 	): TransactionTable?
 	
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC"
 	)
-	fun getTransactionsByAddressAndContract(
+	fun getByAddressAndContract(
 		walletAddress: String,
 		contract: String
 	): List<TransactionTable>

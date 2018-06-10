@@ -954,7 +954,7 @@ object CommonText {
 	}
 	@JvmField
 	val from = when (currentLanguage) {
-		HoneyLanguage.English.code -> "FROM"
+		HoneyLanguage.English.code -> "From"
 		HoneyLanguage.Chinese.code -> "发送者"
 		HoneyLanguage.Japanese.code -> "送信者"
 		HoneyLanguage.Korean.code -> "발신자"
@@ -964,7 +964,7 @@ object CommonText {
 	}
 	@JvmField
 	val to = when (currentLanguage) {
-		HoneyLanguage.English.code -> "TO"
+		HoneyLanguage.English.code -> "To"
 		HoneyLanguage.Chinese.code -> "发送至"
 		HoneyLanguage.Japanese.code -> "送信先"
 		HoneyLanguage.Korean.code -> "수신자"
@@ -985,7 +985,6 @@ object CommonText {
 }
 
 object AlertText {
-	
 	@JvmField
 	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current wallet is watch-only. This operation is not allowed."

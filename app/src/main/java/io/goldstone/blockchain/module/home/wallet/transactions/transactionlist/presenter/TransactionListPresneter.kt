@@ -68,7 +68,7 @@ class TransactionListPresenter(
 	}
 	
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getTransactionListModelsByAddress(Config.getCurrentAddress()) {
+		TransactionTable.getListModelsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
@@ -152,7 +152,7 @@ class TransactionListPresenter(
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
-			mergeNormalAndTokenIncomingTransactions(startBlock, errorCallback) {
+			mergeETHAndERC20IncomingTransactions(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					fragment.filterCompletedData(it, hold)
@@ -165,7 +165,7 @@ class TransactionListPresenter(
 			}.start()
 		}
 		
-		private fun mergeNormalAndTokenIncomingTransactions(
+		private fun mergeETHAndERC20IncomingTransactions(
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -302,7 +302,9 @@ class TransactionListPresenter(
 						}
 						
 						override fun mergeCallBack() {
-							hold(map { TransactionListModel(it) }.toArrayList())
+							hold(map {
+								TransactionListModel(it)
+							}.toArrayList())
 							removeLoadingView()
 						}
 					}.start()

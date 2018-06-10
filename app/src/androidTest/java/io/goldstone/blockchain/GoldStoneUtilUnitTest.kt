@@ -3,11 +3,11 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import io.goldstone.blockchain.common.component.LineChart
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationCell
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,7 +33,7 @@ class GoldStoneUtilUnitTest {
 	
 	@Test
 	fun getChartValue() {
-		QuotationCell.getChardGridValue(4100f, 4111f) { min, max, step ->
+		LineChart.generateChardGridValue(4100f, 4111f) { min, max, step ->
 			LogUtil.debug("$positon getChartValue", "min - $min max - $max step - $step")
 		}
 	}

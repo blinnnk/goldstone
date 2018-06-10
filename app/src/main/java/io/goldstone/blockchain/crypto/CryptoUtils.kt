@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto
 import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -63,7 +64,7 @@ object CryptoUtils {
 			count = inputCode.substring(74, 138).hexToDecimal()
 			return InputCodeData("transfer", address, count)
 		} otherwise {
-			println("not a contract transfer")
+			LogUtil.debug("loadTransferInfoFromInputData", "not a contract transfer")
 			return null
 		}
 	}

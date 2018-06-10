@@ -5,6 +5,9 @@ import android.app.Application
 import com.blinnnk.extension.isNull
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
+import com.instabug.library.Instabug
+import com.instabug.library.invocation.InstabugInvocationEvent
+import io.goldstone.blockchain.common.value.InstaBug
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -29,6 +32,10 @@ class GoldStoneApp : Application() {
 		GoldStoneEthCall.context = this
 		// init `Api` context
 		GoldStoneAPI.context = this
+		// register the instabug system
+		Instabug.Builder(this, InstaBug.key)
+			.setInvocationEvent(InstabugInvocationEvent.SHAKE)
+			.build()
 	}
 	
 	/**

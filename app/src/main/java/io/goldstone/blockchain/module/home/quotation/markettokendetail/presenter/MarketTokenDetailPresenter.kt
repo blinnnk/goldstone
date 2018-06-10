@@ -8,7 +8,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
-import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.*
@@ -21,6 +20,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Cha
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
+import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -30,9 +30,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-@Suppress(
-	"DEPRECATION", "IMPLICIT_CAST_TO_ANY"
-)
 /**
  * @date 25/04/2018 6:52 AM
  * @author KaySaith
@@ -176,12 +173,16 @@ class MarketTokenDetailPresenter(
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
 				// 服务器抓取的数据返回有一定概率返回错误格式数据
-				chartData = try {
-					data.sortedBy { it.timestamp.toLongOrNull().orElse(0) }.map {
-						// 服务器抓取数据这里很容易返回格式不正确的数据, 使用 `try catch` 捕捉
-						val date = DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType)
-						Point(date, it.price.toFloat())
-					}.toArrayList()
+				try {
+					updateData(
+						data.sortedBy {
+							it.timestamp.toLongOrNull().orElse(0)
+						}.map {
+							// 服务器抓取数据这里很容易返回格式不正确的数据, 使用 `try catch` 捕捉
+							val date = DateUtils.formatDateTime(this, it.timestamp.toLong(), dateType)
+							ChartPoint(date, it.price.toFloat())
+						}.toArrayList()
+					)
 				} catch (error: Exception) {
 					LogUtil.error("updateChartUI", error)
 					return@runOnUiThread

@@ -5,9 +5,14 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.util.Log
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import junit.framework.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +68,25 @@ class GoldStoneServerUnitTest {
 			assertTrue("Share title is empty", it.title.isNotEmpty())
 			assertTrue("Share content is empty", it.content.isNotEmpty())
 			assertTrue("Share url is empty", it.url.isNotEmpty())
+		}
+	}
+	
+	@Test
+	fun getNotificationList() {
+		NotificationTable.getAllNotifications { localData ->
+			AppConfigTable.getAppConfig { config ->
+				val latestTime = localData.maxBy { it.createTime }?.createTime
+				val requestTime = if (latestTime.isNull()) 0 else latestTime!!
+				GoldStoneAPI.getNotificationList(
+					config?.goldStoneID.orEmpty(),
+					requestTime,
+					{
+						LogUtil.error("$positon getNotificationList", it)
+					}
+				) {
+					Log.d("$positon + getNotificationList", it.toString())
+				}
+			}
 		}
 	}
 }
