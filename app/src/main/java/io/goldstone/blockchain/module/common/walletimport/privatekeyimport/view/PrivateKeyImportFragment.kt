@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import org.jetbrains.anko.AnkoContext
@@ -56,6 +57,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.password
+					setPasswordSafeLevel()
 				}.into(this)
 				
 				repeatPassword.apply {
@@ -104,6 +106,12 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					}
 				}.into(this)
 			}
+		}
+	}
+	
+	private fun RoundInput.setPasswordSafeLevel() {
+		afterTextChanged = Runnable {
+			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
 		}
 	}
 }
