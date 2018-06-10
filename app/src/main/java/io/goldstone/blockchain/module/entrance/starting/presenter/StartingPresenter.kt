@@ -7,9 +7,12 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -38,6 +41,21 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	}
 	
 	companion object {
+		
+		fun updateShareContentFromServer() {
+			GoldStoneAPI.getShareContent(
+				{
+					LogUtil.error("showShareChooser", it)
+				}
+			) {
+				val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
+					ProfileText.shareContent
+				} else {
+					"${it.title}\n${it.content}\n${it.url}"
+				}
+				AppConfigTable.updateShareContent(shareText)
+			}
+		}
 		
 		fun insertLocalTokens(context: Context, callback: () -> Unit) {
 			doAsync {

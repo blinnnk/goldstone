@@ -13,10 +13,10 @@ import com.blinnnk.util.PermissionCategory
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -163,18 +163,11 @@ class ProfilePresenter(
 			intent.type = "text/plain"
 			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 		}
-		GoldStoneAPI.getShareContent(
-			{
-				LogUtil.error("showShareChooser", it)
-				getShareContentThenShowView(ProfileText.shareContent)
+		
+		AppConfigTable.getAppConfig {
+			it?.apply {
+				getShareContentThenShowView(shareContent)
 			}
-		) {
-			val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
-				ProfileText.shareContent
-			} else {
-				"${it.title}\n${it.content}\n${it.url}"
-			}
-			getShareContentThenShowView(shareText)
 		}
 	}
 	
