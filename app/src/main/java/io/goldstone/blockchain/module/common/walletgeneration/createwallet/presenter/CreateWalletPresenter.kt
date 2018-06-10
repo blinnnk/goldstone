@@ -90,6 +90,7 @@ class CreateWalletPresenter(
 			setConfirmButtonStyle(confirmButton)
 		}
 		passwordInput.afterTextChanged = Runnable {
+			showPasswordSafeLevel(passwordInput)
 			passwordInput.getContent { passwordText = it }
 			setConfirmButtonStyle(confirmButton)
 		}
@@ -160,6 +161,19 @@ class CreateWalletPresenter(
 	}
 	
 	companion object {
+		
+		fun showPasswordSafeLevel(passwordInput: RoundInput) {
+			passwordInput.apply {
+				val password = text.toString()
+				password.checkPasswordInRules { SafeLevel, _ ->
+					context?.apply {
+						runOnUiThread {
+							setAlertStyle(SafeLevel)
+						}
+					}
+				}
+			}
+		}
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */

@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
@@ -32,11 +33,15 @@ open class RoundInput(context: Context) : EditText(context) {
 	var title by observing("") {
 		invalidate()
 	}
+	private var safeLevel = ""
 	private val paint = Paint()
 	private val textPaint = Paint()
+	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()
 	private var maxCount = 16
+	private var themeColor = Spectrum.blue
+	private var showAlert = false
 	
 	init {
 		paint.isAntiAlias = true
@@ -53,6 +58,12 @@ open class RoundInput(context: Context) : EditText(context) {
 		textPaint.color = GrayScale.midGray
 		textPaint.typeface = GoldStoneFont.heavy(context)
 		textPaint.textSize = titleSize
+		
+		alertPaint.isAntiAlias = true
+		alertPaint.style = Paint.Style.FILL
+		alertPaint.color = GrayScale.midGray
+		alertPaint.typeface = GoldStoneFont.heavy(context)
+		alertPaint.textSize = 11.uiPX().toFloat()
 		
 		singleLine = true
 		
@@ -95,17 +106,48 @@ open class RoundInput(context: Context) : EditText(context) {
 		
 		onFocusChange { _, hasFocus ->
 			if (hasFocus) {
-				paint.color = Spectrum.blue
-				textPaint.color = Spectrum.blue
-				textColor = Spectrum.blue
+				paint.color = themeColor
+				textPaint.color = themeColor
+				textColor = themeColor
 				invalidate()
 			} else {
+				showAlert = false
 				paint.color = GrayScale.lightGray
 				textPaint.color = GrayScale.midGray
 				textColor = GrayScale.black
 				invalidate()
 			}
 		}
+	}
+	
+	fun setAlertStyle(style: SafeLevel) {
+		showAlert = true
+		when (style) {
+			SafeLevel.High -> {
+				themeColor = Spectrum.green
+				safeLevel = SafeLevel.High.info.toUpperCase()
+			}
+			
+			SafeLevel.Strong -> {
+				themeColor = Spectrum.green
+				safeLevel = SafeLevel.Strong.info.toUpperCase()
+			}
+			
+			SafeLevel.Normal -> {
+				themeColor = Spectrum.darkBlue
+				safeLevel = SafeLevel.Normal.info.toUpperCase()
+			}
+			
+			SafeLevel.Weak -> {
+				themeColor = Spectrum.lightRed
+				safeLevel = SafeLevel.Weak.info.toUpperCase()
+			}
+		}
+		alertPaint.color = themeColor
+		paint.color = themeColor
+		textPaint.color = themeColor
+		textColor = themeColor
+		invalidate()
 	}
 	
 	fun getContent(hold: (String) -> Unit) {
@@ -142,6 +184,15 @@ open class RoundInput(context: Context) : EditText(context) {
 		canvas?.drawRect(textBackground, backgroundPaint)
 		
 		canvas?.drawText(title, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
+		
+		if (showAlert) {
+			canvas?.drawText(
+				safeLevel,
+				width - alertPaint.measureText(safeLevel) - 25.uiPX(),
+				32.uiPX().toFloat(),
+				alertPaint
+			)
+		}
 	}
 	
 	fun setNumberInput() {
