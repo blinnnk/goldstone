@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -121,20 +120,13 @@ class TransactionListPresenter(
 				return@getTransactionDataFromEtherScan
 			}
 			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-			newData.forEachOrEnd { item, isEnd ->
-				localData.find {
-					it.transactionHash == item.transactionHash
-				}?.let {
-					localData.remove(it)
-					TransactionTable.deleteByTaxHash(it.transactionHash)
-				}
-				if (isEnd) {
-					// when finish update ui in UI thread
-					context?.runOnUiThread {
-						localData.addAll(0, newData)
-						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
-						removeLoadingView()
-					}
+			context?.runOnUiThread {
+				if (newData.isNotEmpty()) {
+					localData.addAll(0, newData)
+					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
+					removeLoadingView()
+				} else {
+					removeLoadingView()
 				}
 			}
 		}
@@ -214,21 +206,47 @@ class TransactionListPresenter(
 				}
 				
 				override fun mergeCallBack() {
-					coroutinesTask(
-						{
-							arrayListOf<TransactionTable>().apply {
-								addAll(chainData)
-								addAll(logData)
-							}.filter {
-								it.to.isNotEmpty() && it.value.toDouble() > 0.0
-							}.distinctBy {
-								it.hash
-							}.sortedByDescending {
-								it.timeStamp
-							}.toArrayList()
-						}, hold
-					)
+					arrayListOf<TransactionTable>().apply {
+						addAll(chainData)
+						addAll(logData)
+					}.filter {
+						it.to.isNotEmpty() && it.value.toDouble() > 0.0
+					}.distinctBy {
+						it.hash
+					}.sortedByDescending {
+						it.timeStamp
+					}.let {
+						diffNewDataAndUpdateLocalData(it, hold)
+					}
 				}
+			}
+		}
+		
+		private fun diffNewDataAndUpdateLocalData(
+			newData: List<TransactionTable>,
+			hold: ArrayList<TransactionTable>.() -> Unit
+		) {
+			GoldStoneDataBase.database.transactionDao().apply {
+				getTransactionsByAddress(Config.getCurrentAddress())
+					.let { localData ->
+						newData.filterNot { new ->
+							localData.any {
+								update(it.apply {
+									transactionIndex = new.transactionIndex
+									hasError = new.hasError
+									txreceipt_status = new.txreceipt_status
+									gasUsed = new.gasUsed
+									blockHash = new.blockHash
+									cumulativeGasUsed = new.cumulativeGasUsed
+								})
+								it.hash == new.hash
+							}
+						}.let {
+							GoldStoneAPI.context.runOnUiThread {
+								hold(it.toArrayList())
+							}
+						}
+					}
 			}
 		}
 		
