@@ -45,13 +45,13 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 	abstract fun canClickPoint(): Boolean
 	
 	open fun setRedColor() {
-		chartColor = Spectrum.red
-		chartLineColor = Spectrum.lightRed
+		chartColor = Spectrum.lightRed
+		chartLineColor = Spectrum.red
 	}
 	
 	open fun setGreenColor() {
-		chartColor = Spectrum.green
-		chartLineColor = Spectrum.lightGreen
+		chartColor = Spectrum.lightGreen
+		chartLineColor = Spectrum.green
 	}
 	
 	private fun setStyle() {

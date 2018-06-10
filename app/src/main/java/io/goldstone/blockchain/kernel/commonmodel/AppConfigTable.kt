@@ -9,6 +9,7 @@ import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -34,7 +35,8 @@ data class AppConfigTable(
 	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
-	var chainID: String = ChainID.Main.id
+	var chainID: String = ChainID.Main.id,
+	var shareContent: String = ProfileText.shareContent
 ) {
 	
 	companion object {
@@ -170,6 +172,16 @@ data class AppConfigTable(
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
+					}
+				}
+			}
+		}
+		
+		fun updateShareContent(shareContent: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply { this.shareContent = shareContent })
 					}
 				}
 			}
