@@ -190,7 +190,6 @@
 
 # Sun Misc
 -dontwarn sun.misc.****
--keep class sun.misc.** { *; }
 
 # My Own Proguard
 -dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
@@ -198,17 +197,11 @@
 -dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
 -dontwarn io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.**
 
-# Kotlin 协程
--keep class org.jetbrains.kotlinx.**
--keep class ru.gildor.coroutines.**
-
 # Ethereum Geth
 -keep class org.ethereum.geth.** { *; }
 
 # PBKDF2withHmacSHA512
 -keep class org.spongycastle.** { *; }
-#-keep class java.security.spec.**  { *; }
-#-keep class sun.security.jca.** { *; }
 
 # V8 Render
 -keep class android.support.v8.renderscript.** { *; }
@@ -227,9 +220,6 @@
   public *;
 }
 -dontwarn com.bumptech.glide.load.resource.bitmap.VideoDecoder
-
--dontwarn com.google.android.gms.**
--keep class com.google.android.gms.** { *; }
 
 # Jackson
 -keep @com.fasterxml.jackson.annotation.JsonIgnoreProperties class * { *; }
@@ -255,7 +245,6 @@
     public *;
 }
 -keep class android.support.annotation.Keep
-
 -keep @android.support.annotation.Keep class * {*;}
 
 -keepclasseswithmembers class * {
@@ -271,3 +260,10 @@
 }
 
 -adaptclassstrings com.example.Test
+
+# Instabug
+-dontwarn org.apache.http.**
+-dontwarn android.net.http.AndroidHttpClient
+-dontwarn com.google.android.gms.**
+-dontwarn com.android.volley.toolbox.**
+-dontwarn com.instabug.**

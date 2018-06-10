@@ -281,7 +281,7 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getByAddressAndContract(
+		fun getCurrentChainByAddressAndContract(
 			walletAddress: String,
 			contract: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -291,7 +291,7 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getByAddressAndContract(walletAddress, contract)
+						.getCurrentChainByAddressAndContract(walletAddress, contract)
 				}) {
 				hold(it.toArrayList())
 			}
@@ -434,6 +434,15 @@ interface TransactionDao {
 	fun getByAddressAndContract(
 		walletAddress: String,
 		contract: String
+	): List<TransactionTable>
+	
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC"
+	)
+	fun getCurrentChainByAddressAndContract(
+		walletAddress: String,
+		contract: String,
+		chainID: String = Config.getCurrentChain()
 	): List<TransactionTable>
 	
 	@Insert
