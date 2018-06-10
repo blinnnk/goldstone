@@ -43,7 +43,7 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(0, viewHeight)
 		backgroundColor = Color.WHITE
 		addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square, viewHeight / 2f)
-		elevation = 5.uiPX().toFloat()
+		elevation = 4.uiPX().toFloat()
 		
 		arrowIcon
 			.apply { setWhiteSytle() }

@@ -96,7 +96,7 @@ class TokenDetailPresenter(
 	
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
-		TransactionTable.getByAddressAndContract(
+		TransactionTable.getCurrentChainByAddressAndContract(
 			Config.getCurrentAddress(),
 			fragment.token?.contract.orEmpty()
 		) { transactions ->
