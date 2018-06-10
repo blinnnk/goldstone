@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
@@ -11,17 +10,16 @@ import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.memoryTransactionListData
 
 /**
  * @date 2018/6/6 3:59 PM
  * @author KaySaith
  */
-fun TransactionDetailPresenter.updateHeaderValueFromTransactionList() {
+fun TransactionDetailPresenter.updateDataFromTransactionList() {
 	dataFromList?.apply {
 		val headerData = TransactionHeaderModel(
 			count,
@@ -31,48 +29,24 @@ fun TransactionDetailPresenter.updateHeaderValueFromTransactionList() {
 			isReceived,
 			hasError
 		)
-		updateHeaderValue(headerData)
 		headerModel = headerData
 		currentHash = transactionHash
-		
-		if (memo.isEmpty() && !isPending) {
-			fragment.showLoadingView("Load transaction detail information")
-			TransactionTable.updateMemoByHashAndReceiveStatus(transactionHash, isReceived) {
-				fragment.asyncData = generateModels(this.apply { memo = it })
-				updateHeaderValue(headerData)
-				fragment.removeLoadingView()
+		fragment.showLoadingView("Loading data from chain")
+		TransactionTable.getMemoByHashAndReceiveStatus(currentHash, isReceived) { memo ->
+			fragment.removeLoadingView()
+			fragment.asyncData = generateModels(this).apply {
+				this[1].info = memo
 			}
-		} else {
-			fragment.asyncData = generateModels(this)
+			// 更新内存里面的数据
+			memoryTransactionListData?.find {
+				it.transactionHash == dataFromList?.transactionHash
+			}?.memo = memo
+			
 			updateHeaderValue(headerData)
 		}
-		
 		if (isPending) {
 			// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
 			observerTransaction()
-		}
-	}
-}
-
-fun TransactionDetailPresenter.saveInputCodeByTaxHash(
-	taxHash: String,
-	callback: (input: String, isETHTransfer: Boolean) -> Unit
-) {
-	doAsync {
-		TransactionTable.getTransactionByHash(taxHash) {
-			it.find { it.hash == taxHash }?.let { transaction ->
-				if (transaction.input.isEmpty()) {
-					GoldStoneEthCall.getInputCodeByHash(
-						taxHash,
-						Config.getCurrentChain(), { error, reason ->
-							LogUtil.error("saveInputCodeByTaxHash $reason", error)
-						}) {
-						TransactionTable.updateInputCodeByHash(taxHash, it) {
-							callback(it, transaction.isERC20)
-						}
-					}
-				}
-			}
 		}
 	}
 }
@@ -97,8 +71,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
-				Config.getCurrentAddress().toUpperCase(),
-				receipt.transactionHash.toUpperCase(),
+				Config.getCurrentAddress(),
+				receipt.transactionHash,
 				receipt.blockNumber,
 				receipt.date,
 				receipt.url
@@ -110,8 +84,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				Config.getCurrentAddress().toUpperCase(),
-				currentHash.toUpperCase(),
+				Config.getCurrentAddress(),
+				currentHash,
 				receipt.blockNumber,
 				date,
 				EtherScanApi.transactionDetail(currentHash)
@@ -122,8 +96,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				Config.getCurrentAddress().toUpperCase(),
-				currentHash.toUpperCase(),
+				Config.getCurrentAddress(),
+				currentHash,
 				"Waiting...",
 				date,
 				EtherScanApi.transactionDetail(currentHash)

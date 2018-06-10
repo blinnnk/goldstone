@@ -21,7 +21,8 @@ class TransactionDetailFragment :
 	override val presenter = TransactionDetailPresenter(this)
 	
 	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionDetailModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<TransactionDetailModel>?
 	) {
 		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) {
 			onClick {
@@ -36,6 +37,8 @@ class TransactionDetailFragment :
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
-		parentFragment?.let { presenter.runBackEventBy(it) }
+		parentFragment?.let {
+			presenter.runBackEventBy(it)
+		}
 	}
 }

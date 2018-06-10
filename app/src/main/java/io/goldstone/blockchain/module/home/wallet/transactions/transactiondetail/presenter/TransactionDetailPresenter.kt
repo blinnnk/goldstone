@@ -19,7 +19,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.getMemoFromInputCode
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -48,15 +47,11 @@ class TransactionDetailPresenter(
 	
 	override fun updateData() {
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
-		updateHeaderValueFromTransactionList()
+		updateDataFromTransactionList()
 		/** 这个是转账完毕后进入的初始数据 */
-		updateHeaderValueFromTransferFragment()
+		updateDataFromTransferFragment()
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
-		updateHeaderValueFromNotification()
-		// 如果没有拉取到 `Input Code` 这里再拉取并存入数据库
-		saveInputCodeByTaxHash(currentHash) { input, isERC20 ->
-			fragment.asyncData!![1].info = getMemoFromInputCode(input, isERC20)
-		}
+		updateDataFromNotification()
 	}
 	
 	override fun updateParentContentLayoutHeight(

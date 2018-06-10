@@ -29,7 +29,8 @@ data class NotificationTransactionInfo(
 	val chainID: String,
 	val isReceived: Boolean,
 	val symbol: String,
-	val value: Double
+	val value: Double,
+	val timeStamp: Long
 ) : Serializable
 
 class NotificationListPresenter(
@@ -58,10 +59,7 @@ class NotificationListPresenter(
 				TransactionText.detail,
 				NotificationText.notification,
 				Bundle().apply {
-					putSerializable(
-						ArgumentKey.notificationTransaction,
-						transactionInfo
-					)
+					putSerializable(ArgumentKey.notificationTransaction, transactionInfo)
 				})
 		}
 	}

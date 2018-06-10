@@ -29,7 +29,7 @@ import org.jetbrains.anko.runOnUiThread
  * 从通知中心进入的, 使用获取的 `Transaction` 转换成标准的使用格式, 这里临时填写
  * `Timestamp` 数字会在准备详情界面的时候获取时间戳, 见 [getTimestampAndInsertToDatabase]
  */
-fun TransactionDetailPresenter.updateHeaderValueFromNotification() {
+fun TransactionDetailPresenter.updateDataFromNotification() {
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
@@ -102,25 +102,23 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) { receipt ->
-		receipt.getTimestampAndInsertToDatabase(fragment, info.chainID) { timestamp ->
-			fragment.context?.runOnUiThread {
-				TransactionTable.updateMemoByHashAndReceiveStatus(
-					info.hash,
-					info.isReceived,
-					info.chainID
-				) { memo ->
-					receipt.toAsyncData().let {
-						it[4].info = TimeUtils.formatDate(timestamp)
-						it[1].info = memo
-						fragment.apply {
-							if (asyncData.isNull()) asyncData = it
-							else presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
-						}
-						updateHeaderFromNotification(receipt, info)
+		fragment.context?.runOnUiThread {
+			TransactionTable.getMemoByHashAndReceiveStatus(
+				info.hash,
+				info.isReceived,
+				info.chainID
+			) { memo ->
+				receipt.toAsyncData().let {
+					it[4].info = TimeUtils.formatDate(info.timeStamp)
+					it[1].info = memo
+					fragment.apply {
+						if (asyncData.isNull()) asyncData = it
+						else presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
 					}
+					updateHeaderFromNotification(receipt, info)
 				}
-				callback()
 			}
+			callback()
 		}
 	}
 }

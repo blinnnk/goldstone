@@ -21,6 +21,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
@@ -95,7 +96,7 @@ class TokenDetailPresenter(
 	
 	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
 		// 内存里面没有数据首先从本地数据库查询数据
-		TransactionTable.getTransactionsByAddressAndContract(
+		TransactionTable.getByAddressAndContract(
 			Config.getCurrentAddress(),
 			fragment.token?.contract.orEmpty()
 		) { transactions ->
@@ -168,16 +169,12 @@ class TokenDetailPresenter(
 	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 6
-			val chartArray = arrayListOf<Point>()
+			val chartArray = arrayListOf<ChartPoint>()
 			val charCount = if (size > maxChartCount) maxChartCount else size
 			forEach {
-				chartArray.add(Point(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
+				chartArray.add(ChartPoint(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
 				if (chartArray.size == charCount) {
-					var maxY = maxYValue(chartArray)
-					var unitY = Math.ceil((maxY / 10)).toFloat()
-					if (maxY == 0.0) maxY = 10.0
-					if (unitY == 0f) unitY = 1f
-					header?.setCharData(chartArray.reversed().toArrayList(), maxY.toFloat(), unitY)
+					header?.setCharData(chartArray.reversed().toArrayList())
 				}
 			}
 		}
@@ -219,10 +216,7 @@ class TokenDetailPresenter(
 		}
 	}
 	
-	data class DateBalance(
-		val date: Long,
-		val balance: Double
-	)
+	data class DateBalance(val date: Long, val balance: Double)
 	
 	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,

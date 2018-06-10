@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -68,7 +67,7 @@ class TransactionListPresenter(
 	}
 	
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getTransactionListModelsByAddress(Config.getCurrentAddress()) {
+		TransactionTable.getListModelsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
@@ -121,20 +120,13 @@ class TransactionListPresenter(
 				return@getTransactionDataFromEtherScan
 			}
 			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-			newData.forEachOrEnd { item, isEnd ->
-				localData.find {
-					it.transactionHash == item.transactionHash
-				}?.let {
-					localData.remove(it)
-					TransactionTable.deleteByTaxHash(it.transactionHash)
-				}
-				if (isEnd) {
-					// when finish update ui in UI thread
-					context?.runOnUiThread {
-						localData.addAll(0, newData)
-						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
-						removeLoadingView()
-					}
+			context?.runOnUiThread {
+				if (newData.isNotEmpty()) {
+					localData.addAll(0, newData)
+					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
+					removeLoadingView()
+				} else {
+					removeLoadingView()
 				}
 			}
 		}
@@ -152,7 +144,7 @@ class TransactionListPresenter(
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
-			mergeNormalAndTokenIncomingTransactions(startBlock, errorCallback) {
+			mergeETHAndERC20IncomingTransactions(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					fragment.filterCompletedData(it, hold)
@@ -165,7 +157,7 @@ class TransactionListPresenter(
 			}.start()
 		}
 		
-		private fun mergeNormalAndTokenIncomingTransactions(
+		private fun mergeETHAndERC20IncomingTransactions(
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
 			hold: (ArrayList<TransactionTable>) -> Unit
@@ -214,21 +206,47 @@ class TransactionListPresenter(
 				}
 				
 				override fun mergeCallBack() {
-					coroutinesTask(
-						{
-							arrayListOf<TransactionTable>().apply {
-								addAll(chainData)
-								addAll(logData)
-							}.filter {
-								it.to.isNotEmpty() && it.value.toDouble() > 0.0
-							}.distinctBy {
-								it.hash
-							}.sortedByDescending {
-								it.timeStamp
-							}.toArrayList()
-						}, hold
-					)
+					arrayListOf<TransactionTable>().apply {
+						addAll(chainData)
+						addAll(logData)
+					}.filter {
+						it.to.isNotEmpty() && it.value.toDouble() > 0.0
+					}.distinctBy {
+						it.hash
+					}.sortedByDescending {
+						it.timeStamp
+					}.let {
+						diffNewDataAndUpdateLocalData(it, hold)
+					}
 				}
+			}
+		}
+		
+		private fun diffNewDataAndUpdateLocalData(
+			newData: List<TransactionTable>,
+			hold: ArrayList<TransactionTable>.() -> Unit
+		) {
+			GoldStoneDataBase.database.transactionDao().apply {
+				getTransactionsByAddress(Config.getCurrentAddress())
+					.let { localData ->
+						newData.filterNot { new ->
+							localData.any {
+								update(it.apply {
+									transactionIndex = new.transactionIndex
+									hasError = new.hasError
+									txreceipt_status = new.txreceipt_status
+									gasUsed = new.gasUsed
+									blockHash = new.blockHash
+									cumulativeGasUsed = new.cumulativeGasUsed
+								})
+								it.hash == new.hash
+							}
+						}.let {
+							GoldStoneAPI.context.runOnUiThread {
+								hold(it.toArrayList())
+							}
+						}
+					}
 			}
 		}
 		
@@ -302,7 +320,9 @@ class TransactionListPresenter(
 						}
 						
 						override fun mergeCallBack() {
-							hold(map { TransactionListModel(it) }.toArrayList())
+							hold(map {
+								TransactionListModel(it)
+							}.toArrayList())
 							removeLoadingView()
 						}
 					}.start()
