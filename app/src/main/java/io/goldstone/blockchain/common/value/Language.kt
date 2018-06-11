@@ -2524,7 +2524,7 @@ object DateAndTimeText {
 	}
 	@JvmField
 	val day = when (currentLanguage) {
-		HoneyLanguage.English.code -> "HOUR"
+		HoneyLanguage.English.code -> "DAY"
 		HoneyLanguage.Chinese.code -> "日"
 		HoneyLanguage.Japanese.code -> "日"
 		HoneyLanguage.Korean.code -> "주간"
