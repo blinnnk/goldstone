@@ -1595,6 +1595,27 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
 		else -> ""
 	}
+
+	@JvmField
+	val deletContactAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DELETE CONTACT"
+		HoneyLanguage.Chinese.code -> "删除联系人"
+		HoneyLanguage.Japanese.code -> "連絡先を削除"
+		HoneyLanguage.Korean.code -> "연락처 삭제"
+		HoneyLanguage.Russian.code -> "УДАЛИТЬ КОНТАКТ"
+		HoneyLanguage.TraditionalChinese.code -> "刪除聯繫人"
+		else -> ""
+	}
+	@JvmField
+	val deleteContactAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Are you sure you want to delete this contact and the corresponding address?"
+		HoneyLanguage.Chinese.code -> "通知中心"
+		HoneyLanguage.Japanese.code -> "この連絡先と対応するアドレスを削除してもよろしいですか？"
+		HoneyLanguage.Korean.code -> "이 연락처와 해당 주소를 삭제 하시겠습니까?"
+		HoneyLanguage.Russian.code -> "Вы действительно хотите удалить этот контакт и соответствующий адрес?"
+		HoneyLanguage.TraditionalChinese.code -> "你確定要刪除這個聯繫人和對應的地址嗎？"
+		else -> ""
+	}
 }
 
 object EmptyText {
