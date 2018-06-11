@@ -5,13 +5,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
-import com.blinnnk.extension.setUnderline
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -108,13 +106,15 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					text = QAText.whatIsKeystore.setUnderline()
 				}.click {
 					getParentFragment<WalletImportFragment> {
-						presenter.showTargetFragment<WebViewFragment>(
-							QAText.whatIsKeystore,
-							ImportWalletText.importWallet,
-							Bundle().apply {
-								putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
-							}
-						)
+						NetworkUtil.hasNetworkWithAlert(context) isTrue {
+							presenter.showTargetFragment<WebViewFragment>(
+								QAText.whatIsKeystore,
+								ImportWalletText.importWallet,
+								Bundle().apply {
+									putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
+								}
+							)
+						}
 					}
 				}.into(this)
 			}

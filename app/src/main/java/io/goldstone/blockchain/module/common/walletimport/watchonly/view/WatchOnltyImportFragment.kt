@@ -9,6 +9,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -75,13 +76,15 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				text = QAText.whatIsWatchOnlyWallet.setUnderline()
 			}.click {
 				getParentFragment<WalletImportFragment> {
-					presenter.showTargetFragment<WebViewFragment>(
-						QAText.whatIsWatchOnlyWallet,
-						ImportWalletText.importWallet,
-						Bundle().apply {
-							putString(ArgumentKey.webViewUrl, WebUrl.whatIsWatchOnly)
-						}
-					)
+					NetworkUtil.hasNetworkWithAlert(context) isTrue {
+						presenter.showTargetFragment<WebViewFragment>(
+							QAText.whatIsWatchOnlyWallet,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsWatchOnly)
+							}
+						)
+					}
 				}
 			}.into(this)
 		}

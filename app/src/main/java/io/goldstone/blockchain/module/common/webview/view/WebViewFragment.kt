@@ -94,9 +94,9 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	
 	private fun ViewGroup.showLocalContent() {
 		if (urlPath.equals(WebUrl.terms, true)) {
-			setPadding(PaddingSize.device, 0, PaddingSize.device, 0)
 			scrollView {
 				verticalLayout {
+					setPadding(PaddingSize.device, 0, PaddingSize.device, 0)
 					linearLayout {
 						lparams {
 							width = matchParent
