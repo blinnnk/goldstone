@@ -334,6 +334,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 	
+	open fun recoveryBackEvent() {
+		getMainActivity()?.apply {
+			backEvent = Runnable {
+				setBackEvent(this)
+			}
+		}
+	}
+	
 	open fun setBackEvent(mainActivity: MainActivity?) {
 		val parent = parentFragment
 		if (parent is BaseOverlayFragment<*>) {

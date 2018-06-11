@@ -181,9 +181,9 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			chartType: ChartType,
 			hold: (min: Float, max: Float, step: Float) -> Unit
 		) {
-			// minRate = 最低点 / min值
+			// 最低点 = min - (max - min) * minRate
 			val minRate = when (chartType) {
-				ChartType.Assets -> 0.3
+				ChartType.Assets -> 0.6
 				ChartType.Quotation -> 1.0
 			}
 			val stepsCount = 5 //代表希望分成几个阶段
@@ -196,10 +196,14 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 				} else {
 					maxValue.toDouble()
 				}
-			val min = when {
-				maxValue == minValue -> maxValue - Math.abs(maxValue * 0.5)
-				maxValue < minValue -> maxValue * minRate
-				else -> minValue * minRate
+			val min = if (maxValue == minValue) {
+				maxValue - Math.abs(maxValue * 0.5)
+			} else if (maxValue < minValue) {
+				val minPoint = maxValue - (minValue - maxValue) * minRate
+				if (minPoint > 0.0) minPoint else 0.0
+			} else {
+				val minPoint = minValue - (maxValue - minValue) * minRate
+				if (minPoint > 0.0) minPoint else 0.0
 			}
 			val roughStep = (max - min) / (stepsCount - 1)
 			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级

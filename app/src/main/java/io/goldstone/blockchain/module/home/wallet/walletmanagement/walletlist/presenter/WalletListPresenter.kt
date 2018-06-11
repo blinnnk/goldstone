@@ -37,7 +37,10 @@ class WalletListPresenter(
 	
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showAddButton(false)
+			overlayView.header.showAddButton(true) {
+				presenter.showWalletAddingMethodFragment()
+			}
+			overlayView.header.showCloseButton(false)
 			overlayView.header.showBackButton(true) {
 				headerTitle = WalletSettingsText.walletSettings
 				presenter.showWalletSettingListFragment()

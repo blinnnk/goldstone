@@ -3,7 +3,6 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import io.goldstone.blockchain.common.component.LineChart
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -32,16 +31,14 @@ class GoldStoneUtilUnitTest {
 	}
 	
 	@Test
-	fun getChartValue() {
-		LineChart.generateChardGridValue(4100f, 4111f) { min, max, step ->
-			LogUtil.debug("$positon getChartValue", "min - $min max - $max step - $step")
-		}
-	}
-	
-	@Test
 	fun getAppconfig() {
 		AppConfigTable.getAppConfig {
 			LogUtil.debug("$positon + getAppconfig", it.toString())
 		}
+	}
+	
+	@Test
+	fun getSystemParameter() {
+		LogUtil.debug(positon + "getSystemParameter", CountryCode.currentLanguageSymbol)
 	}
 }

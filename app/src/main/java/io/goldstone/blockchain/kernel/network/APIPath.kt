@@ -21,6 +21,7 @@ object APIPath {
 	const val updateAddress = "$url/account/updateAddress"
 	const val getNotification = "$url/account/unreadMessageList"
 	const val marketSearch = "$url/account/searchPair?pair="
+	const val terms = "$url/index/agreement?md5="
 	const val getCurrencyLineChartData = "$url/account/lineDataByDay"
 	const val getPriceByAddress = "$url/index/priceByAddress"
 	const val getTokenDescription = "$url/market/coinDescription?symbol="

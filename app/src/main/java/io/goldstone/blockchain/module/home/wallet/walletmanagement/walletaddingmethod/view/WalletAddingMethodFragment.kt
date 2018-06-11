@@ -1,9 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
@@ -46,7 +44,9 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 					iconSize = 100.uiPX()
 					iconColor = Spectrum.darkBlue
 					src = R.drawable.create_wallet_icon
-				}.click { presenter.showCreateWalletFragment() }.into(this)
+				}.click {
+					presenter.showCreateWalletFragment()
+				}.into(this)
 				textView {
 					text = CreateWalletText.create
 					gravity = Gravity.CENTER

@@ -180,6 +180,8 @@ fun Context.deleteAccount(
 					keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
 					callback(true)
 				}
+			} else {
+				callback(true)
 			}
 		}
 	}

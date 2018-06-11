@@ -101,7 +101,7 @@ class WalletSettingsPresenter(
 		}
 	}
 	
-	private fun showWalletAddingMethodFragment() {
+	fun showWalletAddingMethodFragment() {
 		fragment.overlayView.header.showAddButton(false)
 		showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
 	}
