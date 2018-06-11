@@ -89,4 +89,16 @@ class GoldStoneServerUnitTest {
 			}
 		}
 	}
+	
+	@Test
+	fun getTermsFromServer() {
+		GoldStoneAPI.getTerms(
+			"hello",
+			{
+				LogUtil.error("$positon getTermsFromServer", it)
+			}
+		) {
+			LogUtil.debug(positon, it)
+		}
+	}
 }

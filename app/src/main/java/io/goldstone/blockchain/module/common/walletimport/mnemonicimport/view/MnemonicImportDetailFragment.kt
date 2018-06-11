@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -84,7 +86,13 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				agreementView
 					.click {
 						getParentFragment<WalletImportFragment> {
-							presenter.showWebViewFragment(WebUrl.terms, ProfileText.terms)
+							presenter.showTargetFragment<WebViewFragment>(
+								ProfileText.terms,
+								ImportWalletText.importWallet,
+								Bundle().apply {
+									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								}
+							)
 						}
 					}
 					.into(this)
@@ -108,7 +116,13 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					text = QAText.whatIsMnemonic.setUnderline()
 				}.click {
 					getParentFragment<WalletImportFragment> {
-						presenter.showWebViewFragment(WebUrl.whatIsMnemonic, QAText.whatIsMnemonic)
+						presenter.showTargetFragment<WebViewFragment>(
+							QAText.whatIsMnemonic,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+							}
+						)
 					}
 				}.into(this)
 			}

@@ -5,6 +5,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.CreateWalletText
@@ -20,11 +21,10 @@ import org.web3j.crypto.Wallet
  * @date 23/03/2018 1:49 AM
  * @author KaySaith
  */
-
 class KeystoreImportPresenter(
 	override val fragment: KeystoreImportFragment
 ) : BasePresenter<KeystoreImportFragment>() {
-
+	
 	fun importKeystoreWallet(
 		keystore: String,
 		password: EditText,
@@ -41,7 +41,7 @@ class KeystoreImportPresenter(
 						DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
 					)?.let {
 						val walletName =
-							if (nameInput.text.isEmpty()) "Wallet"
+							if (nameInput.text.isEmpty()) UIUtils.generateDefaultName()
 							else nameInput.text.toString()
 						PrivateKeyImportPresenter.importWallet(
 							it.privateKey.toString(16),
@@ -65,5 +65,4 @@ class KeystoreImportPresenter(
 			callback()
 		}
 	}
-	
 }

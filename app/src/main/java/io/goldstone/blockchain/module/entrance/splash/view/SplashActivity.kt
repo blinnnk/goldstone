@@ -9,9 +9,13 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Duration
+import io.goldstone.blockchain.common.value.currentLanguage
+import io.goldstone.blockchain.crypto.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
@@ -70,6 +74,7 @@ class SplashActivity : AppCompatActivity() {
 			
 			initLaunchLanguage(language)
 			setCurrentChainID(chainID)
+			
 			container.apply {
 				gradientView.into(this)
 				initWaveView()
@@ -87,6 +92,8 @@ class SplashActivity : AppCompatActivity() {
 					initSupportCurrencyList {
 						// 更新分享的文案内容
 						updateShareContentFromServer()
+						// 更新用户条款如果有必要
+						updateAgreement()
 						// insert support currency list from local json
 						updateCurrencyRateFromServer(this@prepareAppConfig)
 						// check network to get default toke list
@@ -105,6 +112,21 @@ class SplashActivity : AppCompatActivity() {
 			super.onBackPressed()
 		} else {
 			backEvent?.run()
+		}
+	}
+	
+	private fun updateAgreement() {
+		AppConfigTable.getAppConfig {
+			it?.apply {
+				val md5 = terms.getObjectMD5HexString().removePrefix("0x")
+				GoldStoneAPI.getTerms(md5, {
+					LogUtil.error("updateAgreement", it)
+				}) {
+					if (it.isNotEmpty()) {
+						AppConfigTable.updateTerms(it)
+					}
+				}
+			}
 		}
 	}
 	
@@ -134,6 +156,7 @@ class SplashActivity : AppCompatActivity() {
 	 * set and displaying the interface from the database.
 	 */
 	private fun initLaunchLanguage(code: Int) {
+		currentLanguage = code
 		Config.updateCurrentLanguageCode(code)
 	}
 	

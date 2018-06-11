@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.keystoreimport.view
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -75,7 +77,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 					}.click {
 						getParentFragment<WalletImportFragment> {
-							presenter.showWebViewFragment(WebUrl.terms, ProfileText.terms)
+							presenter.showTargetFragment<WebViewFragment>(
+								ProfileText.terms,
+								ImportWalletText.importWallet,
+								Bundle().apply {
+									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								}
+							)
 						}
 					}.into(this)
 				
@@ -89,7 +97,8 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						keystoreEditText.text.toString(),
 						passwordInput,
 						nameInput,
-						agreementView.radioButton.isChecked, hintInput
+						agreementView.radioButton.isChecked,
+						hintInput
 					) {
 						it.showLoadingStatus(false)
 					}
@@ -99,9 +108,12 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					text = QAText.whatIsKeystore.setUnderline()
 				}.click {
 					getParentFragment<WalletImportFragment> {
-						presenter.showWebViewFragment(
-							WebUrl.whatIsKeystore,
-							QAText.whatIsKeystore
+						presenter.showTargetFragment<WebViewFragment>(
+							QAText.whatIsKeystore,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
+							}
 						)
 					}
 				}.into(this)

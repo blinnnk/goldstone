@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -75,7 +77,13 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				agreementView
 					.click {
 						getParentFragment<WalletImportFragment> {
-							presenter.showWebViewFragment(WebUrl.terms, ProfileText.terms)
+							presenter.showTargetFragment<WebViewFragment>(
+								ProfileText.terms,
+								ImportWalletText.importWallet,
+								Bundle().apply {
+									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								}
+							)
 						}
 					}
 					.into(this)
@@ -102,7 +110,13 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					text = QAText.whatIsPrivateKey.setUnderline()
 				}.click {
 					getParentFragment<WalletImportFragment> {
-						presenter.showWebViewFragment(WebUrl.whatIsPrivatekey, QAText.whatIsPrivateKey)
+						presenter.showTargetFragment<WebViewFragment>(
+							QAText.whatIsPrivateKey,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsPrivatekey)
+							}
+						)
 					}
 				}.into(this)
 			}

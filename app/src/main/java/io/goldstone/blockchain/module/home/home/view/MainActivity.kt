@@ -13,10 +13,12 @@ import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	override fun onBackPressed() {
-		recoveryBackEventWhenBackFromOtherApp()
+		recoveryTokenDetailBackEventFromOtherApp()
 		if (backEvent.isNull()) {
 			super.onBackPressed()
 		} else {
@@ -125,11 +127,13 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 	
-	private fun recoveryBackEventWhenBackFromOtherApp() {
+	private fun recoveryTokenDetailBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
-			if (it is BaseOverlayFragment<*>) {
+			if (it is TokenDetailOverlayFragment) {
 				val child = it.childFragmentManager.fragments.last()
 				if (child is BaseFragment<*>) {
+					child.recoveryBackEvent()
+				} else if (child is BaseRecyclerFragment<*, *>) {
 					child.recoveryBackEvent()
 				}
 			}
@@ -145,7 +149,9 @@ class MainActivity : AppCompatActivity() {
 		getHomeFragment()?.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)
 			?.apply {
 				// 如果有正在打开的悬浮层, 直接关闭
-				supportFragmentManager.fragments.find { it is BaseOverlayFragment<*> }?.let {
+				supportFragmentManager.fragments.find {
+					it is BaseOverlayFragment<*>
+				}?.let {
 					(it as? BaseOverlayFragment<*>)?.presenter?.removeSelfFromActivity()
 				}
 				// 展示通知中心

@@ -3,9 +3,13 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
 import android.provider.Settings
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.safeGet
+import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.R.raw
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
@@ -36,7 +40,8 @@ data class AppConfigTable(
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
 	var chainID: String = ChainID.Main.id,
-	var shareContent: String = ProfileText.shareContent
+	var shareContent: String = ProfileText.shareContent,
+	var terms: String = ""
 ) {
 	
 	companion object {
@@ -177,6 +182,16 @@ data class AppConfigTable(
 			}
 		}
 		
+		fun updateTerms(terms: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply { this.terms = terms })
+					}
+				}
+			}
+		}
+		
 		fun updateShareContent(shareContent: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -215,16 +230,28 @@ data class AppConfigTable(
 					.insert(
 						AppConfigTable(
 							0,
-							null,
-							false,
-							null,
-							5,
-							goldStoneID,
-							false,
-							HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+							goldStoneID = goldStoneID,
+							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+							terms = getLocalTerms()
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }
+			}
+		}
+		
+		private fun getLocalTerms(): String {
+			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(raw.terms).let { localTerms ->
+				localTerms.find {
+					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
+				}.let {
+					return if (it.isNull()) {
+						localTerms.find {
+							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
+						}?.safeGet("terms").orEmpty()
+					} else {
+						return it!!.safeGet("terms")
+					}
+				}
 			}
 		}
 	}

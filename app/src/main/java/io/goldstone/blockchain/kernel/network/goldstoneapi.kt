@@ -143,6 +143,22 @@ object GoldStoneAPI {
 	}
 	
 	@JvmStatic
+	fun getTerms(
+		md5: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (String) -> Unit
+	) {
+		requestData<String>(
+			APIPath.terms + md5,
+			"",
+			true,
+			errorCallback
+		) {
+			hold(JSONObject(this[0]).safeGet("result"))
+		}
+	}
+	
+	@JvmStatic
 	fun getShareContent(
 		errorCallback: (Exception) -> Unit,
 		hold: (ShareContentModel) -> Unit
@@ -513,9 +529,7 @@ object GoldStoneAPI {
 				override fun onResponse(call: Call, response: Response) {
 					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
 					try {
-						val dataObject =
-							data?.toJsonObject()
-							?: JSONObject("")
+						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 						if (justGetData) {
 							hold(listOf(jsonData as T))

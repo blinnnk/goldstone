@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.pr
 import android.os.Bundle
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -18,24 +17,23 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 22/03/2018 9:32 PM
  * @author KaySaith
  */
-
 class MnemonicBackupPresenter(
 	override val fragment: MnemonicBackupFragment
 ) : BasePresenter<MnemonicBackupFragment>() {
-
+	
 	fun skipBackUp() {
 		val parent = fragment.parentFragment
 		when (parent) {
 			is WalletGenerationFragment -> {
 				fragment.activity?.jump<SplashActivity>()
 			}
-
+			
 			is WalletSettingsFragment -> {
 				parent.presenter.removeSelfFromActivity()
 			}
 		}
 	}
-
+	
 	fun goToMnemonicConfirmation(mnemonic: String?) {
 		val argument = Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonic) }
 		val parent = fragment.parentFragment
@@ -45,7 +43,7 @@ class MnemonicBackupPresenter(
 					CreateWalletText.mnemonicConfirmation, CreateWalletText.mnemonicBackUp, argument
 				)
 			}
-
+			
 			is WalletSettingsFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletSettingsFragment>(
 					WalletSettingsText.walletSettings, CreateWalletText.mnemonicBackUp, argument
@@ -53,31 +51,19 @@ class MnemonicBackupPresenter(
 			}
 		}
 	}
-
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		val parent = fragment.parentFragment
 		when (parent) {
-			is WalletGenerationFragment -> {
-				parent.apply {
-					overlayView.header.backButton.onClick {
-						headerTitle = CreateWalletText.create
-						presenter.popFragmentFrom<MnemonicBackupFragment>()
-						setContentHeight()
-					}
-				}
-			}
-
 			is WalletSettingsFragment -> {
 				parent.apply {
-					overlayView.header.backButton.onClick {
-						headerTitle = WalletSettingsText.walletSettings
-						presenter.popFragmentFrom<MnemonicBackupFragment>()
-						setContentHeight()
+					overlayView.header.showCloseButton(false)
+					overlayView.header.showBackButton(true) {
+						parent.presenter.showWalletSettingListFragment()
 					}
 				}
 			}
 		}
 	}
-
 }

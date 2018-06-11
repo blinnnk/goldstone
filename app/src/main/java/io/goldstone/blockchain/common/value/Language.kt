@@ -8,12 +8,11 @@ import com.blinnnk.extension.toUpperCaseFirstLetter
  * @date 21/03/2018 7:34 PM
  * @author KaySaith
  */
-private val currentLanguage =
+var currentLanguage =
 	if (HoneyLanguage.currentLanguageIsSupported()) Config.getCurrentLanguageCode()
 	else HoneyLanguage.English.code
 
 object CreateWalletText {
-	@JvmField
 	val attention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password strength is critical for the security of your wallet. We will be unable to recover your password, so make sure save it yourself, and in a very secure way!"
 		HoneyLanguage.Chinese.code -> "越强的密码越安全，请尽量设置更复杂的密码。我们不会为您保管密码，请您谨慎保管。"
@@ -23,7 +22,6 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管。"
 		else -> ""
 	}
-	@JvmField
 	val create = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Start a New Wallet"
 		HoneyLanguage.Chinese.code -> "创建钱包"
@@ -33,7 +31,6 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "產生錢包"
 		else -> ""
 	}
-	@JvmField
 	val passwordRules = when (currentLanguage) {
 		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters"
 		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，并少于8位"
@@ -62,7 +59,7 @@ object CreateWalletText {
 		else -> ""
 	}
 	val agreementName = when (currentLanguage) {
-		HoneyLanguage.English.code -> "GoldStone 用戶條款"
+		HoneyLanguage.English.code -> "GoldStone User Agreement"
 		HoneyLanguage.Chinese.code -> "GoldStone 用户条款"
 		HoneyLanguage.Japanese.code -> "GoldStone ユーザー規約"
 		HoneyLanguage.Korean.code -> "GoldStone 이용 약관"
@@ -694,7 +691,7 @@ object TokenDetailText {
 		HoneyLanguage.Chinese.code -> "接收"
 		HoneyLanguage.Japanese.code -> "受信"
 		HoneyLanguage.Korean.code -> "접수"
-		HoneyLanguage.Russian.code -> "депозит".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "депозит"
 		HoneyLanguage.TraditionalChinese.code -> "接收"
 		else -> ""
 	}

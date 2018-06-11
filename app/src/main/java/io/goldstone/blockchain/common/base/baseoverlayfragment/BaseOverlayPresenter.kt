@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 
 /**
  * @date 22/03/2018 2:29 AM
@@ -44,7 +45,9 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			childFragmentManager.fragments.apply {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
-				if (size == 2) {
+				// 因为 `WalletImportFragment 是一个 `ViewPager Fragment`
+				// 集合， 固这里单独处理了。
+				if (size == 2 || fragment is WalletImportFragment) {
 					overlayView.header.apply {
 						showBackButton(false)
 						showCloseButton(true)
