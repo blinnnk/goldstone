@@ -178,6 +178,43 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "確認助憶口令"
 		else -> ""
 	}
+	val safetyLevelWeak = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WEAK"
+		HoneyLanguage.Chinese.code -> "弱"
+		HoneyLanguage.Japanese.code -> "弱い"
+		HoneyLanguage.Korean.code -> "약점"
+		HoneyLanguage.Russian.code -> "слабый".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "弱"
+		else -> ""
+	}
+	val safetyLevelNoraml = when (currentLanguage) {
+		HoneyLanguage.English.code -> "NORMAL"
+		HoneyLanguage.Chinese.code -> "一般"
+		HoneyLanguage.Japanese.code -> "一般"
+		HoneyLanguage.Korean.code -> "일반"
+		HoneyLanguage.Russian.code -> "общий".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "普通"
+		else -> ""
+	}
+	val safetyLevelHigh = when (currentLanguage) {
+		HoneyLanguage.English.code -> "GOOD"
+		HoneyLanguage.Chinese.code -> "高"
+		HoneyLanguage.Japanese.code -> "高い"
+		HoneyLanguage.Korean.code -> "고"
+		HoneyLanguage.Russian.code -> "высокая".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "高"
+		else -> ""
+	}
+	val safetyLevelStrong = when (currentLanguage) {
+		HoneyLanguage.English.code -> "STRONG"
+		HoneyLanguage.Chinese.code -> "很强"
+		HoneyLanguage.Japanese.code -> "強い"
+		HoneyLanguage.Korean.code -> "강"
+		HoneyLanguage.Russian.code -> "сильный".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "很强"
+		else -> ""
+	}
+
 }
 
 object ImportWalletText {
