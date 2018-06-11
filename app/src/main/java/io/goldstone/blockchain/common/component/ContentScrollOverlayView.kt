@@ -29,6 +29,7 @@ import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
  */
 class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	
+	var recoveryBackEvent: Runnable? = null
 	private var container: RelativeLayout
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
@@ -88,6 +89,11 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 		container.setCenterInParent()
 	}
 	
+	override fun onAttachedToWindow() {
+		super.onAttachedToWindow()
+		setBackEvent()
+	}
+	
 	fun setContentPadding(
 		left: Int = 20.uiPX(),
 		top: Int = 10.uiPX(),
@@ -102,15 +108,23 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun remove() {
-		(context as? MainActivity)
-			?.getMainContainer()?.apply {
-				findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
-					removeView(it)
+		(context as? MainActivity)?.apply {
+			getMainContainer()?.let { container ->
+				container.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
+					container.removeView(it)
+					recoveryBackEvent?.run()
 				}
 			}
+		}
 	}
 	
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
+	}
+	
+	private fun setBackEvent() {
+		(context as? MainActivity)?.backEvent = Runnable {
+			remove()
+		}
 	}
 }

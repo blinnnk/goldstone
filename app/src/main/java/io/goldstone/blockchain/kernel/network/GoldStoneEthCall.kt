@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
@@ -132,8 +131,8 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
@@ -342,6 +341,7 @@ object GoldStoneEthCall {
 	fun getEthBalance(
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
@@ -351,7 +351,7 @@ object GoldStoneEthCall {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
 				LogUtil.error(Method.GetBalance.display, error)
-			}) {
+			}, chainID) {
 				holdValue(it.hexToDecimal())
 			}
 		}
@@ -398,7 +398,9 @@ object GoldStoneEthCall {
 		GoldStoneAPI.getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
-					errorCallback(error, "Call Ethereum Failured")
+					GoldStoneAPI.context.runOnUiThread {
+						errorCallback(error, "Call Ethereum Failured")
+					}
 				}
 				
 				@SuppressLint("SetTextI18n")
@@ -420,7 +422,9 @@ object GoldStoneEthCall {
 							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
-						errorCallback(error, "onResponse Error")
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback(error, "onResponse Error")
+						}
 					}
 				}
 			})

@@ -19,6 +19,7 @@ import org.jetbrains.anko.matchParent
 class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	private val chartView = object : LineChart(context) {
+		override fun setChartValueType() = LineChart.Companion.ChartType.Assets
 		override fun canClickPoint() = true
 		override fun setChartStyle() = LineChart.Companion.Style.PointStyle
 		override fun hasAnimation() = true

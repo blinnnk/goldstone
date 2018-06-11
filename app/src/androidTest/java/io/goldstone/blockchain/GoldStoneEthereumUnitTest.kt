@@ -51,14 +51,46 @@ class GoldStoneEthereumUnitTest {
 	fun getTransactionByHash() {
 		val transactionHash = "0XF3652ACBADF1EB216E21FF77B742B30786438D63E5EEF4FEB96F24C2CAF54715"
 		val chainID = ChainID.Ropstan.id
-		GoldStoneEthCall.getTransactionByHash(transactionHash, chainID, {
+		GoldStoneEthCall.getTransactionByHash(
+			transactionHash, chainID, {
 			// Unfinished
 		}, { error, reason ->
-			LogUtil.error(positon + "getTransactionByHash" + reason, error)
-		}) {
+				LogUtil.error(
+					positon + "getTransactionByHash" + reason,
+					error
+				)
+			}
+		) {
 			// The ring result of blocknumber is 3396621
 			LogUtil.debug(positon + "getTransactionByHash", it.toString())
 			assertTrue("Blocknumber is null or empty", it.blockNumber.isBlank())
+		}
+	}
+	
+	@Test
+	fun getEthBalance() {
+		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
+		val chainID = ChainID.Ropstan.id
+		GoldStoneEthCall.getEthBalance(
+			address,
+			{ error, reason ->
+				LogUtil.error(positon + reason, error)
+			}, chainID
+		) {
+			LogUtil.debug("$positon + getEthBalance", it.toString())
+		}
+	}
+	
+	@Test
+	fun getInputCodeByTaxHash() {
+		val hash = "0x3dda45630cab85080320ee791a540f2f6ef2e9ad7e845831126e03f193088965"
+		GoldStoneEthCall.getInputCodeByHash(
+			hash,
+			{ error, reason ->
+				LogUtil.error(positon + reason, error)
+			}
+		) {
+			LogUtil.debug("$positon + getInputCodeByTaxHash", it)
 		}
 	}
 }

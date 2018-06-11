@@ -30,6 +30,8 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 	
 	abstract fun setChartStyle(): LineChart.Companion.Style
 	abstract fun hasAnimation(): Boolean
+	abstract fun setChartValueType(): LineChart.Companion.ChartType
+	
 	open fun updateData(data: ArrayList<ChartPoint>) {
 		chartData = data
 	}
@@ -111,7 +113,11 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			setFontSize(8.uiPX())
 			val maxValue = chartData.max()?.value ?: 0f
 			val minValue = chartData.min()?.value ?: 0f
-			LineChart.generateChardGridValue(maxValue, minValue) { min, max, step ->
+			LineChart.generateChardGridValue(
+				maxValue,
+				minValue,
+				setChartValueType()
+			) { min, max, step ->
 				setAxisBorderValues(min, max, step)
 			}
 		}
@@ -122,18 +128,20 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 				context.toast(chartData[entryIndex].value.toString())
 			}
 		}
+		
+		notifyDataUpdate()
+		
 		try {
-			notifyDataUpdate()
+			// 决定是否显示动画
+			if (hasAnimation()) {
+				val animation = Animation(1000)
+				animation.setInterpolator(OvershootInterpolator())
+				show(animation)
+			} else {
+				show()
+			}
 		} catch (error: Exception) {
 			LogUtil.error(this.javaClass.simpleName, error)
-		}
-		// 决定是否显示动画
-		if (hasAnimation()) {
-			val animation = Animation(1000)
-			animation.setInterpolator(OvershootInterpolator())
-			show(animation)
-		} else {
-			show()
 		}
 	}
 	
@@ -163,30 +171,42 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			LineStyle, PointStyle
 		}
 		
+		enum class ChartType {
+			Assets, Quotation
+		}
+		
 		fun generateChardGridValue(
 			maxValue: Float,
 			minValue: Float,
+			chartType: ChartType,
 			hold: (min: Float, max: Float, step: Float) -> Unit
 		) {
-			val stepsCount = 5   //代表希望分成几个阶段
-			val max: Double = if (maxValue == minValue) {
-				if (maxValue == 0f)
-					(stepsCount - 1).toDouble()
-				else maxValue + Math.abs(maxValue * 0.5)
-			} else {
-				maxValue.toDouble()
+			// minRate = 最低点 / min值
+			val minRate = when (chartType) {
+				ChartType.Assets -> 0.3
+				ChartType.Quotation -> 1.0
 			}
-			val min: Double = if (maxValue == minValue) {
-				maxValue - Math.abs(maxValue * 0.5)
-			} else {
-				minValue.toDouble()
+			val stepsCount = 5 //代表希望分成几个阶段
+			val max =
+				if (maxValue == minValue) {
+					if (maxValue == 0f) (stepsCount - 1).toDouble()
+					else maxValue + Math.abs(maxValue * 0.5)
+				} else if (maxValue < minValue) {
+					minValue.toDouble()
+				} else {
+					maxValue.toDouble()
+				}
+			val min = when {
+				maxValue == minValue -> maxValue - Math.abs(maxValue * 0.5)
+				maxValue < minValue -> maxValue * minRate
+				else -> minValue * minRate
 			}
 			val roughStep = (max - min) / (stepsCount - 1)
 			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
 			val step = (Math.ceil(roughStep / stepLevel) * stepLevel)
-			val minChartHeight = Math.floor(min / step).toFloat() * step
-			val maxChartHeight = (1.0 + Math.floor(max / step)).toFloat() * step
-			hold(minChartHeight.toFloat(), maxChartHeight.toFloat(), step.toFloat())
+			val minChartHeight = (Math.floor(min / step) * step).toFloat()
+			val maxChartHeight = ((1.0 + Math.floor(max / step)) * step).toFloat()
+			hold(minChartHeight, maxChartHeight, step.toFloat())
 		}
 	}
 }

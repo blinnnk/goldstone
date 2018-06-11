@@ -11,9 +11,11 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
@@ -89,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	override fun onBackPressed() {
+		recoveryBackEventWhenBackFromOtherApp()
 		if (backEvent.isNull()) {
 			super.onBackPressed()
 		} else {
@@ -111,9 +114,24 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	fun showHomeFragment() {
-		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
-			if (it.isHidden) {
-				supportFragmentManager?.beginTransaction()?.show(it)?.commit()
+		try {
+			(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
+				if (it.isHidden) {
+					supportFragmentManager?.beginTransaction()?.show(it)?.commitAllowingStateLoss()
+				}
+			}
+		} catch (error: Exception) {
+			LogUtil.error(this.javaClass.simpleName + "showHomeFragment", error)
+		}
+	}
+	
+	private fun recoveryBackEventWhenBackFromOtherApp() {
+		supportFragmentManager.fragments.last()?.let {
+			if (it is BaseOverlayFragment<*>) {
+				val child = it.childFragmentManager.fragments.last()
+				if (child is BaseFragment<*>) {
+					child.recoveryBackEvent()
+				}
 			}
 		}
 	}

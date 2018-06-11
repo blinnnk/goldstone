@@ -31,11 +31,18 @@ import org.jetbrains.anko.textColor
 class QuotationCell(context: Context) : LinearLayout(context) {
 	
 	var model: QuotationModel by observing(QuotationModel()) {
+		val price =
+			if (model.price == ValueTag.emptyPrice) model.price
+			else model.price.toDoubleOrNull()?.toBigDecimal().toString()
+		
 		tokenInfo.title.text = model.pairDisplay.toUpperCase()
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
-			model.quoteSymbol.toUpperCase(), model.quoteSymbol.toUpperCase() + " " + model.price,
-			GrayScale.midGray, 13.uiPX(), false, false
+			model.quoteSymbol.toUpperCase(),
+			model.quoteSymbol.toUpperCase() + " " + price,
+			GrayScale.midGray, 13.uiPX(),
+			false,
+			false
 		)
 		
 		tokenPrice.subtitle.text = model.percent + "%"
@@ -83,6 +90,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		}
 	}
 	private val chartView = object : LineChart(context) {
+		override fun setChartValueType() = LineChart.Companion.ChartType.Quotation
 		override fun canClickPoint() = false
 		override fun setChartStyle() = LineChart.Companion.Style.LineStyle
 		override fun hasAnimation() = false
@@ -113,14 +121,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			}
 		}
 	}
-	private var cellLayout: RelativeLayout
 	
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, 180.uiPX())
 		
-		cellLayout = relativeLayout {
+		relativeLayout {
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 170.uiPX())
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
 			

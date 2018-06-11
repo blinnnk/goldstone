@@ -200,16 +200,22 @@ class WalletDetailPresenter(
 			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
 				val overlay = ContentScrollOverlayView(context)
 				overlay.into(this)
-				overlay.setTitle("Token Selection")
-				overlay.addContent {
-					topPadding = 10.uiPX()
-					defaultTokens.filter { default ->
-						myTokens.any { it.contract.equals(default.contract, true) }
-					}.let {
-						val data = it.sortedByDescending { it.weight }.toArrayList()
-						val tokenList = TokenSelectionRecyclerView(context)
-						tokenList.into(this)
-						tokenList.setAdapter(data, isShowAddress)
+				overlay.apply {
+					setTitle("Token Selection")
+					addContent {
+						topPadding = 10.uiPX()
+						defaultTokens.filter { default ->
+							myTokens.any { it.contract.equals(default.contract, true) }
+						}.let {
+							val data = it.sortedByDescending { it.weight }.toArrayList()
+							val tokenList = TokenSelectionRecyclerView(context)
+							tokenList.into(this)
+							tokenList.setAdapter(data, isShowAddress)
+						}
+					}
+					
+					recoveryBackEvent = Runnable {
+						fragment.getMainActivity()?.backEvent = null
 					}
 				}
 			}

@@ -109,16 +109,21 @@ class MarketTokenDetailPresenter(
 		if (parent.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
 			val overlay = ContentScrollOverlayView(parent.context)
 			overlay.into(parent)
-			overlay.setTitle("DESCRIPTION")
-			overlay.setContentPadding()
-			overlay.addContent {
-				QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
-					textView(it?.description) {
-						textColor = GrayScale.gray
-						textSize = fontSize(14)
-						typeface = GoldStoneFont.medium(context)
-						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+			overlay.apply {
+				setTitle("DESCRIPTION")
+				setContentPadding()
+				addContent {
+					QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
+						textView(it?.description) {
+							textColor = GrayScale.gray
+							textSize = fontSize(14)
+							typeface = GoldStoneFont.medium(context)
+							layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+						}
 					}
+				}
+				recoveryBackEvent = Runnable {
+					fragment.recoveryBackEvent()
 				}
 			}
 		}
@@ -336,10 +341,13 @@ class MarketTokenDetailPresenter(
 	
 	private fun QuotationModel.updateCurrencyPriceInfo() {
 		// 长连接获取数据
-		QuotationPresenter.getPriceInfoBySocket(arrayListOf(pair), {
-			currentSocket = it
-			currentSocket?.runSocket()
-		}) {
+		QuotationPresenter.getPriceInfoBySocket(
+			arrayListOf(pair),
+			{
+				currentSocket = it
+				currentSocket?.runSocket()
+			}
+		) {
 			if (it.pair == pair) {
 				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
 			}

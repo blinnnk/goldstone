@@ -475,6 +475,9 @@ object GoldStoneAPI {
 					try {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
+						GoldStoneAPI.context.runOnUiThread {
+							netWorkError(error)
+						}
 						LogUtil.error(path, error)
 					}
 				}
@@ -653,12 +656,16 @@ object GoldStoneCode {
 			if (code.isNotEmpty()) {
 				when (code.toInt()) {
 					-1 -> {
-						errorCallback()
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback()
+						}
 						LogUtil.error("Server Error GoldStone")
 					}
 					
 					-4 -> {
-						errorCallback()
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback()
+						}
 						LogUtil.error("Url Error")
 						/**
 						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误
