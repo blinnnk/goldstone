@@ -6,6 +6,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
@@ -43,8 +44,8 @@ class ContactPresenter(
 
 	fun deleteContact(id: Int) {
 		fragment.context?.showAlertView(
-			"DELETE CONTACT",
-			"are you sure to delete this contact? once you delete this record will delete totaly",
+			ProfileText.deletContactAlertTitle,
+			ProfileText.deleteContactAlertDescription,
 			false
 		) {
 			ContactTable.deleteContactByID(id) {

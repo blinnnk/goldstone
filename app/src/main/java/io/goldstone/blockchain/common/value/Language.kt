@@ -175,6 +175,43 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "確認助憶口令"
 		else -> ""
 	}
+	val safetyLevelWeak = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WEAK"
+		HoneyLanguage.Chinese.code -> "弱"
+		HoneyLanguage.Japanese.code -> "弱い"
+		HoneyLanguage.Korean.code -> "약점"
+		HoneyLanguage.Russian.code -> "слабый".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "弱"
+		else -> ""
+	}
+	val safetyLevelNoraml = when (currentLanguage) {
+		HoneyLanguage.English.code -> "NORMAL"
+		HoneyLanguage.Chinese.code -> "一般"
+		HoneyLanguage.Japanese.code -> "一般"
+		HoneyLanguage.Korean.code -> "일반"
+		HoneyLanguage.Russian.code -> "общий".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "普通"
+		else -> ""
+	}
+	val safetyLevelHigh = when (currentLanguage) {
+		HoneyLanguage.English.code -> "GOOD"
+		HoneyLanguage.Chinese.code -> "高"
+		HoneyLanguage.Japanese.code -> "高い"
+		HoneyLanguage.Korean.code -> "고"
+		HoneyLanguage.Russian.code -> "высокая".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "高"
+		else -> ""
+	}
+	val safetyLevelStrong = when (currentLanguage) {
+		HoneyLanguage.English.code -> "STRONG"
+		HoneyLanguage.Chinese.code -> "很强"
+		HoneyLanguage.Japanese.code -> "強い"
+		HoneyLanguage.Korean.code -> "강"
+		HoneyLanguage.Russian.code -> "сильный".toUpperCase()
+		HoneyLanguage.TraditionalChinese.code -> "很强"
+		else -> ""
+	}
+
 }
 
 object ImportWalletText {
@@ -1553,6 +1590,27 @@ object ProfileText {
 		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://goldstone.io"
 		HoneyLanguage.Russian.code -> "GoldStone\nБезопасный, простой в использовании, быстрый\nhttps://goldstone.io"
 		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
+		else -> ""
+	}
+
+	@JvmField
+	val deletContactAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DELETE CONTACT"
+		HoneyLanguage.Chinese.code -> "删除联系人"
+		HoneyLanguage.Japanese.code -> "連絡先を削除"
+		HoneyLanguage.Korean.code -> "연락처 삭제"
+		HoneyLanguage.Russian.code -> "УДАЛИТЬ КОНТАКТ"
+		HoneyLanguage.TraditionalChinese.code -> "刪除聯繫人"
+		else -> ""
+	}
+	@JvmField
+	val deleteContactAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Are you sure you want to delete this contact and the corresponding address?"
+		HoneyLanguage.Chinese.code -> "通知中心"
+		HoneyLanguage.Japanese.code -> "この連絡先と対応するアドレスを削除してもよろしいですか？"
+		HoneyLanguage.Korean.code -> "이 연락처와 해당 주소를 삭제 하시겠습니까?"
+		HoneyLanguage.Russian.code -> "Вы действительно хотите удалить этот контакт и соответствующий адрес?"
+		HoneyLanguage.TraditionalChinese.code -> "你確定要刪除這個聯繫人和對應的地址嗎？"
 		else -> ""
 	}
 }
