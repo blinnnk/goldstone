@@ -12,7 +12,7 @@ import org.jetbrains.anko.matchParent
  */
 class MarketTokenChart(context: Context) : LineChart(context) {
 	
-	override fun setChartValueType() = LineChart.Companion.ChartType.Quotation
+	override fun setChartValueType() = LineChart.Companion.ChartType.MarketTokenDetail
 	override fun canClickPoint() = true
 	override fun setChartStyle() = LineChart.Companion.Style.LineStyle
 	

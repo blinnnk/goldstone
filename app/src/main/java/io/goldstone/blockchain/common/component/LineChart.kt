@@ -46,12 +46,12 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 	
 	abstract fun canClickPoint(): Boolean
 	
-	open fun setRedColor() {
+	fun setRedColor() {
 		chartColor = Spectrum.lightRed
 		chartLineColor = Spectrum.red
 	}
 	
-	open fun setGreenColor() {
+	fun setGreenColor() {
 		chartColor = Spectrum.lightGreen
 		chartLineColor = Spectrum.green
 	}
@@ -129,9 +129,23 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			}
 		}
 		
-		notifyDataUpdate()
-		
 		try {
+			notifyDataUpdate()
+			if (setChartValueType() != ChartType.MarketTokenDetail) {
+				// 决定是否显示动画
+				if (hasAnimation()) {
+					val animation = Animation(1000)
+					animation.setInterpolator(OvershootInterpolator())
+					show(animation)
+				} else {
+					show()
+				}
+			}
+		} catch (error: Exception) {
+			LogUtil.error(this.javaClass.simpleName, error)
+		}
+		
+		if (setChartValueType() == ChartType.MarketTokenDetail) {
 			// 决定是否显示动画
 			if (hasAnimation()) {
 				val animation = Animation(1000)
@@ -140,8 +154,6 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			} else {
 				show()
 			}
-		} catch (error: Exception) {
-			LogUtil.error(this.javaClass.simpleName, error)
 		}
 	}
 	
@@ -172,7 +184,7 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 		}
 		
 		enum class ChartType {
-			Assets, Quotation
+			Assets, Quotation, MarketTokenDetail
 		}
 		
 		fun generateChardGridValue(
@@ -182,9 +194,10 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			hold: (min: Float, max: Float, step: Float) -> Unit
 		) {
 			// 最低点 = min - (max - min) * minRate
+			// 最低点 = min + (max - min) *
 			val minRate = when (chartType) {
-				ChartType.Assets -> 0.6
-				ChartType.Quotation -> 1.0
+				ChartType.Assets -> 0.8
+				ChartType.Quotation, ChartType.MarketTokenDetail -> 0.1
 			}
 			val stepsCount = 5 //代表希望分成几个阶段
 			val max =
@@ -196,14 +209,10 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 				} else {
 					maxValue.toDouble()
 				}
-			val min = if (maxValue == minValue) {
-				maxValue - Math.abs(maxValue * 0.5)
-			} else if (maxValue < minValue) {
-				val minPoint = maxValue - (minValue - maxValue) * minRate
-				if (minPoint > 0.0) minPoint else 0.0
-			} else {
-				val minPoint = minValue - (maxValue - minValue) * minRate
-				if (minPoint > 0.0) minPoint else 0.0
+			val min = when {
+				maxValue == minValue -> maxValue - Math.abs(maxValue * 0.5)
+				maxValue < minValue -> maxValue - (minValue - maxValue) * minRate
+				else -> minValue - (maxValue - minValue) * minRate
 			}
 			val roughStep = (max - min) / (stepsCount - 1)
 			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
