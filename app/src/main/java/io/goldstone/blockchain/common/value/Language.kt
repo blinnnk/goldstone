@@ -904,12 +904,12 @@ object CommonText {
 	}
 	@JvmField
 	val delete = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Delete Wallet"
-		HoneyLanguage.Chinese.code -> "删除钱包"
-		HoneyLanguage.Japanese.code -> "ウォレットを削除"
-		HoneyLanguage.Korean.code -> "지갑 삭제"
+		HoneyLanguage.English.code -> "Delete"
+		HoneyLanguage.Chinese.code -> "删除"
+		HoneyLanguage.Japanese.code -> "削除"
+		HoneyLanguage.Korean.code -> "삭제"
 		HoneyLanguage.Russian.code -> "УДАЛИТЬ"
-		HoneyLanguage.TraditionalChinese.code -> "刪除錢包"
+		HoneyLanguage.TraditionalChinese.code -> "刪除"
 		else -> ""
 	}
 	@JvmField

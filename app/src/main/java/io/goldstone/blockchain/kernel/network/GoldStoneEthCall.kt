@@ -131,8 +131,8 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
@@ -341,6 +341,7 @@ object GoldStoneEthCall {
 	fun getEthBalance(
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
@@ -350,7 +351,7 @@ object GoldStoneEthCall {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
 				LogUtil.error(Method.GetBalance.display, error)
-			}) {
+			}, chainID) {
 				holdValue(it.hexToDecimal())
 			}
 		}

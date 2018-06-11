@@ -46,6 +46,7 @@ class QuotationPresenter(
 			if (selectionMD5 == selections.getObjectMD5HexString()) {
 				return@getMySelections
 			}
+			
 			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
@@ -78,9 +79,7 @@ class QuotationPresenter(
 					}
 				} otherwise {
 					// 更新 `Sockert`
-					fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
-						currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
-					}
+					subscribeSocket()
 				}
 			}
 		}
@@ -94,12 +93,20 @@ class QuotationPresenter(
 		currentSocket?.let {
 			if (!it.isSocketConnected()) {
 				it.runSocket()
+				subscribeSocket()
 			}
 		}
 		if (currentSocket.isNull() && hasInitSocket) {
 			setSocket {
 				currentSocket?.runSocket()
 			}
+		}
+	}
+	
+	private fun subscribeSocket() {
+		// 更新 `Sockert`
+		fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
+			currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 		}
 	}
 	
@@ -124,9 +131,9 @@ class QuotationPresenter(
 	}
 	
 	private var currentSocket: GoldStoneWebSocket? = null
-	fun setSocket(
+	private fun setSocket(
 		holdData: CurrencyPriceInfoModel.() -> Unit = {},
-		callback: (GoldStoneWebSocket?) -> Unit = {}
+		callback: (GoldStoneWebSocket?) -> Unit
 	) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(

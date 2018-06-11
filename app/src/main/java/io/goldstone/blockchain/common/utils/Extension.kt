@@ -51,9 +51,7 @@ fun Context.showAlertView(
 	action: (EditText?) -> Unit
 ) {
 	var input: EditText? = null
-	alert(
-		subtitle, title
-	) {
+	alert(subtitle, title) {
 		showEditText isTrue {
 			customView {
 				verticalLayout {

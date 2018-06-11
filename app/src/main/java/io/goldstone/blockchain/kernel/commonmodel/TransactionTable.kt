@@ -352,11 +352,11 @@ data class TransactionTable(
 					GoldStoneEthCall.apply {
 						getInputCodeByHash(
 							hash,
-							chainID,
 							{ error, reason ->
 								reason?.let { context.alert(it) }
 								LogUtil.error("getByHashAndReceivedStatus", error)
-							}
+							},
+							chainID
 						) { input ->
 							val isErc20 = CryptoUtils.isERC20TransferByInputCode(input)
 							val memo = getMemoFromInputCode(input, isErc20)

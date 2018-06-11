@@ -47,11 +47,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	}
 	
 	open fun onFragmentDestroy() {
-		try {
-			fragment.getMainActivity()?.showHomeFragment()
-		} catch (error: Exception) {
-			LogUtil.error("BasePresenter showHomeFragment", error)
-		}
+		fragment.getMainActivity()?.showHomeFragment()
 	}
 	
 	fun recoveryFragmentHeight() {
@@ -69,12 +65,16 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 			overlayView.contentLayout.updateHeightAnimation(height, height, 0)
 		}
 		// 优化重汇
-		if (height >= ScreenSize.Height) {
-			AnimationDuration.Default timeUpThen {
-				fragment.getMainActivity()?.hideHomeFragment()
+		try {
+			if (height >= ScreenSize.Height) {
+				AnimationDuration.Default timeUpThen {
+					fragment.getMainActivity()?.hideHomeFragment()
+				}
+			} else {
+				fragment.getMainActivity()?.showHomeFragment()
 			}
-		} else {
-			fragment.getMainActivity()?.showHomeFragment()
+		} catch (error: Error) {
+			LogUtil.error(this.javaClass.simpleName + "showHomeFragment", error)
 		}
 	}
 	

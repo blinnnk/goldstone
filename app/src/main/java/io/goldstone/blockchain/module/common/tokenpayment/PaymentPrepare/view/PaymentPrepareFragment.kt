@@ -203,10 +203,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 	
-	fun setSymbolAndPrice(
-		symbol: String,
-		price: String
-	) {
+	fun setSymbolAndPrice(symbol: String, price: String) {
 		this.inputView.setHeaderSymbol(symbol)
 		this.price.setSubtitle(price)
 	}
@@ -215,8 +212,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		activity: MainActivity,
 		parent: Fragment?
 	) {
-		getParentFragment<TokenDetailOverlayFragment>()?.let {
-			presenter.backEvent(it)
+		if (memoInputView.isNull()) {
+			getParentFragment<TokenDetailOverlayFragment>()?.let {
+				presenter.backEvent(it)
+			}
+		} else {
+			removeMemoInputView()
 		}
 	}
 }
