@@ -5,10 +5,7 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -55,7 +52,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 					fragment.asyncData = generateModels(TransactionListModel(localTransaction))
 					val headerData = TransactionHeaderModel(
 						value.toDouble(),
-						fromAddress,
+						if (isReceive) fromAddress else tokenReceiveAddress ?: to,
 						symbol,
 						false,
 						isReceive,
@@ -71,12 +68,10 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 
 // 通过从 `notification` 计算后传入的值来完善 `token` 基础信息的方法
 fun TransactionDetailPresenter.prepareHeaderValueFromNotification(
-	receipt: TransactionTable,
-	toAddress: String,
+	address: String,
 	value: Double,
 	isReceive: Boolean
 ) {
-	val address = if (isReceive) receipt.fromAddress else toAddress
 	updateHeaderValue(
 		TransactionHeaderModel(
 			value,
@@ -111,11 +106,12 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 				receipt.toAsyncData().let {
 					it[4].info = TimeUtils.formatDate(info.timeStamp)
 					it[1].info = memo
+					it[2].info = if (info.isReceived) info.fromAddress else info.toAddress
 					fragment.apply {
 						if (asyncData.isNull()) asyncData = it
 						else presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
 					}
-					updateHeaderFromNotification(receipt, info)
+					updateHeaderFromNotification(info)
 				}
 			}
 			callback()
@@ -145,16 +141,10 @@ private fun TransactionTable.getTimestampAndInsertToDatabase(
 }
 
 private fun TransactionDetailPresenter.updateHeaderFromNotification(
-	receipt: TransactionTable,
 	info: NotificationTransactionInfo
 ) {
-	// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-	val transactionInfo =
-		CryptoUtils.loadTransferInfoFromInputData(receipt.input)
-	
 	prepareHeaderValueFromNotification(
-		receipt,
-		transactionInfo?.address ?: receipt.to,
+		if (info.isReceived) info.fromAddress else info.toAddress,
 		notificationData?.value.orElse(0.0),
 		info.isReceived
 	)
@@ -164,6 +154,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
 		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(),
 		TransactionText.noMemo,
+		"",
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(0),
@@ -172,6 +163,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
+		(if (isReceive == true) CommonText.to else CommonText.from) + " " + ImportWalletText.address,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

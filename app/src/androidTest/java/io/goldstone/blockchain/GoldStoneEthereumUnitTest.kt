@@ -27,7 +27,7 @@ class GoldStoneEthereumUnitTest {
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	
+	n
 	@Test
 	fun getTokenInfoByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // symbol = GSC

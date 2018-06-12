@@ -30,7 +30,9 @@ data class NotificationTransactionInfo(
 	val isReceived: Boolean,
 	val symbol: String,
 	val value: Double,
-	val timeStamp: Long
+	val timeStamp: Long,
+	val toAddress: String,
+	val fromAddress: String
 ) : Serializable
 
 class NotificationListPresenter(

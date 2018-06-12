@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.toAddressCode
 
@@ -13,22 +14,27 @@ import io.goldstone.blockchain.crypto.toAddressCode
 object APIPath {
 	
 	/** GoldStone Basic Api Address */
-	private const val url = "https://goldstone-api1.naonaola.com"
-	const val defaultTokenList = "$url/index/defaultCoinList"
-	const val getCoinInfo = "$url/index/searchToken?symbolOrContract="
-	const val getCurrencyRate = "$url/index/exchangeRate?currency="
-	const val registerDevice = "$url/account/registerDevice"
-	const val updateAddress = "$url/account/updateAddress"
-	const val getNotification = "$url/account/unreadMessageList"
-	const val marketSearch = "$url/account/searchPair?pair="
-	const val terms = "$url/index/agreement?md5="
-	const val getConfigList = "$url/index/getConfigList"
-	const val getCurrencyLineChartData = "$url/account/lineDataByDay"
-	const val getPriceByAddress = "$url/index/priceByAddress"
-	const val getTokenDescription = "$url/market/coinDescription?symbol="
-	const val getUnreadCount = "$url/account/checkUnreadMessage"
-	const val getNewVersion = "$url/index/getNewVersion"
-	const val getShareContent = "$url/index/getShareContent"
+	var currentUrl = WebUrl.normalServer
+	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
+	fun updateServerUrl(newUrl: String) {
+		currentUrl = newUrl
+	}
+	
+	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
+	val getCoinInfo: (header: String) -> String = { "$it/index/searchToken?symbolOrContract=" }
+	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
+	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
+	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" }
+	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
+	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
+	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
+	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
+	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
+	val getPriceByAddress: (header: String) -> String = { "$it/index/priceByAddress" }
+	val getTokenDescription: (header: String) -> String = { "$it/market/coinDescription?symbol=" }
+	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
+	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
+	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	/** Chain Address */
 	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
 	const val main = "https://eth-node-mainnet.goldstone.io/eth"
@@ -39,10 +45,10 @@ object APIPath {
 		period: String,
 		size: Int
 	) -> String = { pair, period, size ->
-		"$url/market/lineData?pair=$pair&period=$period&size=$size"
+		"$currentUrl/market/lineData?pair=$pair&period=$period&size=$size"
 	}
 	val getQuotationCurrencyInfo: (pair: String) -> String = { pair ->
-		"$url/market/coinDetail?pair=$pair"
+		"$currentUrl/market/coinDetail?pair=$pair"
 	}
 }
 

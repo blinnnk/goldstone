@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
@@ -80,7 +81,7 @@ data class DefaultTokenTable(
 		data.iconUrl,
 		data.symbol,
 		0,
-		data.price.toDouble(),
+		data.price.toDoubleOrNull().orZero(),
 		data.name,
 		data.decimal.toDouble(),
 		"",

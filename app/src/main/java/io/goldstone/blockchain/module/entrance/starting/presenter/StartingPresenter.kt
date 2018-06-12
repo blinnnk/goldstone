@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.BackupServerChecker
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -45,6 +46,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fun updateShareContentFromServer() {
 			GoldStoneAPI.getShareContent(
 				{
+					BackupServerChecker.checkBackupStatusByException(it)
 					LogUtil.error("showShareChooser", it)
 				}
 			) {
