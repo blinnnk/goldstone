@@ -6,8 +6,8 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.json.JSONObject
 
 /**
@@ -96,7 +96,7 @@ data class NotificationTable(
 		
 		fun getReceiveStatus(extra: String): Boolean? {
 			return if (extra.isNotEmpty()) {
-				JSONObject(extra).safeGet("from_or_to").toIntOrNull() == TinyNumber.True.value
+				TinyNumberUtils.isTrue(JSONObject(extra).safeGet("from_or_to"))
 			} else null
 		}
 		

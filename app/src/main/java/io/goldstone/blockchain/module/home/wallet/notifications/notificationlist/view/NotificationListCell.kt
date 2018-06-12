@@ -26,11 +26,15 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		info.apply {
 			title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
 		}
-		date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString(), DateAndTimeText.getDateText())
+		date.text =
+			HoneyDateUtil.getSinceTime(
+				(model?.createTime.orElse(0) / 1000).toString(),
+				DateAndTimeText.getDateText()
+			)
 		WalletTable.getAll {
 			when (model?.type) {
 				NotificationType.Transaction.code -> {
-					if (NotificationTable.getReceiveStatus(model?.extra.orEmpty())!!) {
+					if (NotificationTable.getReceiveStatus(model?.extra.orEmpty()).orFalse()) {
 						setIconColor(Spectrum.green)
 						setIconResource(R.drawable.receive_icon)
 						info.subtitle.text =

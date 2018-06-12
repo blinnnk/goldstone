@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
@@ -11,6 +10,7 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
@@ -27,7 +27,6 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
@@ -119,7 +118,7 @@ object GoldStoneAPI {
 			val data = JSONObject(this[0])
 			val hasNewVersion =
 				if (this[0].contains("has_new_version"))
-					data.safeGet("has_new_version").toIntOrNull().orZero() == TinyNumber.True.value
+					TinyNumberUtils.isTrue(data.safeGet("has_new_version"))
 				else false
 			GoldStoneAPI.context.runOnUiThread {
 				if (hasNewVersion) {

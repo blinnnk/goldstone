@@ -11,13 +11,13 @@ import com.instabug.library.Instabug
 import com.instabug.library.invocation.InstabugInvocationEvent
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ConfigTag
 import io.goldstone.blockchain.common.value.InstaBug
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 
 /**
  * @date 22/03/2018 3:02 PM
@@ -73,7 +73,7 @@ class GoldStoneApp : Application() {
 	}
 	
 	private fun userInstaBugBySwitch(switch: String) {
-		if (switch.toIntOrNull() != TinyNumber.False.value) {
+		if (TinyNumberUtils.isTrue(switch)) {
 			Instabug.Builder(this, InstaBug.key)
 				.setInvocationEvent(InstabugInvocationEvent.SHAKE)
 				.build()

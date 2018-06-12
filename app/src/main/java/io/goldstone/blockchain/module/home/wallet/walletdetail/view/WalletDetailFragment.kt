@@ -15,7 +15,8 @@ import java.util.*
  * @date 23/03/2018 3:44 PM
  * @author KaySaith
  */
-class WalletDetailFragment : BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
+class WalletDetailFragment :
+	BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 	
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
 	private var headerView: WalletDetailHeaderView? = null
