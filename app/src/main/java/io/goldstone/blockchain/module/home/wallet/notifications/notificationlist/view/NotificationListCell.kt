@@ -37,7 +37,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 							CryptoUtils.scaleTo28(CommonText.from + " " + model?.content.orEmpty())
 					} else {
 						setIconColor(GrayScale.midGray)
-						setIconResource(R.drawable.transfer_icon)
+						setIconResource(R.drawable.send_icon)
 						info.subtitle.text =
 							CryptoUtils.scaleTo28(CommonText.to + " " + model?.content.orEmpty())
 					}

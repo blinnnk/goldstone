@@ -118,7 +118,9 @@ object GoldStoneAPI {
 		) {
 			val data = JSONObject(this[0])
 			val hasNewVersion =
-				data.safeGet("has_new_version").toIntOrNull().orZero() == TinyNumber.True.value
+				if (this[0].contains("has_new_version"))
+					data.safeGet("has_new_version").toIntOrNull().orZero() == TinyNumber.True.value
+				else false
 			GoldStoneAPI.context.runOnUiThread {
 				if (hasNewVersion) {
 					hold(VersionModel(JSONObject(data.safeGet("data"))))

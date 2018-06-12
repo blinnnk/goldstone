@@ -63,7 +63,7 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
-				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
+				ProfileModel(R.drawable.contact_us_icon, ProfileText.support, ""),
 				ProfileModel(R.drawable.help_center_icon, ProfileText.helpCenter, ""),
 				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
 				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""),
@@ -104,15 +104,17 @@ class ProfilePresenter(
 	private var newVersionUrl = ""
 	
 	fun showUpgradeDialog() {
-		GoldStoneDialog.show(fragment.context!!) {
-			showButtons(CommonText.upgrade) {
-				downloadNewVersion {
-					GoldStoneDialog.remove(fragment.context!!)
-					fragment.context?.alert("Application is downloading now")
+		fragment.context?.let {
+			GoldStoneDialog.show(it) {
+				showButtons(CommonText.upgrade) {
+					downloadNewVersion {
+						GoldStoneDialog.remove(it)
+						fragment.context?.alert("Application is downloading now")
+					}
 				}
+				setContent(newVersionName, newVersionDescription)
+				setImage(R.drawable.version_banner)
 			}
-			setContent(newVersionName, newVersionDescription)
-			setImage(R.drawable.version_banner)
 		}
 	}
 	

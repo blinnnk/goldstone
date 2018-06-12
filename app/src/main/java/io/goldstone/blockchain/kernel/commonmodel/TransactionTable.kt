@@ -77,7 +77,8 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = Config.getCurrentChain()
+	var chainID: String = Config.getCurrentChain(),
+	var isFee: Boolean = false
 ) {
 	
 	/** 默认的 `constructor` */

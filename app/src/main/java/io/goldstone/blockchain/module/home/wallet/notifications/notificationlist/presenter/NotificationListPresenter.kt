@@ -118,15 +118,17 @@ class NotificationListPresenter(
 	
 	private fun showServerErrorDialog() {
 		// error call back
-		GoldStoneDialog.show(fragment.context!!) {
-			showOnlyConfirmButton {
-				GoldStoneDialog.remove(fragment.context!!)
+		fragment.context?.let {
+			GoldStoneDialog.show(it) {
+				showOnlyConfirmButton {
+					GoldStoneDialog.remove(it)
+				}
+				setContent(
+					"SERVER IS BUSY",
+					"a lot of requests are happening, please wait a moment, let little forg has a rest"
+				)
+				setImage(R.drawable.server_error_banner)
 			}
-			setContent(
-				"SERVER IS BUSY",
-				"a lot of requests are happening, please wait a moment, let little forg has a rest"
-			)
-			setImage(R.drawable.server_error_banner)
 		}
 	}
 }
