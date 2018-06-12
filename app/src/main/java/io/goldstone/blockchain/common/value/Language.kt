@@ -9,8 +9,11 @@ import com.blinnnk.extension.toUpperCaseFirstLetter
  * @author KaySaith
  */
 var currentLanguage =
-	if (HoneyLanguage.currentLanguageIsSupported()) Config.getCurrentLanguageCode()
-	else HoneyLanguage.English.code
+	when {
+		Config.getCurrentLanguageCode() == 100 -> HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+		HoneyLanguage.currentLanguageIsSupported() -> Config.getCurrentLanguageCode()
+		else -> HoneyLanguage.English.code
+	}
 
 object CreateWalletText {
 	val attention = when (currentLanguage) {

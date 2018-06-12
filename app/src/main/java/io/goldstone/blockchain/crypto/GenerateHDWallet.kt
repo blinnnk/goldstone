@@ -180,8 +180,6 @@ fun Context.deleteAccount(
 					keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
 					callback(true)
 				}
-			} else {
-				callback(true)
 			}
 		}
 	}
@@ -198,7 +196,6 @@ fun Context.updatePassword(
 		getPrivateKey(walletAddress, oldPassword, {
 			runOnUiThread {
 				errorCallback()
-				alert(CommonText.wrongPassword)
 			}
 		}) { privateKey ->
 			deleteAccount(walletAddress, oldPassword) {
