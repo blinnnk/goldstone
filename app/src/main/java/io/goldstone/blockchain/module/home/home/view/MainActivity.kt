@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val application = application as GoldStoneApp
+		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
 		
 		hideStatusBar()
@@ -69,7 +70,14 @@ class MainActivity : AppCompatActivity() {
 	
 	fun sendAnalyticsData(className: String) {
 		tracker?.setScreenName(className)
-		tracker?.send(HitBuilders.ScreenViewBuilder().build())
+		tracker?.send(
+			HitBuilders.ScreenViewBuilder()
+				.setCustomDimension(
+					ApkChannel.Home.code,
+					ApkChannel.Home.value
+				)
+				.build()
+		)
 	}
 	
 	fun showLoadingView() {

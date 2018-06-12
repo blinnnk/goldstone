@@ -24,7 +24,7 @@
     "url": "http://hunger.blinnnk.com/42fa79545c4647af802b5eabec4f0285",
     "price": "4.15",
     "force_show": 0,
-    "is_default": 0,
+    "is_default": 1,
     "chain_id": "1"
   },
   {
@@ -122,7 +122,7 @@
     "url": "http://hunger.blinnnk.com/ca64e79b0c2b469b8a82b1122a843ad5",
     "price": "809.41",
     "force_show": 0,
-    "is_default": 0,
+    "is_default": 1,
     "chain_id": "1"
   },
   {
@@ -2502,7 +2502,7 @@
     "url": "http://hunger.blinnnk.com/08b492d721d3479aa263e8ecdbdb3adb",
     "price": "0.001694",
     "force_show": 0,
-    "is_default": 0,
+    "is_default": 1,
     "chain_id": "1"
   },
   {

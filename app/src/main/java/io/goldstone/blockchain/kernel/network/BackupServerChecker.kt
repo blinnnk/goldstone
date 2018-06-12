@@ -30,7 +30,6 @@ object BackupServerChecker {
 				}
 			) {
 				isTrue {
-					System.out.println("hello2")
 					APIPath.updateServerUrl(WebUrl.backUpServer)
 					GoldStoneWebSocket.updateSocketUrl(WebUrl.backUpSocket)
 				}
@@ -46,17 +45,14 @@ object BackupServerChecker {
 		errorCallback: (Exception) -> Unit,
 		hold: Boolean.() -> Unit
 	) {
-		System.out.println("hello3")
 		RequisitionUtil.requestData<String>(
 			APIPath.serverStatus,
 			"",
 			true,
 			errorCallback = errorCallback
 		) {
-			System.out.println("hello4 ___ $this")
 			JSONObject(this[0]).safeGet("inuse").toIntOrNull()?.let {
 				hold(it == TinyNumber.True.value)
-				System.out.println("hello5 $it")
 			}
 		}
 	}

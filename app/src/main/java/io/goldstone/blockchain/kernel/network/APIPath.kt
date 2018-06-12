@@ -15,11 +15,11 @@ object APIPath {
 	
 	/** GoldStone Basic Api Address */
 	var currentUrl = WebUrl.normalServer
-	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
 	fun updateServerUrl(newUrl: String) {
 		currentUrl = newUrl
 	}
 	
+	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
 	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
 	val getCoinInfo: (header: String) -> String = { "$it/index/searchToken?symbolOrContract=" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }

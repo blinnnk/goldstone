@@ -7,7 +7,6 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
@@ -53,11 +52,6 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	
 	override fun emptyClickEvent() {
 		presenter.showQuotationManagement()
-	}
-	
-	override fun onResume() {
-		super.onResume()
-		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
 	
 	private var isShow = false
