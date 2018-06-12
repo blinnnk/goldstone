@@ -211,7 +211,6 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "很强"
 		else -> ""
 	}
-
 }
 
 object ImportWalletText {
@@ -402,7 +401,7 @@ object DialogText {
 		else -> ""
 	}
 	val goToBackUp = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Back Up"
+		HoneyLanguage.English.code -> "BACK UP"
 		HoneyLanguage.Chinese.code -> "立即备份"
 		HoneyLanguage.Japanese.code -> "今すぐバックアップする"
 		HoneyLanguage.Korean.code -> "백업"
@@ -888,7 +887,7 @@ object CommonText {
 	}
 	@JvmField
 	val saveToAlbum = when (currentLanguage) {
-		HoneyLanguage.English.code -> "SAVE TO ALBUM"
+		HoneyLanguage.English.code -> "Save To Album"
 		HoneyLanguage.Chinese.code -> "保存到相册"
 		HoneyLanguage.Japanese.code -> "アルバムに保存"
 		HoneyLanguage.Korean.code -> "앨범에 저장"
@@ -1592,7 +1591,6 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://goldstone.io"
 		else -> ""
 	}
-
 	@JvmField
 	val deletContactAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELETE CONTACT"

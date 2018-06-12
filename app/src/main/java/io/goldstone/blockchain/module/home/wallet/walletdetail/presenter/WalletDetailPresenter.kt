@@ -13,6 +13,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
@@ -79,7 +80,13 @@ class WalletDetailPresenter(
 	
 	fun setQuickTransferEvent(isShowAddress: Boolean) {
 		// Check current wallet is watch only or not
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
+		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+			fragment.context!!,
+			{
+				// Click Dialog Confirm Button Event
+				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+			}
+		) {
 			MyTokenTable.getCurrentChainDefaultAndMyTokens { myTokens, defaultTokens ->
 				// Jump directly if there is only one type of token
 				if (myTokens.size == 1) {
@@ -93,7 +100,11 @@ class WalletDetailPresenter(
 						}
 					}
 				} else {
-					fragment.showSelectionListOverlayView(myTokens, defaultTokens, isShowAddress)
+					fragment.showSelectionListOverlayView(
+						myTokens,
+						defaultTokens,
+						isShowAddress
+					)
 				}
 			}
 		}
