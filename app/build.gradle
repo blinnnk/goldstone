@@ -19,7 +19,7 @@ android {
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 1
-    versionName "1.0-RC1"
+    versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -72,7 +72,7 @@ dependencies {
     exclude group: 'com.google.android', module: 'android'
   }
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.0.3'
+  implementation 'com.blinnnk:honeyui:0.3.0.4'
   // Crypto
   implementation 'org.ethereum:geth:1.8.8'
   implementation 'org.web3j:core:3.3.1-android'

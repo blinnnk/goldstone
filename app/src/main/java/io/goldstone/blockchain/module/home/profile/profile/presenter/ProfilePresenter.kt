@@ -64,6 +64,7 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.support_icon, ProfileText.support, ""),
+				ProfileModel(R.drawable.help_center_icon, ProfileText.helpCenter, ""),
 				ProfileModel(R.drawable.privacy_icon, ProfileText.privacy, ""),
 				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""),
 				ProfileModel(
@@ -88,7 +89,8 @@ class ProfilePresenter(
 					showShareChooser()
 				} else {
 					addFragmentAndSetArguments<ProfileOverlayFragment>(
-						ContainerID.main, FragmentTag.profileOverlay
+						ContainerID.main,
+						FragmentTag.profileOverlay
 					) {
 						putString(ArgumentKey.profileTitle, title)
 					}

@@ -20,6 +20,8 @@ object WebUrl {
 	@JvmStatic
 	val support = "$header/${webLanguage(Config.getCurrentLanguageCode())}/support"
 	@JvmStatic
+	val helpCenter = "$header/${webLanguage(Config.getCurrentLanguageCode())}/helpCenter"
+	@JvmStatic
 	val aboutUs = "$header/${webLanguage(Config.getCurrentLanguageCode())}/aboutUs"
 	@JvmStatic
 	var whatIsKeystore = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/keystore"
@@ -32,4 +34,14 @@ object WebUrl {
 		"$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/watchOnlyWallet"
 	@JvmStatic
 	val whatIsGas = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/gas"
+	
+	const
+	val backUpServer = "https://goldstone-api1.naonaola.com"
+	const
+	val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
+	
+	const
+	val normalServer = "https://api1.goldstone.io"
+	const
+	val normalSocket = "wss://api1.goldstone.io/ws"
 }

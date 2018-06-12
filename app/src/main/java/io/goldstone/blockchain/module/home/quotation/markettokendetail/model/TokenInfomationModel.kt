@@ -57,8 +57,8 @@ enum class MarketTokenDetailChartType(
 	val display: String
 ) {
 	
-	Hour(0, "1hour", DateAndTimeText.hour),
-	DAY(1, "1day", DateAndTimeText.day),
-	WEEK(2, "1week", DateAndTimeText.week),
-	MONTH(3, "1month", DateAndTimeText.month)
+	Hour(0, "1hour", DateAndTimeText.hour.toUpperCase()),
+	DAY(1, "1day", DateAndTimeText.day.toUpperCase()),
+	WEEK(2, "1week", DateAndTimeText.week.toUpperCase()),
+	MONTH(3, "1month", DateAndTimeText.month.toUpperCase())
 }

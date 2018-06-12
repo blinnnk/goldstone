@@ -3,8 +3,8 @@ package io.goldstone.blockchain.common.utils
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptGetRequest
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -25,7 +25,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	private val tag: String = "GoldStoneWebSocket"
 	private val timeout = 30000L
 	private val normalCloseCode = 1000
-	private val serverURL = "wss://goldstone-api1.naonaola.com/ws"
+	private var serverURL = sockerUrl
 	private var isConnected = false
 	private val handler = Handler(Looper.getMainLooper())
 	private val handlerPing = Handler(Looper.getMainLooper())
@@ -145,6 +145,13 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	
 	fun sendMessage(message: String) {
 		webSocket?.send(AesCrypto.encrypt(message).orEmpty())
+	}
+	
+	companion object {
+		private var sockerUrl = WebUrl.normalSocket
+		fun updateSocketUrl(newUrl: String) {
+			sockerUrl = newUrl
+		}
 	}
 }
 

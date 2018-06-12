@@ -45,6 +45,7 @@ class ProfileOverlayPresenter(
 			ProfileText.terms -> showTermsFragment()
 			ProfileText.support -> showSupportFragment()
 			ProfileText.aboutUs -> showAboutFragment()
+			ProfileText.helpCenter -> showHelpCenterFragment()
 		}
 	}
 	
@@ -69,6 +70,12 @@ class ProfileOverlayPresenter(
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.support)
+		}
+	}
+	
+	private fun showHelpCenterFragment() {
+		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
+			putString(ArgumentKey.webViewUrl, WebUrl.helpCenter)
 		}
 	}
 	

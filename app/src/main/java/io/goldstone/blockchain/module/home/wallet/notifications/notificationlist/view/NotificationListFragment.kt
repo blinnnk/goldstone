@@ -38,7 +38,9 @@ class NotificationListFragment :
 								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse(),
 								NotificationTable.getSymbol(extra.orEmpty()),
 								NotificationTable.getValue(extra.orEmpty()),
-								createTime
+								createTime,
+								NotificationTable.getToAddress(extra.orEmpty()),
+								NotificationTable.getFromAddress(extra.orEmpty())
 							)
 						)
 					}

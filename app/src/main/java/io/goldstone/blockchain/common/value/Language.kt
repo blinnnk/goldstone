@@ -334,7 +334,7 @@ object ImportWalletText {
 		HoneyLanguage.Japanese.code -> "これは、ニーモニックの正しい形式ではありません"
 		HoneyLanguage.Korean.code -> "니모닉 포맷 오류"
 		HoneyLanguage.Russian.code -> "Недействительный мнемонический формат"
-		HoneyLanguage.TraditionalChinese.code -> "助憶口令格式不對哦"
+		HoneyLanguage.TraditionalChinese.code -> "助憶口令格式不對"
 		else -> ""
 	}
 	val pathAlert = when (currentLanguage) {
@@ -634,7 +634,7 @@ object TransactionText {
 	@JvmField
 	val noMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't a memo."
-		HoneyLanguage.Chinese.code -> "没有备注信息。"
+		HoneyLanguage.Chinese.code -> "没有备注信息"
 		HoneyLanguage.Japanese.code -> "メモはありません。"
 		HoneyLanguage.Korean.code -> "메모가 없습니다."
 		HoneyLanguage.Russian.code -> "Нет памятки."
@@ -1516,12 +1516,22 @@ object ProfileText {
 	}
 	@JvmField
 	val support = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Support"
+		HoneyLanguage.English.code -> "Contact Us"
+		HoneyLanguage.Chinese.code -> "联系我们"
+		HoneyLanguage.Japanese.code -> "お問い合わせ"
+		HoneyLanguage.Korean.code -> "문의하기"
+		HoneyLanguage.Russian.code -> "Как с нами связаться"
+		HoneyLanguage.TraditionalChinese.code -> "聯繫我們"
+		else -> ""
+	}
+	@JvmField
+	val helpCenter = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Help Center"
 		HoneyLanguage.Chinese.code -> "帮助中心"
 		HoneyLanguage.Japanese.code -> "ヘルプセンター"
-		HoneyLanguage.Korean.code -> "도움센터"
-		HoneyLanguage.Russian.code -> "Поддержка"
-		HoneyLanguage.TraditionalChinese.code -> "聯繫我們"
+		HoneyLanguage.Korean.code -> "도움말 센터"
+		HoneyLanguage.Russian.code -> "Справочный центр"
+		HoneyLanguage.TraditionalChinese.code -> "幫助中心"
 		else -> ""
 	}
 	@JvmField
@@ -1608,7 +1618,7 @@ object ProfileText {
 	@JvmField
 	val deleteContactAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Are you sure you want to delete this contact and the corresponding address?"
-		HoneyLanguage.Chinese.code -> "通知中心"
+		HoneyLanguage.Chinese.code -> "你确定要删除这个联系人和其对应的地址么?"
 		HoneyLanguage.Japanese.code -> "この連絡先と対応するアドレスを削除してもよろしいですか？"
 		HoneyLanguage.Korean.code -> "이 연락처와 해당 주소를 삭제 하시겠습니까?"
 		HoneyLanguage.Russian.code -> "Вы действительно хотите удалить этот контакт и соответствующий адрес?"
@@ -1895,11 +1905,11 @@ object QuotationText {
 	@JvmField
 	val addQuotationChartPlaceholderSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Search and add a real-time\n token pricing chart from\n exchanges."
-		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势哦"
+		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势"
 		HoneyLanguage.Japanese.code -> "市場から気になるトークンを検索して\n追加すると、リアルタイムの\n価格動向を見ることができます"
 		HoneyLanguage.Korean.code -> "주요 시장의 거래 쌍에서 관심있는\n 토큰을 검색하고 추가하면 실시간\n 가격 동향을 볼 수 있습니다."
 		HoneyLanguage.Russian.code -> "Поиск и добавление в реальном\n времени Схема ценообразования\n токенов обменов."
-		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢哦"
+		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢"
 		else -> ""
 	}
 }
@@ -2558,20 +2568,20 @@ object DateAndTimeText {
 	val second = when (currentLanguage) {
 		HoneyLanguage.English.code -> "second"
 		HoneyLanguage.Chinese.code -> "秒"
-		HoneyLanguage.Japanese.code -> "second"
-		HoneyLanguage.Korean.code -> "second"
-		HoneyLanguage.Russian.code -> "second"
-		HoneyLanguage.TraditionalChinese.code -> "second"
+		HoneyLanguage.Japanese.code -> "秒"
+		HoneyLanguage.Korean.code -> "초"
+		HoneyLanguage.Russian.code -> "второй"
+		HoneyLanguage.TraditionalChinese.code -> "秒"
 		else -> ""
 	}
 	@JvmField
 	val minute = when (currentLanguage) {
 		HoneyLanguage.English.code -> "minute"
 		HoneyLanguage.Chinese.code -> "分钟"
-		HoneyLanguage.Japanese.code -> "minute"
-		HoneyLanguage.Korean.code -> "minute"
-		HoneyLanguage.Russian.code -> "minute"
-		HoneyLanguage.TraditionalChinese.code -> "月"
+		HoneyLanguage.Japanese.code -> "分"
+		HoneyLanguage.Korean.code -> "분"
+		HoneyLanguage.Russian.code -> "минут"
+		HoneyLanguage.TraditionalChinese.code -> "分鐘"
 		else -> ""
 	}
 	@JvmField
@@ -2598,10 +2608,10 @@ object DateAndTimeText {
 	val ago = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ago"
 		HoneyLanguage.Chinese.code -> "之前"
-		HoneyLanguage.Japanese.code -> "ago"
-		HoneyLanguage.Korean.code -> "ago"
-		HoneyLanguage.Russian.code -> "ago"
-		HoneyLanguage.TraditionalChinese.code -> "ago"
+		HoneyLanguage.Japanese.code -> "之前"
+		HoneyLanguage.Korean.code -> "전에"
+		HoneyLanguage.Russian.code -> "тому назад"
+		HoneyLanguage.TraditionalChinese.code -> "之前"
 		else -> ""
 	}
 	

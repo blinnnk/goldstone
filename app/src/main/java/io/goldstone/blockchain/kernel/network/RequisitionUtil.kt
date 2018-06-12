@@ -280,7 +280,11 @@ object GoldStoneCode {
 	
 	fun showErrorCodeReason(data: String?, errorCallback: () -> Unit = {}) {
 		data?.apply {
-			val code = JSONObject(this).safeGet("code")
+			val code = try {
+				JSONObject(this).safeGet("code")
+			} catch (error: Exception) {
+				"100"
+			}
 			if (code.isNotEmpty()) {
 				when (code.toInt()) {
 					-1 -> {

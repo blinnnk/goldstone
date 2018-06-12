@@ -55,7 +55,12 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit = {},
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
-		requestData<String>(APIPath.defaultTokenList, "data", true, errorCallback) {
+		requestData<String>(
+			APIPath.defaultTokenList(APIPath.currentUrl),
+			"data",
+			true,
+			errorCallback
+		) {
 			val gson = Gson()
 			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
 			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
@@ -92,7 +97,7 @@ object GoldStoneAPI {
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(
-			APIPath.getCoinInfo + symbols,
+			APIPath.getCoinInfo(APIPath.currentUrl) + symbols,
 			"list",
 			errorCallback = errorCallback
 		) {
@@ -106,7 +111,7 @@ object GoldStoneAPI {
 		hold: (VersionModel?) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getNewVersion,
+			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
 			true,
 			errorCallback
@@ -131,7 +136,7 @@ object GoldStoneAPI {
 		hold: (Double) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getCurrencyRate + symbols,
+			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
 			"rate",
 			true,
 			errorCallback
@@ -147,7 +152,7 @@ object GoldStoneAPI {
 		hold: (String) -> Unit
 	) {
 		requestData<String>(
-			APIPath.terms + md5,
+			APIPath.terms(APIPath.currentUrl) + md5,
 			"",
 			true,
 			errorCallback
@@ -162,7 +167,7 @@ object GoldStoneAPI {
 		hold: (ArrayList<ServerConfigModel>) -> Unit
 	) {
 		requestData<ServerConfigModel>(
-			APIPath.getConfigList,
+			APIPath.getConfigList(APIPath.currentUrl),
 			"list",
 			errorCallback = errorCallback
 		) {
@@ -181,7 +186,7 @@ object GoldStoneAPI {
 		// this is an important behavior so it need to set a short connect timeout value
 		val timeOutValue = 3L
 		requestData<String>(
-			APIPath.getShareContent,
+			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			true,
 			errorCallback,
@@ -200,7 +205,7 @@ object GoldStoneAPI {
 		hold: (ArrayList<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
-			APIPath.marketSearch + pair,
+			APIPath.marketSearch(APIPath.currentUrl) + pair,
 			"pair_list",
 			errorCallback = errorCallback
 		) {
@@ -260,7 +265,11 @@ object GoldStoneAPI {
 				"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID}"
 			).orEmpty()
 		).let {
-			postRequest(it, APIPath.registerDevice, errorCallback) {
+			postRequest(
+				it,
+				APIPath.registerDevice(APIPath.currentUrl),
+				errorCallback
+			) {
 				hold(it)
 			}
 		}
@@ -278,7 +287,7 @@ object GoldStoneAPI {
 			postRequestGetJsonObject<QuotationSelectionLineChartModel>(
 				it,
 				"data_list",
-				APIPath.getCurrencyLineChartData,
+				APIPath.getCurrencyLineChartData(APIPath.currentUrl),
 				errorCallback = errorCallback
 			) {
 				hold(it.toArrayList())
@@ -296,7 +305,7 @@ object GoldStoneAPI {
 			requestContentType,
 			AesCrypto.encrypt("{\"address_list\":$addressList,\"device\":\"$deviceID\"}").orEmpty()
 		).let {
-			postRequest(it, APIPath.updateAddress, errorCallback) {
+			postRequest(it, APIPath.updateAddress(APIPath.currentUrl), errorCallback) {
 				hold(it)
 			}
 		}
@@ -313,7 +322,7 @@ object GoldStoneAPI {
 		).let {
 			postRequest(
 				it,
-				APIPath.getUnreadCount,
+				APIPath.getUnreadCount(APIPath.currentUrl),
 				errorCallback
 			) {
 				hold(JSONObject(it).safeGet("count"))
@@ -333,7 +342,7 @@ object GoldStoneAPI {
 			postRequestGetJsonObject<String>(
 				it,
 				"message_list",
-				APIPath.getNotification,
+				APIPath.getNotification(APIPath.currentUrl),
 				true,
 				errorCallback
 			) {
@@ -367,7 +376,7 @@ object GoldStoneAPI {
 			postRequestGetJsonObject<TokenPriceModel>(
 				it,
 				"price_list",
-				APIPath.getPriceByAddress,
+				APIPath.getPriceByAddress(APIPath.currentUrl),
 				errorCallback = errorCallback
 			) {
 				GoldStoneAPI.context.runOnUiThread {
@@ -414,7 +423,7 @@ object GoldStoneAPI {
 		hold: (String) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getTokenDescription + symbol,
+			APIPath.getTokenDescription(APIPath.currentUrl) + symbol,
 			"",
 			true,
 			errorCallback

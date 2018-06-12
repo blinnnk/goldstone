@@ -70,6 +70,18 @@ data class NotificationTable(
 			} else ""
 		}
 		
+		fun getFromAddress(extra: String): String {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("from")
+			} else ""
+		}
+		
+		fun getToAddress(extra: String): String {
+			return if (extra.isNotEmpty()) {
+				JSONObject(extra).safeGet("to")
+			} else ""
+		}
+		
 		fun getSymbol(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("symbol")
