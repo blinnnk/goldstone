@@ -1,13 +1,12 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter
 
 import android.annotation.SuppressLint
+import android.support.v4.app.Fragment
 import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -17,7 +16,9 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**ø
  * @date 27/03/2018 3:41 PM
@@ -72,56 +73,65 @@ class TokenDetailOverlayPresenter(
 	}
 	
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			hasBackUpOrElse {
-				if (isFromQuickTransfer) {
-					fragment.apply {
-						setValueHeader(token)
-						addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content) {}
-						headerTitle = TokenDetailText.address
-					}
-				} else {
-					showTargetFragment<AddressSelectionFragment>(
-						TokenDetailText.address,
-						TokenDetailText.tokenDetail
-					)
+		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+			fragment.context!!,
+			{
+				// Click Dialog Confirm Button Event
+				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+			}
+		) {
+			if (isFromQuickTransfer) {
+				fragment.apply {
+					setValueHeader(token)
+					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content) {}
+					headerTitle = TokenDetailText.address
 				}
+			} else {
+				showTargetFragment<AddressSelectionFragment>(
+					TokenDetailText.address,
+					TokenDetailText.tokenDetail
+				)
 			}
 		}
 	}
 	
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			hasBackUpOrElse {
-				if (isFromQuickTransfer) {
-					fragment.apply {
-						setValueHeader(token)
-						addFragmentAndSetArgument<DepositFragment>(ContainerID.content) {}
-						headerTitle = TokenDetailText.deposit
-					}
-				} else {
-					showTargetFragment<DepositFragment>(
-						TokenDetailText.deposit,
-						TokenDetailText.tokenDetail
-					)
+		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+			fragment.context!!,
+			{
+				// Click Dialog Confirm Button Event
+				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+			}
+		) {
+			if (isFromQuickTransfer) {
+				fragment.apply {
+					setValueHeader(token)
+					addFragmentAndSetArgument<DepositFragment>(ContainerID.content) {}
+					headerTitle = TokenDetailText.deposit
 				}
+			} else {
+				showTargetFragment<DepositFragment>(
+					TokenDetailText.deposit,
+					TokenDetailText.tokenDetail
+				)
 			}
 		}
 	}
 	
-	private fun hasBackUpOrElse(callback: () -> Unit) {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				hasBackUpMnemonic isFalse {
-					GoldStoneDialog.show(fragment.context!!) {
-						showButtons(DialogText.goToBackUp) { }
-						setImage(R.drawable.succeed_banner)
-						setContent(
-							DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
+	companion object {
+		fun showMnemonicBackupFragment(fragment: Fragment) {
+			if (fragment is TokenDetailOverlayFragment) {
+				fragment.presenter.removeSelfFromActivity()
+			}
+			fragment.activity?.apply {
+				findIsItExist(FragmentTag.walletSettings) isFalse {
+					addFragmentAndSetArguments<WalletSettingsFragment>(
+						ContainerID.main, FragmentTag.walletSettings
+					) {
+						putString(
+							ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
 						)
 					}
-				} otherwise {
-					callback()
 				}
 			}
 		}

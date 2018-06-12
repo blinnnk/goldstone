@@ -2,13 +2,13 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 
 import android.arch.persistence.room.*
 import android.content.Context
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orFalse
-import com.blinnnk.extension.otherwise
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.DialogText
 import io.goldstone.blockchain.crypto.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -221,6 +221,40 @@ data class WalletTable(
 					GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
 				}) {
 				callback(it)
+			}
+		}
+		
+		fun checkIsWatchOnlyAndHasBackupOrElse(
+			context: Context,
+			confirmEvent: () -> Unit,
+			callback: () -> Unit
+		) {
+			WalletTable.isWatchOnlyWalletShowAlertOrElse(context) {
+				context.hasBackUpOrElse(confirmEvent, callback)
+			}
+		}
+		
+		private fun Context.hasBackUpOrElse(
+			confirmEvent: () -> Unit,
+			callback: () -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					hasBackUpMnemonic isFalse {
+						GoldStoneDialog.show(this@hasBackUpOrElse) {
+							showButtons(DialogText.goToBackUp) {
+								confirmEvent()
+								GoldStoneDialog.remove(this@hasBackUpOrElse)
+							}
+							setImage(R.drawable.succeed_banner)
+							setContent(
+								DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
+							)
+						}
+					} otherwise {
+						callback()
+					}
+				}
 			}
 		}
 	}

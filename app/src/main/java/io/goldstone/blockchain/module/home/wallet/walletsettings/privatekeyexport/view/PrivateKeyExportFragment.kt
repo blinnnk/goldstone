@@ -29,15 +29,13 @@ import org.jetbrains.anko.verticalLayout
  * @date 06/04/2018 1:02 AM
  * @author KaySaith
  */
-
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
-
+	
 	private val privateKeyTextView by lazy { TextView(context) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-
 	override val presenter = PrivateKeyExportPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -61,7 +59,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)
-
+			
 			passwordInput.apply {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
@@ -69,7 +67,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 				title = CreateWalletText.password
 			}.into(this)
-
+			
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				setBlueStyle()
@@ -85,10 +83,9 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					it.showLoadingStatus(false)
 				}
 			}.into(this)
-
 		}
 	}
-
+	
 	override fun setBackEvent(
 		activity: MainActivity,
 		parent: Fragment?
@@ -98,5 +95,4 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			presenter.showWalletSettingListFragment()
 		}
 	}
-
 }
