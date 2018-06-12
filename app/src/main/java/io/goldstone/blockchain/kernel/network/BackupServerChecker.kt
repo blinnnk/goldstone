@@ -4,8 +4,8 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.json.JSONObject
 
 /**
@@ -51,9 +51,7 @@ object BackupServerChecker {
 			true,
 			errorCallback = errorCallback
 		) {
-			JSONObject(this[0]).safeGet("inuse").toIntOrNull()?.let {
-				hold(it == TinyNumber.True.value)
-			}
+			hold(TinyNumberUtils.isTrue(JSONObject(this[0]).safeGet("inuse")))
 		}
 	}
 }

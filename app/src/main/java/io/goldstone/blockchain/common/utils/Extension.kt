@@ -89,8 +89,7 @@ fun String.getDecimalCount(): Int? {
 	}
 }
 
-fun String.trimAfterColonSYmbol(): String {
-	return toString().trimStart {
-		it.toString().startsWith(":", true)
-	}
+fun String.showAfterColonContent(): String {
+	return if (contains(":")) toString().substringAfter(":")
+	else this
 }

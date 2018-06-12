@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -30,7 +31,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vie
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -174,6 +174,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
+		
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
@@ -245,7 +246,7 @@ class CreateWalletPresenter(
 		) {
 			filter {
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
-				it.forceShow == TinyNumber.True.value
+				TinyNumberUtils.isTrue(it.forceShow)
 			}.apply {
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据

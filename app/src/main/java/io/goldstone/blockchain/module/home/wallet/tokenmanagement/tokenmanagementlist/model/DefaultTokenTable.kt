@@ -6,7 +6,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -19,12 +19,6 @@ import org.json.JSONObject
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-enum class TinyNumber(val value: Int) {
-	
-	True(1),
-	False(0)
-}
-
 @Entity(tableName = "defaultTokens")
 data class DefaultTokenTable(
 	@PrimaryKey(autoGenerate = true)
@@ -104,7 +98,7 @@ data class DefaultTokenTable(
 		localData.safeGet("name"),
 		localData.safeGet("decimals").toDouble(),
 		localData.safeGet("total_supply"),
-		localData.safeGet("is_default").toInt() == TinyNumber.True.value,
+		TinyNumberUtils.isTrue(localData.safeGet("is_default")),
 		isUsed,
 		if (localData.safeGet("weight").isEmpty()) 0
 		else localData.safeGet("weight").toInt(),

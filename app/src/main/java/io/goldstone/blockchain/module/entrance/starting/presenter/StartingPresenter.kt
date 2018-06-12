@@ -8,6 +8,7 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -21,7 +22,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.TinyNumber
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -65,7 +65,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					.forEachOrEnd { token, isEnd ->
 						DefaultTokenTable(
 							token,
-							token.get("force_show").toString().toInt() == TinyNumber.True.value
+							TinyNumberUtils.isTrue(token.safeGet("force_show"))
 						).let {
 							GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							context.runOnUiThread {
