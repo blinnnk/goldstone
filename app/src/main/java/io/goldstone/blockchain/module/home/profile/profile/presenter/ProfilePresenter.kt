@@ -10,10 +10,10 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
+import com.blinnnk.util.SystemUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.utils.SystemUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable

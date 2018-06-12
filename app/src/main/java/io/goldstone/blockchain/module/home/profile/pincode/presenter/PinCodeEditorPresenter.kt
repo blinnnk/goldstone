@@ -28,17 +28,17 @@ class PinCodeEditorPresenter(
 	
 	fun setShowPinCodeStatus(
 		status: Boolean,
-		callback: (Boolean) -> Unit = {}
+		callback: () -> Unit = {}
 	) {
 		AppConfigTable.apply {
 			getAppConfig {
 				if (it?.pincode.isNull()) {
 					fragment.context?.alert(PincodeText.turnOnAttention)
-					callback(false)
+					callback()
 					return@getAppConfig
 				}
 				setShowPinCodeStatus(status) {
-					callback(true)
+					callback()
 				}
 			}
 		}

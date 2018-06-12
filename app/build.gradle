@@ -72,7 +72,7 @@ dependencies {
     exclude group: 'com.google.android', module: 'android'
   }
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.0.1'
+  implementation 'com.blinnnk:honeyui:0.3.0.3'
   // Crypto
   implementation 'org.ethereum:geth:1.8.8'
   implementation 'org.web3j:core:3.3.1-android'
@@ -96,7 +96,6 @@ dependencies {
   implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   implementation 'com.tencent.mid:mid:4.0.6-release'
-  implementation 'com.tencent.xinge:xgmz:3.2.2-release'
   // Google Analytics
   implementation 'com.google.android.gms:play-services-analytics:16.0.0'
   // Wave Animation

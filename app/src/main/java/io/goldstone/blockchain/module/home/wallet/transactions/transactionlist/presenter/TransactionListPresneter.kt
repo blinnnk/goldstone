@@ -110,7 +110,7 @@ class TransactionListPresenter(
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
 				fragment.context
-					?.alert("${AlertText.getTransactionErrorPrefix} ${Config.getCurrentChain()} ${AlertText.getTransactionErrorSuffix}")
+					?.alert("${AlertText.getTransactionErrorPrefix} ${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}")
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
 			}
 		) { newData ->

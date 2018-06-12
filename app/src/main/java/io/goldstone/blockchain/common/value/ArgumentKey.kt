@@ -46,4 +46,5 @@ object SharesPreference {
 	const val currentBalance = "currentBalance"
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
+	const val instaBugStatus = "instaBugStatus"
 }

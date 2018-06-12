@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.common.value
 
 import com.blinnnk.extension.toUpperCaseFirstLetter
+import com.blinnnk.util.HoneyDateUtil
 
 /**
  * @date 21/03/2018 7:34 PM
@@ -1743,7 +1744,7 @@ object QuotationText {
 	}
 	@JvmField
 	val management = when (currentLanguage) {
-		HoneyLanguage.English.code -> "My Markets".toUpperCase()
+		HoneyLanguage.English.code -> "My Markets"
 		HoneyLanguage.Chinese.code -> "自选管理"
 		HoneyLanguage.Japanese.code -> "オプションの管理"
 		HoneyLanguage.Korean.code -> "셀프관리"
@@ -1857,7 +1858,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "排名"
 		HoneyLanguage.Japanese.code -> "ランク"
 		HoneyLanguage.Korean.code -> "순위"
-		HoneyLanguage.Russian.code -> "ранг".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "ранг".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "排名"
 		else -> ""
 	}
@@ -1867,7 +1868,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "总供应量"
 		HoneyLanguage.Japanese.code -> "総供給"
 		HoneyLanguage.Korean.code -> "총 공급"
-		HoneyLanguage.Russian.code -> "Общее снабжение".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "Общее снабжение".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "總供應量"
 		else -> ""
 	}
@@ -1877,7 +1878,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "流通市值"
 		HoneyLanguage.Japanese.code -> "時価総額"
 		HoneyLanguage.Korean.code -> "시가 총액"
-		HoneyLanguage.Russian.code -> "Рынок".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "Рынок".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "流通市值"
 		else -> ""
 	}
@@ -2515,7 +2516,7 @@ object SplashText {
 object DateAndTimeText {
 	@JvmField
 	val hour = when (currentLanguage) {
-		HoneyLanguage.English.code -> "HOUR"
+		HoneyLanguage.English.code -> "hour"
 		HoneyLanguage.Chinese.code -> "小时"
 		HoneyLanguage.Japanese.code -> "時間"
 		HoneyLanguage.Korean.code -> "시간"
@@ -2525,7 +2526,7 @@ object DateAndTimeText {
 	}
 	@JvmField
 	val day = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DAY"
+		HoneyLanguage.English.code -> "day"
 		HoneyLanguage.Chinese.code -> "日"
 		HoneyLanguage.Japanese.code -> "日"
 		HoneyLanguage.Korean.code -> "주간"
@@ -2535,21 +2536,41 @@ object DateAndTimeText {
 	}
 	@JvmField
 	val week = when (currentLanguage) {
-		HoneyLanguage.English.code -> "WEEK"
+		HoneyLanguage.English.code -> "week"
 		HoneyLanguage.Chinese.code -> "周"
 		HoneyLanguage.Japanese.code -> "週"
 		HoneyLanguage.Korean.code -> "주"
-		HoneyLanguage.Russian.code -> "НЕДЕЛЯ".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "НЕДЕЛЯ"
 		HoneyLanguage.TraditionalChinese.code -> "周"
 		else -> ""
 	}
 	@JvmField
 	val month = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MONTH"
+		HoneyLanguage.English.code -> "month"
 		HoneyLanguage.Chinese.code -> "月"
 		HoneyLanguage.Japanese.code -> "月"
 		HoneyLanguage.Korean.code -> "달"
-		HoneyLanguage.Russian.code -> "месяц".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "месяц"
+		HoneyLanguage.TraditionalChinese.code -> "月"
+		else -> ""
+	}
+	@JvmField
+	val second = when (currentLanguage) {
+		HoneyLanguage.English.code -> "second"
+		HoneyLanguage.Chinese.code -> "秒"
+		HoneyLanguage.Japanese.code -> "second"
+		HoneyLanguage.Korean.code -> "second"
+		HoneyLanguage.Russian.code -> "second"
+		HoneyLanguage.TraditionalChinese.code -> "second"
+		else -> ""
+	}
+	@JvmField
+	val minute = when (currentLanguage) {
+		HoneyLanguage.English.code -> "minute"
+		HoneyLanguage.Chinese.code -> "分钟"
+		HoneyLanguage.Japanese.code -> "minute"
+		HoneyLanguage.Korean.code -> "minute"
+		HoneyLanguage.Russian.code -> "minute"
 		HoneyLanguage.TraditionalChinese.code -> "月"
 		else -> ""
 	}
@@ -2559,7 +2580,7 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "24 小时"
 		HoneyLanguage.Japanese.code -> "24 時間"
 		HoneyLanguage.Korean.code -> "24 시간"
-		HoneyLanguage.Russian.code -> "24 ${"часа".toUpperCaseFirstLetter()}"
+		HoneyLanguage.Russian.code -> "24 часа "
 		HoneyLanguage.TraditionalChinese.code -> "24 小時"
 		else -> ""
 	}
@@ -2569,15 +2590,37 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "全部"
 		HoneyLanguage.Japanese.code -> "すべて"
 		HoneyLanguage.Korean.code -> "모두"
-		HoneyLanguage.Russian.code -> "полный".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "полный"
 		HoneyLanguage.TraditionalChinese.code -> "全部"
 		else -> ""
+	}
+	@JvmField
+	val ago = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ago"
+		HoneyLanguage.Chinese.code -> "之前"
+		HoneyLanguage.Japanese.code -> "ago"
+		HoneyLanguage.Korean.code -> "ago"
+		HoneyLanguage.Russian.code -> "ago"
+		HoneyLanguage.TraditionalChinese.code -> "ago"
+		else -> ""
+	}
+	
+	fun getDateText(): HoneyDateUtil.DataText {
+		return HoneyDateUtil.DataText(
+			hour,
+			week,
+			day,
+			hour,
+			minute,
+			second,
+			ago,
+			HoneyLanguage.getLanguageByCode(currentLanguage)
+		)
 	}
 }
 
 object WalletNameText {
 	
-	@JvmField
 	val Owl = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Owl"
 		HoneyLanguage.Chinese.code -> "猫头鹰"
@@ -2587,7 +2630,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "貓頭鷹"
 		else -> ""
 	}
-	@JvmField
 	val Bear = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bear"
 		HoneyLanguage.Chinese.code -> "熊老大"
@@ -2597,7 +2639,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "熊老大"
 		else -> ""
 	}
-	@JvmField
 	val Elephant = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Elephant"
 		HoneyLanguage.Chinese.code -> "象先生"
@@ -2607,7 +2648,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "象先生"
 		else -> ""
 	}
-	@JvmField
 	val Rhinoceros = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rhinoceros"
 		HoneyLanguage.Chinese.code -> "红犀牛"
@@ -2617,7 +2657,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "红犀牛"
 		else -> ""
 	}
-	@JvmField
 	val Frog = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Frog"
 		HoneyLanguage.Chinese.code -> "青蛙"
@@ -2627,7 +2666,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "青蛙"
 		else -> ""
 	}
-	@JvmField
 	val Koala = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Koala"
 		HoneyLanguage.Chinese.code -> "考拉宝宝"
@@ -2637,7 +2675,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "考拉寶寶"
 		else -> ""
 	}
-	@JvmField
 	val Fox = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Fox"
 		HoneyLanguage.Chinese.code -> "火狐狸"
@@ -2647,7 +2684,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "火狐狸"
 		else -> ""
 	}
-	@JvmField
 	val Monkey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Monkey"
 		HoneyLanguage.Chinese.code -> "猕猴"
@@ -2657,7 +2693,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "獼猴"
 		else -> ""
 	}
-	@JvmField
 	val Giraffle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Giraffle"
 		HoneyLanguage.Chinese.code -> "长颈鹿"
@@ -2667,7 +2702,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "長頸鹿"
 		else -> ""
 	}
-	@JvmField
 	val Penguin = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Penguin"
 		HoneyLanguage.Chinese.code -> "企鹅"
@@ -2677,7 +2711,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "企鵝"
 		else -> ""
 	}
-	@JvmField
 	val Wolf = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wolf"
 		HoneyLanguage.Chinese.code -> "小灰狼"
@@ -2687,7 +2720,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "小灰狼"
 		else -> ""
 	}
-	@JvmField
 	val Bull = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bull"
 		HoneyLanguage.Chinese.code -> "牛魔王"
@@ -2707,7 +2739,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "黑豹"
 		else -> ""
 	}
-	@JvmField
 	val Deer = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Deer"
 		HoneyLanguage.Chinese.code -> "梅花鹿"
@@ -2717,7 +2748,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "梅花鹿"
 		else -> ""
 	}
-	@JvmField
 	val Raccoon = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Raccoon"
 		HoneyLanguage.Chinese.code -> "小浣熊"
@@ -2727,7 +2757,6 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "小浣熊"
 		else -> ""
 	}
-	@JvmField
 	val Lion = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Lion"
 		HoneyLanguage.Chinese.code -> "狮子王"
@@ -2737,13 +2766,12 @@ object WalletNameText {
 		HoneyLanguage.TraditionalChinese.code -> "獅子王"
 		else -> ""
 	}
-	@JvmField
 	val Hippo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Hippo"
 		HoneyLanguage.Chinese.code -> "河马"
 		HoneyLanguage.Japanese.code -> "カバ"
 		HoneyLanguage.Korean.code -> "하마"
-		HoneyLanguage.Russian.code -> "Бегемот".toUpperCaseFirstLetter().toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "Бегемот".toUpperCaseFirstLetter()
 		HoneyLanguage.TraditionalChinese.code -> "河馬君"
 		else -> ""
 	}

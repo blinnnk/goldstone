@@ -179,9 +179,6 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 fun Application.registerDeviceForPush() {
 	// 为测试方便设置，发布上线时设置为 `false`
 	XGPushConfig.enableDebug(this, false)
-	XGPushConfig.enableOtherPush(this, true)
-	XGPushConfig.setMzPushAppId(this, PushKey.appID)
-	XGPushConfig.setMzPushAppKey(this, PushKey.appKey)
 	XGPushManager.registerPush(this, object : XGIOperateCallback {
 		override fun onSuccess(token: Any?, p1: Int) {
 			// 准备信息注册设备的信息到服务器, 为了 `Push` 做的工作
@@ -214,7 +211,6 @@ fun Context.registerDevice(
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value
-	
 	doAsync {
 		AppConfigTable.getAppConfig { config ->
 			config?.apply {

@@ -141,7 +141,12 @@ data class AppConfigTable(
 			AppConfigTable.getAppConfig {
 				it?.let {
 					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply { showPincode = status })
+						GoldStoneDataBase.database.appConfigDao().update(it.apply {
+							showPincode = status
+							if (!status) {
+								pincode = null
+							}
+						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}

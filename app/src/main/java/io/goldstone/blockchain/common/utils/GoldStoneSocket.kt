@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptGetRequest
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -107,7 +108,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 						.connectTimeout(timeout, TimeUnit.MILLISECONDS)
 						.retryOnConnectionFailure(true)
 						.build()
-				GoldStoneAPI.getcryptGetRequest(serverURL) {
+				getcryptGetRequest(serverURL) {
 					client?.newWebSocket(it, this)
 					client?.dispatcher()?.executorService()?.shutdown()
 				}

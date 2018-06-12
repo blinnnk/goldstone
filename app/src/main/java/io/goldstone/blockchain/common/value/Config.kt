@@ -9,6 +9,12 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  */
 object Config {
 	
+	fun getInstaBugStatus(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.instaBugStatus)
+	
+	fun updateInstaBugStatus(statisCode: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.instaBugStatus, statisCode)
+	
 	fun getCurrentAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentAddress)
 	
