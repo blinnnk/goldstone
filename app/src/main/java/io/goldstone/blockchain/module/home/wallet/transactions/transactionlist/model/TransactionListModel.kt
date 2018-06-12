@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.toAscii
@@ -37,7 +38,7 @@ data class TransactionListModel(
 	
 	constructor(data: TransactionTable) : this(
 		data.tokenReceiveAddress.orEmpty(),
-		CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp) + descriptionText(data.isReceive) + data.fromAddress), // 副标题的生成
+		CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp, DateAndTimeText.getDateText()) + descriptionText(data.isReceive) + data.fromAddress), /* 副标题的生成*/
 		data.value.toDouble(), // 转账个数
 		data.symbol,
 		data.isReceive,

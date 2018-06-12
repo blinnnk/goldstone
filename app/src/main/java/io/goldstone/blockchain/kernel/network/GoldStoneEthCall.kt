@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptoRequest
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -395,7 +396,7 @@ object GoldStoneEthCall {
 			.connectTimeout(50, TimeUnit.SECONDS)
 			.readTimeout(70, TimeUnit.SECONDS)
 			.build()
-		GoldStoneAPI.getcryptoRequest(body, currentChain(chainID)) {
+		getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {

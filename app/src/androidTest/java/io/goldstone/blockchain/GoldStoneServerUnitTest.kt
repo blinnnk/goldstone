@@ -95,10 +95,22 @@ class GoldStoneServerUnitTest {
 		GoldStoneAPI.getTerms(
 			"hello",
 			{
-				LogUtil.error("$positon getTermsFromServer", it)
+				LogUtil.error("$positon GetTermsFromServer", it)
 			}
 		) {
 			LogUtil.debug(positon, it)
+			assertTrue("Terms is empty", it.isNotEmpty())
+		}
+	}
+	
+	@Test
+	fun getConfigList() {
+		GoldStoneAPI.getConfigList(
+			{
+				LogUtil.error("$positon GetConfigList", it)
+			}
+		) {
+			LogUtil.debug(positon, it.toString())
 		}
 	}
 }

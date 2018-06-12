@@ -2,12 +2,21 @@ package io.goldstone.blockchain.module.common.passcode.presenter
 
 import android.annotation.SuppressLint
 import android.os.Handler
+import android.support.v7.app.AppCompatActivity
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.HomeFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**
  * @date 23/04/2018 11:04 AM
@@ -80,6 +89,43 @@ class PasscodePresenter(
 	
 	override fun onFragmentDetach() {
 		handler.removeCallbacks(refreshRunnable)
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		fun AppCompatActivity.recoverBackEventAfterPinCode() {
+			supportFragmentManager.fragments.last()?.apply {
+				when (this) {
+					is HomeFragment -> {
+						(childFragmentManager.fragments.last() as? BaseRecyclerFragment<*, *>)?.apply {
+							if (this is WalletDetailFragment) {
+								getMainActivity()?.backEvent = null
+							} else {
+								recoveryBackEvent()
+							}
+						}
+					}
+					
+					is BaseFragment<*> -> recoveryBackEvent()
+					is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
+					
+					is BaseOverlayFragment<*> -> {
+						childFragmentManager.fragments.last()?.apply {
+							when (this) {
+								is BaseFragment<*> -> recoveryBackEvent()
+								is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
+							}
+						}
+					}
+				}
+			}
+		}
+		fragment.activity?.apply {
+			when (this) {
+				is SplashActivity -> recoverBackEventAfterPinCode()
+				is MainActivity -> recoverBackEventAfterPinCode()
+			}
+		}
 	}
 	
 	private fun resetConfig() {

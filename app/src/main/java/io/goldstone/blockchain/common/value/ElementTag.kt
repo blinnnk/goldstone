@@ -38,3 +38,7 @@ object ErrorTag {
 object ValueTag {
 	const val emptyPrice = "--"
 }
+
+object ConfigTag {
+	const val instaBug = "useInstaBug"
+}

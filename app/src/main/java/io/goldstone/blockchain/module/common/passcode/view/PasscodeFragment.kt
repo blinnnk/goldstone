@@ -26,16 +26,14 @@ import org.jetbrains.anko.textColor
  * @date 23/04/2018 11:04 AM
  * @author KaySaith
  */
-
 class PasscodeFragment : BaseFragment<PasscodePresenter>() {
-
+	
 	lateinit var container: RelativeLayout
 	private val keyboard by lazy { NumberKeyboard(context!!) }
 	private val passcodeInput by lazy { PasscodeInput(context!!) }
 	private var failedAttention: TextView? = null
-
 	override val presenter = PasscodePresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		container = relativeLayout {
 			isClickable = true
@@ -44,11 +42,11 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 				setStyle(GradientType.Blue)
 				lparams(matchParent, matchParent)
 			}.into(this)
-
+			
 			passcodeInput.apply {
 				y += ScreenSize.Height * 0.18f
 			}.into(this)
-
+			
 			keyboard.into(this)
 			keyboard.apply {
 				setCenterInHorizontal()
@@ -58,7 +56,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 			}
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -66,12 +64,12 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		activity?.apply { SoftKeyboard.hide(this) }
 	}
-
+	
 	fun resetHeaderStyle() {
 		keyboard.resetCode()
 		passcodeInput.swipe()
 	}
-
+	
 	fun showFailedAttention(content: String) {
 		failedAttention.isNull() isFalse {
 			failedAttention?.text = content
@@ -88,14 +86,14 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 			failedAttention?.into(container)
 		}
 	}
-
+	
 	fun recoveryAfterFrezon() {
 		failedAttention?.let { container.removeView(it) }
 		keyboard.setKeyboardClickEventByFrozenStatus()
 		failedAttention = null
 		resetHeaderStyle()
 	}
-
+	
 	private fun NumberKeyboard.setKeyboardClickEventByFrozenStatus() {
 		// 检查是否处于冻结状态
 		presenter.isFrozenStatus { isFrozen ->

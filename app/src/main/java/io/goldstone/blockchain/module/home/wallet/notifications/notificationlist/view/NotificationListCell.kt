@@ -9,10 +9,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -29,7 +26,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		info.apply {
 			title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
 		}
-		date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString())
+		date.text = HoneyDateUtil.getSinceTime((model?.createTime.orElse(0) / 1000).toString(), DateAndTimeText.getDateText())
 		WalletTable.getAll {
 			when (model?.type) {
 				NotificationType.Transaction.code -> {

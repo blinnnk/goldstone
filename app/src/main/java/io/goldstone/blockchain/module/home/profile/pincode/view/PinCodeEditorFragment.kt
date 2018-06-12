@@ -37,7 +37,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			AppConfigTable.getAppConfig {
-				it?.pincode.isNotNull {
+				it?.showPincode?.isTrue {
 					presenter.showPinCodeFragment()
 				}
 

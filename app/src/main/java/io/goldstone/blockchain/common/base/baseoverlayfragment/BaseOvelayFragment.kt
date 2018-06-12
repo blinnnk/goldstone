@@ -15,6 +15,8 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -119,7 +121,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			}
 		}
 		presenter.onFragmentViewCreated()
-		
 		// 让出动画时间
 		150L timeUpThen {
 			hideTabBarToAvoidOverdraw()
@@ -135,6 +136,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	override fun onDestroy() {
 		super.onDestroy()
 		presenter.onFragmentDestroy()
+		setBackEvent()
 	}
 	
 	override fun onResume() {
@@ -146,6 +148,27 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
 			presenter.onFragmentShowFromHidden()
+		}
+	}
+	
+	open fun setBackEvent() {
+		// 恢复 `HomeFragment` 的 `ChildFragment` 的回退栈事件
+		activity?.apply {
+			when (this) {
+				is MainActivity -> {
+					getHomeFragment()?.apply {
+						childFragmentManager.fragments?.last()?.let {
+							backEvent = if (it !is WalletDetailFragment) {
+								Runnable {
+									presenter.showWalletDetailFragment()
+								}
+							} else {
+								null
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	

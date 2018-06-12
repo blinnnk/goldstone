@@ -173,7 +173,10 @@ class MarketTokenDetailPresenter(
 		}
 	}
 	
-	private fun MarketTokenChart.updateChartUI(data: ArrayList<ChartModel>, dateType: Int) {
+	private fun MarketTokenChart.updateChartUI(
+		data: ArrayList<ChartModel>,
+		dateType: Int
+	) {
 		fragment.context?.apply {
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
@@ -277,7 +280,9 @@ class MarketTokenDetailPresenter(
 		) { serverData ->
 			val tokenData = TokenInformationModel(serverData, info.symbol)
 			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
-			hold(tokenData, priceData)
+			fragment.context?.runOnUiThread {
+				hold(tokenData, priceData)
+			}
 		}
 	}
 	
