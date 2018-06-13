@@ -91,7 +91,8 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		headerModel: TransactionHeaderModel
 	) {
 		val type =
-			if (headerModel.isReceive) TransactionText.transferResultReceived else TransactionText.transferResultSent
+			if (headerModel.isReceive) TransactionText.transferResultReceived
+			else TransactionText.transferResultSent
 		info.title.text =
 			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
@@ -109,7 +110,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			showPendingIcon()
 		} else {
 			showPendingIcon(false)
-			if (!headerModel.isReceive && !headerModel.isError) {
+			if (!headerModel.isReceive) {
 				icon.iconColor = Spectrum.yellow
 				icon.src = R.drawable.send_icon
 				icon.setColorFilter(GrayScale.Opacity5Black)
