@@ -7,7 +7,6 @@ import java.math.BigInteger
  * @author KaySaith
  */
 fun String.toAscii(removeBlank: Boolean = true): String {
-	/** 去掉前两个字母 `0x` */
 	var hex =
 		if (substring(0, 2).equals(SolidityCode.ethTransfer, true)) substring(2, length)
 		else this
