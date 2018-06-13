@@ -18,4 +18,12 @@ object TinyNumberUtils {
 	fun isTrue(value: String): Boolean {
 		return value.toIntOrNull() == TinyNumber.True.value
 	}
+	
+	fun allTrue(vararg values: Boolean): Boolean {
+		return values.none { false }
+	}
+	
+	fun allFalse(vararg values: Boolean): Boolean {
+		return values.none { true }
+	}
 }

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto
 
+import com.blinnnk.extension.orZero
 import java.math.BigInteger
 
 /**
@@ -7,41 +8,44 @@ import java.math.BigInteger
  * @author KaySaith
  */
 fun String.toAscii(removeBlank: Boolean = true): String {
-	/** 去掉前两个字母 `0x` */
-	var hex = if (substring(0, 2) == "0x") substring(2, length) else this
+	var hex =
+		if (substring(0, 2).equals(SolidityCode.ethTransfer, true)) substring(2, length)
+		else this
 	var ascii = ""
-	var str: String
+	var string: String
 	// Convert hex string to "even" length
 	val rmd: Int
 	val length: Int = hex.length
 	rmd = length % 2
 	if (rmd == 1) hex = "0$hex"
 	// split into two characters
-	var i = 0
-	while (i < hex.length - 1) {
+	var index = 0
+	while (index < hex.length - 1) {
 		//split the hex into pairs
-		val pair = hex.substring(i, i + 2)
+		val pair = hex.substring(index, index + 2)
 		//convert hex to decimal
 		val dec = Integer.parseInt(pair, 16)
-		str = if (removeBlank) {
+		string = if (removeBlank) {
 			checkCode(dec).trim()
 		} else {
 			checkCode(dec)
 		}
-		ascii += str
-		i += 2
+		ascii += string
+		index += 2
 	}
 	return ascii
 }
 
 private fun checkCode(dec: Int): String {
-	var str: String
+	var string: String
 	// convert the decimal to character
-	str = Character.toString(dec.toChar())
-	if (dec < 32 || dec in 127 .. 160) str = ""
-	return str
+	string = Character.toString(dec.toChar())
+	if (dec < 32 || dec in 127 .. 160) string = ""
+	return string
 }
-
+/**
+ * `hash` 值转换为 `Decimal`
+ */
 /**
  * `hash` 值转换为 `Decimal`
  */
@@ -64,6 +68,10 @@ fun String.toDecimalFromHex(): String {
 	return hexToDecimal().formatCount(3)
 }
 
+fun String.toIntFromHex(): Int {
+	return hexToDecimal().toString().toIntOrNull().orZero()
+}
+
 fun String.hexToLong(): Long {
-	return hexToDecimal().toLong()
+	return toDecimalFromHex().toLong()
 }

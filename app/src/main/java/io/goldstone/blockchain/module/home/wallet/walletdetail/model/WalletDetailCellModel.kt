@@ -52,7 +52,7 @@ data class WalletDetailCellModel(
 		
 		fun Boolean.convertBalance(balance: Double, decimal: Double): Double {
 			return if (this) {
-				balance.formatCount(3).toDoubleOrNull().orElse(0.0)
+				balance.formatCount(5).toDoubleOrNull().orElse(0.0)
 			} else {
 				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
 			}

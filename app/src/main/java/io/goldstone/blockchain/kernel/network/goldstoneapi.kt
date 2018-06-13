@@ -257,13 +257,14 @@ object GoldStoneAPI {
 		isChina: Int,
 		isAndroid: Int,
 		chainID: Int,
+		country: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
 			requestContentType,
 			AesCrypto.encrypt(
-				"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID}"
+				"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID, \"country\":\"$country\"}"
 			).orEmpty()
 		).let {
 			postRequest(

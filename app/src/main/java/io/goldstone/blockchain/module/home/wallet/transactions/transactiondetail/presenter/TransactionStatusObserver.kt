@@ -3,13 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.findChildFragmentByTag
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -46,16 +46,30 @@ abstract class TransactionStatusObserver {
 						{ error, _ ->
 							LogUtil.error("checkStatusByTransaction", error)
 							// error callback if need to do something
-						}) {
-						GoldStoneAPI.context.runOnUiThread {
-							val blockInterval = it - transaction.blockNumber.toInt() + 1
-							val hasConfirmed = blockInterval > targetIntervla
-							getStatus(hasConfirmed, blockInterval)
-							if (hasConfirmed) {
-								removeObserver()
-							} else {
-								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-								handler.postDelayed(reDo, 6000L)
+						}) { blockNumber ->
+						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+						GoldStoneEthCall.getReceiptByHash(
+							transactionHash,
+							{ error, reason ->
+								LogUtil.error("checkStatusByTransaction$reason", error)
+							}
+						) { isFailed ->
+							GoldStoneAPI.context.runOnUiThread {
+								val blockInterval = blockNumber - transaction.blockNumber.toInt() + 1
+								val hasConfirmed = blockInterval > targetIntervla
+								val hasError = TinyNumberUtils.isTrue(transaction.hasError)
+								getStatus(
+									hasConfirmed,
+									blockInterval,
+									hasError,
+									isFailed
+								)
+								if (hasConfirmed || isFailed || hasError) {
+									removeObserver()
+								} else {
+									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+									handler.postDelayed(reDo, 6000L)
+								}
 							}
 						}
 					}
@@ -63,7 +77,12 @@ abstract class TransactionStatusObserver {
 		}
 	}
 	
-	abstract fun getStatus(status: Boolean, blockInterval: Int)
+	abstract fun getStatus(
+		status: Boolean,
+		blockInterval: Int,
+		hasError: Boolean,
+		isFailed: Boolean
+	)
 	
 	private fun removeObserver() {
 		handler.removeCallbacks(reDo)
@@ -84,9 +103,14 @@ fun TransactionDetailPresenter.observerTransaction() {
 	val currentActivity = fragment.getMainActivity()
 	object : TransactionStatusObserver() {
 		override val transactionHash = currentHash
-		override fun getStatus(status: Boolean, blockInterval: Int) {
-			if (status) {
-				onTransactionSucceed()
+		override fun getStatus(
+			status: Boolean,
+			blockInterval: Int,
+			hasError: Boolean,
+			isFailed: Boolean
+		) {
+			if (status || hasError || isFailed) {
+				onTransactionSucceed(hasError, isFailed)
 				updateWalletDetailValue(currentActivity)
 			} else {
 				showConformationInterval(blockInterval)
@@ -100,7 +124,9 @@ private fun TransactionDetailPresenter.showConformationInterval(
 ) {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
 		it?.apply {
-			headerModel?.let { updateHeaderValue(it) }
+			headerModel?.let {
+				updateHeaderValue(it)
+			}
 			updateConformationBar(intervalCount)
 		}
 	}
@@ -109,7 +135,18 @@ private fun TransactionDetailPresenter.showConformationInterval(
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
-private fun TransactionDetailPresenter.onTransactionSucceed() {
+private fun TransactionDetailPresenter.onTransactionSucceed(
+	hasError: Boolean, isFailed: Boolean
+) {
+	// 交易过程中发生错误
+	if (hasError) {
+		updateDataWhenHasError()
+	}
+	// 交易流程全部成功, 但是合约的问题导致失败
+	if (isFailed) {
+		updateDataWhenFailed()
+	}
+	
 	data?.apply {
 		updateHeaderValue(
 			TransactionHeaderModel(
@@ -117,7 +154,8 @@ private fun TransactionDetailPresenter.onTransactionSucceed() {
 				address,
 				token.symbol,
 				false,
-				false
+				false,
+				TinyNumberUtils.allFalse(hasError, isFailed)
 			)
 		)
 		getTransactionFromChain()
@@ -130,25 +168,63 @@ private fun TransactionDetailPresenter.onTransactionSucceed() {
 				addressName,
 				symbol,
 				false,
-				false
+				false,
+				TinyNumberUtils.allFalse(hasError, isFailed)
 			)
 		)
 		getTransactionFromChain()
 	}
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailValue(activity: MainActivity?) {
-	updateMyTokenBalanceByTransaction {
-		activity?.apply {
-			supportFragmentManager.findFragmentByTag(FragmentTag.home)
-				.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-					runOnUiThread { presenter.updateData() }
-				}
+fun TransactionDetailPresenter.updateDataWhenHasError() {
+	TransactionTable.getTransactionByHash(currentHash) {
+		it.find {
+			it.hash == currentHash
+		}?.let {
+			doAsync {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.update(
+						it.apply {
+							this.hasError = TinyNumber.True.value.toString()
+						}
+					)
+			}
 		}
 	}
 }
 
-private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(callback: () -> Unit) {
+fun TransactionDetailPresenter.updateDataWhenFailed() {
+	TransactionTable.getTransactionByHash(currentHash) {
+		it.find {
+			it.hash == currentHash
+		}?.let {
+			doAsync {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.update(it.apply { isFailed = true })
+			}
+		}
+	}
+}
+
+private fun TransactionDetailPresenter.updateWalletDetailValue(activity: MainActivity?) {
+	updateMyTokenBalanceByTransaction {
+		activity?.apply {
+			supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
+				it.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
+					runOnUiThread { presenter.updateData() }
+				}
+			}
+		}
+	}
+}
+
+private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
+	callback: () -> Unit
+) {
 	GoldStoneEthCall
 		.getTransactionByHash(
 			currentHash,

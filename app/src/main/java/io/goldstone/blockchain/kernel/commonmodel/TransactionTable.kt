@@ -78,7 +78,8 @@ data class TransactionTable(
 	var logIndex: String = "",
 	var memo: String = "",
 	var chainID: String = Config.getCurrentChain(),
-	var isFee: Boolean = false
+	var isFee: Boolean = false,
+	var isFailed: Boolean = false
 ) {
 	
 	/** 默认的 `constructor` */
@@ -180,7 +181,8 @@ data class TransactionTable(
 		data.safeGet("value").toDecimalFromHex(),
 		data.safeGet("gas").toDecimalFromHex(),
 		data.safeGet("gasPrice").toDecimalFromHex(),
-		"0", "1",
+		"0",
+		"1",
 		data.safeGet("input"),
 		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
 			data.safeGet("to") else "0x0",
@@ -420,8 +422,7 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
 	fun getTransactionByTaxHash(
 		taxHash: String
-	):
-		List<TransactionTable>
+	): List<TransactionTable>
 	
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
 	fun getByTaxHashAndReceivedStatus(

@@ -3,13 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.DateAndTimeText
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.SolidityCode
-import io.goldstone.blockchain.crypto.toAscii
-import io.goldstone.blockchain.crypto.toEthValue
+import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.common.value.TransactionText
 import java.io.Serializable
 
 /**
@@ -38,16 +35,22 @@ data class TransactionListModel(
 	
 	constructor(data: TransactionTable) : this(
 		data.tokenReceiveAddress.orEmpty(),
-		CryptoUtils.scaleTo28(HoneyDateUtil.getSinceTime(data.timeStamp, DateAndTimeText.getDateText()) + descriptionText(data.isReceive) + data.fromAddress), /* 副标题的生成*/
+		CryptoUtils.scaleTo28(
+			HoneyDateUtil.getSinceTime(
+				data.timeStamp,
+				DateAndTimeText.getDateText()
+			) + descriptionText(data.isReceive) + data.fromAddress
+		), // 副标题的生成
 		data.value.toDouble(), // 转账个数
 		data.symbol,
 		data.isReceive,
-		TimeUtils.formatDate(data.timeStamp.toLong()), // 拼接时间
+		TimeUtils.formatDate(data.timeStamp), // 拼接时间
 		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
 		data.hash,
 		data.memo,
-		((data.gas.toDoubleOrNull() ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble()).toEthValue(), //
+		((data.gas.toDoubleOrNull()
+		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble()).toEthValue(), //
 		// 计算燃气费使用情况
 		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
 		data.isPending,
@@ -63,11 +66,11 @@ val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { in
 		if (input.equals(SolidityCode.ethTransfer, true)) {
 			TransactionText.noMemo
 		} else {
-			input.toAscii(false)
+			input.toUpperCase().toStringFromHex()
 		}
 	} else {
 		if (input.length > 138) {
-			input.substring(137, input.length).toAscii(false)
+			input.substring(138, input.length).toUpperCase().toStringFromHex()
 		} else TransactionText.noMemo
 	}
 }

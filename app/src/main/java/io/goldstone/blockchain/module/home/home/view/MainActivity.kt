@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -110,7 +109,10 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	fun getHomeFragment(): HomeFragment? {
-		return supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment
+		supportFragmentManager.findFragmentByTag(FragmentTag.home).let {
+			return if (it.isNull()) null
+			else it as? HomeFragment
+		}
 	}
 	
 	fun getMainContainer(): RelativeLayout? {
@@ -118,20 +120,23 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	fun hideHomeFragment() {
-		(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
-			supportFragmentManager.beginTransaction().hide(it).commit()
+		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
+			(it as? HomeFragment)?.let {
+				supportFragmentManager.beginTransaction().hide(it).commit()
+			}
 		}
 	}
 	
 	fun showHomeFragment() {
-		try {
-			(supportFragmentManager.findFragmentByTag(FragmentTag.home) as? HomeFragment)?.let {
+		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
+			(it as? HomeFragment)?.let {
 				if (it.isHidden) {
-					supportFragmentManager?.beginTransaction()?.show(it)?.commitAllowingStateLoss()
+					supportFragmentManager
+						?.beginTransaction()
+						?.show(it)
+						?.commitAllowingStateLoss()
 				}
 			}
-		} catch (error: Exception) {
-			LogUtil.error(this.javaClass.simpleName + "showHomeFragment", error)
 		}
 	}
 	

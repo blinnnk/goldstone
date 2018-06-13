@@ -222,6 +222,7 @@ fun Context.registerDevice(
 					isChina,
 					0,
 					config.chainID.toInt(),
+					CountryCode.currentCountry,
 					{
 						// Error Callback
 						LogUtil.error("registerDevice")

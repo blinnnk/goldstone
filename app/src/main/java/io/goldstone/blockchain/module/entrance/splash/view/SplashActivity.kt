@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.common.value.currentLanguage
 import io.goldstone.blockchain.crypto.getObjectMD5HexString
@@ -66,24 +67,30 @@ class SplashActivity : AppCompatActivity() {
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		
-		hideStatusBar()
-		
-		prepareAppConfig {
-			application.registerDeviceForPush()
-			
-			initLaunchLanguage(language)
-			setCurrentChainID(chainID)
-			
+		// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
+		savedInstanceState.isNull {
+			hideStatusBar()
 			container.apply {
 				gradientView.into(this)
 				initWaveView()
-				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-				savedInstanceState.isNull {
-					addFragment<StartingFragment>(container.id)
-				}
 			}.let {
 				setContentView(it)
+			}
+		}
+	}
+	
+	override fun onStart() {
+		super.onStart()
+		prepareAppConfig config@{
+			application.registerDeviceForPush()
+			initLaunchLanguage(language)
+			setCurrentChainID(chainID)
+			findViewById<RelativeLayout>(ContainerID.splash)?.let {
+				supportFragmentManager.fragments.find {
+					it is StartingFragment
+				}.isNull() isTrue {
+					addFragment<StartingFragment>(it.id)
+				}
 			}
 			// 错开动画时间再执行数据请求
 			Duration.wave timeUpThen {
@@ -95,7 +102,7 @@ class SplashActivity : AppCompatActivity() {
 						// 更新用户条款如果有必要
 						updateAgreement()
 						// insert support currency list from local json
-						updateCurrencyRateFromServer(this@prepareAppConfig)
+						updateCurrencyRateFromServer(this@config)
 						// check network to get default toke list
 						initDefaultTokenByNetWork {
 							hasAccountThenLogin()

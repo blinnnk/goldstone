@@ -19,49 +19,44 @@ import org.jetbrains.anko.textColor
  * @date 26/03/2018 6:49 PM
  * @author KaySaith
  */
-
 open class BaseRadioCell(context: Context) : BaseCell(context) {
-
+	
 	var checkedStatus: Boolean by observing(false) {
 		radioButton.isChecked = checkedStatus
 	}
-
 	protected val title = TextView(context)
 	private val radioButton = HoneyRadioButton(context)
-
 	protected var icon: ImageView? = null
-
+	
 	init {
-
 		hasArrow = false
 		setGrayStyle()
-
+		
 		this.addView(title.apply {
 			textSize = fontSize(15)
 			textColor = GrayScale.black
 			typeface = GoldStoneFont.medium(context)
 		})
-
+		
 		title.setCenterInVertical()
-
+		
 		this.addView(radioButton.apply {
 			setColorStyle(GrayScale.midGray, Spectrum.green)
 		})
-
+		
 		radioButton.apply {
 			isClickable = false
 			setAlignParentRight()
 			setCenterInVertical()
 		}
-
+		
 		layoutParams.height = 50.uiPX()
-
 	}
-
+	
 	fun setSwitchStatusBy(isSelected: Boolean) {
 		radioButton.isChecked = isSelected
 	}
-
+	
 	fun showIcon(image: Int, color: Int = GrayScale.whiteGray) {
 		title.x = 50.uiPX().toFloat()
 		if (icon.isNull()) {
@@ -74,5 +69,4 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		}
 		icon?.imageResource = image
 	}
-
 }

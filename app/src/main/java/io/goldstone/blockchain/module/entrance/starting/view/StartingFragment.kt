@@ -55,6 +55,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				textView(SplashText.slogan) {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
+					textColor = Spectrum.opacity5White
 				}
 			}.lparams {
 				centerHorizontally()

@@ -9,7 +9,6 @@ import android.widget.EditText
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
-import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
@@ -44,7 +43,6 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 				leftPadding = 20.uiPX()
 				rightPadding = 20.uiPX()
-				setCursorColor(Spectrum.blue)
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				gravity = Gravity.CENTER
 				typeface = GoldStoneFont.medium(context)
