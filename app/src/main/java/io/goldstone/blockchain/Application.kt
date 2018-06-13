@@ -31,7 +31,6 @@ class GoldStoneApp : Application() {
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
-		
 		// init google analytics
 		sAnalytics = GoogleAnalytics.getInstance(this)
 		// create and init database

@@ -52,7 +52,7 @@ class GasSelectionPresenter(
 	private val prepareModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
 	}
-	private val defaultGasPrices by lazy {
+	val defaultGasPrices by lazy {
 		arrayListOf(
 			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei()), // cheap
 			BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei()), // fast
@@ -196,9 +196,12 @@ class GasSelectionPresenter(
 			) { privateKey ->
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
-						nonce, getSelectedGasPrice(currentMinnerType),
+						nonce,
+						getSelectedGasPrice(currentMinnerType),
 						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinnerType).toLong())),
-						toAddress, countWithDecimal, inputData
+						toAddress,
+						countWithDecimal,
+						inputData
 					)
 					// 准备秘钥格式
 					val credentials = Credentials.create(privateKey)
@@ -221,7 +224,12 @@ class GasSelectionPresenter(
 							// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 							taxHash.isValidTaxHash() isTrue {
 								// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-								insertPendingDataToTransactionTable(toWalletAddress, raw!!, taxHash)
+								insertPendingDataToTransactionTable(
+									toWalletAddress,
+									raw!!,
+									taxHash,
+									prepareModel?.memo ?: TransactionText.noMemo
+								)
 							}
 							// 主线程跳转到账目详情界面
 							fragment.context?.runOnUiThread {
@@ -266,7 +274,8 @@ class GasSelectionPresenter(
 	private fun insertPendingDataToTransactionTable(
 		toWalletAddress: String,
 		raw: RawTransaction,
-		taxHash: String
+		taxHash: String,
+		memoData: String
 	) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			TransactionTable().apply {
@@ -288,6 +297,7 @@ class GasSelectionPresenter(
 				input = raw.data
 				contractAddress = token!!.contract
 				chainID = Config.getCurrentChain()
+				memo = memoData
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
 			}
@@ -337,7 +347,7 @@ class GasSelectionPresenter(
 		}
 	}
 	
-	private fun prepareGasLimit(gasPrice: Long): Long {
+	fun prepareGasLimit(gasPrice: Long): Long {
 		return if (gasPrice == MinerFeeType.Custom.value)
 			gasFeeFromCustom()?.gasLimit.orElse(0)
 		else prepareModel?.gasLimit?.toLong().orElse(0)
@@ -351,7 +361,7 @@ class GasSelectionPresenter(
 		}
 	}
 	
-	private fun getGasCurrencyPrice(
+	fun getGasCurrencyPrice(
 		info: String,
 		hold: (String) -> Unit
 	) {

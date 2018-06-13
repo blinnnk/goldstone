@@ -8,6 +8,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
@@ -216,6 +217,30 @@ object GoldStoneEthCall {
 				} else {
 					holdValue(TransactionTable(data))
 				}
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getReceiptByHash(
+		hash: String,
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		holdValue: (Boolean) -> Unit
+	) {
+		RequestBody.create(
+			contentType, AesCrypto.encrypt(
+			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionReceiptByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
+		)
+		).let {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTransactionReceiptByHash.display, error)
+				}
+			) {
+				val data = it.toJsonObject()
+				holdValue(!TinyNumberUtils.isTrue(data.safeGet("status").toIntFromHex()))
 			}
 		}
 	}

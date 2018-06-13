@@ -5,7 +5,10 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -14,17 +17,12 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
 import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/6/6 4:16 PM
  * @author KaySaith
- */
-/**
- * 从通知中心进入的, 使用获取的 `Transaction` 转换成标准的使用格式, 这里临时填写
- * `Timestamp` 数字会在准备详情界面的时候获取时间戳, 见 [getTimestampAndInsertToDatabase]
  */
 fun TransactionDetailPresenter.updateDataFromNotification() {
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
@@ -116,27 +114,6 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			}
 			callback()
 		}
-	}
-}
-
-/**
- * JSON RPC `GetTransactionByHash` 获取不到 `Timestamp` 需要从 `Transaction` 里面首先获取
- * `Block Hash` 然后再发起新的 `JSON RPC` 获取  `Block` 的 `TimeStamp` 来完善交易信息.
- */
-private fun TransactionTable.getTimestampAndInsertToDatabase(
-	fragment: TransactionDetailFragment,
-	chainID: String = Config.getCurrentChain(),
-	callback: (Long) -> Unit
-) {
-	GoldStoneEthCall.getBlockTimeStampByBlockHash(
-		blockHash,
-		chainID,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-		}
-	) {
-		this.timeStamp = it.toString()
-		callback(it)
 	}
 }
 

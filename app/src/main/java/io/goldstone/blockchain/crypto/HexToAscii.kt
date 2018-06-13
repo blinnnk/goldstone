@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto
 
+import com.blinnnk.extension.orZero
 import java.math.BigInteger
 
 /**
@@ -65,6 +66,10 @@ fun String.hexToDecimal(): Double {
 
 fun String.toDecimalFromHex(): String {
 	return hexToDecimal().formatCount(3)
+}
+
+fun String.toIntFromHex(): Int {
+	return hexToDecimal().toString().toIntOrNull().orZero()
 }
 
 fun String.hexToLong(): Long {
