@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.findChildFragmentByTag
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -28,6 +29,7 @@ abstract class TransactionStatusObserver {
 	private val handler = Handler(Looper.getMainLooper())
 	private val targetIntervla = 6
 	abstract val transactionHash: String
+	private var isFailed: Boolean? = null
 	
 	open fun checkStatusByTransaction() {
 		doAsync {
@@ -47,29 +49,39 @@ abstract class TransactionStatusObserver {
 							LogUtil.error("checkStatusByTransaction", error)
 							// error callback if need to do something
 						}) { blockNumber ->
-						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
-						GoldStoneEthCall.getReceiptByHash(
-							transactionHash,
-							{ error, reason ->
-								LogUtil.error("checkStatusByTransaction$reason", error)
-							}
-						) { isFailed ->
+						isFailed?.let { failed ->
 							GoldStoneAPI.context.runOnUiThread {
 								val blockInterval = blockNumber - transaction.blockNumber.toInt() + 1
 								val hasConfirmed = blockInterval > targetIntervla
 								val hasError = TinyNumberUtils.isTrue(transaction.hasError)
+								
 								getStatus(
 									hasConfirmed,
 									blockInterval,
 									hasError,
-									isFailed
+									failed
 								)
-								if (hasConfirmed || isFailed || hasError) {
+								
+								if (hasConfirmed || failed || hasError) {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 									handler.postDelayed(reDo, 6000L)
 								}
+							}
+						}
+						// 只判断一次是否是失败的交易
+						if (isFailed.isNull()) {
+							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+							GoldStoneEthCall.getReceiptByHash(
+								transactionHash,
+								{ error, reason ->
+									LogUtil.error("checkStatusByTransaction$reason", error)
+								}
+							) { failed ->
+								isFailed = failed
+								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+								handler.postDelayed(reDo, 6000L)
 							}
 						}
 					}
@@ -112,6 +124,9 @@ fun TransactionDetailPresenter.observerTransaction() {
 			if (status || hasError || isFailed) {
 				onTransactionSucceed(hasError, isFailed)
 				updateWalletDetailValue(currentActivity)
+				if (status) {
+					updateConformationBarFinished()
+				}
 			} else {
 				showConformationInterval(blockInterval)
 			}
@@ -128,6 +143,14 @@ private fun TransactionDetailPresenter.showConformationInterval(
 				updateHeaderValue(it)
 			}
 			updateConformationBar(intervalCount)
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateConformationBarFinished() {
+	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
+		it?.apply {
+			updateConformationBar(CryptoValue.confirmBlockNumber)
 		}
 	}
 }

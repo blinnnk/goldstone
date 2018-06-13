@@ -69,7 +69,7 @@ fun String.toDecimalFromHex(): String {
 }
 
 fun String.toIntFromHex(): Int {
-	return hexToDecimal().toString().toIntOrNull().orZero()
+	return hexToDecimal().toInt()
 }
 
 fun String.hexToLong(): Long {
