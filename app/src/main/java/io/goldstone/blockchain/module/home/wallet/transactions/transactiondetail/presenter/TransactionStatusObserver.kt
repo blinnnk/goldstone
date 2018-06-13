@@ -62,7 +62,7 @@ abstract class TransactionStatusObserver {
 									failed
 								)
 								
-								if (hasConfirmed || failed || hasError) {
+								if (hasConfirmed || hasError) {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
@@ -171,6 +171,8 @@ fun TransactionDetailPresenter.updateConformationBarFinished() {
 private fun TransactionDetailPresenter.onTransactionSucceed(
 	hasError: Boolean, isFailed: Boolean
 ) {
+	
+	System.out.println("shit$hasError, and $isFailed")
 	// 交易过程中发生错误
 	if (hasError) {
 		updateDataWhenHasError()
