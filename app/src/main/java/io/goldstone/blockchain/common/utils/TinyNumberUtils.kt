@@ -26,4 +26,8 @@ object TinyNumberUtils {
 	fun allFalse(vararg values: Boolean): Boolean {
 		return values.none { true }
 	}
+	
+	fun hasTrue(vararg values: Boolean): Boolean {
+		return values.any { true }
+	}
 }

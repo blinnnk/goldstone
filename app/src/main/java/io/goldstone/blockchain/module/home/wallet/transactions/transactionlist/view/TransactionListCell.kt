@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.GridLayout
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
@@ -18,13 +17,12 @@ import org.jetbrains.anko.textColor
  * @date 24/03/2018 2:15 PM
  * @author KaySaith
  */
-
 open class TransactionListCell(context: Context) : BaseValueCell(context) {
-
+	
 	var model: TransactionListModel? by observing(null) {
 		model?.let {
 			icon.apply {
-				if (it.hasError) {
+				if (it.hasError || it.isFailed) {
 					src = R.drawable.error_icon
 					iconColor = Spectrum.red
 					count?.title?.textColor = Spectrum.red
@@ -40,24 +38,23 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 					}
 				}
 			}
-
+			
 			info.apply {
 				title.text =
 					if (model?.isReceived == true) CryptoUtils.scaleTo16(it.targetAddress)
-				  else CryptoUtils.scaleTo16(it.addressName)
+					else CryptoUtils.scaleTo16(it.addressName)
 				subtitle.text = it.addressInfo
 			}
-
+			
 			count?.apply {
 				title.text = (if (it.isReceived) "+" else "-") + it.count.formatCount()
 				subtitle.text = it.symbol
 			}
 		}
 	}
-
+	
 	init {
 		setGrayStyle()
 		setValueStyle(true)
 	}
-
 }
