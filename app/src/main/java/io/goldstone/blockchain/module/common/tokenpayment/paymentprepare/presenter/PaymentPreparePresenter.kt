@@ -86,7 +86,7 @@ class PaymentPreparePresenter(
 		// `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
 		if (currentToken?.contract.equals(CryptoValue.ethContract, true)) {
 			to = toAddress
-			data = if (memo.isEmpty()) "0x" else "0x" + memo.toHexCode() // Memo
+			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
 		} else {
 			to = currentToken!!.contract
@@ -95,8 +95,9 @@ class PaymentPreparePresenter(
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toDataStringFromAddress() + // 地址
 				countWithDecimal.toDataString() + // 数量
-				if (memo.isEmpty()) "" else memo.toHexCode() // Memo
+				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 		}
+		
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			Config.getCurrentAddress(),

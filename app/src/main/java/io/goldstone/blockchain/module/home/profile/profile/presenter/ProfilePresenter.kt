@@ -119,17 +119,21 @@ class ProfilePresenter(
 	}
 	
 	private fun checkVersion() {
-		GoldStoneAPI.getNewVersionOrElse {
-			version = if (it.isNull()) {
-				SystemUtils.getVersionName(fragment.context!!)
-			} else {
-				newVersionDescription = it?.description.orEmpty()
-				newVersionName = it?.versionName.orEmpty()
-				newVersionUrl = it?.url.orEmpty()
-				it?.versionName + " " + CommonText.new
+		fragment.context?.let { context ->
+			GoldStoneAPI.getNewVersionOrElse { versionModel ->
+				version = if (versionModel.isNull()) {
+					SystemUtils.getVersionName(context)
+				} else {
+					newVersionDescription = versionModel?.description.orEmpty()
+					newVersionName = versionModel?.versionName.orEmpty()
+					newVersionUrl = versionModel?.url.orEmpty()
+					versionModel?.versionName + " " + CommonText.new
+				}
+				fragment.asyncData?.apply {
+					last().info = version
+					fragment.recyclerView.adapter.notifyItemChanged(lastIndex)
+				}
 			}
-			fragment.asyncData?.last()?.info = version
-			fragment.recyclerView.adapter.notifyItemChanged(fragment.asyncData!!.lastIndex)
 		}
 	}
 	

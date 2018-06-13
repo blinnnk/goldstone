@@ -44,7 +44,7 @@ object CryptoUtils {
 	}
 	
 	fun formatDouble(value: Double): Double {
-		return DecimalFormat("0.000").format(value).toDouble()
+		return DecimalFormat("0.000000").format(value).toDouble()
 	}
 	
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
@@ -146,7 +146,7 @@ fun Double.formatCurrency(): String {
 	return prefix + formatEditor.format(this * rate)
 }
 
-fun Double.formatCount(count: Int = 5): String {
+fun Double.formatCount(count: Int = 6): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
 	val value = formatEditor.format(this).toDouble()
@@ -183,7 +183,7 @@ fun BigInteger.toDataString() = this.toHexStringZeroPadded(64, false)
 
 fun String.toDataStringFromAddress(): String {
 	if (length < 42) {
-		println("Wrong Address")
+		LogUtil.error("Wrong Address")
 	}
 	return "000000000000000000000000" + substring(2, length)
 }

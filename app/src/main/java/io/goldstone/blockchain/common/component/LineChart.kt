@@ -193,33 +193,38 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			chartType: ChartType,
 			hold: (min: Float, max: Float, step: Float) -> Unit
 		) {
-			// 最低点 = min - (max - min) * minRate
-			// 最低点 = min + (max - min) *
-			val minRate = when (chartType) {
-				ChartType.Assets -> 0.8
-				ChartType.Quotation, ChartType.MarketTokenDetail -> 0.1
-			}
-			val stepsCount = 5 //代表希望分成几个阶段
-			val max =
-				if (maxValue == minValue) {
-					if (maxValue == 0f) (stepsCount - 1).toDouble()
-					else maxValue + Math.abs(maxValue * 0.5)
-				} else if (maxValue < minValue) {
-					minValue.toDouble()
-				} else {
-					maxValue.toDouble()
+			val step: Float
+			val minChartHeight: Float
+			val maxChartHeight: Float
+			val stepsCount = 5f //代表希望分成几个阶段
+			if (chartType == ChartType.Assets) {
+				val average = minValue + maxValue
+				minChartHeight = minValue - average * 0.2f
+				maxChartHeight = maxValue + average * 0.15f + if (minValue == maxValue) 0.01f else 0f
+				step = (minChartHeight + maxChartHeight) / stepsCount
+			} else {
+				val max =
+					if (maxValue == minValue) {
+						if (maxValue == 0f) (stepsCount - 1).toDouble()
+						else maxValue + Math.abs(maxValue * 0.5)
+					} else if (maxValue < minValue) {
+						minValue.toDouble()
+					} else {
+						maxValue.toDouble()
+					}
+				val min = when {
+					maxValue == minValue -> maxValue - Math.abs(maxValue * 0.5)
+					maxValue < minValue -> maxValue - (minValue - maxValue) * 0.1
+					else -> minValue - (maxValue - minValue) * 0.1
 				}
-			val min = when {
-				maxValue == minValue -> maxValue - Math.abs(maxValue * 0.5)
-				maxValue < minValue -> maxValue - (minValue - maxValue) * minRate
-				else -> minValue - (maxValue - minValue) * minRate
+				val roughStep = (max - min) / (stepsCount - 1)
+				val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
+				step = (Math.ceil(roughStep / stepLevel) * stepLevel).toFloat()
+				minChartHeight = (Math.floor(min / step) * step).toFloat()
+				maxChartHeight = ((1.0 + Math.floor(max / step)) * step).toFloat()
 			}
-			val roughStep = (max - min) / (stepsCount - 1)
-			val stepLevel = Math.pow(10.0, Math.floor(Math.log10(roughStep))) //代表gap的数量级
-			val step = (Math.ceil(roughStep / stepLevel) * stepLevel)
-			val minChartHeight = (Math.floor(min / step) * step).toFloat()
-			val maxChartHeight = ((1.0 + Math.floor(max / step)) * step).toFloat()
-			hold(minChartHeight, maxChartHeight, step.toFloat())
+			
+			hold(minChartHeight, maxChartHeight, step)
 		}
 	}
 }

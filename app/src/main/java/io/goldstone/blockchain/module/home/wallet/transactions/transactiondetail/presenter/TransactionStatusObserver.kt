@@ -46,9 +46,9 @@ abstract class TransactionStatusObserver {
 						{ error, _ ->
 							LogUtil.error("checkStatusByTransaction", error)
 							// error callback if need to do something
-						}) {
+						}) { blockNumber ->
 						GoldStoneAPI.context.runOnUiThread {
-							val blockInterval = it - transaction.blockNumber.toInt() + 1
+							val blockInterval = blockNumber - transaction.blockNumber.toInt() + 1
 							val hasConfirmed = blockInterval > targetIntervla
 							getStatus(hasConfirmed, blockInterval)
 							if (hasConfirmed) {

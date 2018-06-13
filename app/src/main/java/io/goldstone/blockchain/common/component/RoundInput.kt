@@ -12,7 +12,6 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
-import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
@@ -78,7 +77,6 @@ open class RoundInput(context: Context) : EditText(context) {
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.heavy(context)
 		textSize = fontSize(14)
-		setCursorColor(Spectrum.blue)
 		
 		filters = arrayOf(InputFilter.LengthFilter(maxCount))
 		// `RoundInput` 主要用于输入用户名或密码, 防止输入太长内容做了长度限制

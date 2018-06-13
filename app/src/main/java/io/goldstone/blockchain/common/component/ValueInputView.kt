@@ -15,7 +15,6 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
-import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -68,7 +67,6 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				typeface = GoldStoneFont.heavy(context)
 				gravity = Gravity.CENTER
 				inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-				setCursorColor(Spectrum.blue)
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				y -= 3.uiPX()
 			}.into(this)
@@ -132,7 +130,8 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setHeaderSymbol(symbol: String) {
-		description.text = "${PrepareTransferText.sendAmountPrefix} $symbol ${PrepareTransferText.sendAmountSuffix}"
+		description.text =
+			"${PrepareTransferText.sendAmountPrefix} $symbol ${PrepareTransferText.sendAmountSuffix}"
 	}
 	
 	fun getValue(): String {

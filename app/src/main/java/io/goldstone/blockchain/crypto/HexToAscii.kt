@@ -8,7 +8,9 @@ import java.math.BigInteger
  */
 fun String.toAscii(removeBlank: Boolean = true): String {
 	/** 去掉前两个字母 `0x` */
-	var hex = if (substring(0, 2) == "0x") substring(2, length) else this
+	var hex =
+		if (substring(0, 2).equals(SolidityCode.ethTransfer, true)) substring(2, length)
+		else this
 	var ascii = ""
 	var str: String
 	// Convert hex string to "even" length
@@ -41,7 +43,9 @@ private fun checkCode(dec: Int): String {
 	if (dec < 32 || dec in 127 .. 160) str = ""
 	return str
 }
-
+/**
+ * `hash` 值转换为 `Decimal`
+ */
 /**
  * `hash` 值转换为 `Decimal`
  */
@@ -65,5 +69,5 @@ fun String.toDecimalFromHex(): String {
 }
 
 fun String.hexToLong(): Long {
-	return hexToDecimal().toLong()
+	return toDecimalFromHex().toLong()
 }

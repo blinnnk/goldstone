@@ -27,7 +27,7 @@ class GoldStoneEthereumUnitTest {
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	n
+	
 	@Test
 	fun getTokenInfoByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // symbol = GSC
@@ -83,7 +83,7 @@ class GoldStoneEthereumUnitTest {
 	
 	@Test
 	fun getInputCodeByTaxHash() {
-		val hash = "0x3dda45630cab85080320ee791a540f2f6ef2e9ad7e845831126e03f193088965"
+		val hash = "0x26acbb2138b0e99bbd929dddef42cf77b4b4fd303d94b0588fadb7143b6f7cb2"
 		GoldStoneEthCall.getInputCodeByHash(
 			hash,
 			{ error, reason ->

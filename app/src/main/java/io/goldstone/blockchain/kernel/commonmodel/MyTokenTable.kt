@@ -293,7 +293,9 @@ data class MyTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					getCurrentChainTokenByContractAndAddress(contract, Config.getCurrentAddress()).let {
-						it?.let { update(it.apply { this.balance = balance }) }
+						it?.let {
+							update(it.apply { this.balance = balance })
+						}
 					}
 				}
 			}

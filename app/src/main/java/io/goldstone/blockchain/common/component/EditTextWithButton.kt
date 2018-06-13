@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.common.component
 
 import android.app.Activity
@@ -13,7 +15,6 @@ import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
-import com.blinnnk.honey.setCursorColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
@@ -42,7 +43,6 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			x += PaddingSize.device
 			singleLine = true
 			leftPadding = 20.uiPX()
-			setCursorColor(Spectrum.blue)
 			backgroundTintMode = PorterDuff.Mode.CLEAR
 			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 		}.into(this)
