@@ -62,7 +62,7 @@ abstract class TransactionStatusObserver {
 									failed
 								)
 								
-								if (hasConfirmed || failed || hasError) {
+								if (hasConfirmed || hasError) {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
@@ -80,8 +80,18 @@ abstract class TransactionStatusObserver {
 								}
 							) { failed ->
 								isFailed = failed
-								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-								handler.postDelayed(reDo, 6000L)
+								if (isFailed == true) {
+									getStatus(
+										false,
+										1,
+										false,
+										failed
+									)
+									removeObserver()
+								} else {
+									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+									handler.postDelayed(reDo, 6000L)
+								}
 							}
 						}
 					}
@@ -90,7 +100,7 @@ abstract class TransactionStatusObserver {
 	}
 	
 	abstract fun getStatus(
-		status: Boolean,
+		confirmed: Boolean,
 		blockInterval: Int,
 		hasError: Boolean,
 		isFailed: Boolean
@@ -116,15 +126,15 @@ fun TransactionDetailPresenter.observerTransaction() {
 	object : TransactionStatusObserver() {
 		override val transactionHash = currentHash
 		override fun getStatus(
-			status: Boolean,
+			confirmed: Boolean,
 			blockInterval: Int,
 			hasError: Boolean,
 			isFailed: Boolean
 		) {
-			if (status || hasError || isFailed) {
+			if (confirmed || hasError || isFailed) {
 				onTransactionSucceed(hasError, isFailed)
 				updateWalletDetailValue(currentActivity)
-				if (status) {
+				if (confirmed) {
 					updateConformationBarFinished()
 				}
 			} else {
@@ -161,6 +171,8 @@ fun TransactionDetailPresenter.updateConformationBarFinished() {
 private fun TransactionDetailPresenter.onTransactionSucceed(
 	hasError: Boolean, isFailed: Boolean
 ) {
+	
+	System.out.println("shit$hasError, and $isFailed")
 	// 交易过程中发生错误
 	if (hasError) {
 		updateDataWhenHasError()
@@ -178,7 +190,7 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 				token.symbol,
 				false,
 				false,
-				TinyNumberUtils.allFalse(hasError, isFailed)
+				TinyNumberUtils.hasTrue(hasError, isFailed)
 			)
 		)
 		getTransactionFromChain()
@@ -192,7 +204,7 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 				symbol,
 				false,
 				false,
-				TinyNumberUtils.allFalse(hasError, isFailed)
+				TinyNumberUtils.hasTrue(hasError, isFailed)
 			)
 		)
 		getTransactionFromChain()

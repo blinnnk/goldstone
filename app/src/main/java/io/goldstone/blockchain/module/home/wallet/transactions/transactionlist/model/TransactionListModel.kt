@@ -30,7 +30,8 @@ data class TransactionListModel(
 	val timeStamp: String,
 	val value: String,
 	val hasError: Boolean,
-	var contract: String
+	var contract: String,
+	var isFailed: Boolean
 ) : Serializable {
 	
 	constructor(data: TransactionTable) : this(
@@ -57,7 +58,8 @@ data class TransactionListModel(
 		data.timeStamp,
 		data.value,
 		data.hasError == "1",
-		data.contractAddress
+		data.contractAddress,
+		data.isFailed
 	)
 }
 

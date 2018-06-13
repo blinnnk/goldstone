@@ -20,10 +20,14 @@ object TinyNumberUtils {
 	}
 	
 	fun allTrue(vararg values: Boolean): Boolean {
-		return values.none { false }
+		return values.none { !it }
 	}
 	
 	fun allFalse(vararg values: Boolean): Boolean {
-		return values.none { true }
+		return values.none { it }
+	}
+	
+	fun hasTrue(vararg values: Boolean): Boolean {
+		return values.any { it }
 	}
 }
