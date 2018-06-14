@@ -26,14 +26,13 @@
     android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
     android:label="GoldStone"
+    tools:replace="icon, label"
     android:roundIcon="@mipmap/ic_launcher"
     android:screenOrientation="portrait"
     android:supportsRtl="true"
     android:theme="@style/MainTheme"
     tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
-    tools:targetApi="donut"
-    tools:node="replace"
-    android:fullBackupContent="@xml/backup_descriptor">
+    tools:targetApi="donut">
     <!-- 登录和闪屏界面 -->
     <activity
       android:name=".module.entrance.splash.view.SplashActivity"
@@ -58,7 +57,7 @@
     <receiver
       android:name=".kernel.receiver.XinGePushReceiver"
       android:exported="true"
-      tools:ignore="ExportedReceiver">
+      android:permission="GoldStone">
       <intent-filter>
         <!-- 接收消息透传 -->
         <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
@@ -81,6 +80,7 @@
       android:name="com.journeyapps.barcodescanner.CaptureActivity"
       android:screenOrientation="fullSensor"
       tools:replace="screenOrientation" />
+
   </application>
 
 </manifest>

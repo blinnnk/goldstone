@@ -82,8 +82,8 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {

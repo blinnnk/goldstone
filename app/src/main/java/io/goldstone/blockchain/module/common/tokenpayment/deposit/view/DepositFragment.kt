@@ -96,8 +96,8 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		}
 	}
 	
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		getParentFragment<TokenDetailOverlayFragment> {

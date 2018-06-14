@@ -105,8 +105,8 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		getParentFragment<TokenDetailOverlayFragment> {

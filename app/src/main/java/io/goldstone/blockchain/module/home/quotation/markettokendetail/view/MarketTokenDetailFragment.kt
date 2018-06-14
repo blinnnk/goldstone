@@ -107,13 +107,13 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		}
 	}
 	
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
-		super.setBackEvent(activity, parent)
+		super.setBaseBackEvent(activity, parent)
 		// 恢复回退事件
-		activity.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
+		activity?.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
 			?.apply {
 				updateBackEvent()
 			}

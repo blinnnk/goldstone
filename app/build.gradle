@@ -32,6 +32,8 @@ android {
       abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    // Leave only support language
+    resConfigs "en", "ja", "ru", "zh_CN", "zh_HK", "zh_TW", "ko"
   }
 
   buildTypes {
@@ -49,6 +51,7 @@ android {
       signingConfig signingConfigs.release
     }
   }
+
 }
 
 dependencies {
@@ -93,7 +96,7 @@ dependencies {
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.2'
   // XinGe Push
-  implementation 'com.tencent.xinge:xinge:3.2.3_1-beta'
+  implementation 'com.tencent.xinge:xinge:3.2.4-beta'
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   implementation 'com.tencent.mid:mid:4.0.6-release'
   // Google Analytics

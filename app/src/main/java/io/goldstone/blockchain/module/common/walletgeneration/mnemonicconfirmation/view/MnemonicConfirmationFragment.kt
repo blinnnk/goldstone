@@ -143,8 +143,8 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		}
 	}
 	
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		if (parent is BaseOverlayFragment<*>) {

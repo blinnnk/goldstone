@@ -89,8 +89,8 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 		}
 	}
 
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		when (parent) {

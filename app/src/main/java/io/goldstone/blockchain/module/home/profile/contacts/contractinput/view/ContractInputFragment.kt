@@ -28,15 +28,13 @@ import org.jetbrains.anko.verticalLayout
  * @date 16/04/2018 1:13 PM
  * @author KaySaith
  */
-
 class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
-
+	
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val addressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-
 	override val presenter = ContractInputPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -46,12 +44,12 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 				setTextInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 			}.into(this)
-
+			
 			addressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 				hint = ContactText.hint
 			}.into(this)
-
+			
 			confirmButton.apply {
 				text = CommonText.confirm
 				setGrayStyle(20.uiPX())
@@ -60,7 +58,7 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 			}.into(this)
 		}
 	}
-
+	
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -68,9 +66,9 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
 	}
-
-	override fun setBackEvent(
-		activity: MainActivity,
+	
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		getParentFragment<ProfileOverlayFragment> {

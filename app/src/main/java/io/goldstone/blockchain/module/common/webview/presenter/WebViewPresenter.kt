@@ -24,12 +24,6 @@ class WebViewPresenter(
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		fragment.activity?.apply {
-			when (this) {
-				is SplashActivity -> backEvent = Runnable { setBackEvent() }
-				is MainActivity -> backEvent = Runnable { setBackEvent() }
-			}
-		}
 		if (fragment.parentFragment is ProfileOverlayFragment) {
 			updateHeight(fragment.context?.getRealScreenHeight().orZero())
 		}

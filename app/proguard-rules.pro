@@ -207,10 +207,10 @@
 -keep class android.support.v8.renderscript.** { *; }
 
 # Xin Ge
--keep class com.tencent.android.tpush.**  {*;}
--keep class com.tencent.mid.**  {*;}
--dontwarn com.meizu.cloud.pushsdk.**
--keep class com.meizu.cloud.pushsdk.**{*;}
+-keep class com.tencent.android.tpush.** {* ;}
+-keep class com.tencent.mid.** {* ;}
+-keep class com.qq.taf.jce.** {*;}
+
 
 # Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
