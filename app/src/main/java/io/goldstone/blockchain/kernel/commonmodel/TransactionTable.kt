@@ -225,7 +225,12 @@ data class TransactionTable(
 						.transactionDao()
 						.getTransactionsByAddress(address)
 				}) {
-				hold(it.map { TransactionListModel(it) }.toArrayList())
+				val result = if (it.isEmpty()) {
+					arrayListOf()
+				} else {
+					it.map { TransactionListModel(it) }.toArrayList()
+				}
+				hold(result)
 			}
 		}
 		

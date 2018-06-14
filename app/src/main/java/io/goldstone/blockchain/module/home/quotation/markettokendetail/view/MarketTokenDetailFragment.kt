@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.into
@@ -44,7 +45,9 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	override val presenter = MarketTokenDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, matchParent)
 			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
 				menu.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 15.uiPX()

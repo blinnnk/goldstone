@@ -5,6 +5,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -212,7 +213,7 @@ class WalletDetailPresenter(
 				val overlay = ContentScrollOverlayView(context)
 				overlay.into(this)
 				overlay.apply {
-					setTitle("Token Selection")
+					setTitle(TransactionText.tokenSelection)
 					addContent {
 						topPadding = 10.uiPX()
 						defaultTokens.filter { default ->
@@ -268,14 +269,18 @@ class WalletDetailPresenter(
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
 		Config.updateCurrentBalance(totalBalance.orElse(0.0))
-		recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
-			it?.model = WalletDetailHeaderModel(
-				null,
-				Config.getCurrentName(),
-				CryptoUtils.scaleAddress(Config.getCurrentAddress()),
-				totalBalance.toString(),
-				Config.getWalletCount()
-			)
+		try {
+			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
+				it?.model = WalletDetailHeaderModel(
+					null,
+					Config.getCurrentName(),
+					CryptoUtils.scaleAddress(Config.getCurrentAddress()),
+					totalBalance.toString(),
+					Config.getWalletCount()
+				)
+			}
+		} catch (error: Exception) {
+			LogUtil.error("WalletDetail updateHeaderValue", error)
 		}
 	}
 }

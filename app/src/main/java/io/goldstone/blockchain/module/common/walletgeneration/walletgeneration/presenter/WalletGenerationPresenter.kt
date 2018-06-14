@@ -13,11 +13,10 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
  * @date 22/03/2018 9:38 PM
  * @author KaySaith
  */
-
 class WalletGenerationPresenter(
 	override val fragment: WalletGenerationFragment
 ) : BaseOverlayPresenter<WalletGenerationFragment>() {
-
+	
 	fun showCreateWalletFragment() {
 		fragment.apply {
 			addFragmentAndSetArgument<CreateWalletFragment>(
@@ -29,10 +28,9 @@ class WalletGenerationPresenter(
 			headerTitle = CreateWalletText.create
 		}
 	}
-
+	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		WalletImportPresenter.recoveryBackEventInMainActivity(fragment.activity)
 	}
-
 }

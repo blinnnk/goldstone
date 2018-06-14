@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.web3j.crypto.WalletUtils
@@ -57,5 +58,10 @@ class WatchOnlyImportPresenter(
 				callback()
 			}
 		}
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
 }

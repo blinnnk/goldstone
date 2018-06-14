@@ -19,7 +19,7 @@ import org.jetbrains.anko.support.v4.toast
 class KeystoreExportPresenter(
 	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
-
+	
 	fun getKeystoreByAddress(
 		passwordInput: EditText,
 		hold: String.() -> Unit
@@ -29,7 +29,7 @@ class KeystoreExportPresenter(
 			hold("")
 			return
 		}
-
+		
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
@@ -43,5 +43,4 @@ class KeystoreExportPresenter(
 			}
 		}
 	}
-
 }

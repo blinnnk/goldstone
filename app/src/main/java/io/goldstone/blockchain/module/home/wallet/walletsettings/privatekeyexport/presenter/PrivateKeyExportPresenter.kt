@@ -18,7 +18,7 @@ import org.jetbrains.anko.support.v4.toast
 class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {
-
+	
 	fun getPrivateKeyByAddress(
 		passwordInput: EditText,
 		hold: String.() -> Unit
@@ -28,7 +28,7 @@ class PrivateKeyExportPresenter(
 			hold("")
 			return
 		}
-
+		
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
 		WalletTable.getCurrentWallet {
 			doAsync {
@@ -40,5 +40,4 @@ class PrivateKeyExportPresenter(
 			}
 		}
 	}
-
 }

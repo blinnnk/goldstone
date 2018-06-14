@@ -171,8 +171,6 @@ fun TransactionDetailPresenter.updateConformationBarFinished() {
 private fun TransactionDetailPresenter.onTransactionSucceed(
 	hasError: Boolean, isFailed: Boolean
 ) {
-	
-	System.out.println("shit$hasError, and $isFailed")
 	// 交易过程中发生错误
 	if (hasError) {
 		updateDataWhenHasError()

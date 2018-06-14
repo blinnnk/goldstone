@@ -631,6 +631,7 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "燃氣單價"
 		else -> ""
 	}
+	
 	@JvmField
 	val noMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't a memo."
@@ -639,6 +640,17 @@ object TransactionText {
 		HoneyLanguage.Korean.code -> "메모가 없습니다."
 		HoneyLanguage.Russian.code -> "Нет памятки."
 		HoneyLanguage.TraditionalChinese.code -> "沒有備註信息。"
+		else -> ""
+	}
+	
+	@JvmField
+	val tokenSelection = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Select a Token"
+		HoneyLanguage.Chinese.code -> "选择一个Token"
+		HoneyLanguage.Japanese.code -> "トークンを選択。"
+		HoneyLanguage.Korean.code -> "토큰 선택"
+		HoneyLanguage.Russian.code -> "Выберите токен"
+		HoneyLanguage.TraditionalChinese.code -> "選擇一個Token"
 		else -> ""
 	}
 	@JvmField
