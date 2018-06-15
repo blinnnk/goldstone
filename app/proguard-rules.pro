@@ -67,73 +67,6 @@
 -dontskipnonpubliclibraryclasses
 -dontskipnonpubliclibraryclassmembers
 
-# Keep Options
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.app.backup.BackupAgentHelper
--keep public class * extends android.preference.Preference
--keep public class com.google.vending.licensing.ILicensingService
--keep public class com.android.vending.licensing.ILicensingService
-
--keep public class * extends android.view.View {
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-    public void set*(...);
-}
-
--keepclasseswithmembers class * {
-    public <init>(android.content.Context, android.util.AttributeSet);
-}
-
--keepclasseswithmembers class * {
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
-
--keepclassmembers class * extends android.content.Context {
-   public void *(android.view.View);
-   public void *(android.view.MenuItem);
-}
-
--keep class * implements android.os.Parcelable {
-  public static final android.os.Parcelable$Creator *;
-}
-
--keep class **.R
--keepclassmembers class **.R$* {
-    public static <fields>;
-}
-
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
--keepclassmembernames class * {
-    java.lang.Class class$(java.lang.String);
-    java.lang.Class class$(java.lang.String, boolean);
-}
--keepclasseswithmembernames,includedescriptorclasses class * {
-    native <methods>;
-}
-
--keepclassmembers,allowoptimization enum * {
-    <init>(...);
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
-
--keepnames class * implements java.io.Serializable
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
 # In the optimization step, ProGuard will then remove calls to such methods, if it can determine that the return values aren't used.
 
 -assumenosideeffects class android.util.Log {
@@ -156,19 +89,17 @@
 #For app
 #-keepattributes *Annotation*
 
--optimizationpasses 5
+-optimizationpasses 10
 -dontskipnonpubliclibraryclassmembers
 -printmapping proguardMapping.txt
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 -keepattributes *Annotation*,InnerClasses, Signature, SourceFile,LineNumberTable, Exceptions
 
--printmapping build/mapping.txt
-
 -renamesourcefileattribute SourceFile
 
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
+#-keepclassmembers class * {
+#    @android.webkit.JavascriptInterface <methods>;
+#}
 
 
 # OKHTTP

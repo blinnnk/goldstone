@@ -46,9 +46,8 @@ class MnemonicConfirmationPresenter(
 	
 	private fun validAndContinue(mnemonic: String) {
 		val currentActivity = fragment.activity
-		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(
-			mnemonic
-		) {
+		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(mnemonic) {
+			System.out.println("finished deleteEncryp ++++")
 			when (currentActivity) {
 				is MainActivity -> {
 					fragment.getParentFragment<WalletSettingsFragment> {

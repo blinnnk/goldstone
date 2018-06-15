@@ -51,7 +51,6 @@ android {
       signingConfig signingConfigs.release
     }
   }
-
 }
 
 dependencies {
