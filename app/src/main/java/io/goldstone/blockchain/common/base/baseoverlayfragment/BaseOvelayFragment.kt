@@ -12,9 +12,13 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.matchParent
@@ -156,17 +160,30 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		activity?.apply {
 			when (this) {
 				is MainActivity -> {
-					getHomeFragment()?.apply {
-						childFragmentManager.fragments?.last()?.let {
-							backEvent = if (it !is WalletDetailFragment) {
-								Runnable {
-									presenter.showWalletDetailFragment()
+					supportFragmentManager.fragments.last()?.let { lastChild ->
+						if (lastChild is HomeFragment) {
+							lastChild.childFragmentManager.fragments?.last()?.let {
+								backEvent = if (it !is WalletDetailFragment) {
+									Runnable {
+										lastChild.presenter.showWalletDetailFragment()
+									}
+								} else {
+									null
 								}
-							} else {
-								null
+							}
+						} else {
+							lastChild.childFragmentManager.fragments.last()?.let {
+								when (it) {
+									is BaseFragment<*> -> it.recoveryBackEvent()
+									is BaseRecyclerFragment<*, *> -> it.recoveryBackEvent()
+								}
 							}
 						}
 					}
+				}
+				
+				is SplashActivity -> {
+					backEvent = null
 				}
 			}
 		}

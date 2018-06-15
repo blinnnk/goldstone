@@ -20,9 +20,7 @@ class QuotationOverlayPresenter(
 ) : BaseOverlayPresenter<QuotationOverlayFragment>() {
 	
 	fun showQutationManagementFragment() {
-		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content) {
-			//
-		}
+		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
 	}
 	
 	fun showMarketTokenDetailFragment(model: QuotationModel?) {

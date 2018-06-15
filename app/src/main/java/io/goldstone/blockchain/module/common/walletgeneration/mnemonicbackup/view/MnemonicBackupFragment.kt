@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -29,16 +28,14 @@ import org.jetbrains.anko.*
  * @date 22/03/2018 9:32 PM
  * @author KaySaith
  */
-
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
-
+	
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val skipButton by lazy { RoundButton(context!!) }
 	private val attentionTextView by lazy { AttentionTextView(context!!) }
-
 	override val presenter = MnemonicBackupPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -70,12 +67,13 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(5.uiPX())
 				}.click {
+					System.out.println("what ___$mnemonicCode")
 					presenter.goToMnemonicConfirmation(mnemonicCode)
 				}.into(this)
 			}
 		}
 	}
-
+	
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		val current = activity
@@ -88,9 +86,9 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 			}
 		}
 	}
-
-	override fun setBackEvent(
-		activity: MainActivity,
+	
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		when (parent) {
@@ -98,12 +96,11 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 				parent.presenter.removeSelfFromActivity()
 				this.activity?.jump<SplashActivity>()
 			}
-
+			
 			is WalletSettingsFragment -> {
 				parent.headerTitle = WalletSettingsText.walletSettings
 				parent.presenter.showWalletSettingListFragment()
 			}
 		}
 	}
-
 }

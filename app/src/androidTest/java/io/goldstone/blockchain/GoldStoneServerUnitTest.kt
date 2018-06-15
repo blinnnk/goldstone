@@ -2,13 +2,12 @@
 
 package io.goldstone.blockchain
 
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -112,5 +111,12 @@ class GoldStoneServerUnitTest {
 		) {
 			LogUtil.debug(positon, it.toString())
 		}
+	}
+	
+	@Test
+	fun getWebUrlValue() {
+		val terms =
+			"${WebUrl.header}/${WebUrl.webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
+		LogUtil.debug("getWebUrlValue", terms)
 	}
 }

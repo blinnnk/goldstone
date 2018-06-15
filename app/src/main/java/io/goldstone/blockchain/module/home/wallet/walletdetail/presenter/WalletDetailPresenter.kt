@@ -5,6 +5,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoUtils
@@ -212,7 +213,7 @@ class WalletDetailPresenter(
 				val overlay = ContentScrollOverlayView(context)
 				overlay.into(this)
 				overlay.apply {
-					setTitle("Token Selection")
+					setTitle(TransactionText.tokenSelection)
 					addContent {
 						topPadding = 10.uiPX()
 						defaultTokens.filter { default ->
@@ -234,17 +235,23 @@ class WalletDetailPresenter(
 	}
 	
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
-		coroutinesTask(
-			{
-				/** 先按照资产情况排序, 资产为零的按照权重排序 */
-				val currencyList = data.filter { it.currency > 0.0 }
-				val weightList = data.filter { it.currency == 0.0 }
-				currencyList.sortedByDescending { it.currency }
-					.plus(weightList.sortedByDescending { it.weight }).toArrayList()
-			}
-		) {
-			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+		if (data.isEmpty()) {
+			diffAndUpdateAdapterData<WalletDetailAdapter>(data)
 			fragment.updateHeaderValue()
+		} else {
+			coroutinesTask(
+				{
+					/** 先按照资产情况排序, 资产为零的按照权重排序 */
+					val currencyList = data.filter { it.currency > 0.0 }
+					val weightList = data.filter { it.currency == 0.0 }
+					currencyList.sortedByDescending {
+						it.currency
+					}.plus(weightList.sortedByDescending { it.weight }).toArrayList()
+				}
+			) {
+				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+				fragment.updateHeaderValue()
+			}
 		}
 	}
 	
@@ -255,10 +262,9 @@ class WalletDetailPresenter(
 			AppConfigTable.getAppConfig {
 				it?.showPincode?.isTrue {
 					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main, FragmentTag.pinCode
-					) {
-						// Send Argument
-					}
+						ContainerID.main,
+						FragmentTag.pinCode
+					)
 				}
 			}
 		}
@@ -268,14 +274,18 @@ class WalletDetailPresenter(
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
 		Config.updateCurrentBalance(totalBalance.orElse(0.0))
-		recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
-			it?.model = WalletDetailHeaderModel(
-				null,
-				Config.getCurrentName(),
-				CryptoUtils.scaleAddress(Config.getCurrentAddress()),
-				totalBalance.toString(),
-				Config.getWalletCount()
-			)
+		try {
+			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
+				it?.model = WalletDetailHeaderModel(
+					null,
+					Config.getCurrentName(),
+					CryptoUtils.scaleAddress(Config.getCurrentAddress()),
+					totalBalance.toString(),
+					Config.getWalletCount()
+				)
+			}
+		} catch (error: Exception) {
+			LogUtil.error("WalletDetail updateHeaderValue", error)
 		}
 	}
 }

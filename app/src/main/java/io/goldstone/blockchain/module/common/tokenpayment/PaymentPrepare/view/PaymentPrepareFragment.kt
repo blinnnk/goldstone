@@ -208,8 +208,8 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		this.price.setSubtitle(price)
 	}
 	
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		if (memoInputView.isNull()) {

@@ -11,7 +11,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmati
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 22/03/2018 9:32 PM
@@ -35,18 +34,25 @@ class MnemonicBackupPresenter(
 	}
 	
 	fun goToMnemonicConfirmation(mnemonic: String?) {
-		val argument = Bundle().apply { putString(ArgumentKey.mnemonicCode, mnemonic) }
+		System.out.println("shit $mnemonic")
+		val argument = Bundle().apply {
+			putString(ArgumentKey.mnemonicCode, mnemonic)
+		}
 		val parent = fragment.parentFragment
 		when (parent) {
 			is WalletGenerationFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletGenerationFragment>(
-					CreateWalletText.mnemonicConfirmation, CreateWalletText.mnemonicBackUp, argument
+					CreateWalletText.mnemonicConfirmation,
+					CreateWalletText.mnemonicBackUp,
+					argument
 				)
 			}
 			
 			is WalletSettingsFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletSettingsFragment>(
-					WalletSettingsText.walletSettings, CreateWalletText.mnemonicBackUp, argument
+					WalletSettingsText.walletSettings,
+					CreateWalletText.mnemonicBackUp,
+					argument
 				)
 			}
 		}

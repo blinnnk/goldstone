@@ -20,9 +20,10 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 
   override fun ViewGroup.initView() {
     headerTitle = TransactionText.transaction
-    addFragmentAndSetArgument<TransactionListFragment>(ContainerID.content, FragmentTag.transactionList) {
-      // Send Argument
-    }
+    addFragmentAndSetArgument<TransactionListFragment>(
+      ContainerID.content,
+      FragmentTag.transactionList
+    )
   }
 
 }

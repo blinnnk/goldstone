@@ -160,6 +160,11 @@ class CreateWalletPresenter(
 		)
 	}
 	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		setRootChildFragmentBackEvent<WalletGenerationFragment>(fragment)
+	}
+	
 	companion object {
 		
 		fun showPasswordSafeLevel(passwordInput: RoundInput) {

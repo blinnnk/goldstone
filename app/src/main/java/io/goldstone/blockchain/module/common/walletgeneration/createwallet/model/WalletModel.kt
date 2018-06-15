@@ -75,25 +75,15 @@ data class WalletTable(
 			}
 		}
 		
-		fun deleteEncryptMnemonicAfterUserHasBackUp(
-			mnemonic: String,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					getAllWallets().let {
-						it.findLast {
-							JavaKeystoreUtil().decryptData(it.encryptMnemonic!!) == mnemonic
-						}?.let {
-							update(it.apply {
-								this.encryptMnemonic = null
-								hasBackUpMnemonic = true
-								GoldStoneAPI.context.runOnUiThread {
-									callback()
-								}
-							})
-						}
-					}
+		fun deleteEncryptMnemonicAfterUserHasBackUp(mnemonic: String, callback: () -> Unit) {
+			getAll {
+				System.out.println("hi")
+				find {
+					System.out.println("hi2")
+					!it.encryptMnemonic.isNull()
+					&& JavaKeystoreUtil().decryptData(it.encryptMnemonic!!).equals(mnemonic, true)
+				}?.isNotNull {
+					updateHasBackedUpStatus(callback)
 				}
 			}
 		}
@@ -156,6 +146,22 @@ data class WalletTable(
 					GoldStoneDataBase.database.walletDao().apply {
 						findWhichIsUsing(true)?.let {
 							update(it.apply { hint = newHint })
+						}
+					}
+				}) {
+				callback()
+			}
+		}
+		
+		private fun updateHasBackedUpStatus(callback: () -> Unit) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.walletDao().apply {
+						findWhichIsUsing(true)?.let {
+							update(it.apply {
+								hasBackUpMnemonic = true
+								encryptMnemonic = null
+							})
 						}
 					}
 				}) {

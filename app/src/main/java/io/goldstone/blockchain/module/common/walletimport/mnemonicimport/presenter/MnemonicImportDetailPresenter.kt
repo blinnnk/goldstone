@@ -10,6 +10,7 @@ import io.goldstone.blockchain.crypto.getWalletByMnemonic
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -93,6 +94,11 @@ class MnemonicImportDetailPresenter(
 				)
 			}
 		}
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
 	
 	private fun isVaildPath(path: String): Boolean {

@@ -80,32 +80,22 @@ class ProfileOverlayPresenter(
 	}
 	
 	private fun showChainSelectionFragment() {
-		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content)
 	}
 	
 	private fun showPinCodeEditorFragment() {
-		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content)
 	}
 	
 	private fun showContactsFragment() {
-		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 	}
 	
 	private fun showCurrencyFragment() {
-		fragment.addFragmentAndSetArgument<CurrencyFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.addFragmentAndSetArgument<CurrencyFragment>(ContainerID.content)
 	}
 	
 	private fun showLanguageFragment() {
-		fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.addFragmentAndSetArgument<LanguageFragment>(ContainerID.content)
 	}
 }

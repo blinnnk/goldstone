@@ -40,18 +40,14 @@ class MnemonicConfirmationPresenter(
 		}
 	}
 	
-	private fun compareMnemonicCode(
-		correct: String,
-		current: String
-	): Boolean {
+	private fun compareMnemonicCode(correct: String, current: String): Boolean {
 		return correct.equals(current, true)
 	}
 	
 	private fun validAndContinue(mnemonic: String) {
 		val currentActivity = fragment.activity
-		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(
-			mnemonic
-		) {
+		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(mnemonic) {
+			System.out.println("finished deleteEncryp ++++")
 			when (currentActivity) {
 				is MainActivity -> {
 					fragment.getParentFragment<WalletSettingsFragment> {

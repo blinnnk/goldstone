@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 
 /**
  * @date 22/03/2018 2:58 AM
@@ -100,6 +101,24 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 					showCloseButton(!hasBackButton)
 				}
 				headerTitle = title
+			}
+		}
+	}
+	
+	companion object {
+		
+		// SplashActivity 的回退栈在公用组件下的特殊设定
+		inline fun <reified T : BaseOverlayFragment<*>> setRootChildFragmentBackEvent(
+			fragment: Fragment
+		) {
+			fragment.activity?.let {
+				if (it is SplashActivity) {
+					fragment.getParentFragment<T> {
+						it.backEvent = Runnable {
+							presenter.removeSelfFromActivity()
+						}
+					}
+				}
 			}
 		}
 	}

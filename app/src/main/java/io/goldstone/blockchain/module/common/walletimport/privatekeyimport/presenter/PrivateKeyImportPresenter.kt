@@ -12,6 +12,7 @@ import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import org.web3j.crypto.WalletUtils
 
 /**
@@ -56,6 +57,11 @@ class PrivateKeyImportPresenter(
 				callback
 			)
 		}
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
 	
 	companion object {

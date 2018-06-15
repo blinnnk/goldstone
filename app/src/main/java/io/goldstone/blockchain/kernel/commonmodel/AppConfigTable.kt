@@ -9,7 +9,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import com.blinnnk.util.coroutinesTask
-import io.goldstone.blockchain.R.raw
+import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
@@ -245,7 +245,7 @@ data class AppConfigTable(
 		}
 		
 		private fun getLocalTerms(): String {
-			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(raw.terms).let { localTerms ->
+			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {
 					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
 				}.let {

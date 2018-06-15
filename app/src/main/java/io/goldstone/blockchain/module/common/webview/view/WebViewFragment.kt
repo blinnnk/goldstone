@@ -2,11 +2,9 @@ package io.goldstone.blockchain.module.common.webview.view
 
 import android.R
 import android.annotation.SuppressLint
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.Html
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -22,15 +20,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import org.jetbrains.anko.*
 
 @Suppress("DEPRECATION")
@@ -125,54 +115,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 							}
 						}
 					}
-				}
-			}
-		}
-	}
-	
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-		activity?.apply {
-			when (this) {
-				is SplashActivity -> backEvent = Runnable { setBackEvent() }
-				is MainActivity -> backEvent = Runnable { setBackEvent() }
-			}
-		}
-		if (parentFragment is ProfileOverlayFragment) {
-			presenter.updateHeight(context?.getRealScreenHeight().orZero())
-		}
-	}
-	
-	private fun setBackEvent() {
-		parentFragment?.apply {
-			when (this) {
-				is TransactionFragment -> {
-					headerTitle = TransactionText.detail
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is NotificationFragment -> {
-					headerTitle = NotificationText.notification
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is TokenDetailOverlayFragment -> {
-					headerTitle = TokenDetailText.tokenDetail
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is WalletGenerationFragment -> {
-					headerTitle = CreateWalletText.create
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is WalletImportFragment -> {
-					headerTitle = ImportWalletText.importWallet
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is ProfileOverlayFragment -> {
-					presenter.removeSelfFromActivity()
 				}
 			}
 		}

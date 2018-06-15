@@ -115,7 +115,7 @@ class QuotationPresenter(
 		sortedByDescending {
 			it.label.toLong()
 		}.let {
-			/** 服务端传入的最近的事件会做减1处理, 从服务器获取的事件是昨天的事件. */
+			/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
 				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {

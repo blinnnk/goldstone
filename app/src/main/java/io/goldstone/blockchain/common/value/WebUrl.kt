@@ -6,7 +6,7 @@ package io.goldstone.blockchain.common.value
  */
 object WebUrl {
 	
-	private val webLanguage: (currentLanguageCode: Int) -> String = {
+	val webLanguage: (currentLanguageCode: Int) -> String = {
 		when (it) {
 			HoneyLanguage.Chinese.code -> "zh-s"
 			else -> "en"

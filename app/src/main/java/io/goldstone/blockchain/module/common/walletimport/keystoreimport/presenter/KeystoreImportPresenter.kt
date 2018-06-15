@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.crypto.convertKeystoreToModel
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -64,5 +65,10 @@ class KeystoreImportPresenter(
 			fragment.context?.alert(CreateWalletText.agreeRemind)
 			callback()
 		}
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
 }

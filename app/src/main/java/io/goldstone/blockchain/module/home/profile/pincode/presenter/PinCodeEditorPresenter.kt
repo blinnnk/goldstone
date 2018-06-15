@@ -80,8 +80,6 @@ class PinCodeEditorPresenter(
 	}
 	
 	fun showPinCodeFragment() {
-		fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-			//
-		}
+		fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 	}
 }

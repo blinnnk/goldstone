@@ -67,9 +67,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 				AppConfigTable.getAppConfig {
 					it?.showPincode?.isTrue {
 						getParentFragment<ProfileOverlayFragment> {
-							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-								// Send Argument
-							}
+							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 						}
 					}
 				}
@@ -79,8 +77,8 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		}
 	}
 	
-	override fun setBackEvent(
-		activity: MainActivity,
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
 		parent: Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {
