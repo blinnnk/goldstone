@@ -31,9 +31,7 @@ class TokenManagementPresenter(
 	
 	fun showTokenManagementFragment() {
 		fragment.apply {
-			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content) {
-				// Send Arguments
-			}
+			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content)
 			
 			overlayView.header.apply {
 				showSearchButton(true) {
@@ -49,9 +47,7 @@ class TokenManagementPresenter(
 	private fun TokenManagementFragment.showTokenSearchFragment() {
 		childFragmentManager.fragments.apply {
 			if (last() is TokenManagementListFragment) hideChildFragment(last())
-			addFragmentAndSetArgument<TokenSearchFragment>(ContainerID.content) {
-				// Send Arguments
-			}
+			addFragmentAndSetArgument<TokenSearchFragment>(ContainerID.content)
 		}
 	}
 }

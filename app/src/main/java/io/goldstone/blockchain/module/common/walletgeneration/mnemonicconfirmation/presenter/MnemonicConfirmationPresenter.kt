@@ -40,10 +40,7 @@ class MnemonicConfirmationPresenter(
 		}
 	}
 	
-	private fun compareMnemonicCode(
-		correct: String,
-		current: String
-	): Boolean {
+	private fun compareMnemonicCode(correct: String, current: String): Boolean {
 		return correct.equals(current, true)
 	}
 	

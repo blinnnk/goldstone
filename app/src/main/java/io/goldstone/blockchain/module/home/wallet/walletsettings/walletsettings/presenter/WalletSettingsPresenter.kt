@@ -117,14 +117,10 @@ class WalletSettingsPresenter(
 					it?.apply {
 						// 如果有私密验证首先要通过 `Pin Code`
 						showPincode.isTrue {
-							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-								// Send Argument
-							}
+							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 						}
 						// 加载 `Hint` 编辑界面
-						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content) {
-							// Send Arguments
-						}
+						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
 					}
 				}
 			}

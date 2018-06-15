@@ -40,9 +40,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 			GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
 			verticalLayout {
 				id = ContainerID.home
-				addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail) {
-					// Send Argument
-				}
+				addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail)
 			}
 
 			tabBar.apply {

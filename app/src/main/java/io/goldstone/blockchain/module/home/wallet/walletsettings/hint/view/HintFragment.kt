@@ -67,9 +67,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 				AppConfigTable.getAppConfig {
 					it?.showPincode?.isTrue {
 						getParentFragment<ProfileOverlayFragment> {
-							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main) {
-								// Send Argument
-							}
+							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 						}
 					}
 				}

@@ -75,22 +75,17 @@ data class WalletTable(
 			}
 		}
 		
-		fun deleteEncryptMnemonicAfterUserHasBackUp(
-			mnemonic: String,
-			callback: () -> Unit
-		) {
+		fun deleteEncryptMnemonicAfterUserHasBackUp(mnemonic: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					getAllWallets().let {
-						it.findLast {
+						it.find {
 							JavaKeystoreUtil().decryptData(it.encryptMnemonic!!) == mnemonic
 						}?.let {
 							update(it.apply {
 								this.encryptMnemonic = null
 								hasBackUpMnemonic = true
-								GoldStoneAPI.context.runOnUiThread {
-									callback()
-								}
+								GoldStoneAPI.context.runOnUiThread { callback() }
 							})
 						}
 					}
