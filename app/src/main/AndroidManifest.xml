@@ -51,7 +51,7 @@
       android:launchMode="singleTask"
       android:screenOrientation="portrait"
       android:theme="@style/MainTheme"
-      android:windowSoftInputMode="adjustResize" />
+      android:windowSoftInputMode="adjustPan" />
 
     <!-- APP实现的Receiver，用于接收消息和结果反馈 -->
     <receiver

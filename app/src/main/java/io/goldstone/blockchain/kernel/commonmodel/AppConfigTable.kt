@@ -66,7 +66,7 @@ data class AppConfigTable(
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
 						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].pincode = newPinCode })
+							update(it[0].apply { this.pincode = newPinCode })
 							GoldStoneAPI.context.runOnUiThread {
 								callback()
 							}
@@ -80,7 +80,9 @@ data class AppConfigTable(
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						update(it[0].apply { pushToken = token })
+						it.isNotEmpty() isTrue {
+							update(it[0].apply { this.pushToken = token })
+						}
 					}
 				}
 			}
@@ -94,7 +96,7 @@ data class AppConfigTable(
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
 						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].isRegisteredAddresses = isRegistered })
+							update(it[0].apply { this.isRegisteredAddresses = isRegistered })
 							GoldStoneAPI.context.runOnUiThread {
 								callback()
 							}
@@ -111,7 +113,7 @@ data class AppConfigTable(
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
 						it.isNotEmpty() isTrue {
-							update(it[0].apply { it[0].retryTimes = times })
+							update(it[0].apply { this.retryTimes = times })
 						}
 					}
 				}
@@ -162,7 +164,7 @@ data class AppConfigTable(
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						update(it[0].apply { language = code })
+						update(it[0].apply { this.language = code })
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}

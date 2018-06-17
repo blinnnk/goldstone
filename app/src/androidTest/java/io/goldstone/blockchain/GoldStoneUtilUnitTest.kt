@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.toCryptHexString
 import io.goldstone.blockchain.crypto.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.junit.Rule
 import org.junit.Test
@@ -49,5 +50,16 @@ class GoldStoneUtilUnitTest {
 	fun hextStringConverter() {
 		LogUtil.debug(positon, "你好".toCryptHexString())
 		LogUtil.debug(positon, "e7bb86e88a82".toUpperCase().toStringFromHex())
+	}
+	
+	@Test
+	fun prepareParameter() {
+		ParameterUtil.prepare(
+			Pair("device", "123"),
+			Pair("id", 5),
+			Pair("list", arrayListOf(1, 2, 3))
+		).let {
+			LogUtil.debug(positon + "prepareParameter", it)
+		}
 	}
 }

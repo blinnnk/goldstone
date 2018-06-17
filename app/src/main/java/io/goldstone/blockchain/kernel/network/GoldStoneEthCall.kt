@@ -30,8 +30,10 @@ import java.util.concurrent.TimeUnit
 object GoldStoneEthCall {
 	
 	lateinit var context: Context
+	@JvmStatic
+	private val contentType = MediaType.parse("application/json; charset=utf-8")
 	
-	private enum class Method(
+	enum class Method(
 		val method: String,
 		val code: String = "",
 		val display: String = ""
@@ -44,16 +46,8 @@ object GoldStoneEthCall {
 		GetTotalSupply("eth_call", SolidityCode.getTotalSupply, "GetTotalSupply"),
 		GetTokenDecimal("eth_call", SolidityCode.getDecimal, "GetTokenDecimal"),
 		GetTokenName("eth_call", SolidityCode.getTokenName, "GetTokenName"),
-		SendRawTransaction(
-			                  "eth_sendRawTransaction",
-			                  SolidityCode.getTokenName,
-			                  "SendRawTransaction"
-		                  ),
-		GetTransactionByHash(
-			                    "eth_getTransactionByHash",
-			                    SolidityCode.ethCall,
-			                    "GetTransactionByHash"
-		                    ),
+		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName, "SendRawTransaction"),
+		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall, "GetTransactionByHash"),
 		GetTransactionReceiptByHash(
 			                           "eth_getTransactionReceipt",
 			                           SolidityCode.ethCall,
@@ -64,9 +58,6 @@ object GoldStoneEthCall {
 		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
 		GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
 	}
-	
-	@JvmStatic
-	private val contentType = MediaType.parse("application/json; charset=utf-8")
 	
 	@JvmStatic
 	private infix fun String.withAddress(address: String) =
@@ -90,28 +81,11 @@ object GoldStoneEthCall {
 			decimal: Double
 		) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress, chainID, errorCallback) { symbol ->
+		getTokenSymbolByContract(contractAddress, errorCallback, chainID) { symbol ->
 			getTokenName(contractAddress, errorCallback) { name ->
-				getTokenDecimal(contractAddress, chainID, errorCallback) { decimal ->
+				getTokenDecimal(contractAddress, errorCallback, chainID) { decimal ->
 					hold(symbol, name, decimal)
 				}
-			}
-		}
-	}
-	
-	@JvmStatic
-	fun getTokenSymbolAndDecimalByContract(
-		contractAddress: String,
-		chainID: String = Config.getCurrentChain(),
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		hold: (symbol: String, decimal: Double) -> Unit
-	) {
-		getTokenSymbolByContract(contractAddress, chainID, { error, reason ->
-			errorCallback(error, reason)
-			LogUtil.error("getTokenSymbolAndDecimalByContract", error)
-		}) { symbol ->
-			getTokenDecimal(contractAddress, chainID, errorCallback) { decimal ->
-				hold(symbol, decimal)
 			}
 		}
 	}
@@ -124,7 +98,7 @@ object GoldStoneEthCall {
 		hold: (Double) -> Unit
 	) {
 		getTokenBalanceWithContract(contractAddress, walletAddress, errorCallback) { tokenBalance ->
-			getTokenDecimal(contractAddress, chainID, errorCallback) {
+			getTokenDecimal(contractAddress, errorCallback, chainID) {
 				hold(tokenBalance / Math.pow(10.0, it))
 			}
 		}
@@ -138,9 +112,8 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(Method.GetTransactionByHash.method, 1, false, hash)
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
@@ -154,17 +127,21 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getBlockNumber(
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Int) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockNumber.method}\", \"params\":[], \"id\":83}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(Method.GetBlockNumber.method, 83, false, "")
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetBlockNumber.display, error)
-			}) {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetBlockNumber.display, error)
+				},
+				chainID
+			) {
 				holdValue(it.hexToDecimal().toInt())
 			}
 		}
@@ -173,14 +150,19 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Long) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBlockByHash.method}\", \"params\":[\"$blockHash\", true], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Method.GetBlockByHash.method,
+				1,
+				false,
+				blockHash,
+				true
+			)
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
@@ -203,14 +185,22 @@ object GoldStoneEthCall {
 		holdValue: (TransactionTable) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Method.GetTransactionByHash.method,
+				1,
+				false,
+				hash
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetTransactionByHash.display, error)
-			}, chainID) {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTransactionByHash.display, error)
+				},
+				chainID
+			) {
 				val data = it.toJsonObject()
 				if (data.safeGet("blockNumber").toDecimalFromHex().toIntOrNull().isNull()) {
 					unfinishedCallback()
@@ -225,21 +215,28 @@ object GoldStoneEthCall {
 	fun getReceiptByHash(
 		hash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Boolean) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTransactionReceiptByHash.method}\", \"params\":[\"$hash\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Method.GetTransactionReceiptByHash.method,
+				1,
+				false,
+				hash
+			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
 					LogUtil.error(Method.GetTransactionReceiptByHash.display, error)
-				}
+				},
+				chainID
 			) {
 				val data = it.toJsonObject()
+				// Return Status hasError or Not if
 				holdValue(!TinyNumberUtils.isTrue(data.safeGet("status").toIntFromHex()))
 			}
 		}
@@ -251,17 +248,27 @@ object GoldStoneEthCall {
 		from: String,
 		data: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (BigInteger) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetEstimateGas.method}\",  \"params\":[{\"to\": \"$to\", \"from\": \"$from\", \"data\": \"$data\"}],\"id\":1}"
-		)
+			contentType,
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetEstimateGas.method,
+				false,
+				Pair("to", to),
+				Pair("from", from),
+				Pair("data", data)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetEstimateGas.display, error)
-			}) {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetEstimateGas.display, error)
+				},
+				chainID
+			) {
 				GoldStoneAPI.context.runOnUiThread {
 					try {
 						holdValue(it.toDecimalFromHex().toBigDecimal().toBigInteger())
@@ -280,9 +287,13 @@ object GoldStoneEthCall {
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.SendRawTransaction.method}\", \"params\":[\"$signTransactions\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Method.SendRawTransaction.method,
+				1,
+				false,
+				signTransactions
+			)
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
@@ -296,71 +307,113 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenBalance.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenBalance.code withAddress address}\"}, \"latest\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetTokenBalance.method,
+				true,
+				Pair("to", contractAddress),
+				Pair("data", Method.GetTokenBalance.code withAddress address)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetTokenBalance.display, error)
-			}) { holdValue(it.hexToDecimal()) }
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTokenBalance.display, error)
+				},
+				chainID
+			) { holdValue(it.hexToDecimal()) }
 		}
 	}
 	
 	@JvmStatic
-	private fun getTokenSymbolByContract(
+	fun getTokenSymbolByContract(
 		contractAddress: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
 			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetSymbol.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetSymbol.code}\"}, \"latest\"], \"id\":1}")
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetSymbol.method,
+				true,
+				Pair("to", contractAddress),
+				Pair("data", Method.GetSymbol.code)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetSymbol.display, error)
-			}, chainID) { holdValue(it.toAscii()) }
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetSymbol.display, error)
+				},
+				chainID
+			) {
+				holdValue(it.toAscii())
+			}
 		}
 	}
 	
 	@JvmStatic
-	private fun getTokenDecimal(
+	fun getTokenDecimal(
 		contractAddress: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenDecimal.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenDecimal.code}\"}, \"latest\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetTokenDecimal.method,
+				true,
+				Pair("to", contractAddress),
+				Pair("data", Method.GetTokenDecimal.code)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetTokenDecimal.display, error)
-			}, chainID) { holdValue(it.hexToDecimal()) }
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTokenDecimal.display, error)
+				},
+				chainID
+			) {
+				holdValue(it.hexToDecimal())
+			}
 		}
 	}
 	
 	@JvmStatic
-	private fun getTokenName(
+	fun getTokenName(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTokenName.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTokenName.code}\"}, \"latest\"], \"id\":1}")
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetTokenName.method,
+				true,
+				Pair("to", contractAddress),
+				Pair("data", Method.GetTokenName.code)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetTokenName.display, error)
-			}) { holdValue(it.toAscii()) }
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTokenName.display, error)
+				},
+				chainID
+			) {
+				holdValue(it.toAscii())
+			}
 		}
 	}
 	
@@ -372,7 +425,12 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			AesCrypto.encrypt("{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetBalance.method}\", \"params\":[\"$address\", \"latest\"],\"id\":1}")
+			ParameterUtil.prepareJsonRPC(
+				Method.GetBalance.method,
+				1,
+				true,
+				address
+			)
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
@@ -383,20 +441,31 @@ object GoldStoneEthCall {
 		}
 	}
 	
-	private fun getTokenTotalSupply(
+	fun getTokenTotalSupply(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
-			contentType, AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"${Method.GetTotalSupply.method}\", \"params\":[{ \"to\": \"$contractAddress\", \"data\": \"${Method.GetTotalSupply.code}\"}, \"latest\"], \"id\":1}"
-		)
+			contentType,
+			ParameterUtil.preparePairJsonRPC(
+				Method.GetTotalSupply.method,
+				true,
+				Pair("to", contractAddress),
+				Pair("data", Method.GetTotalSupply.code)
+			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(Method.GetTotalSupply.display, error)
-			}) { holdValue(it.hexToDecimal()) }
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(Method.GetTotalSupply.display, error)
+				},
+				chainID
+			) {
+				holdValue(it.hexToDecimal())
+			}
 		}
 	}
 	

@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto
 
-import com.blinnnk.extension.orZero
 import java.math.BigInteger
 
 /**
