@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
 
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.crypto.toAddressFromCode
-import io.goldstone.blockchain.crypto.toDecimalFromHex
+import io.goldstone.blockchain.crypto.utils.toAddressFromCode
+import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 
 /**
  * @date 15/04/2018 1:13 AM

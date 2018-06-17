@@ -21,7 +21,7 @@ import io.goldstone.blockchain.common.component.ValueInputView
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity

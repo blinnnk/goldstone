@@ -7,6 +7,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -263,7 +264,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun prepareJsonRPCParam() {
 		ParameterUtil.prepareJsonRPC(
-			GoldStoneEthCall.Method.GetBlockNumber.method,
+			EthereumMethod.GetBlockNumber.method,
 			1,
 			false,
 			"hello"

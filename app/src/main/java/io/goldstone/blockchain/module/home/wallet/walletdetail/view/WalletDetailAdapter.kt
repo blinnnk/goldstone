@@ -1,11 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
-import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener

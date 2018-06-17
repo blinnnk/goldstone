@@ -15,7 +15,7 @@ import io.goldstone.blockchain.common.component.LineChart
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.daysAgoInMills
+import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.margin

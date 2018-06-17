@@ -8,7 +8,7 @@ import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI

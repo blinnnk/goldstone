@@ -7,7 +7,6 @@ import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.addTopLRCorner
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.alignParentBottom

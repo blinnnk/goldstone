@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.common.value.currentLanguage
-import io.goldstone.blockchain.crypto.getObjectMD5HexString
+import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver

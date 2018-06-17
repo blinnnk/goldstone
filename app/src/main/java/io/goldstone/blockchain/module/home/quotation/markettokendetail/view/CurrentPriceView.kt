@@ -13,7 +13,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent

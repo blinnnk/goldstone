@@ -9,14 +9,12 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.crypto.convertKeystoreToModel
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.web3j.crypto.Wallet
 
 /**
  * @date 23/03/2018 1:49 AM
@@ -36,29 +34,29 @@ class KeystoreImportPresenter(
 	) {
 		isAgree isTrue {
 			doAsync {
-				try {
-					Wallet.decrypt(
-						password.text.toString(),
-						DecryptKeystore.GenerateFile(keystore.convertKeystoreToModel())
-					)?.let {
-						val walletName =
-							if (nameInput.text.isEmpty()) UIUtils.generateDefaultName()
-							else nameInput.text.toString()
-						PrivateKeyImportPresenter.importWallet(
-							it.privateKey.toString(16),
-							password.text.toString(),
-							walletName,
-							fragment, hintInput.text?.toString()
-						) {
-							fragment.context?.runOnUiThread { callback() }
-						}
-					}
-				} catch (error: Exception) {
+				WalletUtil.getKeyPairFromWalletFile(
+					keystore,
+					password.text.toString()
+				) {
 					fragment.context?.runOnUiThread {
-						fragment.context?.alert(AlertText.wrongKeyStorePassword)
-						callback()
+						fragment.context?.runOnUiThread {
+							fragment.context?.alert(AlertText.wrongKeyStorePassword)
+							callback()
+						}
+						LogUtil.error(this.javaClass.simpleName, it)
 					}
-					LogUtil.error(this.javaClass.simpleName, error)
+				}?.let {
+					val walletName =
+						if (nameInput.text.isEmpty()) UIUtils.generateDefaultName()
+						else nameInput.text.toString()
+					PrivateKeyImportPresenter.importWallet(
+						it.privateKey.toString(16),
+						password.text.toString(),
+						walletName,
+						fragment, hintInput.text?.toString()
+					) {
+						fragment.context?.runOnUiThread { callback() }
+					}
 				}
 			}
 		} otherwise {

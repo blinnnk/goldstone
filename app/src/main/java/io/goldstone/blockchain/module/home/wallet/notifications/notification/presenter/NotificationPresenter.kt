@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notification.presenter
 
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 
 /**

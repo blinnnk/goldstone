@@ -12,7 +12,9 @@ import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.EthereumMethod
+import io.goldstone.blockchain.crypto.toJsonObject
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptoRequest
 import okhttp3.*
@@ -32,40 +34,6 @@ object GoldStoneEthCall {
 	lateinit var context: Context
 	@JvmStatic
 	private val contentType = MediaType.parse("application/json; charset=utf-8")
-	
-	enum class Method(
-		val method: String,
-		val code: String = "",
-		val display: String = ""
-	) {
-		
-		EthCall("eth_call", SolidityCode.ethCall, "EthCall"),
-		GetSymbol("eth_call", SolidityCode.ethCall, "GetSymbol"),
-		GetTokenBalance("eth_call", SolidityCode.getTokenBalance, "GetTokenBalance"),
-		GetBalance("eth_getBalance", "", "GetBalance"),
-		GetTotalSupply("eth_call", SolidityCode.getTotalSupply, "GetTotalSupply"),
-		GetTokenDecimal("eth_call", SolidityCode.getDecimal, "GetTokenDecimal"),
-		GetTokenName("eth_call", SolidityCode.getTokenName, "GetTokenName"),
-		SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName, "SendRawTransaction"),
-		GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall, "GetTransactionByHash"),
-		GetTransactionReceiptByHash(
-			                           "eth_getTransactionReceipt",
-			                           SolidityCode.ethCall,
-			                           "GetTransactionReceiptByHash"
-		                           ),
-		GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
-		PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
-		GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
-		GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
-	}
-	
-	@JvmStatic
-	private infix fun String.withAddress(address: String) =
-		this + address.checkAddressInRules()
-	
-	@JvmStatic
-	private fun String.checkAddressInRules() =
-		if (substring(0, 2) == "0x") substring(2 until length) else this
 	
 	/**
 	 * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
@@ -113,11 +81,11 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			ParameterUtil.prepareJsonRPC(Method.GetTransactionByHash.method, 1, false, hash)
+			ParameterUtil.prepareJsonRPC(EthereumMethod.GetTransactionByHash.method, 1, false, hash)
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
-				LogUtil.error(Method.GetTransactionByHash.display, error)
+				LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
 			}, chainID) {
 				holdValue(JSONObject(it).safeGet("input"))
 			}
@@ -132,13 +100,13 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			ParameterUtil.prepareJsonRPC(Method.GetBlockNumber.method, 83, false, "")
+			ParameterUtil.prepareJsonRPC(EthereumMethod.GetBlockNumber.method, 83, false, "")
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetBlockNumber.display, error)
+					LogUtil.error(EthereumMethod.GetBlockNumber.display, error)
 				},
 				chainID
 			) {
@@ -157,7 +125,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Method.GetBlockByHash.method,
+				EthereumMethod.GetBlockByHash.method,
 				1,
 				false,
 				blockHash,
@@ -166,7 +134,7 @@ object GoldStoneEthCall {
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
-				LogUtil.error(Method.GetBlockByHash.display, error)
+				LogUtil.error(EthereumMethod.GetBlockByHash.display, error)
 			}, chainID) {
 				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
 				else {
@@ -187,7 +155,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Method.GetTransactionByHash.method,
+				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
 				hash
@@ -197,7 +165,7 @@ object GoldStoneEthCall {
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTransactionByHash.display, error)
+					LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
 				},
 				chainID
 			) {
@@ -221,7 +189,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Method.GetTransactionReceiptByHash.method,
+				EthereumMethod.GetTransactionReceiptByHash.method,
 				1,
 				false,
 				hash
@@ -231,7 +199,7 @@ object GoldStoneEthCall {
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTransactionReceiptByHash.display, error)
+					LogUtil.error(EthereumMethod.GetTransactionReceiptByHash.display, error)
 				},
 				chainID
 			) {
@@ -254,7 +222,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetEstimateGas.method,
+				EthereumMethod.GetEstimateGas.method,
 				false,
 				Pair("to", to),
 				Pair("from", from),
@@ -265,7 +233,7 @@ object GoldStoneEthCall {
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetEstimateGas.display, error)
+					LogUtil.error(EthereumMethod.GetEstimateGas.display, error)
 				},
 				chainID
 			) {
@@ -289,7 +257,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Method.SendRawTransaction.method,
+				EthereumMethod.SendRawTransaction.method,
 				1,
 				false,
 				signTransactions
@@ -297,7 +265,7 @@ object GoldStoneEthCall {
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
-				LogUtil.error(Method.SendRawTransaction.display, error)
+				LogUtil.error(EthereumMethod.SendRawTransaction.display, error)
 			}) { holdValue(it) }
 		}
 	}
@@ -313,17 +281,17 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetTokenBalance.method,
+				EthereumMethod.GetTokenBalance.method,
 				true,
 				Pair("to", contractAddress),
-				Pair("data", Method.GetTokenBalance.code withAddress address)
+				Pair("data", EthereumMethod.GetTokenBalance.code withAddress address)
 			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTokenBalance.display, error)
+					LogUtil.error(EthereumMethod.GetTokenBalance.display, error)
 				},
 				chainID
 			) { holdValue(it.hexToDecimal()) }
@@ -340,17 +308,17 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetSymbol.method,
+				EthereumMethod.GetSymbol.method,
 				true,
 				Pair("to", contractAddress),
-				Pair("data", Method.GetSymbol.code)
+				Pair("data", EthereumMethod.GetSymbol.code)
 			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetSymbol.display, error)
+					LogUtil.error(EthereumMethod.GetSymbol.display, error)
 				},
 				chainID
 			) {
@@ -369,17 +337,17 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetTokenDecimal.method,
+				EthereumMethod.GetTokenDecimal.method,
 				true,
 				Pair("to", contractAddress),
-				Pair("data", Method.GetTokenDecimal.code)
+				Pair("data", EthereumMethod.GetTokenDecimal.code)
 			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTokenDecimal.display, error)
+					LogUtil.error(EthereumMethod.GetTokenDecimal.display, error)
 				},
 				chainID
 			) {
@@ -398,17 +366,17 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetTokenName.method,
+				EthereumMethod.GetTokenName.method,
 				true,
 				Pair("to", contractAddress),
-				Pair("data", Method.GetTokenName.code)
+				Pair("data", EthereumMethod.GetTokenName.code)
 			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTokenName.display, error)
+					LogUtil.error(EthereumMethod.GetTokenName.display, error)
 				},
 				chainID
 			) {
@@ -426,7 +394,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Method.GetBalance.method,
+				EthereumMethod.GetBalance.method,
 				1,
 				true,
 				address
@@ -434,7 +402,7 @@ object GoldStoneEthCall {
 		).let {
 			callEthBy(it, { error, reason ->
 				errorCallback(error, reason)
-				LogUtil.error(Method.GetBalance.display, error)
+				LogUtil.error(EthereumMethod.GetBalance.display, error)
 			}, chainID) {
 				holdValue(it.hexToDecimal())
 			}
@@ -450,17 +418,17 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Method.GetTotalSupply.method,
+				EthereumMethod.GetTotalSupply.method,
 				true,
 				Pair("to", contractAddress),
-				Pair("data", Method.GetTotalSupply.code)
+				Pair("data", EthereumMethod.GetTotalSupply.code)
 			)
 		).let {
 			callEthBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(Method.GetTotalSupply.display, error)
+					LogUtil.error(EthereumMethod.GetTotalSupply.display, error)
 				},
 				chainID
 			) {
@@ -545,4 +513,12 @@ object GoldStoneEthCall {
 			else -> ""
 		}
 	}
+	
+	@JvmStatic
+	private infix fun String.withAddress(address: String) =
+		this + address.checkAddressInRules()
+	
+	@JvmStatic
+	private fun String.checkAddressInRules() =
+		if (substring(0, 2) == "0x") substring(2 until length) else this
 }

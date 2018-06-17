@@ -11,7 +11,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.google.zxing.BarcodeFormat
-import com.google.zxing.client.android.BeepManager
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.CaptureActivity

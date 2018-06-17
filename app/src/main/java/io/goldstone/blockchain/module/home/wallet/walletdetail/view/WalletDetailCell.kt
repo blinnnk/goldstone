@@ -15,8 +15,8 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.formatCount
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.imageResource
 

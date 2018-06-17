@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.kecca
 
-import io.goldstone.blockchain.crypto.hexToByteArray
+import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import org.spongycastle.jcajce.provider.digest.Keccak
 
 fun String.keccak() = hexToByteArray().keccak()

@@ -13,7 +13,6 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import org.jetbrains.anko.leftPadding

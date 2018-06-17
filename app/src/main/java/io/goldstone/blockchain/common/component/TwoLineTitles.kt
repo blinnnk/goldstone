@@ -1,20 +1,17 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
-import android.content.res.Resources
-import android.util.TypedValue
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.EmptyText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
 
 /**
  * @date 23/03/2018 11:32 PM

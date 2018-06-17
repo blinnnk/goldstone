@@ -6,7 +6,9 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -17,7 +19,6 @@ import org.jetbrains.anko.noButton
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
-import org.web3j.crypto.WalletUtils
 
 /**
  * @date 28/03/2018 9:24 AM
@@ -94,7 +95,7 @@ class AddressSelectionPresenter(
 		address: String,
 		count: Double = 0.0
 	) {
-		WalletUtils.isValidAddress(address).isFalse {
+		Address(address).isValid().isFalse {
 			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			return
 		}

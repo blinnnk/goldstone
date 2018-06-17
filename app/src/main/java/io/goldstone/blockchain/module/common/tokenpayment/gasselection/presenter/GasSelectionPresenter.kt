@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -30,10 +31,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.web3j.crypto.Credentials
-import org.web3j.crypto.RawTransaction
-import org.web3j.crypto.TransactionEncoder
-import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -196,52 +193,56 @@ class GasSelectionPresenter(
 					fragment.showMaskView(false)
 				}
 			) { privateKey ->
-				prepareModel?.apply {
-					val raw = RawTransaction.createTransaction(
-						nonce,
-						getSelectedGasPrice(currentMinerType),
-						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinerType).toLong())),
-						toAddress,
-						if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
-						else countWithDecimal,
-						inputData
-					)
-					// 准备秘钥格式
-					val credentials = Credentials.create(privateKey)
-					// 生成签名文件
-					val signedMessage = TransactionEncoder.signMessage(raw, credentials)
-					// 生成签名哈希值
-					val hexValue = Numeric.toHexString(signedMessage)
+				prepareModel?.apply model@{
+					// 更新 `prepareModel`  的 `gasPrice` 的值
+					this.gasPrice = getSelectedGasPrice(currentMinerType)
+					// Generate Transaction Model
+					val raw = Transaction().apply {
+						chain = ChainDefinition(Config.getCurrentChain().toLong())
+						nonce = this@model.nonce
+						gasPrice = getSelectedGasPrice(currentMinerType)
+						gasLimit =
+							BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinerType).toLong()))
+						to = Address(toAddress)
+						value = if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
+						else countWithDecimal
+						input = inputData.hexToByteArray().toList()
+					}
+					val signedHex = TransactionUtils.signTransaction(raw, privateKey)
 					// 发起 `sendRawTransaction` 请求
-					GoldStoneEthCall
-						.sendRawTransaction(hexValue, { error, reason ->
-							fragment.context?.apply {
-								runOnUiThread {
-									alert(reason ?: error.toString())
-									callback()
-									fragment.showMaskView(false)
-								}
-							}
-						}) { taxHash ->
-							LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
-							// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-							taxHash.isValidTaxHash() isTrue {
-								// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-								insertPendingDataToTransactionTable(
-									toWalletAddress,
-									countWithDecimal,
-									raw!!,
-									taxHash,
-									prepareModel?.memo ?: TransactionText.noMemo
-								)
-							}
-							// 主线程跳转到账目详情界面
-							fragment.context?.runOnUiThread {
-								goToTransactionDetailFragment(toWalletAddress, raw!!, countWithDecimal, taxHash)
+					GoldStoneEthCall.sendRawTransaction(signedHex, { error, reason ->
+						fragment.context?.apply {
+							runOnUiThread {
+								alert(reason ?: error.toString())
 								callback()
 								fragment.showMaskView(false)
 							}
 						}
+					}) { taxHash ->
+						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
+						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+						taxHash.isValidTaxHash() isTrue {
+							// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+							insertPendingDataToTransactionTable(
+								toWalletAddress,
+								countWithDecimal,
+								this@model,
+								taxHash,
+								prepareModel?.memo ?: TransactionText.noMemo
+							)
+						}
+						// 主线程跳转到账目详情界面
+						fragment.context?.runOnUiThread {
+							goToTransactionDetailFragment(
+								toWalletAddress,
+								this@model,
+								countWithDecimal,
+								taxHash
+							)
+							callback()
+							fragment.showMaskView(false)
+						}
+					}
 				}
 			}
 		}
@@ -252,7 +253,7 @@ class GasSelectionPresenter(
 	 */
 	private fun goToTransactionDetailFragment(
 		toWalletAddress: String,
-		raw: RawTransaction,
+		raw: PaymentPrepareModel,
 		value: BigInteger,
 		taxHash: String
 	) {
@@ -285,7 +286,7 @@ class GasSelectionPresenter(
 	private fun insertPendingDataToTransactionTable(
 		toWalletAddress: String,
 		value: BigInteger,
-		raw: RawTransaction,
+		raw: PaymentPrepareModel,
 		taxHash: String,
 		memoData: String
 	) {
@@ -296,7 +297,8 @@ class GasSelectionPresenter(
 				timeStamp =
 					(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 				fromAddress = Config.getCurrentAddress()
-				this.value = CryptoUtils.toCountByDecimal(value.toDouble(), token!!.decimal).formatCount()
+				this.value = CryptoUtils
+					.toCountByDecimal(value.toDouble(), token!!.decimal).formatCount()
 				hash = taxHash
 				gasPrice = getSelectedGasPrice(currentMinerType).toString()
 				gasUsed = raw.gasLimit.toString()
@@ -305,8 +307,8 @@ class GasSelectionPresenter(
 				tokenReceiveAddress = toWalletAddress
 				isERC20 = token!!.symbol == CryptoSymbol.eth
 				nonce = raw.nonce.toString()
-				to = raw.to
-				input = raw.data
+				to = raw.toWalletAddress
+				input = raw.inputData
 				contractAddress = token!!.contract
 				chainID = Config.getCurrentChain()
 				memo = memoData

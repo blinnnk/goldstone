@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -357,7 +357,8 @@ class TransactionListPresenter(
 									receiveAddress = transaction.to
 								} otherwise {
 									// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-									val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
+									val transactionInfo = CryptoUtils
+										.loadTransferInfoFromInputData(transaction.input)
 									count = CryptoUtils.toCountByDecimal(
 										transactionInfo?.count.orElse(0.0),
 										tokenInfo?.decimals.orElse(0.0)

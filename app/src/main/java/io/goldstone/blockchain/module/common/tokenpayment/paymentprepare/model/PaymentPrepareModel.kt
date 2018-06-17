@@ -7,7 +7,6 @@ import java.math.BigInteger
  * @date 2018/5/16 3:32 PM
  * @author KaySaith
  */
-
 data class PaymentPrepareModel(
 	val nonce: BigInteger,
 	val gasLimit: BigInteger,
@@ -16,5 +15,6 @@ data class PaymentPrepareModel(
 	val count: Double,
 	val inputData: String,
 	val toWalletAddress: String,
-	val memo: String
-): Serializable
+	val memo: String,
+	var gasPrice: BigInteger = BigInteger.ZERO
+) : Serializable

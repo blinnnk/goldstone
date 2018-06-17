@@ -413,8 +413,8 @@ object GoldStoneAPI {
 		hold: (ArrayList<ChartModel>) -> Unit
 	) {
 		requestData<ChartModel>(
-			api = APIPath.getQuotationCurrencyChart(pair, period, size),
-			keyName = "point_list",
+			APIPath.getQuotationCurrencyChart(pair, period, size),
+			"point_list",
 			errorCallback = errorCallback
 		) {
 			hold(this.toArrayList())

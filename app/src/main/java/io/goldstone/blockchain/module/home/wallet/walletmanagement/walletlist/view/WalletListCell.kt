@@ -16,8 +16,8 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletText
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 
 @SuppressLint("SetTextI18n")

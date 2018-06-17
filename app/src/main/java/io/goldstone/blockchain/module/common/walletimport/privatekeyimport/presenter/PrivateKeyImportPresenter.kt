@@ -9,11 +9,11 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.web3j.crypto.WalletUtils
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -86,7 +86,7 @@ class PrivateKeyImportPresenter(
 					.replace("\n", "")
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
-			if (!WalletUtils.isValidPrivateKey(currentPrivateKey)) {
+			if (!WalletUtil.isValidPrivateKey(currentPrivateKey)) {
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
 				callback()
 				return

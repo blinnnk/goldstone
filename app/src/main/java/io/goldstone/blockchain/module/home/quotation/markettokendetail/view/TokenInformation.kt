@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.QuotationText
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout

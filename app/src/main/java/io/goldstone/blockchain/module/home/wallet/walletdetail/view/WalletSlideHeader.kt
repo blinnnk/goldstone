@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 
 /**
  * @date 24/03/2018 12:50 AM

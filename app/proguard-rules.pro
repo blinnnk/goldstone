@@ -47,7 +47,6 @@
 -dontnote org.xml.sax.**
 -dontnote org.xmlpull.v1.**
 
-
 # Stop warnings about missing unused classes
 -dontwarn android.**
 -dontwarn dalvik.**
@@ -170,24 +169,15 @@
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
-
--keep class android.support.design.widget.TabLayout { *; }
--keepclassmembers class fqcn.of.javascript.interface.for.webview {
-    public *;
+# Kotlinx
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
+-keepclassmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+    *** Companion;
 }
--keep class android.support.annotation.Keep
--keep @android.support.annotation.Keep class * {*;}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <methods>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <fields>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <init>(...);
+-keepclasseswithmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+    kotlinx.serialization.KSerializer serializer(...);
 }
 
 -adaptclassstrings com.example.Test

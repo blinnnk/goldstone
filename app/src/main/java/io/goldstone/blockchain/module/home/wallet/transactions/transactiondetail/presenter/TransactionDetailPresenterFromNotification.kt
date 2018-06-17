@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.toEthValue
+import io.goldstone.blockchain.crypto.utils.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall

@@ -9,8 +9,8 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoUtils
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment

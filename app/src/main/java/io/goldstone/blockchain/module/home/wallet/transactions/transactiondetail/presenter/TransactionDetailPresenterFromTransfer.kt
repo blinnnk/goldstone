@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -15,7 +15,8 @@ import org.jetbrains.anko.runOnUiThread
 fun TransactionDetailPresenter.updateDataFromTransferFragment() {
 	data?.apply {
 		currentHash = taxHash
-		count = CryptoUtils.toCountByDecimal(value.toDouble(), token.decimal)
+		count = CryptoUtils
+			.toCountByDecimal(value.toDouble(), token.decimal)
 		fragment.asyncData = generateModels()
 		observerTransaction()
 		val headerData = TransactionHeaderModel(

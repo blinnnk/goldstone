@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 
 /**

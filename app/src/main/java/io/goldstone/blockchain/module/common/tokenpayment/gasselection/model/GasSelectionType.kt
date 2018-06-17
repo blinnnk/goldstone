@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.toEthValue
-import io.goldstone.blockchain.crypto.toGWeiValue
-import io.goldstone.blockchain.crypto.toGasValue
-import io.goldstone.blockchain.crypto.toGwei
+import io.goldstone.blockchain.crypto.utils.toEthValue
+import io.goldstone.blockchain.crypto.utils.toGWeiValue
+import io.goldstone.blockchain.crypto.utils.toGasValue
+import io.goldstone.blockchain.crypto.utils.toGwei
 
 /**
  * @date 2018/5/16 11:37 PM

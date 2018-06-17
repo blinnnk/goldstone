@@ -10,7 +10,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationType
@@ -38,7 +38,8 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 						setIconColor(Spectrum.green)
 						setIconResource(R.drawable.receive_icon)
 						info.subtitle.text =
-							CryptoUtils.scaleTo28(CommonText.from + " " + model?.content.orEmpty())
+							CryptoUtils
+								.scaleTo28(CommonText.from + " " + model?.content.orEmpty())
 					} else {
 						setIconColor(GrayScale.midGray)
 						setIconResource(R.drawable.send_icon)

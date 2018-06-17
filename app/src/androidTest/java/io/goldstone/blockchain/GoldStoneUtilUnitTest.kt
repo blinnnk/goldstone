@@ -5,8 +5,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.toCryptHexString
-import io.goldstone.blockchain.crypto.toStringFromHex
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
+import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity

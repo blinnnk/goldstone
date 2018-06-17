@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.extensions
 
-import io.goldstone.blockchain.crypto.clean0xPrefix
-import io.goldstone.blockchain.crypto.has0xPrefix
+import io.goldstone.blockchain.crypto.utils.clean0xPrefix
+import io.goldstone.blockchain.crypto.utils.has0xPrefix
 import org.spongycastle.jcajce.provider.digest.RIPEMD160
 import org.spongycastle.jcajce.provider.digest.SHA256
 import java.math.BigInteger

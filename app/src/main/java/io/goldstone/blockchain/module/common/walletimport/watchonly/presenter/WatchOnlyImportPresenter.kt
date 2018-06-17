@@ -9,13 +9,14 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import org.web3j.crypto.WalletUtils
 
 /**
  * @date 23/03/2018 2:16 AM
@@ -31,8 +32,9 @@ class WatchOnlyImportPresenter(
 		callback: () -> Unit
 	) {
 		// 默认去除所有的空格
-		val address = addressInput.text.toString().replace(" ", "")
-		if (!WalletUtils.isValidAddress(address)) {
+		val address = Address(addressInput.text.toString().replace(" ", ""))
+		
+		if (address.isValid()) {
 			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			callback()
 			return
@@ -40,13 +42,25 @@ class WatchOnlyImportPresenter(
 		val name = if (nameInput.text.toString().isEmpty()) nameInput.hint.toString()
 		else nameInput.text.toString()
 		
-		WalletTable.getWalletByAddress(address) {
+		WalletTable.getWalletByAddress(address.hex) {
 			it.isNull() isTrue {
-				WalletTable.insert(WalletTable(0, name, address, true, null, true, 0.0, null, true)) {
-					CreateWalletPresenter.generateMyTokenInfo(address, {
-						LogUtil.error(this.javaClass.simpleName)
-						callback()
-					}) {
+				WalletTable.insert(
+					WalletTable(
+						0,
+						name = name,
+						address = address.hex,
+						isUsing = true,
+						isWatchOnly = true,
+						hasBackUpMnemonic = true
+					)
+				) {
+					CreateWalletPresenter.generateMyTokenInfo(
+						address.hex,
+						{
+							LogUtil.error(this.javaClass.simpleName)
+							callback()
+						}
+					) {
 						fragment.activity?.jump<SplashActivity>()
 						callback()
 					}

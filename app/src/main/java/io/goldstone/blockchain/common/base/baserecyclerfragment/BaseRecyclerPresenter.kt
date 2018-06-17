@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.BasicSize
-import io.goldstone.blockchain.crypto.getObjectMD5HexString
+import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**

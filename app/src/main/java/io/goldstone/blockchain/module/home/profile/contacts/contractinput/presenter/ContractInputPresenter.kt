@@ -10,41 +10,41 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContactText
+import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.web3j.crypto.WalletUtils
 
 /**
  * @date 16/04/2018 1:13 PM
  * @author KaySaith
  */
-
 class ContractInputPresenter(
 	override val fragment: ContractInputFragment
 ) : BasePresenter<ContractInputFragment>() {
+	
 	//
 	private var nameText = ""
 	private var addressText = ""
-
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		recoveryFragmentHeight()
 	}
-
+	
 	fun addContact() {
-
 		if (nameText.isEmpty()) {
 			fragment.context?.alert(ContactText.emptyNameAlert)
 			return
 		}
-
+		
 		if (addressText.isEmpty()) {
 			fragment.context?.alert(ContactText.emptyAddressAlert)
 			return
 		}
-
-		if (WalletUtils.isValidAddress(addressText) && nameText.isNotEmpty()) {
+		
+		if (Address(addressText).isValid() && nameText.isNotEmpty()) {
 			ContactTable.insertContact(
 				ContactTable(0, "", nameText, addressText)
 			) {
@@ -59,7 +59,7 @@ class ContractInputPresenter(
 			}
 		}
 	}
-
+	
 	fun setConfirmButtonStyle(
 		nameInput: EditText,
 		addressInput: EditText,
@@ -70,7 +70,7 @@ class ContractInputPresenter(
 				nameText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-
+			
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -78,23 +78,22 @@ class ContractInputPresenter(
 				after: Int
 			) {
 			}
-
+			
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
 				before: Int,
 				count: Int
 			) {
-
 			}
 		})
-
+		
 		addressInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				addressText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-
+			
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -102,7 +101,7 @@ class ContractInputPresenter(
 				after: Int
 			) {
 			}
-
+			
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -112,7 +111,7 @@ class ContractInputPresenter(
 			}
 		})
 	}
-
+	
 	private fun setStyle(confirmButton: RoundButton) {
 		if (nameText.count() * addressText.count() != 0) {
 			confirmButton.setBlueStyle(20.uiPX())

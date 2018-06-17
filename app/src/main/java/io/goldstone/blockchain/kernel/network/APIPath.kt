@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
-import io.goldstone.blockchain.crypto.toAddressCode
+import io.goldstone.blockchain.crypto.utils.toAddressCode
 
 /**
  * @date 31/03/2018 8:09 PM
