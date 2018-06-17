@@ -67,7 +67,6 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(5.uiPX())
 				}.click {
-					System.out.println("what ___$mnemonicCode")
 					presenter.goToMnemonicConfirmation(mnemonicCode)
 				}.into(this)
 			}

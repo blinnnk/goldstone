@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import android.content.Context
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -16,6 +15,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import java.io.Serializable
 
 /**
@@ -90,10 +90,12 @@ data class WalletDetailCellModel(
 		}
 		
 		fun getChainModels(
-			context: Context,
+			fragment: WalletDetailFragment,
 			walletAddress: String = Config.getCurrentAddress(),
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
+			/** 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记 */
+			fragment.presenter.isGettingDataInAsyncThreadNow = true
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
 			// 获取我的钱包的 `Token` 列表
@@ -118,7 +120,9 @@ data class WalletDetailCellModel(
 													walletAddress,
 													{ error, reason ->
 														if (reason == ErrorTag.chain) {
-															GoldStoneDialog.showChainErrorDialog(context)
+															fragment.context?.let {
+																GoldStoneDialog.showChainErrorDialog(it)
+															}
 														}
 														LogUtil.error("updateMyTokensPrices", error)
 													}) {
@@ -133,7 +137,9 @@ data class WalletDetailCellModel(
 													walletAddress,
 													{ error, reason ->
 														if (reason == ErrorTag.chain) {
-															GoldStoneDialog.showChainErrorDialog(context)
+															fragment.context?.let {
+																GoldStoneDialog.showChainErrorDialog(it)
+															}
 														}
 														LogUtil.error("updateMyTokensPrices", error)
 													}) {

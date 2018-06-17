@@ -409,7 +409,7 @@ object DialogText {
 		HoneyLanguage.Chinese.code -> "立即备份"
 		HoneyLanguage.Japanese.code -> "今すぐ"
 		HoneyLanguage.Korean.code -> "백업"
-		HoneyLanguage.Russian.code -> "Резервное копирование"
+		HoneyLanguage.Russian.code -> "Сотрудник"
 		HoneyLanguage.TraditionalChinese.code -> "立即備份"
 		else -> ""
 	}

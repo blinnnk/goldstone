@@ -77,9 +77,7 @@ data class WalletTable(
 		
 		fun deleteEncryptMnemonicAfterUserHasBackUp(mnemonic: String, callback: () -> Unit) {
 			getAll {
-				System.out.println("hi")
 				find {
-					System.out.println("hi2")
 					!it.encryptMnemonic.isNull()
 					&& JavaKeystoreUtil().decryptData(it.encryptMnemonic!!).equals(mnemonic, true)
 				}?.isNotNull {

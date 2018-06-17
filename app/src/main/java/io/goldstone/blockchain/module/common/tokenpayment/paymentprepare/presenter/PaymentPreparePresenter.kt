@@ -59,7 +59,7 @@ class PaymentPreparePresenter(
 	 * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommond` 的 `RawTransaction`
 	 */
 	private fun getPaymentPrepareModel(
-		value: Double,
+		count: Double,
 		memo: String,
 		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
@@ -68,13 +68,13 @@ class PaymentPreparePresenter(
 			{
 				fragment.context?.alert(it.toString())
 			}) {
-			generateTransaction(fragment.address!!, value, memo, it, callback, hold)
+			generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 		}
 	}
 	
 	private fun generateTransaction(
 		toAddress: String,
-		value: Double,
+		count: Double,
 		memo: String,
 		nonce: BigInteger,
 		callback: () -> Unit,
@@ -87,11 +87,11 @@ class PaymentPreparePresenter(
 		if (currentToken?.contract.equals(CryptoValue.ethContract, true)) {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
-			countWithDecimal = Convert.toWei(value.toString(), Convert.Unit.ETHER).toBigInteger()
+			countWithDecimal = Convert.toWei(count.toString(), Convert.Unit.ETHER).toBigInteger()
 		} else {
 			to = currentToken!!.contract
 			countWithDecimal =
-				BigInteger.valueOf((value * Math.pow(10.0, currentToken!!.decimal)).toLong())
+				(count * Math.pow(10.0, currentToken?.decimal!!)).toBigDecimal().toBigInteger()
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toDataStringFromAddress() + // 地址
 				countWithDecimal.toDataString() + // 数量
@@ -101,7 +101,8 @@ class PaymentPreparePresenter(
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			Config.getCurrentAddress(),
-			data, { error, reason ->
+			data,
+			{ error, reason ->
 				fragment.context?.alert(reason ?: error.toString())
 				callback()
 			}) { limit ->
@@ -111,7 +112,7 @@ class PaymentPreparePresenter(
 					limit,
 					to,
 					countWithDecimal,
-					value,
+					count,
 					data,
 					fragment.address!!,
 					fragment.getMemoContent()
