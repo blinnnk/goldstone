@@ -34,7 +34,6 @@ class MnemonicBackupPresenter(
 	}
 	
 	fun goToMnemonicConfirmation(mnemonic: String?) {
-		System.out.println("shit $mnemonic")
 		val argument = Bundle().apply {
 			putString(ArgumentKey.mnemonicCode, mnemonic)
 		}

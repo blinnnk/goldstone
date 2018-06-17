@@ -45,14 +45,14 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 	
-	var currentMinnerType = MinerFeeType.Recommend.content
+	var currentMinerType = MinerFeeType.Recommend.content
 	private var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
 	private val prepareModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
 	}
-	val defaultGasPrices by lazy {
+	private val defaultGasPrices by lazy {
 		arrayListOf(
 			BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei()), // cheap
 			BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei()), // fast
@@ -63,7 +63,7 @@ class GasSelectionPresenter(
 	
 	fun insertCustomGasData() {
 		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
-		currentMinnerType = MinerFeeType.Custom.content
+		currentMinerType = MinerFeeType.Custom.content
 		if (defaultGasPrices.size == 4) {
 			defaultGasPrices.remove(defaultGasPrices.last())
 		}
@@ -80,9 +80,9 @@ class GasSelectionPresenter(
 					index,
 					minner.toString().toDouble(),
 					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-					currentMinnerType
+					currentMinerType
 				)
-				if (model.currentType == currentMinnerType) {
+				if (model.currentType == currentMinerType) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -90,7 +90,7 @@ class GasSelectionPresenter(
 					currentGasUsedInEth = getGasEthCount(model.count)
 				}
 			}.click {
-				currentMinnerType = it.model.type
+				currentMinerType = it.model.type
 				updateGasSettings(parent)
 				getGasCurrencyPrice(it.model.count) {
 					fragment.setSpendingValue(it)
@@ -103,10 +103,13 @@ class GasSelectionPresenter(
 	
 	fun goToGasEditorFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<GasEditorFragment>(TokenDetailText.customGas,
-			                                                TokenDetailText.paymentValue, Bundle().apply {
-				putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
-			})
+			presenter.showTargetFragment<GasEditorFragment>(
+				TokenDetailText.customGas,
+				TokenDetailText.paymentValue,
+				Bundle().apply {
+					putLong(ArgumentKey.gasLimit, prepareModel?.gasLimit?.toLong().orElse(0))
+				}
+			)
 		}
 	}
 	
@@ -157,7 +160,7 @@ class GasSelectionPresenter(
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
 		} else {
-			// 如果当前站长不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
+			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			MyTokenTable.getBalanceWithContract(
 				token?.contract.orEmpty(),
 				Config.getCurrentAddress(),
@@ -175,8 +178,7 @@ class GasSelectionPresenter(
 	}
 	
 	private fun getTransferCount(): BigDecimal {
-		return prepareModel?.count?.toBigDecimal()
-		       ?: BigDecimal.ZERO
+		return prepareModel?.count?.toBigDecimal() ?: BigDecimal.ZERO
 	}
 	
 	/**
@@ -197,10 +199,11 @@ class GasSelectionPresenter(
 				prepareModel?.apply {
 					val raw = RawTransaction.createTransaction(
 						nonce,
-						getSelectedGasPrice(currentMinnerType),
-						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinnerType).toLong())),
+						getSelectedGasPrice(currentMinerType),
+						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinerType).toLong())),
 						toAddress,
-						countWithDecimal,
+						if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
+						else countWithDecimal,
 						inputData
 					)
 					// 准备秘钥格式
@@ -226,6 +229,7 @@ class GasSelectionPresenter(
 								// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
 								insertPendingDataToTransactionTable(
 									toWalletAddress,
+									countWithDecimal,
 									raw!!,
 									taxHash,
 									prepareModel?.memo ?: TransactionText.noMemo
@@ -233,7 +237,7 @@ class GasSelectionPresenter(
 							}
 							// 主线程跳转到账目详情界面
 							fragment.context?.runOnUiThread {
-								goToTransactionDetailFragment(toWalletAddress, raw!!, taxHash)
+								goToTransactionDetailFragment(toWalletAddress, raw!!, countWithDecimal, taxHash)
 								callback()
 								fragment.showMaskView(false)
 							}
@@ -249,6 +253,7 @@ class GasSelectionPresenter(
 	private fun goToTransactionDetailFragment(
 		toWalletAddress: String,
 		raw: RawTransaction,
+		value: BigInteger,
 		taxHash: String
 	) {
 		// 准备跳转到下一个界面
@@ -257,8 +262,14 @@ class GasSelectionPresenter(
 			activity?.apply { SoftKeyboard.hide(this) }
 			removeChildFragment(fragment)
 			val model = ReceiptModel(
-				toWalletAddress, raw.gasLimit, raw.gasPrice, raw.value, token!!, taxHash,
-				System.currentTimeMillis(), prepareModel?.memo
+				toWalletAddress,
+				raw.gasLimit,
+				raw.gasPrice,
+				value,
+				token!!,
+				taxHash,
+				System.currentTimeMillis(),
+				prepareModel?.memo
 			)
 			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.transactionDetail, model)
@@ -273,6 +284,7 @@ class GasSelectionPresenter(
 	
 	private fun insertPendingDataToTransactionTable(
 		toWalletAddress: String,
+		value: BigInteger,
 		raw: RawTransaction,
 		taxHash: String,
 		memoData: String
@@ -284,9 +296,9 @@ class GasSelectionPresenter(
 				timeStamp =
 					(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 				fromAddress = Config.getCurrentAddress()
-				value = CryptoUtils.toCountByDecimal(raw.value.toDouble(), token!!.decimal).formatCount()
+				this.value = CryptoUtils.toCountByDecimal(value.toDouble(), token!!.decimal).formatCount()
 				hash = taxHash
-				gasPrice = getSelectedGasPrice(currentMinnerType).toString()
+				gasPrice = getSelectedGasPrice(currentMinerType).toString()
 				gasUsed = raw.gasLimit.toString()
 				isPending = true
 				recordOwnerAddress = Config.getCurrentAddress()
@@ -347,7 +359,7 @@ class GasSelectionPresenter(
 		}
 	}
 	
-	fun prepareGasLimit(gasPrice: Long): Long {
+	private fun prepareGasLimit(gasPrice: Long): Long {
 		return if (gasPrice == MinerFeeType.Custom.value)
 			gasFeeFromCustom()?.gasLimit.orElse(0)
 		else prepareModel?.gasLimit?.toLong().orElse(0)
@@ -361,7 +373,7 @@ class GasSelectionPresenter(
 		}
 	}
 	
-	fun getGasCurrencyPrice(
+	private fun getGasCurrencyPrice(
 		info: String,
 		hold: (String) -> Unit
 	) {
@@ -379,7 +391,7 @@ class GasSelectionPresenter(
 					index,
 					minner.toDouble(),
 					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-					currentMinnerType
+					currentMinerType
 				)
 			}
 		}

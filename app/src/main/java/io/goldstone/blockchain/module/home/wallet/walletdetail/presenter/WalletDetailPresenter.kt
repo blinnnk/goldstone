@@ -42,6 +42,8 @@ class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 	
+	var isGettingDataInAsyncThreadNow = false
+	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
@@ -69,11 +71,14 @@ class WalletDetailPresenter(
 			// 显示本地的 `Token` 据
 			getLocalModels { it ->
 				updateUIByData(it)
-				// 再检查链上的最新价格和数量
-				getChainModels(fragment.context!!)
-				{
-					updateUIByData(it)
-					fragment.removeMiniLoadingView()
+				/** 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记 */
+				if (!isGettingDataInAsyncThreadNow) {
+					// 再检查链上的最新价格和数量
+					getChainModels(fragment) {
+						isGettingDataInAsyncThreadNow = false
+						updateUIByData(it)
+						fragment.removeMiniLoadingView()
+					}
 				}
 			}
 		}

@@ -189,7 +189,6 @@ fun Application.registerDeviceForPush() {
 					if (it == token) return@registerDevice
 				}
 				// 在本地数据库记录 `Push Token`
-				AppConfigTable.updatePushToken(token.toString())
 				XinGePushReceiver.registerWalletAddressForPush()
 			}
 		}
@@ -207,6 +206,8 @@ fun Context.registerDevice(
 	token: String,
 	callback: () -> Unit
 ) {
+	// 把 `Token` 记录在本地数据库
+	AppConfigTable.updatePushToken(token)
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value

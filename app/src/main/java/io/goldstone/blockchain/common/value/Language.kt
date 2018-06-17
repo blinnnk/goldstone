@@ -409,7 +409,7 @@ object DialogText {
 		HoneyLanguage.Chinese.code -> "立即备份"
 		HoneyLanguage.Japanese.code -> "今すぐ"
 		HoneyLanguage.Korean.code -> "백업"
-		HoneyLanguage.Russian.code -> "Резервное копирование"
+		HoneyLanguage.Russian.code -> "Сотрудник"
 		HoneyLanguage.TraditionalChinese.code -> "立即備份"
 		else -> ""
 	}
@@ -2251,12 +2251,12 @@ object ChainText {
 	}
 	@JvmField
 	val ropstan = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Ropstan Testnet"
-		HoneyLanguage.Chinese.code -> "Ropstan 测试网络"
-		HoneyLanguage.Japanese.code -> "Ropstan テストネット"
-		HoneyLanguage.Korean.code -> "Ropstan 테스트 넷"
-		HoneyLanguage.Russian.code -> "Ropstan Testnet"
-		HoneyLanguage.TraditionalChinese.code -> "Ropstan 測試網絡"
+		HoneyLanguage.English.code -> "Ropsten Testnet"
+		HoneyLanguage.Chinese.code -> "Ropsten 测试网络"
+		HoneyLanguage.Japanese.code -> "Ropsten テストネット"
+		HoneyLanguage.Korean.code -> "Ropsten 테스트 넷"
+		HoneyLanguage.Russian.code -> "Ropsten Testnet"
+		HoneyLanguage.TraditionalChinese.code -> "Ropsten 測試網絡"
 		else -> ""
 	}
 	@JvmField

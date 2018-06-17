@@ -83,7 +83,9 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						presenter.showTargetFragment<WebViewFragment>(
 							QAText.whatIsGas,
 							TokenDetailText.customGas,
-							Bundle().apply { putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas) }
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas)
+							}
 						)
 						presenter.recoverHeader()
 					}
@@ -118,8 +120,10 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 				}.into(container)
 			}
 		} else {
-			// When transfer is end that recovery custom miner gas price value
+			// When transfer is end that recovery custom miner
+			// gas price value and current miner type
 			MinerFeeType.Custom.value = 0
+			presenter.currentMinerType = MinerFeeType.Recommend.content
 			container.findViewById<View>(ElementID.mask)?.let {
 				container.removeView(it)
 			}

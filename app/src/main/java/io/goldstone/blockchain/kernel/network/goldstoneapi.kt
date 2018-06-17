@@ -8,7 +8,6 @@ import com.blinnnk.extension.toArrayList
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
-import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
@@ -263,9 +262,15 @@ object GoldStoneAPI {
 	) {
 		RequestBody.create(
 			requestContentType,
-			AesCrypto.encrypt(
-				"{\"language\":\"$language\", \"cid\":\"$pushToken\", \"device\":\"$deviceID\",\"push_type\":$isChina, \"os\":$isAndroid, \"chainid\":$chainID, \"country\":\"$country\"}"
-			).orEmpty()
+			ParameterUtil.prepare(
+				Pair("language", language),
+				Pair("cid", pushToken),
+				Pair("device", deviceID),
+				Pair("push_type", isChina),
+				Pair("os", isAndroid),
+				Pair("chainid", chainID),
+				Pair("country", country)
+			)
 		).let {
 			postRequest(
 				it,
@@ -284,7 +289,7 @@ object GoldStoneAPI {
 	) {
 		RequestBody.create(
 			requestContentType,
-			AesCrypto.encrypt("{\"pair_list\":$pairList}").orEmpty()
+			ParameterUtil.prepare(Pair("pair_list", pairList))
 		).let {
 			postRequestGetJsonObject<QuotationSelectionLineChartModel>(
 				it,
@@ -305,7 +310,10 @@ object GoldStoneAPI {
 	) {
 		RequestBody.create(
 			requestContentType,
-			AesCrypto.encrypt("{\"address_list\":$addressList,\"device\":\"$deviceID\"}").orEmpty()
+			ParameterUtil.prepare(
+				Pair("address_list", addressList),
+				Pair("device", deviceID)
+			)
 		).let {
 			postRequest(it, APIPath.updateAddress(APIPath.currentUrl), errorCallback) {
 				hold(it)
@@ -320,7 +328,11 @@ object GoldStoneAPI {
 		hold: (String) -> Unit
 	) {
 		RequestBody.create(
-			requestContentType, AesCrypto.encrypt("{\"device\":\"$deviceID\",\"time\":$time}").orEmpty()
+			requestContentType,
+			ParameterUtil.prepare(
+				Pair("device", deviceID),
+				Pair("time", time)
+			)
 		).let {
 			postRequest(
 				it,
@@ -338,9 +350,13 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
-		// 加密 `Post` 请求
-		val content = AesCrypto.encrypt("{\"device\":\"$goldSonteID\",\"time\":$time}").orEmpty()
-		RequestBody.create(requestContentType, content).let {
+		RequestBody.create(
+			requestContentType,
+			ParameterUtil.prepare(
+				Pair("device", goldSonteID),
+				Pair("time", time)
+			)
+		).let {
 			postRequestGetJsonObject<String>(
 				it,
 				"message_list",
@@ -372,9 +388,10 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenPriceModel>) -> Unit
 	) {
-		// 加密 `Post` 请求
-		val content = AesCrypto.encrypt("{\"address_list\":$addressList}").orEmpty()
-		RequestBody.create(requestContentType, content).let {
+		RequestBody.create(
+			requestContentType,
+			ParameterUtil.prepare(Pair("address_list", addressList))
+		).let {
 			postRequestGetJsonObject<TokenPriceModel>(
 				it,
 				"price_list",

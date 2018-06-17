@@ -115,7 +115,6 @@ class SplashActivity : AppCompatActivity() {
 	}
 	
 	override fun onBackPressed() {
-		System.out.println("hello baby")
 		if (backEvent.isNull()) {
 			super.onBackPressed()
 		} else {

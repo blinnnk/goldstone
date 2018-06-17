@@ -2,6 +2,9 @@
 
 package io.goldstone.blockchain
 
+import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
@@ -118,5 +121,20 @@ class GoldStoneServerUnitTest {
 		val terms =
 			"${WebUrl.header}/${WebUrl.webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
 		LogUtil.debug("getWebUrlValue", terms)
+	}
+	
+	@Test
+	fun getUnreadCount() {
+		AppConfigTable.getAppConfig {
+			it?.apply {
+				GoldStoneAPI.getUnreadCount(
+					it.goldStoneID,
+					System.currentTimeMillis(),
+					{ LogUtil.error(positon, it) }
+				) {
+					LogUtil.debug(positon + "getUnreadCount", it)
+				}
+			}
+		}
 	}
 }
