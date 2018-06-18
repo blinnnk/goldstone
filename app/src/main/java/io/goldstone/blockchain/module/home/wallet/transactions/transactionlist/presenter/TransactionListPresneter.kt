@@ -252,40 +252,42 @@ class TransactionListPresenter(
 		}
 		
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
-			filter {
-				it.isERC20 && it.symbol.isEmpty()
-			}.distinctBy {
-				it.contractAddress
-			}.let { unkonwData ->
-				if (unkonwData.isEmpty()) {
-					callback()
-					return
-				}
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount = unkonwData.size
-					override fun concurrentJobs() {
-						unkonwData.forEach {
-							// 原本这里同时可以获取 `Name` 但是为了列表加速, 把这个并不影响显示的信息放到进入账单详情前单独拉取
-							GoldStoneEthCall.getSymbolAndDecimalByContract(
-								it.contractAddress,
-								{ error, reason ->
+			DefaultTokenTable.getCurrentChainTokens { localTokens ->
+				filter {
+					it.isERC20 && it.symbol.isEmpty()
+				}.distinctBy {
+					it.contractAddress
+				}.filterNot { unknowData ->
+					localTokens.any {
+						it.contract.equals(unknowData.contractAddress, true)
+					}
+				}.let { filterData ->
+					if (filterData.isEmpty()) {
+						callback()
+						return@getCurrentChainTokens
+					}
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount = filterData.size
+						override fun concurrentJobs() {
+							filterData.forEach {
+								GoldStoneEthCall.getSymbolAndDecimalByContract(
+									Config.getCurrentChain(),
+									{ error, reason ->
+										LogUtil.error("getUnkonwTokenInfo $reason", error)
+									}
+								) { symbol, decimal ->
+									GoldStoneDataBase
+										.database
+										.defaultTokenDao()
+										.insert(DefaultTokenTable(it.contractAddress, symbol, decimal))
 									completeMark()
-									LogUtil.error("getUnkonwTokenInfoByTransactions $reason", error)
 								}
-							) { symbol, decimal ->
-								GoldStoneDataBase
-									.database
-									.defaultTokenDao()
-									.insert(DefaultTokenTable(it.contractAddress, symbol, decimal))
-								completeMark()
 							}
 						}
-					}
-					
-					override fun mergeCallBack() {
-						callback()
-					}
-				}.start()
+						
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
 		}
 		

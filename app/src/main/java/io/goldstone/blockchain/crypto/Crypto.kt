@@ -18,10 +18,7 @@ import java.util.*
 import kotlin.experimental.and
 
 /**
- *
  * Transaction signing logic.
- *
- *
  * Adapted from the
  * [BitcoinJ ECKey](https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/ECKey.java) implementation.
  */

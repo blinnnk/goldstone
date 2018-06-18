@@ -31,7 +31,10 @@ import org.jetbrains.anko.*
 class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	
 	private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
-	private val loading by lazy { ProgressBar(this.context, null, R.attr.progressBarStyleInverse) }
+	private val loading by lazy {
+		ProgressBar(this.context, null, R.attr.progressBarStyleInverse)
+	}
+	private lateinit var webView: WebView
 	override val presenter = WebViewPresenter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -60,7 +63,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			y -= 30.uiPX()
 		}.into(this)
 		// 当 `webView`加载完毕后清楚 `loading`
-		webView {
+		webView = webView {
 			alpha = 0.1f
 			settings.javaScriptEnabled = true
 			webViewClient = WebViewClient()
@@ -77,6 +80,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		// 如果长时间没加载到 最长 `8s` 超时删除 `loading`
 		8000L timeUpThen {
 			context?.apply {
+				webView.alpha = 1f
 				removeView(loading)
 			}
 		}
