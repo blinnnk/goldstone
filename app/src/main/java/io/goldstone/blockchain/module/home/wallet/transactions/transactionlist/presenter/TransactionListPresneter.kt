@@ -144,7 +144,7 @@ class TransactionListPresenter(
 			// 没有网络直接返回
 			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
-			mergeETHAndERC20IncomingTransactions(startBlock, errorCallback) {
+			mergeETHAndERC20Incoming(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
 					fragment.filterCompletedData(it, hold)
@@ -157,12 +157,11 @@ class TransactionListPresenter(
 			}.start()
 		}
 		
-		private fun mergeETHAndERC20IncomingTransactions(
+		private fun mergeETHAndERC20Incoming(
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
 			hold: (List<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
-			val prepareDataTime = System.currentTimeMillis()
 			return object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = 2
 				// Get transaction data from `etherScan`
@@ -218,7 +217,6 @@ class TransactionListPresenter(
 					}.sortedByDescending {
 						it.timeStamp
 					}.let {
-						System.out.println("MergeEtherScanData ${System.currentTimeMillis() - prepareDataTime}")
 						diffNewDataAndUpdateLocalData(it, hold)
 					}
 				}
@@ -253,10 +251,7 @@ class TransactionListPresenter(
 			}
 		}
 		
-		private fun List<TransactionTable>.getUnkonwTokenInfoByTransactions(
-			callback: () -> Unit
-		) {
-			val startTime = System.currentTimeMillis()
+		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			filter {
 				it.isERC20 && it.symbol.isEmpty()
 			}.distinctBy {
@@ -288,7 +283,6 @@ class TransactionListPresenter(
 					}
 					
 					override fun mergeCallBack() {
-						System.out.println("get unkonw data  ${System.currentTimeMillis() - startTime}")
 						callback()
 					}
 				}.start()
@@ -300,7 +294,7 @@ class TransactionListPresenter(
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
-			data.getUnkonwTokenInfoByTransactions {
+			data.getUnkonwTokenInfo {
 				// 把拉取到的数据加工数据格式并插入本地数据库
 				completeTransactionInfo(data) {
 					object : ConcurrentAsyncCombine() {

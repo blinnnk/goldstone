@@ -274,14 +274,19 @@ class GoldStoneEthereumUnitTest {
 	
 	@Test
 	fun getInputCodeByTaxHash() {
-		val hash = "0x26acbb2138b0e99bbd929dddef42cf77b4b4fd303d94b0588fadb7143b6f7cb2"
+		val hash = "0x6fe5d4a28755b260d01654b0e5b7f74d8ca236bd69229bf57a712b480d39f2b6"
+		val chainID = ChainID.Ropstan.id
 		GoldStoneEthCall.getInputCodeByHash(
 			hash,
 			{ error, reason ->
 				LogUtil.error(positon + reason, error)
-			}
+			},
+			chainID
 		) {
+			val expectedValue =
+				"0xa9059cbb000000000000000000000000ca6655dc28c4ecea148033bf6fac60b1398482e000000000000000000000000000000000000000000000000000000000002c252c4e69636520746f206d65657420796f752062616279"
 			LogUtil.debug("$positon + getInputCodeByTaxHash", it)
+			assertTrue("Got Wrong Input Code", it.equals(expectedValue, true))
 		}
 	}
 }
