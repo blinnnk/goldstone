@@ -15,7 +15,10 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.ArrowIconView
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.rightPadding

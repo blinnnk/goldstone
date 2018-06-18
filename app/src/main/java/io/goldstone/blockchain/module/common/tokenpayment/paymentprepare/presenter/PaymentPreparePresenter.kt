@@ -6,7 +6,12 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.utils.formatCurrency
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
+import io.goldstone.blockchain.crypto.utils.toDataString
+import io.goldstone.blockchain.crypto.utils.toDataStringFromAddress
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -16,7 +21,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.Pa
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
-import org.web3j.utils.Convert
 import java.math.BigInteger
 
 /**
@@ -87,7 +91,8 @@ class PaymentPreparePresenter(
 		if (currentToken?.contract.equals(CryptoValue.ethContract, true)) {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
-			countWithDecimal = Convert.toWei(count.toString(), Convert.Unit.ETHER).toBigInteger()
+			countWithDecimal =
+				(count * Math.pow(10.0, CryptoValue.ethDecimal)).toBigDecimal().toBigInteger()
 		} else {
 			to = currentToken!!.contract
 			countWithDecimal =

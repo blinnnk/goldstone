@@ -2,14 +2,17 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.toEthValue
+import io.goldstone.blockchain.crypto.utils.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
@@ -32,6 +35,9 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView("Loading data from chain")
+		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
+		checkTokenNameInfoOrUpdate()
+		
 		TransactionTable.getMemoByHashAndReceiveStatus(currentHash, isReceived) { memo ->
 			fragment.removeLoadingView()
 			fragment.asyncData = generateModels(this).apply {
@@ -116,5 +122,22 @@ fun TransactionDetailPresenter.generateModels(
 		TransactionDetailModel(receiptData[index].toString(), it)
 	}.let {
 		return it.toArrayList()
+	}
+}
+
+private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
+	DefaultTokenTable.getCurrentChainTokenByContract(contract) {
+		it?.apply {
+			if (name.isEmpty()) {
+				GoldStoneEthCall.getTokenName(
+					contract,
+					{ error, reason ->
+						LogUtil.error("getCurrentChainTokenByContract $reason", error)
+					}
+				) {
+					DefaultTokenTable.updateTokenName(contract, it)
+				}
+			}
+		}
 	}
 }

@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
 

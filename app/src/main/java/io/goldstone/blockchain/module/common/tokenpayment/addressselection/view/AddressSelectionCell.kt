@@ -4,8 +4,6 @@ import android.content.Context
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.ElementID

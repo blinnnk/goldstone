@@ -10,14 +10,13 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.DecryptKeystore
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.web3j.crypto.Keys
-import org.web3j.crypto.Wallet
 import java.io.File
 
 /**
@@ -40,7 +39,7 @@ fun Context.generateWallet(
 		/** Generate Keys */
 		val masterKey = masterWallet.keyPair
 		/** Get Public Key and Private Key*/
-		val publicKey = Keys.getAddress(masterKey.publicKey)
+		val publicKey = masterKey.getAddress()
 		val address = "0x" + publicKey.toLowerCase()
 		holdAddress(mnemonicCode, address)
 		/** Import Private Key to Keystore */
@@ -64,7 +63,7 @@ fun Context.getWalletByMnemonic(
 	/** Generate Keys */
 	val masterKey = masterWallet.keyPair
 	/** Get Public Key and Private Key*/
-	val publicKey = Keys.getAddress(masterKey.publicKey)
+	val publicKey = masterKey.getAddress()
 	val address = "0x" + publicKey.toLowerCase()
 	/** Import Private Key to Keystore */
 	try {
@@ -86,7 +85,7 @@ fun Context.getWalletByPrivateKey(
 	/** Convert PrivateKey To BigInteger */
 	val currentPrivateKey = privateKey.toBigInteger(16)
 	/** Get Public Key and Private Key*/
-	val publicKey = Keys.getAddress(publicKeyFromPrivate(currentPrivateKey))
+	val publicKey = ECKeyPair(currentPrivateKey, publicKeyFromPrivate(currentPrivateKey)).getAddress()
 	val address = "0x" + publicKey.toLowerCase()
 	/** Format PrivateKey */
 	val keyString = when {
@@ -135,13 +134,14 @@ fun Context.getPrivateKey(
 	hold: (String) -> Unit
 ) {
 	getKeystoreFile(walletAddress, password, errorCallback) {
-		try {
-			Wallet.decrypt(password, DecryptKeystore.GenerateFile(it.convertKeystoreToModel())).let {
-				hold(it.privateKey.toString(16))
-			}
-		} catch (error: Exception) {
+		WalletUtil.getKeyPairFromWalletFile(
+			it,
+			password
+		) {
 			GoldStoneAPI.context.runOnUiThread { errorCallback() }
-			LogUtil.error("getPrivateKey", error)
+			LogUtil.error("getPrivateKey", it)
+		}?.let {
+			hold(it.privateKey.toString(16))
 		}
 	}
 }

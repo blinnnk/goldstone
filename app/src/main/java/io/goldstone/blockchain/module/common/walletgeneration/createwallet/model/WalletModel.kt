@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DialogText
-import io.goldstone.blockchain.crypto.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert

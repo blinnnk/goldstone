@@ -7,6 +7,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -145,7 +146,6 @@ class GoldStoneEthereumUnitTest {
 			chainID
 		) {
 			// The balance in June 16/2018 is 1.882099E13
-			System.out.println("hello it$it")
 			LogUtil.debug(positon + "getTokenBalanceByContract", "$it")
 			assertTrue("Get wrong balance", it > 0)
 		}
@@ -263,7 +263,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun prepareJsonRPCParam() {
 		ParameterUtil.prepareJsonRPC(
-			GoldStoneEthCall.Method.GetBlockNumber.method,
+			EthereumMethod.GetBlockNumber.method,
 			1,
 			false,
 			"hello"

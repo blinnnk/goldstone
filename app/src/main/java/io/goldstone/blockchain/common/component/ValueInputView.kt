@@ -20,7 +20,7 @@ import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.formatCurrency
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor

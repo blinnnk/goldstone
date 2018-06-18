@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -160,13 +160,14 @@ class TransactionListPresenter(
 		private fun mergeETHAndERC20IncomingTransactions(
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
-			hold: (ArrayList<TransactionTable>) -> Unit
+			hold: (List<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
+			val prepareDataTime = System.currentTimeMillis()
 			return object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = 2
 				// Get transaction data from `etherScan`
-				var chainData = ArrayList<TransactionTable>()
-				var logData = ArrayList<TransactionTable>()
+				var chainData = listOf<TransactionTable>()
+				var logData = listOf<TransactionTable>()
 				var hasError = false
 				override fun concurrentJobs() {
 					doAsync {
@@ -187,7 +188,6 @@ class TransactionListPresenter(
 						
 						GoldStoneAPI.getERC20TokenIncomingTransaction(
 							startBlock,
-							Config.getCurrentAddress(),
 							{
 								//error callback
 								// 只弹出一次错误信息
@@ -199,7 +199,9 @@ class TransactionListPresenter(
 							}
 						) {
 							// 把请求回来的数据转换成 `TransactionTable` 格式
-							logData = it.map { TransactionTable(ERC20TransactionModel(it)) }.toArrayList()
+							logData = it.map {
+								TransactionTable(ERC20TransactionModel(it))
+							}
 							completeMark()
 						}
 					}
@@ -216,6 +218,7 @@ class TransactionListPresenter(
 					}.sortedByDescending {
 						it.timeStamp
 					}.let {
+						System.out.println("MergeEtherScanData ${System.currentTimeMillis() - prepareDataTime}")
 						diffNewDataAndUpdateLocalData(it, hold)
 					}
 				}
@@ -224,7 +227,7 @@ class TransactionListPresenter(
 		
 		private fun diffNewDataAndUpdateLocalData(
 			newData: List<TransactionTable>,
-			hold: ArrayList<TransactionTable>.() -> Unit
+			hold: List<TransactionTable>.() -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				getTransactionsByAddress(Config.getCurrentAddress())
@@ -243,56 +246,57 @@ class TransactionListPresenter(
 							}
 						}.let {
 							GoldStoneAPI.context.runOnUiThread {
-								hold(it.toArrayList())
+								hold(it)
 							}
 						}
 					}
 			}
 		}
 		
-		private fun ArrayList<TransactionTable>.getUnkonwTokenInfoByTransactions(callback: () -> Unit) {
-			DefaultTokenTable.getCurrentChainTokens { localTokens ->
-				filter {
-					it.isERC20 && it.symbol.isEmpty()
-				}.distinctBy {
-					it.contractAddress
-				}.filterNot { unknowData ->
-					localTokens.any {
-						it.contract.equals(unknowData.contractAddress, true)
-					}
-				}.apply {
-					if (isEmpty()) {
-						callback()
-						return@getCurrentChainTokens
-					}
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount = size
-						override fun concurrentJobs() {
-							forEach {
-								GoldStoneEthCall.apply {
-									getTokenInfoByContractAddress(
-										it.contractAddress,
-										Config.getCurrentChain(), { _, _ ->
-											// error callback if need do something
-										}) { symbol, name, decimal ->
-										GoldStoneDataBase
-											.database
-											.defaultTokenDao()
-											.insert(DefaultTokenTable(it.contractAddress, symbol, decimal, name))
-										completeMark()
-									}
+		private fun List<TransactionTable>.getUnkonwTokenInfoByTransactions(
+			callback: () -> Unit
+		) {
+			val startTime = System.currentTimeMillis()
+			filter {
+				it.isERC20 && it.symbol.isEmpty()
+			}.distinctBy {
+				it.contractAddress
+			}.let { unkonwData ->
+				if (unkonwData.isEmpty()) {
+					callback()
+					return
+				}
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = unkonwData.size
+					override fun concurrentJobs() {
+						unkonwData.forEach {
+							// 原本这里同时可以获取 `Name` 但是为了列表加速, 把这个并不影响显示的信息放到进入账单详情前单独拉取
+							GoldStoneEthCall.getSymbolAndDecimalByContract(
+								it.contractAddress,
+								{ error, reason ->
+									completeMark()
+									LogUtil.error("getUnkonwTokenInfoByTransactions $reason", error)
 								}
+							) { symbol, decimal ->
+								GoldStoneDataBase
+									.database
+									.defaultTokenDao()
+									.insert(DefaultTokenTable(it.contractAddress, symbol, decimal))
+								completeMark()
 							}
 						}
-						
-						override fun mergeCallBack() = callback()
-					}.start()
-				}
+					}
+					
+					override fun mergeCallBack() {
+						System.out.println("get unkonw data  ${System.currentTimeMillis() - startTime}")
+						callback()
+					}
+				}.start()
 			}
 		}
 		
 		private fun BaseRecyclerFragment<*, *>.filterCompletedData(
-			data: ArrayList<TransactionTable>,
+			data: List<TransactionTable>,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
@@ -303,19 +307,11 @@ class TransactionListPresenter(
 						override var asyncCount: Int = size
 						override fun concurrentJobs() {
 							forEach { transactionTable ->
-								if (transactionTable.isERC20) {
-									GoldStoneDataBase
-										.database
-										.transactionDao()
-										.insert(transactionTable)
-									completeMark()
-								} else {
-									GoldStoneDataBase
-										.database
-										.transactionDao()
-										.insert(transactionTable)
-									completeMark()
-								}
+								GoldStoneDataBase
+									.database
+									.transactionDao()
+									.insert(transactionTable)
+								completeMark()
 							}
 						}
 						
@@ -335,73 +331,69 @@ class TransactionListPresenter(
 		 * 在汇总到主线程.
 		 */
 		private fun completeTransactionInfo(
-			data: ArrayList<TransactionTable>,
-			hold: ArrayList<TransactionTable>.() -> Unit
+			data: List<TransactionTable>,
+			hold: List<TransactionTable>.() -> Unit
 		) {
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = data.size
-				override fun concurrentJobs() {
-					data.forEach { transaction ->
-						CryptoUtils.isERC20Transfer(transaction) {
-							val contract = if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
-							else transaction.to
-							var receiveAddress = ""
-							var count = 0.0
-							/** 首先从本地数据库检索 `contract` 对应的 `symbol` */
-							DefaultTokenTable.getCurrentChainTokenByContract(contract) { tokenInfo ->
-								transaction.logIndex.isNotEmpty() isTrue {
-									count = CryptoUtils.toCountByDecimal(
-										transaction.value.toDouble(),
-										tokenInfo?.decimals.orElse(0.0)
-									)
-									receiveAddress = transaction.to
-								} otherwise {
-									// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-									val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
-									count = CryptoUtils.toCountByDecimal(
-										transactionInfo?.count.orElse(0.0),
-										tokenInfo?.decimals.orElse(0.0)
-									)
-									receiveAddress = transactionInfo?.address!!
-								}
-								
-								tokenInfo.isNull() isTrue {
-									// 如果本地没有检索到 `contract` 对应的 `symbol` 则从链上查询
-									TransactionTable.updateModelInfoFromChain(
+			DefaultTokenTable.getCurrentChainTokens { localTokens ->
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = data.size
+					override fun concurrentJobs() {
+						data.forEach { transaction ->
+							CryptoUtils.isERC20Transfer(transaction) {
+								val contract =
+									if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
+									else transaction.to
+								var receiveAddress = ""
+								var count = 0.0
+								/** 从本地数据库检索 `contract` 对应的 `symbol` */
+								localTokens.find {
+									it.contract.equals(contract, true)
+								}?.let { tokenInfo ->
+									transaction.logIndex.isNotEmpty() isTrue {
+										count = CryptoUtils.toCountByDecimal(
+											transaction.value.toDouble(),
+											tokenInfo.decimals.orZero()
+										)
+										receiveAddress = transaction.to
+									} otherwise {
+										// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
+										val transactionInfo = CryptoUtils
+											.loadTransferInfoFromInputData(transaction.input)
+										count = CryptoUtils.toCountByDecimal(
+											transactionInfo?.count.orElse(0.0),
+											tokenInfo.decimals.orZero()
+										)
+										receiveAddress = transactionInfo?.address!!
+									}
+									
+									TransactionTable.updateModelInfo(
 										transaction,
 										true,
-										"",
-										transaction.value,
-										receiveAddress
-									)
-									completeMark()
-								} otherwise {
-									TransactionTable.updateModelInfoFromChain(
-										transaction,
-										true,
-										tokenInfo?.symbol!!,
+										tokenInfo.symbol,
 										count.toString(),
 										receiveAddress
 									)
 									completeMark()
 								}
+							} isFalse {
+								/** 不是 ERC20 币种直接默认为 `ETH` */
+								TransactionTable.updateModelInfo(
+									transaction,
+									false,
+									CryptoSymbol.eth,
+									CryptoUtils.toCountByDecimal(transaction.value.toDouble()).toString(),
+									transaction.to
+								)
+								completeMark()
 							}
-						} isFalse {
-							/** 不是 ERC20 币种直接默认为 `ETH` */
-							TransactionTable.updateModelInfoFromChain(
-								transaction,
-								false,
-								CryptoSymbol.eth,
-								CryptoUtils.toCountByDecimal(transaction.value.toDouble()).toString(),
-								transaction.to
-							)
-							completeMark()
 						}
 					}
-				}
-				
-				override fun mergeCallBack() = hold(data)
-			}.start()
+					
+					override fun mergeCallBack() {
+						hold(data)
+					}
+				}.start()
+			}
 		}
 	}
 }

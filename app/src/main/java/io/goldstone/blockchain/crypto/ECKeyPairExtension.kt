@@ -4,6 +4,9 @@ import io.goldstone.blockchain.crypto.SecureRandomUtils.secureRandom
 import io.goldstone.blockchain.crypto.extensions.toBytesPadded
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.kecca.keccak
+import io.goldstone.blockchain.crypto.utils.clean0xPrefix
+import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.crypto.utils.toHexString
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger

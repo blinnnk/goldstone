@@ -4,8 +4,8 @@ package io.goldstone.blockchain.crypto
  * @date 08/04/2018 12:23 AM
  * @author KaySaith
  */
-
 object SolidityCode {
+	
 	const val contractTransfer = "0xa9059cbb"
 	const val ethTransfer = "0x"
 	const val ethCall = "0x95d89b41000000000000000000000000"
@@ -27,6 +27,7 @@ object CryptoValue {
 	const val ethContract = "0x0"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
+	const val ethDecimal = 18.0
 }
 
 object CryptoSymbol {

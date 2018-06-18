@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -134,7 +134,8 @@ class WalletSettingsPresenter(
 					it?.apply {
 						encryptMnemonic?.let {
 							setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-							val mnemonicCode = JavaKeystoreUtil().decryptData(it)
+							val mnemonicCode = JavaKeystoreUtil()
+								.decryptData(it)
 							replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
 								putString(ArgumentKey.mnemonicCode, mnemonicCode)
 							}

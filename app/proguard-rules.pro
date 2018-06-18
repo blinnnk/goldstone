@@ -1,29 +1,3 @@
-# To enable ProGuard in your project, edit project.properties
-# to define the proguard.config property as described in that file.
-#
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in ${sdk.dir}/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the ProGuard
-# include property in project.properties.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-#   http://proguard.sourceforge.net/index.html#manual/usage.html
-#   http://proguard.sourceforge.net/index.html#manual/examples.html
-
-# Add any project specific keep options here:
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-
-# Some important configuration is based on the annotations in the code.
-# We have to specify what the annotations mean to ProGuard.
 
 # General Options
 -verbose
@@ -46,7 +20,6 @@
 -dontnote org.w3c.dom.**
 -dontnote org.xml.sax.**
 -dontnote org.xmlpull.v1.**
-
 
 # Stop warnings about missing unused classes
 -dontwarn android.**
@@ -170,24 +143,15 @@
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
-
--keep class android.support.design.widget.TabLayout { *; }
--keepclassmembers class fqcn.of.javascript.interface.for.webview {
-    public *;
+# Kotlinx
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
+-keepclassmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+    *** Companion;
 }
--keep class android.support.annotation.Keep
--keep @android.support.annotation.Keep class * {*;}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <methods>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <fields>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <init>(...);
+-keepclasseswithmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+    kotlinx.serialization.KSerializer serializer(...);
 }
 
 -adaptclassstrings com.example.Test

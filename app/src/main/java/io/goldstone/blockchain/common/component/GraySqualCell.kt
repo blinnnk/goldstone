@@ -13,9 +13,14 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.*
+import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
 
 /**
  * @date 25/04/2018 8:56 AM

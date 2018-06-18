@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -12,7 +11,10 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.imageView
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 09/04/2018 6:52 PM
