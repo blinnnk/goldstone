@@ -257,10 +257,10 @@ class TransactionListPresenter(
 					it.isERC20 && it.symbol.isEmpty()
 				}.distinctBy {
 					it.contractAddress
-				}.filterNot { unknowData ->
-					localTokens.any {
+				}.filter { unknowData ->
+					localTokens.find {
 						it.contract.equals(unknowData.contractAddress, true)
-					}
+					}.isNull()
 				}.let { filterData ->
 					if (filterData.isEmpty()) {
 						callback()
@@ -271,8 +271,9 @@ class TransactionListPresenter(
 						override fun concurrentJobs() {
 							filterData.forEach {
 								GoldStoneEthCall.getSymbolAndDecimalByContract(
-									Config.getCurrentChain(),
+									it.contractAddress,
 									{ error, reason ->
+										completeMark()
 										LogUtil.error("getUnkonwTokenInfo $reason", error)
 									}
 								) { symbol, decimal ->
@@ -285,7 +286,9 @@ class TransactionListPresenter(
 							}
 						}
 						
-						override fun mergeCallBack() = callback()
+						override fun mergeCallBack() {
+							callback()
+						}
 					}.start()
 				}
 			}

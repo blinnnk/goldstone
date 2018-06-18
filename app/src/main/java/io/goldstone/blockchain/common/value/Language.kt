@@ -2250,7 +2250,7 @@ object ChainText {
 		else -> ""
 	}
 	@JvmField
-	val ropstan = when (currentLanguage) {
+	val ropsten = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ropsten Testnet"
 		HoneyLanguage.Chinese.code -> "Ropsten 测试网络"
 		HoneyLanguage.Japanese.code -> "Ropsten テストネット"
