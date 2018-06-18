@@ -197,7 +197,7 @@ data class TransactionTable(
 	
 	companion object {
 		
-		fun updateModelInfoFromChain(
+		fun updateModelInfo(
 			transaction: TransactionTable,
 			isERC20: Boolean,
 			symbol: String,

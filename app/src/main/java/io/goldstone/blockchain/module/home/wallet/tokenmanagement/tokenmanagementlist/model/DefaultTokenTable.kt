@@ -108,8 +108,7 @@ data class DefaultTokenTable(
 	constructor(
 		contract: String,
 		symbol: String,
-		decimals: Double,
-		name: String
+		decimals: Double
 	) : this(
 		0,
 		contract,
@@ -117,7 +116,7 @@ data class DefaultTokenTable(
 		symbol,
 		0,
 		0.0,
-		name,
+		"",
 		decimals,
 		"",
 		false,
@@ -182,6 +181,20 @@ data class DefaultTokenTable(
 						getCurrentChainTokenByContract(contract)?.let {
 							update(it.apply { price = newPrice })
 							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
+					}
+			}
+		}
+		
+		fun updateTokenName(
+			contract: String,
+			name: String
+		) {
+			doAsync {
+				GoldStoneDataBase.database.defaultTokenDao()
+					.apply {
+						getCurrentChainTokenByContract(contract)?.let {
+							update(it.apply { this.name = name })
 						}
 					}
 			}

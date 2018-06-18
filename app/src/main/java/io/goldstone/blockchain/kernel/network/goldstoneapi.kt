@@ -215,8 +215,8 @@ object GoldStoneAPI {
 	
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
-		address: String = Config.getCurrentAddress(),
 		errorCallback: (Exception) -> Unit,
+		address: String = Config.getCurrentAddress(),
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
 		requestUncryptoData<ERC20TransactionModel>(

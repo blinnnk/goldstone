@@ -58,6 +58,23 @@ object GoldStoneEthCall {
 		}
 	}
 	
+	@JvmStatic
+	fun getSymbolAndDecimalByContract(
+		contractAddress: String,
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
+		hold: (
+			symbol: String,
+			decimal: Double
+		) -> Unit
+	) {
+		getTokenSymbolByContract(contractAddress, errorCallback, chainID) { symbol ->
+			getTokenDecimal(contractAddress, errorCallback, chainID) { decimal ->
+				hold(symbol, decimal)
+			}
+		}
+	}
+	
 	fun getTokenCountWithDecimalByContract(
 		contractAddress: String,
 		walletAddress: String,
