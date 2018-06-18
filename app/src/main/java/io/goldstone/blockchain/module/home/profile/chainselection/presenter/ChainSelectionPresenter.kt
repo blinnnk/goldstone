@@ -35,7 +35,7 @@ class ChainSelectionPresenter(
 						ChainID.Rinkeby.id
 					),
 					ChainSelectionModel(
-						ChainText.ropstan,
+						ChainText.ropsten,
 						chainID == ChainID.Ropstan.id,
 						EthereumNetColor.ropstan,
 						ChainID.Ropstan.id

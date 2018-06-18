@@ -24,7 +24,7 @@ enum class ChainID(val id: String) {
 		fun getChainNameByID(chainID: String): String {
 			return when (chainID) {
 				Main.id -> ChainText.goldStoneMain
-				Ropstan.id -> ChainText.ropstan
+				Ropstan.id -> ChainText.ropsten
 				Kovan.id -> ChainText.kovan
 				Rinkeby.id -> ChainText.rinkeby
 				else -> ChainText.goldStoneMain
