@@ -146,7 +146,6 @@ class GoldStoneEthereumUnitTest {
 			chainID
 		) {
 			// The balance in June 16/2018 is 1.882099E13
-			System.out.println("hello it$it")
 			LogUtil.debug(positon + "getTokenBalanceByContract", "$it")
 			assertTrue("Get wrong balance", it > 0)
 		}

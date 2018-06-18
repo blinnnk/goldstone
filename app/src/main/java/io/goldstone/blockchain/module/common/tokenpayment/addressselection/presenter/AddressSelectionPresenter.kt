@@ -95,7 +95,7 @@ class AddressSelectionPresenter(
 		address: String,
 		count: Double = 0.0
 	) {
-		Address(address).isValid().isFalse {
+		Address(address).isValid() isFalse {
 			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			return
 		}

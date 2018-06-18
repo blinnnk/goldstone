@@ -33,8 +33,7 @@ class WatchOnlyImportPresenter(
 	) {
 		// 默认去除所有的空格
 		val address = Address(addressInput.text.toString().replace(" ", ""))
-		
-		if (address.isValid()) {
+		if (!address.isValid()) {
 			fragment.context?.alert(ImportWalletText.addressFromatAlert)
 			callback()
 			return

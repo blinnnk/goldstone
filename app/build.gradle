@@ -33,10 +33,10 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi", "armeabi-v7a" //, "x86" // PC 调试的时候恢复
+      abiFilters "armeabi", "armeabi-v7a" , "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    // Leave only support language
+    // Leave only the supported languages
     resConfigs "en", "ja", "ru", "zh_CN", "zh_HK", "zh_TW", "ko"
   }
   buildTypes {
@@ -55,6 +55,10 @@ android {
     }
   }
 
+  kapt {
+    generateStubs = true
+  }
+
 }
 
 dependencies {
@@ -69,9 +73,8 @@ dependencies {
   // Glide Image Loader
   implementation 'com.github.bumptech.glide:glide:4.7.1'
   annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-  kapt 'com.github.bumptech.glide:compiler:4.7.1'
   // Recycler View
-  //noinspection GradleCompatible
+  // noinspection GradleCompatible
   implementation 'com.android.support:recyclerview-v7:27.1.1'
   // Kotlin
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
@@ -118,8 +121,4 @@ kotlin {
   experimental { coroutines 'enable' }
 }
 
-// 使用生成文件
-kapt {
-  generateStubs = true
-}
 apply plugin: 'com.google.gms.google-services'
