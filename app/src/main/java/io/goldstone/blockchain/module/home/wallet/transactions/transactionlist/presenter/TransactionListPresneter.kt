@@ -211,7 +211,7 @@ class TransactionListPresenter(
 						addAll(chainData)
 						addAll(logData)
 					}.filter {
-						it.to.isNotEmpty() && it.value.toDouble() > 0.0
+						it.to.isNotEmpty()
 					}.distinctBy {
 						it.hash
 					}.sortedByDescending {
