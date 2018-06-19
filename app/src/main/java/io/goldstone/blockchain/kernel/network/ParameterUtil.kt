@@ -2,6 +2,7 @@
 
 package io.goldstone.blockchain.kernel.network
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.AesCrypto
 
 /**
@@ -29,16 +30,20 @@ object ParameterUtil {
 		method: String,
 		id: Int,
 		hasLatest: Boolean,
-		vararg parameters: T
+		vararg parameters: T?
 	): String {
 		var content = ""
 		parameters.forEach {
+			if (it.isNull()) return@forEach
 			val value = if (it is String) "\"$it\"" else it
 			content += "$value,"
 		}
 		val latest = if (hasLatest) ",\"latest\"" else ""
+		val finalParameter =
+			if (content.isEmpty()) ""
+			else content.substringBeforeLast(",") + latest
 		return AesCrypto.encrypt(
-			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[${content.substringBeforeLast(",")}$latest], \"id\":$id}"
+			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
 		).orEmpty()
 	}
 	

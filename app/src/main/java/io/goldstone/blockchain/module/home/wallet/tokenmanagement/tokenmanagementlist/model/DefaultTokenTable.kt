@@ -203,13 +203,17 @@ data class DefaultTokenTable(
 		fun updateTokenDefaultStatus(
 			contract: String,
 			isDefault: Boolean,
-			callback: () -> Unit = {}
+			name: String,
+			callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
 						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply { this.isDefault = isDefault })
+							update(it.apply {
+								this.isDefault = isDefault
+								this.name = name
+							})
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
 					}

@@ -212,11 +212,9 @@ class GasSelectionPresenter(
 					// 发起 `sendRawTransaction` 请求
 					GoldStoneEthCall.sendRawTransaction(signedHex, { error, reason ->
 						fragment.context?.apply {
-							runOnUiThread {
-								alert(reason ?: error.toString())
-								callback()
-								fragment.showMaskView(false)
-							}
+							alert(reason ?: error.toString())
+							fragment.showMaskView(false)
+							callback()
 						}
 					}) { taxHash ->
 						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")

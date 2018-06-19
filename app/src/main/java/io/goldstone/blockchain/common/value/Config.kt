@@ -9,6 +9,12 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  */
 object Config {
 	
+	fun isNotchScreen(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isNotchScreen)
+	
+	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
+	
 	fun getInstaBugStatus(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.instaBugStatus)
 	

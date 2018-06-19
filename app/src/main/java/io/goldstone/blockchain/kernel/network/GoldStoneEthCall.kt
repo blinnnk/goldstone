@@ -41,8 +41,8 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
-		chainID: String = Config.getCurrentChain(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainID: String = Config.getCurrentChain(),
 		hold: (
 			symbol: String,
 			name: String,
@@ -117,7 +117,7 @@ object GoldStoneEthCall {
 	) {
 		RequestBody.create(
 			contentType,
-			ParameterUtil.prepareJsonRPC(EthereumMethod.GetBlockNumber.method, 83, false, "")
+			ParameterUtil.prepareJsonRPC(EthereumMethod.GetBlockNumber.method, 83, false, null)
 		).let {
 			callEthBy(
 				it,
@@ -280,10 +280,9 @@ object GoldStoneEthCall {
 				signTransactions
 			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(EthereumMethod.SendRawTransaction.display, error)
-			}) { holdValue(it) }
+			callEthBy(it, errorCallback) {
+				holdValue(it)
+			}
 		}
 	}
 	
@@ -472,8 +471,8 @@ object GoldStoneEthCall {
 	) {
 		val client = OkHttpClient
 			.Builder()
-			.connectTimeout(50, TimeUnit.SECONDS)
-			.readTimeout(70, TimeUnit.SECONDS)
+			.connectTimeout(40, TimeUnit.SECONDS)
+			.readTimeout(60, TimeUnit.SECONDS)
 			.build()
 		getcryptoRequest(body, currentChain(chainID)) {
 			client.newCall(it).enqueue(object : Callback {

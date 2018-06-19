@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.findChildFragmentByTag
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
@@ -17,6 +20,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.component.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.TinyNumber
+import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
 		
-		hideStatusBar()
+		transparentStatus()
 		
 		relativeLayout {
 			id = ContainerID.main
@@ -72,8 +76,8 @@ class MainActivity : AppCompatActivity() {
 		tracker?.send(
 			HitBuilders.ScreenViewBuilder()
 				.setCustomDimension(
-					ApkChannel.Home.code,
-					ApkChannel.Home.value
+					ApkChannel.Google.code,
+					ApkChannel.Google.value
 				)
 				.build()
 		)

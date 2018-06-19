@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.utils
 
-import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
 
@@ -9,6 +8,7 @@ import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
  * @author KaySaith
  */
 object TransactionUtils {
+	
 	fun signTransaction(
 		transaction: Transaction,
 		pirvateKey: String
@@ -16,7 +16,7 @@ object TransactionUtils {
 		val publicKey = publicKeyFromPrivate(pirvateKey.hexToBigInteger())
 		val keyPair = ECKeyPair(pirvateKey.hexToBigInteger(), publicKey)
 		val signatureData =
-			transaction.signViaEIP155(keyPair, transaction.chain.orElse(ChainDefinition(1L)))
+			transaction.signViaEIP155(keyPair, transaction.chain!!)
 		return transaction.encodeRLP(signatureData).toHexString()
 	}
 }

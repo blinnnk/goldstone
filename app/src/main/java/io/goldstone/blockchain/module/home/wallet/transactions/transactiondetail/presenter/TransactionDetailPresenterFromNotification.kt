@@ -135,7 +135,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(0),
-		EtherScanApi.transactionsByHash(hash)
+		EtherScanApi.transactionDetail(hash)
 	)
 	arrayListOf(
 		TransactionText.minerFee,

@@ -17,32 +17,28 @@ import org.jetbrains.anko.textColor
  * @date 26/03/2018 12:13 AM
  * @author KaySaith
  */
-
 class ProfileSlideHeader(context: Context) : SliderHeader(context) {
-
+	
 	private val title = TextView(context)
-
+	
 	init {
-
 		title.apply {
 			text = ProfileText.profile
 			textColor = Spectrum.white
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
-
+		
 		title.setCenterInParent()
-
 	}
-
+	
 	override fun onHeaderShowedStyle() {
 		super.onHeaderShowedStyle()
-		title.updateOriginYAnimation(23.uiPX().toFloat())
+		title.updateOriginYAnimation(26.uiPX().toFloat())
 	}
-
+	
 	override fun onHeaderHidesStyle() {
 		super.onHeaderHidesStyle()
 		title.updateOriginYAnimation(34.uiPX().toFloat())
 	}
-
 }

@@ -37,10 +37,10 @@ class GoldStoneEthereumUnitTest {
 		val chainID = ChainID.Ropstan.id
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
-			chainID,
 			{ error, reason ->
 				LogUtil.error("$positon getTokenInfoByContract $reason", error)
-			}
+			},
+			chainID
 		) { symbol, name, decimal ->
 			val result = "symbol - $symbol name - $name decimal - $decimal"
 			LogUtil.debug("$positon getTokenInfoByContract)", result)

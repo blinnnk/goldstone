@@ -3,10 +3,12 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.content.Context
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.matchParent
 
@@ -19,20 +21,24 @@ class WalletDetailAdapter(
 	private val holdCell: WalletDetailCell.() -> Unit,
 	private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, LinearLayout>() {
+	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
+	
 	override fun generateCell(context: Context) =
 		WalletDetailCell(context)
-
+	
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
-		LinearLayout(context).apply {
+		View(context).apply {
 			val barHeight =
-				if (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) {
+				if (
+					(!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
+					|| Config.isNotchScreen()
+				) {
 					60.uiPX()
 				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
-
+	
 	override fun generateHeader(context: Context) =
 		WalletDetailHeaderView(context).apply {
 			/**
@@ -46,7 +52,7 @@ class WalletDetailAdapter(
 			}
 			holdHeader(this)
 		}
-
+	
 	override fun WalletDetailCell.bindCell(
 		data: WalletDetailCellModel,
 		position: Int
@@ -54,5 +60,4 @@ class WalletDetailAdapter(
 		model = data
 		holdCell(this)
 	}
-
 }

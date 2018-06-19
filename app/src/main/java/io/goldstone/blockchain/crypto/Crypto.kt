@@ -68,7 +68,6 @@ fun signMessageHash(messageHash: ByteArray, keyPair: ECKeyPair, toCanonical: Boo
 		throw RuntimeException(
 			"Could not construct a recoverable key. This should never happen.")
 	}
-	
 	val headerByte = recId + 27
 	
 	val v = headerByte.toByte()
