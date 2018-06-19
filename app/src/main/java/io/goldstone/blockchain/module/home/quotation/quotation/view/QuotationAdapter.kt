@@ -20,7 +20,7 @@ class QuotationAdapter(
 	override var dataSet: ArrayList<QuotationModel>,
 	private val hold: QuotationCell.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, View>() {
+	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, View, QuotationCell, View>() {
 	
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
@@ -36,7 +36,7 @@ class QuotationAdapter(
 		}
 	
 	override fun generateHeader(context: Context) =
-		LinearLayout(context).apply {
+		View(context).apply {
 			/**
 			 * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
 			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
