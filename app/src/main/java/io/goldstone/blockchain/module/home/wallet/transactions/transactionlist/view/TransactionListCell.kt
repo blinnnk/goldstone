@@ -41,8 +41,8 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			
 			info.apply {
 				title.text =
-					if (model?.isReceived == true) CryptoUtils.scaleTo16(it.targetAddress)
-					else CryptoUtils.scaleTo16(it.addressName)
+					if (model?.isReceived == true) CryptoUtils.scaleTo22(it.targetAddress)
+					else CryptoUtils.scaleTo22(it.addressName)
 				subtitle.text = it.addressInfo
 			}
 			

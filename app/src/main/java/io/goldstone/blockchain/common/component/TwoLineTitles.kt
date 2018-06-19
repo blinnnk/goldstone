@@ -53,6 +53,15 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		}
 		subtitle.textColor = GrayScale.gray
 	}
+	
+	fun setBoldTiltes() {
+		title.apply {
+			typeface = GoldStoneFont.black(context)
+			textColor = Spectrum.white
+			textSize = fontSize(16)
+		}
+		subtitle.textColor = Spectrum.opacity5White
+	}
 
 	fun setDialogStyle() {
 		setBlackTitles()

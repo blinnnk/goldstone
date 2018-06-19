@@ -39,19 +39,19 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 						setIconResource(R.drawable.receive_icon)
 						info.subtitle.text =
 							CryptoUtils
-								.scaleTo28(CommonText.from + " " + model?.content.orEmpty())
+								.scaleTo32(CommonText.from + " " + model?.content.orEmpty())
 					} else {
 						setIconColor(GrayScale.midGray)
 						setIconResource(R.drawable.send_icon)
 						info.subtitle.text =
-							CryptoUtils.scaleTo28(CommonText.to + " " + model?.content.orEmpty())
+							CryptoUtils.scaleTo32(CommonText.to + " " + model?.content.orEmpty())
 					}
 				}
 				
 				NotificationType.System.code -> {
 					setIconColor(Spectrum.green)
 					setIconResource(R.drawable.system_notification_icon)
-					info.subtitle.text = CryptoUtils.scaleTo28(model?.content.orEmpty())
+					info.subtitle.text = CryptoUtils.scaleTo32(model?.content.orEmpty())
 				}
 			}
 		}

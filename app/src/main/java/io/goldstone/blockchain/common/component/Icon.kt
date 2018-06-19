@@ -32,15 +32,15 @@ class SquareIcon(
 	val image by lazy { ImageView(context) }
 	private val iconSize = when (style) {
 		SquareIcon.Companion.Style.Small -> 30.uiPX()
-		SquareIcon.Companion.Style.Big -> 36.uiPX()
+		SquareIcon.Companion.Style.Big -> 40.uiPX()
 	}
 	private val imageSize = when (style) {
 		SquareIcon.Companion.Style.Small -> 24.uiPX()
-		SquareIcon.Companion.Style.Big -> 28.uiPX()
+		SquareIcon.Companion.Style.Big -> 32.uiPX()
 	}
 	private val cornerSize = when (style) {
 		SquareIcon.Companion.Style.Small -> CornerSize.default
-		SquareIcon.Companion.Style.Big -> 18.uiPX().toFloat()
+		SquareIcon.Companion.Style.Big -> 20.uiPX().toFloat()
 	}
 	
 	init {
