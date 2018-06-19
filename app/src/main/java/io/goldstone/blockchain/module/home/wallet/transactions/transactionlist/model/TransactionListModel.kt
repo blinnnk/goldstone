@@ -39,11 +39,15 @@ data class TransactionListModel(
 	
 	constructor(data: TransactionTable) : this(
 		data.tokenReceiveAddress.orEmpty(),
-		CryptoUtils.scaleTo28(
+		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp,
 				DateAndTimeText.getDateText()
-			) + descriptionText(data.isReceive) + data.fromAddress
+			) + descriptionText(
+				data.isReceive,
+				data.tokenReceiveAddress.orEmpty(),
+				data.fromAddress
+			)
 		), // 副标题的生成
 		data.value.toDouble(), // 转账个数
 		data.symbol,
@@ -79,6 +83,11 @@ val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { in
 		} else TransactionText.noMemo
 	}
 }
-private val descriptionText: (isReceive: Boolean) -> String = {
-	if (it) TransactionText.receivedFrom else TransactionText.sentTo
+private val descriptionText: (
+	isReceive: Boolean,
+	toAddress: String,
+	fromAddress: String
+) -> String = { isReceive, to, from ->
+	if (isReceive) TransactionText.sentTo + to
+	else TransactionText.receivedFrom + from
 }

@@ -56,7 +56,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		valueInfo.into(this)
 		
 		tokenInfo.apply {
-			title.typeface = GoldStoneFont.heavy(context)
+			setBoldTiltes()
 			setCenterInVertical()
 			x += 50.uiPX()
 			y += 2.uiPX()
@@ -65,7 +65,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		icon.setCenterInVertical()
 		
 		valueInfo.apply {
-			title.typeface = GoldStoneFont.heavy(context)
+			setBoldTiltes()
 			setAlignParentRight()
 			setCenterInVertical()
 			x -= 30.uiPX()
