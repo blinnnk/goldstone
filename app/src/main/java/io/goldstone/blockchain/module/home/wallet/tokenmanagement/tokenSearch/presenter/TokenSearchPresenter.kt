@@ -85,36 +85,36 @@ class TokenSearchPresenter(
 				isSearchingSymbol isFalse {
 					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
 					MyTokenTable.getCurrentChainTokenByContract(content) {
-						GoldStoneEthCall
-							.getTokenInfoByContractAddress(
-								content,
-								Config.getCurrentChain(), { error, reason ->
-									fragment.context?.alert(reason ?: error.toString())
-								}) { symbol, name, decimal ->
-								if (symbol.isEmpty() || name.isEmpty()) {
-									hold(arrayListOf())
-								} else {
-									hold(
-										arrayListOf(
-											DefaultTokenTable(
-												0,
-												content,
-												"",
-												symbol,
-												TinyNumber.False.value,
-												0.0,
-												name,
-												decimal,
-												null,
-												false,
-												!it.isNull(),
-												0,
-												Config.getCurrentChain()
-											)
+						GoldStoneEthCall.getTokenInfoByContractAddress(
+							content,
+							{ error, reason ->
+								fragment.context?.alert(reason ?: error.toString())
+							}
+						) { symbol, name, decimal ->
+							if (symbol.isEmpty() || name.isEmpty()) {
+								hold(arrayListOf())
+							} else {
+								hold(
+									arrayListOf(
+										DefaultTokenTable(
+											0,
+											content,
+											"",
+											symbol,
+											TinyNumber.False.value,
+											0.0,
+											name,
+											decimal,
+											null,
+											false,
+											!it.isNull(),
+											0,
+											Config.getCurrentChain()
 										)
 									)
-								}
+								)
 							}
+						}
 					}
 				} otherwise {
 					hold(arrayListOf())

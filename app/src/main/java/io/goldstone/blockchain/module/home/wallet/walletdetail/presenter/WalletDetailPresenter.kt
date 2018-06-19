@@ -244,18 +244,24 @@ class WalletDetailPresenter(
 			diffAndUpdateAdapterData<WalletDetailAdapter>(data)
 			fragment.updateHeaderValue()
 		} else {
-			coroutinesTask(
-				{
-					/** 先按照资产情况排序, 资产为零的按照权重排序 */
-					val currencyList = data.filter { it.currency > 0.0 }
-					val weightList = data.filter { it.currency == 0.0 }
-					currencyList.sortedByDescending {
-						it.currency
-					}.plus(weightList.sortedByDescending { it.weight }).toArrayList()
+			try {
+				coroutinesTask(
+					{
+						/** 先按照资产情况排序, 资产为零的按照权重排序 */
+						val currencyList = data.filter { it.currency > 0.0 }
+						val weightList = data.filter { it.currency == 0.0 }
+						currencyList.sortedByDescending {
+							it.currency
+						}.plus(weightList.sortedByDescending {
+							it.weight
+						}).toArrayList()
+					}
+				) {
+					diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+					fragment.updateHeaderValue()
 				}
-			) {
-				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-				fragment.updateHeaderValue()
+			} catch (error: Exception) {
+				LogUtil.error("updateUIByData", error)
 			}
 		}
 	}

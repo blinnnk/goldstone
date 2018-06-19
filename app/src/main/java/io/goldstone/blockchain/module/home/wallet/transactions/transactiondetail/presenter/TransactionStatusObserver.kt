@@ -30,6 +30,7 @@ abstract class TransactionStatusObserver {
 	private val targetIntervla = 6
 	abstract val transactionHash: String
 	private var isFailed: Boolean? = null
+	private val retryTime = 6000L
 	
 	open fun checkStatusByTransaction() {
 		doAsync {
@@ -39,19 +40,20 @@ abstract class TransactionStatusObserver {
 					Config.getCurrentChain(),
 					{
 						removeObserver()
-						handler.postDelayed(reDo, 6000L)
-					}, { error, _ ->
+						handler.postDelayed(reDo, retryTime)
+					},
+					{ error, _ ->
 						LogUtil.error("checkStatusByTransaction", error)
-						// error callback if need to do something
-					}) { transaction ->
+					}
+				) { transaction ->
 					GoldStoneEthCall.getBlockNumber(
 						{ error, _ ->
 							LogUtil.error("checkStatusByTransaction", error)
-							// error callback if need to do something
-						}) { blockNumber ->
+						}
+					) { blockNumber ->
 						isFailed?.let { failed ->
 							GoldStoneAPI.context.runOnUiThread {
-								val blockInterval = blockNumber - transaction.blockNumber.toInt() + 1
+								val blockInterval = blockNumber - transaction.blockNumber.toInt()
 								val hasConfirmed = blockInterval > targetIntervla
 								val hasError = TinyNumberUtils.isTrue(transaction.hasError)
 								
@@ -66,7 +68,7 @@ abstract class TransactionStatusObserver {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									handler.postDelayed(reDo, 6000L)
+									handler.postDelayed(reDo, retryTime)
 								}
 							}
 						}
@@ -90,7 +92,7 @@ abstract class TransactionStatusObserver {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									handler.postDelayed(reDo, 6000L)
+									handler.postDelayed(reDo, retryTime)
 								}
 							}
 						}

@@ -3,10 +3,12 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 import android.content.Context
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 
@@ -14,23 +16,25 @@ import org.jetbrains.anko.matchParent
  * @date 20/04/2018 8:17 PM
  * @author KaySaith
  */
-
 class QuotationAdapter(
 	override var dataSet: ArrayList<QuotationModel>,
 	private val hold: QuotationCell.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, LinearLayout>() {
-
+	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, LinearLayout, QuotationCell, View>() {
+	
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
-		LinearLayout(context).apply {
+		View(context).apply {
 			val barHeight =
-				if (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) {
+				if (
+					(!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
+					|| Config.isNotchScreen()
+				) {
 					60.uiPX()
 				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
-
+	
 	override fun generateHeader(context: Context) =
 		LinearLayout(context).apply {
 			/**
@@ -44,10 +48,10 @@ class QuotationAdapter(
 			}
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 		}
-
+	
 	override fun generateCell(context: Context) =
 		QuotationCell(context)
-
+	
 	override fun QuotationCell.bindCell(
 		data: QuotationModel,
 		position: Int

@@ -41,6 +41,7 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 		}
 
 		title.apply {
+			y += 8.uiPX()
 			text = QuotationText.market
 			textColor = Spectrum.white
 			textSize = fontSize(15)

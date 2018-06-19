@@ -5,7 +5,6 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TokenManagementText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
@@ -32,14 +31,13 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	
 	private fun TokenSearchCell.setMyTokenStatus() {
 		model?.let { searchToken ->
-			DefaultTokenTable.getCurrentChainTokenByContract(
-				searchToken.contract,
-				Config.getCurrentChain()
-			) { localToken ->
+			DefaultTokenTable.getCurrentChainTokenByContract(searchToken.contract) { localToken ->
 				localToken.isNotNull {
+					// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
 					DefaultTokenTable.updateTokenDefaultStatus(
 						localToken!!.contract,
-						switch.isChecked
+						switch.isChecked,
+						searchToken.name
 					) {
 						insertToMyToken(switch, localToken)
 					}

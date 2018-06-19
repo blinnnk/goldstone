@@ -25,6 +25,7 @@ class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 	init {
 
 		title.apply {
+			y += 8.uiPX()
 			text = ProfileText.profile
 			textColor = Spectrum.white
 			textSize = fontSize(15)

@@ -96,9 +96,7 @@ object EtherScanApi {
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
 		"${etherScanHeader(Config.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
-	val transactionsByHash: (taxHash: String) -> String = {
-		"${etherScanHeader(Config.getCurrentChain())}/api?module=proxy&action=eth_getTransactionByHash&txhash=$it&apikey=${apikey()}"
-	}
+
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
 			"${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"

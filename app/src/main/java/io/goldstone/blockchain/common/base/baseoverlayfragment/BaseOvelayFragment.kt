@@ -17,6 +17,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.Overl
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.setTransparentStatusBar
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -81,6 +83,16 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		presenter.onFragmentAttach()
 	}
 	
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		// 全屏幕悬浮层展开的时候隐藏 `StatusBar`
+		activity?.apply {
+			if (!Config.isNotchScreen()) {
+				hideStatusBar()
+			}
+		}
+	}
+	
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -141,6 +153,11 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		super.onDestroy()
 		presenter.onFragmentDestroy()
 		setBackEvent()
+		activity?.apply {
+			if (!Config.isNotchScreen()) {
+				setTransparentStatusBar()
+			}
+		}
 	}
 	
 	override fun onResume() {

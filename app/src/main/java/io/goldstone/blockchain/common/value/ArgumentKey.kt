@@ -47,4 +47,5 @@ object SharesPreference {
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
 	const val instaBugStatus = "instaBugStatus"
+	const val isNotchScreen = "isNotchScreen"
 }
