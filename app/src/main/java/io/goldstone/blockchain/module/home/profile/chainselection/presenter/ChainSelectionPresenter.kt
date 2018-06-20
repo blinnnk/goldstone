@@ -1,10 +1,9 @@
 package io.goldstone.blockchain.module.home.profile.chainselection.presenter
 
 import com.blinnnk.extension.jump
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ChainText
-import io.goldstone.blockchain.common.value.EthereumNetColor
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chainselection.model.ChainSelectionModel
@@ -23,28 +22,16 @@ class ChainSelectionPresenter(
 			it?.apply {
 				fragment.asyncData = arrayListOf(
 					ChainSelectionModel(
-						ChainText.goldStoneMain,
-						chainID == ChainID.Main.id,
-						EthereumNetColor.main,
-						ChainID.Main.id
+						ChainText.mainnet,
+						ChainText.mainnetDescription,
+						R.drawable.mainnet_icon,
+						true
 					),
 					ChainSelectionModel(
-						ChainText.rinkeby,
-						chainID == ChainID.Rinkeby.id,
-						EthereumNetColor.rinkeby,
-						ChainID.Rinkeby.id
-					),
-					ChainSelectionModel(
-						ChainText.ropsten,
-						chainID == ChainID.Ropstan.id,
-						EthereumNetColor.ropstan,
-						ChainID.Ropstan.id
-					),
-					ChainSelectionModel(
-						ChainText.kovan,
-						chainID == ChainID.Kovan.id,
-						EthereumNetColor.kovan,
-						ChainID.Kovan.id
+						ChainText.testnet,
+						ChainText.testnetDescription,
+						R.drawable.testnet_icon,
+						false
 					)
 				)
 			}

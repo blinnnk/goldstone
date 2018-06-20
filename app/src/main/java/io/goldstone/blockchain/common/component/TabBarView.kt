@@ -27,7 +27,7 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 
 	val walletButton by lazy { TabItem(context) }
 	val marketButton by lazy { TabItem(context) }
-	val profileButton by lazy { TabItem(context) }
+	val settingsButton by lazy { TabItem(context) }
 
 	init {
 
@@ -43,15 +43,15 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 		marketButton.apply {
 			type = TabItemType.Market
 		}.into(this)
-
-		profileButton.apply {
-			type = TabItemType.Profile
+		
+		settingsButton.apply {
+			type = TabItemType.Setting
 			x -= PaddingSize.device
 		}.into(this)
 
 		// 修改位置
 		marketButton.setCenterInHorizontal()
-		profileButton.setAlignParentRight()
+		settingsButton.setAlignParentRight()
 
 		// 默认选中
 		walletButton.setSelectedStyle()
@@ -71,7 +71,7 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 
 }
 
-enum class TabItemType { Market, Wallet, Profile }
+enum class TabItemType { Market, Wallet, Profile, Setting }
 
 class TabItem(context: Context) : LinearLayout(context) {
 
@@ -80,11 +80,13 @@ class TabItem(context: Context) : LinearLayout(context) {
 			TabItemType.Market -> R.drawable.market_icon
 			TabItemType.Wallet -> R.drawable.wallet_detail_icon
 			TabItemType.Profile -> R.drawable.profile_icon
+			TabItemType.Setting -> R.drawable.setting_icon
 		}
 		titleView.text = when (type) {
 			TabItemType.Market -> QuotationText.market.toLowerCase()
 			TabItemType.Wallet -> WalletText.wallet.toLowerCase()
 			TabItemType.Profile -> ProfileText.profile.toLowerCase()
+			TabItemType.Setting -> ProfileText.settings.toLowerCase()
 		}
 	}
 

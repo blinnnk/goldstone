@@ -9,7 +9,9 @@ enum class ChainID(val id: String) {
 	Main("1"),
 	Ropstan("3"),
 	Rinkeby("4"),
-	Kovan("42");
+	Kovan("42"),
+	ETCMain("61"),
+	ETCTest("62");
 	
 	companion object {
 		fun getAllChainID(): ArrayList<String> {

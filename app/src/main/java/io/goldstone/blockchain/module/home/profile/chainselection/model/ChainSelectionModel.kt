@@ -6,8 +6,8 @@ package io.goldstone.blockchain.module.home.profile.chainselection.model
  */
 
 data class ChainSelectionModel(
-	val chainName: String = "",
-	val isUsed: Boolean = false,
-	val color: Int = 0,
-	val chainID: String = ""
+	val title: String = "",
+	val description: String = "",
+	val icon: Int = 0,
+	val isUsed: Boolean = false
 )
