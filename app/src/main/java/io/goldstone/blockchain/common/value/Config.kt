@@ -64,10 +64,30 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLanguage, languageCode)
 	
 	fun getCurrentChain(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.currentChain)
+				.equals("Default", true)
+		) {
+			ChainID.Main.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
+		}
 	
 	fun updateCurrentChain(chainID: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain, chainID)
+	
+	fun getETCCurrentChain(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
+				.equals("Default", true)
+		) {
+			ChainID.ETCMain.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
+		}
+	
+	fun updateETCCurrentChain(chainID: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainID)
 	
 	fun getCurrencyCode(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)

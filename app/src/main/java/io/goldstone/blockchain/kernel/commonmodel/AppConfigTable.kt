@@ -10,7 +10,6 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R.raw.terms
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.ProfileText
@@ -39,7 +38,7 @@ data class AppConfigTable(
 	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
-	var chainID: String = ChainID.Main.id,
+	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
 	var terms: String = ""
 ) {
@@ -173,14 +172,14 @@ data class AppConfigTable(
 			}
 		}
 		
-		fun updateChainID(
-			chainID: String,
+		fun updateChainStatus(
+			isMainnet: Boolean,
 			callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						update(it[0].apply { this.chainID = chainID })
+						update(it[0].apply { this.isMainnet = isMainnet })
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -239,7 +238,8 @@ data class AppConfigTable(
 							0,
 							goldStoneID = goldStoneID,
 							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
-							terms = getLocalTerms()
+							terms = getLocalTerms(),
+							isMainnet = true
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }

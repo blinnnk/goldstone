@@ -456,7 +456,7 @@ object GoldStoneEthCall {
 	private val currentChain: (currentChainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> APIPath.main
-			ChainID.Ropstan.id -> APIPath.ropstan
+			ChainID.Ropsten.id -> APIPath.ropstan
 			ChainID.Rinkeby.id -> APIPath.rinkeyb
 			ChainID.Kovan.id -> APIPath.kovan
 			else -> APIPath.main

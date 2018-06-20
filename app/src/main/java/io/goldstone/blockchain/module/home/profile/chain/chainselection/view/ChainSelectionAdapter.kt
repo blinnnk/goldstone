@@ -1,8 +1,8 @@
-package io.goldstone.blockchain.module.home.profile.chainselection.view
+package io.goldstone.blockchain.module.home.profile.chain.chainselection.view
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.module.home.profile.chainselection.model.ChainSelectionModel
+import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 
 /**
  * @date 2018/5/11 4:27 PM

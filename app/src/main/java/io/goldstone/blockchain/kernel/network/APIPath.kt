@@ -69,7 +69,7 @@ object EtherScanApi {
 	private val etherScanHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainHeader
-			ChainID.Ropstan.id -> ropstanHeader
+			ChainID.Ropsten.id -> ropstanHeader
 			ChainID.Kovan.id -> kovanHeader
 			ChainID.Rinkeby.id -> rinkebyHeader
 			else -> ropstanHeader
@@ -78,7 +78,7 @@ object EtherScanApi {
 	private val etherScanLogHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropstan.id -> ropstanLogHeader
+			ChainID.Ropsten.id -> ropstanLogHeader
 			ChainID.Kovan.id -> kovanLogHeader
 			ChainID.Rinkeby.id -> rinkebyLogHeader
 			else -> ropstanLogHeader
@@ -87,7 +87,7 @@ object EtherScanApi {
 	private val transactionDetailHeader: (currentChain: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> "https://etherscan.io/tx/"
-			ChainID.Ropstan.id -> "https://ropsten.etherscan.io/tx/"
+			ChainID.Ropsten.id -> "https://ropsten.etherscan.io/tx/"
 			ChainID.Kovan.id -> "https://kovan.etherscan.io/tx/"
 			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
 			else -> "https://etherscan.io/tx/"

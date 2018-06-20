@@ -26,6 +26,7 @@ object ArgumentKey {
 	const val gasPrepareModel = "gasPrepareModel"
 	const val fromQuickTransfer = "fromQuickTransfer"
 	const val fromQuickDeposit = "fromQuickDeposit"
+	const val isMainnet = "isMainnet"
 }
 
 object IntentKey {
@@ -37,6 +38,7 @@ object SharesPreference {
 	const val rate = "rate"
 	const val currencyCode = "currencyCode"
 	const val currentChain = "currentChain"
+	const val etcCurrentChain = "etcCurrentChain"
 	const val currentLanguage = "currentLanguage"
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"

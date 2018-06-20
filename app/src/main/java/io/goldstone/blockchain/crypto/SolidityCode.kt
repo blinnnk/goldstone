@@ -32,4 +32,16 @@ object CryptoValue {
 
 object CryptoSymbol {
 	const val eth = "ETH"
+	const val etc = "ETC"
+}
+
+object CryptoName {
+	const val eth = "Ethereum"
+	const val etc = "Ethereum Classic"
+}
+
+object CryptoID {
+	const val btc = 0
+	const val eth = 60
+	const val etc = 61
 }

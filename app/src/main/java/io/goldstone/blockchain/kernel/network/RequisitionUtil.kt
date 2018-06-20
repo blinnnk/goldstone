@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
@@ -230,7 +231,7 @@ object RequisitionUtil {
 						.addHeader("os", "0")
 						.addHeader("version", version)
 						.addHeader("sign", sign)
-						.addHeader("chainid", chainID)
+						.addHeader("chainid", Config.getCurrentChain())
 						.build()
 				callback(request)
 			}
@@ -258,7 +259,7 @@ object RequisitionUtil {
 						.addHeader("os", "0")
 						.addHeader("version", version)
 						.addHeader("sign", sign)
-						.addHeader("chainid", chainID)
+						.addHeader("chainid", Config.getCurrentChain())
 						.build()
 				callback(request)
 			}

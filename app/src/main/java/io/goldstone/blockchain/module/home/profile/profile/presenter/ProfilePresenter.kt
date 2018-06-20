@@ -58,7 +58,7 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.chain_icon,
 					ProfileText.chain,
-					ChainID.getChainNameByID(Config.getCurrentChain())
+					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.mainnet else ChainText.testnet
 				),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),

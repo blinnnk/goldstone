@@ -2241,6 +2241,28 @@ object ContactText {
 object ChainText {
 	
 	@JvmField
+	val nodeSelection = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Node Selection"
+		HoneyLanguage.Chinese.code -> "Node Selection"
+		HoneyLanguage.Japanese.code -> "Node Selection"
+		HoneyLanguage.Korean.code -> "Node Selection"
+		HoneyLanguage.Russian.code -> "Node Selection"
+		HoneyLanguage.TraditionalChinese.code -> "Node Selection"
+		else -> ""
+	}
+	
+	@JvmField
+	val isUsing = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Using Now"
+		HoneyLanguage.Chinese.code -> "Using Now"
+		HoneyLanguage.Japanese.code -> "Using Now"
+		HoneyLanguage.Korean.code -> "Using Now"
+		HoneyLanguage.Russian.code -> "Using Now"
+		HoneyLanguage.TraditionalChinese.code -> "Using Now"
+		else -> ""
+	}
+	
+	@JvmField
 	val mainnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mainnet"
 		HoneyLanguage.Chinese.code -> "Mainnet"
@@ -2332,6 +2354,27 @@ object ChainText {
 		HoneyLanguage.Korean.code -> "Rinkeby 테스트 넷"
 		HoneyLanguage.Russian.code -> "Rinkeby Testnet"
 		HoneyLanguage.TraditionalChinese.code -> "Rinkeby 測試網絡"
+		else -> ""
+	}
+	
+	@JvmField
+	val morden = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Morden Testnet"
+		HoneyLanguage.Chinese.code -> "Morden 测试网络"
+		HoneyLanguage.Japanese.code -> "Morden テストネット"
+		HoneyLanguage.Korean.code -> "Morden 테스트 넷"
+		HoneyLanguage.Russian.code -> "Morden Testnet"
+		HoneyLanguage.TraditionalChinese.code -> "Morden 測試網絡"
+		else -> ""
+	}
+	@JvmField
+	val etcMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETC Mainnet"
+		HoneyLanguage.Chinese.code -> "ETC Mainnet"
+		HoneyLanguage.Japanese.code -> "ETC Mainnet"
+		HoneyLanguage.Korean.code -> "ETC Mainnet"
+		HoneyLanguage.Russian.code -> "ETC Mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet"
 		else -> ""
 	}
 }

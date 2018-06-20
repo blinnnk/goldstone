@@ -17,39 +17,36 @@ import org.jetbrains.anko.textView
  * @date 23/03/2018 11:32 PM
  * @author KaySaith
  */
-
 class TwoLineTitles(context: Context) : LinearLayout(context) {
-
+	
 	val title = textView {
 		textSize = fontSize(14)
 		textColor = Spectrum.white
 	}
-
 	val subtitle = textView {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
 		y -= 3.uiPX()
 	}
-
 	var isFloatRight by observing(false) {
 		gravity = Gravity.END
 	}
-
 	var isCenter by observing(false) {
 		gravity = Gravity.CENTER_HORIZONTAL
 		subtitle.gravity = Gravity.CENTER_HORIZONTAL
 		title.gravity = Gravity.CENTER_HORIZONTAL
 	}
-
+	
 	init {
 		orientation = VERTICAL
 	}
-
-	fun setBlackTitles() {
+	
+	fun setBlackTitles(titleSize: Float = fontSize(14)) {
 		title.apply {
 			typeface = GoldStoneFont.heavy(context)
 			textColor = GrayScale.black
+			textSize = titleSize
 		}
 		subtitle.textColor = GrayScale.gray
 	}
@@ -65,18 +62,18 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		}
 		subtitle.textColor = subtitleColor
 	}
-
+	
 	fun setDialogStyle() {
 		setBlackTitles()
 		title.textSize = fontSize(16)
 		subtitle.y += 5.uiPX()
 	}
-
+	
 	fun setColorStyle(color: Int) {
 		title.textColor = color
 		subtitle.textColor = color
 	}
-
+	
 	fun setGrayTitles() {
 		title.apply {
 			typeface = GoldStoneFont.book(context)
@@ -86,17 +83,17 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.y += 3.uiPX()
 		subtitle.textColor = GrayScale.midGray
 	}
-
+	
 	fun setSmallStyle() {
 		title.textSize = fontSize(12)
 		subtitle.textSize = fontSize(10)
 	}
-
+	
 	fun setWildStyle() {
 		title.typeface = GoldStoneFont.heavy(context)
 		subtitle.y += 5.uiPX()
 	}
-
+	
 	fun setBigWhiteStyle(titleSize: Int = 24, subtitleSize: Int = 12, lineSpace: Int = 0) {
 		title.apply {
 			textSize = fontSize(titleSize)
@@ -110,7 +107,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			typeface = GoldStoneFont.medium(context)
 		}
 	}
-
+	
 	fun setQuotationStyle() {
 		y += 10.uiPX()
 		title.apply {
@@ -125,14 +122,13 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			y -= 5.uiPX()
 		}
 	}
-
+	
 	fun setOpacityWhiteStyle() {
 		title.typeface = GoldStoneFont.heavy(context)
 		title.textColor = Spectrum.opacity3White
 		title.textSize = fontSize(18)
 		subtitle.textColor = Spectrum.opacity3White
 	}
-
+	
 	fun getSubtitleValue() = subtitle.text.toString()
-
 }

@@ -84,7 +84,7 @@ class SplashActivity : AppCompatActivity() {
 		prepareAppConfig config@{
 			application.registerDeviceForPush()
 			initLaunchLanguage(language)
-			setCurrentChainID(chainID)
+			setCurrentChainID(Config.getCurrentChain())
 			findViewById<RelativeLayout>(ContainerID.splash)?.let {
 				supportFragmentManager.fragments.find {
 					it is StartingFragment

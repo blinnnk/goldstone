@@ -1,13 +1,13 @@
-package io.goldstone.blockchain.module.home.profile.chainselection.view
+package io.goldstone.blockchain.module.home.profile.chain.chainselection.view
 
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.module.home.profile.chainselection.model.ChainSelectionModel
-import io.goldstone.blockchain.module.home.profile.chainselection.presenter.ChainSelectionPresenter
+import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
+import io.goldstone.blockchain.module.home.profile.chain.chainselection.presenter.ChainSelectionPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -26,8 +26,7 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 	) {
 		recyclerView.adapter = ChainSelectionAdapter(asyncData.orEmptyArray()) {
 			onClick {
-				// TODO 这里的是错误的，等新的切换做好替换掉
-				presenter.updateCurrentChainID(ChainID.Ropstan.id)
+				presenter.showNodeSelectionFragment(model.title == ChainText.mainnet)
 				preventDuplicateClicks()
 			}
 		}
