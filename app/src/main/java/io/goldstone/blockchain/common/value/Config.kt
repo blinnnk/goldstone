@@ -73,8 +73,21 @@ object Config {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
 		}
 	
+	fun getCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.currentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.goldStoneMain
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName)
+		}
+	
 	fun updateCurrentChain(chainID: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain, chainID)
+	
+	fun updateCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChainName, chainName)
 	
 	fun getETCCurrentChain(): String =
 		if (GoldStoneAPI.context
@@ -86,8 +99,21 @@ object Config {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 		}
 	
+	fun getETCCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.goldStoneEtcMain
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
+		}
+	
 	fun updateETCCurrentChain(chainID: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainID)
+	
+	fun updateETCCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChainName, chainName)
 	
 	fun getCurrencyCode(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)

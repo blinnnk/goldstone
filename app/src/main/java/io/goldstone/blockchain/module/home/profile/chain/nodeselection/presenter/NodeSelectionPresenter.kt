@@ -18,11 +18,17 @@ class NodeSelectionPresenter(
 	override val fragment: NodeSelectionFragment
 ) : BasePresenter<NodeSelectionFragment>() {
 	
+	
+	/**
+	 * `ChainID` 会重复使用导致获取 `ChainName` 并不能准确, 所以切换 `Chain` 的时候存储 `NodeName`
+	 */
 	fun updateERC20TestChainID(nodeName: String) {
+		Config.updateCurrentChainName(nodeName)
 		Config.updateCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 	
 	fun updateETCTestChainID(nodeName: String) {
+		Config.updateETCCurrentChainName(nodeName)
 		Config.updateETCCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 	
@@ -39,15 +45,15 @@ class NodeSelectionPresenter(
 					if (Config.getCurrentChain() != ChainID.Main.id) {
 						ChainText.goldStoneMain
 					} else {
-						ChainID.getChainNameByID(Config.getCurrentChain())
+						Config.getCurrentChainName()
 					}
 				}
 				
 				else -> {
 					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) {
-						ChainText.etcMain
+						ChainText.goldStoneEtcMain
 					} else {
-						ChainID.getChainNameByID(Config.getETCCurrentChain())
+						Config.getETCCurrentChainName()
 					}
 				}
 			}
@@ -57,7 +63,7 @@ class NodeSelectionPresenter(
 					if (Config.getCurrentChain() == ChainID.Main.id) {
 						ChainText.ropsten
 					} else {
-						ChainID.getChainNameByID(Config.getCurrentChain())
+						Config.getCurrentChainName()
 					}
 				}
 				
@@ -65,7 +71,7 @@ class NodeSelectionPresenter(
 					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) {
 						ChainText.morden
 					} else {
-						ChainID.getChainNameByID(Config.getETCCurrentChain())
+						Config.getETCCurrentChainName()
 					}
 				}
 			}

@@ -2368,13 +2368,23 @@ object ChainText {
 		else -> ""
 	}
 	@JvmField
-	val etcMain = when (currentLanguage) {
-		HoneyLanguage.English.code -> "ETC Mainnet"
-		HoneyLanguage.Chinese.code -> "ETC Mainnet"
-		HoneyLanguage.Japanese.code -> "ETC Mainnet"
-		HoneyLanguage.Korean.code -> "ETC Mainnet"
-		HoneyLanguage.Russian.code -> "ETC Mainnet"
-		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet"
+	val goldStoneEtcMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETC Mainnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "ETC Mainnet (GoldStone)"
+		HoneyLanguage.Japanese.code -> "ETC Mainnet (GoldStone)"
+		HoneyLanguage.Korean.code -> "ETC Mainnet (GoldStone)"
+		HoneyLanguage.Russian.code -> "ETC Mainnet (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet (GoldStone)"
+		else -> ""
+	}
+	@JvmField
+	val etcMainGasTracker = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETC Mainnet (GasTracker)"
+		HoneyLanguage.Chinese.code -> "ETC Mainnet (GasTracker)"
+		HoneyLanguage.Japanese.code -> "ETC Mainnet (GasTracker)"
+		HoneyLanguage.Korean.code -> "ETC Mainnet (GasTracker)"
+		HoneyLanguage.Russian.code -> "ETC Mainnet (GasTracker)"
+		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet (GasTracker)"
 		else -> ""
 	}
 }
