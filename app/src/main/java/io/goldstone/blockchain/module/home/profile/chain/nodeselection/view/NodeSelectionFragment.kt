@@ -39,7 +39,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private val mainnetNodeList = arrayListOf(
 		Pair(CryptoName.eth, ChainText.goldStoneMain),
 		Pair(CryptoName.eth, ChainText.infuraMain),
-		Pair(CryptoName.etc, ChainText.etcMain)
+		Pair(CryptoName.etc, ChainText.goldStoneEtcMain),
+		Pair(CryptoName.etc, ChainText.etcMainGasTracker)
 	)
 	private val confirmButton by lazy {
 		RoundButton(context!!)
