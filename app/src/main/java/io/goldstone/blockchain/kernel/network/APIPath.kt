@@ -15,6 +15,7 @@ object APIPath {
 	
 	/** GoldStone Basic Api Address */
 	var currentUrl = WebUrl.normalServer
+	
 	fun updateServerUrl(newUrl: String) {
 		currentUrl = newUrl
 	}
@@ -36,10 +37,12 @@ object APIPath {
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	/** Chain Address */
-	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
 	const val main = "https://eth-node-mainnet.goldstone.io/eth"
+	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
 	const val kovan = "https://eth-node-kovan.goldstone.io/eth"
 	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
+	const val etcMain = "https://web3.gastracker.io"
+	const val etcTest = "https://web3.gastracker.io/morden"
 	val getQuotationCurrencyChart: (
 		pair: String,
 		period: String,
@@ -66,7 +69,7 @@ object EtherScanApi {
 	private val etherScanHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainHeader
-			ChainID.Ropstan.id -> ropstanHeader
+			ChainID.Ropsten.id -> ropstanHeader
 			ChainID.Kovan.id -> kovanHeader
 			ChainID.Rinkeby.id -> rinkebyHeader
 			else -> ropstanHeader
@@ -75,7 +78,7 @@ object EtherScanApi {
 	private val etherScanLogHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropstan.id -> ropstanLogHeader
+			ChainID.Ropsten.id -> ropstanLogHeader
 			ChainID.Kovan.id -> kovanLogHeader
 			ChainID.Rinkeby.id -> rinkebyLogHeader
 			else -> ropstanLogHeader
@@ -84,7 +87,7 @@ object EtherScanApi {
 	private val transactionDetailHeader: (currentChain: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> "https://etherscan.io/tx/"
-			ChainID.Ropstan.id -> "https://ropsten.etherscan.io/tx/"
+			ChainID.Ropsten.id -> "https://ropsten.etherscan.io/tx/"
 			ChainID.Kovan.id -> "https://kovan.etherscan.io/tx/"
 			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
 			else -> "https://etherscan.io/tx/"
@@ -96,13 +99,12 @@ object EtherScanApi {
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
 		"${etherScanHeader(Config.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
-
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
 			"${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
 		}
 	@JvmStatic
-	val getTokenDefrayTransactiosingleTransactionHasn: (address: String, startBlock: String) -> String =
+	val getTokenDefrayTransactiosingleTransactionHash: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
 			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}"
 		}

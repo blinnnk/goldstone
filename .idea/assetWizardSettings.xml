@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_email_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_bug_report_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,9 +28,12 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="contact_us_icon" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="height" value="54" />
+                            <entry key="outputName" value="etc_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/frog(2).svg" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/etc.svg" />
+                            <entry key="width" value="54" />
                           </map>
                         </option>
                       </PersistentState>

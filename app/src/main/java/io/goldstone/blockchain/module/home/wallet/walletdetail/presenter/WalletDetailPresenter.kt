@@ -291,8 +291,7 @@ class WalletDetailPresenter(
 					null,
 					Config.getCurrentName(),
 					CryptoUtils.scaleAddress(Config.getCurrentAddress()),
-					totalBalance.toString(),
-					Config.getWalletCount()
+					totalBalance.toString()
 				)
 			}
 		} catch (error: Exception) {

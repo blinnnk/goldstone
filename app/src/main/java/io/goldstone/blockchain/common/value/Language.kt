@@ -1457,6 +1457,17 @@ object WalletSettingsText {
 object ProfileText {
 	
 	@JvmField
+	val settings = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Settings"
+		HoneyLanguage.Chinese.code -> "设置"
+		HoneyLanguage.Japanese.code -> "設定"
+		HoneyLanguage.Korean.code -> "설정"
+		HoneyLanguage.Russian.code -> "устанавливать"
+		HoneyLanguage.TraditionalChinese.code -> "設置"
+		else -> ""
+	}
+	
+	@JvmField
 	val profile = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Profile"
 		HoneyLanguage.Chinese.code -> "个人主页"
@@ -2230,6 +2241,72 @@ object ContactText {
 object ChainText {
 	
 	@JvmField
+	val nodeSelection = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Node Selection"
+		HoneyLanguage.Chinese.code -> "Node Selection"
+		HoneyLanguage.Japanese.code -> "Node Selection"
+		HoneyLanguage.Korean.code -> "Node Selection"
+		HoneyLanguage.Russian.code -> "Node Selection"
+		HoneyLanguage.TraditionalChinese.code -> "Node Selection"
+		else -> ""
+	}
+	
+	@JvmField
+	val isUsing = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Using Now"
+		HoneyLanguage.Chinese.code -> "Using Now"
+		HoneyLanguage.Japanese.code -> "Using Now"
+		HoneyLanguage.Korean.code -> "Using Now"
+		HoneyLanguage.Russian.code -> "Using Now"
+		HoneyLanguage.TraditionalChinese.code -> "Using Now"
+		else -> ""
+	}
+	
+	@JvmField
+	val mainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Mainnet"
+		HoneyLanguage.Chinese.code -> "Mainnet"
+		HoneyLanguage.Japanese.code -> "Mainnet"
+		HoneyLanguage.Korean.code -> "Mainnet"
+		HoneyLanguage.Russian.code -> "Mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "Mainnet"
+		else -> ""
+	}
+	
+	@JvmField
+	val mainnetDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The formal production environment \nwhere the assets are of real value"
+		HoneyLanguage.Chinese.code -> "The formal production environment \nwhere the assets are of real value"
+		HoneyLanguage.Japanese.code -> "The formal production environment \nwhere the assets are of real value"
+		HoneyLanguage.Korean.code -> "The formal production environment where the assets are of real value"
+		HoneyLanguage.Russian.code -> "The formal production environment where the assets are of real value"
+		HoneyLanguage.TraditionalChinese.code -> "The formal production environment \nwhere the assets are of real value"
+		else -> ""
+	}
+	
+	@JvmField
+	val testnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Testnet"
+		HoneyLanguage.Chinese.code -> "Testnet"
+		HoneyLanguage.Japanese.code -> "Testnet"
+		HoneyLanguage.Korean.code -> "Testnet"
+		HoneyLanguage.Russian.code -> "Testnet"
+		HoneyLanguage.TraditionalChinese.code -> "Testnet"
+		else -> ""
+	}
+	
+	@JvmField
+	val testnetDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		HoneyLanguage.Chinese.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		HoneyLanguage.Japanese.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		HoneyLanguage.Korean.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		HoneyLanguage.Russian.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		HoneyLanguage.TraditionalChinese.code -> "The chain used for testing, the assets \nhere are usually worthless."
+		else -> ""
+	}
+	
+	@JvmField
 	val goldStoneMain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Main (Gold Stone)"
 		HoneyLanguage.Chinese.code -> "Main (Gold Stone)"
@@ -2277,6 +2354,27 @@ object ChainText {
 		HoneyLanguage.Korean.code -> "Rinkeby 테스트 넷"
 		HoneyLanguage.Russian.code -> "Rinkeby Testnet"
 		HoneyLanguage.TraditionalChinese.code -> "Rinkeby 測試網絡"
+		else -> ""
+	}
+	
+	@JvmField
+	val morden = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Morden Testnet"
+		HoneyLanguage.Chinese.code -> "Morden 测试网络"
+		HoneyLanguage.Japanese.code -> "Morden テストネット"
+		HoneyLanguage.Korean.code -> "Morden 테스트 넷"
+		HoneyLanguage.Russian.code -> "Morden Testnet"
+		HoneyLanguage.TraditionalChinese.code -> "Morden 測試網絡"
+		else -> ""
+	}
+	@JvmField
+	val etcMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETC Mainnet"
+		HoneyLanguage.Chinese.code -> "ETC Mainnet"
+		HoneyLanguage.Japanese.code -> "ETC Mainnet"
+		HoneyLanguage.Korean.code -> "ETC Mainnet"
+		HoneyLanguage.Russian.code -> "ETC Mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet"
 		else -> ""
 	}
 }

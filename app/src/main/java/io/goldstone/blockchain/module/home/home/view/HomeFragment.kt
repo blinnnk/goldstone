@@ -24,13 +24,11 @@ import org.jetbrains.anko.verticalLayout
  * @date 23/03/2018 12:59 PM
  * @author KaySaith
  */
-
 class HomeFragment : BaseFragment<HomePresenter>() {
-
+	
 	private val tabBar by lazy { TabBarView(context!!) }
-
 	override val presenter = HomePresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
@@ -39,7 +37,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 				id = ContainerID.home
 				addFragmentAndSetArgument<WalletDetailFragment>(this.id, FragmentTag.walletDetail)
 			}
-
+			
 			tabBar.apply {
 				walletButton.onClick {
 					presenter.showWalletDetailFragment()
@@ -49,36 +47,36 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 					presenter.showQuotationFragment()
 					preventDuplicateClicks()
 				}
-				profileButton.onClick {
+				settingsButton.onClick {
 					presenter.showProfileFragment()
 					preventDuplicateClicks()
 				}
 			}.into(this)
-
+			
 			tabBar.setAlignParentBottom()
 		}
 	}
-
+	
 	private fun TabItem.setStyleAndClick(callback: () -> Unit) {
 		tabBar.apply {
 			walletButton.resetStyle()
 			marketButton.resetStyle()
-			profileButton.resetStyle()
+			settingsButton.resetStyle()
 		}
 		callback()
 		setSelectedStyle()
 	}
-
+	
 	fun selectWalletDetail(callback: () -> Unit) {
 		tabBar.walletButton.setStyleAndClick(callback)
 	}
-
+	
 	fun selectQuotation(callback: () -> Unit) {
 		tabBar.marketButton.setStyleAndClick(callback)
 	}
-
+	
 	fun setProfile(callback: () -> Unit) {
-		tabBar.profileButton.setStyleAndClick(callback)
+		tabBar.settingsButton.setStyleAndClick(callback)
 	}
 	
 	fun hideTabbarView() {
@@ -88,5 +86,4 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	fun showTabbarView() {
 		tabBar.alpha = 1f
 	}
-
 }

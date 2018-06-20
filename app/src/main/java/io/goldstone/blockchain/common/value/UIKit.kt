@@ -83,25 +83,6 @@ object Spectrum {
 	val opacity5White = Color.parseColor("#80FFFFFF")
 }
 
-object EthereumNetColor {
-	@JvmField
-	val main = Color.parseColor("#FF378588")
-	val ropstan = Color.parseColor("#FFD83553")
-	val kovan = Color.parseColor("#FF5F1C90")
-	val rinkeby = Color.parseColor("#FFE4B455")
-	
-	@JvmStatic
-	fun getCurrentChainColor(): Int {
-		return when (Config.getCurrentChain()) {
-			ChainID.Main.id -> main
-			ChainID.Ropstan.id -> ropstan
-			ChainID.Rinkeby.id -> rinkeby
-			ChainID.Kovan.id -> kovan
-			else -> main
-		}
-	}
-}
-
 object ShadowSize {
 	@JvmField
 	val Button = 10.uiPX().toFloat()

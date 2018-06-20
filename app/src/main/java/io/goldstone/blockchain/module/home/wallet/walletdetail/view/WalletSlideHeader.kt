@@ -93,8 +93,8 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			return if (Config.getCurrentChain() == ChainID.Main.id) {
 				WalletText.totalAssets + " " + Config.getCurrencyCode()
 			} else {
-				ChainID.getChainNameByID(Config.getCurrentChain()) +
-				" · " + WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
+				(if (Config.getCurrentChain() != ChainID.Main.id) ChainText.testnet else "") + " · " +
+				WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
 			}
 		}
 	}
