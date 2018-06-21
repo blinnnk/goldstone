@@ -2388,7 +2388,7 @@ object ChainText {
 	}
 	
 	@JvmField
-	val morden = when (currentLanguage) {
+	val etcMorden = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Morden Testnet"
 		HoneyLanguage.Chinese.code -> "Morden 测试网络"
 		HoneyLanguage.Japanese.code -> "Morden テストネット"

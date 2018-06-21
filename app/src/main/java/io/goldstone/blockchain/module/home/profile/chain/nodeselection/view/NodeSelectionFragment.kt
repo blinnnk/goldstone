@@ -37,7 +37,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.eth, ChainText.infuraKovan),
 		Pair(CryptoName.eth, ChainText.rinkeby),
 		Pair(CryptoName.eth, ChainText.infuraRinkeby),
-		Pair(CryptoName.etc, ChainText.morden)
+		Pair(CryptoName.etc, ChainText.etcMorden)
 	)
 	private val mainnetNodeList = arrayListOf(
 		Pair(CryptoName.eth, ChainText.goldStoneMain),

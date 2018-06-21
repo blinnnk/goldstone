@@ -6,23 +6,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
-import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptoRequest
-import okhttp3.*
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.callEthBy
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
-import java.io.IOException
 import java.math.BigInteger
-import java.util.concurrent.TimeUnit
 
 @SuppressLint("StaticFieldLeak")
 /**
@@ -485,90 +481,6 @@ object GoldStoneEthCall {
 			) {
 				holdValue(it.hexToDecimal())
 			}
-		}
-	}
-	
-	private val currentChain: (currentChainName: String) -> String = {
-		when (it) {
-			ChainText.goldStoneMain -> ChainURL.main
-			ChainText.ropsten -> ChainURL.ropsten
-			ChainText.rinkeby -> ChainURL.rinkeyb
-			ChainText.kovan -> ChainURL.kovan
-			ChainText.infuraRopsten -> ChainURL.infuraRopsten
-			ChainText.infuraKovan -> ChainURL.infuraKovan
-			ChainText.infuraRinkeby -> ChainURL.infuraRinkeby
-			ChainText.infuraMain -> ChainURL.infuraMain
-			else -> ChainURL.main
-		}
-	}
-	
-	private fun callEthBy(
-		body: RequestBody,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
-		hold: (String) -> Unit
-	) {
-		val client = OkHttpClient
-			.Builder()
-			.connectTimeout(40, TimeUnit.SECONDS)
-			.readTimeout(60, TimeUnit.SECONDS)
-			.build()
-		getcryptoRequest(body, currentChain(chainName), isEncrypt) {
-			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
-					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(error, "Call Ethereum Failured")
-					}
-				}
-				
-				@SuppressLint("SetTextI18n")
-				override fun onResponse(
-					call: Call,
-					response: Response
-				) {
-					val data =
-						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
-						else response.body()?.string().orEmpty()
-					checkChainErrorCode(data).let {
-						if (it.isNotEmpty()) {
-							GoldStoneAPI.context.runOnUiThread {
-								errorCallback(null, it)
-							}
-							return
-						}
-					}
-					try {
-						val dataObject =
-							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
-						hold(dataObject["result"].toString())
-					} catch (error: Exception) {
-						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(error, "onResponse Error")
-						}
-					}
-				}
-			})
-		}
-	}
-	
-	private fun checkChainErrorCode(data: String?): String {
-		val hasError = data?.contains("error")
-		val errorData: String
-		if (hasError == true) {
-			errorData = JSONObject(data).safeGet("error")
-		} else {
-			val code =
-				if (data?.contains("code") == true)
-					JSONObject(data).get("code")?.toString()?.toIntOrNull()
-				else null
-			return if (code == -10) ErrorTag.chain
-			else ""
-		}
-		return when {
-			data.isNullOrBlank() -> return ""
-			errorData.isNotEmpty() -> JSONObject(errorData).safeGet("message")
-			else -> ""
 		}
 	}
 	

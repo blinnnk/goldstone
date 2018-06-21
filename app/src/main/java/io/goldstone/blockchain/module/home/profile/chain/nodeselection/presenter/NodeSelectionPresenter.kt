@@ -74,7 +74,7 @@ class NodeSelectionPresenter(
 				
 				else -> {
 					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) {
-						ChainText.morden
+						ChainText.etcMorden
 					} else {
 						Config.getETCCurrentChainName()
 					}
