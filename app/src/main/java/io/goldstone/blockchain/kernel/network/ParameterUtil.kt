@@ -31,7 +31,7 @@ object ParameterUtil {
 	}
 	
 	fun <T> prepareJsonRPC(
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,
 		id: Int,
 		hasLatest: Boolean,
@@ -53,7 +53,7 @@ object ParameterUtil {
 	}
 	
 	fun <T> preparePairJsonRPC(
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,
 		hasLatest: Boolean,
 		vararg parameters: Pair<String, T>

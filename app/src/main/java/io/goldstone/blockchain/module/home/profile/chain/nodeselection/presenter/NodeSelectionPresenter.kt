@@ -27,14 +27,14 @@ class NodeSelectionPresenter(
 		Config.updateCurrentChainName(nodeName)
 		Config.updateCurrentChain(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
-		Config.updateEncryptNodeRequestStatus(checkIsEncryptNodeUrl(nodeName))
+		Config.updateEncryptERCNodeRequest(checkIsEncryptERCNode(nodeName))
 	}
 	
 	fun updateETCTestChainID(nodeName: String) {
 		Config.updateETCCurrentChainName(nodeName)
 		Config.updateETCCurrentChain(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
-		Config.updateEncryptNodeRequestStatus(checkIsEncryptNodeUrl(nodeName))
+		Config.updateEncryptETCNodeRequest(checkIsEncryptETCNode(nodeName))
 	}
 	
 	fun updateDatabaseThenJump(isMainnet: Boolean) {
@@ -83,9 +83,14 @@ class NodeSelectionPresenter(
 		}
 	}
 	
-	private fun checkIsEncryptNodeUrl(nodeName: String): Boolean {
+	private fun checkIsEncryptERCNode(nodeName: String): Boolean {
 		return TinyNumberUtils.allFalse(
-			nodeName.contains("infura", true),
+			nodeName.contains("infura", true)
+		)
+	}
+	
+	private fun checkIsEncryptETCNode(nodeName: String): Boolean {
+		return TinyNumberUtils.allFalse(
 			nodeName.contains("gasTracker", true)
 		)
 	}

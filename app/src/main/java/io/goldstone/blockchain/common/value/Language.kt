@@ -2389,12 +2389,12 @@ object ChainText {
 	
 	@JvmField
 	val etcMorden = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Morden Testnet"
-		HoneyLanguage.Chinese.code -> "Morden 测试网络"
-		HoneyLanguage.Japanese.code -> "Morden テストネット"
-		HoneyLanguage.Korean.code -> "Morden 테스트 넷"
-		HoneyLanguage.Russian.code -> "Morden Testnet"
-		HoneyLanguage.TraditionalChinese.code -> "Morden 測試網絡"
+		HoneyLanguage.English.code -> "Morden (GasTracker)"
+		HoneyLanguage.Chinese.code -> "Morden (GasTracker)"
+		HoneyLanguage.Japanese.code -> "Morden (GasTracker)"
+		HoneyLanguage.Korean.code -> "Morden (GasTracker)"
+		HoneyLanguage.Russian.code -> "Morden (GasTracker)"
+		HoneyLanguage.TraditionalChinese.code -> "Morden (GasTracker)"
 		else -> ""
 	}
 	@JvmField

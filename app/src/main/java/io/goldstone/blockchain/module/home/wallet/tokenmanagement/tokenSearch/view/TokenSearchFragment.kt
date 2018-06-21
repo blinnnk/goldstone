@@ -1,16 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view
 
-import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.TokenManagementText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -25,39 +23,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?
 	) {
 		recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.switch.onClick { cell.setMyTokenStatus() }
-		}
-	}
-	
-	private fun TokenSearchCell.setMyTokenStatus() {
-		model?.let { searchToken ->
-			DefaultTokenTable.getCurrentChainTokenByContract(searchToken.contract) { localToken ->
-				localToken.isNotNull {
-					// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
-					DefaultTokenTable.updateTokenDefaultStatus(
-						localToken!!.contract,
-						switch.isChecked,
-						searchToken.name
-					) {
-						insertToMyToken(switch, localToken)
-					}
-				} otherwise {
-					DefaultTokenTable.insertToken(searchToken.apply {
-						isDefault = switch.isChecked
-					}) {
-						insertToMyToken(switch, searchToken)
-					}
-				}
-			}
-		}
-		switch.preventDuplicateClicks()
-	}
-	
-	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
-		getMainActivity()?.apply {
-			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it, this)
-			}
+			cell.switch.onClick { presenter.setMyTokenStatus(cell) }
 		}
 	}
 	

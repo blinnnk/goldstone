@@ -95,7 +95,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
@@ -124,7 +124,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetBlockNumber.method,
 				83,
 				false,
@@ -154,7 +154,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetBlockByHash.method,
 				1,
 				false,
@@ -189,7 +189,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
@@ -224,7 +224,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTransactionReceiptByHash.method,
 				1,
 				false,
@@ -258,7 +258,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetEstimateGas.method,
 				false,
 				Pair("to", to),
@@ -318,7 +318,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTokenBalance.method,
 				true,
 				Pair("to", contractAddress),
@@ -346,7 +346,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetSymbol.method,
 				true,
 				Pair("to", contractAddress),
@@ -376,7 +376,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTokenDecimal.method,
 				true,
 				Pair("to", contractAddress),
@@ -406,7 +406,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTokenName.method,
 				true,
 				Pair("to", contractAddress),
@@ -432,10 +432,11 @@ object GoldStoneEthCall {
 		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Double) -> Unit
 	) {
+		val isEncrypt = ChainURL.uncryptChainName.none { it.equals(chainName, true) }
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptNodeRequest(),
+				isEncrypt,
 				EthereumMethod.GetBalance.method,
 				1,
 				true,
@@ -464,7 +465,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptNodeRequest(),
+				Config.isEncryptERCNodeRequest(),
 				EthereumMethod.GetTotalSupply.method,
 				true,
 				Pair("to", contractAddress),

@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.crypto
 
+import io.goldstone.blockchain.common.value.Config
+
 /**
  * @date 08/04/2018 12:23 AM
  * @author KaySaith
@@ -19,15 +21,23 @@ object SolidityCode {
 	const val logTransferFilter = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 }
 
-object CryptoValue {
+object CryptoValue  {
 	const val bip39AddressLength = 42 // 包含 `0x`
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	// GoldStone 业务约定的值
 	const val ethContract = "0x0"
+	const val etcContract = "0x61"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
+	val chainID: (contract: String) -> String = {
+		when {
+			it.equals(CryptoValue.etcContract, true) -> Config.getETCCurrentChain()
+			it.equals(CryptoValue.ethContract, true) -> Config.getCurrentChain()
+			else -> Config.getCurrentChain()
+		}
+	}
 }
 
 object CryptoSymbol {
