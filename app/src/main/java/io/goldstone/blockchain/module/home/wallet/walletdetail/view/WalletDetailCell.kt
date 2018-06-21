@@ -11,7 +11,6 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.BaseCell
 import io.goldstone.blockchain.common.component.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -32,11 +31,10 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			if (iconUrl.isBlank()) {
 				icon.image.imageResource = R.drawable.default_token
 			} else {
-				if (symbol.equals(CryptoSymbol.eth, true)) {
-					icon.image.imageResource = R.drawable.eth_icon
-				} else {
-					// 获取指定尺寸的图片
-					icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
+				when (symbol) {
+					CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
+					CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
+					else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 				}
 			}
 			tokenInfo.title.text = symbol

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presente
 
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
@@ -25,11 +26,15 @@ class NodeSelectionPresenter(
 	fun updateERC20TestChainID(nodeName: String) {
 		Config.updateCurrentChainName(nodeName)
 		Config.updateCurrentChain(ChainID.getChainIDByName(nodeName))
+		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
+		Config.updateEncryptNodeRequestStatus(checkIsEncryptNodeUrl(nodeName))
 	}
 	
 	fun updateETCTestChainID(nodeName: String) {
 		Config.updateETCCurrentChainName(nodeName)
 		Config.updateETCCurrentChain(ChainID.getChainIDByName(nodeName))
+		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
+		Config.updateEncryptNodeRequestStatus(checkIsEncryptNodeUrl(nodeName))
 	}
 	
 	fun updateDatabaseThenJump(isMainnet: Boolean) {
@@ -69,12 +74,19 @@ class NodeSelectionPresenter(
 				
 				else -> {
 					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) {
-						ChainText.morden
+						ChainText.etcMorden
 					} else {
 						Config.getETCCurrentChainName()
 					}
 				}
 			}
 		}
+	}
+	
+	private fun checkIsEncryptNodeUrl(nodeName: String): Boolean {
+		return TinyNumberUtils.allFalse(
+			nodeName.contains("infura", true),
+			nodeName.contains("gasTracker", true)
+		)
 	}
 }

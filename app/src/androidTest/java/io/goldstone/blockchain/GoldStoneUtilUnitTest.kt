@@ -55,6 +55,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun prepareParameter() {
 		ParameterUtil.prepare(
+			true,
 			Pair("device", "123"),
 			Pair("id", 5),
 			Pair("list", arrayListOf(1, 2, 3))

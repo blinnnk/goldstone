@@ -52,4 +52,5 @@ object SharesPreference {
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
 	const val instaBugStatus = "instaBugStatus"
 	const val isNotchScreen = "isNotchScreen"
+	const val isEncryptNodeRequest = "isEncryptNodeRequest"
 }

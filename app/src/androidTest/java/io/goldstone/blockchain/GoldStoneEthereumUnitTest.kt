@@ -263,6 +263,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun prepareJsonRPCParam() {
 		ParameterUtil.prepareJsonRPC(
+			true,
 			EthereumMethod.GetBlockNumber.method,
 			1,
 			false,

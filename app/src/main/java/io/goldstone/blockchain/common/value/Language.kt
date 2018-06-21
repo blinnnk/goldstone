@@ -2328,37 +2328,67 @@ object ChainText {
 	}
 	@JvmField
 	val ropsten = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Ropsten Testnet"
-		HoneyLanguage.Chinese.code -> "Ropsten 测试网络"
-		HoneyLanguage.Japanese.code -> "Ropsten テストネット"
-		HoneyLanguage.Korean.code -> "Ropsten 테스트 넷"
-		HoneyLanguage.Russian.code -> "Ropsten Testnet"
-		HoneyLanguage.TraditionalChinese.code -> "Ropsten 測試網絡"
+		HoneyLanguage.English.code -> "Ropsten (GoldStone)"
+		HoneyLanguage.Chinese.code -> "Ropsten (GoldStone)"
+		HoneyLanguage.Japanese.code -> "Ropsten (GoldStone)"
+		HoneyLanguage.Korean.code -> "Ropsten (GoldStone)"
+		HoneyLanguage.Russian.code -> "Ropsten (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "Ropsten (GoldStone)"
+		else -> ""
+	}
+	@JvmField
+	val infuraRopsten = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Ropsten (Infura)"
+		HoneyLanguage.Chinese.code -> "Ropsten (Infura)"
+		HoneyLanguage.Japanese.code -> "Ropsten (Infura)"
+		HoneyLanguage.Korean.code -> "Ropsten (Infura)"
+		HoneyLanguage.Russian.code -> "Ropsten (Infura)"
+		HoneyLanguage.TraditionalChinese.code -> "Ropsten (Infura)"
+		else -> ""
+	}
+	@JvmField
+	val infuraKovan = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Kovan (Infura)"
+		HoneyLanguage.Chinese.code -> "Kovan (Infura)"
+		HoneyLanguage.Japanese.code -> "Kovan (Infura)"
+		HoneyLanguage.Korean.code -> "Kovan (Infura)"
+		HoneyLanguage.Russian.code -> "Kovan (Infura)"
+		HoneyLanguage.TraditionalChinese.code -> "Kovan (Infura)"
+		else -> ""
+	}
+	@JvmField
+	val infuraRinkeby = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Rinkeby (Infura)"
+		HoneyLanguage.Chinese.code -> "Rinkeby (Infura)"
+		HoneyLanguage.Japanese.code -> "Rinkeby (Infura)"
+		HoneyLanguage.Korean.code -> "Rinkeby (Infura)"
+		HoneyLanguage.Russian.code -> "Rinkeby (Infura)"
+		HoneyLanguage.TraditionalChinese.code -> "Rinkeby (Infura)"
 		else -> ""
 	}
 	@JvmField
 	val kovan = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Kovan Testnet"
-		HoneyLanguage.Chinese.code -> "Kovan 测试网络"
-		HoneyLanguage.Japanese.code -> "Kovan テストネット"
-		HoneyLanguage.Korean.code -> "Kovan 테스트 넷"
-		HoneyLanguage.Russian.code -> "Kovan Testnet"
-		HoneyLanguage.TraditionalChinese.code -> "Kovan 測試網絡"
+		HoneyLanguage.English.code -> "Kovan (GoldStone)"
+		HoneyLanguage.Chinese.code -> "Kovan (GoldStone)"
+		HoneyLanguage.Japanese.code -> "Kovan (GoldStone)"
+		HoneyLanguage.Korean.code -> "Kovan (GoldStone)"
+		HoneyLanguage.Russian.code -> "Kovan (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "Kovan (GoldStone)"
 		else -> ""
 	}
 	@JvmField
 	val rinkeby = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Rinkeby Testnet"
-		HoneyLanguage.Chinese.code -> "Rinkeby 测试网络"
-		HoneyLanguage.Japanese.code -> "Rinkeby テストネット"
-		HoneyLanguage.Korean.code -> "Rinkeby 테스트 넷"
-		HoneyLanguage.Russian.code -> "Rinkeby Testnet"
-		HoneyLanguage.TraditionalChinese.code -> "Rinkeby 測試網絡"
+		HoneyLanguage.English.code -> "Rinkeby (GoldStone)"
+		HoneyLanguage.Chinese.code -> "Rinkeby (GoldStone)"
+		HoneyLanguage.Japanese.code -> "Rinkeby (GoldStone)"
+		HoneyLanguage.Korean.code -> "Rinkeby (GoldStone)"
+		HoneyLanguage.Russian.code -> "Rinkeby (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "Rinkeby (GoldStone)"
 		else -> ""
 	}
 	
 	@JvmField
-	val morden = when (currentLanguage) {
+	val etcMorden = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Morden Testnet"
 		HoneyLanguage.Chinese.code -> "Morden 测试网络"
 		HoneyLanguage.Japanese.code -> "Morden テストネット"

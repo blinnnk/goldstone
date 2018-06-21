@@ -9,6 +9,21 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  */
 object Config {
 	
+	fun isEncryptNodeRequest(): Boolean =
+		if (Config.getCurrentChainName().equals(ChainText.goldStoneMain, true)) {
+			// 初始化 App 的时候默认节点是 `GoldStone Main` 这里判断一下
+			updateEncryptNodeRequestStatus(true)
+			true
+		} else {
+			GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isEncryptNodeRequest)
+		}
+	
+	fun updateEncryptNodeRequestStatus(isEncrypt: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.isEncryptNodeRequest,
+			isEncrypt
+		)
+	
 	fun isNotchScreen(): Boolean =
 		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isNotchScreen)
 	
@@ -113,7 +128,10 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainID)
 	
 	fun updateETCCurrentChainName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChainName, chainName)
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.etcCurrentChainName,
+			chainName
+		)
 	
 	fun getCurrencyCode(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)

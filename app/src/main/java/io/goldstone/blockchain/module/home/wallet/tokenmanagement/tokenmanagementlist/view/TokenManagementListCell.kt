@@ -32,6 +32,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			when {
 				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
 				symbol == CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
+				symbol == CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = symbol
