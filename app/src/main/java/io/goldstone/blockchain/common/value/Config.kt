@@ -9,18 +9,28 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  */
 object Config {
 	
-	fun isEncryptNodeRequest(): Boolean =
+	fun isEncryptERCNodeRequest(): Boolean =
 		if (Config.getCurrentChainName().equals(ChainText.goldStoneMain, true)) {
 			// 初始化 App 的时候默认节点是 `GoldStone Main` 这里判断一下
-			updateEncryptNodeRequestStatus(true)
+			updateEncryptERCNodeRequest(true)
 			true
 		} else {
-			GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isEncryptNodeRequest)
+			GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isEncryptERCNodeRequest)
 		}
 	
-	fun updateEncryptNodeRequestStatus(isEncrypt: Boolean) =
+	fun updateEncryptERCNodeRequest(isEncrypt: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.isEncryptNodeRequest,
+			SharesPreference.isEncryptERCNodeRequest,
+			isEncrypt
+		)
+	
+	// TODO 等 `GoldStone` 自己的加密 `ETC` 节点上线这里需要额外判断
+	fun isEncryptETCNodeRequest(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isEncryptETCNodeRequest)
+	
+	fun updateEncryptETCNodeRequest(isEncrypt: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.isEncryptETCNodeRequest,
 			isEncrypt
 		)
 	
@@ -78,6 +88,7 @@ object Config {
 	fun updateCurrentLanguageCode(languageCode: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLanguage, languageCode)
 	
+	/** Chain Config */
 	fun getCurrentChain(): String =
 		if (GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.currentChain)
@@ -133,6 +144,7 @@ object Config {
 			chainName
 		)
 	
+	/** Wallet Info Config */
 	fun getCurrencyCode(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)
 	
@@ -144,9 +156,6 @@ object Config {
 	
 	fun updateCurrentRate(rate: Double) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.rate, rate.toFloat())
-	
-	fun getWalletCount(): Int =
-		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.walletCount)
 	
 	fun updateWalletCount(count: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)

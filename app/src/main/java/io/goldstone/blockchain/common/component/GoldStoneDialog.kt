@@ -20,6 +20,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
@@ -188,6 +189,13 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 					"there are some errors on this chain, please search more information on internet"
 				)
 			}
+		}
+		
+		fun chainError(reason: String?, error: Exception?, context: Context) {
+			if (reason == ErrorTag.chain) {
+				GoldStoneDialog.showChainErrorDialog(context)
+			}
+			LogUtil.error("updateMyTokensPrices", error)
 		}
 	}
 }

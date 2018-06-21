@@ -9,8 +9,6 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -60,7 +58,7 @@ class TokenManagementListPresenter(
 					defaultTokens.forEach { default ->
 						MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
 							default.isUsed = !myTokens.find {
-								default.contract == it.contract
+								default.contract.equals(it.contract, true)
 							}.isNull()
 							completeMark()
 						}
@@ -94,10 +92,7 @@ class TokenManagementListPresenter(
 					token.symbol,
 					token.contract,
 					{ error, reason ->
-						if (reason.equals(ErrorTag.chain, true)) {
-							GoldStoneDialog.showChainErrorDialog(context)
-						}
-						LogUtil.error("updateMyTokensInfoBy, error: $reason", error)
+						GoldStoneDialog.chainError(reason, error, context)
 					}) {
 					switch.isClickable = true
 				}

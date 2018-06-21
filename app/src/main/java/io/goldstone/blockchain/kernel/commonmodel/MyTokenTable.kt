@@ -58,7 +58,7 @@ data class MyTokenTable(
 		
 		fun getCurrentChainTokensWithAddress(
 			walletAddress: String = Config.getCurrentAddress(),
-			callback: (ArrayList<MyTokenTable>) -> Unit = {}
+			callback: (ArrayList<MyTokenTable>) -> Unit
 		) {
 			coroutinesTask(
 				{
@@ -181,12 +181,9 @@ data class MyTokenTable(
 								symbol,
 								contract,
 								ownerAddress,
-								errorCallback
-							) {
-								GoldStoneAPI.context.runOnUiThread {
-									callback()
-								}
-							}
+								errorCallback,
+								callback
+							)
 						} else {
 							insert(
 								MyTokenTable(
@@ -195,7 +192,7 @@ data class MyTokenTable(
 									symbol,
 									0.0,
 									contract,
-									Config.getCurrentChain()
+									CryptoValue.chainID(contract)
 								)
 							)
 							// 没有网络不用检查间隔直接插入数据库
@@ -213,43 +210,46 @@ data class MyTokenTable(
 			contract: String,
 			ownerAddress: String,
 			errorCallback: (error: Exception?, reason: String?) -> Unit,
-			callback: (balance: Double) -> Unit
+			callback: () -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress, { error, reason ->
-					errorCallback(error, reason)
-				}) {
-					insert(
-						MyTokenTable(
-							0,
-							ownerAddress,
-							symbol,
-							it,
-							CryptoValue.ethContract,
-							Config.getCurrentChain()
-						)
-					)
-					callback(it)
-				}
-			} else {
-				GoldStoneEthCall.getTokenBalanceWithContract(
-					contract,
-					ownerAddress, { _, _ ->
-						// error callback if need alert
+			getBalanceWithContract(
+				contract,
+				ownerAddress,
+				false,
+				errorCallback
+			) {
+				val contractAddress: String
+				val chainID: String
+				when {
+					contract.equals(CryptoValue.etcContract, true) -> {
+						contractAddress = CryptoValue.etcContract
+						chainID = Config.getETCCurrentChain()
 					}
-				) {
-					insert(
-						MyTokenTable(
-							0,
-							ownerAddress,
-							symbol,
-							it,
-							contract,
-							Config.getCurrentChain()
-						)
+					
+					contract.equals(CryptoValue.ethContract, true) -> {
+						contractAddress = CryptoValue.ethContract
+						chainID = Config.getCurrentChain()
+					}
+					
+					else -> {
+						contractAddress = contract
+						chainID = Config.getCurrentChain()
+					}
+				}
+				
+				insert(
+					MyTokenTable(
+						0,
+						ownerAddress,
+						symbol,
+						it,
+						contractAddress,
+						chainID
 					)
-					callback(it)
+				)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
@@ -259,27 +259,37 @@ data class MyTokenTable(
 			ownerAddress: String,
 			convertByDecimal: Boolean = false,
 			errorCallback: (error: Exception?, reason: String?) -> Unit,
-			callback: (balance: Double) -> Unit = {}
+			callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
-			if (contract == CryptoValue.ethContract) {
-				GoldStoneEthCall.getEthBalance(ownerAddress, { error, reason ->
-					errorCallback(error, reason)
-				}) {
-					val balance = if (convertByDecimal) it.toEthCount() else it
-					callback(balance)
+			when {
+				contract.equals(CryptoValue.ethContract, true) -> {
+					GoldStoneEthCall.getEthBalance(ownerAddress, errorCallback) {
+						val balance = if (convertByDecimal) it.toEthCount() else it
+						callback(balance)
+					}
 				}
-			} else {
-				DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
+				
+				contract.equals(CryptoValue.etcContract, true) -> {
+					GoldStoneEthCall.getEthBalance(
+						ownerAddress,
+						errorCallback,
+						Config.getETCCurrentChainName()
+					) {
+						val balance = if (convertByDecimal) it.toEthCount() else it
+						callback(balance)
+					}
+				}
+				
+				else -> DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
-						ownerAddress, { _, _ ->
-							// error callback if need do something
-						}
+						ownerAddress, errorCallback
 					) {
-						val balance = if (convertByDecimal) CryptoUtils.toCountByDecimal(
-							it, token?.decimals.orElse(0.0)
-						) else it
+						val balance =
+							if (convertByDecimal)
+								CryptoUtils.toCountByDecimal(it, token?.decimals.orElse(0.0))
+							else it
 						callback(balance)
 					}
 				}
@@ -306,17 +316,19 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 	
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain) ")
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
-		chainID: String = Config.getCurrentChain()
+		ercChain: String = Config.getCurrentChain(),
+		etcChain: String = Config.getETCCurrentChain()
 	): MyTokenTable?
 	
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain) ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
-		chainID: String = Config.getCurrentChain()
+		ercChain: String = Config.getCurrentChain(),
+		etcChain: String = Config.getETCCurrentChain()
 	): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

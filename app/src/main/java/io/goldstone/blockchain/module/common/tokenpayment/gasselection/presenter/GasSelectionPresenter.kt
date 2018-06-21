@@ -163,10 +163,7 @@ class GasSelectionPresenter(
 				Config.getCurrentAddress(),
 				true,
 				{ error, reason ->
-					if (reason == ErrorTag.chain) {
-						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
-					}
-					LogUtil.error("checkBalanceIsValid", error)
+					fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
 				}
 			) {
 				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))

@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
+import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -12,9 +14,11 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -53,6 +57,42 @@ class TokenSearchPresenter(
 		}
 	}
 	
+	fun setMyTokenStatus(cell: TokenSearchCell) {
+		cell.apply {
+			model?.let { searchToken ->
+				DefaultTokenTable.getCurrentChainTokenByContract(searchToken.contract) { localToken ->
+					localToken.isNotNull {
+						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
+						DefaultTokenTable.updateTokenDefaultStatus(
+							localToken?.contract.orEmpty(),
+							switch.isChecked,
+							searchToken.name
+						) {
+							insertToMyToken(switch, localToken)
+						}
+					} otherwise {
+						DefaultTokenTable.insertToken(searchToken.apply {
+							isDefault = switch.isChecked
+							// 区分 `ETC` 插入的 `ChainID`
+							chain_id = CryptoValue.chainID(contract)
+						}) {
+							insertToMyToken(switch, searchToken)
+						}
+					}
+				}
+			}
+			switch.preventDuplicateClicks()
+		}
+	}
+	
+	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
+		fragment.getMainActivity()?.apply {
+			model?.let {
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it, this)
+			}
+		}
+	}
+	
 	private fun searchTokenByContractOrSymbol(
 		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
@@ -77,7 +117,7 @@ class TokenSearchPresenter(
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
-							isUsed = localTokens.any { it.symbol == serverToken.symbol }
+							isUsed = localTokens.any { it.symbol.equals(serverToken.symbol, true) }
 						}
 					}.let {
 						hold(it.toArrayList())

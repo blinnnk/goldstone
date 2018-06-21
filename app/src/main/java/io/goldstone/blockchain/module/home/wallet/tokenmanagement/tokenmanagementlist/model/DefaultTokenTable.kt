@@ -156,7 +156,8 @@ data class DefaultTokenTable(
 		
 		fun getCurrentChainTokenByContract(
 			contract: String,
-			chainID: String = Config.getCurrentChain(),
+			ercChain: String = Config.getCurrentChain(),
+			etcChain: String = Config.getETCCurrentChain(),
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			coroutinesTask(
@@ -164,7 +165,7 @@ data class DefaultTokenTable(
 					GoldStoneDataBase
 						.database
 						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract, chainID)
+						.getCurrentChainTokenByContract(contract, ercChain, etcChain)
 				}) {
 				hold(it)
 			}
@@ -240,19 +241,24 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :chainID")
-	fun getCurrentChainTokens(chainID: String = Config.getCurrentChain()): List<DefaultTokenTable>
-	
-	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chain_id LIKE :chainID")
-	fun getDefaultTokens(
-		isDefault: Boolean = true,
-		chainID: String = Config.getCurrentChain()
+	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :ercChain OR chain_id LIKE :etcChain")
+	fun getCurrentChainTokens(
+		ercChain: String = Config.getCurrentChain(),
+		etcChain: String = Config.getETCCurrentChain()
 	): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chain_id LIKE :chainID")
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain)")
+	fun getDefaultTokens(
+		isDefault: Boolean = true,
+		ercChain: String = Config.getCurrentChain(),
+		etcChain: String = Config.getETCCurrentChain()
+	): List<DefaultTokenTable>
+	
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain)")
 	fun getCurrentChainTokenByContract(
 		contract: String,
-		chainID: String = Config.getCurrentChain()
+		ercChain: String = Config.getCurrentChain(),
+		etcChain: String = Config.getETCCurrentChain()
 	): DefaultTokenTable?
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")

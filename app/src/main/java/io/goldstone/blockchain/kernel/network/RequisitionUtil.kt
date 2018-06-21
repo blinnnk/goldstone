@@ -31,7 +31,7 @@ object RequisitionUtil {
 		path: String,
 		justData: Boolean = false,
 		noinline errorCallback: (Exception) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		crossinline hold: (List<T>) -> Unit
 	) {
 		val client =
@@ -81,7 +81,7 @@ object RequisitionUtil {
 		body: RequestBody,
 		path: String,
 		netWorkError: (Exception) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		hold: (String) -> Unit
 	) {
 		val client =
@@ -123,7 +123,7 @@ object RequisitionUtil {
 		keyName: String,
 		justGetData: Boolean = false,
 		crossinline errorCallback: (Exception) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		maxConnectTime: Long = 20,
 		crossinline hold: List<T>.() -> Unit
 	) {
@@ -221,7 +221,7 @@ object RequisitionUtil {
 	fun getcryptoRequest(
 		body: RequestBody,
 		path: String,
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		callback: (Request) -> Unit
 	) {
 		if (isEncrypt) {
@@ -261,7 +261,7 @@ object RequisitionUtil {
 	
 	fun getcryptGetRequest(
 		api: String,
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
+		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		callback: (Request) -> Unit
 	) {
 		val timeStamp = System.currentTimeMillis().toString()
@@ -300,15 +300,19 @@ object RequisitionUtil {
 		body: RequestBody,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		chainName: String = Config.getCurrentChainName(),
-		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		hold: (String) -> Unit
 	) {
+		val isEncrypt = ChainURL.uncryptChainName.none { it.equals(chainName, true) }
 		val client = OkHttpClient
 			.Builder()
 			.connectTimeout(40, TimeUnit.SECONDS)
 			.readTimeout(60, TimeUnit.SECONDS)
 			.build()
-		getcryptoRequest(body, ChainURL.currentChain(chainName), isEncrypt) {
+		val chainUrl =
+			if (ChainURL.etcChainName.any { it.equals(chainName, true) })
+				ChainURL.currentETCChain(chainName)
+			else ChainURL.currentChain(chainName)
+		getcryptoRequest(body, chainUrl, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {

@@ -2938,5 +2938,19 @@
     "force_show": 0,
     "is_default": 1,
     "chain_id": "1"
+  },
+  {
+    "name": "Ethereum Classic",
+    "weight": 10000,
+    "total_supply": 102436699,
+    "type": 61,
+    "symbol": "ETC",
+    "decimals": 18,
+    "address": "0x61",
+    "url": "http://hunger.blinnnk.com/02ffc587372d495fb5583cc5a62a068e",
+    "price": "16.5",
+    "force_show": 1,
+    "is_default": 1,
+    "chain_id": "62"
   }
 ]
