@@ -4,6 +4,7 @@ package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.value.Config
 
 /**
  * @date 2018/6/17 2:16 PM
@@ -11,7 +12,10 @@ import io.goldstone.blockchain.common.utils.AesCrypto
  */
 object ParameterUtil {
 	
-	fun <T> prepare(vararg parameters: Pair<String, T>, isEncrypt: Boolean = true): String {
+	fun <T> prepare(
+		isEncrypt: Boolean = true,
+		vararg parameters: Pair<String, T>
+	): String {
 		var content = ""
 		parameters.forEach {
 			val value = if (it.second is String) {
@@ -27,6 +31,7 @@ object ParameterUtil {
 	}
 	
 	fun <T> prepareJsonRPC(
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		method: String,
 		id: Int,
 		hasLatest: Boolean,
@@ -42,12 +47,13 @@ object ParameterUtil {
 		val finalParameter =
 			if (content.isEmpty()) ""
 			else content.substringBeforeLast(",") + latest
-		return AesCrypto.encrypt(
+		return if (isEncrypt) AesCrypto.encrypt(
 			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
-		).orEmpty()
+		).orEmpty() else "{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
 	}
 	
 	fun <T> preparePairJsonRPC(
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		method: String,
 		hasLatest: Boolean,
 		vararg parameters: Pair<String, T>
@@ -60,8 +66,10 @@ object ParameterUtil {
 			content += "\"${it.first}\":$value,"
 		}
 		val latest = if (hasLatest) ",\"latest\"" else ""
-		return AesCrypto.encrypt(
+		return if (isEncrypt) AesCrypto.encrypt(
 			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[{${content.substringBeforeLast(",")}}$latest],\"id\":1}"
-		).orEmpty()
+		).orEmpty() else "{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[{${content.substringBeforeLast(
+			","
+		)}}$latest],\"id\":1}"
 	}
 }

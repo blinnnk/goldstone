@@ -84,7 +84,6 @@ class SplashActivity : AppCompatActivity() {
 		prepareAppConfig config@{
 			application.registerDeviceForPush()
 			initLaunchLanguage(language)
-			setCurrentChainID(Config.getCurrentChain())
 			findViewById<RelativeLayout>(ContainerID.splash)?.let {
 				supportFragmentManager.fragments.find {
 					it is StartingFragment
@@ -165,10 +164,6 @@ class SplashActivity : AppCompatActivity() {
 	private fun initLaunchLanguage(code: Int) {
 		currentLanguage = code
 		Config.updateCurrentLanguageCode(code)
-	}
-	
-	private fun setCurrentChainID(id: String) {
-		Config.updateCurrentChain(id)
 	}
 	
 	private fun ViewGroup.initWaveView() {

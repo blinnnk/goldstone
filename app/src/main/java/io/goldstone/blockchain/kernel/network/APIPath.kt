@@ -36,13 +36,7 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
-	/** Chain Address */
-	const val main = "https://eth-node-mainnet.goldstone.io/eth"
-	const val ropstan = "https://eth-node-ropsten.goldstone.io/eth"
-	const val kovan = "https://eth-node-kovan.goldstone.io/eth"
-	const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
-	const val etcMain = "https://web3.gastracker.io"
-	const val etcTest = "https://web3.gastracker.io/morden"
+	
 	val getQuotationCurrencyChart: (
 		pair: String,
 		period: String,

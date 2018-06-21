@@ -29,6 +29,7 @@ object RequisitionUtil {
 		path: String,
 		justData: Boolean = false,
 		noinline errorCallback: (Exception) -> Unit,
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		crossinline hold: (List<T>) -> Unit
 	) {
 		val client =
@@ -38,7 +39,7 @@ object RequisitionUtil {
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
 		
-		getcryptoRequest(body, path) {
+		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
@@ -47,11 +48,10 @@ object RequisitionUtil {
 					LogUtil.error(path, error)
 				}
 				
-				override fun onResponse(
-					call: Call,
-					response: Response
-				) {
-					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+				override fun onResponse(call: Call, response: Response) {
+					val data =
+						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
+						else response.body()?.string().orEmpty()
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = dataObject[keyName].toString()
@@ -64,11 +64,11 @@ object RequisitionUtil {
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
 						LogUtil.error(keyName, error)
-						GoldStoneCode.showErrorCodeReason(data, {
+						GoldStoneCode.showErrorCodeReason(data) {
 							GoldStoneAPI.context.runOnUiThread {
 								errorCallback(error)
 							}
-						})
+						}
 					}
 				}
 			})
@@ -79,6 +79,7 @@ object RequisitionUtil {
 		body: RequestBody,
 		path: String,
 		netWorkError: (Exception) -> Unit,
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		hold: (String) -> Unit
 	) {
 		val client =
@@ -88,7 +89,7 @@ object RequisitionUtil {
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
 		
-		getcryptoRequest(body, path) {
+		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
@@ -98,7 +99,9 @@ object RequisitionUtil {
 				}
 				
 				override fun onResponse(call: Call, response: Response) {
-					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					val data =
+						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
+						else response.body()?.string().orEmpty()
 					try {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
@@ -118,6 +121,7 @@ object RequisitionUtil {
 		keyName: String,
 		justGetData: Boolean = false,
 		crossinline errorCallback: (Exception) -> Unit,
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		maxConnectTime: Long = 20,
 		crossinline hold: List<T>.() -> Unit
 	) {
@@ -128,7 +132,7 @@ object RequisitionUtil {
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
 		
-		getcryptGetRequest(api) {
+		getcryptGetRequest(api, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
@@ -138,7 +142,9 @@ object RequisitionUtil {
 				}
 				
 				override fun onResponse(call: Call, response: Response) {
-					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					val data =
+						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
+						else response.body()?.string().orEmpty()
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
@@ -213,55 +219,77 @@ object RequisitionUtil {
 	fun getcryptoRequest(
 		body: RequestBody,
 		path: String,
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		callback: (Request) -> Unit
 	) {
-		val timeStamp = System.currentTimeMillis().toString()
-		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
-		AppConfigTable.getAppConfig {
-			it?.apply {
-				val sign =
-					(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
-						.getObjectMD5HexString()
-						.removePrefix("0x")
-				val request =
-					Request.Builder().url(path).method("POST", body)
-						.header("Content-type", "application/json")
-						.addHeader("device", goldStoneID)
-						.addHeader("timestamp", timeStamp)
-						.addHeader("os", "0")
-						.addHeader("version", version)
-						.addHeader("sign", sign)
-						.addHeader("chainid", Config.getCurrentChain())
-						.build()
-				callback(request)
+		if (isEncrypt) {
+			AppConfigTable.getAppConfig {
+				it?.apply {
+					val timeStamp = System.currentTimeMillis().toString()
+					val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
+					val sign =
+						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
+							.getObjectMD5HexString()
+							.removePrefix("0x")
+					val request =
+						Request.Builder()
+							.url(path)
+							.method("POST", body)
+							.header("Content-type", "application/json")
+							.addHeader("device", goldStoneID)
+							.addHeader("timestamp", timeStamp)
+							.addHeader("os", "0")
+							.addHeader("version", version)
+							.addHeader("sign", sign)
+							.addHeader("chainid", Config.getCurrentChain())
+							.build()
+					callback(request)
+				}
 			}
+		} else {
+			val request =
+				Request.Builder()
+					.url(path)
+					.method("POST", body)
+					.header("Content-type", "application/json")
+					.build()
+			callback(request)
 		}
 	}
 	
 	fun getcryptGetRequest(
 		api: String,
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		callback: (Request) -> Unit
 	) {
 		val timeStamp = System.currentTimeMillis().toString()
 		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
 		AppConfigTable.getAppConfig {
 			it?.apply {
-				val sign =
-					(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
-						.getObjectMD5HexString()
-						.removePrefix("0x")
-				val request =
-					Request.Builder()
+				if (isEncrypt) {
+					val sign =
+						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
+							.getObjectMD5HexString()
+							.removePrefix("0x")
+					val request =
+						Request.Builder()
+							.url(api)
+							.header("Content-type", "application/json")
+							.addHeader("device", goldStoneID)
+							.addHeader("timestamp", timeStamp)
+							.addHeader("os", "0")
+							.addHeader("version", version)
+							.addHeader("sign", sign)
+							.addHeader("chainid", Config.getCurrentChain())
+							.build()
+					callback(request)
+				} else {
+					val uncryptRequest = Request.Builder()
 						.url(api)
 						.header("Content-type", "application/json")
-						.addHeader("device", goldStoneID)
-						.addHeader("timestamp", timeStamp)
-						.addHeader("os", "0")
-						.addHeader("version", version)
-						.addHeader("sign", sign)
-						.addHeader("chainid", Config.getCurrentChain())
 						.build()
-				callback(request)
+					callback(uncryptRequest)
+				}
 			}
 		}
 	}

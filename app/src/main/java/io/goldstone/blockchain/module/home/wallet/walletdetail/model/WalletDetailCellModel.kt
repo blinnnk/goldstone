@@ -75,7 +75,9 @@ data class WalletDetailCellModel(
 						override var asyncCount: Int = allTokens.size
 						override fun concurrentJobs() {
 							allTokens.forEach { token ->
-								localTokens.find { it.contract.equals(token.contract, true) }?.let { targetToken ->
+								localTokens.find {
+									it.contract.equals(token.contract, true)
+								}?.let { targetToken ->
 									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
 								}
 								completeMark()
@@ -114,43 +116,44 @@ data class WalletDetailCellModel(
 							override var asyncCount: Int = myTokens.size
 							override fun concurrentJobs() {
 								myTokens.forEach { token ->
-									localTokens.find { it.contract.equals(token.contract, true) }
-										?.let { targetToken ->
-											if (targetToken.contract == CryptoValue.ethContract) {
-												GoldStoneEthCall.getEthBalance(
-													walletAddress,
-													{ error, reason ->
-														if (reason == ErrorTag.chain) {
-															fragment.context?.let {
-																GoldStoneDialog.showChainErrorDialog(it)
-															}
+									localTokens.find {
+										it.contract.equals(token.contract, true)
+									}?.let { targetToken ->
+										if (targetToken.contract == CryptoValue.ethContract) {
+											GoldStoneEthCall.getEthBalance(
+												walletAddress,
+												{ error, reason ->
+													if (reason == ErrorTag.chain) {
+														fragment.context?.let {
+															GoldStoneDialog.showChainErrorDialog(it)
 														}
-														LogUtil.error("updateMyTokensPrices", error)
-													}) {
-													MyTokenTable
-														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
-													tokenList.add(WalletDetailCellModel(targetToken, it))
-													completeMark()
-												}
-											} else {
-												GoldStoneEthCall.getTokenBalanceWithContract(
-													targetToken.contract,
-													walletAddress,
-													{ error, reason ->
-														if (reason == ErrorTag.chain) {
-															fragment.context?.let {
-																GoldStoneDialog.showChainErrorDialog(it)
-															}
+													}
+													LogUtil.error("updateMyTokensPrices", error)
+												}) {
+												MyTokenTable
+													.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+												tokenList.add(WalletDetailCellModel(targetToken, it))
+												completeMark()
+											}
+										} else {
+											GoldStoneEthCall.getTokenBalanceWithContract(
+												targetToken.contract,
+												walletAddress,
+												{ error, reason ->
+													if (reason == ErrorTag.chain) {
+														fragment.context?.let {
+															GoldStoneDialog.showChainErrorDialog(it)
 														}
-														LogUtil.error("updateMyTokensPrices", error)
-													}) {
-													MyTokenTable
-														.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
-													tokenList.add(WalletDetailCellModel(targetToken, it))
-													completeMark()
-												}
+													}
+													LogUtil.error("updateMyTokensPrices", error)
+												}) {
+												MyTokenTable
+													.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+												tokenList.add(WalletDetailCellModel(targetToken, it))
+												completeMark()
 											}
 										}
+									}
 								}
 							}
 							
@@ -163,10 +166,13 @@ data class WalletDetailCellModel(
 		
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
 			map { it.contract }.toJsonArray {
-				GoldStoneAPI.getPriceByContractAddress(it, {
-					callback()
-					LogUtil.error("updateMyTokensPrices", it)
-				}) { newPrices ->
+				GoldStoneAPI.getPriceByContractAddress(
+					it,
+					{
+						callback()
+						LogUtil.error("updateMyTokensPrices", it)
+					}
+				) { newPrices ->
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = newPrices.size
 						override fun concurrentJobs() {

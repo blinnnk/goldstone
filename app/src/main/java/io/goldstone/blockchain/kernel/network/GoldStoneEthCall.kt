@@ -9,7 +9,7 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.crypto.EthereumMethod
@@ -42,16 +42,16 @@ object GoldStoneEthCall {
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		hold: (
 			symbol: String,
 			name: String,
 			decimal: Double
 		) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress, errorCallback, chainID) { symbol ->
+		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
 			getTokenName(contractAddress, errorCallback) { name ->
-				getTokenDecimal(contractAddress, errorCallback, chainID) { decimal ->
+				getTokenDecimal(contractAddress, errorCallback, chainName) { decimal ->
 					hold(symbol, name, decimal)
 				}
 			}
@@ -62,14 +62,14 @@ object GoldStoneEthCall {
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		hold: (
 			symbol: String,
 			decimal: Double
 		) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress, errorCallback, chainID) { symbol ->
-			getTokenDecimal(contractAddress, errorCallback, chainID) { decimal ->
+		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
+			getTokenDecimal(contractAddress, errorCallback, chainName) { decimal ->
 				hold(symbol, decimal)
 			}
 		}
@@ -78,12 +78,12 @@ object GoldStoneEthCall {
 	fun getTokenCountWithDecimalByContract(
 		contractAddress: String,
 		walletAddress: String,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		hold: (Double) -> Unit
 	) {
 		getTokenBalanceWithContract(contractAddress, walletAddress, errorCallback) { tokenBalance ->
-			getTokenDecimal(contractAddress, errorCallback, chainID) {
+			getTokenDecimal(contractAddress, errorCallback, chainName) {
 				hold(tokenBalance / Math.pow(10.0, it))
 			}
 		}
@@ -93,85 +93,13 @@ object GoldStoneEthCall {
 	fun getInputCodeByHash(
 		hash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
 			contentType,
-			ParameterUtil.prepareJsonRPC(EthereumMethod.GetTransactionByHash.method, 1, false, hash)
-		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
-			}, chainID) {
-				holdValue(JSONObject(it).safeGet("input"))
-			}
-		}
-	}
-	
-	@JvmStatic
-	fun getBlockNumber(
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
-		holdValue: (Int) -> Unit
-	) {
-		RequestBody.create(
-			contentType,
-			ParameterUtil.prepareJsonRPC(EthereumMethod.GetBlockNumber.method, 83, false, null)
-		).let {
-			callEthBy(
-				it,
-				{ error, reason ->
-					errorCallback(error, reason)
-					LogUtil.error(EthereumMethod.GetBlockNumber.display, error)
-				},
-				chainID
-			) {
-				holdValue(it.hexToDecimal().toInt())
-			}
-		}
-	}
-	
-	@JvmStatic
-	fun getBlockTimeStampByBlockHash(
-		blockHash: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
-		holdValue: (Long) -> Unit
-	) {
-		RequestBody.create(
-			contentType,
 			ParameterUtil.prepareJsonRPC(
-				EthereumMethod.GetBlockByHash.method,
-				1,
-				false,
-				blockHash,
-				true
-			)
-		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(EthereumMethod.GetBlockByHash.display, error)
-			}, chainID) {
-				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
-				else {
-					holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
-				}
-			}
-		}
-	}
-	
-	@JvmStatic
-	fun getTransactionByHash(
-		hash: String,
-		chainID: String = Config.getCurrentChain(),
-		unfinishedCallback: () -> Unit = {},
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		holdValue: (TransactionTable) -> Unit
-	) {
-		RequestBody.create(
-			contentType,
-			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
@@ -184,7 +112,101 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
 				},
-				chainID
+				chainName
+			) {
+				holdValue(JSONObject(it).safeGet("input"))
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getBlockNumber(
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainName: String = Config.getCurrentChainName(),
+		holdValue: (Int) -> Unit
+	) {
+		RequestBody.create(
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
+				EthereumMethod.GetBlockNumber.method,
+				83,
+				false,
+				null
+			)
+		).let {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(EthereumMethod.GetBlockNumber.display, error)
+				},
+				chainName
+			) {
+				holdValue(it.hexToDecimal().toInt())
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getBlockTimeStampByBlockHash(
+		blockHash: String,
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainName: String = Config.getCurrentChainName(),
+		holdValue: (Long) -> Unit
+	) {
+		RequestBody.create(
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
+				EthereumMethod.GetBlockByHash.method,
+				1,
+				false,
+				blockHash,
+				true
+			)
+		).let {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(EthereumMethod.GetBlockByHash.display, error)
+				},
+				chainName
+			) {
+				if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
+				else {
+					holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
+				}
+			}
+		}
+	}
+	
+	@JvmStatic
+	fun getTransactionByHash(
+		hash: String,
+		chainName: String = Config.getCurrentChainName(),
+		unfinishedCallback: () -> Unit = {},
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		holdValue: (TransactionTable) -> Unit
+	) {
+		RequestBody.create(
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
+				EthereumMethod.GetTransactionByHash.method,
+				1,
+				false,
+				hash
+			)
+		).let {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
+				},
+				chainName
 			) {
 				val data = it.toJsonObject()
 				if (data.safeGet("blockNumber").toDecimalFromHex().toIntOrNull().isNull()) {
@@ -200,12 +222,13 @@ object GoldStoneEthCall {
 	fun getReceiptByHash(
 		hash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Boolean) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTransactionReceiptByHash.method,
 				1,
 				false,
@@ -218,7 +241,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTransactionReceiptByHash.display, error)
 				},
-				chainID
+				chainName
 			) {
 				val data = it.toJsonObject()
 				// Return Status hasError or Not if
@@ -233,12 +256,13 @@ object GoldStoneEthCall {
 		from: String,
 		data: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (BigInteger) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetEstimateGas.method,
 				false,
 				Pair("to", to),
@@ -252,7 +276,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetEstimateGas.display, error)
 				},
-				chainID
+				chainName
 			) {
 				GoldStoneAPI.context.runOnUiThread {
 					try {
@@ -274,6 +298,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
+				true,
 				EthereumMethod.SendRawTransaction.method,
 				1,
 				false,
@@ -291,12 +316,13 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTokenBalance.method,
 				true,
 				Pair("to", contractAddress),
@@ -309,7 +335,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTokenBalance.display, error)
 				},
-				chainID
+				chainName
 			) { holdValue(it.hexToDecimal()) }
 		}
 	}
@@ -318,12 +344,13 @@ object GoldStoneEthCall {
 	fun getTokenSymbolByContract(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetSymbol.method,
 				true,
 				Pair("to", contractAddress),
@@ -336,7 +363,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetSymbol.display, error)
 				},
-				chainID
+				chainName
 			) {
 				holdValue(it.toAscii())
 			}
@@ -347,12 +374,13 @@ object GoldStoneEthCall {
 	fun getTokenDecimal(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTokenDecimal.method,
 				true,
 				Pair("to", contractAddress),
@@ -365,7 +393,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTokenDecimal.display, error)
 				},
-				chainID
+				chainName
 			) {
 				holdValue(it.hexToDecimal())
 			}
@@ -376,12 +404,13 @@ object GoldStoneEthCall {
 	fun getTokenName(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTokenName.method,
 				true,
 				Pair("to", contractAddress),
@@ -394,7 +423,7 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTokenName.display, error)
 				},
-				chainID
+				chainName
 			) {
 				holdValue(it.toAscii())
 			}
@@ -404,22 +433,27 @@ object GoldStoneEthCall {
 	fun getEthBalance(
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetBalance.method,
 				1,
 				true,
 				address
 			)
 		).let {
-			callEthBy(it, { error, reason ->
-				errorCallback(error, reason)
-				LogUtil.error(EthereumMethod.GetBalance.display, error)
-			}, chainID) {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(EthereumMethod.GetBalance.display, error)
+				},
+				chainName
+			) {
 				holdValue(it.hexToDecimal())
 			}
 		}
@@ -428,12 +462,13 @@ object GoldStoneEthCall {
 	fun getTokenTotalSupply(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
+				Config.isEncryptNodeRequest(),
 				EthereumMethod.GetTotalSupply.method,
 				true,
 				Pair("to", contractAddress),
@@ -446,27 +481,32 @@ object GoldStoneEthCall {
 					errorCallback(error, reason)
 					LogUtil.error(EthereumMethod.GetTotalSupply.display, error)
 				},
-				chainID
+				chainName
 			) {
 				holdValue(it.hexToDecimal())
 			}
 		}
 	}
 	
-	private val currentChain: (currentChainID: String) -> String = {
+	private val currentChain: (currentChainName: String) -> String = {
 		when (it) {
-			ChainID.Main.id -> APIPath.main
-			ChainID.Ropsten.id -> APIPath.ropstan
-			ChainID.Rinkeby.id -> APIPath.rinkeyb
-			ChainID.Kovan.id -> APIPath.kovan
-			else -> APIPath.main
+			ChainText.goldStoneMain -> ChainURL.main
+			ChainText.ropsten -> ChainURL.ropsten
+			ChainText.rinkeby -> ChainURL.rinkeyb
+			ChainText.kovan -> ChainURL.kovan
+			ChainText.infuraRopsten -> ChainURL.infuraRopsten
+			ChainText.infuraKovan -> ChainURL.infuraKovan
+			ChainText.infuraRinkeby -> ChainURL.infuraRinkeby
+			ChainText.infuraMain -> ChainURL.infuraMain
+			else -> ChainURL.main
 		}
 	}
 	
 	private fun callEthBy(
 		body: RequestBody,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainID: String = Config.getCurrentChain(),
+		chainName: String = Config.getCurrentChainName(),
+		isEncrypt: Boolean = Config.isEncryptNodeRequest(),
 		hold: (String) -> Unit
 	) {
 		val client = OkHttpClient
@@ -474,7 +514,7 @@ object GoldStoneEthCall {
 			.connectTimeout(40, TimeUnit.SECONDS)
 			.readTimeout(60, TimeUnit.SECONDS)
 			.build()
-		getcryptoRequest(body, currentChain(chainID)) {
+		getcryptoRequest(body, currentChain(chainName), isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
@@ -487,7 +527,9 @@ object GoldStoneEthCall {
 					call: Call,
 					response: Response
 				) {
-					val data = AesCrypto.decrypt(response.body()?.string().orEmpty())
+					val data =
+						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
+						else response.body()?.string().orEmpty()
 					checkChainErrorCode(data).let {
 						if (it.isNotEmpty()) {
 							GoldStoneAPI.context.runOnUiThread {

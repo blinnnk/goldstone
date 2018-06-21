@@ -38,6 +38,9 @@ import org.json.JSONObject
 /**
  * @date 31/03/2018 8:08 PM
  * @author KaySaith
+ * @Important
+ * 请求 `Parameters` 以及请求 `Response` 的加密规则是, GoldStone 自由 Server 业务以及 GoldStone
+ * 自由节点进行双向加密解密. 第三方接口和节点不加密. 如 `EtherScan`, `Infura` 和 `GasTracker` 等。
  */
 object GoldStoneAPI {
 	
@@ -57,7 +60,8 @@ object GoldStoneAPI {
 			APIPath.defaultTokenList(APIPath.currentUrl),
 			"data",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			val gson = Gson()
 			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
@@ -97,7 +101,8 @@ object GoldStoneAPI {
 		requestData<TokenSearchModel>(
 			APIPath.getCoinInfo(APIPath.currentUrl) + symbols,
 			"list",
-			errorCallback = errorCallback
+			errorCallback = errorCallback,
+			isEncrypt = true
 		) {
 			hold(toArrayList())
 		}
@@ -112,7 +117,8 @@ object GoldStoneAPI {
 			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			val data = JSONObject(this[0])
 			val hasNewVersion =
@@ -139,7 +145,8 @@ object GoldStoneAPI {
 			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
 			"rate",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			this[0].isNotNull { hold(this[0].toDouble()) }
 		}
@@ -155,7 +162,8 @@ object GoldStoneAPI {
 			APIPath.terms(APIPath.currentUrl) + md5,
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			hold(JSONObject(this[0]).safeGet("result"))
 		}
@@ -169,7 +177,8 @@ object GoldStoneAPI {
 		requestData<ServerConfigModel>(
 			APIPath.getConfigList(APIPath.currentUrl),
 			"list",
-			errorCallback = errorCallback
+			errorCallback = errorCallback,
+			isEncrypt = true
 		) {
 			GoldStoneAPI.context.runOnUiThread {
 				hold(toArrayList())
@@ -182,15 +191,12 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (ShareContentModel) -> Unit
 	) {
-		// Get server copywriting when user click share software button everytime
-		// this is an important behavior so it need to set a short connect timeout value
-		val timeOutValue = 3L
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			true,
 			errorCallback,
-			timeOutValue
+			true
 		) {
 			this[0].isNotNull {
 				hold(ShareContentModel(JSONObject(this[0])))
@@ -207,7 +213,8 @@ object GoldStoneAPI {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl) + pair,
 			"pair_list",
-			errorCallback = errorCallback
+			errorCallback = errorCallback,
+			isEncrypt = true
 		) {
 			hold(toArrayList())
 		}
@@ -263,6 +270,7 @@ object GoldStoneAPI {
 		RequestBody.create(
 			requestContentType,
 			ParameterUtil.prepare(
+				true,
 				Pair("language", language),
 				Pair("cid", pushToken),
 				Pair("device", deviceID),
@@ -275,7 +283,8 @@ object GoldStoneAPI {
 			postRequest(
 				it,
 				APIPath.registerDevice(APIPath.currentUrl),
-				errorCallback
+				errorCallback,
+				true
 			) {
 				hold(it)
 			}
@@ -289,13 +298,14 @@ object GoldStoneAPI {
 	) {
 		RequestBody.create(
 			requestContentType,
-			ParameterUtil.prepare(Pair("pair_list", pairList))
+			ParameterUtil.prepare(true, Pair("pair_list", pairList))
 		).let {
 			postRequestGetJsonObject<QuotationSelectionLineChartModel>(
 				it,
 				"data_list",
 				APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-				errorCallback = errorCallback
+				errorCallback = errorCallback,
+				isEncrypt = true
 			) {
 				hold(it.toArrayList())
 			}
@@ -311,11 +321,17 @@ object GoldStoneAPI {
 		RequestBody.create(
 			requestContentType,
 			ParameterUtil.prepare(
+				true,
 				Pair("address_list", addressList),
 				Pair("device", deviceID)
 			)
 		).let {
-			postRequest(it, APIPath.updateAddress(APIPath.currentUrl), errorCallback) {
+			postRequest(
+				it,
+				APIPath.updateAddress(APIPath.currentUrl),
+				errorCallback,
+				true
+			) {
 				hold(it)
 			}
 		}
@@ -330,6 +346,7 @@ object GoldStoneAPI {
 		RequestBody.create(
 			requestContentType,
 			ParameterUtil.prepare(
+				true,
 				Pair("device", deviceID),
 				Pair("time", time)
 			)
@@ -337,7 +354,8 @@ object GoldStoneAPI {
 			postRequest(
 				it,
 				APIPath.getUnreadCount(APIPath.currentUrl),
-				errorCallback
+				errorCallback,
+				true
 			) {
 				hold(JSONObject(it).safeGet("count"))
 			}
@@ -353,6 +371,7 @@ object GoldStoneAPI {
 		RequestBody.create(
 			requestContentType,
 			ParameterUtil.prepare(
+				true,
 				Pair("device", goldSonteID),
 				Pair("time", time)
 			)
@@ -362,7 +381,8 @@ object GoldStoneAPI {
 				"message_list",
 				APIPath.getNotification(APIPath.currentUrl),
 				true,
-				errorCallback
+				errorCallback,
+				true
 			) {
 				// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
 				val notificationData = arrayListOf<NotificationTable>()
@@ -390,13 +410,14 @@ object GoldStoneAPI {
 	) {
 		RequestBody.create(
 			requestContentType,
-			ParameterUtil.prepare(Pair("address_list", addressList))
+			ParameterUtil.prepare(true, Pair("address_list", addressList))
 		).let {
 			postRequestGetJsonObject<TokenPriceModel>(
 				it,
 				"price_list",
 				APIPath.getPriceByAddress(APIPath.currentUrl),
-				errorCallback = errorCallback
+				errorCallback = errorCallback,
+				isEncrypt = true
 			) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it.toArrayList())
@@ -415,7 +436,8 @@ object GoldStoneAPI {
 		requestData<ChartModel>(
 			APIPath.getQuotationCurrencyChart(pair, period, size),
 			"point_list",
-			errorCallback = errorCallback
+			errorCallback = errorCallback,
+			isEncrypt = true
 		) {
 			hold(this.toArrayList())
 		}
@@ -430,7 +452,8 @@ object GoldStoneAPI {
 			APIPath.getQuotationCurrencyInfo(pair),
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			hold(JSONObject(this[0]))
 		}
@@ -445,7 +468,8 @@ object GoldStoneAPI {
 			APIPath.getTokenDescription(APIPath.currentUrl) + symbol,
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			true
 		) {
 			this[0].let {
 				hold(JSONObject(it).safeGet("description"))

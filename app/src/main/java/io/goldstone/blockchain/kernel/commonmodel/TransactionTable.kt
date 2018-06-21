@@ -350,7 +350,7 @@ data class TransactionTable(
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
-			chainID: String = Config.getCurrentChain(),
+			chainName: String = Config.getCurrentChainName(),
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
@@ -364,7 +364,7 @@ data class TransactionTable(
 								reason?.let { context.alert(it) }
 								LogUtil.error("getByHashAndReceivedStatus", error)
 							},
-							chainID
+							chainName
 						) { input ->
 							val isErc20 = CryptoUtils
 								.isERC20TransferByInputCode(input)

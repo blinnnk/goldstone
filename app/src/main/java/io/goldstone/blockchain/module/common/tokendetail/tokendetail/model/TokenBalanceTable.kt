@@ -7,6 +7,7 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toEthCount
@@ -51,9 +52,12 @@ data class TokenBalanceTable(
 		fun getTodayBalance(address: String, contract: String, callback: (Double) -> Unit) {
 			if (contract == CryptoValue.ethContract) {
 				doAsync {
-					GoldStoneEthCall.getEthBalance(address, { _, _ ->
-						// error callback if need do something
-					}) { balance ->
+					GoldStoneEthCall.getEthBalance(
+						address,
+						{ error, reason ->
+							LogUtil.error("getTodayBalance $reason", error)
+						}
+					) { balance ->
 						GoldStoneAPI.context.runOnUiThread {
 							callback(balance.toEthCount())
 						}
@@ -64,10 +68,11 @@ data class TokenBalanceTable(
 					GoldStoneEthCall.getTokenCountWithDecimalByContract(
 						contract,
 						address,
-						Config.getCurrentChain(),
-						{ _, _ ->
-							// do something when error callback
-						}) { balance ->
+						Config.getCurrentChainName(),
+						{ error, reason ->
+							LogUtil.error("getTodayBalance $reason", error)
+						}
+					) { balance ->
 						GoldStoneAPI.context.runOnUiThread {
 							callback(balance)
 						}
