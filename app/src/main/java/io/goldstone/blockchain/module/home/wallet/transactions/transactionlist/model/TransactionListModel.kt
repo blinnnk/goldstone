@@ -4,10 +4,11 @@ import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toEthValue
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
+import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import java.io.Serializable
@@ -58,8 +59,12 @@ data class TransactionListModel(
 		data.hash,
 		data.memo,
 		((data.gas.toDoubleOrNull()
-		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble()).toEthValue(), //
-		// 计算燃气费使用情况
+		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble())
+			.toUnitValue(
+				if (data.symbol.equals(CryptoSymbol.etc, true))
+					CryptoSymbol.eth
+				else CryptoSymbol.eth
+			), // 计算燃气费使用情况
 		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,

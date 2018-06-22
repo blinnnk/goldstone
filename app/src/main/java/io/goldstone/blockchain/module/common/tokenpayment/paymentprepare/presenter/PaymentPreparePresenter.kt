@@ -97,20 +97,25 @@ class PaymentPreparePresenter(
 		val countWithDecimal: BigInteger
 		val data: String
 		val to: String
-		// `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
-		if (rootFragment?.token?.contract.equals(CryptoValue.ethContract, true)) {
-			to = toAddress
-			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
-			countWithDecimal =
-				(count * Math.pow(10.0, CryptoValue.ethDecimal)).toBigDecimal().toBigInteger()
-		} else {
-			to = rootFragment?.token!!.contract
-			countWithDecimal =
-				(count * Math.pow(10.0, rootFragment?.token?.decimal!!)).toBigDecimal().toBigInteger()
-			data = SolidityCode.contractTransfer + // 方法
-				toAddress.toDataStringFromAddress() + // 地址
-				countWithDecimal.toDataString() + // 数量
-				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
+		// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
+		when {
+			rootFragment?.token?.contract.equals(CryptoValue.ethContract, true)
+				or rootFragment?.token?.contract.equals(CryptoValue.etcContract, true) -> {
+				to = toAddress
+				data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
+				countWithDecimal =
+					(count * Math.pow(10.0, CryptoValue.ethDecimal)).toBigDecimal().toBigInteger()
+			}
+			
+			else -> {
+				to = rootFragment?.token!!.contract
+				countWithDecimal =
+					(count * Math.pow(10.0, rootFragment?.token?.decimal!!)).toBigDecimal().toBigInteger()
+				data = SolidityCode.contractTransfer + // 方法
+					toAddress.toDataStringFromAddress() + // 地址
+					countWithDecimal.toDataString() + // 数量
+					if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
+			}
 		}
 		
 		GoldStoneEthCall.getTransactionExecutedValue(

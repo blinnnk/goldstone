@@ -5,6 +5,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
@@ -126,12 +127,12 @@ object CryptoUtils {
 	) == SolidityCode.contractTransfer
 }
 
-fun Double.toEthValue(): String {
+fun Double.toUnitValue(symbol: String = CryptoSymbol.eth): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 18
 	val value = this / 1000000000000000000.0
 	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
-	return "$prefix${formatEditor.format(this / 1000000000000000000.0)} ETH"
+	return "$prefix${formatEditor.format(this / 1000000000000000000.0)} $symbol"
 }
 
 fun Double.toEthCount(): Double {

@@ -60,10 +60,11 @@ class GasSelectionPresenter(
 			BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei()) // recommend
 		)
 	}
-	private var currentGasUsedInEth: Double? = null
+	private var gasUsedInChainCoin: Double? = null
 	
 	fun insertCustomGasData() {
-		val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
+		val gasPrice =
+			BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
 		currentMinerType = MinerFeeType.Custom.content
 		if (defaultGasPrices.size == 4) {
 			defaultGasPrices.remove(defaultGasPrices.last())
@@ -81,14 +82,15 @@ class GasSelectionPresenter(
 					index,
 					minner.toString().toDouble(),
 					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-					currentMinerType
+					currentMinerType,
+					getUnitSymbol()
 				)
 				if (model.currentType == currentMinerType) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
-					/** 更新默认的燃气花销的 `ETH` 用于用户余额判断 */
-					currentGasUsedInEth = getGasEthCount(model.count)
+					/** 更新默认的燃气花销的 `ETH`, `ETC` 用于用户余额判断 */
+					gasUsedInChainCoin = getGasUnitCount(model.count)
 				}
 			}.click {
 				currentMinerType = it.model.type
@@ -96,8 +98,8 @@ class GasSelectionPresenter(
 				getGasCurrencyPrice(it.model.count) {
 					fragment.setSpendingValue(it)
 				}
-				/** 更新当前选择的燃气花销的 `ETH` 用于用户余额判断 */
-				currentGasUsedInEth = getGasEthCount(it.model.count)
+				/** 更新当前选择的燃气花销的 `ETH`, `ETC` 用于用户余额判断 */
+				gasUsedInChainCoin = getGasUnitCount(it.model.count)
 			}.into(parent)
 		}
 	}
@@ -141,36 +143,47 @@ class GasSelectionPresenter(
 		}
 	}
 	
+	private fun getUnitSymbol(): String {
+		return if (rootFragment?.token?.symbol.equals(CryptoSymbol.etc, true))
+			CryptoSymbol.etc
+		else
+			CryptoSymbol.eth
+	}
+	
 	private fun checkBalanceIsValid(
 		token: WalletDetailCellModel?,
 		hold: Boolean.() -> Unit
 	) {
-		// 如果是 `ETH`转账刚好就是判断站长金额加上燃气费费用
-		if (token?.contract.equals(CryptoValue.ethContract, true)) {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!,
-				Config.getCurrentAddress(),
-				true,
-				{ error, reason ->
-					if (reason == ErrorTag.chain) {
-						GoldStoneDialog.showChainErrorDialog(fragment.context!!)
+		when {
+		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
+			token?.contract.equals(CryptoValue.ethContract, true)
+				or token?.contract.equals(CryptoValue.etcContract, true) -> {
+				MyTokenTable.getBalanceWithContract(
+					token?.contract!!,
+					Config.getCurrentAddress(),
+					true,
+					{ error, reason ->
+						fragment.context?.apply {
+							GoldStoneDialog.chainError(reason, error, this)
+						}
 					}
-					LogUtil.error("checkBalanceIsValid", error)
+				) {
+					hold(it >= getTransferCount().toDouble() + gasUsedInChainCoin.orElse(0.0))
 				}
-			) {
-				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
-		} else {
-			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
-			MyTokenTable.getBalanceWithContract(
-				token?.contract.orEmpty(),
-				Config.getCurrentAddress(),
-				true,
-				{ error, reason ->
-					fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
+			
+			else -> {
+				// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
+				MyTokenTable.getBalanceWithContract(
+					token?.contract.orEmpty(),
+					Config.getCurrentAddress(),
+					true,
+					{ error, reason ->
+						fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
+					}
+				) {
+					hold(it >= getTransferCount().toDouble() + gasUsedInChainCoin.orElse(0.0))
 				}
-			) {
-				hold(it >= getTransferCount().toDouble() + currentGasUsedInEth.orElse(0.0))
 			}
 		}
 	}
@@ -199,7 +212,8 @@ class GasSelectionPresenter(
 					this.gasPrice = getSelectedGasPrice(currentMinerType)
 					// Generate Transaction Model
 					val raw = Transaction().apply {
-						chain = ChainDefinition(Config.getCurrentChain().toLong())
+						chain =
+							ChainDefinition(CryptoValue.chainID(rootFragment?.token?.contract.orEmpty()).toLong())
 						nonce = this@model.nonce
 						gasPrice = getSelectedGasPrice(currentMinerType)
 						gasLimit =
@@ -370,7 +384,7 @@ class GasSelectionPresenter(
 		else prepareModel?.gasLimit?.toLong().orElse(0)
 	}
 	
-	private fun getGasEthCount(info: String): Double {
+	private fun getGasUnitCount(info: String): Double {
 		return if (info.length > 3) {
 			info.replace(" ", "").substring(0, info.lastIndex - 3).toDouble()
 		} else {
@@ -379,12 +393,16 @@ class GasSelectionPresenter(
 	}
 	
 	private fun getGasCurrencyPrice(
-		info: String,
+		value: String,
 		hold: (String) -> Unit
 	) {
-		DefaultTokenTable.getCurrentChainTokenByContract(CryptoValue.ethContract) {
+		val chainCoinContract =
+			if (rootFragment?.token?.contract.equals(CryptoValue.etcContract, true))
+				CryptoValue.etcContract
+			else CryptoValue.ethContract
+		DefaultTokenTable.getCurrentChainTokenByContract(chainCoinContract) {
 			hold(
-				"≈ " + (getGasEthCount(info) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
+				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
 			)
 		}
 	}
@@ -396,7 +414,8 @@ class GasSelectionPresenter(
 					index,
 					minner.toDouble(),
 					prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-					currentMinerType
+					currentMinerType,
+					getUnitSymbol()
 				)
 			}
 		}

@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.value.NotificationText
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -112,6 +113,11 @@ class TransactionDetailPresenter(
 			?: dataFromList?.symbol
 			?: notificationData?.symbol.orEmpty()
 		)
+	}
+	
+	fun getUnitSymbol(): String {
+		return if (getCunrrentChainType() == ChainType.ETH) CryptoSymbol.eth
+		else CryptoSymbol.etc
 	}
 	
 	fun showEtherScanTransactionFragment() {

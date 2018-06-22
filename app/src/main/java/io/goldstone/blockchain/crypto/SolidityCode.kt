@@ -50,6 +50,6 @@ object CryptoName {
 	const val etc = "Ethereum Classic"
 }
 
-enum class ChainType(val id: Int) {
+enum class ChainType(val id: Long) {
 	BTC(0), ETH(60), ETC(61)
 }
