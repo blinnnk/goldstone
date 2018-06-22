@@ -2,6 +2,11 @@ package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
 /**
  * @date 2018/6/21 10:36 AM
@@ -42,6 +47,41 @@ object ChainURL {
 			ChainText.etcMorden,
 			ChainText.etcMainGasTracker
 		)
+	
+	fun getChainNameByChainType(type: ChainType): String {
+		return when (type) {
+			ChainType.ETH -> Config.getCurrentChainName()
+			ChainType.ETC -> Config.getETCCurrentChainName()
+			else -> Config.getCurrentChainName()
+		}
+	}
+	
+	fun getChainNameBySymbol(symbol: String): String {
+		return when {
+			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
+			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
+			else -> Config.getCurrentChainName()
+		}
+	}
+	
+	fun getChainTypeBySymbol(symbol: String): ChainType {
+		return when {
+			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
+			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
+			else -> ChainType.ETH
+		}
+	}
+	
+	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
+		return when {
+			transaction.isERC20 -> transaction.to
+			ChainURL.etcChainName.any {
+				it.equals(chainName, true)
+			} -> CryptoValue.etcContract
+			else -> CryptoValue.ethContract
+		}
+	}
+	
 	private val infuraKey: () -> String = {
 		infuraKeys.getRandom()
 	}

@@ -9,6 +9,7 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.*
@@ -38,7 +39,7 @@ object GoldStoneEthCall {
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		hold: (
 			symbol: String,
 			name: String,
@@ -46,7 +47,7 @@ object GoldStoneEthCall {
 		) -> Unit
 	) {
 		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
-			getTokenName(contractAddress, errorCallback) { name ->
+			getTokenName(contractAddress, errorCallback, chainName) { name ->
 				getTokenDecimal(contractAddress, errorCallback, chainName) { decimal ->
 					hold(symbol, name, decimal)
 				}
@@ -58,7 +59,7 @@ object GoldStoneEthCall {
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		hold: (
 			symbol: String,
 			decimal: Double
@@ -74,11 +75,16 @@ object GoldStoneEthCall {
 	fun getTokenCountWithDecimalByContract(
 		contractAddress: String,
 		walletAddress: String,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		hold: (Double) -> Unit
 	) {
-		getTokenBalanceWithContract(contractAddress, walletAddress, errorCallback) { tokenBalance ->
+		getTokenBalanceWithContract(
+			contractAddress,
+			walletAddress,
+			errorCallback,
+			chainName
+		) { tokenBalance ->
 			getTokenDecimal(contractAddress, errorCallback, chainName) {
 				hold(tokenBalance / Math.pow(10.0, it))
 			}
@@ -89,13 +95,13 @@ object GoldStoneEthCall {
 	fun getInputCodeByHash(
 		hash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
-		holdValue: (String) -> Unit = {}
+		chainName: String,
+		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
@@ -116,15 +122,45 @@ object GoldStoneEthCall {
 	}
 	
 	@JvmStatic
+	fun getUsableNonce(
+		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainType: ChainType,
+		address: String = Config.getCurrentAddress(),
+		holdValue: (BigInteger) -> Unit
+	) {
+		RequestBody.create(
+			contentType,
+			ParameterUtil.prepareJsonRPC(
+				getCurrentEncryptStatusByChainType(chainType),
+				EthereumMethod.GetTransactionCount.method,
+				1,
+				true,
+				address
+			)
+		).let {
+			callEthBy(
+				it,
+				{ error, reason ->
+					errorCallback(error, reason)
+					LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
+				},
+				ChainURL.getChainNameByChainType(chainType)
+			) {
+				holdValue(it.toDecimalFromHex().toBigInteger())
+			}
+		}
+	}
+	
+	@JvmStatic
 	fun getBlockNumber(
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Int) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBlockNumber.method,
 				83,
 				false,
@@ -148,13 +184,13 @@ object GoldStoneEthCall {
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Long) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBlockByHash.method,
 				1,
 				false,
@@ -181,7 +217,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTransactionByHash(
 		hash: String,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		unfinishedCallback: () -> Unit = {},
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		holdValue: (TransactionTable) -> Unit
@@ -189,7 +225,7 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
@@ -218,13 +254,13 @@ object GoldStoneEthCall {
 	fun getReceiptByHash(
 		hash: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Boolean) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionReceiptByHash.method,
 				1,
 				false,
@@ -252,13 +288,13 @@ object GoldStoneEthCall {
 		from: String,
 		data: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (BigInteger) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetEstimateGas.method,
 				false,
 				Pair("to", to),
@@ -289,19 +325,20 @@ object GoldStoneEthCall {
 	fun sendRawTransaction(
 		signTransactions: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		chainName: String,
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				true,
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.SendRawTransaction.method,
 				1,
 				false,
 				signTransactions
 			)
 		).let {
-			callEthBy(it, errorCallback) {
+			callEthBy(it, errorCallback, chainName) {
 				holdValue(it)
 			}
 		}
@@ -312,13 +349,13 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenBalance.method,
 				true,
 				Pair("to", contractAddress),
@@ -340,13 +377,13 @@ object GoldStoneEthCall {
 	fun getTokenSymbolByContract(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (String) -> Unit = {}
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetSymbol.method,
 				true,
 				Pair("to", contractAddress),
@@ -370,13 +407,13 @@ object GoldStoneEthCall {
 	fun getTokenDecimal(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenDecimal.method,
 				true,
 				Pair("to", contractAddress),
@@ -400,13 +437,13 @@ object GoldStoneEthCall {
 	fun getTokenName(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (String) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenName.method,
 				true,
 				Pair("to", contractAddress),
@@ -429,14 +466,13 @@ object GoldStoneEthCall {
 	fun getEthBalance(
 		address: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
-		val isEncrypt = ChainURL.uncryptChainName.none { it.equals(chainName, true) }
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				isEncrypt,
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBalance.method,
 				1,
 				true,
@@ -459,13 +495,13 @@ object GoldStoneEthCall {
 	fun getTokenTotalSupply(
 		contractAddress: String,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				Config.isEncryptERCNodeRequest(),
+				getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTotalSupply.method,
 				true,
 				Pair("to", contractAddress),
@@ -492,4 +528,22 @@ object GoldStoneEthCall {
 	@JvmStatic
 	private fun String.checkAddressInRules() =
 		if (substring(0, 2) == "0x") substring(2 until length) else this
+	
+	@JvmStatic
+	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
+		return when (type) {
+			ChainType.ETC -> Config.isEncryptETCNodeRequest()
+			ChainType.ETH -> Config.isEncryptERCNodeRequest()
+			else -> Config.isEncryptERCNodeRequest()
+		}
+	}
+	
+	@JvmStatic
+	private fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
+		return if (ChainURL.etcChainName.any { it.equals(name, true) }) {
+			Config.isEncryptETCNodeRequest()
+		} else {
+			Config.isEncryptERCNodeRequest()
+		}
+	}
 }

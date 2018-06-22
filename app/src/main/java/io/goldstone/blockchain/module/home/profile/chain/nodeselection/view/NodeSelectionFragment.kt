@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.crypto.CryptoID
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionSectionCell
@@ -73,14 +73,14 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						var isSelected = false
 						if (pair.second == presenter.getDefaultOrCurrentChainName(
 								isMainnet.orTrue(),
-								getChainIDByName(chain.first)
+								getChainTypeByName(chain.first)
 							)
 						) {
 							selectedNode += pair
 							isSelected = true
 						}
 						NodeSelectionCell(context).setData(pair.second, isSelected, index).click {
-							clearAllRadio(chainChild.size, getChainIDByName(chain.first))
+							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
 							selectedNode.find {
 								it.first.equals(chain.first, true)
@@ -108,16 +108,16 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		}
 	}
 	
-	private fun getChainIDByName(name: String): Int {
+	private fun getChainTypeByName(name: String): ChainType {
 		return when (name) {
-			CryptoName.eth -> CryptoID.eth
-			else -> CryptoID.etc
+			CryptoName.eth -> ChainType.ETH
+			else -> ChainType.ETC
 		}
 	}
 	
-	private fun clearAllRadio(maxIndex: Int, type: Int) {
+	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
 		val start = when (type) {
-			CryptoID.etc -> 10
+			ChainType.ETC -> 10
 			else -> 0
 		}
 		(start until maxIndex).forEach {

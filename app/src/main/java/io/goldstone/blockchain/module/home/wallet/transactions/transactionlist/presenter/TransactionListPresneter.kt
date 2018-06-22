@@ -275,7 +275,8 @@ class TransactionListPresenter(
 									{ error, reason ->
 										completeMark()
 										LogUtil.error("getUnkonwTokenInfo $reason", error)
-									}
+									},
+									Config.getCurrentChainName()
 								) { symbol, decimal ->
 									GoldStoneDataBase
 										.database

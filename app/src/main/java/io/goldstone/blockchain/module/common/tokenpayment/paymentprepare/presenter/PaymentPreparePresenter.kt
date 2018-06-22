@@ -1,24 +1,24 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.crypto.utils.toDataStringFromAddress
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
@@ -31,7 +31,9 @@ class PaymentPreparePresenter(
 	override val fragment: PaymentPrepareFragment
 ) : BasePresenter<PaymentPrepareFragment>() {
 	
-	private var currentToken: WalletDetailCellModel? = null
+	private val rootFragment by lazy {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()
+	}
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -45,8 +47,13 @@ class PaymentPreparePresenter(
 			callback()
 		} else {
 			fragment.toast(LoadingText.calculateGas)
-			getPaymentPrepareModel(count, fragment.getMemoContent(), callback) { model ->
-				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			getPaymentPrepareModel(
+				count,
+				fragment.getMemoContent(),
+				ChainURL.getChainTypeBySymbol(fragment.rootFragment?.token?.symbol.orEmpty()),
+				callback
+			) { model ->
+				fragment.rootFragment?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(
 						TokenDetailText.customGas,
 						TokenDetailText.paymentValue,
@@ -65,13 +72,16 @@ class PaymentPreparePresenter(
 	private fun getPaymentPrepareModel(
 		count: Double,
 		memo: String,
+		chainType: ChainType,
 		callback: () -> Unit,
 		hold: (PaymentPrepareModel) -> Unit
 	) {
-		TransactionTable.getLatestValidNonce(
-			{
-				fragment.context?.alert(it.toString())
-			}) {
+		GoldStoneEthCall.getUsableNonce(
+			{ error, reason ->
+				fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
+			},
+			chainType
+		) {
 			generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 		}
 	}
@@ -88,15 +98,15 @@ class PaymentPreparePresenter(
 		val data: String
 		val to: String
 		// `ETH` 转账和 `Token` 转账需要准备不同的 `Transaction`
-		if (currentToken?.contract.equals(CryptoValue.ethContract, true)) {
+		if (rootFragment?.token?.contract.equals(CryptoValue.ethContract, true)) {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal =
 				(count * Math.pow(10.0, CryptoValue.ethDecimal)).toBigDecimal().toBigInteger()
 		} else {
-			to = currentToken!!.contract
+			to = rootFragment?.token!!.contract
 			countWithDecimal =
-				(count * Math.pow(10.0, currentToken?.decimal!!)).toBigDecimal().toBigInteger()
+				(count * Math.pow(10.0, rootFragment?.token?.decimal!!)).toBigDecimal().toBigInteger()
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toDataStringFromAddress() + // 地址
 				countWithDecimal.toDataString() + // 数量
@@ -110,7 +120,9 @@ class PaymentPreparePresenter(
 			{ error, reason ->
 				fragment.context?.alert(reason ?: error.toString())
 				callback()
-			}) { limit ->
+			},
+			ChainURL.getChainNameBySymbol(rootFragment?.token?.symbol.orEmpty())
+		) { limit ->
 			hold(
 				PaymentPrepareModel(
 					nonce,
@@ -127,19 +139,16 @@ class PaymentPreparePresenter(
 	}
 	
 	private fun setSymbol() {
-		fragment.getParentFragment<TokenDetailOverlayFragment> {
-			currentToken = token
-			fragment.setSymbolAndPrice(
-				currentToken?.symbol.orEmpty(),
-				currentToken?.price?.formatCurrency().orEmpty() + " " + Config.getCurrencyCode()
-			)
-		}
+		fragment.setSymbolAndPrice(
+			rootFragment?.token?.symbol.orEmpty(),
+			rootFragment?.token?.price?.formatCurrency().orEmpty() + " " + Config.getCurrencyCode()
+		)
 	}
 	
 	override fun onFragmentShowFromHidden() {
-		fragment.getParentFragment<TokenDetailOverlayFragment> {
+		rootFragment?.apply {
 			overlayView.header.backButton.onClick {
-				backEvent(this@getParentFragment)
+				backEvent(this@apply)
 			}
 		}
 	}

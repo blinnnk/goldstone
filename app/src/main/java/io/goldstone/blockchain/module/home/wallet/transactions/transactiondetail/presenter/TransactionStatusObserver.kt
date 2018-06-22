@@ -7,10 +7,12 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -29,75 +31,77 @@ abstract class TransactionStatusObserver {
 	private val handler = Handler(Looper.getMainLooper())
 	private val targetIntervla = 6
 	abstract val transactionHash: String
+	abstract val chainType: ChainType
 	private var isFailed: Boolean? = null
 	private val retryTime = 6000L
 	
 	open fun checkStatusByTransaction() {
 		doAsync {
-			GoldStoneEthCall
-				.getTransactionByHash(
-					transactionHash,
-					Config.getCurrentChain(),
-					{
-						removeObserver()
-						handler.postDelayed(reDo, retryTime)
-					},
+			GoldStoneEthCall.getTransactionByHash(
+				transactionHash,
+				ChainURL.getChainNameByChainType(chainType),
+				{
+					removeObserver()
+					handler.postDelayed(reDo, retryTime)
+				},
+				{ error, _ ->
+					LogUtil.error("checkStatusByTransaction", error)
+				}
+			) { transaction ->
+				GoldStoneEthCall.getBlockNumber(
 					{ error, _ ->
 						LogUtil.error("checkStatusByTransaction", error)
-					}
-				) { transaction ->
-					GoldStoneEthCall.getBlockNumber(
-						{ error, _ ->
-							LogUtil.error("checkStatusByTransaction", error)
-						}
-					) { blockNumber ->
-						isFailed?.let { failed ->
-							GoldStoneAPI.context.runOnUiThread {
-								val blockInterval = blockNumber - transaction.blockNumber.toInt()
-								val hasConfirmed = blockInterval > targetIntervla
-								val hasError = TinyNumberUtils.isTrue(transaction.hasError)
-								
-								getStatus(
-									hasConfirmed,
-									blockInterval,
-									hasError,
-									failed
-								)
-								
-								if (hasConfirmed || hasError) {
-									removeObserver()
-								} else {
-									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									handler.postDelayed(reDo, retryTime)
-								}
+					},
+					ChainURL.getChainNameByChainType(chainType)
+				) { blockNumber ->
+					isFailed?.let { failed ->
+						GoldStoneAPI.context.runOnUiThread {
+							val blockInterval = blockNumber - transaction.blockNumber.toInt()
+							val hasConfirmed = blockInterval > targetIntervla
+							val hasError = TinyNumberUtils.isTrue(transaction.hasError)
+							
+							getStatus(
+								hasConfirmed,
+								blockInterval,
+								hasError,
+								failed
+							)
+							
+							if (hasConfirmed || hasError) {
+								removeObserver()
+							} else {
+								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+								handler.postDelayed(reDo, retryTime)
 							}
 						}
-						// 只判断一次是否是失败的交易
-						if (isFailed.isNull()) {
-							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
-							GoldStoneEthCall.getReceiptByHash(
-								transactionHash,
-								{ error, reason ->
-									LogUtil.error("checkStatusByTransaction$reason", error)
-								}
-							) { failed ->
-								isFailed = failed
-								if (isFailed == true) {
-									getStatus(
-										false,
-										1,
-										false,
-										failed
-									)
-									removeObserver()
-								} else {
-									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									handler.postDelayed(reDo, retryTime)
-								}
+					}
+					// 只判断一次是否是失败的交易
+					if (isFailed.isNull()) {
+						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+						GoldStoneEthCall.getReceiptByHash(
+							transactionHash,
+							{ error, reason ->
+								LogUtil.error("checkStatusByTransaction$reason", error)
+							},
+							ChainURL.getChainNameByChainType(chainType)
+						) { failed ->
+							isFailed = failed
+							if (isFailed == true) {
+								getStatus(
+									false,
+									1,
+									false,
+									failed
+								)
+								removeObserver()
+							} else {
+								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+								handler.postDelayed(reDo, retryTime)
 							}
 						}
 					}
 				}
+			}
 		}
 	}
 	
@@ -126,6 +130,7 @@ fun TransactionDetailPresenter.observerTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	val currentActivity = fragment.getMainActivity()
 	object : TransactionStatusObserver() {
+		override val chainType: ChainType = getCunrrentChainType()
 		override val transactionHash = currentHash
 		override fun getStatus(
 			confirmed: Boolean,
@@ -257,38 +262,27 @@ private fun TransactionDetailPresenter.updateWalletDetailValue(activity: MainAct
 	}
 }
 
-private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
-	callback: () -> Unit
-) {
-	GoldStoneEthCall
-		.getTransactionByHash(
-			currentHash,
-			Config.getCurrentChain(),
-			{
-				// unfinish callback
-			},
-			{ error, reason ->
-				fragment.context?.alert(reason ?: error.toString())
-			}
-		) { transaction ->
-			if (transaction.isERC20) {
-				val contract = transaction.to
-				GoldStoneEthCall.getTokenBalanceWithContract(
-					contract,
-					Config.getCurrentAddress(), { error, reason ->
-						fragment.context?.alert(reason ?: error.toString())
-					}) { balance ->
-					MyTokenTable.updateCurrentWalletBalanceWithContract(balance, contract)
-					callback()
-				}
-			} else {
-				GoldStoneEthCall.getEthBalance(
-					Config.getCurrentAddress(), { error, reason ->
-					fragment.context?.alert(reason ?: error.toString())
-				}) {
-					MyTokenTable.updateCurrentWalletBalanceWithContract(it, CryptoValue.ethContract)
-					callback()
-				}
-			}
+private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(callback: () -> Unit) {
+	GoldStoneEthCall.getTransactionByHash(
+		currentHash,
+		getCurrentChainName(),
+		{}, // unfinish callback
+		{ error, reason ->
+			fragment.context?.alert(reason ?: error.toString())
 		}
+	) { transaction ->
+		val contract = ChainURL.getContractByTransaction(transaction, getCurrentChainName())
+		MyTokenTable.getBalanceWithContract(
+			contract,
+			Config.getCurrentAddress(),
+			false,
+			{ error, reason ->
+				fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
+				LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
+			}
+		) {
+			MyTokenTable.updateCurrentWalletBalanceWithContract(it, contract)
+			callback()
+		}
+	}
 }

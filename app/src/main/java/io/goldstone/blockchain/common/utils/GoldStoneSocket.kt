@@ -108,7 +108,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 						.connectTimeout(timeout, TimeUnit.MILLISECONDS)
 						.retryOnConnectionFailure(true)
 						.build()
-				getcryptGetRequest(serverURL) {
+				getcryptGetRequest(serverURL, true) {
 					client?.newWebSocket(it, this)
 					client?.dispatcher()?.executorService()?.shutdown()
 				}

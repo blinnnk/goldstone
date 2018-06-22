@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -18,7 +17,6 @@ fun TransactionDetailPresenter.updateDataFromTransferFragment() {
 		count = CryptoUtils
 			.toCountByDecimal(value.toDouble(), token.decimal)
 		fragment.asyncData = generateModels()
-		observerTransaction()
 		val headerData = TransactionHeaderModel(
 			count,
 			address,
@@ -27,6 +25,7 @@ fun TransactionDetailPresenter.updateDataFromTransferFragment() {
 		)
 		updateHeaderValue(headerData)
 		headerModel = headerData
+		observerTransaction()
 	}
 }
 
@@ -34,10 +33,8 @@ fun TransactionDetailPresenter.updateDataFromTransferFragment() {
 fun TransactionDetailPresenter.getTransactionFromChain() {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		Config.getCurrentChain(),
-		{
-			// unfinish callback
-		},
+		getCurrentChainName(),
+		{}, // unfinish callback
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}

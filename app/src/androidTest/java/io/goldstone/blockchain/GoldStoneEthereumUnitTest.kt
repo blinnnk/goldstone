@@ -7,6 +7,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -34,13 +36,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenInfoByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // symbol = GSC
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
 			{ error, reason ->
 				LogUtil.error("$positon getTokenInfoByContract $reason", error)
 			},
-			chainID
+			chainName
 		) { symbol, name, decimal ->
 			val result = "symbol - $symbol name - $name decimal - $decimal"
 			LogUtil.debug("$positon getTokenInfoByContract)", result)
@@ -53,10 +55,10 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTransactionByHash() {
 		val transactionHash = "0xfc71d21397ed9e4b3765d2b1fd37c388481bf023bdde1a9edbbd9a732884e3aa"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTransactionByHash(
 			transactionHash,
-			chainID,
+			chainName,
 			{
 				// Unfinished
 			},
@@ -76,7 +78,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getReceiptByHash() {
 		val transactionHash = "0XF3652ACBADF1EB216E21FF77B742B30786438D63E5EEF4FEB96F24C2CAF54715"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getReceiptByHash(
 			transactionHash,
 			{ error, reason ->
@@ -85,7 +87,7 @@ class GoldStoneEthereumUnitTest {
 					error
 				)
 			},
-			chainID
+			chainName
 		) {
 			// Result is False means isFailed == false
 			LogUtil.debug(positon + "getTransactionByHash", "$it")
@@ -96,7 +98,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getBlockTimeStampByBlockHash() {
 		val blockHash = "0x67d97f9de7747023c4340be566db53f48e2bc9c0d953c14d65accb2abcc242db"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getBlockTimeStampByBlockHash(
 			blockHash,
 			{ error, reason ->
@@ -105,7 +107,7 @@ class GoldStoneEthereumUnitTest {
 					error
 				)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be 1485158072
 			LogUtil.debug(positon + "getBlockTimeStampByBlockHash", "$it")
@@ -115,7 +117,7 @@ class GoldStoneEthereumUnitTest {
 	
 	@Test
 	fun getBlockNumber() {
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getBlockNumber(
 			{ error, reason ->
 				LogUtil.error(
@@ -123,7 +125,7 @@ class GoldStoneEthereumUnitTest {
 					error
 				)
 			},
-			chainID
+			chainName
 		) {
 			// Get Current Block number, it will always different than
 			// before but it must bigger than before
@@ -136,14 +138,14 @@ class GoldStoneEthereumUnitTest {
 	fun getTokenBalanceByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
 		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenBalanceWithContract(
 			contract,
 			address,
 			{ error, reason ->
 				LogUtil.error(positon + "getTokenBalanceByContract" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// The balance in June 16/2018 is 1.882099E13
 			LogUtil.debug(positon + "getTokenBalanceByContract", "$it")
@@ -154,13 +156,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenSymbolByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenSymbolByContract(
 			contract,
 			{ error, reason ->
 				LogUtil.error(positon + "getTokenBalanceByContract" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be GSC
 			LogUtil.debug(positon + "getTokenSymbolByContract", it)
@@ -171,13 +173,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenDecimal() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenDecimal(
 			contract,
 			{ error, reason ->
 				LogUtil.error(positon + "getTokenDecimal" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be 9.0
 			LogUtil.debug(positon + "getTokenDecimal", it.toString())
@@ -188,13 +190,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenName() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenName(
 			contract,
 			{ error, reason ->
 				LogUtil.error(positon + "getTokenName" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be GoldstoneCoin
 			LogUtil.debug(positon + "getTokenName", it)
@@ -205,13 +207,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getEthBalance() {
 		val contract = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getEthBalance(
 			contract,
 			{ error, reason ->
 				LogUtil.error(positon + "getEthBalance" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be greater than 0
 			LogUtil.debug(positon + "getEthBalance", it.toString())
@@ -222,13 +224,13 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenTotalSupply() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC In Ropsten
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTokenTotalSupply(
 			contract,
 			{ error, reason ->
 				LogUtil.error(positon + "getTokenTotalSupply" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be 1000000000000000000
 			LogUtil.debug(positon + "getTokenTotalSupply", it.toString())
@@ -244,7 +246,7 @@ class GoldStoneEthereumUnitTest {
 		val from = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
 		val to = "0x6E3DF901A984d50b68355eeDE503cBfC1eAd8F13"
 		val data = "0x"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			from,
@@ -252,7 +254,7 @@ class GoldStoneEthereumUnitTest {
 			{ error, reason ->
 				LogUtil.error(positon + "getTransactionExecutedValue" + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			// Result should be 21000
 			LogUtil.debug(positon + "getTransactionExecutedValue", it.toString())
@@ -276,18 +278,32 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getInputCodeByTaxHash() {
 		val hash = "0x6fe5d4a28755b260d01654b0e5b7f74d8ca236bd69229bf57a712b480d39f2b6"
-		val chainID = ChainID.Ropsten.id
+		val chainName = Config.getCurrentChainName()
 		GoldStoneEthCall.getInputCodeByHash(
 			hash,
 			{ error, reason ->
 				LogUtil.error(positon + reason, error)
 			},
-			chainID
+			chainName
 		) {
 			val expectedValue =
 				"0xa9059cbb000000000000000000000000ca6655dc28c4ecea148033bf6fac60b1398482e000000000000000000000000000000000000000000000000000000000002c252c4e69636520746f206d65657420796f752062616279"
 			LogUtil.debug("$positon + getInputCodeByTaxHash", it)
 			assertTrue("Got Wrong Input Code", it.equals(expectedValue, true))
+		}
+	}
+	
+	@Test
+	fun getUsableNonceByAddress() {
+		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
+		GoldStoneEthCall.getUsableNonce(
+			{ error, reason ->
+				LogUtil.error("getUsableNonceByAddress $reason", error)
+			},
+			ChainType.ETH,
+			address
+		) {
+			LogUtil.debug("getUsableNonceByAddress", "$it")
 		}
 	}
 }
