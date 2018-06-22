@@ -28,4 +28,5 @@ enum class EthereumMethod(
 	PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
 	GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
 	GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
+	GetTransactionCount("eth_getTransactionCount", SolidityCode.ethCall, "GetTransactionCount"),
 }

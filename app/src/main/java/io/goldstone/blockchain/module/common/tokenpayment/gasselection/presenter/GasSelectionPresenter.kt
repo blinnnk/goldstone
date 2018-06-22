@@ -15,6 +15,7 @@ import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
@@ -45,6 +46,9 @@ class GasSelectionPresenter(
 	var currentMinerType = MinerFeeType.Recommend.content
 	private var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
+	}
+	private val rootFragment by lazy {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()
 	}
 	private val prepareModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
@@ -99,7 +103,7 @@ class GasSelectionPresenter(
 	}
 	
 	fun goToGasEditorFragment() {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		rootFragment?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(
 				TokenDetailText.customGas,
 				TokenDetailText.paymentValue,
@@ -113,7 +117,7 @@ class GasSelectionPresenter(
 	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
 		// Prevent user click the other button at this time
 		fragment.showMaskView(true)
-		val token = fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+		val token = rootFragment?.token
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsvalid(token)) {
 			callback()
@@ -207,13 +211,17 @@ class GasSelectionPresenter(
 					}
 					val signedHex = TransactionUtils.signTransaction(raw, privateKey)
 					// 发起 `sendRawTransaction` 请求
-					GoldStoneEthCall.sendRawTransaction(signedHex, { error, reason ->
-						fragment.context?.apply {
-							alert(reason ?: error.toString())
-							fragment.showMaskView(false)
-							callback()
-						}
-					}) { taxHash ->
+					GoldStoneEthCall.sendRawTransaction(
+						signedHex,
+						{ error, reason ->
+							fragment.context?.apply {
+								alert(reason ?: error.toString())
+								fragment.showMaskView(false)
+								callback()
+							}
+						},
+						ChainURL.getChainNameBySymbol(rootFragment?.token?.symbol.orEmpty())
+					) { taxHash ->
 						LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 						// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 						taxHash.isValidTaxHash() isTrue {
@@ -253,7 +261,7 @@ class GasSelectionPresenter(
 		taxHash: String
 	) {
 		// 准备跳转到下一个界面
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		rootFragment?.apply {
 			// 如果有键盘收起键盘
 			activity?.apply { SoftKeyboard.hide(this) }
 			removeChildFragment(fragment)
@@ -285,7 +293,7 @@ class GasSelectionPresenter(
 		taxHash: String,
 		memoData: String
 	) {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		rootFragment?.apply {
 			TransactionTable().apply {
 				isReceive = false
 				symbol = token!!.symbol
@@ -396,7 +404,7 @@ class GasSelectionPresenter(
 	
 	override fun onFragmentShowFromHidden() {
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				backEvent(this@apply)
 			}

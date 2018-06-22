@@ -21,7 +21,7 @@ object SolidityCode {
 	const val logTransferFilter = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 }
 
-object CryptoValue  {
+object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
@@ -50,8 +50,6 @@ object CryptoName {
 	const val etc = "Ethereum Classic"
 }
 
-object CryptoID {
-	const val btc = 0
-	const val eth = 60
-	const val etc = 61
+enum class ChainType(val id: Int) {
+	BTC(0), ETH(60), ETC(61)
 }

@@ -132,7 +132,8 @@ class TokenSearchPresenter(
 							content,
 							{ error, reason ->
 								fragment.context?.alert(reason ?: error.toString())
-							}
+							},
+							Config.getCurrentChainName()
 						) { symbol, name, decimal ->
 							if (symbol.isEmpty() || name.isEmpty()) {
 								hold(arrayListOf())

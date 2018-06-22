@@ -22,8 +22,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.m
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
-import java.math.BigInteger
-import kotlin.math.max
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -234,33 +232,6 @@ data class TransactionTable(
 			}
 		}
 		
-		/**
-		 * 分别从本地数据库以及 `Etherscan` 查询目前成功的最大的 `nonce` 值来生成
-		 * 最近可用的 `nonce`
-		 */
-		fun getLatestValidNonce(
-			errorCallback: (Exception) -> Unit,
-			hold: (BigInteger) -> Unit
-		) {
-			GoldStoneAPI.getTransactionListByAddress(
-				"0",
-				errorCallback
-			) {
-				TransactionTable.getLocalLatestNonce { localNonce ->
-					val myLatestNonce = firstOrNull {
-						it.fromAddress.equals(Config.getCurrentAddress(), true)
-					}?.nonce?.toLong()
-					val chainNonce = if (myLatestNonce.isNull()) 0L
-					else myLatestNonce!! + 1
-					BigInteger.valueOf(
-						max(chainNonce, if (localNonce.isNull()) 0 else localNonce!! + 1)
-					).let {
-						hold(it)
-					}
-				}
-			}
-		}
-		
 		private fun getLocalLatestNonce(hold: (Long?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase
@@ -350,7 +321,7 @@ data class TransactionTable(
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
-			chainName: String = Config.getCurrentChainName(),
+			chainName: String,
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->

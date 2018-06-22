@@ -7,6 +7,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.NotificationText
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -94,6 +96,22 @@ class TransactionDetailPresenter(
 				updateParentContentLayoutHeight(fragment.asyncData?.size)
 			}
 		}
+	}
+	
+	fun getCunrrentChainType(): ChainType {
+		return ChainURL.getChainTypeBySymbol(
+			data?.token?.symbol
+			?: dataFromList?.symbol
+			?: notificationData?.symbol.orEmpty()
+		)
+	}
+	
+	fun getCurrentChainName(): String {
+		return ChainURL.getChainNameBySymbol(
+			data?.token?.symbol
+			?: dataFromList?.symbol
+			?: notificationData?.symbol.orEmpty()
+		)
 	}
 	
 	fun showEtherScanTransactionFragment() {

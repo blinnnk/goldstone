@@ -16,6 +16,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
 class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresenter>() {
 	
 	var valueHeader: TwoLineTitles? = null
+	
 	val token by lazy {
 		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
 	}

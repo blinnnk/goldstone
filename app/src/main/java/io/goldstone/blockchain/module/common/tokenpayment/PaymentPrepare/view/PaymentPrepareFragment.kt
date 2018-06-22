@@ -35,7 +35,12 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	
 	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
-	val count by lazy { arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0) }
+	val count by lazy {
+		arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0)
+	}
+	val rootFragment by lazy {
+		getParentFragment<TokenDetailOverlayFragment>()
+	}
 	private val inputView by lazy { ValueInputView(context!!) }
 	private val sendInfo by lazy { GraySqualCell(context!!) }
 	private val from by lazy { GraySqualCell(context!!) }
@@ -152,7 +157,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	
 	private fun resetBackButtonEvent() {
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
-		getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				if (memoInputView.isNull()) {
 					presenter.setValueHeader(token)
@@ -188,8 +193,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 	
 	private fun updateValueTotalPrice() {
-		val price =
-			getParentFragment<TokenDetailOverlayFragment>()?.token?.price ?: 0.0
+		val price = rootFragment?.token?.price ?: 0.0
 		inputView.inputTextListener {
 			inputView.updateCurrencyValue(price)
 			if (it.isNotEmpty()) {

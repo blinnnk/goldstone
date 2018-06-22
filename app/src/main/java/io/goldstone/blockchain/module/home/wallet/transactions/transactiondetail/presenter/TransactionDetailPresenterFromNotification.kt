@@ -87,10 +87,8 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		info.chainID,
-		{
-			// unfinished callback
-		},
+		getCurrentChainName(),
+		{}, // unfinished callback
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
@@ -99,7 +97,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			TransactionTable.getMemoByHashAndReceiveStatus(
 				info.hash,
 				info.isReceived,
-				info.chainID
+				getCurrentChainName()
 			) { memo ->
 				receipt.toAsyncData().let {
 					it[4].info = TimeUtils.formatDate(info.timeStamp)

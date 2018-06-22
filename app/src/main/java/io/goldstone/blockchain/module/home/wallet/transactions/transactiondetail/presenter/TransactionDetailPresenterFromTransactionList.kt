@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.utils.toEthValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -38,7 +39,11 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
 		checkTokenNameInfoOrUpdate()
 		
-		TransactionTable.getMemoByHashAndReceiveStatus(currentHash, isReceived) { memo ->
+		TransactionTable.getMemoByHashAndReceiveStatus(
+			currentHash,
+			isReceived,
+			getCurrentChainName()
+		) { memo ->
 			fragment.removeLoadingView()
 			fragment.asyncData = generateModels(this).apply {
 				this[1].info = memo
@@ -133,7 +138,8 @@ private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 					contract,
 					{ error, reason ->
 						LogUtil.error("getCurrentChainTokenByContract $reason", error)
-					}
+					},
+					ChainURL.getChainNameBySymbol(symbol)
 				) {
 					DefaultTokenTable.updateTokenName(contract, it)
 				}
