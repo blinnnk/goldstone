@@ -59,7 +59,6 @@ abstract class TransactionStatusObserver {
 							val blockInterval = blockNumber - transaction.blockNumber.toInt()
 							val hasConfirmed = blockInterval > targetIntervla
 							val hasError = TinyNumberUtils.isTrue(transaction.hasError)
-							
 							getStatus(
 								hasConfirmed,
 								blockInterval,
@@ -77,26 +76,32 @@ abstract class TransactionStatusObserver {
 					}
 					// 只判断一次是否是失败的交易
 					if (isFailed.isNull()) {
-						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
-						GoldStoneEthCall.getReceiptByHash(
-							transactionHash,
-							{ error, reason ->
-								LogUtil.error("checkStatusByTransaction$reason", error)
-							},
-							ChainURL.getChainNameByChainType(chainType)
-						) { failed ->
-							isFailed = failed
-							if (isFailed == true) {
-								getStatus(
-									false,
-									1,
-									false,
-									failed
-								)
-								removeObserver()
-							} else {
-								// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-								handler.postDelayed(reDo, retryTime)
+						if (chainType == ChainType.ETC) {
+							isFailed = false
+							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+							handler.postDelayed(reDo, retryTime)
+						} else {
+							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+							GoldStoneEthCall.getReceiptByHash(
+								transactionHash,
+								{ error, reason ->
+									LogUtil.error("checkStatusByTransaction$reason", error)
+								},
+								ChainURL.getChainNameByChainType(chainType)
+							) { failed ->
+								isFailed = failed
+								if (isFailed == true) {
+									getStatus(
+										false,
+										1,
+										false,
+										failed
+									)
+									removeObserver()
+								} else {
+									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+									handler.postDelayed(reDo, retryTime)
+								}
 							}
 						}
 					}

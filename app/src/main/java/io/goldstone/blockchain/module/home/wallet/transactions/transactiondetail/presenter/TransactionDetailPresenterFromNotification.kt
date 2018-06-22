@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.utils.toEthValue
+import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -127,7 +127,7 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(
 
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toEthValue(),
+		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toUnitValue(),
 		TransactionText.noMemo,
 		"",
 		hash,

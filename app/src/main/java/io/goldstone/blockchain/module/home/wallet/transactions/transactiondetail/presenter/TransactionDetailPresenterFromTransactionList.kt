@@ -8,7 +8,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
-import io.goldstone.blockchain.crypto.utils.toEthValue
+import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -68,7 +68,7 @@ fun TransactionDetailPresenter.generateModels(
 ): ArrayList<TransactionDetailModel> {
 	val minerFee =
 		if (data.isNull()) dataFromList?.minerFee
-		else (data!!.gasLimit * data!!.gasPrice).toDouble().toEthValue()
+		else (data!!.gasLimit * data!!.gasPrice).toDouble().toUnitValue(getUnitSymbol())
 	val date =
 		if (data.isNull()) dataFromList?.date
 		else TimeUtils.formatDate(data!!.timestamp / 1000)
