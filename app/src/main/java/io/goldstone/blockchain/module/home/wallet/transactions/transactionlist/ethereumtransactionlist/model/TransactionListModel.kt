@@ -18,7 +18,7 @@ import java.io.Serializable
  * @author KaySaith
  */
 data class TransactionListModel(
-	val addressName: String,
+	var addressName: String,
 	val addressInfo: String,
 	var count: Double,
 	val symbol: String,

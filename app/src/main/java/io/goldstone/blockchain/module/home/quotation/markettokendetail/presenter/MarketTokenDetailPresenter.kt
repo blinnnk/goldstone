@@ -107,7 +107,7 @@ class MarketTokenDetailPresenter(
 				setContentPadding()
 				addContent {
 					QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
-						textView(it?.description) {
+						textView(it?.description?.substring(2)) {
 							textColor = GrayScale.gray
 							textSize = fontSize(14)
 							typeface = GoldStoneFont.medium(context)

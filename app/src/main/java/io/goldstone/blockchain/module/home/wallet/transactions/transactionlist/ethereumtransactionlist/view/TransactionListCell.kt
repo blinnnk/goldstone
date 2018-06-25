@@ -25,24 +25,26 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 				if (it.hasError || it.isFailed) {
 					src = R.drawable.error_icon
 					iconColor = Spectrum.red
-					count?.title?.textColor = Spectrum.red
+					count?.title?.textColor = Spectrum.lightRed
 				} else {
 					if (it.isReceived) {
 						src = R.drawable.receive_icon
 						iconColor = Spectrum.green
 						count?.title?.textColor = Spectrum.green
 					} else {
-						src = if (model?.isPending == true) R.drawable.pending_icon else R.drawable.send_icon
-						iconColor = if (model?.isPending == true) Spectrum.darkBlue else GrayScale.midGray
-						count?.title?.textColor = Spectrum.red
+						src =
+							if (model?.isPending == true) R.drawable.pending_icon
+							else R.drawable.send_icon
+						iconColor =
+							if (model?.isPending == true) Spectrum.darkBlue
+							else GrayScale.midGray
+						count?.title?.textColor = Spectrum.lightRed
 					}
 				}
 			}
 			
 			info.apply {
-				title.text =
-					if (model?.isReceived == true) CryptoUtils.scaleTo22(it.targetAddress)
-					else CryptoUtils.scaleTo22(it.addressName)
+				title.text = CryptoUtils.scaleTo22(it.addressName)
 				subtitle.text = it.addressInfo
 			}
 			

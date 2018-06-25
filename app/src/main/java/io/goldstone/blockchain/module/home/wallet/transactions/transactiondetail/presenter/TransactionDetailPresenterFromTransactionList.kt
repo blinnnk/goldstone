@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -75,14 +74,13 @@ fun TransactionDetailPresenter.generateModels(
 	val memo =
 		if (data?.memo.isNull()) TransactionText.noMemo
 		else data?.memo
-	var isReceive: Boolean? = null
 	val receiptData = when (receipt) {
 		is TransactionListModel -> {
-			isReceive = receipt.isReceived
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
-				Config.getCurrentAddress(),
+				if (receipt.isReceived) receipt.targetAddress else Config.getCurrentAddress(),
+				if (receipt.isReceived) Config.getCurrentAddress() else receipt.targetAddress,
 				receipt.transactionHash,
 				receipt.blockNumber,
 				receipt.date,
@@ -91,11 +89,11 @@ fun TransactionDetailPresenter.generateModels(
 		}
 		
 		is TransactionTable -> {
-			isReceive = receipt.isReceive
 			arrayListOf(
 				minerFee,
 				memo,
-				Config.getCurrentAddress(),
+				if (receipt.isReceive) receipt.to else Config.getCurrentAddress(),
+				if (receipt.isReceive) Config.getCurrentAddress() else receipt.to,
 				currentHash,
 				receipt.blockNumber,
 				date,
@@ -108,6 +106,7 @@ fun TransactionDetailPresenter.generateModels(
 				minerFee,
 				memo,
 				Config.getCurrentAddress(),
+				Config.getCurrentAddress(),
 				currentHash,
 				"Waiting...",
 				date,
@@ -118,7 +117,8 @@ fun TransactionDetailPresenter.generateModels(
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
-		(if (isReceive == true) CommonText.to else CommonText.from) + " " + ImportWalletText.address,
+		CommonText.from,
+		CommonText.to,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

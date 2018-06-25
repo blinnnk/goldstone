@@ -59,7 +59,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 							"(${Config.getCurrencyCode
 							()})"
 						)
-					setBigWhiteStyle(fontSize(16).toInt())
+					setBigWhiteStyle(fontSize(14).toInt())
 					isCenter = true
 				}?.into(this)
 				valueHeader?.apply {

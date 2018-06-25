@@ -16,6 +16,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -55,11 +56,13 @@ class TransactionListPresenter(
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getListModelsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
-				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
-				// Save a copy into memory for imporving the speed of next time to view
-				memoryTransactionListData = it
-				// Check and update the new data from chain in async thread
-				fragment.updateTransactionInAsync(it)
+				checkAddressNameInContacts(it) {
+					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+					// Save a copy into memory for imporving the speed of next time to view
+					memoryTransactionListData = it
+					// Check and update the new data from chain in async thread
+					fragment.updateTransactionInAsync(it)
+				}
 			} else {
 				/**
 				 * if there is none data in local then `StartBlock 0`
@@ -73,8 +76,10 @@ class TransactionListPresenter(
 						LogUtil.error("Error When GetTransactionDataFromEtherScan $it")
 					}
 				) {
-					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
-					removeLoadingView()
+					checkAddressNameInContacts(it) {
+						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+						removeLoadingView()
+					}
 				}
 			}
 		}
@@ -119,6 +124,27 @@ class TransactionListPresenter(
 	}
 	
 	companion object {
+		
+		fun checkAddressNameInContacts(
+			transactions: ArrayList<TransactionListModel>,
+			callback: () -> Unit
+		) {
+			ContactTable.getAllContacts { contacts ->
+				if (contacts.isEmpty()) {
+					callback()
+				} else {
+					transactions.forEachOrEnd { item, isEnd ->
+						item.addressName =
+							contacts.find {
+								it.address.equals(item.targetAddress, true)
+							}?.name ?: item.targetAddress
+						if (isEnd) {
+							callback()
+						}
+					}
+				}
+			}
+		}
 		
 		fun showTransactionDetail(
 			fragment: TransactionFragment?,
@@ -347,7 +373,7 @@ class TransactionListPresenter(
 								val contract =
 									if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
 									else transaction.to
-								var receiveAddress = ""
+								var receiveAddress: String? = null
 								var count = 0.0
 								/** 从本地数据库检索 `contract` 对应的 `symbol` */
 								localTokens.find {
@@ -367,7 +393,7 @@ class TransactionListPresenter(
 											transactionInfo?.count.orElse(0.0),
 											tokenInfo.decimals.orZero()
 										)
-										receiveAddress = transactionInfo?.address!!
+										receiveAddress = transactionInfo?.address
 									}
 									
 									TransactionTable.updateModelInfo(

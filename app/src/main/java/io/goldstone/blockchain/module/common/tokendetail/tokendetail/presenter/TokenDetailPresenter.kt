@@ -129,14 +129,16 @@ class TokenDetailPresenter(
 	}
 	
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
-		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
-		// 显示内存的数据后异步更新数据
-		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			data.prepareTokenHistoryBalance(token?.contract!!) {
-				it.updateChartAndHeaderData()
+		TransactionListPresenter.checkAddressNameInContacts(data) {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
+			// 显示内存的数据后异步更新数据
+			NetworkUtil.hasNetworkWithAlert(context) isTrue {
+				data.prepareTokenHistoryBalance(token?.contract!!) {
+					it.updateChartAndHeaderData()
+				}
+			} otherwise {
+				updateEmptyCharData(token?.symbol!!)
 			}
-		} otherwise {
-			updateEmptyCharData(token?.symbol!!)
 		}
 	}
 	

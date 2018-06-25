@@ -45,7 +45,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 				lparams(matchParent, matchParent)
 				attentionView.apply {
 					text = CreateWalletText.attention
-					textSize = fontSize(12)
+					textSize = fontSize(13)
 					textColor = Spectrum.white
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()

@@ -47,9 +47,10 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		style = Paint.Style.STROKE
 		strokeWidth = fontSize(7)
 	}
-	private val barHeight = 48.uiPX()
+	private val barHeight = 45.uiPX()
 	private var underLineLeft = 0f
 	private var underLineWidth = 0f
+	private val boderSize = fontSize(4)
 	
 	init {
 		setWillNotDraw(false)
@@ -71,18 +72,18 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		paint.color = GrayScale.whiteGray
 		canvas?.drawLine(
 			0f,
-			height - fontSize(7),
+			height - boderSize,
 			width * 1f,
-			height - BorderSize.crude,
+			height - boderSize,
 			paint
 		)
 		
 		paint.color = Spectrum.blue
 		canvas?.drawLine(
 			underLineLeft,
-			height - fontSize(7),
+			height - boderSize,
 			underLineLeft + underLineWidth,
-			height - BorderSize.crude,
+			height - boderSize,
 			paint
 		)
 	}

@@ -62,10 +62,6 @@ object Spectrum {
 	@JvmField
 	val darkBlue = Color.parseColor("#FF0863B8")
 	@JvmField
-	val blueBlack = Color.parseColor("#FF05394B")
-	@JvmField
-	val opacityDarkBlue = Color.parseColor("#800863B8")
-	@JvmField
 	val red = Color.parseColor("#FFFA0D0D")
 	@JvmField
 	val lightRed = Color.parseColor("#FFFF6464")
@@ -74,17 +70,11 @@ object Spectrum {
 	@JvmField
 	val opacity1White = Color.parseColor("#1AFFFFFF")
 	@JvmField
-	val opacity05White = Color.parseColor("#0DFFFFFF")
-	@JvmField
-	val opacity02White = Color.parseColor("#05FFFFFF")
-	@JvmField
 	val opacity3White = Color.parseColor("#4DFFFFFF")
 	@JvmField
 	val opacity2White = Color.parseColor("#33FFFFFF")
 	@JvmField
 	val opacity5White = Color.parseColor("#80FFFFFF")
-	@JvmField
-	val opacity8White = Color.parseColor("#CCFFFFFF")
 }
 
 object ShadowSize {

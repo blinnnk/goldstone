@@ -34,9 +34,10 @@ data class ContactTable(
 		}
 		
 		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit = {}) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.contactDao().getAllContacts()
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.contactDao().getAllContacts()
+				}) {
 				callback(it.toArrayList())
 			}
 		}

@@ -20,9 +20,8 @@ import org.jetbrains.anko.*
  * @date 2018/5/13 11:37 AM
  * @author KaySaith
  */
-
 class RecyclerLoadingView(context: Context) : RelativeLayout(context) {
-
+	
 	private val progressBar = ProgressBar(
 		this.context, null, R.attr.progressBarStyleInverse
 	).apply {
@@ -32,14 +31,13 @@ class RecyclerLoadingView(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(16.uiPX(), 16.uiPX())
 		setCenterInVertical()
 	}
-
 	private var loadingText: TextView
-
+	
 	init {
 		progressBar.into(this)
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 42.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 45.uiPX())
 		backgroundColor = Spectrum.green
-
+		
 		loadingText = textView {
 			x += 16.uiPX()
 			textSize = fontSize(12)
@@ -49,10 +47,9 @@ class RecyclerLoadingView(context: Context) : RelativeLayout(context) {
 		}
 		loadingText.setCenterInParent()
 	}
-
+	
 	fun setTextContent(content: String) {
 		loadingText.text = content
 		progressBar.x = (ScreenSize.Width - loadingText.text.measureTextWidth(14.uiPX().toFloat())) / 2f
 	}
-
 }
