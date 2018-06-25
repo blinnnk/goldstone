@@ -18,7 +18,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContractInputPresenter
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -28,12 +28,12 @@ import org.jetbrains.anko.verticalLayout
  * @date 16/04/2018 1:13 PM
  * @author KaySaith
  */
-class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
+class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 	
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val addressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	override val presenter = ContractInputPresenter(this)
+	override val presenter = ContactInputPresenter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
@@ -56,6 +56,8 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 			}.click {
 				presenter.addContact()
 			}.into(this)
+			
+			presenter.getAddressIfExist(addressInput)
 		}
 	}
 	
@@ -73,7 +75,7 @@ class ContractInputFragment : BaseFragment<ContractInputPresenter>() {
 	) {
 		getParentFragment<ProfileOverlayFragment> {
 			headerTitle = ProfileText.contacts
-			presenter.popFragmentFrom<ContractInputFragment>()
+			presenter.popFragmentFrom<ContactInputFragment>()
 		}
 	}
 }

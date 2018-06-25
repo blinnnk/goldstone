@@ -9,6 +9,7 @@ import com.blinnnk.extension.setAlignParentBottom
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.TokenDetailPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -34,11 +35,23 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionListModel>?
 	) {
-		recyclerView.adapter = TokenDetailAdapter(asyncData.orEmptyArray()) {
+		recyclerView.adapter = TokenDetailAdapter(asyncData.orEmptyArray(), {
 			onClick {
 				model?.let {
 					presenter.showTransactionDetailFragment(it)
 					preventDuplicateClicks()
+				}
+			}
+		}) {
+			menu.getButton { button ->
+				button.onClick {
+					when (button.text) {
+						CommonText.all -> presenter.showAllData()
+						CommonText.deposit -> presenter.showOnlyReceiveData()
+						CommonText.send -> presenter.showOnlySendData()
+					}
+					menu.selected(button.id)
+					button.preventDuplicateClicks()
 				}
 			}
 		}

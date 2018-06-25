@@ -36,6 +36,8 @@ class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 	
+	private var allData: ArrayList<TransactionListModel>? = null
+	
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		loadDataFromDatabaseOrElse()
 	}
@@ -46,6 +48,28 @@ class TokenDetailPresenter(
 		// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
 		AnimationDuration.Default timeUpThen {
 			prepareTokenDetailData()
+		}
+	}
+	
+	fun showOnlyReceiveData() {
+		allData?.filter {
+			it.isReceived
+		}?.let {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		}
+	}
+	
+	fun showOnlySendData() {
+		allData?.filter {
+			!it.isReceived
+		}?.let {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		}
+	}
+	
+	fun showAllData() {
+		allData?.let {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(it)
 		}
 	}
 	
@@ -129,6 +153,7 @@ class TokenDetailPresenter(
 	}
 	
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
+		allData = data
 		TransactionListPresenter.checkAddressNameInContacts(data) {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
 			// 显示内存的数据后异步更新数据

@@ -5,6 +5,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -24,16 +25,24 @@ class TransactionDetailFragment :
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionDetailModel>?
 	) {
-		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) {
-			onClick {
-				if (model.description == TransactionText.url) {
-					presenter.showEtherScanTransactionFragment()
-				} else {
-					this@TransactionDetailFragment.context?.clickToCopy(model.info)
+		recyclerView.adapter =
+			TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
+				if (
+					model.description.equals(CommonText.from, true)
+					|| model.description.equals(CommonText.to, true)
+				) {
+					presenter.showAddContactsButton(this@cell)
 				}
-				preventDuplicateClicks()
+				
+				onClick {
+					if (model.description == TransactionText.url) {
+						presenter.showEtherScanTransactionFragment()
+					} else {
+						this@cell.context?.clickToCopy(model.info)
+					}
+					preventDuplicateClicks()
+				}
 			}
-		}
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {

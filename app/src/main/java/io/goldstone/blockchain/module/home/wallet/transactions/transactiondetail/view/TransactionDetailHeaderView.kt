@@ -46,7 +46,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		
 		verticalLayout {
 			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 140.uiPX()).apply {
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 160.uiPX()).apply {
 					leftMargin = (ScreenSize.Width * 0.2).toInt()
 					addRule(CENTER_VERTICAL)
 				}
@@ -54,10 +54,10 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			gravity = Gravity.CENTER_HORIZONTAL
 			
 			icon.apply {
+				y += 5.uiPX()
 				iconSize = 60.uiPX()
 				setColorFilter(GrayScale.Opacity2Black)
-				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-				elevation = 15.uiPX().toFloat()
+				elevation = 10.uiPX().toFloat()
 			}.into(this)
 			
 			info.apply {
