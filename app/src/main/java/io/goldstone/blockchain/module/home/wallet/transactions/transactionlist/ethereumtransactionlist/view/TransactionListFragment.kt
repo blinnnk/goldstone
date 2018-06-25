@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -32,6 +33,13 @@ class TransactionListFragment :
 					preventDuplicateClicks()
 				}
 			}
+		}
+	}
+	
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		getParentFragment<TransactionFragment> {
+			showMenuBar(!hidden)
 		}
 	}
 }

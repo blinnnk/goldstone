@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transaction.view
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -20,6 +21,8 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  * @author KaySaith
  */
 class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
+	
+	var isETCListShown: Runnable? = null
 	
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
@@ -50,8 +53,16 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 				onPageScrolled { position, percent, _ ->
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 				}
+				
+				onPageSelected {
+					if (it == 1) isETCListShown?.run()
+				}
 			}
 		}
+	}
+	
+	fun showMenuBar(isShow: Boolean) {
+		menuBar.visibility = if (isShow) View.VISIBLE else View.GONE
 	}
 	
 	companion object {

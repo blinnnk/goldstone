@@ -26,6 +26,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
@@ -100,6 +101,24 @@ object GoldStoneAPI {
 	) {
 		requestData<TokenSearchModel>(
 			APIPath.getCoinInfo(APIPath.currentUrl) + symbols,
+			"list",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(toArrayList())
+		}
+	}
+	
+	@JvmStatic
+	fun getETCTransactions(
+		chainType: Int,
+		chainID: Int,
+		address: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<ETCTransactionModel>) -> Unit
+	) {
+		requestData<ETCTransactionModel>(
+			APIPath.getETCTransactions(APIPath.currentUrl, chainType, chainID, address),
 			"list",
 			errorCallback = errorCallback,
 			isEncrypt = true

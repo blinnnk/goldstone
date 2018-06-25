@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -35,13 +36,17 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView("Loading data from chain")
+		
 		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
-		checkTokenNameInfoOrUpdate()
+		if (!symbol.equals(CryptoSymbol.etc, true)) {
+			checkTokenNameInfoOrUpdate()
+		}
 		
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			getCurrentChainName()
+			if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChainName()
+			else getCurrentChainName()
 		) { memo ->
 			fragment.removeLoadingView()
 			fragment.asyncData = generateModels(this).apply {

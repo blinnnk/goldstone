@@ -8,18 +8,20 @@ import com.blinnnk.util.ConcurrentCombine
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
+import io.goldstone.blockchain.crypto.utils.toIntFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 
@@ -68,10 +70,10 @@ data class TransactionTable(
 	@SerializedName("confirmations")
 	var confirmations: String,
 	var isReceive: Boolean,
-	var isERC20: Boolean,
+	var isERC20Token: Boolean,
 	var symbol: String,
 	var recordOwnerAddress: String,
-	var tokenReceiveAddress: String? = null,
+	var tokenReceiveAddress: String? = null, // `Contract` 内的真实接收地址
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
@@ -193,18 +195,49 @@ data class TransactionTable(
 		Config.getCurrentAddress()
 	)
 	
+	constructor(data: ETCTransactionModel) : this(
+		0,
+		data.blockNumber.toIntFromHex().toString(),
+		data.timestamp.hexToDecimal().toBigDecimal().toString(),
+		data.hash,
+		data.nonce.toIntFromHex().toString(),
+		data.blockHash,
+		data.transactionIndex.hexToDecimal().toString(),
+		data.from,
+		data.to,
+		CryptoUtils.toCountByDecimal(
+			data.value.hexToDecimal(),
+			CryptoValue.ethDecimal
+		).toString(),
+		data.gas.hexToDecimal().toString(),
+		data.gasPrice.hexToDecimal().toString(),
+		"0",
+		"1",
+		data.input,
+		CryptoValue.etcContract,
+		"",
+		"",
+		"",
+		data.from != Config.getCurrentAddress(),
+		false,
+		CryptoSymbol.etc,
+		Config.getCurrentAddress(),
+		tokenReceiveAddress = data.to,
+		chainID = Config.getETCCurrentChain()
+	)
+	
 	companion object {
 		
 		fun updateModelInfo(
 			transaction: TransactionTable,
-			isERC20: Boolean,
+			isERC20Token: Boolean,
 			symbol: String,
 			value: String,
 			tokenReceiveAddress: String?
 		) {
 			transaction.apply {
 				this.isReceive = Config.getCurrentAddress().equals(tokenReceiveAddress, true)
-				this.isERC20 = isERC20
+				this.isERC20Token = isERC20Token
 				this.symbol = symbol
 				this.value = value
 				this.tokenReceiveAddress = tokenReceiveAddress
@@ -212,7 +245,7 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getListModelsByAddress(
+		fun getETHTransactionsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
@@ -221,7 +254,7 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getTransactionsByAddress(address)
+						.getETHTransactionsByAddress(address)
 				}) {
 				val result = if (it.isEmpty()) {
 					arrayListOf()
@@ -232,31 +265,23 @@ data class TransactionTable(
 			}
 		}
 		
-		private fun getLocalLatestNonce(hold: (Long?) -> Unit) {
-			doAsync {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.getTransactionsByAddress(Config.getCurrentAddress()).let {
-						GoldStoneAPI.context.runOnUiThread {
-							if (it.isEmpty()) {
-								hold(null)
-								return@runOnUiThread
-							}
-							// 获取最大的 nonce
-							it.filter {
-								it.hasError == "0"
-							}.filter {
-								!it.isReceive
-							}.filter {
-								it.blockNumber.isNotEmpty()
-							}.maxBy {
-								it.nonce
-							}.let {
-								hold(it?.nonce?.toLongOrNull())
-							}
-						}
-					}
+		fun getETCTransactionsByAddress(
+			address: String,
+			hold: (ArrayList<TransactionListModel>) -> Unit
+		) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.transactionDao()
+						.getETCTransactionsByAddress(address)
+				}) {
+				val result = if (it.isEmpty()) {
+					arrayListOf()
+				} else {
+					it.map { TransactionListModel(it) }.toArrayList()
+				}
+				hold(result)
 			}
 		}
 		
@@ -280,7 +305,7 @@ data class TransactionTable(
 			address: String = Config.getCurrentAddress(),
 			hold: (String) -> Unit
 		) {
-			GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address).let {
+			GoldStoneDataBase.database.transactionDao().getETHTransactionsByAddress(address).let {
 				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
 				hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
 			}
@@ -307,17 +332,6 @@ data class TransactionTable(
 			}
 		}
 		
-		// 异步方法
-		fun deleteByTaxHash(taxHash: String) {
-			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash).let {
-					it.forEach {
-						delete(it)
-					}
-				}
-			}
-		}
-		
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
@@ -325,25 +339,26 @@ data class TransactionTable(
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
-				if (transaction.isNull() || transaction?.memo?.isNotEmpty() == true) {
-					callback(transaction?.memo.orEmpty())
+				if (transaction?.memo?.isNotEmpty() == true) {
+					callback(transaction.memo)
 				} else {
 					GoldStoneEthCall.apply {
 						getInputCodeByHash(
 							hash,
 							{ error, reason ->
-								reason?.let { context.alert(it) }
-								LogUtil.error("getByHashAndReceivedStatus", error)
+								LogUtil.error("getMemoByHashAndReceiveStatus $reason", error)
 							},
 							chainName
 						) { input ->
-							val isErc20 = CryptoUtils
-								.isERC20TransferByInputCode(input)
-							val memo = getMemoFromInputCode(input, isErc20)
-							GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
-								this.input = input
-								this.memo = memo
-							})
+							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
+							val memo = getMemoFromInputCode(input, isErc20Token)
+							// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
+							if (!transaction.isNull()) {
+								GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
+									this.input = input
+									this.memo = memo
+								})
+							}
 							GoldStoneAPI.context.runOnUiThread {
 								callback(memo)
 							}
@@ -384,10 +399,20 @@ data class TransactionTable(
 interface TransactionDao {
 	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
 	)
-	fun getTransactionsByAddress(
+	fun getETHTransactionsByAddress(
 		walletAddress: String,
+		symbol: String = CryptoSymbol.eth,
+		chainID: String = Config.getCurrentChain()
+	): List<TransactionTable>
+	
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
+	)
+	fun getETCTransactionsByAddress(
+		walletAddress: String,
+		symbol: String = CryptoSymbol.etc,
 		chainID: String = Config.getCurrentChain()
 	): List<TransactionTable>
 	

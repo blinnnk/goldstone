@@ -1,7 +1,7 @@
 <resources>
 
   <!-- Base application theme. -->
-  <style name="MainTheme" parent="Theme.AppCompat.NoActionBar">
+  <style name="MainTheme" parent="Theme.AppCompat.Light.NoActionBar">
     <item name="android:colorBackground">#00000000</item>
     <item name="android:windowDisablePreview">true</item>
     <item name="colorAccent">@color/colorAccent</item>

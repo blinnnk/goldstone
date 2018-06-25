@@ -74,7 +74,7 @@ object ChainURL {
 	
 	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
 		return when {
-			transaction.isERC20 -> transaction.to
+			transaction.isERC20Token -> transaction.to
 			ChainURL.etcChainName.any {
 				it.equals(chainName, true)
 			} -> CryptoValue.etcContract

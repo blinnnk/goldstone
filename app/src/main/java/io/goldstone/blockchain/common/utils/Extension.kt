@@ -39,8 +39,8 @@ fun Fragment.getMainActivity() = activity as? MainActivity
 
 fun Context.getMainActivity() = this as? MainActivity
 
-fun Context.alert(message: String) {
-	alert(Appcompat, message).show()
+fun Context?.alert(message: String) {
+	this?.alert(Appcompat, message)?.show()
 }
 
 fun Context.showAlertView(

@@ -36,7 +36,14 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
-	
+	val getETCTransactions: (
+		header: String,
+		chainType: Int,
+		chainID: Int,
+		address: String
+	) -> String = { header, type, chainID, address ->
+		"$header/tx/list?chain_type=$type&chainid=$chainID&address=$address"
+	}
 	val getQuotationCurrencyChart: (
 		pair: String,
 		period: String,

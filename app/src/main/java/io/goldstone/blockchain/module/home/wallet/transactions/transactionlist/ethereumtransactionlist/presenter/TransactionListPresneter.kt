@@ -54,7 +54,7 @@ class TransactionListPresenter(
 	}
 	
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getListModelsByAddress(Config.getCurrentAddress()) {
+		TransactionTable.getETHTransactionsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				checkAddressNameInContacts(it) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
@@ -91,8 +91,7 @@ class TransactionListPresenter(
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
 			localData.firstOrNull {
-				!it.symbol.equals(CryptoSymbol.etc, true)
-				&& it.blockNumber.isNotEmpty()
+				it.blockNumber.isNotEmpty()
 			}?.blockNumber ?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(
@@ -258,33 +257,32 @@ class TransactionListPresenter(
 			hold: List<TransactionTable>.() -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionsByAddress(Config.getCurrentAddress())
-					.let { localData ->
-						newData.filterNot { new ->
-							localData.any {
-								update(it.apply {
-									transactionIndex = new.transactionIndex
-									hasError = new.hasError
-									txreceipt_status = new.txreceipt_status
-									gasUsed = new.gasUsed
-									blockHash = new.blockHash
-									cumulativeGasUsed = new.cumulativeGasUsed
-								})
-								it.hash == new.hash
-							}
-						}.let {
-							GoldStoneAPI.context.runOnUiThread {
-								hold(it)
-							}
+				getETHTransactionsByAddress(Config.getCurrentAddress()).let { localData ->
+					newData.filterNot { new ->
+						localData.any {
+							update(it.apply {
+								transactionIndex = new.transactionIndex
+								hasError = new.hasError
+								txreceipt_status = new.txreceipt_status
+								gasUsed = new.gasUsed
+								blockHash = new.blockHash
+								cumulativeGasUsed = new.cumulativeGasUsed
+							})
+							it.hash == new.hash
+						}
+					}.let {
+						GoldStoneAPI.context.runOnUiThread {
+							hold(it)
 						}
 					}
+				}
 			}
 		}
 		
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			DefaultTokenTable.getCurrentChainTokens { localTokens ->
 				filter {
-					it.isERC20 && it.symbol.isEmpty()
+					it.isERC20Token && it.symbol.isEmpty()
 				}.distinctBy {
 					it.contractAddress
 				}.filter { unknowData ->

@@ -322,12 +322,14 @@ class GasSelectionPresenter(
 				isPending = true
 				recordOwnerAddress = Config.getCurrentAddress()
 				tokenReceiveAddress = toWalletAddress
-				isERC20 = token!!.symbol == CryptoSymbol.eth
+				isERC20Token = token!!.symbol == CryptoSymbol.eth
 				nonce = raw.nonce.toString()
 				to = raw.toWalletAddress
 				input = raw.inputData
 				contractAddress = token!!.contract
-				chainID = Config.getCurrentChain()
+				chainID =
+					if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChain()
+					else Config.getCurrentChain()
 				memo = memoData
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
