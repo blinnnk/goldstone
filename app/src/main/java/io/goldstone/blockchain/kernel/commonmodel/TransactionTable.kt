@@ -245,7 +245,8 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getETHTransactionsByAddress(
+		// `ERC` 类型的 `Transactions` 专用
+		fun getERCTransactionsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
@@ -254,7 +255,7 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getETHTransactionsByAddress(address)
+						.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
 				}) {
 				val result = if (it.isEmpty()) {
 					arrayListOf()
@@ -288,6 +289,7 @@ data class TransactionTable(
 		fun getCurrentChainByAddressAndContract(
 			walletAddress: String,
 			contract: String,
+			chainID: String,
 			hold: (ArrayList<TransactionTable>) -> Unit
 		) {
 			coroutinesTask(
@@ -295,17 +297,22 @@ data class TransactionTable(
 					GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getCurrentChainByAddressAndContract(walletAddress, contract)
+						.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
 				}) {
 				hold(it.toArrayList())
 			}
 		}
 		
+		// `EtherScan` 数据类型专用
 		fun getMyLatestStartBlock(
 			address: String = Config.getCurrentAddress(),
 			hold: (String) -> Unit
 		) {
-			GoldStoneDataBase.database.transactionDao().getETHTransactionsByAddress(address).let {
+			GoldStoneDataBase.database.transactionDao()
+				.getTransactionsByAddress(
+					address,
+					Config.getCurrentChain()
+				).let {
 				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
 				hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
 			}
@@ -353,6 +360,7 @@ data class TransactionTable(
 							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
 							val memo = getMemoFromInputCode(input, isErc20Token)
 							// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
+							// TODO ETC 类型的数据需要维护数据库插入
 							if (!transaction.isNull()) {
 								GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
 									this.input = input
@@ -399,12 +407,11 @@ data class TransactionTable(
 interface TransactionDao {
 	
 	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
-	fun getETHTransactionsByAddress(
+	fun getTransactionsByAddress(
 		walletAddress: String,
-		symbol: String = CryptoSymbol.eth,
-		chainID: String = Config.getCurrentChain()
+		chainID: String
 	): List<TransactionTable>
 	
 	@Query(

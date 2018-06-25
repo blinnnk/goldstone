@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.crypto.utils.toMills
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter.ClassicTransactionListPresenter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.doAsync
@@ -110,7 +112,8 @@ class TokenDetailPresenter(
 		// 内存里面没有数据首先从本地数据库查询数据
 		TransactionTable.getCurrentChainByAddressAndContract(
 			Config.getCurrentAddress(),
-			fragment.token?.contract.orEmpty()
+			fragment.token?.contract.orEmpty(),
+			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
@@ -123,11 +126,19 @@ class TokenDetailPresenter(
 	}
 	
 	private fun TokenDetailFragment.loadDataFromChain() {
+		if (token?.symbol.equals(CryptoSymbol.etc, true)) {
+			loadETCChainData()
+		} else {
+			loadERCChainData()
+		}
+	}
+	
+	private fun TokenDetailFragment.loadERCChainData() {
 		doAsync {
 			TransactionTable.getMyLatestStartBlock { blockNumber ->
 				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
 				TransactionListPresenter.getTransactionDataFromEtherScan(
-					this@loadDataFromChain,
+					this@loadERCChainData,
 					blockNumber,
 					{
 						// ToDo 等自定义的 `Alert` 完成后应当友好提示
@@ -144,11 +155,19 @@ class TokenDetailPresenter(
 						context?.runOnUiThread {
 							// 链上和本地都没有数据就更新一个空数组作为默认
 							updateChartBy(arrayListOf())
-							fragment.removeLoadingView()
+							removeLoadingView()
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	private fun TokenDetailFragment.loadETCChainData() {
+		ClassicTransactionListPresenter.getETCTransactionsFromChain {
+			// TODO 数据库更新逻辑
+			updateChartBy(this)
+			removeLoadingView()
 		}
 	}
 	

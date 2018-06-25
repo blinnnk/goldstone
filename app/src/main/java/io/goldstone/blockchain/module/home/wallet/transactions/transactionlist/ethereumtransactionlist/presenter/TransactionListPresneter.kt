@@ -54,7 +54,7 @@ class TransactionListPresenter(
 	}
 	
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getETHTransactionsByAddress(Config.getCurrentAddress()) {
+		TransactionTable.getERCTransactionsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				checkAddressNameInContacts(it) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
@@ -257,7 +257,10 @@ class TransactionListPresenter(
 			hold: List<TransactionTable>.() -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getETHTransactionsByAddress(Config.getCurrentAddress()).let { localData ->
+				getTransactionsByAddress(
+					Config.getCurrentAddress(),
+					Config.getCurrentChain()
+				).let { localData ->
 					newData.filterNot { new ->
 						localData.any {
 							update(it.apply {
