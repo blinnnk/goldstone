@@ -4,7 +4,6 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.QuotationSize
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -31,9 +30,6 @@ class QuotationManagementFragment :
 			}
 		}
 	}
-	
-	override fun setSlideUpWithCellHeight() =
-		QuotationSize.cellHeight
 	
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)

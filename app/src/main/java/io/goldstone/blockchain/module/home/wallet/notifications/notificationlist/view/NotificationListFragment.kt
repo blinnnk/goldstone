@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -49,8 +48,6 @@ class NotificationListFragment :
 			}
 		}
 	}
-	
-	override fun setSlideUpWithCellHeight() = 75.uiPX()
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)

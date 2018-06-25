@@ -160,9 +160,8 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				if (memoInputView.isNull()) {
-					presenter.setValueHeader(token)
+					setValueHeader(token)
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
-					this@PaymentPrepareFragment.presenter.recoveryFragmentHeight()
 				} else {
 					removeMemoInputView()
 				}

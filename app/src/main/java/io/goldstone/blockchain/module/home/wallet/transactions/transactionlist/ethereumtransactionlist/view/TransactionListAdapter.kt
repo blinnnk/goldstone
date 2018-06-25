@@ -1,8 +1,8 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
 /**
  * @date 24/03/2018 2:14 PM

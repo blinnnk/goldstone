@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils

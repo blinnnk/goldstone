@@ -7,12 +7,9 @@ import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 
 /**
  * @date 22/03/2018 2:29 AM
@@ -40,27 +37,27 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	 * 中重设回退按钮点击状态
 	 * @example [TransactionDetailPresenter.onFragmentShowFromHidden]
 	 */
-	inline fun <reified R : Fragment> popFragmentFrom() {
+	inline fun <reified R : Fragment> popFragmentFrom(viewPagerSize: Int = 0) {
 		fragment.apply {
 			childFragmentManager.fragments.apply {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
 				// 因为 `WalletImportFragment 是一个 `ViewPager Fragment`
 				// 集合， 固这里单独处理了。
-				if (size == 2 || fragment is WalletImportFragment) {
+				if (size == 2 || viewPagerSize > 0) {
 					overlayView.header.apply {
 						showBackButton(false)
 						showCloseButton(true)
 					}
 				}
 				// 恢复 `TransactionListFragment` 的视图
-				this[size - 2]?.let {
-					showChildFragment(it)
-					// 两种不同的父级进行高度恢复
-					if (it is BaseRecyclerFragment<*, *>) {
-						it.presenter.recoveryFragmentHeight()
-					} else if (it is BaseFragment<*>) {
-						it.presenter.recoveryFragmentHeight()
+				if (viewPagerSize > 0) {
+					(size - viewPagerSize - 1 until size).forEach {
+						showChildFragment(this[it])
+					}
+				} else {
+					this[size - 2]?.let {
+						showChildFragment(it)
 					}
 				}
 			}
@@ -70,23 +67,41 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	inline fun <reified T : Fragment> showTargetFragment(
 		title: String,
 		previousTitle: String,
-		bundle: Bundle = Bundle()
+		bundle: Bundle = Bundle(),
+		viewPagerSize: Int = 0
 	) {
 		fragment.apply {
 			headerTitle = title
-			childFragmentManager.fragments.last()?.let {
-				hideChildFragment(it)
-				addFragmentAndSetArgument<T>(ContainerID.content) {
-					putAll(bundle)
-				}
-				overlayView.header.apply {
-					showBackButton(true) {
-						headerTitle = previousTitle
-						popFragmentFrom<T>()
+			if (viewPagerSize > 0) {
+				childFragmentManager.fragments.apply {
+					forEachIndexed { index, fragment ->
+						if (index in lastIndex - viewPagerSize .. lastIndex) {
+							hideChildFragment(fragment)
+						}
 					}
-					showCloseButton(false)
+					addSubFragment<T>(bundle, previousTitle, viewPagerSize)
+				}
+			} else {
+				childFragmentManager.fragments.last()?.let {
+					hideChildFragment(it)
+					addSubFragment<T>(bundle, previousTitle, 0)
 				}
 			}
+		}
+	}
+	
+	inline fun <reified T : Fragment> BaseOverlayFragment<*>.addSubFragment(
+		bundle: Bundle, previousTitle: String, viewPagerSize: Int
+	) {
+		addFragmentAndSetArgument<T>(ContainerID.content) {
+			putAll(bundle)
+		}
+		overlayView.header.apply {
+			showBackButton(true) {
+				headerTitle = previousTitle
+				popFragmentFrom<T>(viewPagerSize)
+			}
+			showCloseButton(false)
 		}
 	}
 	

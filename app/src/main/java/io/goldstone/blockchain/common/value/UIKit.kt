@@ -44,9 +44,11 @@ object Spectrum {
 	@JvmField
 	val white = Color.parseColor("#FFFFFFFF")
 	@JvmField
-	val blue = Color.parseColor("#FF00B1FF")
+	val blue = Color.parseColor("#FF235682")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
+	@JvmField
+	val tree = Color.parseColor("#FF10B571")
 	@JvmField
 	val blueGreen = Color.parseColor("#FF008489")
 	@JvmField
@@ -81,11 +83,15 @@ object Spectrum {
 	val opacity2White = Color.parseColor("#33FFFFFF")
 	@JvmField
 	val opacity5White = Color.parseColor("#80FFFFFF")
+	@JvmField
+	val opacity8White = Color.parseColor("#CCFFFFFF")
 }
 
 object ShadowSize {
 	@JvmField
 	val Button = 10.uiPX().toFloat()
+	@JvmField
+	val Header = 3.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
 }

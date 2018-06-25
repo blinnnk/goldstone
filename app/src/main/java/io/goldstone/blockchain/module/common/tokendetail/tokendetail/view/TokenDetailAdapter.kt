@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.matchParent
 
 /**
@@ -13,8 +13,8 @@ import org.jetbrains.anko.matchParent
  */
 
 class TokenDetailAdapter(
-  override val dataSet: ArrayList<TransactionListModel>,
-  private val callback: TokenDetailCell.() -> Unit
+	override val dataSet: ArrayList<TransactionListModel>,
+	private val callback: TokenDetailCell.() -> Unit
   ) : HoneyBaseAdapterWithHeaderAndFooter<TransactionListModel, TokenDetailHeaderView, TokenDetailCell, LinearLayout>() {
 
   override fun generateCell(context: Context) = TokenDetailCell(context)

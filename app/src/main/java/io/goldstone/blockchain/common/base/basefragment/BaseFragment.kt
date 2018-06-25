@@ -74,7 +74,9 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 			 */
 			if (parentFragment.isNull()) return
 			getMainActivity()?.apply {
-				backEvent = Runnable { setBaseBackEvent(this, parentFragment) }
+				backEvent = Runnable {
+					setBaseBackEvent(this, parentFragment)
+				}
 			}
 		}
 	}

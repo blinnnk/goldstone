@@ -30,7 +30,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 80.uiPX())
 		gradientView
-			.apply { setStyle(GradientType.DarkGreenYellow, 80.uiPX()) }
+			.apply { setStyle(GradientType.Tree, 150.uiPX()) }
 			.into(this)
 		
 		addressInput
@@ -39,7 +39,6 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 				hint = EmptyText.transferToAddress
 				textSize = fontSize(15)
 				textColor = Spectrum.white
-				hintTextColor = Spectrum.opacity5White
 				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 				leftPadding = 20.uiPX()
 				rightPadding = 20.uiPX()
@@ -51,7 +50,7 @@ class AddressSelectionHeaderView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setFocusStatus() {
-		addressInput.hintTextColor = Spectrum.opacity1White
+		addressInput.hintTextColor = Spectrum.opacity3White
 		addressInput.requestFocus()
 	}
 	

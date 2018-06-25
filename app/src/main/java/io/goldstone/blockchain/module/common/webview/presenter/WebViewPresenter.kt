@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.common.webview.presenter
 
-import com.blinnnk.extension.getRealScreenHeight
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -19,13 +17,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.
 class WebViewPresenter(
 	override val fragment: WebViewFragment
 ) : BasePresenter<WebViewFragment>() {
-	
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		if (fragment.parentFragment is ProfileOverlayFragment) {
-			updateHeight(fragment.context?.getRealScreenHeight().orZero())
-		}
-	}
 	
 	fun setBackEvent() {
 		fragment.parentFragment?.apply {

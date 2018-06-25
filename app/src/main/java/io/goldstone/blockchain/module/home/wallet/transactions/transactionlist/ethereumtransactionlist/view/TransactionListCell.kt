@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
 
 @SuppressLint("SetTextI18n")

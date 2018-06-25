@@ -37,7 +37,7 @@ class RecyclerLoadingView(context: Context) : RelativeLayout(context) {
 
 	init {
 		progressBar.into(this)
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 40.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 42.uiPX())
 		backgroundColor = Spectrum.green
 
 		loadingText = textView {

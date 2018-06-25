@@ -42,7 +42,7 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 				gravity = Gravity.CENTER
 				createButton.apply {
 					iconSize = 100.uiPX()
-					iconColor = Spectrum.darkBlue
+					iconColor = Spectrum.blue
 					src = R.drawable.create_wallet_icon
 				}.click {
 					presenter.showCreateWalletFragment()
@@ -60,7 +60,7 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 				gravity = Gravity.CENTER
 				importButton.apply {
 					iconSize = 100.uiPX()
-					iconColor = Spectrum.darkBlue
+					iconColor = Spectrum.blue
 					src = R.drawable.wallet_icon
 				}.click {
 					NetworkUtil.hasNetworkWithAlert(context, AlertText.importWalletNetwork)

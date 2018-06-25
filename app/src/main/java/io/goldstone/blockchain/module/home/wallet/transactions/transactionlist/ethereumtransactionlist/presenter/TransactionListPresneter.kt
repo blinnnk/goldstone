@@ -1,9 +1,8 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter
 
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -20,10 +19,10 @@ import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListAdapter
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view.TransactionListFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view.TransactionListAdapter
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -53,24 +52,10 @@ class TransactionListPresenter(
 		}
 	}
 	
-	fun showTransactionDetail(model: TransactionListModel?) {
-		fragment.getParentFragment<TransactionFragment>()?.apply {
-			Bundle().apply {
-				putSerializable(ArgumentKey.transactionFromList, model)
-				presenter.showTargetFragment<TransactionDetailFragment>(
-					TransactionText.detail,
-					TransactionText.transaction,
-					this
-				)
-			}
-		}
-	}
-	
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getListModelsByAddress(Config.getCurrentAddress()) {
 			if (it.isNotEmpty()) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
-				updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 				// Save a copy into memory for imporving the speed of next time to view
 				memoryTransactionListData = it
 				// Check and update the new data from chain in async thread
@@ -89,7 +74,6 @@ class TransactionListPresenter(
 					}
 				) {
 					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
-					updateParentContentLayoutHeight(it.size, fragment.setSlideUpWithCellHeight().orZero())
 					removeLoadingView()
 				}
 			}
@@ -101,8 +85,10 @@ class TransactionListPresenter(
 	) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
-			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber
-			?: "0"
+			localData.firstOrNull {
+				!it.symbol.equals(CryptoSymbol.etc, true)
+				&& it.blockNumber.isNotEmpty()
+			}?.blockNumber ?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
 		getTransactionDataFromEtherScan(
 			fragment,
@@ -133,6 +119,24 @@ class TransactionListPresenter(
 	}
 	
 	companion object {
+		
+		fun showTransactionDetail(
+			fragment: TransactionFragment?,
+			model: TransactionListModel?,
+			isFromTransactionList: Boolean = false
+		) {
+			fragment?.apply {
+				Bundle().apply {
+					putSerializable(ArgumentKey.transactionFromList, model)
+					presenter.showTargetFragment<TransactionDetailFragment>(
+						TransactionText.detail,
+						TransactionText.transaction,
+						this,
+						if (isFromTransactionList) TransactionFragment.viewPagerSize else 0
+					)
+				}
+			}
+		}
 		
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		fun getTransactionDataFromEtherScan(

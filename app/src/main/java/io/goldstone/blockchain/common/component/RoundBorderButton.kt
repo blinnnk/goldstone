@@ -38,6 +38,10 @@ open class RoundBorderButton(context: Context) : View(context) {
 		typeface = GoldStoneFont.heavy(context)
 	}
 	
+	fun setBoldTitle() {
+		textPaint.typeface = GoldStoneFont.black(context)
+	}
+	
 	open fun setBorderWidth(width: Float = BorderSize.default) {
 		paint.strokeWidth = width
 	}

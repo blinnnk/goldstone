@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.profile.chain.chainselection.view
 
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.ChainText
@@ -17,8 +16,6 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, ChainSelectionModel>() {
 	
 	override val presenter = ChainSelectionPresenter(this)
-	
-	override fun setSlideUpWithCellHeight() = 50.uiPX()
 	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,

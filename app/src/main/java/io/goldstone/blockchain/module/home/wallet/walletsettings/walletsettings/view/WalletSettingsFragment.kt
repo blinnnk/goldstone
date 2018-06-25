@@ -38,7 +38,7 @@ class WalletSettingsFragment : BaseOverlayFragment<WalletSettingsPresenter>() {
       x = 10.uiPX().toFloat()
       layoutParams = RelativeLayout.LayoutParams(wrapContent, 24.uiPX())
       text = WalletText.manage
-      themeColor = Spectrum.green
+      themeColor = Spectrum.white
       setBorderWidth(BorderSize.bold)
       setAdjustWidth()
     }

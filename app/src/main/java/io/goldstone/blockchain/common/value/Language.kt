@@ -467,6 +467,18 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "添加錢包"
 		else -> ""
 	}
+	
+	@JvmField
+	val assetChart = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Assets Chart"
+		HoneyLanguage.Chinese.code -> "Assets Chart"
+		HoneyLanguage.Japanese.code -> "Assets Chart"
+		HoneyLanguage.Korean.code -> "Assets Chart"
+		HoneyLanguage.Russian.code -> "Assets Chart"
+		HoneyLanguage.TraditionalChinese.code -> "Assets Chart"
+		else -> ""
+	}
+	
 	@JvmField
 	val wallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet"

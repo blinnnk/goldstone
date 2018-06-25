@@ -1,11 +1,11 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.view
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view
 
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
+import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -24,12 +24,14 @@ class TransactionListFragment :
 		asyncData?.let {
 			recyclerView.adapter = TransactionListAdapter(it) {
 				onClick {
-					presenter.showTransactionDetail(model)
+					TransactionListPresenter.showTransactionDetail(
+						parentFragment as? TransactionFragment,
+						model,
+						true
+					)
 					preventDuplicateClicks()
 				}
 			}
 		}
 	}
-	
-	override fun setSlideUpWithCellHeight() = 75.uiPX()
 }

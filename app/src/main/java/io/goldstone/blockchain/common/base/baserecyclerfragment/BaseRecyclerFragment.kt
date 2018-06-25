@@ -35,8 +35,8 @@ import org.jetbrains.anko.support.v4.UI
  * @date 23/03/2018 3:46 PM
  * @author KaySaith
  */
-abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D> :
-	Fragment() {
+abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D>
+	: Fragment() {
 	
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
@@ -58,8 +58,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		presenter.afterUpdateAdapterDataset(recyclerView)
 		/** 如果数据返回空的显示占位图 */
 		asyncData?.let { setEmptyViewBy(it) }
-		/** 当数据返回后在这个方法根据数据的数量决定如何做伸展动画 */
-		setSlideUpAnimation()
 	}
 	/**
 	 * @description
@@ -100,26 +98,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	
 	open fun observingRecyclerViewHorizontalOffset(offset: Int) {
 		// Do Something
-	}
-	
-	/**
-	 * 当设定 `Cell` 的单元高度后,就会在 `OnViewCreated` 的时机执行 `updateParentContentLayoutHeight`
-	 * 来动画伸展出初始界面.
-	 */
-	open fun setSlideUpWithCellHeight(): Int? =
-		null
-	
-	open fun setSlideUpAnimation() {
-		// 如果有父级 `ParentFragment` 就可以在 `Presenter` 执行这个方法
-		setSlideUpWithCellHeight().let {
-			it.isNull() isTrue {
-				presenter.updateParentContentLayoutHeight()
-			} otherwise {
-				presenter.updateParentContentLayoutHeight(
-					asyncData?.size.orZero(), it.orZero()
-				)
-			}
-		}
 	}
 	
 	/**
@@ -319,11 +297,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			wrapper.invalidate()
 			emptyLayout = null
 		}
-	}
-	
-	fun updateWrapperHeight(height: Int) {
-		wrapper.layoutParams = RelativeLayout.LayoutParams(matchParent, height)
-		wrapper.requestLayout()
 	}
 	
 	private fun setEmptyViewBy(data: ArrayList<D>) {

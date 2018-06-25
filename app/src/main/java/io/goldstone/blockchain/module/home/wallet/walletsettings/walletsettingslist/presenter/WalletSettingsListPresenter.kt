@@ -46,7 +46,7 @@ class WalletSettingsListPresenter(
 				WalletSettingsListModel(WalletSettingsText.checkQRCode),
 				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
 				WalletSettingsListModel(WalletSettingsText.walletName, Config.getCurrentName()),
-				WalletSettingsListModel(WalletSettingsText.hint, "······"),
+				WalletSettingsListModel(WalletSettingsText.hint, "******"),
 				WalletSettingsListModel(WalletSettingsText.passwordSettings),
 				WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
 				WalletSettingsListModel(WalletSettingsText.exportKeystore),
@@ -66,14 +66,21 @@ class WalletSettingsListPresenter(
 	}
 	
 	fun showTargetFragment(title: String) {
-		fragment.getParentFragment<WalletSettingsFragment>()?.apply {
-			headerTitle = title
-			presenter.showTargetFragmentByTitle(title)
+		when {
+			title.equals(WalletSettingsText.delete, true) -> deleteWallet()
+			title.equals(WalletSettingsText.balance, true) -> return
+			
+			else -> {
+				fragment.getParentFragment<WalletSettingsFragment>()?.apply {
+					headerTitle = title
+					presenter.showTargetFragmentByTitle(title)
+				}
+			}
 		}
 	}
 	
 	/** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
-	fun deleteWallet() {
+	private fun deleteWallet() {
 		fragment.context?.showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,

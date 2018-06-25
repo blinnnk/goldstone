@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model
+package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.crypto.utils.toAddressFromCode

@@ -40,7 +40,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	init {
 		gradientView.apply {
-			setStyle(GradientType.DarkGreen, TransactionSize.headerView)
+			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
 		

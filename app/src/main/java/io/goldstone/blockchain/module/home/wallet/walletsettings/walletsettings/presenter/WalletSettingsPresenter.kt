@@ -1,16 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.presenter
 
 import android.view.View
-import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -52,6 +51,7 @@ class WalletSettingsPresenter(
 			WalletSettingsText.hint -> showHintEditorFragment()
 			WalletSettingsText.walletSettings -> showWalletSettingListFragment()
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
+			WalletSettingsText.balance -> showAssetPieChartFragment()
 		}
 	}
 	
@@ -59,9 +59,7 @@ class WalletSettingsPresenter(
 		setCustomHeader {
 			showWalletListFragment()
 		}
-		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content) {
-			// Send Arguments
-		}
+		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)
 	}
 	
 	private fun setCustomHeader(manageEvent: () -> Unit) {
@@ -94,11 +92,16 @@ class WalletSettingsPresenter(
 			overlayView.header.showAddButton(true, false) {
 				showWalletAddingMethodFragment()
 			}
-			setNormalHeaderWithHeight(0)
-			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content) {
-				// Send Arguments
-			}
+			recoveryHeaderStyle()
+			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
 		}
+	}
+	
+	private fun showAssetPieChartFragment() {
+		showTargetFragment<WalletAddingMethodFragment>(
+			WalletText.assetChart,
+			CurrentWalletText.Wallets
+		)
 	}
 	
 	fun showWalletAddingMethodFragment() {
@@ -111,7 +114,7 @@ class WalletSettingsPresenter(
 			// 判断是否是只读钱包
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
 				// 恢复 `Header` 样式
-				setNormalHeaderWithHeight(250.uiPX())
+				recoveryHeaderStyle()
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
 				AppConfigTable.getAppConfig {
 					it?.apply {
@@ -133,7 +136,7 @@ class WalletSettingsPresenter(
 				WalletTable.getCurrentWallet {
 					it?.apply {
 						encryptMnemonic?.let {
-							setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
+							recoveryHeaderStyle()
 							val mnemonicCode = JavaKeystoreUtil()
 								.decryptData(it)
 							replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
@@ -149,10 +152,8 @@ class WalletSettingsPresenter(
 	private fun showPrivateKeyExportFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-				replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content) {
-					// Send Arguments
-				}
+				recoveryHeaderStyle()
+				replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content)
 			}
 		}
 	}
@@ -160,61 +161,44 @@ class WalletSettingsPresenter(
 	private fun showKeystoreExportFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-				setNormalHeaderWithHeight(context?.getRealScreenHeight().orZero())
-				replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content) {
-					// Send Arguments
-				}
+				recoveryHeaderStyle()
+				replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content)
 			}
 		}
 	}
 	
 	private fun showQRCodeFragment() {
 		fragment.apply {
-			setNormalHeaderWithHeight(fragment.context?.getRealScreenHeight().orZero())
-			replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content) {
-				// Send Arguments
-			}
+			recoveryHeaderStyle()
+			replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content)
 		}
 	}
 	
 	private fun showWalletNameEditorFragment() {
 		fragment.apply {
-			setNormalHeaderWithHeight(300.uiPX())
-			replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content) {
-				// Send Arguments
-			}
+			recoveryHeaderStyle()
+			replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content)
 		}
 	}
 	
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-				setNormalHeaderWithHeight(420.uiPX())
-				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content) {
-					// Send Arguments
-				}
+				recoveryHeaderStyle()
+				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content)
 			}
 		}
 	}
 	
-	private fun WalletSettingsFragment.setNormalHeaderWithHeight(contentHeight: Int) {
+	private fun WalletSettingsFragment.recoveryHeaderStyle() {
 		recoveryOverlayHeader()
 		header?.visibility = View.GONE
 		manageButton?.visibility = View.GONE
 		overlayView.apply {
-			header.showBackButton(true) { showWalletSettingListFragment() }
-			header.showCloseButton(false)
-			if (contentHeight != 0) {
-				contentLayout.updateHeightAnimation(contentHeight, contentHeight, 0) {
-					if (contentHeight >= ScreenSize.Height) {
-						AnimationDuration.Default timeUpThen {
-							fragment.getMainActivity()?.hideHomeFragment()
-						}
-					} else {
-						fragment.getMainActivity()?.showHomeFragment()
-					}
-				}
+			header.showBackButton(true) {
+				showWalletSettingListFragment()
 			}
+			header.showCloseButton(false)
 		}
 	}
 	

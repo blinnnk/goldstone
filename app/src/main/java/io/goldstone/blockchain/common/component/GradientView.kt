@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.UIUtils.setGradientColor
  * @author KaySaith
  */
 enum class GradientType {
+	
 	Blue,
 	PinkToYellow,
 	BlueGreen,
@@ -21,7 +22,8 @@ enum class GradientType {
 	DarkGreenYellow,
 	BlueGreenHorizontal,
 	BlueGray,
-	CrystalGreen
+	CrystalGreen,
+	Tree
 }
 
 class GradientView(context: Context) : View(context) {
@@ -34,7 +36,9 @@ class GradientView(context: Context) : View(context) {
 		super.onDraw(canvas)
 		val rectF = RectF(0f, 0f, width.toFloat(), height.toFloat())
 		
-		shaderStyle?.let { paint.shader = it }
+		shaderStyle?.let {
+			paint.shader = it
+		}
 		canvas?.drawRect(rectF, paint)
 	}
 	
@@ -46,14 +50,14 @@ class GradientView(context: Context) : View(context) {
 		shaderStyle = when (type) {
 			GradientType.Blue -> LinearGradient(
 				0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(), intArrayOf(
-				Color.parseColor("#FF122750"),
+				Color.parseColor("#FF235682"),
 				Color.parseColor("#FF204972"),
 				Color.parseColor("#FF0e6c8c"),
-				Color.parseColor("#FF0e6c8c")
+				Color.parseColor("#FF235682")
 			), floatArrayOf(0f, 0.3f, 0.8f, 1f), Shader.TileMode.MIRROR
 			)
 			GradientType.CrystalGreen -> LinearGradient(
-				0f, 0f, ScreenSize.Width.toFloat(), distance.toFloat(), intArrayOf(
+				ScreenSize.Width.toFloat(), 0f, ScreenSize.Width.toFloat(), distance.toFloat(), intArrayOf(
 				Color.parseColor("#FF368279"),
 				Color.parseColor("#FF327b84"),
 				Color.parseColor("#FF2c7397"),
@@ -63,6 +67,14 @@ class GradientView(context: Context) : View(context) {
 			GradientType.PinkToYellow -> setGradientColor(
 				Color.parseColor("#FF00FF80"),
 				Color.parseColor("#FF0076FF")
+			)
+			GradientType.Tree -> LinearGradient(
+				ScreenSize.Width.toFloat(), 0f, ScreenSize.Width.toFloat(), distance.toFloat(),
+				intArrayOf(
+					Color.parseColor("#FF0E945D"),
+					Color.parseColor("#FF08603C")
+				),
+				floatArrayOf(0f, distance * 1.3f), Shader.TileMode.CLAMP
 			)
 			GradientType.BlueGray -> setGradientColor(
 				Color.parseColor("#FF1E3950"),

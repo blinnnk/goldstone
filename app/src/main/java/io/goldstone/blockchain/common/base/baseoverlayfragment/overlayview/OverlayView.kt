@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.addTopLRCorner
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -40,7 +39,7 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 					id = ContainerID.content
 				}.lparams {
 					width = matchParent
-					height = 200.uiPX()
+					height = matchParent
 					topMargin = header.layoutParams.height
 				}
 				lparams { alignParentBottom() }

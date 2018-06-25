@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view
 
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -42,8 +41,6 @@ class TokenManagementListFragment :
 			}
 		}
 	}
-	
-	override fun setSlideUpWithCellHeight() = 60.uiPX()
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)

@@ -3,11 +3,9 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.text.format.DateUtils
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.*
@@ -23,7 +21,6 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
-import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.jetbrains.anko.*
 import org.json.JSONArray
@@ -40,10 +37,6 @@ class MarketTokenDetailPresenter(
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		fragment.getParentFragment<QuotationOverlayFragment>()?.apply {
-			val finalHeight = context?.getRealScreenHeight().orZero()
-			overlayView.contentLayout.updateHeightAnimation(finalHeight, finalHeight, 0)
-		}
 		fragment.currencyInfo?.apply {
 			updateCurrencyPriceInfo()
 		}

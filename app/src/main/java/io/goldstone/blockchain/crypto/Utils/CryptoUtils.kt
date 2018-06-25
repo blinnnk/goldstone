@@ -26,22 +26,22 @@ object CryptoUtils {
 	
 	fun scaleAddress(address: String): String {
 		return if (address.isEmpty()) ""
-		else address.substring(0, 5) + " ··· " + address.substring(address.length - 5, address.length)
+		else address.substring(0, 5) + " ... " + address.substring(address.length - 5, address.length)
 	}
 	
 	fun scaleTo16(address: String): String {
 		return if (address.length < 16) address
-		else address.substring(0, 16) + "···"
+		else address.substring(0, 16) + "..."
 	}
 	
 	fun scaleTo22(address: String): String {
 		return if (address.length < 22) address
-		else address.substring(0, 22) + "···"
+		else address.substring(0, 22) + "..."
 	}
 	
 	fun scaleTo32(address: String): String {
 		return if (address.length < 32) address
-		else address.substring(0, 32) + "···"
+		else address.substring(0, 32) + "..."
 	}
 	
 	fun scaleMiddleAddress(address: String): String {

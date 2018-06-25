@@ -34,4 +34,5 @@ object ElementID {
 
 object ViewPagerID {
 	const val walletImport = 30001
+	const val transactions = 30002
 }

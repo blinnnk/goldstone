@@ -29,7 +29,6 @@ class QuotationSearchPresenter(
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		setHeightMatchParent()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.searchInputLinstener {
 				NetworkUtil.hasNetworkWithAlert(context) isTrue {
