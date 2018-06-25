@@ -32,7 +32,7 @@ class ClassicTransactionListPresenter(
 	override fun onFragmentViewCreated() {
 		fragment.getParentFragment<TransactionFragment>()?.apply {
 			isETCListShown = Runnable {
-				getETCTransactionsFromChain()
+				showChainData()
 			}
 		}
 	}
@@ -42,28 +42,36 @@ class ClassicTransactionListPresenter(
 		}
 	}
 	
-	private fun getETCTransactionsFromChain() {
+	private fun showChainData() {
 		fragment.showLoadingView(LoadingText.transactionData)
-		GoldStoneAPI.getETCTransactions(
-			ChainType.ETC.id.toInt(),
-			Config.getETCCurrentChain().toInt(),
-			Config.getCurrentAddress(),
-			{
-				LogUtil.error(this.javaClass.simpleName, it)
+		getETCTransactionsFromChain {
+			fragment.removeLoadingView()
+			TransactionListPresenter.checkAddressNameInContacts(this) {
+				if (fragment.asyncData.isNull()) {
+					fragment.asyncData = this
+				} else {
+					diffAndUpdateSingleCellAdapterData<ClassicTransactionListAdapter>(this)
+				}
 			}
-		) {
-			if (it.isNotEmpty()) {
-				it.map {
-					TransactionListModel(TransactionTable(it))
-				}.toArrayList().apply {
-					GoldStoneAPI.context.runOnUiThread {
-						fragment.removeLoadingView()
-						TransactionListPresenter.checkAddressNameInContacts(this@apply) {
-							if (fragment.asyncData.isNull()) {
-								fragment.asyncData = this@apply
-							} else {
-								diffAndUpdateSingleCellAdapterData<ClassicTransactionListAdapter>(this@apply)
-							}
+		}
+	}
+	
+	companion object {
+		fun getETCTransactionsFromChain(hold: ArrayList<TransactionListModel>.() -> Unit) {
+			GoldStoneAPI.getETCTransactions(
+				ChainType.ETC.id.toInt(),
+				Config.getETCCurrentChain().toInt(),
+				Config.getCurrentAddress(),
+				{
+					LogUtil.error("getETCTransactionsFromChain", it)
+				}
+			) {
+				if (it.isNotEmpty()) {
+					it.map {
+						TransactionListModel(TransactionTable(it))
+					}.toArrayList().apply {
+						GoldStoneAPI.context.runOnUiThread {
+							hold(this@apply)
 						}
 					}
 				}

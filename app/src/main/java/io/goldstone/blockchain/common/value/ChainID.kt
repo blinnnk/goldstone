@@ -1,5 +1,8 @@
 package io.goldstone.blockchain.common.value
 
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import kotlinx.coroutines.experimental.internal.Symbol
+
 /**
  * @date 2018/5/25 8:14 PM
  * @author KaySaith
@@ -56,6 +59,13 @@ enum class ChainID(val id: String) {
 				ChainText.goldStoneEtcMain -> ETCMain.id
 				ChainText.etcMainGasTracker -> ETCMain.id
 				else -> Main.id
+			}
+		}
+		
+		fun getChainIDBySymbol(symbol: String): String {
+			return when (symbol) {
+				CryptoSymbol.etc -> Config.getETCCurrentChain()
+				else -> Config.getCurrentChain()
 			}
 		}
 	}
