@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
-import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContractInputFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
@@ -31,12 +31,13 @@ class ProfileOverlayPresenter(
 	}
 	
 	fun showContactInputFragment() {
-		showTargetFragment<ContractInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
+		showTargetFragment<ContactInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
 	}
 	
 	fun showTargetFragmentByTitle(title: String) {
 		when (title) {
 			ProfileText.contacts -> showContactsFragment()
+			ProfileText.contactsInput -> showContactInput()
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
@@ -89,6 +90,10 @@ class ProfileOverlayPresenter(
 	
 	private fun showContactsFragment() {
 		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content)
+	}
+	
+	private fun showContactInput() {
+		fragment.addFragmentAndSetArgument<ContactInputFragment>(ContainerID.content)
 	}
 	
 	private fun showCurrencyFragment() {

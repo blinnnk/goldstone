@@ -151,12 +151,7 @@ object HomeSize {
 
 object TokenDetailSize {
 	@JvmField
-	val headerHeight = 280.uiPX()
-}
-
-object QuotationSize {
-	@JvmField
-	val cellHeight = 60.uiPX()
+	val headerHeight = 300.uiPX()
 }
 
 object Count {

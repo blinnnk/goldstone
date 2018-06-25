@@ -27,6 +27,7 @@ object ArgumentKey {
 	const val fromQuickTransfer = "fromQuickTransfer"
 	const val fromQuickDeposit = "fromQuickDeposit"
 	const val isMainnet = "isMainnet"
+	const val address = "address"
 }
 
 object IntentKey {

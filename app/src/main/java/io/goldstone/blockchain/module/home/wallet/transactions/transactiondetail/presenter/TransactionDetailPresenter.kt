@@ -2,23 +2,28 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.NotificationText
-import io.goldstone.blockchain.common.value.TokenDetailText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -107,6 +112,32 @@ class TransactionDetailPresenter(
 	fun getUnitSymbol(): String {
 		return if (getCunrrentChainType() == ChainType.ETH) CryptoSymbol.eth
 		else CryptoSymbol.etc
+	}
+	
+	fun showAddContactsButton(cell: TransactionDetailCell) {
+		ContactTable.getAllContacts {
+			if (it.find { contact ->
+					contact.address.equals(cell.model.info, true)
+				}.isNull()) {
+				cell.showAddContactButton {
+					onClick {
+						fragment.parentFragment?.apply {
+							when (this) {
+								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+								is TransactionFragment -> presenter.removeSelfFromActivity()
+							}
+						}
+						fragment.getMainActivity()?.apply {
+							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+								putString(ArgumentKey.address, cell.model.info)
+							}
+						}
+						preventDuplicateClicks()
+					}
+				}
+			}
+		}
 	}
 	
 	fun showEtherScanTransactionFragment() {

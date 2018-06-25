@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
@@ -56,6 +57,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 	}
 	
 	init {
+		layoutParams.height = 65.uiPX()
 		setGrayStyle()
 		setValueStyle(true)
 	}

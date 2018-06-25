@@ -1034,6 +1034,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val all = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ALL"
+		HoneyLanguage.Chinese.code -> "ALL"
+		HoneyLanguage.Japanese.code -> "ALL"
+		HoneyLanguage.Korean.code -> "ALL"
+		HoneyLanguage.Russian.code -> "ALL"
+		HoneyLanguage.TraditionalChinese.code -> "ALL"
+		else -> ""
+	}
+	@JvmField
 	val upgrade = when (currentLanguage) {
 		HoneyLanguage.English.code -> "UPGRADE"
 		HoneyLanguage.Chinese.code -> "升级版本"

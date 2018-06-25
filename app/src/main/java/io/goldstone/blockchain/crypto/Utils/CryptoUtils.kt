@@ -44,10 +44,10 @@ object CryptoUtils {
 		else address.substring(0, 32) + "..."
 	}
 	
-	fun scaleMiddleAddress(address: String): String {
+	fun scaleMiddleAddress(address: String, halfSize: Int = 14): String {
 		return if (address.length == CryptoValue.bip39AddressLength) address.substring(
-			0, 14
-		) + " ··· " + address.substring(address.length - 14, address.length)
+			0, halfSize
+		) + " ··· " + address.substring(address.length - halfSize, address.length)
 		else "wrong address"
 	}
 	
