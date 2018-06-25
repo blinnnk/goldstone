@@ -26,7 +26,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.ERC20TransactionModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
 import okhttp3.RequestBody

@@ -28,11 +28,6 @@ class ContractInputPresenter(
 	private var nameText = ""
 	private var addressText = ""
 	
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		recoveryFragmentHeight()
-	}
-	
 	fun addContact() {
 		if (nameText.isEmpty()) {
 			fragment.context?.alert(ContactText.emptyNameAlert)

@@ -44,7 +44,6 @@ class ChainSelectionPresenter(
 	
 	fun showNodeSelectionFragment(isMainnet: Boolean) {
 		fragment.getParentFragment<ProfileOverlayFragment> {
-			setHeightMatchParent()
 			presenter.showTargetFragment<NodeSelectionFragment>(
 				ChainText.nodeSelection,
 				ProfileText.chain,

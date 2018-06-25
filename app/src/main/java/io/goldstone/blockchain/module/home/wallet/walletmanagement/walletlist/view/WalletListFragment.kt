@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.v
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.WalletSettingsText
@@ -33,8 +32,6 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 			}
 		}
 	}
-	
-	override fun setSlideUpWithCellHeight() = 75.uiPX()
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<WalletSettingsFragment> {

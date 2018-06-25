@@ -7,10 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.*
+import com.blinnnk.extension.hideStatusBar
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
@@ -19,6 +20,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.setTransparentStatusBar
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -31,8 +33,8 @@ import org.jetbrains.anko.support.v4.UI
  * @date 22/03/2018 2:28 AM
  * @author KaySaith
  */
-abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragment<T>>> :
-	Fragment() {
+abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragment<T>>>
+	: Fragment() {
 	
 	abstract val presenter: T
 	abstract fun ViewGroup.initView()
@@ -48,7 +50,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.title.text = headerTitle
 	}
 	lateinit var overlayView: OverlayView
-	private val minHeight = 265.uiPX()
 	/**
 	 * 通过对 `Runnable` 的变化监控, 重新定制控件的 `Header`
 	 */
@@ -68,14 +69,13 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	fun recoveryOverlayHeader() {
 		overlayView.apply {
 			header.title.visibility = View.VISIBLE
-			header.layoutParams.height = 65.uiPX()
+			header.layoutParams.height = HomeSize.headerHeight
 			contentLayout.setMargins<RelativeLayout.LayoutParams> {
-				topMargin = 65.uiPX()
+				topMargin = HomeSize.headerHeight
 			}
 		}
 	}
 	
-	open fun setContentHeight(): Int = minHeight
 	var afterSetHeightAnimation: Runnable? = null
 	
 	override fun onAttach(context: Context?) {
@@ -102,13 +102,12 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		return UI {
 			overlayView = OverlayView(context!!)
 			overlayView.contentLayout.initView()
-			addView(overlayView, RelativeLayout.LayoutParams(matchParent, minHeight))
+			addView(overlayView, RelativeLayout.LayoutParams(matchParent, matchParent))
 			
 			overlayView.apply {
-				val maxHeight = context?.getRealScreenHeight().orZero()
 				/** 执行伸展动画 */
-				contentLayout.updateHeightAnimation(setContentHeight(), maxHeight, 0) {
-					AnimationDuration.Default timeUpThen { afterSetHeightAnimation?.run() }
+				AnimationDuration.Default timeUpThen {
+					afterSetHeightAnimation?.run()
 				}
 				/** 设置悬浮曾的 `Header` 初始状态 */
 				header.apply {

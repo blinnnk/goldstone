@@ -40,13 +40,13 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	init {
 		gradientView.apply {
-			setStyle(GradientType.DarkGreen, TransactionSize.headerView)
+			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
 		
 		verticalLayout {
 			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 130.uiPX()).apply {
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), 140.uiPX()).apply {
 					leftMargin = (ScreenSize.Width * 0.2).toInt()
 					addRule(CENTER_VERTICAL)
 				}
@@ -54,13 +54,14 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			gravity = Gravity.CENTER_HORIZONTAL
 			
 			icon.apply {
+				iconSize = 60.uiPX()
 				setColorFilter(GrayScale.Opacity2Black)
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				elevation = 15.uiPX().toFloat()
 			}.into(this)
 			
 			info.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
+				layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
 				isCenter = true
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				setWildStyle()
@@ -96,10 +97,10 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		info.title.text =
 			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
-		info.subtitle.text = headerModel.address
+		info.subtitle.text = headerModel.address.toUpperCase()
 		
 		if (headerModel.isError) {
-			icon.iconColor = Spectrum.red
+			icon.iconColor = Spectrum.lightRed
 			icon.src = R.drawable.error_icon
 			showPendingIcon(false)
 			return

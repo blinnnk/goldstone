@@ -34,15 +34,6 @@ class AddressSelectionPresenter(
 		}
 	}
 	
-	override fun updateParentContentLayoutHeight(
-		dataCount: Int?,
-		cellHeight: Int,
-		maxHeight: Int
-	) {
-		// 详情页面直接全屏高度
-		setHeightMatchParent()
-	}
-	
 	fun showPaymentPrepareFragmentByQRCode(result: String) {
 		val minERC20ResultLength = 100
 		val content = result.orEmpty()
@@ -131,7 +122,6 @@ class AddressSelectionPresenter(
 				backButton.onClick {
 					headerTitle = TokenDetailText.address
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
-					setHeightMatchParent()
 					showCloseButton(false)
 				}
 			}
@@ -145,9 +135,8 @@ class AddressSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			if (!isFromQuickTransfer) {
 				overlayView.header.showBackButton(true) {
-					presenter.setValueHeader(token)
+					setValueHeader(token)
 					presenter.popFragmentFrom<AddressSelectionFragment>()
-					setHeightMatchParent()
 				}
 			}
 		}

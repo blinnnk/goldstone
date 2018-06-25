@@ -23,8 +23,8 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.TransactionListPresenter
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -41,24 +41,12 @@ class TokenDetailPresenter(
 	}
 	
 	override fun updateData() {
-		// 详情页面直接全屏高度
-		setHeightMatchParent {
-			fragment.asyncData = arrayListOf()
-			updateEmptyCharData(fragment.token?.symbol.orEmpty())
-			// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
-			AnimationDuration.Default timeUpThen {
-				prepareTokenDetailData()
-			}
+		fragment.asyncData = arrayListOf()
+		updateEmptyCharData(fragment.token?.symbol.orEmpty())
+		// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
+		AnimationDuration.Default timeUpThen {
+			prepareTokenDetailData()
 		}
-	}
-	
-	override fun updateParentContentLayoutHeight(
-		dataCount: Int?,
-		cellHeight: Int,
-		maxHeight: Int
-	) {
-		// 详情页面直接全屏高度
-		setHeightMatchParent()
 	}
 	
 	fun showAddressSelectionFragment() {
@@ -141,14 +129,16 @@ class TokenDetailPresenter(
 	}
 	
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
-		diffAndUpdateAdapterData<TokenDetailAdapter>(data)
-		// 显示内存的数据后异步更新数据
-		NetworkUtil.hasNetworkWithAlert(context) isTrue {
-			data.prepareTokenHistoryBalance(token?.contract!!) {
-				it.updateChartAndHeaderData()
+		TransactionListPresenter.checkAddressNameInContacts(data) {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
+			// 显示内存的数据后异步更新数据
+			NetworkUtil.hasNetworkWithAlert(context) isTrue {
+				data.prepareTokenHistoryBalance(token?.contract!!) {
+					it.updateChartAndHeaderData()
+				}
+			} otherwise {
+				updateEmptyCharData(token?.symbol!!)
 			}
-		} otherwise {
-			updateEmptyCharData(token?.symbol!!)
 		}
 	}
 	

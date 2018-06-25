@@ -75,7 +75,6 @@ class NotificationListPresenter(
 					putString(ArgumentKey.webViewUrl, url)
 				})
 		}
-		setHeightMatchParent()
 	}
 	
 	private fun getDataFromDatabase() {
@@ -93,7 +92,6 @@ class NotificationListPresenter(
 			} otherwise {
 				fragment.removeLoadingView()
 			}
-			updateParentContentLayoutHeight(localData.size, fragment.setSlideUpWithCellHeight())
 		}
 	}
 	

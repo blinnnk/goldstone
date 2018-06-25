@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.text.Editable
@@ -75,12 +74,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	private val paint = Paint()
 	
 	init {
-		setWillNotDraw(false)
-		
+		backgroundColor = Spectrum.blue
+		elevation = ShadowSize.Header
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, headerHeight)
 		
 		title = textView {
-			textColor = GrayScale.black
+			textColor = Spectrum.white
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 			gravity = Gravity.CENTER
@@ -236,15 +235,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				it.visibility = View.VISIBLE
 			}
 		}
-	}
-	
-	override fun onDraw(canvas: Canvas?) {
-		super.onDraw(canvas)
-		canvas?.drawLine(
-			PaddingSize.device.toFloat(), height - BorderSize.default,
-			(ScreenSize.Width - PaddingSize.device).toFloat(), height - BorderSize.default, paint
-		)
-		canvas?.save()
 	}
 }
 

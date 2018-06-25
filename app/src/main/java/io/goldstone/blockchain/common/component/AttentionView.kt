@@ -22,17 +22,17 @@ import org.jetbrains.anko.rightPadding
 class AttentionView(context: Context) : TextView(context) {
 
 	init {
-		typeface = GoldStoneFont.light(context)
+		typeface = GoldStoneFont.medium(context)
 		gravity = Gravity.CENTER_VERTICAL
 
 		layoutParams = LinearLayout.LayoutParams(
-			ScreenSize.Width - PaddingSize.device * 2, 80.uiPX()
+			ScreenSize.Width - PaddingSize.device * 2, 95.uiPX()
 		).apply {
 			leftPadding = 20.uiPX()
 			rightPadding = 20.uiPX()
 		}
 
-		setBackgroundColor(Spectrum.darkBlue)
+		setBackgroundColor(Spectrum.green)
 	}
 
 	override fun setBackgroundColor(color: Int) {

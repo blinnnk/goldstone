@@ -21,7 +21,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -57,14 +57,6 @@ class TransactionDetailPresenter(
 		updateDataFromNotification()
 	}
 	
-	override fun updateParentContentLayoutHeight(
-		dataCount: Int?,
-		cellHeight: Int,
-		maxHeight: Int
-	) {
-		setHeightMatchParent()
-	}
-	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.setBackEventByParentFragment()
@@ -82,19 +74,16 @@ class TransactionDetailPresenter(
 			is TransactionFragment -> {
 				parent.headerTitle = TransactionText.detail
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-				setHeightMatchParent()
 			}
 			
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-				setHeightMatchParent()
 			}
 			
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-				updateParentContentLayoutHeight(fragment.asyncData?.size)
 			}
 		}
 	}
@@ -153,7 +142,7 @@ class TransactionDetailPresenter(
 				is TransactionFragment -> {
 					overlayView.header.backButton.onClick {
 						headerTitle = TransactionText.detail
-						presenter.popFragmentFrom<TransactionDetailFragment>()
+						presenter.popFragmentFrom<TransactionDetailFragment>(TransactionFragment.viewPagerSize)
 					}
 				}
 				
@@ -168,7 +157,6 @@ class TransactionDetailPresenter(
 					overlayView.header.backButton.onClick {
 						headerTitle = TokenDetailText.tokenDetail
 						presenter.popFragmentFrom<TransactionDetailFragment>()
-						updateParentContentLayoutHeight(fragment.asyncData?.size)
 					}
 				}
 			}

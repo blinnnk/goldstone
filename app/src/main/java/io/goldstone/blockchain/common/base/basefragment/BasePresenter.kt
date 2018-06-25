@@ -2,15 +2,11 @@ package io.goldstone.blockchain.common.base.basefragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.blinnnk.animation.updateHeightAnimation
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -49,34 +45,6 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	
 	open fun onFragmentDestroy() {
 		fragment.getMainActivity()?.showHomeFragment()
-	}
-	
-	fun recoveryFragmentHeight() {
-		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			val finalHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-			overlayView.contentLayout.updateHeightAnimation(finalHeight, finalHeight, 0)
-		}
-		AnimationDuration.Default timeUpThen {
-			fragment.getMainActivity()?.hideHomeFragment()
-		}
-	}
-	
-	fun updateHeight(height: Int) {
-		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(height, height, 0)
-		}
-		// 优化重汇
-		try {
-			if (height >= ScreenSize.Height) {
-				AnimationDuration.Default timeUpThen {
-					fragment.getMainActivity()?.hideHomeFragment()
-				}
-			} else {
-				fragment.getMainActivity()?.showHomeFragment()
-			}
-		} catch (error: Error) {
-			LogUtil.error(this.javaClass.simpleName + "showHomeFragment", error)
-		}
 	}
 	
 	// 当 `BaseFragment` 加载在 `BaseOverlayFragment` 的时候提供支持回退的加载卸载方法

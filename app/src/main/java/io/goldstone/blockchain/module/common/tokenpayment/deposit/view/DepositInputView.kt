@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.component.ValueInputView
 class DepositInputView(context: Context) : ValueInputView(context) {
 
 	init {
-		gradientView.setStyle(GradientType.Blue, gradientViewHeight)
+		gradientView.setStyle(GradientType.CrystalGreen, gradientViewHeight)
 	}
 
 }

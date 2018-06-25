@@ -15,7 +15,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.memoryTransactionListData
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 import org.jetbrains.anko.doAsync
 
 /**

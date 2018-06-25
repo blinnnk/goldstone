@@ -1,16 +1,12 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter
 
-import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.View
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
+import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -36,35 +32,6 @@ class TokenDetailOverlayPresenter(
 		}
 	}
 	
-	@SuppressLint("SetTextI18n")
-	fun setValueHeader(token: WalletDetailCellModel?) {
-		fragment.apply {
-			overlayView.header.title.isHidden()
-			valueHeader.isNull() isTrue {
-				customHeader = {
-					valueHeader = TwoLineTitles(context)
-					valueHeader?.apply {
-						title.text = "${WalletText.tokenDetailHeaderText} ${token?.symbol}"
-						subtitle.text =
-							CryptoUtils.scaleTo32(
-								"${token?.count} ${token?.symbol} ≈ ${token?.currency?.formatCurrency()} " +
-								"(${Config.getCurrencyCode
-								()})"
-							)
-						setBlackTitles()
-						isCenter = true
-					}?.into(this)
-					valueHeader?.apply {
-						setCenterInHorizontal()
-						y += 15.uiPX()
-					}
-				}
-			} otherwise {
-				valueHeader?.visibility = View.VISIBLE
-			}
-		}
-	}
-	
 	fun recoverHeader() {
 		fragment.apply {
 			overlayView.header.title.visibility = View.VISIBLE
@@ -82,7 +49,7 @@ class TokenDetailOverlayPresenter(
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
-					setValueHeader(token)
+					fragment.setValueHeader(token)
 					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content) {}
 					headerTitle = TokenDetailText.address
 				}

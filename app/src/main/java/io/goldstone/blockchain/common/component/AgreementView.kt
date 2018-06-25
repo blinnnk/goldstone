@@ -44,7 +44,12 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 		val terms = CreateWalletText.agreementName
 		textView.apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
-			text = CustomTargetTextStyle(terms, "${CreateWalletText.agreementPreString} $terms ${CreateWalletText.agreementPostString}", Spectrum.blue, 10.uiPX())
+			text = CustomTargetTextStyle(
+				terms,
+				"${CreateWalletText.agreementPreString} $terms ${CreateWalletText.agreementPostString}",
+				Spectrum.green,
+				11.uiPX()
+			)
 			textSize = fontSize(11)
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
@@ -60,8 +65,7 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 
 		// 增大点击区域
 		radioButton.layoutParams.width += 80.uiPX()
-		radioButton.x = (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f -
-			40.uiPX()
+		radioButton.x = (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 45.uiPX()
 
 	}
 

@@ -29,6 +29,7 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 		sendButton
 			.apply {
 				text = CommonText.send
+				setBoldTitle()
 				themeColor = Spectrum.green
 				layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
 					leftMargin = PaddingSize.device
@@ -41,6 +42,7 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 		receivedButton
 			.apply {
 				text = CommonText.deposit
+				setBoldTitle()
 				themeColor = Spectrum.blue
 				layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
 					topMargin = 15.uiPX()

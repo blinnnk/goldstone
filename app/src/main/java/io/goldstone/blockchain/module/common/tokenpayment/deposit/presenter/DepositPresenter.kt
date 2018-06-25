@@ -12,7 +12,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.
  * @date 2018/5/7 11:41 PM
  * @author KaySaith
  */
-
 class DepositPresenter(
 	override val fragment: DepositFragment
 ) : BasePresenter<DepositFragment>() {
@@ -25,7 +24,6 @@ class DepositPresenter(
 			fragment.setInputViewDescription(token?.symbol.orEmpty())
 		}
 		generateQRCode()
-		recoveryFragmentHeight()
 	}
 
 	fun generateQRCode(amount: Double = 0.0, callback: () -> Unit = {}) {
@@ -35,7 +33,7 @@ class DepositPresenter(
 				val tokenParameter = if (amount == 0.0) "" else "?amount=$amount?token=${token?.contract}"
 				val content = when (token?.symbol) {
 					CryptoSymbol.eth -> "$this$ethParameter"
-					else             -> "$this$tokenParameter"
+					else -> "$this$tokenParameter"
 				}
 				qrContent = content
 				QRCodePresenter.generateQRCode(content).let {
@@ -45,5 +43,4 @@ class DepositPresenter(
 			}
 		}
 	}
-
 }

@@ -1,17 +1,11 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.support.v7.widget.RecyclerView
-import com.blinnnk.animation.updateHeightAnimation
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.AnimationDuration
+import com.blinnnk.extension.isFalse
 import io.goldstone.blockchain.common.base.BaseRecyclerView
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.BasicSize
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 
@@ -72,11 +66,9 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		// Do Something
 	}
 	
-	open fun onFragmentResume() {
-	}
+	open fun onFragmentResume() {}
 	
-	open fun onFragmentHiddenChanged(isHidden: Boolean) {
-	}
+	open fun onFragmentHiddenChanged(isHidden: Boolean) {}
 	
 	/** 获取依赖的 `Adapter` */
 	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
@@ -126,73 +118,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		}
 	}
 	
-	fun diffDataSetChanged(
+	inline fun diffDataSetChanged(
 		oldData: ArrayList<D>,
 		newData: ArrayList<D>,
 		hold: (Boolean) -> Unit
 	) {
 		hold(oldData.getObjectMD5HexString() == newData.getObjectMD5HexString())
-	}
-	
-	/**
-	 * @description
-	 * 这个方法会在 [BaseRecyclerFragment] 中根据 `setSlideUpWithCellHeight` 的设定
-	 * 状态而决定是否执行.
-	 */
-	open fun updateParentContentLayoutHeight(
-		dataCount: Int? = 0,
-		cellHeight: Int = 0,
-		maxHeight: Int = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-	) {
-		val actualHeight = dataCount.orZero() * cellHeight
-		val targetHeight = when {
-			dataCount == 0 -> BasicSize.overlayMinHeight
-			actualHeight > BasicSize.overlayMinHeight -> actualHeight
-			else -> BasicSize.overlayMinHeight
-		}
-		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			overlayView.contentLayout.updateHeightAnimation(targetHeight, maxHeight, 0) {
-				if (targetHeight >= maxHeight) {
-					AnimationDuration.Default timeUpThen {
-						fragment.getMainActivity()?.hideHomeFragment()
-					}
-				} else {
-					fragment.getMainActivity()?.showHomeFragment()
-				}
-			}
-		}
-	}
-	
-	fun setHeightMatchParent(callback: () -> Unit = {}) {
-		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			val fullHeight = context?.getRealScreenHeight().orZero()
-			overlayView.contentLayout.updateHeightAnimation(fullHeight, fullHeight, 0) {
-				AnimationDuration.Default timeUpThen {
-					fragment.getMainActivity()?.hideHomeFragment()
-				}
-				callback()
-			}
-		}
-	}
-	
-	open fun recoveryFragmentHeight() {
-		fragment.getParentFragment<BaseOverlayFragment<BaseOverlayPresenter<*>>> {
-			if (setContentHeight() >= context?.getRealScreenHeight().orZero()) return
-			val recoveryHeight =
-				fragment.asyncData?.size.orZero() * fragment.setSlideUpWithCellHeight().orZero()
-			val maxHeight = fragment.activity?.getScreenHeightWithoutStatusBar().orZero()
-			val realHeight = when {
-				recoveryHeight == 0 -> maxHeight
-				recoveryHeight > BasicSize.overlayMinHeight -> recoveryHeight
-				else -> BasicSize.overlayMinHeight
-			}
-			overlayView.contentLayout.updateHeightAnimation(realHeight, maxHeight, 0) {
-				if (realHeight >= maxHeight) {
-					fragment.getMainActivity()?.hideHomeFragment()
-				} else {
-					fragment.getMainActivity()?.showHomeFragment()
-				}
-			}
-		}
 	}
 }
