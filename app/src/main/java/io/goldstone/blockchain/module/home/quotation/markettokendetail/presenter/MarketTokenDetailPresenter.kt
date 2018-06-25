@@ -129,7 +129,7 @@ class MarketTokenDetailPresenter(
 	) {
 		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8, {
 			// Show the error exception to user
-			fragment.context?.alert(it.toString().showAfterColonContent())
+			fragment.context.alert(it.toString().showAfterColonContent())
 		}) {
 			// 把数据更新到数据库
 			it.updateChartDataInDatabaseBy(period, pair)
@@ -268,7 +268,7 @@ class MarketTokenDetailPresenter(
 			info.pair,
 			{
 				// Show error information to user
-				fragment.context?.alert(it.toString().showAfterColonContent())
+				fragment.context.alert(it.toString().showAfterColonContent())
 			}
 		) { serverData ->
 			val tokenData = TokenInformationModel(serverData, info.symbol)

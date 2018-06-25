@@ -79,11 +79,10 @@ object CryptoUtils {
 	}
 	
 	fun isERC20Transfer(transactionTable: TransactionTable, hold: () -> Unit): Boolean {
-		return if (transactionTable.input.length >= 138 && isTransferInputCode(
-				transactionTable.input
-			)
-		           // 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
-		           || transactionTable.logIndex.isNotEmpty()
+		return if (
+			transactionTable.input.length >= 138 && isTransferInputCode(transactionTable.input)
+			// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
+			|| transactionTable.logIndex.isNotEmpty()
 		) {
 			hold()
 			true

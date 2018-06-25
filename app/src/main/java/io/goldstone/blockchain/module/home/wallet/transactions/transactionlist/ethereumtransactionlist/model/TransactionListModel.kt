@@ -39,7 +39,7 @@ data class TransactionListModel(
 ) : Serializable {
 	
 	constructor(data: TransactionTable) : this(
-		data.tokenReceiveAddress.orEmpty(),
+		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp,
@@ -62,7 +62,7 @@ data class TransactionListModel(
 		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble())
 			.toUnitValue(
 				if (data.symbol.equals(CryptoSymbol.etc, true))
-					CryptoSymbol.eth
+					CryptoSymbol.etc
 				else CryptoSymbol.eth
 			), // 计算燃气费使用情况
 		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
