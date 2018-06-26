@@ -43,6 +43,8 @@ object CryptoValue {
 object CryptoSymbol {
 	const val eth = "ETH"
 	const val etc = "ETC"
+	const val btc = "BTC"
+	const val ltc = "LTC"
 }
 
 object CryptoName {
@@ -51,5 +53,5 @@ object CryptoName {
 }
 
 enum class ChainType(val id: Long) {
-	BTC(0), ETH(60), ETC(61)
+	BTC(0), LTC(2), ETH(60), ETC(61)
 }

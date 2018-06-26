@@ -243,7 +243,6 @@ object RequisitionUtil {
 							.addHeader("os", "0")
 							.addHeader("version", version)
 							.addHeader("sign", sign)
-							.addHeader("chainid", Config.getCurrentChain())
 							.build()
 					callback(request)
 				}
@@ -282,7 +281,6 @@ object RequisitionUtil {
 							.addHeader("os", "0")
 							.addHeader("version", version)
 							.addHeader("sign", sign)
-							.addHeader("chainid", Config.getCurrentChain())
 							.build()
 					callback(request)
 				} else {

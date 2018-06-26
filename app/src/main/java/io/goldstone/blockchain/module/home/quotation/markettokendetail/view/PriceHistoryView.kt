@@ -25,7 +25,7 @@ data class PriceHistoryModel(
 	val dayLow: String,
 	val totalHighest: String,
 	val totalLow: String,
-	val baseSymbol: String
+	var baseSymbol: String
 ) {
 	
 	constructor(
@@ -47,6 +47,14 @@ data class PriceHistoryModel(
 		data.low24,
 		data.highTotal,
 		data.lowTotal,
+		symbol
+	)
+	
+	constructor(symbol: String) : this(
+		"",
+		"",
+		"",
+		"",
 		symbol
 	)
 }

@@ -5,12 +5,15 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -22,6 +25,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -80,7 +84,9 @@ class MarketTokenDetailPresenter(
 						(0 until jsonArray.length()).map {
 							ChartModel(JSONObject(jsonArray[it]?.toString()))
 						}.toArrayList().let {
-							val databaseTime = it.maxBy { it.timestamp }?.timestamp?.toLongOrNull().orElse(0)
+							val databaseTime = it.maxBy {
+								it.timestamp
+							}?.timestamp?.toLongOrNull().orElse(0)
 							/** 校验数据库的数据时间是否有效，是否需要更新 */
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
 								isTrue {
@@ -106,7 +112,10 @@ class MarketTokenDetailPresenter(
 				setTitle("DESCRIPTION")
 				setContentPadding()
 				addContent {
-					QuotationSelectionTable.getSelectionByPair(fragment.currencyInfo?.pair!!) {
+					DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+						fragment.currencyInfo?.symbol!!,
+						fragment.currencyInfo?.contract!!
+					) {
 						textView(it?.description?.substring(2)) {
 							textColor = GrayScale.gray
 							textSize = fontSize(14)
@@ -226,12 +235,20 @@ class MarketTokenDetailPresenter(
 		currencyInfo?.let { info ->
 			// 首先展示数据库数据
 			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
-				tokenInformation.model = tokenData
+				if (tokenData.marketCap.isEmpty()) {
+					// 本地没有数据的话从服务端拉取 `Coin Infomation`
+					loadCoinInfoFromServer(info) {
+						tokenInformation.model = TokenInformationModel(it, info.symbol)
+						tokenInfo.setTokenDescription(it.description)
+					}
+				} else {
+					tokenInfo.setTokenDescription(tokenData.description)
+					tokenInformation.model = tokenData
+				}
 				priceHistroy.model = priceData
 			}
 			// 在更新网络数据, 更新界面并更新数据库
-			getCurrencyInfoFromServer(info) { tokenData, priceData ->
-				tokenInformation.model = tokenData
+			getCurrencyInfoFromServer(info) { priceData ->
 				priceHistroy.model = priceData
 				QuotationSelectionTable.getSelectionByPair(info.pair) {
 					it?.apply {
@@ -239,12 +256,6 @@ class MarketTokenDetailPresenter(
 							.database
 							.quotationSelectionDao()
 							.update(it.apply {
-								availableSupply = tokenData.avaliableSupply.toDoubleOrNull().orElse(0.0)
-								exchange = tokenData.exchange
-								website = tokenData.website
-								whitePaper = tokenData.whitePaper
-								socialMedia = tokenData.socialMedia
-								startDate = tokenData.startDate
 								high24 = priceData.dayHighest
 								low24 = priceData.dayLow
 								highTotal = priceData.totalHighest
@@ -253,16 +264,12 @@ class MarketTokenDetailPresenter(
 					}
 				}
 			}
-			loadDescriptionFromLocalOrServer(info, tokenInfo)
 		}
 	}
 	
 	private fun getCurrencyInfoFromServer(
 		info: QuotationModel,
-		hold: (
-			tokenData: TokenInformationModel,
-			priceData: PriceHistoryModel
-		) -> Unit
+		hold: (PriceHistoryModel) -> Unit
 	) {
 		GoldStoneAPI.getQuotationCurrencyInfo(
 			info.pair,
@@ -271,66 +278,65 @@ class MarketTokenDetailPresenter(
 				fragment.context.alert(it.toString().showAfterColonContent())
 			}
 		) { serverData ->
-			val tokenData = TokenInformationModel(serverData, info.symbol)
 			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
 			fragment.context?.runOnUiThread {
-				hold(tokenData, priceData)
+				hold(priceData)
 			}
 		}
 	}
 	
 	private fun getCurrencyInfoFromDatabase(
 		info: QuotationModel,
-		hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
+		hold: (
+			tokenData: TokenInformationModel,
+			priceData: PriceHistoryModel
+		) -> Unit
 	) {
-		QuotationSelectionTable.getSelectionByPair(info.pair) {
-			it?.let {
-				val tokenData = TokenInformationModel(it, info.symbol)
-				val priceData = PriceHistoryModel(it, info.symbol)
+		DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+			info.symbol,
+			info.contract
+		) { default ->
+			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
+				val tokenData =
+					if (default.isNull()) {
+						TokenInformationModel()
+					} else {
+						TokenInformationModel(default!!, info.symbol)
+					}
+				val priceData = if (quotation.isNull()) {
+					PriceHistoryModel(info.symbol)
+				} else {
+					PriceHistoryModel(quotation!!, info.symbol)
+				}
 				hold(tokenData, priceData)
 			}
 		}
 	}
 	
-	private fun loadDescriptionFromLocalOrServer(
+	// Async Function
+	private fun loadCoinInfoFromServer(
 		info: QuotationModel,
-		tokenInfo: TokenInfoView
+		hold: (DefaultTokenTable) -> Unit
 	) {
-		QuotationSelectionTable.getSelectionByPair(info.pair) {
-			it?.apply {
-				val maxCount: (String?) -> Int = { it ->
-					if (it?.length.orZero() < 300) it?.length.orZero()
-					else 300
-				}
-				// 判断本地是否有数据, 或者本地的描述的语言和用户的选择语言是否一致
-				if (
-					description.isNullOrBlank()
-					|| !description?.substring(0, 2).equals(HoneyLanguage.getCurrentSymbol(), true)
-				) {
-					GoldStoneAPI.getQuotationCurrencyDescription(
-						info.symbol,
-						{
-							LogUtil.error("getQuotationCurrencyDescription", it)
-						}
-					) { description ->
-						fragment.context?.runOnUiThread {
-							val content = description.substring(0, maxCount(description)) + "..."
-							tokenInfo.setTokenDescription(content)
-							tokenInfo.updateHeightByText(
-								content,
-								tokenInfo.fontSize(14),
-								18.uiPX(),
-								ScreenSize.widthWithPadding,
-								200.uiPX()
-							)
-						}
-						QuotationSelectionTable.updateDescription(info.pair, description)
-					}
-				} else {
-					tokenInfo.setTokenDescription(
-						description?.substring(2, maxCount(description)) + "..."
-					)
-				}
+		val chainID = when {
+			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
+			info.contract.isNotEmpty() -> ChainID.Main.id
+			info.symbol.equals(CryptoSymbol.btc, true) -> ChainID.BTCMain.id
+			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.BTCMain.id
+			else -> ""
+		}
+		GoldStoneAPI.getTokenInfoFromMarket(
+			info.symbol,
+			chainID,
+			{
+				LogUtil.error("loadCoinInformationFromServer", it)
+			}
+		) {
+			DefaultTokenTable.updateOrInsertCoinInfo(it) {
+				DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+					info.symbol,
+					info.contract
+				) { it?.let(hold) }
 			}
 		}
 	}

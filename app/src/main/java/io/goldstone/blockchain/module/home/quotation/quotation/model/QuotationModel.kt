@@ -8,7 +8,6 @@ import java.io.Serializable
  * @date 26/03/2018 8:57 PM
  * @author KaySaith
  */
-
 data class QuotationModel(
 	val symbol: String = "",
 	val name: String = "",
@@ -19,8 +18,9 @@ data class QuotationModel(
 	val orderID: Double = 0.0,
 	val pairDisplay: String = "",
 	val pair: String = "",
-	val quoteSymbol: String = ""
-): Serializable {
+	val quoteSymbol: String = "",
+	val contract: String = ""
+) : Serializable {
 	
 	constructor(
 		data: QuotationSelectionTable,
@@ -37,7 +37,8 @@ data class QuotationModel(
 		data.orderID,
 		data.pairDisplay,
 		data.pair,
-		data.quoteSymbol
+		data.quoteSymbol,
+		data.contract
 	)
 }
 

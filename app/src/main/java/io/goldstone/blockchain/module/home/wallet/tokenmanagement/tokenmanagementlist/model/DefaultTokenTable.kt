@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -40,12 +42,18 @@ data class DefaultTokenTable(
 	var totalSupply: String? = null,
 	// 个人通过 `Contract` 搜索到的, 和 `Server` 与 `Local` Json 数据都不同的部分.
 	var isDefault: Boolean = true,
-	@Ignore
-	var isUsed: Boolean = false,
 	@SerializedName("weight")
 	var weight: Int,
 	@SerializedName("chain_id")
-	var chain_id: String
+	var chain_id: String,
+	var description: String = "",
+	var exchange: String = "",
+	var whitePaper: String = "",
+	var socialMedia: String = "",
+	var startDate: String = "",
+	var website: String = "",
+	var rank: String = "",
+	var marketCap: String = ""
 ) {
 	
 	/** 默认的 `constructor` */
@@ -61,14 +69,13 @@ data class DefaultTokenTable(
 		0.0,
 		"",
 		true,
-		false,
 		0,
 		Config.getCurrentChain()
 	)
 	
 	constructor(
 		data: TokenSearchModel,
-		isUsed: Boolean = false
+		isDefault: Boolean = false
 	) : this(
 		0,
 		data.contract,
@@ -79,15 +86,13 @@ data class DefaultTokenTable(
 		data.name,
 		data.decimal.toDouble(),
 		"",
-		isUsed,
-		isUsed,
+		isDefault,
 		data.weight,
 		Config.getCurrentChain()
 	)
 	
 	constructor(
-		localData: JSONObject,
-		isUsed: Boolean = false
+		localData: JSONObject
 	) : this(
 		0,
 		localData.safeGet("address"),
@@ -99,12 +104,41 @@ data class DefaultTokenTable(
 		localData.safeGet("decimals").toDouble(),
 		localData.safeGet("total_supply"),
 		TinyNumberUtils.isTrue(localData.safeGet("is_default")),
-		isUsed,
 		if (localData.safeGet("weight").isEmpty()) 0
 		else localData.safeGet("weight").toInt(),
-		localData.safeGet("chain_id")
+		localData.safeGet("chain_id"),
+		localData.safeGet("description"),
+		localData.safeGet("website"),
+		localData.safeGet("exchange"),
+		localData.safeGet("white_paper"),
+		localData.safeGet("social_media"),
+		localData.safeGet("start_date")
 	)
 	
+	constructor(data: CoinInfoModel) : this(
+		0,
+		data.contract,
+		"",
+		data.symbol,
+		0,
+		0.0,
+		"",
+		0.0,
+		data.supply,
+		false,
+		0,
+		data.chainID,
+		data.description,
+		data.exchange,
+		data.whitePaper,
+		data.socialMedia,
+		data.startDate,
+		data.website,
+		data.rank,
+		data.marketCap
+	)
+	
+	@Ignore
 	constructor(
 		contract: String,
 		symbol: String,
@@ -120,9 +154,8 @@ data class DefaultTokenTable(
 		decimals,
 		"",
 		false,
-		false,
 		0,
-		Config.getCurrentChain()
+		ChainID.getChainIDBySymbol(symbol)
 	)
 	
 	companion object {
@@ -154,6 +187,22 @@ data class DefaultTokenTable(
 			}
 		}
 		
+		fun getTokenByContractAndSymbolFromAllChains(
+			symbol: String,
+			contract: String,
+			hold: (DefaultTokenTable?) -> Unit
+		) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.defaultTokenDao()
+						.getTokenByContractAndSymbolFromAllChains(symbol, contract)
+				}) {
+				hold(it)
+			}
+		}
+		
 		fun getCurrentChainTokenByContract(
 			contract: String,
 			ercChain: String = Config.getCurrentChain(),
@@ -168,6 +217,36 @@ data class DefaultTokenTable(
 						.getCurrentChainTokenByContract(contract, ercChain, etcChain)
 				}) {
 				hold(it)
+			}
+		}
+		
+		fun updateOrInsertCoinInfo(
+			data: CoinInfoModel,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.defaultTokenDao()
+					.apply {
+						getTokenByContractFromAllChains(data.contract).let {
+							if (it.isNull()) {
+								System.out.println("what happened 1")
+								insert(DefaultTokenTable(data))
+								callback()
+							} else {
+								update(it!!.apply {
+									exchange = data.exchange
+									website = data.website
+									marketCap = data.marketCap
+									whitePaper = data.whitePaper
+									socialMedia = data.socialMedia
+									rank = data.rank
+									totalSupply = data.supply
+									startDate = data.startDate
+								})
+								callback()
+							}
+						}
+					}
 			}
 		}
 		
@@ -263,6 +342,9 @@ interface DefaultTokenDao {
 	
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContractFromAllChains(contract: String): DefaultTokenTable?
+	
+	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND contract LIKE :contract")
+	fun getTokenByContractAndSymbolFromAllChains(symbol: String, contract: String): DefaultTokenTable?
 	
 	@Insert
 	fun insert(token: DefaultTokenTable)

@@ -22,7 +22,7 @@ object APIPath {
 	
 	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
 	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
-	val getCoinInfo: (header: String) -> String = { "$it/index/searchToken?symbolOrContract=" }
+	val getTokenInfo: (header: String) -> String = { "$it/index/searchToken?symbolOrContract=" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
 	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" }
@@ -32,7 +32,7 @@ object APIPath {
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
 	val getPriceByAddress: (header: String) -> String = { "$it/index/priceByAddress" }
-	val getTokenDescription: (header: String) -> String = { "$it/market/coinDescription?symbol=" }
+	val getCoinInfo: (header: String) -> String = { "$it/market/coinInfo?symbol=" }
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }

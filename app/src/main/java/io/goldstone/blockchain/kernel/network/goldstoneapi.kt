@@ -25,6 +25,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
@@ -94,13 +95,13 @@ object GoldStoneAPI {
 	}
 	
 	@JvmStatic
-	fun getCoinInfoBySymbolFromGoldStone(
+	fun getTokenInfoBySymbolFromGoldStone(
 		symbols: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(
-			APIPath.getCoinInfo(APIPath.currentUrl) + symbols,
+			APIPath.getTokenInfo(APIPath.currentUrl) + symbols,
 			"list",
 			errorCallback = errorCallback,
 			isEncrypt = true
@@ -479,20 +480,21 @@ object GoldStoneAPI {
 		}
 	}
 	
-	fun getQuotationCurrencyDescription(
+	fun getTokenInfoFromMarket(
 		symbol: String,
+		chainID: String,
 		errorCallback: (Exception) -> Unit,
-		hold: (String) -> Unit
+		hold: (CoinInfoModel) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getTokenDescription(APIPath.currentUrl) + symbol,
+			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
 			"",
 			true,
 			errorCallback,
 			true
 		) {
 			this[0].let {
-				hold(JSONObject(it).safeGet("description"))
+				hold(CoinInfoModel(JSONObject(it), symbol, chainID))
 			}
 		}
 	}

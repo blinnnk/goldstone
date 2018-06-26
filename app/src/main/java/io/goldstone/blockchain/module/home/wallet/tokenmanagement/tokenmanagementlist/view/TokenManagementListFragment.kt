@@ -28,7 +28,7 @@ class TokenManagementListFragment :
 					asyncData?.find {
 						it.contract == model.contract
 					}?.apply {
-						isUsed = switch.isChecked
+						isDefault = switch.isChecked
 					}
 					// 更新数据库
 					TokenManagementListPresenter
