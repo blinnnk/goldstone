@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
+import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
@@ -37,6 +38,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name
+			switch.isChecked = model?.isUsed.orFalse()
 		}
 	}
 	var searchModel: QuotationSelectionTable? by observing(null) {

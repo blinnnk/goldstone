@@ -41,7 +41,7 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 
 	fun setTokenDescription(content: String) {
 		// 描述第一位存储了语言码, 如果语言格式不对也要重新拉取数据
-		contentView.text = content.substring(1)
+		contentView.text = if (content.length > 1) content.substring(1) else return
 	}
 
 }

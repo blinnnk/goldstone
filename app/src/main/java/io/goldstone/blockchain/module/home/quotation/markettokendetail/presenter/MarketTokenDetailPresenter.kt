@@ -1,6 +1,9 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -30,9 +33,6 @@ import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
-import android.support.v4.content.ContextCompat.startActivity
-import android.content.Intent
-import android.net.Uri
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -115,7 +115,7 @@ class MarketTokenDetailPresenter(
 				setTitle("DESCRIPTION")
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
 						fragment.currencyInfo?.symbol!!,
 						fragment.currencyInfo?.contract!!
 					) {
@@ -320,7 +320,7 @@ class MarketTokenDetailPresenter(
 			priceData: PriceHistoryModel
 		) -> Unit
 	) {
-		DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+		DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
 			info.symbol,
 			info.contract
 		) { default ->
@@ -361,7 +361,7 @@ class MarketTokenDetailPresenter(
 			}
 		) {
 			DefaultTokenTable.updateOrInsertCoinInfo(it) {
-				DefaultTokenTable.getTokenByContractAndSymbolFromAllChains(
+				DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
 					info.symbol,
 					info.contract
 				) { it?.let(hold) }

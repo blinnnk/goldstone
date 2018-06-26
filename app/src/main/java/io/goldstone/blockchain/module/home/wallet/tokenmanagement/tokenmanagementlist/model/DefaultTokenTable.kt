@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -53,11 +52,12 @@ data class DefaultTokenTable(
 	var startDate: String = "",
 	var website: String = "",
 	var rank: String = "",
-	var marketCap: String = ""
+	var marketCap: String = "",
+	@Ignore
+	var isUsed: Boolean = false
 ) {
 	
 	/** 默认的 `constructor` */
-	@Ignore
 	constructor() : this(
 		0,
 		"",
@@ -187,7 +187,7 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun getTokenByContractAndSymbolFromAllChains(
+		fun getTokenBySymbolAndContractFromAllChains(
 			symbol: String,
 			contract: String,
 			hold: (DefaultTokenTable?) -> Unit
@@ -197,9 +197,13 @@ data class DefaultTokenTable(
 					GoldStoneDataBase
 						.database
 						.defaultTokenDao()
-						.getTokenByContractAndSymbolFromAllChains(symbol, contract)
+						.getTokenBySymbolAndContractFromAllChains(symbol, contract)
 				}) {
-				hold(it)
+				if (it.isNotEmpty()) {
+					hold(it[0])
+				} else {
+					hold(null)
+				}
 			}
 		}
 		
@@ -227,22 +231,27 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenByContractFromAllChains(data.contract).let {
-							if (it.isNull()) {
+						getTokenBySymbolAndContractFromAllChains(data.symbol, data.contract).let {
+							if (it.isEmpty()) {
 								insert(DefaultTokenTable(data))
 								callback()
 							} else {
-								update(it!!.apply {
-									exchange = data.exchange
-									website = data.website
-									marketCap = data.marketCap
-									whitePaper = data.whitePaper
-									socialMedia = data.socialMedia
-									rank = data.rank
-									totalSupply = data.supply
-									startDate = data.startDate
-									description = "${Config.getCurrentLanguageCode()}${data.description}"
-								})
+								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
+								it.filterNot { default ->
+									ChainID.getTestChains().any { it.equals(default.chain_id, true) }
+								}[0].let {
+									update(it.apply {
+										exchange = data.exchange
+										website = data.website
+										marketCap = data.marketCap
+										whitePaper = data.whitePaper
+										socialMedia = data.socialMedia
+										rank = data.rank
+										totalSupply = data.supply
+										startDate = data.startDate
+										description = "${Config.getCurrentLanguageCode()}${data.description}"
+									})
+								}
 								callback()
 							}
 						}
@@ -340,11 +349,11 @@ interface DefaultTokenDao {
 		etcChain: String = Config.getETCCurrentChain()
 	): DefaultTokenTable?
 	
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-	fun getTokenByContractFromAllChains(contract: String): DefaultTokenTable?
-	
 	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND contract LIKE :contract")
-	fun getTokenByContractAndSymbolFromAllChains(symbol: String, contract: String): DefaultTokenTable?
+	fun getTokenBySymbolAndContractFromAllChains(
+		symbol: String,
+		contract: String
+	): List<DefaultTokenTable>
 	
 	@Insert
 	fun insert(token: DefaultTokenTable)

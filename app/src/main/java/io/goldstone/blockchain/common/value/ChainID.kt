@@ -20,6 +20,18 @@ enum class ChainID(val id: String) {
 	LTCMain("12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2");
 	
 	companion object {
+		
+		fun getTestChains(): ArrayList<String> {
+			return arrayListOf(
+				ChainID.ETCTest.id,
+				ChainID.BTCTest.id,
+				ChainID.BTCRegtest.id,
+				ChainID.Ropsten.id,
+				ChainID.Kovan.id,
+				ChainID.Rinkeby.id
+			)
+		}
+		
 		fun getAllChainID(): ArrayList<String> {
 			return arrayListOf(
 				ChainID.Main.id,

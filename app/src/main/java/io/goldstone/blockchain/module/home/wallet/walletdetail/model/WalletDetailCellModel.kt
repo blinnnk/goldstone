@@ -60,18 +60,18 @@ data class WalletDetailCellModel(
 			walletAddress: String = Config.getCurrentAddress(),
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			MyTokenTable.getCurrentChainTokensWithAddress(walletAddress) { allTokens ->
+			MyTokenTable.getCurrentChainTokensWithAddress(walletAddress) { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
-				if (allTokens.isEmpty()) {
+				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
 					return@getCurrentChainTokensWithAddress
 				}
 				DefaultTokenTable.getCurrentChainTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
 						val tokenList = ArrayList<WalletDetailCellModel>()
-						override var asyncCount: Int = allTokens.size
+						override var asyncCount: Int = myTokens.size
 						override fun concurrentJobs() {
-							allTokens.forEach { token ->
+							myTokens.forEach { token ->
 								localTokens.find {
 									it.contract.equals(token.contract, true)
 								}?.let { targetToken ->

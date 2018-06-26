@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
@@ -30,16 +31,20 @@ class TokenInfoLink(
 	
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		website.setSubtitle(CryptoUtils.scaleTo(model.website, 28))
-		whitePaper.setSubtitle(CryptoUtils.scaleTo(model.whitePaper, 28))
-		
 		website.onClick {
 			clickEvent(model.website, QuotationText.website)
 			website.preventDuplicateClicks()
 		}
-		
-		whitePaper.onClick {
-			clickEvent(model.whitePaper, QuotationText.whitePaper)
-			whitePaper.preventDuplicateClicks()
+		// Is there white paper link exist
+		if (model.whitePaper.isNotEmpty()) {
+			whitePaper.setSubtitle(CryptoUtils.scaleTo(model.whitePaper, 28))
+			whitePaper.onClick {
+				clickEvent(model.whitePaper, QuotationText.whitePaper)
+				whitePaper.preventDuplicateClicks()
+			}
+		} else {
+			whitePaper.visibility = View.GONE
+			layoutParams.height = 90.uiPX()
 		}
 	}
 	private val website = GraySqualCell(context).apply { showArrow() }

@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter
 
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -11,8 +10,8 @@ import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.view.ClassicTransactionListAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.view.ClassicTransactionListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
@@ -32,6 +31,7 @@ class ClassicTransactionListPresenter(
 	}
 	
 	override fun onFragmentViewCreated() {
+		super.onFragmentViewCreated()
 		fragment.getParentFragment<TransactionFragment>()?.apply {
 			isETCListShown = Runnable {
 				fragment.showChainData()
@@ -44,11 +44,7 @@ class ClassicTransactionListPresenter(
 		showLoadingView(LoadingText.transactionData)
 		// 首先显示本地数据
 		getETCTransactionsFromDatabase {
-			if (asyncData.isNull()) {
-				asyncData = it
-			} else {
-				diffAndUpdateAdapterData<TokenDetailAdapter>(it)
-			}
+			diffAndUpdateSingleCellAdapterData<ClassicTransactionListAdapter>(it)
 			if (!hasUpdateChainData) {
 				// 异步查询网络数据并决定是否更新
 				getInvalidETCTransactionsFromChain(it) {

@@ -33,6 +33,12 @@ class TokenSocialMedia(
 ) : TopBottomLineCell(context) {
 	
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
+		if (model.socialMedia.isEmpty()) return@observing
+		/***
+		 * 按照约定的规则拆分数据
+		 * Mulitiple data split with `,` Single data split with `|`
+		 * [0] `Name` [1] `Icon Url` [2] `Link Url`
+		 * */
 		model.socialMedia.split(",").forEach {
 			IconWithTitle(context).apply {
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding / 3, wrapContent)
