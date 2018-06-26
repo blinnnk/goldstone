@@ -8,7 +8,6 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -63,10 +62,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
 					.forEachOrEnd { token, isEnd ->
-						DefaultTokenTable(
-							token,
-							TinyNumberUtils.isTrue(token.safeGet("force_show"))
-						).let {
+						DefaultTokenTable(token).let {
 							GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							context.runOnUiThread {
 								if (isEnd) callback()

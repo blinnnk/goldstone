@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -92,7 +93,7 @@ class TokenSearchPresenter(
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		
 		fragment.showLoadingView(LoadingText.searchingToken)
-		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(
+		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
 			content,
 			{
 				// Usually this kinds of Exception will be connect to the service Timeout
@@ -109,7 +110,9 @@ class TokenSearchPresenter(
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
-							isUsed = localTokens.any { it.symbol.equals(serverToken.symbol, true) }
+							isDefault = localTokens.any {
+								it.symbol.equals(serverToken.symbol, true)
+							}
 						}
 					}.let {
 						hold(it.toArrayList())
@@ -143,9 +146,8 @@ class TokenSearchPresenter(
 											decimal,
 											null,
 											false,
-											!it.isNull(),
 											0,
-											Config.getCurrentChain()
+											ChainID.getChainIDBySymbol(symbol)
 										)
 									)
 								)

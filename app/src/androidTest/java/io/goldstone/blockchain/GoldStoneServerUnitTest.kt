@@ -38,7 +38,7 @@ class GoldStoneServerUnitTest {
 	fun searchTokenBySymbolOrContract() {
 		// Change any symbo or contract value to test the result
 		val symbolOrContract = "t"
-		GoldStoneAPI.getCoinInfoBySymbolFromGoldStone(symbolOrContract, {
+		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(symbolOrContract, {
 			LogUtil.error("$positon GetSearchToken", it)
 		}) {
 			LogUtil.debug("$positon GetSearchToken", it.toString())

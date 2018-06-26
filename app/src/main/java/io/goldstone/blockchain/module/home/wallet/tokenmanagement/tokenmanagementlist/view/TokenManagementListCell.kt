@@ -37,7 +37,6 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = name
-			switch.isChecked = isUsed
 		}
 	}
 	var searchModel: QuotationSelectionTable? by observing(null) {

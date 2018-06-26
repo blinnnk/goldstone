@@ -11,7 +11,16 @@
     "price": "0.059459",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "VeChain",
@@ -25,7 +34,16 @@
     "price": "4.15",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "OmiseGO",
@@ -39,7 +57,16 @@
     "price": "11.52",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Binance Coin",
@@ -53,7 +80,16 @@
     "price": "16.68",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ICON",
@@ -67,7 +103,16 @@
     "price": "2.66",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Populous",
@@ -81,7 +126,16 @@
     "price": "11.45",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bytom",
@@ -95,7 +149,16 @@
     "price": "0.641016",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "DigixDAO",
@@ -109,7 +172,16 @@
     "price": "158.24",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Maker",
@@ -123,7 +195,16 @@
     "price": "809.41",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Zilliqa",
@@ -137,7 +218,16 @@
     "price": "0.133825",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "RChain",
@@ -151,7 +241,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/e8e9dc5b01f14e1b93d002f209ea24ad",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Aeternity",
@@ -165,7 +264,16 @@
     "price": "3.77",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "0x",
@@ -179,7 +287,16 @@
     "price": "1.31",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Aion",
@@ -193,7 +310,16 @@
     "price": "2.14",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Loopring",
@@ -207,7 +333,16 @@
     "price": "0.521658",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Augur",
@@ -221,7 +356,16 @@
     "price": "39.82",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "IOST",
@@ -235,7 +379,16 @@
     "price": "0.041300",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "KuCoin Shares",
@@ -249,7 +402,16 @@
     "price": "3.10",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Waltonchain",
@@ -263,7 +425,16 @@
     "price": "12.83",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "aelf",
@@ -277,7 +448,16 @@
     "price": "1.06",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Substratum",
@@ -291,7 +471,16 @@
     "price": "0.406290",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "QASH",
@@ -305,7 +494,16 @@
     "price": "0.502637",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Mithril",
@@ -319,7 +517,16 @@
     "price": "0.582116",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Veritaseum",
@@ -333,7 +540,16 @@
     "price": "83.34",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Dentacoin",
@@ -347,7 +563,16 @@
     "price": "0.000596",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethos",
@@ -361,7 +586,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/be69329cab424289aaa20d1e0de255ef",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Nebulas",
@@ -375,7 +609,16 @@
     "price": "7.03",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "WAX",
@@ -389,7 +632,16 @@
     "price": "0.189023",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SALT",
@@ -403,7 +655,16 @@
     "price": "1.95",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Mixin",
@@ -417,7 +678,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/dcba74913ee2455dbfacda0abdd67b32",
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Power Ledger",
@@ -431,7 +701,16 @@
     "price": "0.336636",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Storm",
@@ -445,7 +724,16 @@
     "price": "0.032862",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ChainLink",
@@ -459,7 +747,16 @@
     "price": "0.317539",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bancor",
@@ -473,7 +770,16 @@
     "price": "4.19",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Request Network",
@@ -487,7 +793,16 @@
     "price": "0.135346",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Enigma",
@@ -501,7 +816,16 @@
     "price": "2.10",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "TenX",
@@ -515,7 +839,16 @@
     "price": "0.907926",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Storj",
@@ -529,7 +862,16 @@
     "price": "0.773579",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Cindicator",
@@ -543,7 +885,16 @@
     "price": "0.060374",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Civic",
@@ -557,7 +908,16 @@
     "price": "0.298387",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Iconomi",
@@ -571,7 +931,16 @@
     "price": "0.915918",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Fusion",
@@ -585,7 +954,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/46fe6f8fe4fa436eb00868d35ce7215f",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Dent",
@@ -599,7 +977,16 @@
     "price": "0.008892",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Gnosis",
@@ -613,7 +1000,16 @@
     "price": "72.23",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Monaco",
@@ -627,7 +1023,16 @@
     "price": "6.72",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Cube",
@@ -641,7 +1046,16 @@
     "price": "0.008578",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Quantstamp",
@@ -655,7 +1069,16 @@
     "price": "0.153750",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Polymath",
@@ -669,7 +1092,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/066d3b9a30bb4efb97548a6b7212dbe7",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "iExec RLC",
@@ -683,7 +1115,16 @@
     "price": "1.57",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Loom Network",
@@ -697,7 +1138,16 @@
     "price": "0.323582",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Genaro Network",
@@ -711,7 +1161,16 @@
     "price": "0.272502",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Po.et",
@@ -725,7 +1184,16 @@
     "price": "0.027769",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Time New Bank",
@@ -739,7 +1207,16 @@
     "price": "0.038738",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Dynamic Trading Rights",
@@ -753,7 +1230,16 @@
     "price": "0.050564",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Nuls",
@@ -767,7 +1253,16 @@
     "price": "3.84",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "High Performance Blockchain",
@@ -781,7 +1276,16 @@
     "price": "3.86",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Enjin Coin",
@@ -795,7 +1299,16 @@
     "price": "0.110209",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Arcblock",
@@ -809,7 +1322,16 @@
     "price": "0.927691",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Raiden Network Token",
@@ -823,7 +1345,16 @@
     "price": "1.26",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Metal",
@@ -837,7 +1368,16 @@
     "price": "2.76",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SIRIN LABS Token",
@@ -851,7 +1391,16 @@
     "price": "0.315705",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SmartMesh",
@@ -865,7 +1414,16 @@
     "price": "0.050320",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bluzelle",
@@ -879,7 +1437,16 @@
     "price": "0.458427",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Genesis Vision",
@@ -893,7 +1460,16 @@
     "price": "16.61",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Gifto",
@@ -907,7 +1483,16 @@
     "price": "0.234828",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Theta Token",
@@ -921,7 +1506,16 @@
     "price": "0.255671",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "PayPie",
@@ -935,7 +1529,16 @@
     "price": "0.516962",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "BLOCKv",
@@ -949,7 +1552,16 @@
     "price": "0.029755",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "CyberMiles",
@@ -963,7 +1575,16 @@
     "price": "0.310333",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "AirSwap",
@@ -977,7 +1598,16 @@
     "price": "0.270168",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ETHLend",
@@ -991,7 +1621,16 @@
     "price": "0.043706",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "IoT Chain",
@@ -1005,7 +1644,16 @@
     "price": "1.01",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "OST",
@@ -1019,7 +1667,16 @@
     "price": "0.140677",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "DATA",
@@ -1033,7 +1690,16 @@
     "price": "0.012309",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ruff",
@@ -1047,7 +1713,16 @@
     "price": "0.094365",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Streamr DATAcoin",
@@ -1061,7 +1736,16 @@
     "price": "0.112941",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ripio Credit Network",
@@ -1075,7 +1759,16 @@
     "price": "0.083193",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "AdEx",
@@ -1089,7 +1782,16 @@
     "price": "0.607680",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SophiaTX",
@@ -1103,7 +1805,16 @@
     "price": "0.352494",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "UTRUST",
@@ -1117,7 +1828,16 @@
     "price": "0.106147",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Eidoo",
@@ -1131,7 +1851,16 @@
     "price": "1.48",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "WePower",
@@ -1145,7 +1874,16 @@
     "price": "0.075760",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SpankChain",
@@ -1159,7 +1897,16 @@
     "price": "0.123501",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ambrosus",
@@ -1173,7 +1920,16 @@
     "price": "0.408312",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Telcoin",
@@ -1187,7 +1943,16 @@
     "price": "0.001545",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Edgeless",
@@ -1201,7 +1966,16 @@
     "price": "0.493423",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Crypterium",
@@ -1215,7 +1989,16 @@
     "price": "0.750562",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "MediShares",
@@ -1229,7 +2012,16 @@
     "price": "0.072750",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "AppCoins",
@@ -1243,7 +2035,16 @@
     "price": "0.324378",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Universa",
@@ -1257,7 +2058,16 @@
     "price": "0.016186",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "VIBE",
@@ -1271,7 +2081,16 @@
     "price": "0.149466",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Tierion",
@@ -1285,7 +2104,16 @@
     "price": "0.072136",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "MobileGo",
@@ -1299,7 +2127,16 @@
     "price": "0.289561",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bread",
@@ -1313,7 +2150,16 @@
     "price": "0.567908",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "INS Ecosystem",
@@ -1327,7 +2173,16 @@
     "price": "1.06",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ormeus Coin",
@@ -1341,7 +2196,16 @@
     "price": "0.803950",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "KickCoin",
@@ -1355,7 +2219,16 @@
     "price": "0.063093",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "OriginTrail",
@@ -1369,7 +2242,16 @@
     "price": "0.211835",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Presearch",
@@ -1383,7 +2265,16 @@
     "price": "0.180969",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Etherparty",
@@ -1397,7 +2288,16 @@
     "price": "0.052211",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "BlockMason Credit Protocol",
@@ -1411,7 +2311,16 @@
     "price": "0.307117",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Rock",
@@ -1425,7 +2334,16 @@
     "price": "0.117525",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Republic Protocol",
@@ -1439,7 +2357,16 @@
     "price": "0.099129",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Trade Token",
@@ -1453,7 +2380,16 @@
     "price": "0.568839",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Delphy",
@@ -1467,7 +2403,16 @@
     "price": "2.04",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Blox",
@@ -1481,7 +2426,16 @@
     "price": "0.039941",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "IHT Real Estate Protocol",
@@ -1495,7 +2449,16 @@
     "price": "0.157952",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bottos",
@@ -1509,7 +2472,16 @@
     "price": "0.162236",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Game.com",
@@ -1523,7 +2495,16 @@
     "price": "0.132088",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Viberate",
@@ -1537,7 +2518,16 @@
     "price": "0.130050",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Cofound.it",
@@ -1551,7 +2541,16 @@
     "price": "0.058202",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Unikoin Gold",
@@ -1565,7 +2564,16 @@
     "price": "0.148920",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Internet Node Token",
@@ -1579,7 +2587,16 @@
     "price": "0.213547",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Spectre.ai Dividend Token",
@@ -1593,7 +2610,16 @@
     "price": "0.233137",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "TokenCard",
@@ -1607,7 +2633,16 @@
     "price": "1.50",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Humaniq",
@@ -1621,7 +2656,16 @@
     "price": "0.122196",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Datum",
@@ -1635,7 +2679,16 @@
     "price": "0.024597",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "YOYOW",
@@ -1649,7 +2702,16 @@
     "price": "0.095339",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "adToken",
@@ -1663,7 +2725,16 @@
     "price": "0.029233",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "EDUCare",
@@ -1677,7 +2748,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/717ed8147d03466e9a2fb2d098c4b04a",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Decision Token",
@@ -1691,7 +2771,16 @@
     "price": "0.598454",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Lunyr",
@@ -1705,7 +2794,16 @@
     "price": "11.62",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Electrify.Asia",
@@ -1719,7 +2817,16 @@
     "price": "0.058549",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Havven",
@@ -1733,7 +2840,16 @@
     "price": "0.524011",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Bankex",
@@ -1747,7 +2863,16 @@
     "price": "0.283889",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Refereum",
@@ -1761,7 +2886,16 @@
     "price": "0.009133",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Zeusshield",
@@ -1775,7 +2909,16 @@
     "price": "0.016400",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Grid+",
@@ -1789,7 +2932,16 @@
     "price": "0.424432",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SunContract",
@@ -1803,7 +2955,16 @@
     "price": "0.146966",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Propy",
@@ -1817,7 +2978,16 @@
     "price": "1.09",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "QunQun",
@@ -1831,7 +3001,16 @@
     "price": "0.032465",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "STK",
@@ -1845,7 +3024,16 @@
     "price": "0.052806",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Medicalchain",
@@ -1859,7 +3047,16 @@
     "price": "0.106848",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Everex",
@@ -1873,7 +3070,16 @@
     "price": "1.05",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SwftCoin",
@@ -1887,7 +3093,16 @@
     "price": "0.010030",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Uquid Coin",
@@ -1901,7 +3116,16 @@
     "price": "1.20",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Odyssey",
@@ -1915,7 +3139,16 @@
     "price": "0.016584",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Moeda Loyalty Points",
@@ -1929,7 +3162,16 @@
     "price": "0.779152",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Matryx",
@@ -1943,7 +3185,16 @@
     "price": "0.380519",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "AI Doctor",
@@ -1957,7 +3208,16 @@
     "price": "0.033010",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Mothership",
@@ -1971,7 +3231,16 @@
     "price": "0.140820",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SwissBorg",
@@ -1985,7 +3254,16 @@
     "price": "0.022551",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ATMChain",
@@ -1999,7 +3277,16 @@
     "price": "0.002327",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Aeron",
@@ -2013,7 +3300,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/222b2cbc2cf442bd85640e3c2d16da40",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Hive Project",
@@ -2027,7 +3323,16 @@
     "price": "0.055837",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "OneRoot Network",
@@ -2041,7 +3346,16 @@
     "price": "0.057344",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "All Sports",
@@ -2055,7 +3369,16 @@
     "price": "0.172579",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Blockport",
@@ -2069,7 +3392,16 @@
     "price": "0.237877",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "OAX",
@@ -2083,7 +3415,16 @@
     "price": "0.573729",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "DADI",
@@ -2097,7 +3438,16 @@
     "price": "0.182507",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "YEE",
@@ -2111,7 +3461,16 @@
     "price": "0.020669",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Lympo",
@@ -2125,7 +3484,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9dff541770614a729d46d9a3bab55750",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ICOS",
@@ -2139,7 +3507,16 @@
     "price": "13.90",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Blackmoon",
@@ -2153,7 +3530,16 @@
     "price": "0.724225",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "EncrypGen",
@@ -2167,7 +3553,16 @@
     "price": "0.110587",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Olympus Labs",
@@ -2181,7 +3576,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/348e60e17ac4482f9af4f0dce3d98af2",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "CoinMeet",
@@ -2195,7 +3599,16 @@
     "price": "0.052916",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ProChain",
@@ -2209,7 +3622,16 @@
     "price": "0.315139",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "EchoLink",
@@ -2223,7 +3645,16 @@
     "price": "0.033103",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Zap",
@@ -2237,7 +3668,16 @@
     "price": "0.103174",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Primas",
@@ -2251,7 +3691,16 @@
     "price": "0.597320",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "CanYaCoin",
@@ -2265,7 +3714,16 @@
     "price": "0.147773",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SportyCo",
@@ -2279,7 +3737,16 @@
     "price": "0.111731",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Aventus",
@@ -2293,7 +3760,16 @@
     "price": "1.03",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Hydro Protocol",
@@ -2307,7 +3783,16 @@
     "price": "0.054662",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Zilla",
@@ -2321,7 +3806,16 @@
     "price": "0.146418",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Payfair",
@@ -2335,7 +3829,16 @@
     "price": "0.048507",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "MicroMoney",
@@ -2349,7 +3852,16 @@
     "price": "0.172364",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Centra",
@@ -2363,7 +3875,16 @@
     "price": "0.016479",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ace",
@@ -2377,7 +3898,16 @@
     "price": "0.200510",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Cobinhood",
@@ -2391,7 +3921,16 @@
     "price": "0.055386",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "IPChain",
@@ -2405,7 +3944,16 @@
     "price": "0.717731",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Cortex",
@@ -2419,7 +3967,16 @@
     "price": "1.28",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Molecular Future",
@@ -2433,7 +3990,16 @@
     "price": "0.340822",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "BnkToTheFuture",
@@ -2447,7 +4013,16 @@
     "price": "0.208870",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Exchange Union",
@@ -2461,7 +4036,16 @@
     "price": "5.49",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "LightChain",
@@ -2475,7 +4059,16 @@
     "price": "0.001143",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "UnlimitedIP",
@@ -2489,7 +4082,16 @@
     "price": "0.033088",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "NEO GOLD",
@@ -2503,7 +4105,16 @@
     "price": "0.001694",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Melon",
@@ -2517,7 +4128,16 @@
     "price": "39.21",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "TaaS",
@@ -2531,7 +4151,16 @@
     "price": "3.30",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "CommerceBlock",
@@ -2545,7 +4174,16 @@
     "price": "0.036398",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ugChain",
@@ -2559,7 +4197,16 @@
     "price": "0.033730",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Penta",
@@ -2573,7 +4220,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/d4b1e6b75d5f4cf99e3c2a3e05cb5c33",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Nexo",
@@ -2587,7 +4243,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/c06f435a0a5f43e1a65a9863e9e8eb7c",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "BigONE Token",
@@ -2601,7 +4266,16 @@
     "price": "1.91",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Measurable Data Token",
@@ -2615,7 +4289,16 @@
     "price": "0.048144",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "TopChain",
@@ -2629,7 +4312,16 @@
     "price": "0.034011",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Tripio",
@@ -2643,7 +4335,16 @@
     "price": "0.017966",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Skrumble Network",
@@ -2657,7 +4358,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/faea2ae2c48f4507a4d44e496dd62de1",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethereum",
@@ -2671,7 +4381,16 @@
     "price": "609.41",
     "force_show": 1,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethereum",
@@ -2685,7 +4404,16 @@
     "price": "609.41",
     "force_show": 1,
     "is_default": 1,
-    "chain_id": "3"
+    "chain_id": "3",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethereum",
@@ -2699,7 +4427,16 @@
     "price": "609.41",
     "force_show": 1,
     "is_default": 1,
-    "chain_id": "4"
+    "chain_id": "4",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethereum",
@@ -2713,7 +4450,16 @@
     "price": "609.41",
     "force_show": 1,
     "is_default": 1,
-    "chain_id": "5"
+    "chain_id": "5",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "EduCoin",
@@ -2727,7 +4473,16 @@
     "price": "0.002931",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "InsurChain",
@@ -2741,7 +4496,16 @@
     "price": "0.001595",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "True Chain",
@@ -2755,7 +4519,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/9d7b294cd506491884ef53da9603cd63",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Libra Credit",
@@ -2769,7 +4542,16 @@
     "price": "0.221132",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "IoTeX",
@@ -2783,7 +4565,16 @@
     "force_show": 0,
     "url": "http://hunger.blinnnk.com/bf5d1c5b370649769d215d0cbc6bc66d",
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "ZIP",
@@ -2797,7 +4588,16 @@
     "price": "0.002957",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "FirstBlood",
@@ -2811,7 +4611,16 @@
     "price": "0.240340",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "district0x",
@@ -2825,7 +4634,16 @@
     "price": "0.059933",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "SingularDTV",
@@ -2839,7 +4657,16 @@
     "price": "0.065171",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Santiment Network Token",
@@ -2853,7 +4680,16 @@
     "price": "1.19",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Decentraland",
@@ -2867,7 +4703,16 @@
     "price": "0.105266",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Kyber Network",
@@ -2881,7 +4726,16 @@
     "price": "1.43",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "FunFair",
@@ -2895,7 +4749,16 @@
     "price": "0.034094",
     "force_show": 0,
     "is_default": 0,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Basic Attention Token",
@@ -2909,7 +4772,16 @@
     "price": "0.273445",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Golem",
@@ -2923,7 +4795,16 @@
     "price": "0.574815",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Status",
@@ -2937,7 +4818,16 @@
     "price": "0.096873",
     "force_show": 0,
     "is_default": 1,
-    "chain_id": "1"
+    "chain_id": "1",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "supply": "21,000,000",
+    "rank": "",
+    "market_cap": ""
   },
   {
     "name": "Ethereum Classic",
@@ -2951,6 +4841,14 @@
     "price": "16.5",
     "force_show": 1,
     "is_default": 1,
-    "chain_id": "62"
+    "chain_id": "62",
+    "website": "",
+    "description": "",
+    "white_paper": "",
+    "social_media": "",
+    "start_date": "",
+    "exchange": "",
+    "rank": "",
+    "market_cap": ""
   }
 ]

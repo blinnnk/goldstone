@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 import android.content.Context
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -27,7 +28,9 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 		avalibaleSupply.setSubtitle(model.avaliableSupply)
 		// 服务器返回的是带 `,` 的字符串这里加工成 `Double`
 		marketCap.setSubtitle(
-			model.marketCap.formatCurrency() + " " + Config.getCurrencyCode()
+			model.marketCap.replace(",", "")
+				.toDoubleOrNull().orZero()
+				.formatCurrency() + " " + Config.getCurrencyCode()
 		)
 	}
 	private val rank = GraySqualCell(context)
