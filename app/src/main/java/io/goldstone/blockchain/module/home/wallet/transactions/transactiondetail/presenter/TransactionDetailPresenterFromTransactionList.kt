@@ -36,7 +36,6 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView("Loading data from chain")
-		
 		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
 		if (!symbol.equals(CryptoSymbol.etc, true)) {
 			checkTokenNameInfoOrUpdate()
@@ -102,7 +101,7 @@ fun TransactionDetailPresenter.generateModels(
 				currentHash,
 				receipt.blockNumber,
 				date,
-				EtherScanApi.transactionDetail(currentHash)
+				TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
 			)
 		}
 		
@@ -111,7 +110,7 @@ fun TransactionDetailPresenter.generateModels(
 				minerFee,
 				memo,
 				Config.getCurrentAddress(),
-				Config.getCurrentAddress(),
+				data?.address ?: "",
 				currentHash,
 				"Waiting...",
 				date,

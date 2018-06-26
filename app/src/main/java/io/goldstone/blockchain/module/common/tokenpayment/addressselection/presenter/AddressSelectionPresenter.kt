@@ -91,7 +91,7 @@ class AddressSelectionPresenter(
 			return
 		}
 		WalletTable.getAllAddresses {
-			any { it == address } isTrue {
+			any { it.equals(address, true) } isTrue {
 				fragment.alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle

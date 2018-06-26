@@ -40,9 +40,10 @@ object APIPath {
 		header: String,
 		chainType: Int,
 		chainID: Int,
-		address: String
-	) -> String = { header, type, chainID, address ->
-		"$header/tx/list?chain_type=$type&chainid=$chainID&address=$address"
+		address: String,
+		startBlock: String
+	) -> String = { header, type, chainID, address, startBlock ->
+		"$header/tx/pageList?chain_type=$type&chainid=$chainID&address=$address&start_block=$startBlock"
 	}
 	val getQuotationCurrencyChart: (
 		pair: String,
@@ -93,6 +94,9 @@ object EtherScanApi {
 			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
 			else -> "https://etherscan.io/tx/"
 		}
+	}
+	val gasTrackerHeader: (taxHash: String) -> String = {
+		"https://gastracker.io/tx/$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"
