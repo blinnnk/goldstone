@@ -72,7 +72,7 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 	
 	init {
 		title.text = QuotationText.priceHistory
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 140.uiPX())
 		
 		dayPrice.setPriceTitle(DateAndTimeText.hours)
 		totalPrice.setPriceTitle(DateAndTimeText.total)

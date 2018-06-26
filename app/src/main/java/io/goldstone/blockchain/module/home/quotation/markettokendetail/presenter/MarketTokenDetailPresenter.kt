@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter
 
+import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -8,15 +9,13 @@ import com.blinnnk.uikit.TimeUtils
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -24,12 +23,16 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
+import android.support.v4.content.ContextCompat.startActivity
+import android.content.Intent
+import android.net.Uri
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -116,7 +119,8 @@ class MarketTokenDetailPresenter(
 						fragment.currencyInfo?.symbol!!,
 						fragment.currencyInfo?.contract!!
 					) {
-						textView(it?.description?.substring(2)) {
+						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
+						textView(it?.description?.substring(1)) {
 							textColor = GrayScale.gray
 							textSize = fontSize(14)
 							typeface = GoldStoneFont.medium(context)
@@ -126,6 +130,71 @@ class MarketTokenDetailPresenter(
 				}
 				recoveryBackEvent = Runnable {
 					fragment.recoveryBackEvent()
+				}
+			}
+		}
+	}
+	
+	fun showWebfragumentWithLink(link: String, title: String, previousTitle: String) {
+		showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
+			title,
+			previousTitle,
+			Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+			true
+		)
+	}
+	
+	fun openSystemBrowser(url: String) {
+		val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+		startActivity(fragment.context!!, browserIntent, null)
+	}
+	
+	fun setCurrencyInfo(
+		currencyInfo: QuotationModel?,
+		tokenInformation: TokenInformation,
+		priceHistroy: PriceHistoryView,
+		tokenInfo: TokenInfoView,
+		tokenInfoLink: TokenInfoLink,
+		tokenSocialMedia: TokenSocialMedia
+	) {
+		currencyInfo?.let { info ->
+			// 首先展示数据库数据
+			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
+				if (
+					tokenData.marketCap.isEmpty()
+					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != Config.getCurrentLanguageCode()
+				) {
+					// 本地没有数据的话从服务端拉取 `Coin Infomation`
+					loadCoinInfoFromServer(info) {
+						val data = TokenInformationModel(it, info.symbol)
+						tokenInformation.model = data
+						tokenInfo.setTokenDescription(it.description)
+						tokenInfoLink.model = data
+						tokenSocialMedia.model = data
+					}
+				} else {
+					tokenInfo.setTokenDescription(tokenData.description)
+					tokenInformation.model = tokenData
+					tokenInfoLink.model = tokenData
+					tokenSocialMedia.model = tokenData
+				}
+				priceHistroy.model = priceData
+			}
+			// 更新行情价目网络数据, 更新界面并更新数据库
+			getCurrencyInfoFromServer(info) { priceData ->
+				priceHistroy.model = priceData
+				QuotationSelectionTable.getSelectionByPair(info.pair) {
+					it?.apply {
+						GoldStoneDataBase
+							.database
+							.quotationSelectionDao()
+							.update(it.apply {
+								high24 = priceData.dayHighest
+								low24 = priceData.dayLow
+								highTotal = priceData.totalHighest
+								lowTotal = priceData.totalLow
+							})
+					}
 				}
 			}
 		}
@@ -221,47 +290,6 @@ class MarketTokenDetailPresenter(
 				
 				MarketTokenDetailChartType.Hour.info -> {
 					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
-				}
-			}
-		}
-	}
-	
-	fun setCurrencyInfo(
-		currencyInfo: QuotationModel?,
-		tokenInformation: TokenInformation,
-		priceHistroy: PriceHistoryView,
-		tokenInfo: TokenInfoView
-	) {
-		currencyInfo?.let { info ->
-			// 首先展示数据库数据
-			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
-				if (tokenData.marketCap.isEmpty()) {
-					// 本地没有数据的话从服务端拉取 `Coin Infomation`
-					loadCoinInfoFromServer(info) {
-						tokenInformation.model = TokenInformationModel(it, info.symbol)
-						tokenInfo.setTokenDescription(it.description)
-					}
-				} else {
-					tokenInfo.setTokenDescription(tokenData.description)
-					tokenInformation.model = tokenData
-				}
-				priceHistroy.model = priceData
-			}
-			// 在更新网络数据, 更新界面并更新数据库
-			getCurrencyInfoFromServer(info) { priceData ->
-				priceHistroy.model = priceData
-				QuotationSelectionTable.getSelectionByPair(info.pair) {
-					it?.apply {
-						GoldStoneDataBase
-							.database
-							.quotationSelectionDao()
-							.update(it.apply {
-								high24 = priceData.dayHighest
-								low24 = priceData.dayLow
-								highTotal = priceData.totalHighest
-								lowTotal = priceData.totalLow
-							})
-					}
 				}
 			}
 		}

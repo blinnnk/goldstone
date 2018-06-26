@@ -32,22 +32,26 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 				.toDoubleOrNull().orZero()
 				.formatCurrency() + " " + Config.getCurrencyCode()
 		)
+		startDate.setSubtitle(model.startDate)
 	}
 	private val rank = GraySqualCell(context)
 	private val avalibaleSupply = GraySqualCell(context)
 	private val marketCap = GraySqualCell(context)
+	private val startDate = GraySqualCell(context)
 	
 	init {
 		title.text = QuotationText.tokenInformation
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 200.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 240.uiPX())
 		verticalLayout {
 			rank.into(this)
 			avalibaleSupply.into(this)
 			marketCap.into(this)
+			startDate.into(this)
 			
 			rank.setTitle(QuotationText.rank)
 			avalibaleSupply.setTitle(QuotationText.totalSupply)
 			marketCap.setTitle(QuotationText.marketCap)
+			startDate.setTitle(QuotationText.startDate)
 			y -= 10.uiPX()
 		}.setAlignParentBottom()
 	}

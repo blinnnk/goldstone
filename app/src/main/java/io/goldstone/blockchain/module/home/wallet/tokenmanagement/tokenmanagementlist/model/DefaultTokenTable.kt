@@ -128,7 +128,7 @@ data class DefaultTokenTable(
 		false,
 		0,
 		data.chainID,
-		data.description,
+		"${Config.getCurrentLanguageCode()}${data.description}",
 		data.exchange,
 		data.whitePaper,
 		data.socialMedia,
@@ -229,7 +229,6 @@ data class DefaultTokenTable(
 					.apply {
 						getTokenByContractFromAllChains(data.contract).let {
 							if (it.isNull()) {
-								System.out.println("what happened 1")
 								insert(DefaultTokenTable(data))
 								callback()
 							} else {
@@ -242,6 +241,7 @@ data class DefaultTokenTable(
 									rank = data.rank
 									totalSupply = data.supply
 									startDate = data.startDate
+									description = "${Config.getCurrentLanguageCode()}${data.description}"
 								})
 								callback()
 							}

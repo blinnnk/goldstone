@@ -42,7 +42,18 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	private val priceHistroy by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }
+	private val tokenInfoLink by lazy {
+		TokenInfoLink(context!!) { link, title ->
+			presenter.showWebfragumentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
+		}
+	}
+	private val tokenSocialMedia by lazy {
+		TokenSocialMedia(context!!) { url ->
+			presenter.openSystemBrowser(url)
+		}
+	}
 	override val presenter = MarketTokenDetailPresenter(this)
+	
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -92,12 +103,15 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					}
 					.into(this)
 				tokenInformation.into(this)
-				
+				tokenSocialMedia.into(this)
+				tokenInfoLink.into(this)
 				presenter.setCurrencyInfo(
 					currencyInfo,
 					tokenInformation,
 					priceHistroy,
-					tokenInfo
+					tokenInfo,
+					tokenInfoLink,
+					tokenSocialMedia
 				)
 			}.lparams {
 				width = ScreenSize.widthWithPadding
