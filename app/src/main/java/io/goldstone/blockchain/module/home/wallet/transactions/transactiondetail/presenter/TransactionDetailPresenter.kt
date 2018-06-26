@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.network.ChainURL
-import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -142,7 +141,13 @@ class TransactionDetailPresenter(
 	
 	fun showEtherScanTransactionFragment() {
 		val argument = Bundle().apply {
-			putString(ArgumentKey.webViewUrl, EtherScanApi.transactionDetail(currentHash))
+			putString(
+				ArgumentKey.webViewUrl,
+				TransactionListModel.generateTransactionURL(
+					currentHash,
+					dataFromList?.symbol ?: data?.token?.contract ?: notificationData?.symbol
+				)
+			)
 		}
 		fragment.parentFragment.apply {
 			when (this) {

@@ -48,7 +48,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			textColor = GrayScale.black
 			textSize = titleSize
 		}
-		subtitle.textColor = GrayScale.gray
+		subtitle.textColor = GrayScale.midGray
 	}
 	
 	fun setBoldTiltes(

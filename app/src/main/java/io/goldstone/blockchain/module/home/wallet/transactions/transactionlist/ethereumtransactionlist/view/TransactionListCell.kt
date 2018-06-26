@@ -39,7 +39,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 						iconColor =
 							if (model?.isPending == true) Spectrum.darkBlue
 							else GrayScale.midGray
-						count?.title?.textColor = Spectrum.lightRed
+						count?.title?.textColor = Spectrum.red
 					}
 				}
 			}

@@ -62,7 +62,7 @@ enum class ChainID(val id: String) {
 			}
 		}
 		
-		fun getChainIDBySymbol(symbol: String): String {
+		fun getChainIDBySymbol(symbol: String?): String {
 			return when (symbol) {
 				CryptoSymbol.etc -> Config.getETCCurrentChain()
 				else -> Config.getCurrentChain()
