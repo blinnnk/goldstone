@@ -59,7 +59,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				}
 			}.lparams {
 				centerHorizontally()
-				topMargin = (ScreenSize.Height * 0.22).toInt() + logoSize
+				topMargin = (ScreenSize.Height * 0.2).toInt() + logoSize
 			}
 			
 			WalletTable.getAll {
@@ -70,7 +70,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						createButton.apply {
 							text = CreateWalletText.create.toUpperCase()
 							marginTop = 0
-							setWhiteStyle()
+							setDarkStyle()
 						}.click {
 							presenter.showCreateWalletFragment()
 						}.into(this)
@@ -78,7 +78,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						importButton.apply {
 							text = ImportWalletText.importWallet.toUpperCase()
 							marginTop = PaddingSize.content
-							setWhiteStyle()
+							setDarkStyle()
 						}.click {
 							NetworkUtil.hasNetworkWithAlert(
 								context, AlertText.importWalletNetwork

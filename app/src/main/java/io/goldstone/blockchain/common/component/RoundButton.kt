@@ -22,30 +22,28 @@ import io.goldstone.blockchain.common.value.*
  * @date 21/03/2018 11:00 PM
  * @author KaySaith
  */
-
 class RoundButton(context: Context) : RelativeLayout(context) {
-
+	
 	var text by observing("") {
 		invalidate()
 	}
 	var marginTop = 0
 	private val shadowSize = 1.uiPX().toFloat()
 	private val buttonHeight = 45.uiPX()
-
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize
 		invalidate()
 	}
-
+	
 	init {
 		setWillNotDraw(false)
 		textPaint.isAntiAlias = true
 		textPaint.style = Paint.Style.FILL
-		textPaint.typeface = GoldStoneFont.heavy(context)
+		textPaint.typeface = GoldStoneFont.black(context)
 		elevation = shadowSize
 	}
-
+	
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
@@ -54,7 +52,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		canvas?.drawText(text, textX, textY, textPaint)
 		canvas?.save()
 	}
-
+	
 	fun showLoadingStatus(
 		needToShow: Boolean = true,
 		color: Int = Spectrum.white,
@@ -92,61 +90,84 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			isEnabled = true
 		}
 	}
-
+	
 	fun setWhiteStyle() {
 		textSize = 14.uiPX().toFloat()
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.widthWithPadding,
+			buttonHeight
+		).apply {
 			topMargin = marginTop
 			bottomMargin = 5.uiPX()
 		}
-
+		
 		addTouchRippleAnimation(
-			Spectrum.white, Spectrum.yellow, RippleMode.Square, layoutParams.height / 2f
+			Spectrum.white,
+			Spectrum.yellow,
+			RippleMode.Square,
+			layoutParams.height / 2f
 		)
 		textPaint.color = Spectrum.blue
 		invalidate()
 	}
-
+	
 	fun setGrayStyle(top: Int? = null) {
 		textSize = 14.uiPX().toFloat()
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
-			topMargin = top ?: marginTop
-			bottomMargin = 5.uiPX()
-		}
-
-		addTouchRippleAnimation(
-			GrayScale.whiteGray, Spectrum.green, RippleMode.Square, layoutParams.height / 2f
-		)
-		textPaint.color = GrayScale.midGray
-		invalidate()
-	}
-
-	fun setBlueStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
-			topMargin = top ?: marginTop
-			bottomMargin = 5.uiPX()
-		}
-
-		addTouchRippleAnimation(
-			Spectrum.blue, Spectrum.white, RippleMode.Square, layoutParams.height / 2f
-		)
-		textPaint.color = Spectrum.white
-		invalidate()
-	}
-	
-	fun setGreenStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.widthWithPadding,
+			buttonHeight
+		).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
 		
 		addTouchRippleAnimation(
-			Spectrum.green, Spectrum.white, RippleMode.Square, layoutParams.height / 2f
+			GrayScale.whiteGray,
+			Spectrum.green,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = GrayScale.midGray
+		invalidate()
+	}
+	
+	fun setBlueStyle(top: Int? = null) {
+		textSize = 14.uiPX().toFloat()
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.widthWithPadding,
+			buttonHeight
+		).apply {
+			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
+		}
+		
+		addTouchRippleAnimation(
+			Spectrum.blue,
+			Spectrum.white,
+			RippleMode.Square,
+			layoutParams.height / 2f
 		)
 		textPaint.color = Spectrum.white
 		invalidate()
 	}
-
+	
+	fun setDarkStyle(top: Int? = null) {
+		textSize = 14.uiPX().toFloat()
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.widthWithPadding,
+			buttonHeight
+		).apply {
+			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
+		}
+		
+		addTouchRippleAnimation(
+			GrayScale.Opacity3Black,
+			Spectrum.white,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = Spectrum.white
+		invalidate()
+	}
 }

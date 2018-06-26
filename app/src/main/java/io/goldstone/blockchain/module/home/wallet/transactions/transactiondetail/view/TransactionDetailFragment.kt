@@ -35,7 +35,7 @@ class TransactionDetailFragment :
 				}
 				
 				onClick {
-					if (model.description == TransactionText.url) {
+					if (model.description.equals(TransactionText.url, true)) {
 						presenter.showEtherScanTransactionFragment()
 					} else {
 						this@cell.context?.clickToCopy(model.info)

@@ -71,7 +71,7 @@ data class TransactionListModel(
 	)
 	
 	companion object {
-		fun generateTransactionURL(taxHash: String, symbol: String): String {
+		fun generateTransactionURL(taxHash: String, symbol: String?): String {
 			return if (symbol.equals(CryptoSymbol.etc, true)) {
 				EtherScanApi.gasTrackerHeader(taxHash)
 			} else {

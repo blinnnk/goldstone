@@ -5,7 +5,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
-import com.db.chart.model.Point
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -108,7 +107,22 @@ class TokenDetailPresenter(
 		}
 	}
 	
-	private fun loadDataFromDatabaseOrElse(withoutLocalDataCallback: () -> Unit = {}) {
+	private var hasUpdateETCData = false
+	private var hasUpdateERCData = false
+	
+	private fun TokenDetailFragment.loadDataFromChain() {
+		if (token?.symbol.equals(CryptoSymbol.etc, true)) {
+			if (!hasUpdateETCData) loadETCChainData()
+			hasUpdateETCData = true
+		} else {
+			if (!hasUpdateERCData) loadERCChainData()
+			hasUpdateERCData = true
+		}
+	}
+	
+	private fun loadDataFromDatabaseOrElse(
+		withoutLocalDataCallback: () -> Unit = {}
+	) {
 		// 内存里面没有数据首先从本地数据库查询数据
 		TransactionTable.getCurrentChainByAddressAndContract(
 			Config.getCurrentAddress(),
@@ -116,7 +130,7 @@ class TokenDetailPresenter(
 			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
-				fragment.updateChartBy(transactions.map { TransactionListModel(it) }.toArrayList())
+				fragment.updateChartBy(transactions)
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
@@ -125,67 +139,41 @@ class TokenDetailPresenter(
 		}
 	}
 	
-	private fun TokenDetailFragment.loadDataFromChain() {
-		if (token?.symbol.equals(CryptoSymbol.etc, true)) {
-			loadETCChainData()
-		} else {
-			loadERCChainData()
-		}
-	}
-	
 	private fun TokenDetailFragment.loadERCChainData() {
 		doAsync {
-			TransactionTable.getMyLatestStartBlock { blockNumber ->
-				// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-				TransactionListPresenter.getTransactionDataFromEtherScan(
-					this@loadERCChainData,
-					blockNumber,
-					{
-						// ToDo 等自定义的 `Alert` 完成后应当友好提示
-						LogUtil.error("error in getTransactionDataFromEtherScan $it")
-					}
-				) {
-					// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-					it.find {
-						it.contract.equals(token?.contract, true)
-					}.isNotNull {
-						// 有数据后重新执行从数据库拉取数据
-						loadDataFromDatabaseOrElse()
-					} otherwise {
-						context?.runOnUiThread {
-							// 链上和本地都没有数据就更新一个空数组作为默认
-							updateChartBy(arrayListOf())
-							removeLoadingView()
-						}
+			// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+			TransactionListPresenter.getTransactionDataFromEtherScan(
+				this@loadERCChainData,
+				"0",
+				{
+					// ToDo 等自定义的 `Alert` 完成后应当友好提示
+					LogUtil.error("error in getTransactionDataFromEtherScan $it")
+				}
+			) {
+				// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
+				it.find {
+					it.contract.equals(token?.contract, true)
+				}.isNotNull {
+					// 有数据后重新执行从数据库拉取数据
+					loadDataFromDatabaseOrElse()
+				} otherwise {
+					context?.runOnUiThread {
+						// 链上和本地都没有数据就更新一个空数组作为默认
+						updateChartBy(arrayListOf())
+						removeLoadingView()
 					}
 				}
 			}
 		}
 	}
-	
-	// 获取本地数据并从异步更新网络数据 `ETC Transactions`
-	private var hasUpdateChainData: Boolean = false
 	
 	private fun TokenDetailFragment.loadETCChainData() {
 		showLoadingView(LoadingText.transactionData)
-		// 首先显示本地数据
-		ClassicTransactionListPresenter.getETCTransactionsFromDatabase {
-			if (asyncData.isNull()) {
-				fragment.asyncData = it
-			} else {
-				diffAndUpdateAdapterData<TokenDetailAdapter>(it)
-			}
-			if (!hasUpdateChainData) {
-				// 异步查询网络数据并决定是否更新
-				ClassicTransactionListPresenter.getInvalidETCTransactionsFromChain(it) {
-					fragment.removeLoadingView()
-					loadETCChainData()
-					hasUpdateChainData = true
-				}
-			} else {
+		ClassicTransactionListPresenter
+			.getInvalidETCTransactionsFromChain(arrayListOf()) {
 				fragment.removeLoadingView()
+				loadDataFromDatabaseOrElse()
 			}
-		}
 	}
 	
 	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
@@ -229,12 +217,6 @@ class TokenDetailPresenter(
 				}
 			}
 		}
-	}
-	
-	// 计算出 `chartView` Y 轴的最大值
-	private val maxYValue: (ArrayList<Point>) -> Double = {
-		val maxValue = Math.ceil(it.maxBy { it.value }?.value!!.toDouble())
-		if (maxValue > 10) maxValue * 1.5 else maxValue + 5
 	}
 	
 	private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
