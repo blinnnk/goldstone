@@ -70,11 +70,6 @@
 
 -renamesourcefileattribute SourceFile
 
-#-keepclassmembers class * {
-#    @android.webkit.JavascriptInterface <methods>;
-#}
-
-
 # OKHTTP
 -dontwarn okhttp3.**
 -dontwarn okio.**
@@ -93,13 +88,7 @@
 -keep class com.shaded.fasterxml.jackson.** { *; }
 
 # Sun Misc
--dontwarn sun.misc.****
-
-# My Own Proguard
--dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
--dontwarn io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.**
--dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
--dontwarn io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.presenter.**
+-keep class sun.misc.Unsafe { *; }
 
 # Ethereum Geth
 -keep class org.ethereum.geth.** { *; }
@@ -162,3 +151,6 @@
 -dontwarn com.google.android.gms.**
 -dontwarn com.android.volley.toolbox.**
 -dontwarn com.instabug.**
+
+# Anko
+-dontwarn kotlin.jvm.internal.Intrinsics

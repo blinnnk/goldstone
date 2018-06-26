@@ -47,7 +47,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 			} else {
 				// 本地有数据直接展示本地数据
 				localTransaction?.apply {
-					fragment.asyncData = generateModels(TransactionListModel(localTransaction))
+					fragment.asyncData = generateModels(TransactionListModel(this))
 					val headerData = TransactionHeaderModel(
 						value.toDouble(),
 						if (isReceive) fromAddress else tokenReceiveAddress ?: to,

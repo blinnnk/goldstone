@@ -163,11 +163,28 @@ class TokenDetailPresenter(
 		}
 	}
 	
+	// 获取本地数据并从异步更新网络数据 `ETC Transactions`
+	private var hasUpdateChainData: Boolean = false
+	
 	private fun TokenDetailFragment.loadETCChainData() {
-		ClassicTransactionListPresenter.getETCTransactionsFromChain {
-			// TODO 数据库更新逻辑
-			updateChartBy(this)
-			removeLoadingView()
+		showLoadingView(LoadingText.transactionData)
+		// 首先显示本地数据
+		ClassicTransactionListPresenter.getETCTransactionsFromDatabase {
+			if (asyncData.isNull()) {
+				fragment.asyncData = it
+			} else {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it)
+			}
+			if (!hasUpdateChainData) {
+				// 异步查询网络数据并决定是否更新
+				ClassicTransactionListPresenter.getInvalidETCTransactionsFromChain(it) {
+					fragment.removeLoadingView()
+					loadETCChainData()
+					hasUpdateChainData = true
+				}
+			} else {
+				fragment.removeLoadingView()
+			}
 		}
 	}
 	

@@ -313,9 +313,24 @@ data class TransactionTable(
 					address,
 					Config.getCurrentChain()
 				).let {
-				// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
-				hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
-			}
+					// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
+					hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
+				}
+		}
+		
+		// `ETC` 数据类型专用
+		fun getLatestETCStartBlock(
+			address: String = Config.getCurrentAddress(),
+			hold: (String) -> Unit
+		) {
+			GoldStoneDataBase.database.transactionDao()
+				.getTransactionsByAddress(
+					address,
+					Config.getETCCurrentChain()
+				).let {
+					// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
+					hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
+				}
 		}
 		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
@@ -420,7 +435,7 @@ interface TransactionDao {
 	fun getETCTransactionsByAddress(
 		walletAddress: String,
 		symbol: String = CryptoSymbol.etc,
-		chainID: String = Config.getCurrentChain()
+		chainID: String = Config.getETCCurrentChain()
 	): List<TransactionTable>
 	
 	@Query(

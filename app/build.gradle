@@ -25,7 +25,7 @@ android {
     versionCode 4
     versionName "1.0.2"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    // kotlinOptions.allWarningsAsErrors = true // 1.2.50 报错
+     kotlinOptions.allWarningsAsErrors = true // 1.2.50 报错
     renderscriptSupportModeEnabled true
     vectorDrawables.useSupportLibrary = true
     manifestPlaceholders = [

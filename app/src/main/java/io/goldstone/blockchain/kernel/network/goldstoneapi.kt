@@ -114,11 +114,12 @@ object GoldStoneAPI {
 		chainType: Int,
 		chainID: Int,
 		address: String,
+		startBlock: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<ETCTransactionModel>) -> Unit
 	) {
 		requestData<ETCTransactionModel>(
-			APIPath.getETCTransactions(APIPath.currentUrl, chainType, chainID, address),
+			APIPath.getETCTransactions(APIPath.currentUrl, chainType, chainID, address, startBlock),
 			"list",
 			errorCallback = errorCallback,
 			isEncrypt = true

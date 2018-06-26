@@ -60,12 +60,8 @@ data class TransactionListModel(
 		data.memo,
 		((data.gas.toDoubleOrNull()
 		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble())
-			.toUnitValue(
-				if (data.symbol.equals(CryptoSymbol.etc, true))
-					CryptoSymbol.etc
-				else CryptoSymbol.eth
-			), // 计算燃气费使用情况
-		EtherScanApi.transactionDetail(data.hash), // Api 地址拼接
+			.toUnitValue(getUnitSymbol(data.symbol)), // 计算燃气费使用情况
+		generateTransactionURL(data.hash, data.symbol), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,
 		data.value,
@@ -73,6 +69,22 @@ data class TransactionListModel(
 		data.contractAddress,
 		data.isFailed
 	)
+	
+	companion object {
+		fun generateTransactionURL(taxHash: String, symbol: String): String {
+			return if (symbol.equals(CryptoSymbol.etc, true)) {
+				EtherScanApi.gasTrackerHeader(taxHash)
+			} else {
+				EtherScanApi.transactionDetail(taxHash)
+			}
+		}
+		
+		private fun getUnitSymbol(symbol: String): String {
+			return if (symbol.equals(CryptoSymbol.etc, true))
+				CryptoSymbol.etc
+			else CryptoSymbol.eth
+		}
+	}
 }
 
 val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { input, isERC20 ->
