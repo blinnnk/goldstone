@@ -332,8 +332,7 @@ object RequisitionUtil {
 						}
 					}
 					try {
-						val dataObject =
-							JSONObject(data?.substring(data.indexOf("{"), data.lastIndexOf("}") + 1))
+						val dataObject = data?.toJsonObject() ?: JSONObject()
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {

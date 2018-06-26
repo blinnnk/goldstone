@@ -26,7 +26,7 @@ object CryptoValue {
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	// GoldStone 业务约定的值
-	const val ethContract = "0x0"
+	const val ethContract = "0x60"
 	const val etcContract = "0x61"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6

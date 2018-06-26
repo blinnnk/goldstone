@@ -1888,6 +1888,27 @@ object QuotationText {
 		else -> ""
 	}
 	@JvmField
+	val tokenInfoLink = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Link"
+		HoneyLanguage.Chinese.code -> "Token Link"
+		HoneyLanguage.Japanese.code -> "Token Link"
+		HoneyLanguage.Korean.code -> "Token Link"
+		HoneyLanguage.Russian.code -> "Token Link"
+		HoneyLanguage.TraditionalChinese.code -> "Token Link"
+		else -> ""
+	}
+	
+	@JvmField
+	val socimalMedia = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Social Media"
+		HoneyLanguage.Chinese.code -> "Social Media"
+		HoneyLanguage.Japanese.code -> "Social Media"
+		HoneyLanguage.Korean.code -> "Social Media"
+		HoneyLanguage.Russian.code -> "Social Media"
+		HoneyLanguage.TraditionalChinese.code -> "Social Media"
+		else -> ""
+	}
+	@JvmField
 	val tokenDescriptionPlaceHolder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description Content"
 		HoneyLanguage.Chinese.code -> "Token 信息内容"
@@ -1903,7 +1924,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "最高/最低"
 		HoneyLanguage.Japanese.code -> "最高/最低"
 		HoneyLanguage.Korean.code -> "최고 / 최저"
-		HoneyLanguage.Russian.code -> "Высокая/Низкий".toUpperCase()
+		HoneyLanguage.Russian.code -> "Высокая/Низкий"
 		HoneyLanguage.TraditionalChinese.code -> "最高 / 最低"
 		else -> ""
 	}
@@ -1913,8 +1934,38 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "排名"
 		HoneyLanguage.Japanese.code -> "ランク"
 		HoneyLanguage.Korean.code -> "순위"
-		HoneyLanguage.Russian.code -> "ранг".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "ранг"
 		HoneyLanguage.TraditionalChinese.code -> "排名"
+		else -> ""
+	}
+	@JvmField
+	val website = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Website"
+		HoneyLanguage.Chinese.code -> "Website"
+		HoneyLanguage.Japanese.code -> "Website"
+		HoneyLanguage.Korean.code -> "Website"
+		HoneyLanguage.Russian.code -> "Website"
+		HoneyLanguage.TraditionalChinese.code -> "Website"
+		else -> ""
+	}
+	@JvmField
+	val whitePaper = when (currentLanguage) {
+		HoneyLanguage.English.code -> "White Paper"
+		HoneyLanguage.Chinese.code -> "White Paper"
+		HoneyLanguage.Japanese.code -> "White Paper"
+		HoneyLanguage.Korean.code -> "White Paper"
+		HoneyLanguage.Russian.code -> "White Paper"
+		HoneyLanguage.TraditionalChinese.code -> "White Paper"
+		else -> ""
+	}
+	@JvmField
+	val startDate = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Start Date"
+		HoneyLanguage.Chinese.code -> "Start Date"
+		HoneyLanguage.Japanese.code -> "Start Date"
+		HoneyLanguage.Korean.code -> "Start Date"
+		HoneyLanguage.Russian.code -> "Start Date"
+		HoneyLanguage.TraditionalChinese.code -> "Start Date"
 		else -> ""
 	}
 	@JvmField
@@ -1923,7 +1974,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "总供应量"
 		HoneyLanguage.Japanese.code -> "総供給"
 		HoneyLanguage.Korean.code -> "총 공급"
-		HoneyLanguage.Russian.code -> "Общее снабжение".toUpperCaseFirstLetter()
+		HoneyLanguage.Russian.code -> "Общее снабжение"
 		HoneyLanguage.TraditionalChinese.code -> "總供應量"
 		else -> ""
 	}
