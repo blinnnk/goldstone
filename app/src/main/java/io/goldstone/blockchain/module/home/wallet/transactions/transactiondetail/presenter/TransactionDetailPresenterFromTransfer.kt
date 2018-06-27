@@ -11,7 +11,7 @@ import org.jetbrains.anko.runOnUiThread
  * @date 2018/6/6 4:26 PM
  * @author KaySaith
  */
-fun TransactionDetailPresenter.updateDataFromTransferFragment() {
+fun TransactionDetailPresenter.updateDataFromTransfer() {
 	data?.apply {
 		currentHash = taxHash
 		count = CryptoUtils

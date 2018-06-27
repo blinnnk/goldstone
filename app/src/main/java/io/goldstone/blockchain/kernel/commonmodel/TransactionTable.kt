@@ -303,21 +303,6 @@ data class TransactionTable(
 			}
 		}
 		
-		fun getMyLatestStartBlock(
-			address: String = Config.getCurrentAddress(),
-			chainID: String = Config.getCurrentChain(),
-			hold: (String) -> Unit
-		) {
-			GoldStoneDataBase.database.transactionDao()
-				.getTransactionsByAddress(
-					address,
-					chainID
-				).let {
-					// 获取到当前最近的一个 `BlockNumber` 若获取不到返回 `0`
-					hold((it.maxBy { it.blockNumber }?.blockNumber ?: "0") + 1)
-				}
-		}
-		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				val data = getAllTransactionsByAddress(address)

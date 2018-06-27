@@ -994,6 +994,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val failed = when (currentLanguage) {
+		HoneyLanguage.English.code -> "FAILED"
+		HoneyLanguage.Chinese.code -> "FAILED"
+		HoneyLanguage.Japanese.code -> "FAILED"
+		HoneyLanguage.Korean.code -> "FAILED"
+		HoneyLanguage.Russian.code -> "FAILED"
+		HoneyLanguage.TraditionalChinese.code -> "FAILED"
+		else -> ""
+	}
+	@JvmField
 	val send = when (currentLanguage) {
 		HoneyLanguage.English.code -> "SEND"
 		HoneyLanguage.Chinese.code -> "转出"

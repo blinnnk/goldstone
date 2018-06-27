@@ -11,7 +11,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
-import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -114,7 +113,10 @@ fun TransactionDetailPresenter.generateModels(
 				currentHash,
 				"Waiting...",
 				date,
-				EtherScanApi.transactionDetail(currentHash)
+				TransactionListModel.generateTransactionURL(
+					currentHash,
+					data?.token?.symbol ?: notificationData?.symbol
+				)
 			)
 		}
 	}

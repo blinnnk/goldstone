@@ -40,11 +40,15 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
 		}.into(this)
 		
-		menu
-			.apply {
-				y -= 10.uiPX()
-				titles = arrayListOf(CommonText.all, CommonText.deposit, CommonText.send)
-			}
+		menu.apply {
+			y -= 10.uiPX()
+			titles = arrayListOf(
+				CommonText.all,
+				CommonText.deposit,
+				CommonText.send,
+				CommonText.failed
+			)
+		}
 			.into(this)
 		menu.setAlignParentBottom()
 		menu.setCenterInParent()

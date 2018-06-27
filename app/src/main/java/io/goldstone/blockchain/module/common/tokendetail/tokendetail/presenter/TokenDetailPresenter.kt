@@ -9,11 +9,11 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.crypto.utils.toMills
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -55,6 +55,14 @@ class TokenDetailPresenter(
 	fun showOnlyReceiveData() {
 		allData?.filter {
 			it.isReceived
+		}?.let {
+			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		}
+	}
+	
+	fun showOnlyFailedData() {
+		allData?.filter {
+			it.isFailed || it.hasError
 		}?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
@@ -265,7 +273,7 @@ class TokenDetailPresenter(
 					val currentMills =
 						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
-						it.timeStamp.toMills() in index.daysAgoInMills() .. currentMills
+						it.timeStamp.toMillsecond() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {
 						it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
 					}).let {

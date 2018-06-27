@@ -56,7 +56,7 @@ class TransactionDetailPresenter(
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
 		updateDataFromTransactionList()
 		/** 这个是转账完毕后进入的初始数据 */
-		updateDataFromTransferFragment()
+		updateDataFromTransfer()
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 		updateDataFromNotification()
 	}

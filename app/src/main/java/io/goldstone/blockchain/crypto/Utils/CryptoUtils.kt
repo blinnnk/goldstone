@@ -175,22 +175,6 @@ fun Double.formatCount(count: Int = 6): String {
 fun Int.daysAgoInMills(): Long =
 	CryptoUtils.getTargetDayInMills(-this)
 
-enum class TimeType {
-	Second,
-	Minute,
-	Hour,
-	Day
-}
-
-fun String.toMills(timeType: TimeType = TimeType.Second): Long {
-	return when (timeType) {
-		TimeType.Second -> this.toLong() * 1000L
-		TimeType.Minute -> this.toLong() * 1000L * 60L
-		TimeType.Hour -> this.toLong() * 1000L * 60L * 60L
-		TimeType.Day -> this.toLong() * 1000L * 60L * 60L * 12L
-	}
-}
-
 fun Double.toGwei() = (this / 1000000000.0).toLong()
 fun Long.scaleToGwei() = this * 1000000000
 

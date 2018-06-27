@@ -51,9 +51,8 @@ enum class ChainID(val id: String) {
 				Kovan.id -> ChainText.kovan
 				Rinkeby.id -> ChainText.rinkeby
 				ETCMain.id -> ChainText.goldStoneEtcMain
-				ETCMain.id -> ChainText.etcMainGasTracker
-				ETCMain.id -> ChainText.goldStoneEtcMain
 				ETCTest.id -> ChainText.etcMorden
+				ETCMain.id -> ChainText.etcMainGasTracker
 				ETCTest.id -> ChainText.goldStoneEtcMorderTest
 				else -> ChainText.goldStoneMain
 			}
