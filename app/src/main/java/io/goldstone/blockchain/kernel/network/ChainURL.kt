@@ -31,6 +31,8 @@ object ChainURL {
 		when (it) {
 			ChainText.etcMorden -> ChainURL.etcMorderTest
 			ChainText.etcMainGasTracker -> ChainURL.etcMain
+			ChainText.goldStoneEtcMain -> ChainURL.etcGoldStoneMain
+			ChainText.goldStoneEtcMorderTest -> ChainURL.etcGoldStoneMorderTest
 			else -> ChainURL.etcMain
 		}
 	}
@@ -45,7 +47,9 @@ object ChainURL {
 	val etcChainName =
 		arrayListOf(
 			ChainText.etcMorden,
-			ChainText.etcMainGasTracker
+			ChainText.etcMainGasTracker,
+			ChainText.goldStoneEtcMain,
+			ChainText.goldStoneEtcMorderTest
 		)
 	
 	fun getChainNameByChainType(type: ChainType): String {
@@ -93,6 +97,8 @@ object ChainURL {
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMorderTest = "https://web3.gastracker.io/morden"
+	private const val etcGoldStoneMain = "https://etc-node-mainnet.goldstone.io/eth"
+	private const val etcGoldStoneMorderTest = "https://etc-node-testnet.goldstone.io/eth"
 	/** Infura Chain Address */
 	private val infuraMain = "https://mainnet.infura.io/${infuraKey()}"
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"

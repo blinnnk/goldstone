@@ -5,10 +5,7 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -87,7 +84,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		getCurrentChainName(),
+		ChainID.getChainNameByID(info.chainID),
 		{}, // unfinished callback
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
@@ -97,7 +94,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			TransactionTable.getMemoByHashAndReceiveStatus(
 				info.hash,
 				info.isReceived,
-				getCurrentChainName()
+				ChainID.getChainNameByID(info.chainID)
 			) { memo ->
 				receipt.toAsyncData().let {
 					it[4].info = TimeUtils.formatDate(info.timeStamp)

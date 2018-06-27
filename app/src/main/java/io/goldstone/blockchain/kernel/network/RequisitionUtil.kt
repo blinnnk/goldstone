@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.kernel.network
 
-import android.annotation.SuppressLint
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
@@ -318,7 +317,6 @@ object RequisitionUtil {
 					}
 				}
 				
-				@SuppressLint("SetTextI18n")
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -336,7 +334,7 @@ object RequisitionUtil {
 						hold(dataObject["result"].toString())
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(error, "onResponse Error")
+							errorCallback(error, "onResponse Error in $chainName")
 						}
 					}
 				}

@@ -31,8 +31,13 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 	var model: TransactionDetailModel by observing(TransactionDetailModel()) {
 		description.text = model.description
 		info.text =
-			if (model.info.isEmpty()) "Waiting ..."
-			else {
+			if (model.info.isEmpty()) {
+				if (model.description.equals(TransactionText.memo, true)) {
+					TransactionText.noMemo
+				} else {
+					"Waiting ..."
+				}
+			} else {
 				if (
 					model.description.equals(CommonText.from, true)
 					|| model.description.equals(CommonText.to, true)
