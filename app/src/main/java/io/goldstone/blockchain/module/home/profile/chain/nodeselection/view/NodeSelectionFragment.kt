@@ -80,7 +80,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							selectedNode += pair
 							isSelected = true
 						}
-						NodeSelectionCell(context).setData(pair.second, isSelected, index).click {
+						/**
+						 * `ID` 用 `10` 为波段进行区分, ETH 0～10 ， ETC 10~20
+						 */
+						val id = index + if (pair.first.equals(CryptoName.etc, true)) 10 else 0
+						NodeSelectionCell(context).setData(pair.second, isSelected, id).click {
 							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
 							selectedNode.find {
@@ -121,7 +125,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			ChainType.ETC -> 10
 			else -> 0
 		}
-		(start until maxIndex).forEach {
+		(start until maxIndex + start).forEach {
 			container.findViewById<NodeSelectionCell>(it)?.clearRadio()
 		}
 	}

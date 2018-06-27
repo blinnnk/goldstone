@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
@@ -98,6 +99,15 @@ object TimeUtils {
 		) + " " + DateUtils.formatDateTime(
 			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
 		)
+	}
+}
+
+fun String.toMillsecond(): Long {
+	val timestamp = toLongOrNull().orElse(0L)
+	return when {
+		count() < 13 -> timestamp * Math.pow(10.0, (13 - count()).toDouble()).toLong()
+		count() > 13 -> timestamp / Math.pow(10.0, (count() - 13).toDouble()).toLong()
+		else -> timestamp
 	}
 }
 

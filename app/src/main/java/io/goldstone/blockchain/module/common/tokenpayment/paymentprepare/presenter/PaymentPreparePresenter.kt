@@ -117,7 +117,6 @@ class PaymentPreparePresenter(
 					if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 			}
 		}
-		
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			Config.getCurrentAddress(),

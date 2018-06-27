@@ -142,11 +142,11 @@ object GoldStoneEthCall {
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
-					LogUtil.error(EthereumMethod.GetTransactionByHash.display, error)
+					LogUtil.error(EthereumMethod.GetTransactionCount.display, error)
 				},
 				ChainURL.getChainNameByChainType(chainType)
 			) {
-				holdValue(it.toDecimalFromHex().toBigInteger())
+				holdValue(it.hexToDecimal().toBigDecimal().toBigInteger())
 			}
 		}
 	}

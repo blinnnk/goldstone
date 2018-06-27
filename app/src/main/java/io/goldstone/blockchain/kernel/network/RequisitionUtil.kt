@@ -330,8 +330,8 @@ object RequisitionUtil {
 						}
 					}
 					try {
-						val dataObject = data?.toJsonObject() ?: JSONObject()
-						hold(dataObject["result"].toString())
+						val dataObject = data?.toJsonObject() ?: JSONObject("")
+						hold(dataObject.safeGet("result"))
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
 							errorCallback(error, "onResponse Error in $chainName")

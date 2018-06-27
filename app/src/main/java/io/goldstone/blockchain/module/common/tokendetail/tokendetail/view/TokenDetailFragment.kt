@@ -49,6 +49,7 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 						CommonText.all -> presenter.showAllData()
 						CommonText.deposit -> presenter.showOnlyReceiveData()
 						CommonText.send -> presenter.showOnlySendData()
+						CommonText.failed -> presenter.showOnlyFailedData()
 					}
 					menu.selected(button.id)
 					button.preventDuplicateClicks()

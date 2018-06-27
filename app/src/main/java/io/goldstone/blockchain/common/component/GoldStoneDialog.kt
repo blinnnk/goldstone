@@ -178,7 +178,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}
 		
-		fun showChainErrorDialog(context: Context) {
+		private fun showChainErrorDialog(context: Context) {
 			GoldStoneDialog.show(context) {
 				showOnlyConfirmButton("Got It") {
 					GoldStoneDialog.remove(context)
@@ -192,10 +192,10 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		}
 		
 		fun chainError(reason: String?, error: Exception?, context: Context) {
-			if (reason == ErrorTag.chain) {
+			if (reason.equals(ErrorTag.chain, true)) {
 				GoldStoneDialog.showChainErrorDialog(context)
 			}
-			LogUtil.error("updateMyTokensPrices", error)
+			LogUtil.error("ChainErrorDialog", error)
 		}
 	}
 }
