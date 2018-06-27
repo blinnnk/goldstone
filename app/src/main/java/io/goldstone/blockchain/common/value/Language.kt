@@ -2481,6 +2481,16 @@ object ChainText {
 		else -> ""
 	}
 	@JvmField
+	val goldStoneEtcMorderTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Morden (GoldStone)"
+		HoneyLanguage.Chinese.code -> "Morden (GoldStone)"
+		HoneyLanguage.Japanese.code -> "Morden (GoldStone)"
+		HoneyLanguage.Korean.code -> "Morden (GoldStone)"
+		HoneyLanguage.Russian.code -> "Morden (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "Morden (GoldStone)"
+		else -> ""
+	}
+	@JvmField
 	val etcMainGasTracker = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ETC Mainnet (GasTracker)"
 		HoneyLanguage.Chinese.code -> "ETC Mainnet (GasTracker)"
