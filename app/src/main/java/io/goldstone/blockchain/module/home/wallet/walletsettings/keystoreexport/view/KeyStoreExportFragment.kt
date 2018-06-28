@@ -63,7 +63,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				typeface = GoldStoneFont.heavy(context)
 			}.click {
 				// 如果 `textview` 的内容不是默认的 `placeholder` 就可以支持点击复制
-				if (it.text.toString() != ImportWalletText.exportKeystore) {
+				if (it.text.isNotEmpty()) {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)

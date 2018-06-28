@@ -132,7 +132,6 @@ class QuotationPresenter(
 	
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(
-		holdData: CurrencyPriceInfoModel.() -> Unit = {},
 		callback: (GoldStoneWebSocket?) -> Unit
 	) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
@@ -141,9 +140,8 @@ class QuotationPresenter(
 			{
 				currentSocket = it
 				callback(it)
-			}) {
-			holdData(it)
-			fragment.updateAdapterDataset(it)
+			}) { model, isDisconnected ->
+			fragment.updateAdapterDataset(model, isDisconnected)
 		}
 	}
 	
@@ -159,12 +157,18 @@ class QuotationPresenter(
 		}
 	}
 	
-	private fun QuotationFragment.updateAdapterDataset(data: CurrencyPriceInfoModel) {
+	private fun QuotationFragment.updateAdapterDataset(
+		data: CurrencyPriceInfoModel,
+		isDisconnected: Boolean
+	) {
 		coroutinesTask(
 			{
-				asyncData?.find { it.pair == data.pair }?.apply {
-					price = data.price
-					percent = data.percent
+				asyncData?.find {
+					it.pair.equals(data.pair, true)
+				}?.apply {
+					this.price = data.price
+					this.percent = data.percent
+					this.isDisconnected = isDisconnected
 				}
 			}) {
 			it?.let {
@@ -205,7 +209,7 @@ class QuotationPresenter(
 		fun getPriceInfoBySocket(
 			pairList: ArrayList<String>?,
 			holdSocket: (GoldStoneWebSocket) -> Unit,
-			hold: (CurrencyPriceInfoModel) -> Unit
+			hold: (model: CurrencyPriceInfoModel, isDisconnected: Boolean) -> Unit
 		) {
 			/**
 			 * 准备长连接, 发送参数. 并且在返回结果的地方异步更新界面上的 `UI`.
@@ -217,8 +221,8 @@ class QuotationPresenter(
 					}
 				}
 				
-				override fun getServerBack(content: JSONObject) {
-					hold(CurrencyPriceInfoModel(content))
+				override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
+					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}
 			}.apply(holdSocket)
 		}

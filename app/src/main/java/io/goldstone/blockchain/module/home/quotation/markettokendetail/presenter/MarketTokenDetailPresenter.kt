@@ -383,9 +383,9 @@ class MarketTokenDetailPresenter(
 				currentSocket = it
 				currentSocket?.runSocket()
 			}
-		) {
-			if (it.pair == pair) {
-				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
+		) { model, isDisconnected ->
+			if (model.pair.equals(pair, true)) {
+				fragment.currentPriceInfo.model = CurrentPriceModel(model, quoteSymbol, isDisconnected)
 			}
 		}
 	}

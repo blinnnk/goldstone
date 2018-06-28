@@ -111,7 +111,7 @@ class TokenSearchPresenter(
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							isDefault = localTokens.any {
-								it.symbol.equals(serverToken.symbol, true)
+								it.contract.equals(serverToken.contract, true)
 							}
 						}
 					}.let {

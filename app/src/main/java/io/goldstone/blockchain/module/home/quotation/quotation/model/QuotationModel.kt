@@ -19,7 +19,8 @@ data class QuotationModel(
 	val pairDisplay: String = "",
 	val pair: String = "",
 	val quoteSymbol: String = "",
-	val contract: String = ""
+	val contract: String = "",
+	var isDisconnected: Boolean = false
 ) : Serializable {
 	
 	constructor(
