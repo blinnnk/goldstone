@@ -28,17 +28,20 @@ data class CurrentPriceModel(
 	val currentPrice: Float = 0f,
 	val baseCurrency: String = "",
 	val percent: String = "0.0",
-	val usdtPrice: Double = 1.0
+	val usdtPrice: Double = 1.0,
+	var isDisconnected: Boolean = false
 ) {
 	
 	constructor(
 		data: CurrencyPriceInfoModel,
-		symbol: String
+		symbol: String,
+		isDisconnected: Boolean
 	) : this(
 		data.price.toFloat(),
 		symbol,
 		data.percent,
-		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0)
+		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0),
+		isDisconnected
 	)
 	
 	constructor(data: QuotationModel) : this(
@@ -61,10 +64,10 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		
 		percent.text = model.percent + "%"
 		// 增减显示不同的颜色
-		if (model.percent.toDouble() < 0.0) {
-			percent.textColor = Spectrum.red
-		} else {
-			percent.textColor = Spectrum.green
+		when {
+			model.isDisconnected -> percent.textColor = GrayScale.midGray
+			model.percent.toDouble() < 0.0 -> percent.textColor = Spectrum.red
+			else -> percent.textColor = Spectrum.green
 		}
 	}
 	private val priceTitles by lazy { TextView(context) }

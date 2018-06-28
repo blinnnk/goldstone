@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.utils
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.getcryptGetRequest
@@ -36,7 +37,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	
 	abstract fun onOpened()
 	
-	open fun getServerBack(content: JSONObject) {
+	open fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 		// Do Something
 	}
 	
@@ -80,7 +81,11 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 		super.onMessage(webSocket!!, text!!)
 		val jsonObject = JSONObject(AesCrypto.decrypt(text))
 		if (jsonObject["t"] != "pong") {
-			getServerBack(jsonObject)
+			// 如果返回的字符串中包含 `offline` 那么以为着长链接是断开的
+			getServerBack(
+				jsonObject,
+				AesCrypto.decrypt(text)?.contains("offline").orFalse()
+			)
 		} else {
 			reportStatus()
 		}

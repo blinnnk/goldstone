@@ -56,6 +56,11 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 		chartLineColor = Spectrum.green
 	}
 	
+	fun setDisconnectedStyle() {
+		chartColor = GrayScale.lightGray
+		chartLineColor = GrayScale.midGray
+	}
+	
 	private fun setStyle() {
 		chartLineColor = when (setChartStyle()) {
 			LineStyle -> Spectrum.green

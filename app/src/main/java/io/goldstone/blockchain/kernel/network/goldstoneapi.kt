@@ -101,7 +101,11 @@ object GoldStoneAPI {
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(
-			APIPath.getTokenInfo(APIPath.currentUrl) + symbols,
+			APIPath.getTokenInfo(
+				APIPath.currentUrl,
+				symbols,
+				"${Config.getCurrentChain()},${Config.getETCCurrentChain()}"
+			),
 			"list",
 			errorCallback = errorCallback,
 			isEncrypt = true

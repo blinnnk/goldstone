@@ -1808,6 +1808,16 @@ object QuotationText {
 		else -> ""
 	}
 	@JvmField
+	val emptyDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There isn't description of this token"
+		HoneyLanguage.Chinese.code -> "There isn't description of this token"
+		HoneyLanguage.Japanese.code -> "There isn't description of this token"
+		HoneyLanguage.Korean.code -> "There isn't description of this token"
+		HoneyLanguage.Russian.code -> "There isn't description of this token"
+		HoneyLanguage.TraditionalChinese.code -> "There isn't description of this token"
+		else -> ""
+	}
+	@JvmField
 	val management = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Markets"
 		HoneyLanguage.Chinese.code -> "自选管理"

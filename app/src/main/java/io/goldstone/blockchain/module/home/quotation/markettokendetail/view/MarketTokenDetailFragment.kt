@@ -3,19 +3,13 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.findChildFragmentByTag
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
+import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
@@ -97,7 +91,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				priceHistroy.into(this)
 				tokenInfo
 					.click {
-						getMainActivity()?.getMainContainer()?.let {
+						getParentContainer()?.let {
 							presenter.showAllDescription(it)
 						}
 					}
@@ -125,11 +119,19 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		activity: MainActivity?,
 		parent: Fragment?
 	) {
-		super.setBaseBackEvent(activity, parent)
-		// 恢复回退事件
-		activity?.getHomeFragment()?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
-			?.apply {
-				updateBackEvent()
-			}
+		val overlay = getParentContainer()
+			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+		if (overlay.isNull()) {
+			super.setBaseBackEvent(activity, parent)
+			// 恢复回退事件
+			activity?.getHomeFragment()
+				?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
+				?.apply {
+					updateBackEvent()
+				}
+		} else {
+			// 如果存在悬浮层销毁悬浮层
+			overlay?.remove()
+		}
 	}
 }

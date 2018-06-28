@@ -138,13 +138,24 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		presenter.onFragmentViewCreated()
 		// 让出动画时间
 		150L timeUpThen {
+			showHomeFragment(false)
 			hideTabBarToAvoidOverdraw()
+		}
+	}
+	
+	private fun showHomeFragment(isShow: Boolean) {
+		activity?.let {
+			if (it is MainActivity) {
+				if (isShow) it.showHomeFragment()
+				else it.hideHomeFragment()
+			}
 		}
 	}
 	
 	override fun onDetach() {
 		super.onDetach()
 		presenter.onFragmentDetach()
+		showHomeFragment(true)
 		showTabBarView()
 	}
 	

@@ -46,12 +46,19 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		)
 		
 		tokenPrice.subtitle.text = model.percent + "%"
-		if (model.percent.toDouble() < 0) {
-			tokenPrice.setColorStyle(Spectrum.red)
-			chartView.setRedColor()
-		} else {
-			tokenPrice.setColorStyle(Spectrum.green)
-			chartView.setGreenColor()
+		when {
+			model.isDisconnected -> {
+				tokenPrice.setColorStyle(GrayScale.midGray)
+				chartView.setDisconnectedStyle()
+			}
+			model.percent.toDouble() < 0 -> {
+				tokenPrice.setColorStyle(Spectrum.red)
+				chartView.setRedColor()
+			}
+			else -> {
+				tokenPrice.setColorStyle(Spectrum.green)
+				chartView.setGreenColor()
+			}
 		}
 		
 		chartView.updateData(

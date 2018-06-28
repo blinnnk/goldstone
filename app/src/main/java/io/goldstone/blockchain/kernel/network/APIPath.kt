@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
+import java.util.concurrent.locks.Condition
 
 /**
  * @date 31/03/2018 8:09 PM
@@ -22,7 +23,6 @@ object APIPath {
 	
 	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
 	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
-	val getTokenInfo: (header: String) -> String = { "$it/index/searchToken?symbolOrContract=" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
 	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" }
@@ -36,6 +36,13 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
+	val getTokenInfo: (
+		header: String,
+		condition: String,
+		chainID: String
+	) -> String = { header, condition, chainID ->
+		"$header/index/searchToken?symbolOrContract=$condition&chainid=$chainID"
+	}
 	val getETCTransactions: (
 		header: String,
 		chainType: Int,

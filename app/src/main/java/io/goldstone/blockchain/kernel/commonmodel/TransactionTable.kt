@@ -198,7 +198,7 @@ data class TransactionTable(
 	constructor(data: ETCTransactionModel) : this(
 		0,
 		data.blockNumber.toIntFromHex().toString(),
-		data.timestamp.hexToDecimal().toBigDecimal().toString(),
+		data.timestamp.hexToDecimal().toString(),
 		data.hash,
 		data.nonce.toIntFromHex().toString(),
 		data.blockHash,

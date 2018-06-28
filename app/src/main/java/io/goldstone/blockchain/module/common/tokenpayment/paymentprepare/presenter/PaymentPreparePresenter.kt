@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.utils.CryptoUtils.toValueWithDecimal
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
@@ -103,14 +104,12 @@ class PaymentPreparePresenter(
 				or rootFragment?.token?.contract.equals(CryptoValue.etcContract, true) -> {
 				to = toAddress
 				data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
-				countWithDecimal =
-					(count * Math.pow(10.0, CryptoValue.ethDecimal)).toBigDecimal().toBigInteger()
+				countWithDecimal = toValueWithDecimal(count)
 			}
 			
 			else -> {
 				to = rootFragment?.token!!.contract
-				countWithDecimal =
-					(count * Math.pow(10.0, rootFragment?.token?.decimal!!)).toBigDecimal().toBigInteger()
+				countWithDecimal = toValueWithDecimal(count, rootFragment?.token?.decimal!!)
 				data = SolidityCode.contractTransfer + // 方法
 					toAddress.toDataStringFromAddress() + // 地址
 					countWithDecimal.toDataString() + // 数量

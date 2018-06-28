@@ -60,7 +60,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				typeface = GoldStoneFont.heavy(context)
 			}.click {
 				// 如果 `textview` 的内容不是默认的 `placeholder` 就可以支持点击复制
-				if (it.text.toString() != ImportWalletText.exportPrivateKey) {
+				if (it.text.isNotEmpty()) {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)

@@ -14,8 +14,7 @@ import org.jetbrains.anko.runOnUiThread
 fun TransactionDetailPresenter.updateDataFromTransfer() {
 	data?.apply {
 		currentHash = taxHash
-		count = CryptoUtils
-			.toCountByDecimal(value.toDouble(), token.decimal)
+		count = CryptoUtils.toCountByDecimal(value.toBigDecimal().toDouble(), token.decimal)
 		fragment.asyncData = generateModels()
 		val headerData = TransactionHeaderModel(
 			count,

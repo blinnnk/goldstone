@@ -6,6 +6,7 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.preventDuplicateClicks
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
@@ -77,7 +78,8 @@ class TransactionDetailPresenter(
 		when (parent) {
 			is TransactionFragment -> {
 				parent.headerTitle = TransactionText.detail
-				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+				parent.presenter
+					.popFragmentFrom<TransactionDetailFragment>(TransactionFragment.viewPagerSize)
 			}
 			
 			is TokenDetailOverlayFragment -> {
@@ -151,49 +153,24 @@ class TransactionDetailPresenter(
 		}
 		fragment.parentFragment.apply {
 			when (this) {
-				is TransactionFragment -> {
-					presenter.showTargetFragment<WebViewFragment>(
-						TransactionText.etherScanTransaction, TransactionText.detail, argument
-					)
-				}
-				
-				is TokenDetailOverlayFragment -> {
-					presenter.showTargetFragment<WebViewFragment>(
-						TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
-					)
-				}
-				
-				is NotificationFragment -> {
-					presenter.showTargetFragment<WebViewFragment>(
-						TransactionText.etherScanTransaction, NotificationText.notification, argument
-					)
-				}
+				is TransactionFragment -> presenter.showTargetFragment<WebViewFragment>(
+					TransactionText.etherScanTransaction, TransactionText.detail, argument
+				)
+				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(
+					TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
+				)
+				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(
+					TransactionText.etherScanTransaction, NotificationText.notification, argument
+				)
 			}
 		}
 	}
 	
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
-		parentFragment.apply {
-			when (this) {
-				is TransactionFragment -> {
-					overlayView.header.backButton.onClick {
-						headerTitle = TransactionText.detail
-						presenter.popFragmentFrom<TransactionDetailFragment>(TransactionFragment.viewPagerSize)
-					}
-				}
-				
-				is TokenDetailOverlayFragment -> {
-					overlayView.header.backButton.onClick {
-						headerTitle = TokenDetailText.tokenDetail
-						presenter.popFragmentFrom<TransactionDetailFragment>()
-					}
-				}
-				
-				is NotificationFragment -> {
-					overlayView.header.backButton.onClick {
-						headerTitle = TokenDetailText.tokenDetail
-						presenter.popFragmentFrom<TransactionDetailFragment>()
-					}
+		parentFragment?.let { parent ->
+			if (parent is BaseOverlayFragment<*>) {
+				parent.overlayView.header.backButton.onClick {
+					runBackEventBy(parent)
 				}
 			}
 		}

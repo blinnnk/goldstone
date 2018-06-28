@@ -61,7 +61,11 @@ object CryptoUtils {
 	}
 	
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
-		return value / Math.pow(10.0, if (decimal < 4) 18.0 else decimal)
+		return value / Math.pow(10.0, decimal)
+	}
+	
+	fun toValueWithDecimal(count: Double, decimal: Double = 18.0): BigInteger {
+		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
 	}
 	
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
@@ -230,8 +234,4 @@ fun String.getObjectMD5HexString(): String {
 		println(error)
 		"error"
 	}
-}
-
-fun String.toHexCode(): String {
-	return toByteArray(charset("UTF-8")).toHexString("")
 }

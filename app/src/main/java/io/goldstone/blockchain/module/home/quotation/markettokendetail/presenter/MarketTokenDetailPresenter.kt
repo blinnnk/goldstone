@@ -120,7 +120,11 @@ class MarketTokenDetailPresenter(
 						fragment.currencyInfo?.contract!!
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
-						textView(it?.description?.substring(1)) {
+						val content =
+							if (it?.description.isNullOrBlank() || it?.description?.count() == 0) QuotationText
+								.emptyDescription
+							else it?.description?.substring(1)
+						textView(content) {
 							textColor = GrayScale.gray
 							textSize = fontSize(14)
 							typeface = GoldStoneFont.medium(context)
@@ -379,9 +383,9 @@ class MarketTokenDetailPresenter(
 				currentSocket = it
 				currentSocket?.runSocket()
 			}
-		) {
-			if (it.pair == pair) {
-				fragment.currentPriceInfo.model = CurrentPriceModel(it, quoteSymbol)
+		) { model, isDisconnected ->
+			if (model.pair.equals(pair, true)) {
+				fragment.currentPriceInfo.model = CurrentPriceModel(model, quoteSymbol, isDisconnected)
 			}
 		}
 	}
