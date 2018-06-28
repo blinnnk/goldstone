@@ -5,9 +5,7 @@ import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.isFalse
 import io.goldstone.blockchain.common.base.BaseRecyclerView
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -43,14 +41,6 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 	
 	open fun onFragmentDetach() {
-		val activit = fragment.activity
-		if (activit is MainActivity) {
-			try {
-				activit.showHomeFragment()
-			} catch (error: Exception) {
-				LogUtil.error("showHomeFragment", error)
-			}
-		}
 	}
 	
 	open fun onFragmentDestroy() {

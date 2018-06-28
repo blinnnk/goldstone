@@ -7,7 +7,6 @@ import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 
@@ -44,7 +43,6 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	}
 	
 	open fun onFragmentDestroy() {
-		fragment.getMainActivity()?.showHomeFragment()
 	}
 	
 	// 当 `BaseFragment` 加载在 `BaseOverlayFragment` 的时候提供支持回退的加载卸载方法

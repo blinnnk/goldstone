@@ -7,7 +7,6 @@ import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
@@ -122,12 +121,6 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	}
 	
 	open fun onFragmentDestroy() {
-		// Do Something
-		try {
-			fragment.getMainActivity()?.showHomeFragment()
-		} catch (error: Exception) {
-			LogUtil.error(this.javaClass.simpleName + "showHomeFragment", error)
-		}
 	}
 	
 	open fun onFragmentResume() {

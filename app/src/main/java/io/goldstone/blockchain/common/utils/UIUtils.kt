@@ -94,10 +94,11 @@ object TimeUtils {
 	
 	// 将时间戳转化为界面显示的时间格式的工具
 	fun formatDate(timeStamp: Long): String {
+		val time = timeStamp.toMillsecond()
 		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_YEAR
+			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, timeStamp * 1000, DateUtils.FORMAT_SHOW_TIME
+			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
 }
@@ -105,9 +106,21 @@ object TimeUtils {
 fun String.toMillsecond(): Long {
 	val timestamp = toLongOrNull().orElse(0L)
 	return when {
+		count() == 10 -> timestamp * 1000
 		count() < 13 -> timestamp * Math.pow(10.0, (13 - count()).toDouble()).toLong()
 		count() > 13 -> timestamp / Math.pow(10.0, (count() - 13).toDouble()).toLong()
 		else -> timestamp
+	}
+}
+
+fun Long.toMillsecond(): Long {
+	val currentTime = toString()
+	return when {
+		currentTime.count() < 13 -> this * Math.pow(10.0, (13 - currentTime.count()).toDouble())
+			.toLong()
+		currentTime.count() > 13 -> this / Math.pow(10.0, (currentTime.count() - 13).toDouble())
+			.toLong()
+		else -> this
 	}
 }
 

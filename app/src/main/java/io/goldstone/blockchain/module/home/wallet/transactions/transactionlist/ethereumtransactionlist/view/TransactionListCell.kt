@@ -6,6 +6,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -46,7 +47,9 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			
 			info.apply {
 				title.text = CryptoUtils.scaleTo22(it.addressName)
-				subtitle.text = it.addressInfo
+				subtitle.text =
+					if (Config.getCurrentLanguageCode() == 0) it.addressInfo
+					else CryptoUtils.scaleTo(it.addressInfo, 26)
 			}
 			
 			count?.apply {

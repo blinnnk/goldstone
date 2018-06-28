@@ -72,25 +72,6 @@ object GoldStoneEthCall {
 		}
 	}
 	
-	fun getTokenCountWithDecimalByContract(
-		contractAddress: String,
-		walletAddress: String,
-		chainName: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
-		hold: (Double) -> Unit
-	) {
-		getTokenBalanceWithContract(
-			contractAddress,
-			walletAddress,
-			errorCallback,
-			chainName
-		) { tokenBalance ->
-			getTokenDecimal(contractAddress, errorCallback, chainName) {
-				hold(tokenBalance / Math.pow(10.0, it))
-			}
-		}
-	}
-	
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
@@ -540,10 +521,6 @@ object GoldStoneEthCall {
 	
 	@JvmStatic
 	private fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
-		return if (ChainURL.etcChainName.any { it.equals(name, true) }) {
-			Config.isEncryptETCNodeRequest()
-		} else {
-			Config.isEncryptERCNodeRequest()
-		}
+		return !ChainURL.uncryptChainName.any { it.equals(name, true) }
 	}
 }

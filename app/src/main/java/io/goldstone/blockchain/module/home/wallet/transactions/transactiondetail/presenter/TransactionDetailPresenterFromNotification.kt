@@ -90,24 +90,22 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) { receipt ->
-		fragment.context?.runOnUiThread {
-			TransactionTable.getMemoByHashAndReceiveStatus(
-				info.hash,
-				info.isReceived,
-				ChainID.getChainNameByID(info.chainID)
-			) { memo ->
-				receipt.toAsyncData().let {
-					it[4].info = TimeUtils.formatDate(info.timeStamp)
-					it[1].info = memo
-					it[2].info = if (info.isReceived) info.fromAddress else info.toAddress
-					fragment.apply {
-						if (asyncData.isNull()) asyncData = it
-						else presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
-					}
+		TransactionTable.getMemoByHashAndReceiveStatus(
+			info.hash,
+			info.isReceived,
+			ChainID.getChainNameByID(info.chainID)
+		) { memo ->
+			receipt.toAsyncData().let {
+				it[5].info = TimeUtils.formatDate(info.timeStamp)
+				it[1].info = memo
+				it[2].info = if (info.isReceived) info.fromAddress else info.toAddress
+				fragment.context?.runOnUiThread {
+					if (fragment.asyncData.isNull()) fragment.asyncData = it
+					else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
 					updateHeaderFromNotification(info)
+					callback()
 				}
 			}
-			callback()
 		}
 	}
 }

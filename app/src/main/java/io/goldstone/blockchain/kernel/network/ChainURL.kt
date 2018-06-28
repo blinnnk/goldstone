@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
@@ -65,6 +66,18 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
 			else -> Config.getCurrentChainName()
+		}
+	}
+	
+	fun getChainNameByChainID(chainID: String): String {
+		return when (chainID) {
+			ChainID.Ropsten.id -> ChainText.infuraRopsten
+			ChainID.Kovan.id -> ChainText.infuraKovan
+			ChainID.Rinkeby.id -> ChainText.infuraRinkeby
+			ChainID.Main.id -> ChainText.infuraMain
+			ChainID.ETCTest.id -> ChainText.etcMorden
+			ChainID.ETCMain.id -> ChainText.etcMainGasTracker
+			else -> ChainText.infuraMain
 		}
 	}
 	

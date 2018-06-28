@@ -117,4 +117,13 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 			activity?.removeLoadingView()
 		}
 	}
+	
+	fun getParentContainer(): ViewGroup? {
+		val parent = parentFragment
+		return if (parent is BaseOverlayFragment<*>) {
+			parent.overlayView
+		} else {
+			null
+		}
+	}
 }

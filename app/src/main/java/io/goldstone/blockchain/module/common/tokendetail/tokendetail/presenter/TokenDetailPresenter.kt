@@ -219,7 +219,12 @@ class TokenDetailPresenter(
 			val chartArray = arrayListOf<ChartPoint>()
 			val charCount = if (size > maxChartCount) maxChartCount else size
 			forEach {
-				chartArray.add(ChartPoint(CryptoUtils.dateInDay(it.date), it.balance.toFloat()))
+				chartArray.add(
+					ChartPoint(
+						CryptoUtils.dateInDay(it.date),
+						it.balance.toBigDecimal().toFloat()
+					)
+				)
 				if (chartArray.size == charCount) {
 					header?.setCharData(chartArray.reversed().toArrayList())
 				}

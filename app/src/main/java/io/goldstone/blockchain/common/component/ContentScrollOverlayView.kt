@@ -18,7 +18,6 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
@@ -89,11 +88,6 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 		container.setCenterInParent()
 	}
 	
-	override fun onAttachedToWindow() {
-		super.onAttachedToWindow()
-		setBackEvent()
-	}
-	
 	fun setContentPadding(
 		left: Int = 20.uiPX(),
 		top: Int = 10.uiPX(),
@@ -108,23 +102,14 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun remove() {
-		(context as? MainActivity)?.apply {
-			getMainContainer()?.let { container ->
-				container.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
-					container.removeView(it)
-					recoveryBackEvent?.run()
-				}
+		(parent as? ViewGroup)?.apply {
+			findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
+				removeView(it)
 			}
 		}
 	}
 	
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
-	}
-	
-	private fun setBackEvent() {
-		(context as? MainActivity)?.backEvent = Runnable {
-			remove()
-		}
 	}
 }

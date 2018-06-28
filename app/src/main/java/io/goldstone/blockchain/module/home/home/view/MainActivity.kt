@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 	}
 	
 	override fun onBackPressed() {
-		recoveryTokenDetailBackEventFromOtherApp()
+		recoveryBackEventFromOtherApp()
 		if (backEvent.isNull()) {
 			super.onBackPressed()
 		} else {
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 	
-	private fun recoveryTokenDetailBackEventFromOtherApp() {
+	private fun recoveryBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
 			if (it is BaseOverlayFragment<*>) {
 				val child = it.childFragmentManager.fragments.last()
