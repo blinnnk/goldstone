@@ -159,15 +159,19 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		showTabBarView()
 	}
 	
-	override fun onDestroy() {
-		super.onDestroy()
-		presenter.onFragmentDestroy()
-		setBackEvent()
+	open fun setTrasparentStatus() {
 		activity?.apply {
 			if (!Config.isNotchScreen()) {
 				setTransparentStatusBar()
 			}
 		}
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		presenter.onFragmentDestroy()
+		setBackEvent()
+		setTrasparentStatus()
 	}
 	
 	override fun onResume() {

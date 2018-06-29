@@ -231,11 +231,9 @@ class WalletDetailPresenter(
 							tokenList.setAdapter(data, isShowAddress)
 						}
 					}
-					
-					recoveryBackEvent = Runnable {
-						fragment.getMainActivity()?.backEvent = null
-					}
 				}
+				// 重置回退栈首先关闭悬浮层
+				recoveryBackEvent()
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.component.MenuBar
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 
 /**
  * @date 23/03/2018 12:54 AM
@@ -24,5 +25,11 @@ class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 		menuBar.into(this)
 		presenter.onClickMenuBarItem()
 		headerTitle = ImportWalletText.importWallet
+	}
+	
+	override fun setTrasparentStatus() {
+		if (activity !is MainActivity) {
+			super.setTrasparentStatus()
+		}
 	}
 }

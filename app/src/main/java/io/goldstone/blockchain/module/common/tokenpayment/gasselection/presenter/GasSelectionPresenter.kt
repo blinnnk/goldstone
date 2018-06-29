@@ -331,8 +331,10 @@ class GasSelectionPresenter(
 					if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChain()
 					else Config.getCurrentChain()
 				memo = memoData
+				minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
+				GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })
 			}
 		}
 	}
