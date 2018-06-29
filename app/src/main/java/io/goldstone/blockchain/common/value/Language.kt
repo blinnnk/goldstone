@@ -2407,12 +2407,21 @@ object LoadingText {
 		else -> ""
 	}
 	@JvmField val notificationData = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Loading notifications..."
+		HoneyLanguage.English.code -> "Loading notifications ..."
 		HoneyLanguage.Chinese.code -> "正在加载通知信息..."
 		HoneyLanguage.Japanese.code -> "通知の読み込み中..."
 		HoneyLanguage.Korean.code -> "알림 정보 로드중..."
 		HoneyLanguage.Russian.code -> "Загрузка информации об уведомлении ..."
 		HoneyLanguage.TraditionalChinese.code -> "正在加載通知信息..."
+		else -> ""
+	}
+	@JvmField val loadingDataFromChain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Loading data from chain ..."
+		HoneyLanguage.Chinese.code -> "正在从链获取信息..."
+		HoneyLanguage.Japanese.code -> "チェーンから情報を取得する..."
+		HoneyLanguage.Korean.code -> "체인에서 정보를 얻는 중 ..."
+		HoneyLanguage.Russian.code -> "Получение информации из цепочки ..."
+		HoneyLanguage.TraditionalChinese.code -> "正在從鏈獲取信息..."
 		else -> ""
 	}
 }
