@@ -1630,7 +1630,7 @@ object EmptyText {
 	}
 	@JvmField val contractSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
-		HoneyLanguage.Chinese.code -> "點擊左上角加號，可以添加常用聯繫人的地址"
+		HoneyLanguage.Chinese.code -> "点击左上角加号，可以添加常用联系人的地址"
 		HoneyLanguage.Japanese.code -> "左上隅のプラス記号をクリックして、共通の連絡先のアドレスを追加します"
 		HoneyLanguage.Korean.code -> "좌측 상단 플러스 부호를 클릭하면 상용 연락처 주소를 추가할 수 있습니다"
 		HoneyLanguage.Russian.code -> "Щелкните знак плюса в верхнем левом углу, чтобы добавить контактный адрес "
@@ -2164,11 +2164,11 @@ object ChainText {
 
 	@JvmField val isUsing = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Using Now"
-		HoneyLanguage.Chinese.code -> "立即使用"
-		HoneyLanguage.Japanese.code -> "今すぐ使用する"
-		HoneyLanguage.Korean.code -> "지금 사용하기"
-		HoneyLanguage.Russian.code -> "Использование"
-		HoneyLanguage.TraditionalChinese.code -> "立即使用"
+		HoneyLanguage.Chinese.code -> "正在使用"
+		HoneyLanguage.Japanese.code -> "使用しています"
+		HoneyLanguage.Korean.code -> "사용 중"
+		HoneyLanguage.Russian.code -> "Использует"
+		HoneyLanguage.TraditionalChinese.code -> "正在使用"
 		else -> ""
 	}
 
