@@ -4,9 +4,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -34,7 +32,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		)
 		headerModel = headerData
 		currentHash = transactionHash
-		fragment.showLoadingView("Loading data from chain")
+		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
 		if (!symbol.equals(CryptoSymbol.etc, true)) {
 			checkTokenNameInfoOrUpdate()

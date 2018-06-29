@@ -122,8 +122,8 @@ class NotificationListPresenter(
 					GoldStoneDialog.remove(it)
 				}
 				setContent(
-					"SERVER IS BUSY",
-					"a lot of requests are happening, please wait a moment, let little forg has a rest"
+					DialogText.serverBusyTitle,
+					DialogText.serverBusyDescription
 				)
 				setImage(R.drawable.server_error_banner)
 			}

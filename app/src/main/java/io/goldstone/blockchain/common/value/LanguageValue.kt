@@ -11,11 +11,11 @@ enum class HoneyLanguage(
 ) {
 	
 	English(0, "English", "EN"),
-	Chinese(1, "Chinese", "ZH"),
-	Japanese(2, "Japanese", "JA"),
-	Russian(3, "Russian", "RU"),
-	Korean(4, "Korean", "KR"),
-	TraditionalChinese(5, "Traditional Chinese", "TC");
+	Chinese(1, "简体中文", "ZH"),
+	Japanese(2, "日本語", "JA"),
+	Russian(3, "Русский язык", "RU"),
+	Korean(4, "한국어", "KR"),
+	TraditionalChinese(5, "繁體中文", "TC");
 	
 	companion object {
 		
