@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -25,10 +26,17 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 		model?.let {
 			icon.apply {
 				if (it.hasError || it.isFailed) {
+					// 失败或错误的样式
 					src = R.drawable.error_icon
 					iconColor = Spectrum.red
 					count?.title?.textColor = Spectrum.lightRed
+				} else if (it.isFee) {
+					// 燃气费开销的样式
+					src = R.drawable.gas_used_icon
+					iconColor = GrayScale.midGray
+					count?.title?.textColor = GrayScale.midGray
 				} else {
+					// 接收或转出的样式
 					if (it.isReceived) {
 						src = R.drawable.receive_icon
 						iconColor = Spectrum.green
@@ -53,8 +61,13 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			}
 			
 			count?.apply {
-				title.text = (if (it.isReceived) "+" else "-") + it.count.formatCount()
-				subtitle.text = it.symbol
+				title.text =
+					(if (it.isReceived) "+" else "-") +
+					if (it.isFee) it.minerFee.substringBefore(" ") else it.count.formatCount()
+				subtitle.text = if (it.isFee) {
+					if (it.symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
+					else CryptoSymbol.eth
+				} else it.symbol
 			}
 		}
 	}

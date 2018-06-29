@@ -235,6 +235,7 @@ class TransactionListPresenter(
 					}
 				}
 				
+				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
 					arrayListOf<TransactionTable>().apply {
 						addAll(chainData)
@@ -318,9 +319,8 @@ class TransactionListPresenter(
 							}
 						}
 						
-						override fun mergeCallBack() {
-							callback()
-						}
+						override fun getResultInMainThread() = false
+						override fun mergeCallBack() = callback()
 					}.start()
 				}
 			}
@@ -334,14 +334,32 @@ class TransactionListPresenter(
 			data.getUnkonwTokenInfo {
 				// 把拉取到的数据加工数据格式并插入本地数据库
 				completeTransactionInfo(data) {
+					val allNewData = this
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = size
 						override fun concurrentJobs() {
-							forEach { transactionTable ->
+							allNewData.forEach {
+								it.apply {
+									minerFee = CryptoUtils.toGasUsedEther(
+										gas,
+										gasPrice,
+										false
+									)
+								}
+								
 								GoldStoneDataBase
 									.database
 									.transactionDao()
-									.insert(transactionTable)
+									.insert(it)
+								if (!it.isReceive) {
+									val feeData = it.apply {
+										isFee = true
+									}
+									GoldStoneDataBase
+										.database
+										.transactionDao()
+										.insert(feeData)
+								}
 								completeMark()
 							}
 						}
@@ -420,9 +438,8 @@ class TransactionListPresenter(
 						}
 					}
 					
-					override fun mergeCallBack() {
-						hold(data)
-					}
+					override fun getResultInMainThread() = false
+					override fun mergeCallBack() = hold(data)
 				}.start()
 			}
 		}

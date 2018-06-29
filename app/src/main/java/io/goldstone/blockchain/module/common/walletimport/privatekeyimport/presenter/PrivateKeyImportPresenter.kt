@@ -26,7 +26,6 @@ class PrivateKeyImportPresenter(
 	fun importWalletByPrivateKey(
 		privateKeyInput: EditText,
 		passwordInput: EditText,
-		repeatPasswordInput: EditText,
 		isAgree: Boolean,
 		nameInput: EditText,
 		hintInput: EditText,
@@ -40,7 +39,6 @@ class PrivateKeyImportPresenter(
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
 			isAgree,
 			fragment.context,
 			{

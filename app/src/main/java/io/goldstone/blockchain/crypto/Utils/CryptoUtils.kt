@@ -64,6 +64,18 @@ object CryptoUtils {
 		return value / Math.pow(10.0, decimal)
 	}
 	
+	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
+		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
+			"0"
+		} else if (!isHex) {
+			(gas!!.toBigDecimal() * gasPrice!!.toBigDecimal()).toDouble().toEthCount().toBigDecimal()
+				.toString()
+		} else {
+			(gas!!.hexToDecimal().toBigDecimal() * gasPrice!!.hexToDecimal().toBigDecimal())
+				.toDouble().toEthCount().toBigDecimal().toString()
+		}
+	}
+	
 	fun toValueWithDecimal(count: Double, decimal: Double = 18.0): BigInteger {
 		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
 	}
@@ -180,6 +192,7 @@ fun Int.daysAgoInMills(): Long =
 	CryptoUtils.getTargetDayInMills(-this)
 
 fun Double.toGwei() = (this / 1000000000.0).toLong()
+fun Double.toEtherFromGwei() = (this / 1000000000.0).toBigDecimal().toString()
 fun Long.scaleToGwei() = this * 1000000000
 
 /**

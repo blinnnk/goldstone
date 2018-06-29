@@ -38,6 +38,10 @@ object CryptoValue {
 			else -> Config.getCurrentChain()
 		}
 	}
+	val isToken: (contract: String) -> Boolean = {
+		(!it.equals(ethContract, true)
+		 && !it.equals(etcContract, true))
+	}
 }
 
 object CryptoSymbol {
@@ -45,6 +49,7 @@ object CryptoSymbol {
 	const val etc = "ETC"
 	const val btc = "BTC"
 	const val ltc = "LTC"
+	const val erc = "ERC20"
 }
 
 object CryptoName {

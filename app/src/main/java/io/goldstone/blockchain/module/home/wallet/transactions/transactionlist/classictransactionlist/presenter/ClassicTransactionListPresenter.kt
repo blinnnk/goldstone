@@ -1,16 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter
 
-import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.view.ClassicTransactionListAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.view.ClassicTransactionListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -47,7 +46,7 @@ class ClassicTransactionListPresenter(
 			diffAndUpdateSingleCellAdapterData<ClassicTransactionListAdapter>(it)
 			if (!hasUpdateChainData) {
 				// 异步查询网络数据并决定是否更新
-				getInvalidETCTransactionsFromChain(it) {
+				getValidETCTransactionsFromChain(it) {
 					removeLoadingView()
 					showChainData()
 					hasUpdateChainData = true
@@ -72,7 +71,7 @@ class ClassicTransactionListPresenter(
 			}
 		}
 		
-		fun getInvalidETCTransactionsFromChain(
+		fun getValidETCTransactionsFromChain(
 			localData: ArrayList<TransactionListModel>,
 			callback: () -> Unit
 		) {
@@ -90,35 +89,46 @@ class ClassicTransactionListPresenter(
 			callback: () -> Unit
 		) {
 			GoldStoneAPI.getETCTransactions(
-				ChainType.ETC.id.toInt(),
-				Config.getETCCurrentChain().toInt(),
+				Config.getETCCurrentChain(),
 				Config.getCurrentAddress(),
 				blockNumber,
 				{
-					LogUtil.error("getETCTransactionsFromChain", it)
+					LogUtil.error("loadDataFromChain", it)
 				}
 			) { newData ->
+				// 插入数据库的抽象方法
+				fun List<ETCTransactionModel>.insertDataToDataBase() {
+					// 生成最终的数据格式
+					map {
+						// 加工数据并存如数据库
+						TransactionTable(it).apply {
+							GoldStoneDataBase.database.transactionDao().insert(this)
+						}
+					}
+				}
+				
 				if (newData.isNotEmpty()) {
-					newData.filterNot { new ->
+					val finalNewData = newData.filterNot { new ->
 						// 和本地数据去重处理
 						localData.any {
 							it.transactionHash.equals(new.hash, true)
 						}
-					}.map {
-						// 加工数据并存如数据库
-						TransactionTable(it).apply {
-							GoldStoneDataBase.database.transactionDao().insert(this)
-						}.let {
-							// 返回列表需要的数据格式
-							TransactionListModel(it)
-						}
-					}.toArrayList().apply {
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+					}
+					finalNewData.insertDataToDataBase()
+					// Copy 出燃气费的部分
+					val feeData = finalNewData.filter {
+						it.from.equals(Config.getCurrentAddress(), true)
+					}.apply {
+						forEach { it.isFee = true }
+					}
+					
+					feeData.insertDataToDataBase()
+					
+					GoldStoneAPI.context.runOnUiThread {
+						callback()
 					}
 				} else {
-					// 数据为空返回空数组
+					// 数据为空返回
 					GoldStoneAPI.context.runOnUiThread {
 						callback()
 					}

@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 
@@ -79,7 +80,8 @@ data class TransactionTable(
 	var memo: String = "",
 	var chainID: String = Config.getCurrentChain(),
 	var isFee: Boolean = false,
-	var isFailed: Boolean = false
+	var isFailed: Boolean = false,
+	var minerFee: String = ""
 ) {
 	
 	/** 默认的 `constructor` */
@@ -216,14 +218,16 @@ data class TransactionTable(
 		data.input,
 		CryptoValue.etcContract,
 		"",
-		"",
+		"0",
 		"",
 		data.from != Config.getCurrentAddress(),
 		false,
 		CryptoSymbol.etc,
 		Config.getCurrentAddress(),
 		tokenReceiveAddress = data.to,
-		chainID = Config.getETCCurrentChain()
+		chainID = Config.getETCCurrentChain(),
+		isFee = data.isFee,
+		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
 	
 	companion object {
@@ -292,14 +296,41 @@ data class TransactionTable(
 			chainID: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
+			doAsync {
+				var transactions = GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
+				// 如果是 `ETH` or `ETC` 需要查询出所有相关的 `Miner` 作为账单记录
+				var fee = listOf<TransactionTable>()
+				if (!CryptoValue.isToken(contract)) {
+					fee = GoldStoneDataBase
 						.database
 						.transactionDao()
-						.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
-				}) {
-				hold(it.map { TransactionListModel(it) }.toArrayList())
+						.getCurrentChainFee(walletAddress, true, chainID)
+				}
+				transactions += fee.filter { !CryptoValue.isToken(contract) }
+				GoldStoneAPI.context.runOnUiThread {
+					hold(
+						if (
+							CryptoValue.isToken(contract)
+						) {
+							transactions.filter {
+								!it.isFee
+							}.map {
+								TransactionListModel(it)
+							}.sortedByDescending {
+								it.timeStamp
+							}.toArrayList()
+						} else {
+							transactions.map {
+								TransactionListModel(it)
+							}.sortedByDescending {
+								it.timeStamp
+							}.toArrayList()
+						}
+					)
+				}
 			}
 		}
 		
@@ -439,6 +470,15 @@ interface TransactionDao {
 		walletAddress: String,
 		contract: String,
 		chainID: String = Config.getCurrentChain()
+	): List<TransactionTable>
+	
+	@Query(
+		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND isFee LIKE :isFee AND chainID LIKE :chainID ORDER BY timeStamp DESC"
+	)
+	fun getCurrentChainFee(
+		walletAddress: String,
+		isFee: Boolean,
+		chainID: String
 	): List<TransactionTable>
 	
 	@Insert

@@ -65,7 +65,6 @@ class CreateWalletPresenter(
 		checkInputValue(
 			nameText,
 			passwordText,
-			repeatPasswordText,
 			isAgree,
 			fragment.context,
 			callback
@@ -204,24 +203,18 @@ class CreateWalletPresenter(
 		fun checkInputValue(
 			name: String,
 			password: String,
-			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
 			failedCallback: () -> Unit = {},
 			callback: (password: String, walletName: String) -> Unit
 		) {
-			if (password.isEmpty() || repeatPassword.isEmpty()) {
+			if (password.isEmpty()) {
 				context?.alert(CreateWalletText.emptyRepeatPasswordAlert)
 				failedCallback()
 				return
 			}
 			isAgree isFalse {
 				context?.alert(CreateWalletText.agreeRemind)
-				failedCallback()
-				return
-			}
-			if (password != repeatPassword) {
-				context?.alert(CreateWalletText.passwordRepeatAlert)
 				failedCallback()
 				return
 			}

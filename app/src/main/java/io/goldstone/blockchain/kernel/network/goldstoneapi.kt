@@ -96,14 +96,14 @@ object GoldStoneAPI {
 	
 	@JvmStatic
 	fun getTokenInfoBySymbolFromGoldStone(
-		symbols: String,
+		symbolsOrContract: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
-				symbols,
+				symbolsOrContract,
 				"${Config.getCurrentChain()},${Config.getETCCurrentChain()}"
 			),
 			"list",
@@ -116,15 +116,19 @@ object GoldStoneAPI {
 	
 	@JvmStatic
 	fun getETCTransactions(
-		chainType: Int,
-		chainID: Int,
+		chainID: String,
 		address: String,
 		startBlock: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<ETCTransactionModel>) -> Unit
 	) {
 		requestData<ETCTransactionModel>(
-			APIPath.getETCTransactions(APIPath.currentUrl, chainType, chainID, address, startBlock),
+			APIPath.getETCTransactions(
+				APIPath.currentUrl,
+				chainID,
+				address,
+				startBlock
+			),
 			"list",
 			errorCallback = errorCallback,
 			isEncrypt = true
