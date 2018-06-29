@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_add_to_photos_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.2%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_ev_station_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,11 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="height" value="20" />
-                            <entry key="outputName" value="add_contact_icon" />
+                            <entry key="outputName" value="gas_used_icon" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/etc.svg" />
-                            <entry key="width" value="20" />
                           </map>
                         </option>
                       </PersistentState>

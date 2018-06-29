@@ -23,7 +23,6 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
 class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	
 	var isETCListShown: Runnable? = null
-	
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
 	}
@@ -38,7 +37,12 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 		addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 		viewPager.apply {
 			// `MenuBar` 点击选中动画和内容更换
-			menuBar.setMemnuTitles(arrayListOf(CryptoSymbol.eth, CryptoSymbol.etc)) { button, id ->
+			menuBar.setMemnuTitles(
+				arrayListOf(
+					CryptoSymbol.eth + "/" + CryptoSymbol.erc,
+					CryptoSymbol.etc
+				)
+			) { button, id ->
 				button.onClick {
 					currentItem = id
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)

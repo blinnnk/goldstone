@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
-import java.util.concurrent.locks.Condition
 
 /**
  * @date 31/03/2018 8:09 PM
@@ -39,18 +38,17 @@ object APIPath {
 	val getTokenInfo: (
 		header: String,
 		condition: String,
-		chainID: String
-	) -> String = { header, condition, chainID ->
-		"$header/index/searchToken?symbolOrContract=$condition&chainid=$chainID"
+		chainIDs: String
+	) -> String = { header, condition, chainIDs ->
+		"$header/index/searchToken?symbolOrContract=$condition&chainids=$chainIDs"
 	}
 	val getETCTransactions: (
 		header: String,
-		chainType: Int,
-		chainID: Int,
+		chainID: String,
 		address: String,
 		startBlock: String
-	) -> String = { header, type, chainID, address, startBlock ->
-		"$header/tx/pageList?chain_type=$type&chainid=$chainID&address=$address&start_block=$startBlock"
+	) -> String = { header, chainID, address, startBlock ->
+		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
 	}
 	val getQuotationCurrencyChart: (
 		pair: String,
@@ -114,21 +112,6 @@ object EtherScanApi {
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
 			"${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getTokenDefrayTransactiosingleTransactionHash: (address: String, startBlock: String) -> String =
-		{ address, startBlock ->
-			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getAllTokenTransaction: (address: String, startBlock: String) -> String =
-		{ address, startBlock ->
-			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${address.toAddressCode()}&topic1_2_opr=or&topic2=${address.toAddressCode()}"
-		}
-	@JvmStatic
-	val getTokenTransactionBetween: (sendAddress: String, receiveAddress: String, startBlock: String) -> String =
-		{ sendAddress, receiveAddress, startBlock ->
-			"$${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic1=${sendAddress.toAddressCode()}&topic2=${receiveAddress.toAddressCode()}"
 		}
 }
 

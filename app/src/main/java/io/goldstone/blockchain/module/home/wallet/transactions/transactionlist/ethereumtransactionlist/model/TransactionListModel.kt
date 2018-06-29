@@ -35,7 +35,8 @@ data class TransactionListModel(
 	val value: String,
 	val hasError: Boolean,
 	var contract: String,
-	var isFailed: Boolean
+	var isFailed: Boolean,
+	var isFee: Boolean = false
 ) : Serializable {
 	
 	constructor(data: TransactionTable) : this(
@@ -58,16 +59,15 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		data.memo,
-		((data.gas.toDoubleOrNull()
-		  ?: data.gasUsed.toDouble()) * data.gasPrice.toDouble())
-			.toUnitValue(getUnitSymbol(data.symbol)), // 计算燃气费使用情况
+		data.minerFee + getUnitSymbol(data.symbol), // 计算燃气费使用情况
 		generateTransactionURL(data.hash, data.symbol), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,
 		data.value,
 		data.hasError == "1",
 		data.contractAddress,
-		data.isFailed
+		data.isFailed,
+		data.isFee
 	)
 	
 	companion object {
@@ -80,7 +80,7 @@ data class TransactionListModel(
 		}
 		
 		private fun getUnitSymbol(symbol: String): String {
-			return if (symbol.equals(CryptoSymbol.etc, true))
+			return " " + if (symbol.equals(CryptoSymbol.etc, true))
 				CryptoSymbol.etc
 			else CryptoSymbol.eth
 		}

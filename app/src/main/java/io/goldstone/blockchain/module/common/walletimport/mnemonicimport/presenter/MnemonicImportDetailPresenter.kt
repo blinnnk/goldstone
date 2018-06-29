@@ -23,7 +23,6 @@ class MnemonicImportDetailPresenter(
 	fun importWalletByMnemonic(
 		pathInput: EditText,
 		mnemonicInput: EditText,
-		passwordInput: EditText,
 		repeatPasswordInput: EditText,
 		hintInput: EditText,
 		isAgree: Boolean,
@@ -47,7 +46,6 @@ class MnemonicImportDetailPresenter(
 		
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
-			passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(),
 			isAgree,
 			fragment.context,

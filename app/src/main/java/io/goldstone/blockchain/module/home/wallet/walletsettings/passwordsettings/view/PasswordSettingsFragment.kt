@@ -25,19 +25,15 @@ import org.jetbrains.anko.verticalLayout
  * @date 26/03/2018 9:13 PM
  * @author KaySaith
  */
-
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
-
+	
 	private val oldPassword by lazy { RoundInput(context!!) }
 	private val newPassword by lazy { RoundInput(context!!) }
-	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val passwordHint by lazy { RoundInput(context!!) }
 	val confirmButton by lazy { RoundButton(context!!) }
-
 	override val presenter = PasswordSettingsPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
-
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
@@ -46,15 +42,9 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 			}.into(this)
-
+			
 			newPassword.apply {
 				title = WalletSettingsText.newPassword
-				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-			}.into(this)
-
-			repeatPassword.apply {
-				title = CreateWalletText.repeatPassword
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 			}.into(this)
@@ -63,7 +53,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				title = CreateWalletText.hint
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 			}.into(this)
-
+			
 			confirmButton.apply {
 				text = CommonText.confirm
 				setBlueStyle()
@@ -73,7 +63,6 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				presenter.updatePassword(
 					oldPassword,
 					newPassword,
-					repeatPassword,
 					passwordHint
 				) {
 					it.showLoadingStatus(false)
@@ -81,7 +70,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 			}.into(this)
 		}
 	}
-
+	
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

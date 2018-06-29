@@ -178,7 +178,7 @@ class TokenDetailPresenter(
 	private fun TokenDetailFragment.loadETCChainData() {
 		showLoadingView(LoadingText.transactionData)
 		ClassicTransactionListPresenter
-			.getInvalidETCTransactionsFromChain(arrayListOf()) {
+			.getValidETCTransactionsFromChain(arrayListOf()) {
 				fragment.removeLoadingView()
 				loadDataFromDatabaseOrElse()
 			}
@@ -280,7 +280,8 @@ class TokenDetailPresenter(
 					(balance - filter {
 						it.timeStamp.toMillsecond() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {
-						it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
+						if (it.isFee) it.minerFee.substringBefore(" ").toDouble() * -1
+						else it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
 					}).let {
 						balance = it
 						balances.add(DateBalance(index.daysAgoInMills(), balance))

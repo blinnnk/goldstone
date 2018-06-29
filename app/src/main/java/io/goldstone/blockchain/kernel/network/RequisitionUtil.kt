@@ -158,6 +158,7 @@ object RequisitionUtil {
 						}
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
+							LogUtil.error("Error in onResponse Try Catch")
 							errorCallback(error)
 						}
 						GoldStoneCode.showErrorCodeReason(data)

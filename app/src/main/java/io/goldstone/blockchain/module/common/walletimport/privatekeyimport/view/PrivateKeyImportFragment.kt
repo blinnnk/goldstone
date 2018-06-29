@@ -31,7 +31,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	private val passwordHintInput by lazy { RoundInput(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
-	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyImportPresenter(this)
@@ -58,12 +57,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
-				}.into(this)
-				
-				repeatPassword.apply {
-					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					title = CreateWalletText.repeatPassword
 				}.into(this)
 				
 				passwordHintInput.apply {
@@ -95,7 +88,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					presenter.importWalletByPrivateKey(
 						privateKeyInput,
 						passwordInput,
-						repeatPassword,
 						agreementView.radioButton.isChecked,
 						nameInput,
 						passwordHintInput

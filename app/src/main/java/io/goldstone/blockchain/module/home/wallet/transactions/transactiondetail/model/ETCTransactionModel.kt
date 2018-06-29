@@ -32,5 +32,6 @@ data class ETCTransactionModel(
 	@SerializedName("input")
 	var input: String,
 	@SerializedName("transactionIndex")
-	var transactionIndex: String
+	var transactionIndex: String,
+	var isFee: Boolean = false
 )

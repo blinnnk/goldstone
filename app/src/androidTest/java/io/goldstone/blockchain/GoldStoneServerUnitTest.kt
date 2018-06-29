@@ -142,9 +142,9 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getETCTransactions() {
 		GoldStoneAPI.getETCTransactions(
-			ChainType.ETC.id.toInt(),
 			62,
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
+			"0",
 			{
 				LogUtil.error("getETCTransactions", it)
 			}
