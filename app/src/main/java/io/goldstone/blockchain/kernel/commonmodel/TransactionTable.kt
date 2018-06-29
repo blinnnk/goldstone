@@ -309,7 +309,7 @@ data class TransactionTable(
 						.transactionDao()
 						.getCurrentChainFee(walletAddress, true, chainID)
 				}
-				transactions += fee.filter { !CryptoValue.isToken(contract) }
+				transactions += fee.filter { CryptoValue.isToken(it.contractAddress) }
 				GoldStoneAPI.context.runOnUiThread {
 					hold(
 						if (

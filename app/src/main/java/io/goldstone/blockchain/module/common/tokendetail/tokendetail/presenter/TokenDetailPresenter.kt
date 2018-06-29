@@ -142,7 +142,7 @@ class TokenDetailPresenter(
 				fragment.removeLoadingView()
 			} otherwise {
 				withoutLocalDataCallback()
-				LogUtil.debug(this.javaClass.simpleName, "reason: There isn't Local Transaction Data")
+				LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
 			}
 		}
 	}

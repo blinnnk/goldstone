@@ -6,6 +6,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
@@ -98,6 +99,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			receipt.toAsyncData().let {
 				it[5].info = TimeUtils.formatDate(info.timeStamp)
 				it[1].info = memo
+				it[0].info = CryptoUtils.toGasUsedEther(receipt.gas, receipt.gasPrice, false) + " " + getUnitSymbol()
 				it[2].info = if (info.isReceived) info.fromAddress else info.toAddress
 				fragment.context?.runOnUiThread {
 					if (fragment.asyncData.isNull()) fragment.asyncData = it

@@ -2,10 +2,12 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -94,5 +96,17 @@ class WalletDetailFragment :
 	
 	fun recoveryNotifyButtonStyle() {
 		slideHeader.notifyButton.removeRedot()
+	}
+	
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		val overlay = mainActivity
+			?.getMainContainer()
+			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+		overlay.isNull() isTrue {
+			super.setBackEvent(mainActivity)
+		} otherwise  {
+			overlay?.remove()
+			mainActivity?.backEvent = null
+		}
 	}
 }

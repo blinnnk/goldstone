@@ -111,8 +111,9 @@ class TransactionDetailPresenter(
 	}
 	
 	fun getUnitSymbol(): String {
-		return if (getCunrrentChainType() == ChainType.ETH) CryptoSymbol.eth
-		else CryptoSymbol.etc
+		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
+		return if (symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
+		else CryptoSymbol.eth
 	}
 	
 	fun showAddContactsButton(cell: TransactionDetailCell) {

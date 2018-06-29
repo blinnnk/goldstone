@@ -4,7 +4,11 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -37,7 +41,6 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		if (!symbol.equals(CryptoSymbol.etc, true)) {
 			checkTokenNameInfoOrUpdate()
 		}
-		
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
@@ -71,7 +74,7 @@ fun TransactionDetailPresenter.generateModels(
 		else (data!!.gasLimit * data!!.gasPrice).toDouble().toUnitValue(getUnitSymbol())
 	val date =
 		if (data.isNull()) dataFromList?.date
-		else TimeUtils.formatDate(data!!.timestamp / 1000)
+		else TimeUtils.formatDate(data!!.timestamp.toMillsecond())
 	val memo =
 		if (data?.memo.isNull()) TransactionText.noMemo
 		else data?.memo
