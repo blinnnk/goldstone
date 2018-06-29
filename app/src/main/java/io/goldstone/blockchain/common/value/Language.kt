@@ -397,9 +397,27 @@ object DialogText {
 		HoneyLanguage.English.code -> "The current state of the network is not good. Please check. You can try turning on and off airplane mode to try to recover."
 		HoneyLanguage.Chinese.code -> "现在的网络状态不好，请检查。您可以尝试开启再关闭飞行模式来尝试恢复。"
 		HoneyLanguage.Japanese.code -> "ネットワークの現在の状態が良好ではありません。確認してください。 飛行機モードをオンまたはオフにして回復を試みることができます。"
-		HoneyLanguage.Korean.code -> "네트워크의 현재 상태가 좋지 않습니다. 확인하십시오. 비행기 모드를 켜고 끄고 복구를 시도 할 수 있습니다.An extensible dialog system I designed for the ItsON SaaS telecom solution for mobile Android devices at the OS level. Having dialogs easily identifiable as the brand of the phones service provider allows the context to be clearly understood"
+		HoneyLanguage.Korean.code -> "네트워크의 현재 상태가 좋지 않습니다. 확인하십시오. 비행기 모드를 켜고 끄고 복구를 시도 할 수 있습니다."
 		HoneyLanguage.Russian.code -> "Текущее состояние сети не очень хорошее. Пожалуйста, проверьте. Вы можете попробовать включить и выключить режим полета, чтобы попытаться восстановиться."
 		HoneyLanguage.TraditionalChinese.code -> "現在的網絡狀態不好，請檢查。您可以嘗試開啟再關閉飛行模式來嘗試恢復。"
+		else -> ""
+	}
+	val serverBusyTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Network Busy"
+		HoneyLanguage.Chinese.code -> "网络繁忙，无法连接"
+		HoneyLanguage.Japanese.code -> "ネットワークがビジーで接続できません"
+		HoneyLanguage.Korean.code -> "네트워크가 사용 중입니다."
+		HoneyLanguage.Russian.code -> "Сеть занята"
+		HoneyLanguage.TraditionalChinese.code -> "網絡繁忙，無法連接"
+		else -> ""
+	}
+	val serverBusyDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Can't connect with service right now, sorry, please try again later."
+		HoneyLanguage.Chinese.code -> "现在无法和服务连接，抱歉呀，请稍后再试。"
+		HoneyLanguage.Japanese.code -> "今サービスに接続できません。申し訳ありませんが、後でやり直してください。"
+		HoneyLanguage.Korean.code -> "지금 서비스에 연결할 수 없습니다. 죄송합니다. 잠시 후 다시 시도하십시오."
+		HoneyLanguage.Russian.code -> "Не могу подключиться к сервису прямо сейчас, извините, повторите попытку позже."
+		HoneyLanguage.TraditionalChinese.code -> "現在無法和服務連接，抱歉呀，請稍後再試。"
 		else -> ""
 	}
 	val goToBackUp = when (currentLanguage) {
