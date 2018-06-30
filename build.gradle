@@ -9,7 +9,7 @@ buildscript {
     maven { url "https://kotlin.bintray.com/kotlinx" }
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.2.0-beta01'
+    classpath 'com.android.tools.build:gradle:3.2.0-beta02'
     //noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"

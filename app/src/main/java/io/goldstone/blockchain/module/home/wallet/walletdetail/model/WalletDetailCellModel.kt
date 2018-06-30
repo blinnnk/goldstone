@@ -51,8 +51,7 @@ data class WalletDetailCellModel(
 			return if (this) {
 				balance.formatCount(5).toDoubleOrNull().orElse(0.0)
 			} else {
-				CryptoUtils
-					.formatDouble(balance / Math.pow(10.0, decimal))
+				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
 			}
 		}
 		

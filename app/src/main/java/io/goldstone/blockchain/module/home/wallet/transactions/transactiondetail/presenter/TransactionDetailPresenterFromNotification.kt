@@ -5,17 +5,21 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -47,7 +51,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 				localTransaction?.apply {
 					fragment.asyncData = generateModels(TransactionListModel(this))
 					val headerData = TransactionHeaderModel(
-						value.toDouble(),
+						notificationData?.value ?: value.toDouble(),
 						if (isReceive) fromAddress else tokenReceiveAddress ?: to,
 						symbol,
 						false,
@@ -86,27 +90,23 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		ChainID.getChainNameByID(info.chainID),
-		{}, // unfinished callback
-		{ error, reason ->
+		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) { receipt ->
-		TransactionTable.getMemoByHashAndReceiveStatus(
-			info.hash,
-			info.isReceived,
-			ChainID.getChainNameByID(info.chainID)
-		) { memo ->
-			receipt.toAsyncData().let {
-				it[5].info = TimeUtils.formatDate(info.timeStamp)
-				it[1].info = memo
-				it[0].info = CryptoUtils.toGasUsedEther(receipt.gas, receipt.gasPrice, false) + " " + getUnitSymbol()
-				it[2].info = if (info.isReceived) info.fromAddress else info.toAddress
-				fragment.context?.runOnUiThread {
-					if (fragment.asyncData.isNull()) fragment.asyncData = it
-					else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
-					updateHeaderFromNotification(info)
-					callback()
-				}
+		// 通过 `Notification` 获取确实信息
+		receipt.apply {
+			this.recordOwnerAddress = if (info.isReceived) info.toAddress else info.fromAddress
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+			this.memo = getMemoFromInputCode(receipt.input, CryptoValue.isToken(receipt.contractAddress))
+		}.toAsyncData().let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
 			}
 		}
 	}
@@ -124,18 +124,25 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(
 
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toUnitValue(),
-		TransactionText.noMemo,
-		"",
+		(gas.toBigDecimal() * gasPrice.toBigDecimal())
+			.toDouble()
+			.toUnitValue(
+				if (symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
+				else CryptoSymbol.eth
+			),
+		if (memo.isEmpty()) TransactionText.noMemo else memo,
+		fromAddress,
+		to,
 		hash,
 		blockNumber,
-		TimeUtils.formatDate(0),
-		EtherScanApi.transactionDetail(hash)
+		TimeUtils.formatDate(timeStamp),
+		TransactionListModel.generateTransactionURL(hash, symbol)
 	)
 	arrayListOf(
 		TransactionText.minerFee,
 		TransactionText.memo,
-		(if (isReceive == true) CommonText.to else CommonText.from) + " " + ImportWalletText.address,
+		CommonText.from,
+		CommonText.to,
 		TransactionText.transactionHash,
 		TransactionText.blockNumber,
 		TransactionText.transactionDate,

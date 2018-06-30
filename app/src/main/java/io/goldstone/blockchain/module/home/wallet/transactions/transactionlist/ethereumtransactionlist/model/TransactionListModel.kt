@@ -2,13 +2,13 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import java.io.Serializable
@@ -40,10 +40,11 @@ data class TransactionListModel(
 ) : Serializable {
 	
 	constructor(data: TransactionTable) : this(
-		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
+		if (data.isReceive) data.fromAddress
+		else data.tokenReceiveAddress.orEmpty(),
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
-				data.timeStamp,
+				data.timeStamp.toMillsecond(),
 				DateAndTimeText.getDateText()
 			) + descriptionText(
 				data.isReceive,

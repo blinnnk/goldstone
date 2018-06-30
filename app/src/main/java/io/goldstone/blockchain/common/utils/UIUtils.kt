@@ -86,9 +86,9 @@ object TimeUtils {
 		val stamp = if (timeStamp.contains(".")) timeStamp.substringBefore(".").toLong()
 		else timeStamp.toLong()
 		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp * 1000, DateUtils.FORMAT_SHOW_YEAR
+			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp * 1000, DateUtils.FORMAT_SHOW_TIME
+			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_TIME
 		)
 	}
 	
@@ -114,14 +114,7 @@ fun String.toMillsecond(): Long {
 }
 
 fun Long.toMillsecond(): Long {
-	val currentTime = toString()
-	return when {
-		currentTime.count() < 13 -> this * Math.pow(10.0, (13 - currentTime.count()).toDouble())
-			.toLong()
-		currentTime.count() > 13 -> this / Math.pow(10.0, (currentTime.count() - 13).toDouble())
-			.toLong()
-		else -> this
-	}
+	return toString().toMillsecond()
 }
 
 fun Activity.transparentStatus() {

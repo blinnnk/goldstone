@@ -17,7 +17,6 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import java.io.Serializable
 
 /**
@@ -47,12 +46,9 @@ class NotificationListPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()
-			?.supportFragmentManager
-			?.findFragmentByTag(FragmentTag.home)
-			?.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)
-			?.apply {
-				presenter.updateUnreadCount()
-			}
+			?.getWalletDetailFragment()
+			?.presenter
+			?.updateUnreadCount()
 	}
 	
 	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {

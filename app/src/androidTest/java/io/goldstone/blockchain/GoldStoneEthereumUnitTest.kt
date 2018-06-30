@@ -58,10 +58,7 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTransactionByHash(
 			transactionHash,
 			chainName,
-			{
-				// Unfinished
-			},
-			{ error, reason ->
+			errorCallback = { error, reason ->
 				LogUtil.error(
 					positon + "getTransactionByHash" + reason,
 					error

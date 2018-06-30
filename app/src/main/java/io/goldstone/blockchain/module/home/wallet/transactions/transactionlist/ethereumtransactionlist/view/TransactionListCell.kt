@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -57,7 +58,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 				title.text = CryptoUtils.scaleTo16(it.addressName)
 				subtitle.text =
 					if (Config.getCurrentLanguageCode() == 0) it.addressInfo
-					else CryptoUtils.scaleTo(it.addressInfo, 26)
+					else it.addressInfo.scaleTo(26)
 			}
 			
 			count?.apply {

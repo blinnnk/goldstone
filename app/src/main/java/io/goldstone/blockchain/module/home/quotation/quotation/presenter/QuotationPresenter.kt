@@ -5,10 +5,12 @@ import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -225,19 +227,6 @@ class QuotationPresenter(
 					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}
 			}.apply(holdSocket)
-		}
-		
-		fun getQuotationFragment(
-			activity: MainActivity?,
-			callback: QuotationFragment.() -> Unit
-		) {
-			activity?.apply {
-				supportFragmentManager.findFragmentByTag(FragmentTag.home)?.apply {
-					findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)?.let {
-						callback(it)
-					}
-				}
-			}
 		}
 	}
 }

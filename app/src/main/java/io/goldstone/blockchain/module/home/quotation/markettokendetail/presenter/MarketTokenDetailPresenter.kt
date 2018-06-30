@@ -394,8 +394,6 @@ class MarketTokenDetailPresenter(
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
 		
-		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
-			presenter.resetSocket()
-		}
+		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
 	}
 }

@@ -6,13 +6,13 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.scaleTo
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.value.QuotationText
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -30,14 +30,14 @@ class TokenInfoLink(
 ) : TopBottomLineCell(context) {
 	
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
-		website.setSubtitle(CryptoUtils.scaleTo(model.website, 28))
+		website.setSubtitle(model.website.scaleTo(28))
 		website.onClick {
 			clickEvent(model.website, QuotationText.website)
 			website.preventDuplicateClicks()
 		}
 		// Is there white paper link exist
 		if (model.whitePaper.isNotEmpty()) {
-			whitePaper.setSubtitle(CryptoUtils.scaleTo(model.whitePaper, 28))
+			whitePaper.setSubtitle(model.whitePaper.scaleTo(28))
 			whitePaper.onClick {
 				clickEvent(model.whitePaper, QuotationText.whitePaper)
 				whitePaper.preventDuplicateClicks()
