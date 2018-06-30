@@ -187,7 +187,7 @@ data class TransactionTable(
 		"1",
 		data.safeGet("input"),
 		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
-			data.safeGet("to") else "0x0",
+			data.safeGet("to") else CryptoValue.ethContract,
 		"",
 		"",
 		"",

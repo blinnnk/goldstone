@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
@@ -72,9 +73,11 @@ fun TransactionDetailPresenter.generateModels(
 	val minerFee =
 		if (data.isNull()) dataFromList?.minerFee
 		else (data!!.gasLimit * data!!.gasPrice).toDouble().toUnitValue(getUnitSymbol())
-	val date =
-		if (data.isNull()) dataFromList?.date
-		else TimeUtils.formatDate(data!!.timestamp.toMillsecond())
+	val timstamp =
+		data?.timestamp
+		?: notificationData?.timeStamp.orElse(0L)
+		?: dataFromList?.timeStamp?.toLong().orElse(0L)
+	val date = TimeUtils.formatDate(timstamp.toMillsecond())
 	val memo =
 		if (data?.memo.isNull()) TransactionText.noMemo
 		else data?.memo
