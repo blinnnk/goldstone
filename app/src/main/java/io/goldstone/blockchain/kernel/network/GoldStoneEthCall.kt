@@ -225,7 +225,14 @@ object GoldStoneEthCall {
 				if (data.safeGet("blockNumber").toDecimalFromHex().toIntOrNull().isNull()) {
 					unfinishedCallback()
 				} else {
-					holdValue(TransactionTable(data))
+					holdValue(
+						TransactionTable(
+							data,
+							ChainURL.etcChainName.any {
+								it.equals(chainName, true)
+							}
+						)
+					)
 				}
 			}
 		}

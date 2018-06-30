@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
 
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onResume() {
 		super.onResume()
 		// Push 跳转
-		showTransactionDetailFragment(currentIntent ?: intent)
+		showNotificationFragmentByIntent(currentIntent ?: intent)
 	}
 	
 	fun sendAnalyticsData(className: String) {
@@ -117,25 +118,33 @@ class MainActivity : AppCompatActivity() {
 		return findViewById(ContainerID.main)
 	}
 	
+	// 防止重绘的专用方法
 	fun hideHomeFragment() {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
 			(it as? HomeFragment)?.let {
-				supportFragmentManager.beginTransaction().hide(it).commit()
+				supportFragmentManager.beginTransaction().hide(it).commitAllowingStateLoss()
 			}
 		}
 	}
 	
+	// 防止重绘的专用方法
 	fun showHomeFragment() {
-		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
-			(it as? HomeFragment)?.let {
-				if (it.isHidden) {
-					supportFragmentManager
-						?.beginTransaction()
-						?.show(it)
-						?.commitAllowingStateLoss()
-				}
+		getHomeFragment()?.let {
+			if (it.isHidden) {
+				supportFragmentManager
+					?.beginTransaction()
+					?.show(it)
+					?.commitAllowingStateLoss()
 			}
 		}
+	}
+	
+	fun getWalletDetailFragment(): WalletDetailFragment? {
+		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.walletDetail)
+	}
+	
+	fun getQuotationFragment(): QuotationFragment? {
+		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.quotation)
 	}
 	
 	private fun recoveryBackEventFromOtherApp() {
@@ -154,21 +163,20 @@ class MainActivity : AppCompatActivity() {
 	/**
 	 * 接受到 `Push` 跳转到 `NotificationFragment`
 	 */
-	private fun showTransactionDetailFragment(intent: Intent?) {
+	private fun showNotificationFragmentByIntent(intent: Intent?) {
 		val hash = intent?.getStringExtra(IntentKey.hashFromNotify)
 		if (hash.isNull()) return
-		getHomeFragment()?.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)
-			?.apply {
-				// 如果有正在打开的悬浮层, 直接关闭
-				supportFragmentManager.fragments.find {
-					it is BaseOverlayFragment<*>
-				}?.let {
-					(it as? BaseOverlayFragment<*>)?.presenter?.removeSelfFromActivity()
-				}
-				// 展示通知中心
-				presenter.showNotificationListFragment()
-				currentIntent = null
+		getWalletDetailFragment()?.apply {
+			// 如果有正在打开的悬浮层, 直接关闭
+			supportFragmentManager.fragments.find {
+				it is BaseOverlayFragment<*>
+			}?.let {
+				(it as? BaseOverlayFragment<*>)?.presenter?.removeSelfFromActivity()
 			}
+			// 展示通知中心
+			presenter.showNotificationListFragment()
+			currentIntent = null
+		}
 	}
 	
 	private fun registerReceiver() {

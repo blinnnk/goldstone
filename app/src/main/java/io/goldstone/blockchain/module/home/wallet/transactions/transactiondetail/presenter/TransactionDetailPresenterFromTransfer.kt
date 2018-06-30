@@ -33,8 +33,7 @@ fun TransactionDetailPresenter.getTransactionFromChain() {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		getCurrentChainName(),
-		{}, // unfinish callback
-		{ error, reason ->
+		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) {

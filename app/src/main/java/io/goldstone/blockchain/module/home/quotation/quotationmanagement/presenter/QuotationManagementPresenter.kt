@@ -23,9 +23,7 @@ class QuotationManagementPresenter(
 	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
-		QuotationPresenter.getQuotationFragment(fragment.getMainActivity()) {
-			presenter.updateData()
-		}
+		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 	}
 	
 	private fun updateSelectionsData(callback: () -> Unit = {}) {

@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -92,14 +91,6 @@ class TransactionDetailPresenter(
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 			}
 		}
-	}
-	
-	fun getCunrrentChainType(): ChainType {
-		return ChainURL.getChainTypeBySymbol(
-			data?.token?.symbol
-			?: dataFromList?.symbol
-			?: notificationData?.symbol.orEmpty()
-		)
 	}
 	
 	fun getCurrentChainName(): String {

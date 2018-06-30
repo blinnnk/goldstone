@@ -169,8 +169,7 @@ data class TransactionTable(
 		data.logIndex
 	)
 	
-	// 这个是专门为入账的 `ERC20 Token` 准备的
-	constructor(data: JSONObject) : this(
+	constructor(data: JSONObject, isETC: Boolean = false) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
 		"",
@@ -186,15 +185,22 @@ data class TransactionTable(
 		"0",
 		"1",
 		data.safeGet("input"),
-		if (CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")))
-			data.safeGet("to") else CryptoValue.ethContract,
+		when {
+			isETC -> CryptoValue.etcContract
+			CryptoUtils.isERC20TransferByInputCode(
+				data.safeGet
+				("input")
+			) -> data.safeGet("to")
+			else -> CryptoValue.ethContract
+		},
 		"",
 		"",
 		"",
 		data.safeGet("from") != Config.getCurrentAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		Config.getCurrentAddress()
+		Config.getCurrentAddress(),
+		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice"))
 	)
 	
 	constructor(data: ETCTransactionModel) : this(

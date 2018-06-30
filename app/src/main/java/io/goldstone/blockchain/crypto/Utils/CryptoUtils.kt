@@ -80,6 +80,10 @@ object CryptoUtils {
 		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
 	}
 	
+	fun toCountByDecimalAndValue(value: String, decimal: Double = 18.0): String {
+		return (value.toBigDecimal() / Math.pow(10.0, decimal).toBigDecimal()).toString()
+	}
+	
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
 		var count: Double

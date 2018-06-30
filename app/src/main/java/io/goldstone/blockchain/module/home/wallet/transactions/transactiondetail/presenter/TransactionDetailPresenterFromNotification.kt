@@ -5,7 +5,6 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.LoadingText
@@ -14,6 +13,7 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -52,7 +52,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 				localTransaction?.apply {
 					fragment.asyncData = generateModels(TransactionListModel(this))
 					val headerData = TransactionHeaderModel(
-						value.toDouble(),
+						notificationData?.value ?: value.toDouble(),
 						if (isReceive) fromAddress else tokenReceiveAddress ?: to,
 						symbol,
 						false,
@@ -91,16 +91,18 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		ChainID.getChainNameByID(info.chainID),
-		{}, // unfinished callback
-		{ error, reason ->
+		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) { receipt ->
 		// 通过 `Notification` 获取确实信息
 		receipt.apply {
 			this.symbol = notificationData?.symbol.orEmpty()
-			this.timeStamp = TimeUtils.formatDate(info.timeStamp.toMillsecond())
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
 			this.memo = getMemoFromInputCode(receipt.input, CryptoValue.isToken(receipt.contractAddress))
+		}.apply {
+			GoldStoneDataBase.database.transactionDao().insert(this)
 		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
 				if (fragment.asyncData.isNull()) fragment.asyncData = it
@@ -135,7 +137,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		to,
 		hash,
 		blockNumber,
-		timeStamp,
+		TimeUtils.formatDate(timeStamp),
 		TransactionListModel.generateTransactionURL(hash, symbol)
 	)
 	arrayListOf(

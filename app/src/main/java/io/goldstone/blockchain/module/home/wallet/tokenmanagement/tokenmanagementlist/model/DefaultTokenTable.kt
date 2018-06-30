@@ -1,16 +1,19 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -184,6 +187,37 @@ data class DefaultTokenTable(
 					GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
 				}) {
 				hold(it.toArrayList())
+			}
+		}
+		
+		fun getDecimalByContract(
+			contract: String,
+			chainName: String,
+			hold: (decimal: Double?) -> Unit
+		) {
+			// 首先从本地数据库查询数据
+			coroutinesTask(
+				{
+					GoldStoneDataBase
+						.database
+						.defaultTokenDao()
+						.getCurrentChainTokenByContract(contract)
+				}) {
+				if (it.isNull()) {
+					// 如果本地没有数据就从网络获取
+					GoldStoneEthCall.getTokenDecimal(
+						contract,
+						{ error, reason ->
+							hold(null)
+							LogUtil.error("getDecimalByContract $reason", error)
+						},
+						chainName
+					) {
+						hold(it)
+					}
+				} else {
+					hold(it?.decimals)
+				}
 			}
 		}
 		

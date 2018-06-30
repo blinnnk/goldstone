@@ -1,16 +1,13 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.presenter
 
-import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**
  * @date 25/03/2018 2:46 AM
@@ -21,12 +18,11 @@ class TokenManagementPresenter(
 ) : BaseOverlayPresenter<TokenManagementFragment>() {
 	
 	override fun onFragmentDestroy() {
-		fragment.getMainActivity()?.apply {
-			supportFragmentManager.findFragmentByTag(FragmentTag.home)
-				.findChildFragmentByTag<WalletDetailFragment>(FragmentTag.walletDetail)?.apply {
-					presenter.updateData()
-				}
-		}
+		// 销毁的时候更新首页的数据
+		fragment.getMainActivity()
+			?.getWalletDetailFragment()
+			?.presenter
+			?.updateData()
 	}
 	
 	fun showTokenManagementFragment() {

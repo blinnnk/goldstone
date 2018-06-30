@@ -144,7 +144,7 @@ class PasscodePresenter(
 	private fun PasscodeFragment.removePasscodeFragment(callback: () -> Unit = {}) {
 		activity?.let {
 			container.updateAlphaAnimation(0f) {
-				it.supportFragmentManager.beginTransaction().remove(this).commit()
+				it.supportFragmentManager.beginTransaction().remove(this).commitAllowingStateLoss()
 				callback()
 			}
 		}
