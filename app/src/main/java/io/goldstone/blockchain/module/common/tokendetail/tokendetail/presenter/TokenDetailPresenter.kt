@@ -150,8 +150,7 @@ class TokenDetailPresenter(
 	private fun TokenDetailFragment.loadERCChainData() {
 		doAsync {
 			// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-			TransactionListPresenter.getTransactionDataFromEtherScan(
-				this@loadERCChainData,
+			TransactionListPresenter.getTokenTransactions(
 				"0",
 				{
 					// ToDo 等自定义的 `Alert` 完成后应当友好提示

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -49,35 +48,32 @@ class TransactionListPresenter(
 			}
 		} else {
 			fragment.asyncData = memoryTransactionListData
-			fragment.updateTransactionInAsync(memoryTransactionListData!!)
+			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
+				updateTransactionInAsync(memoryTransactionListData!!) {
+					it isTrue {
+						hasUpdate = true
+						fragment.initData()
+					}
+					fragment.removeLoadingView()
+				}
+			}
 		}
 	}
 	
+	private var hasUpdate = false
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getERCTransactionsByAddress(Config.getCurrentAddress()) {
-			if (it.isNotEmpty()) {
-				checkAddressNameInContacts(it) {
-					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
-					// Save a copy into memory for imporving the speed of next time to view
-					memoryTransactionListData = it
-					// Check and update the new data from chain in async thread
-					fragment.updateTransactionInAsync(it)
-				}
-			} else {
-				/**
-				 * if there is none data in local then `StartBlock 0`
-				 * and load data from `EtherScan`
-				 **/
-				getTransactionDataFromEtherScan(
-					fragment,
-					"0",
-					{
-						// ToDo 等自定义的 `Alert` 完成后应当友好提示
-						LogUtil.error("Error When GetTransactionDataFromEtherScan $it")
-					}
-				) {
-					checkAddressNameInContacts(it) {
-						presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+			checkAddressNameInContacts(it) {
+				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+				// Save a copy into memory for imporving the speed of next time to view
+				memoryTransactionListData = it
+				// Check and update the new data from chain in async thread
+				if (!hasUpdate) {
+					updateTransactionInAsync(it) {
+						it isTrue {
+							initData()
+							hasUpdate = true
+						}
 						removeLoadingView()
 					}
 				}
@@ -85,17 +81,15 @@ class TransactionListPresenter(
 		}
 	}
 	
-	private fun TransactionListFragment.updateTransactionInAsync(
-		localData: ArrayList<TransactionListModel>
+	private fun updateTransactionInAsync(
+		localData: ArrayList<TransactionListModel>,
+		callback: (hasData: Boolean) -> Unit
 	) {
 		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
-			localData.firstOrNull {
-				it.blockNumber.isNotEmpty()
-			}?.blockNumber ?: "0"
+			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber ?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
-		getTransactionDataFromEtherScan(
-			fragment,
+		getTransactionsFromEtherScan(
 			currentBlockNumber,
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
@@ -103,22 +97,8 @@ class TransactionListPresenter(
 					?.alert("${AlertText.getTransactionErrorPrefix} ${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}")
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
 			}
-		) { newData ->
-			/** chain data is empty then return and remove loading view */
-			if (newData.isEmpty()) {
-				removeLoadingView()
-				return@getTransactionDataFromEtherScan
-			}
-			// 拉取到新数据后检查是否包含本地已有的部分, 这种该情况会出现在, 本地转账后插入临时数据的条目。
-			context?.runOnUiThread {
-				if (newData.isNotEmpty()) {
-					localData.addAll(0, newData)
-					presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(localData)
-					removeLoadingView()
-				} else {
-					removeLoadingView()
-				}
-			}
+		) {
+			callback(it)
 		}
 	}
 	
@@ -151,37 +131,45 @@ class TransactionListPresenter(
 			isFromTransactionList: Boolean = false
 		) {
 			fragment?.apply {
-				Bundle().apply {
-					putSerializable(ArgumentKey.transactionFromList, model)
-					presenter.showTargetFragment<TransactionDetailFragment>(
-						TransactionText.detail,
-						TransactionText.transaction,
-						this,
-						if (isFromTransactionList) TransactionFragment.viewPagerSize else 0
-					)
+				presenter.showTargetFragment<TransactionDetailFragment>(
+					TransactionText.detail,
+					TransactionText.transaction,
+					Bundle().apply {
+						putSerializable(ArgumentKey.transactionFromList, model)
+					},
+					if (isFromTransactionList) TransactionFragment.viewPagerSize else 0
+				)
+			}
+		}
+		
+		fun getTokenTransactions(
+			startBlock: String,
+			errorCallback: (Exception) -> Unit,
+			hold: (ArrayList<TransactionListModel>) -> Unit
+		) {
+			getTransactionsFromEtherScan(startBlock, errorCallback) {
+				it isTrue {
+					TransactionTable.getERCTransactionsByAddress(Config.getCurrentAddress()) {
+						checkAddressNameInContacts(it) { hold(it) }
+					}
+				} otherwise {
+					hold(arrayListOf())
 				}
 			}
 		}
 		
 		// 默认拉取全部的 `EtherScan` 的交易数据
-		fun getTransactionDataFromEtherScan(
-			fragment: BaseRecyclerFragment<*, *>,
+		private fun getTransactionsFromEtherScan(
 			startBlock: String,
 			errorCallback: (Exception) -> Unit,
-			hold: (ArrayList<TransactionListModel>) -> Unit
+			hold: (hasNewData: Boolean) -> Unit
 		) {
-			// 没有网络直接返回
-			if (!NetworkUtil.hasNetworkWithAlert(fragment.getContext())) return
 			// 请求所有链上的数据
 			mergeETHAndERC20Incoming(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
-					// 因为进入这里之前外部已经更新了最近的 `BlockNumber`, 所以这里的数据可以直接理解为最新的本地没有的部分
-					fragment.filterCompletedData(it, hold)
+					filterCompletedData(it, hold)
 				} otherwise {
-					fragment.getContext()?.runOnUiThread {
-						// if data is empty then return an empty array
-						hold(arrayListOf())
-					}
+					hold(false)
 				}
 			}.start()
 		}
@@ -326,52 +314,63 @@ class TransactionListPresenter(
 			}
 		}
 		
-		private fun BaseRecyclerFragment<*, *>.filterCompletedData(
+		private fun filterCompletedData(
 			data: List<TransactionTable>,
-			hold: (ArrayList<TransactionListModel>) -> Unit
+			hold: (hasData: Boolean) -> Unit
 		) {
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
 			data.getUnkonwTokenInfo {
 				// 把拉取到的数据加工数据格式并插入本地数据库
-				completeTransactionInfo(data) {
-					val allNewData = this
+				completeTransactionInfo(data) list@{
 					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = size
 						override fun concurrentJobs() {
-							allNewData.forEach {
-								it.apply {
-									minerFee = CryptoUtils.toGasUsedEther(
-										gas,
-										gasPrice,
-										false
-									)
-								}
-								
+							forEach {
 								GoldStoneDataBase
 									.database
 									.transactionDao()
 									.insert(it)
-								if (!it.isReceive) {
-									val feeData = it.apply {
-										isFee = true
-									}
-									GoldStoneDataBase
-										.database
-										.transactionDao()
-										.insert(feeData)
-								}
 								completeMark()
 							}
 						}
 						
 						override fun mergeCallBack() {
-							hold(map {
-								TransactionListModel(it)
-							}.toArrayList())
-							removeLoadingView()
+							this@list.insertMinerFeeToDatabase {
+								hold(distinctBy { new ->
+									data.any {
+										it.hash.equals(new.hash, true)
+									}
+								}.isNotEmpty())
+							}
 						}
 					}.start()
 				}
+			}
+		}
+		
+		private fun List<TransactionTable>.insertMinerFeeToDatabase(
+			hold: (List<TransactionTable>) -> Unit
+		) {
+			// 抽出燃气费的部分单独插入
+			filter {
+				!it.isReceive
+			}.map {
+				it.apply { isFee = true }
+			}.apply list@{
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = size
+					override fun concurrentJobs() {
+						forEach {
+							GoldStoneDataBase
+								.database
+								.transactionDao()
+								.insert(it)
+							completeMark()
+						}
+					}
+					
+					override fun mergeCallBack() = hold(this@list)
+				}.start()
 			}
 		}
 		

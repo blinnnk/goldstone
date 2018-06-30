@@ -151,7 +151,7 @@ data class TransactionTable(
 		data.from,
 		data.to,
 		data.value,
-		"",
+		data.gasUsed,
 		data.gasPrice,
 		"0",
 		"1",
@@ -169,7 +169,11 @@ data class TransactionTable(
 		data.logIndex
 	)
 	
-	constructor(data: JSONObject, isETC: Boolean = false) : this(
+	constructor(
+		data: JSONObject,
+		isETC: Boolean = false,
+		chainID: String = Config.getCurrentChain()
+	) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
 		"",
@@ -200,7 +204,8 @@ data class TransactionTable(
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
 		Config.getCurrentAddress(),
-		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice"))
+		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
+		chainID = chainID
 	)
 	
 	constructor(data: ETCTransactionModel) : this(
@@ -252,6 +257,7 @@ data class TransactionTable(
 				this.value = value
 				this.tokenReceiveAddress = tokenReceiveAddress
 				this.recordOwnerAddress = Config.getCurrentAddress()
+				this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
 			}
 		}
 		

@@ -13,7 +13,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -97,12 +96,11 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	) { receipt ->
 		// 通过 `Notification` 获取确实信息
 		receipt.apply {
+			this.recordOwnerAddress = if (info.isReceived) info.toAddress else info.fromAddress
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
 			this.memo = getMemoFromInputCode(receipt.input, CryptoValue.isToken(receipt.contractAddress))
-		}.apply {
-			GoldStoneDataBase.database.transactionDao().insert(this)
 		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
 				if (fragment.asyncData.isNull()) fragment.asyncData = it

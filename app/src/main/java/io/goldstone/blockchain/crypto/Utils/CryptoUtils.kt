@@ -2,6 +2,7 @@ package io.goldstone.blockchain.crypto.utils
 
 import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
@@ -44,11 +45,6 @@ object CryptoUtils {
 		else address.substring(0, 32) + "..."
 	}
 	
-	fun scaleTo(address: String, count: Int): String {
-		return if (address.length < count) address
-		else address.substring(0, count) + "..."
-	}
-	
 	fun scaleMiddleAddress(address: String, halfSize: Int = 14): String {
 		return if (address.length == CryptoValue.bip39AddressLength) address.substring(
 			0, halfSize
@@ -81,7 +77,7 @@ object CryptoUtils {
 	}
 	
 	fun toCountByDecimalAndValue(value: String, decimal: Double = 18.0): String {
-		return (value.toBigDecimal() / Math.pow(10.0, decimal).toBigDecimal()).toString()
+		return (value.toDoubleOrNull().orZero() / Math.pow(10.0, decimal)).toString()
 	}
 	
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {

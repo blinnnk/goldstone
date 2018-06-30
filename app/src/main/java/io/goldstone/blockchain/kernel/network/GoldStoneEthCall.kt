@@ -8,6 +8,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.EthereumMethod
@@ -230,7 +231,8 @@ object GoldStoneEthCall {
 							data,
 							ChainURL.etcChainName.any {
 								it.equals(chainName, true)
-							}
+							},
+							ChainID.getChainIDByName(chainName)
 						)
 					)
 				}
