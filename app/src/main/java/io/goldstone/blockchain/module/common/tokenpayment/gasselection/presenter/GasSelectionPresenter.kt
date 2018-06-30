@@ -174,6 +174,7 @@ class GasSelectionPresenter(
 			
 			else -> {
 				// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
+				// 首先查询 `Token Balance` 余额
 				MyTokenTable.getBalanceWithContract(
 					token?.contract.orEmpty(),
 					Config.getCurrentAddress(),
@@ -181,8 +182,22 @@ class GasSelectionPresenter(
 					{ error, reason ->
 						fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
 					}
-				) {
-					hold(it >= getTransferCount().toDouble() + gasUsedInChainCoin.orElse(0.0))
+				) { tokenBalance ->
+					// 查询 `ETH` 余额
+					MyTokenTable.getBalanceWithContract(
+						CryptoValue.ethContract,
+						Config.getCurrentAddress(),
+						true,
+						{ error, reason ->
+							LogUtil.error("checkBalanceIsValid $reason", error)
+						}
+					) { ethBalance ->
+						// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
+						hold(
+							tokenBalance >= getTransferCount().toDouble()
+							&& ethBalance > gasUsedInChainCoin.orElse(0.0)
+						)
+					}
 				}
 			}
 		}
@@ -331,7 +346,8 @@ class GasSelectionPresenter(
 					if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChain()
 					else Config.getCurrentChain()
 				memo = memoData
-				minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
+				minerFee =
+					CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
 			}.let {
 				GoldStoneDataBase.database.transactionDao().insert(it)
 				GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })
