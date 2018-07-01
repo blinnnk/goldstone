@@ -46,7 +46,8 @@ data class TransactionListModel(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
 				DateAndTimeText.getDateText()
-			) + descriptionText(
+			).apply {
+			} + descriptionText(
 				data.isReceive,
 				data.tokenReceiveAddress.orEmpty(),
 				data.fromAddress
