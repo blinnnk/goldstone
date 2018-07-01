@@ -31,12 +31,11 @@ class TokenManagementListFragment :
 						isUsed = switch.isChecked
 					}
 					// 更新数据库
-					TokenManagementListPresenter
-						.updateMyTokensInfoBy(
-							switch,
-							model,
-							this@TokenManagementListFragment.context!!
-						)
+					TokenManagementListPresenter.updateMyTokensInfoBy(
+						switch,
+						model,
+						this@TokenManagementListFragment.context!!
+					)
 				}
 			}
 		}

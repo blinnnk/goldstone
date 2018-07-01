@@ -121,11 +121,11 @@ data class WalletDetailCellModel(
 											walletAddress,
 											false,
 											{ error, reason ->
+												completeMark()
 												fragment.context?.apply { chainError(reason, error, this) }
 											}
 										) {
-											MyTokenTable
-												.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
+											MyTokenTable.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
 											tokenList.add(WalletDetailCellModel(targetToken, it))
 											completeMark()
 										}

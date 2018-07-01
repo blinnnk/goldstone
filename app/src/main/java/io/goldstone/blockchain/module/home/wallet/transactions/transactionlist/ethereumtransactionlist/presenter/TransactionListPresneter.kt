@@ -49,8 +49,8 @@ class TransactionListPresenter(
 		} else {
 			fragment.asyncData = memoryTransactionListData
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				updateTransactionInAsync(memoryTransactionListData!!) {
-					it isTrue {
+				updateTransactionInAsync(memoryTransactionListData!!) { hasData ->
+					hasData isTrue {
 						hasUpdate = true
 						fragment.initData()
 					}
@@ -273,12 +273,11 @@ class TransactionListPresenter(
 		
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			DefaultTokenTable.getCurrentChainTokens { localTokens ->
-				filter {
-					it.isERC20Token && it.symbol.isEmpty()
-				}.distinctBy {
+				distinctBy {
 					it.contractAddress
 				}.filter { unknowData ->
-					localTokens.find {
+					(unknowData.isERC20Token && unknowData.symbol.isEmpty())
+					|| localTokens.find {
 						it.contract.equals(unknowData.contractAddress, true)
 					}.isNull()
 				}.let { filterData ->
@@ -334,6 +333,7 @@ class TransactionListPresenter(
 							}
 						}
 						
+						override fun getResultInMainThread() = false
 						override fun mergeCallBack() {
 							this@list.insertMinerFeeToDatabase {
 								hold(distinctBy { new ->
@@ -353,9 +353,8 @@ class TransactionListPresenter(
 		) {
 			// 抽出燃气费的部分单独插入
 			filter {
+				if (!it.isReceive) it.isFee = true
 				!it.isReceive
-			}.map {
-				it.apply { isFee = true }
 			}.apply list@{
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount: Int = size

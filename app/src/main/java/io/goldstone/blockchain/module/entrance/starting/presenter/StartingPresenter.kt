@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.entrance.starting.presenter
 import android.content.Context
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.BackupServerChecker
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
@@ -38,6 +40,14 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	
 	fun showImportWalletFragment() {
 		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.splash)
+	}
+	
+	fun updateWalletInfoForUserInfo(arrayList: ArrayList<WalletTable>) {
+		arrayList.apply {
+			// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
+			Config.updateMaxWalletID(maxBy { it.id }?.id.orZero())
+			Config.updateWalletCount(size)
+		}
 	}
 	
 	companion object {
