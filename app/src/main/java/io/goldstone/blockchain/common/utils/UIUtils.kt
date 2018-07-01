@@ -104,7 +104,7 @@ object TimeUtils {
 }
 
 fun String.toMillsecond(): Long {
-	val timestamp = toLongOrNull().orElse(0L)
+	val timestamp = toBigDecimal().toString().toLong().orElse(0L)
 	return when {
 		count() == 10 -> timestamp * 1000
 		count() < 13 -> timestamp * Math.pow(10.0, (13 - count()).toDouble()).toLong()

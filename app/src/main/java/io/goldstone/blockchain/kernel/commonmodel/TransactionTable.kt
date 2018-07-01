@@ -11,10 +11,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.hexToDecimal
-import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
-import io.goldstone.blockchain.crypto.utils.toIntFromHex
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -211,7 +208,7 @@ data class TransactionTable(
 	constructor(data: ETCTransactionModel) : this(
 		0,
 		data.blockNumber.toIntFromHex().toString(),
-		data.timestamp.hexToDecimal().toString(),
+		data.timestamp.hexToLong().toString(),
 		data.hash,
 		data.nonce.toIntFromHex().toString(),
 		data.blockHash,
