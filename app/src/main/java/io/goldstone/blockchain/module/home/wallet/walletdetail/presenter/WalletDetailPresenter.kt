@@ -53,14 +53,6 @@ class WalletDetailPresenter(
 	
 	override fun updateData() {
 		fragment.showMiniLoadingView()
-		// 查询钱包总数更新数字
-		WalletTable.apply {
-			getAll {
-				// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
-				Config.updateMaxWalletID(maxBy { it.id }?.id.orZero())
-				Config.updateWalletCount(size)
-			}
-		}
 		// 先初始化空数组再更新列表
 		if (fragment.asyncData.isNull()) {
 			fragment.asyncData = arrayListOf()
@@ -79,6 +71,8 @@ class WalletDetailPresenter(
 						updateUIByData(it)
 						fragment.removeMiniLoadingView()
 					}
+				} else {
+					fragment.removeMiniLoadingView()
 				}
 			}
 		}

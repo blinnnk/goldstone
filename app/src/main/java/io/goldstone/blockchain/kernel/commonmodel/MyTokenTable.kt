@@ -237,7 +237,6 @@ data class MyTokenTable(
 						chainID = Config.getCurrentChain()
 					}
 				}
-				
 				insert(
 					MyTokenTable(
 						0,

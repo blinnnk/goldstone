@@ -91,6 +91,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						width = matchParent
 					}
 				} else {
+					presenter.updateWalletInfoForUserInfo(this)
 					LoadingView.addLoadingCircle(
 						this@relativeLayout,
 						30.uiPX(),

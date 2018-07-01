@@ -47,9 +47,9 @@ object ParameterUtil {
 		val finalParameter =
 			if (content.isEmpty()) ""
 			else content.substringBeforeLast(",") + latest
-		return if (isEncrypt) AesCrypto.encrypt(
+		val rpcContent =
 			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
-		).orEmpty() else "{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
+		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
 	
 	fun <T> preparePairJsonRPC(
@@ -66,10 +66,8 @@ object ParameterUtil {
 			content += "\"${it.first}\":$value,"
 		}
 		val latest = if (hasLatest) ",\"latest\"" else ""
-		return if (isEncrypt) AesCrypto.encrypt(
+		val rpcContent =
 			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[{${content.substringBeforeLast(",")}}$latest],\"id\":1}"
-		).orEmpty() else "{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[{${content.substringBeforeLast(
-			","
-		)}}$latest],\"id\":1}"
+		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
 }
