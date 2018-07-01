@@ -71,8 +71,8 @@ class TransactionListPresenter(
 				if (!hasUpdate) {
 					updateTransactionInAsync(it) {
 						it isTrue {
-							initData()
 							hasUpdate = true
+							initData()
 						}
 						removeLoadingView()
 					}

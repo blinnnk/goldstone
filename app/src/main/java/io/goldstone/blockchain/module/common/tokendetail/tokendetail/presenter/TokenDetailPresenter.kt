@@ -70,7 +70,7 @@ class TokenDetailPresenter(
 	
 	fun showOnlySendData() {
 		allData?.filter {
-			!it.isReceived
+			!it.isReceived && !it.isFee
 		}?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
