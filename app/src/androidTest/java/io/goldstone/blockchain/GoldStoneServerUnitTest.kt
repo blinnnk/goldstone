@@ -11,7 +11,6 @@ import com.blinnnk.extension.orEmpty
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -142,7 +141,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getETCTransactions() {
 		GoldStoneAPI.getETCTransactions(
-			62,
+			"62",
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
 			"0",
 			{

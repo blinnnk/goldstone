@@ -273,11 +273,12 @@ class TransactionListPresenter(
 		
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			DefaultTokenTable.getCurrentChainTokens { localTokens ->
-				distinctBy {
+				filter {
+					it.isERC20Token && it.symbol.isEmpty()
+				}.distinctBy {
 					it.contractAddress
 				}.filter { unknowData ->
-					(unknowData.isERC20Token && unknowData.symbol.isEmpty())
-					|| localTokens.find {
+					localTokens.find {
 						it.contract.equals(unknowData.contractAddress, true)
 					}.isNull()
 				}.let { filterData ->
