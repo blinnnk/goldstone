@@ -84,8 +84,10 @@ dependencies {
   }
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.3.1.2'
-  // Crypto
+  // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.8'
+  // Crypto Bitcoin
+  implementation 'org.bitcoinj:bitcoinj-core:0.14.7'
   // Support PBKDF2withHmacSHA512 Below Api 26
   implementation 'com.madgag.spongycastle:core:1.58.0.0'
   implementation 'com.madgag.spongycastle:prov:1.58.0.0'
