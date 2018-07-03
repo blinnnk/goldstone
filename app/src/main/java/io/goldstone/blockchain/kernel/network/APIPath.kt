@@ -51,14 +51,15 @@ object APIPath {
 		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
 	}
 	val getQuotationCurrencyChart: (
+		header: String,
 		pair: String,
 		period: String,
 		size: Int
-	) -> String = { pair, period, size ->
-		"$currentUrl/market/lineData?pair=$pair&period=$period&size=$size"
+	) -> String = { header, pair, period, size ->
+		"$header/market/lineData?pair=$pair&period=$period&size=$size"
 	}
-	val getQuotationCurrencyInfo: (pair: String) -> String = { pair ->
-		"$currentUrl/market/coinDetail?pair=$pair"
+	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
+		"$header/market/coinDetail?pair=$pair"
 	}
 }
 

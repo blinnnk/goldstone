@@ -7,6 +7,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
@@ -29,12 +30,21 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			// 分配点击事件
 			item.apply {
 				// 调整布局
-				if (position == 5) {
-					item.layoutParams.height = 90.uiPX()
-					isCenterInVertical = false
-				} else {
-					item.layoutParams.height = 60.uiPX()
-					isCenterInVertical = true
+				when (position) {
+					ProfileCellType.AboutUs.index -> {
+						item.layoutParams.height = 90.uiPX()
+						isCenterInVertical = false
+					}
+					else -> {
+						// 增加查询 GoldStoneID 的快捷方法
+						if (model.title.equals(ProfileText.version, true)) {
+							onClick {
+								presenter.showGoldStoneID()
+							}
+						}
+						item.layoutParams.height = 60.uiPX()
+						isCenterInVertical = true
+					}
 				}
 				if (position == asyncData?.size) {
 					upgradeEvent = Runnable {
@@ -75,4 +85,13 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			presenter.showWalletDetailFragment()
 		}
 	}
+}
+
+enum class ProfileCellType(val index: Int) {
+	Contacts(0),
+	CurrencySettings(1),
+	Language(2),
+	ChainNode(3),
+	Pin(4),
+	AboutUs(5)
 }

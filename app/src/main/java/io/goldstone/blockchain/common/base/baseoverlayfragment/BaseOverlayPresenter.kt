@@ -51,12 +51,10 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 				}
 				// 恢复 `TransactionListFragment` 的视图
 				if (viewPagerSize > 0) {
-					System.out.println("hello 1")
 					(size - viewPagerSize - 1 until size).forEach {
 						showChildFragment(this[it])
 					}
 				} else {
-					System.out.println("hello 2")
 					this[size - 2]?.let {
 						showChildFragment(it)
 					}
