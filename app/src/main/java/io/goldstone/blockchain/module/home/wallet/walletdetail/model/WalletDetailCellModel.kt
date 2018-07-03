@@ -105,7 +105,13 @@ data class WalletDetailCellModel(
 					return@getCurrentChainTokensWithAddress
 				}
 				// 首先更新 `MyToken` 的 `Price`
-				myTokens.updateMyTokensPrices {
+				myTokens.updateMyTokensPrices(
+					{
+						// 接口可链接但返回出错的情况下不仅需进行操作
+						LogUtil.error("update My Tokens Prices", it)
+						return@updateMyTokensPrices
+					}
+				) {
 					DefaultTokenTable.getCurrentChainTokens { localTokens ->
 						object : ConcurrentAsyncCombine() {
 							val tokenList = ArrayList<WalletDetailCellModel>()
@@ -140,12 +146,15 @@ data class WalletDetailCellModel(
 			}
 		}
 		
-		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(callback: () -> Unit) {
+		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(
+			errorCallback: (Exception) -> Unit,
+			callback: () -> Unit
+		) {
 			map { it.contract }.toJsonArray {
 				GoldStoneAPI.getPriceByContractAddress(
 					it,
 					{
-						callback()
+						errorCallback(it)
 						LogUtil.error("updateMyTokensPrices", it)
 					}
 				) { newPrices ->

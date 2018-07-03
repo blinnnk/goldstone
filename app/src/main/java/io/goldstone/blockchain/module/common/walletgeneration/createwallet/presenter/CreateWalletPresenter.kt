@@ -65,6 +65,7 @@ class CreateWalletPresenter(
 		checkInputValue(
 			nameText,
 			passwordText,
+			repeatPasswordText,
 			isAgree,
 			fragment.context,
 			callback
@@ -170,10 +171,8 @@ class CreateWalletPresenter(
 			passwordInput.apply {
 				val password = text.toString()
 				password.checkPasswordInRules { SafeLevel, _ ->
-					context?.apply {
-						runOnUiThread {
-							setAlertStyle(SafeLevel)
-						}
+					context?.runOnUiThread {
+						setAlertStyle(SafeLevel)
 					}
 				}
 			}
@@ -203,6 +202,7 @@ class CreateWalletPresenter(
 		fun checkInputValue(
 			name: String,
 			password: String,
+			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
 			failedCallback: () -> Unit = {},
@@ -218,20 +218,24 @@ class CreateWalletPresenter(
 				failedCallback()
 				return
 			}
+			
+			if (password != repeatPassword) {
+				context?.alert(CreateWalletText.passwordRepeatAlert)
+				failedCallback()
+				return
+			}
 			val walletName =
 				if (name.isEmpty()) generateDefaultName()
 				else name
 			
 			doAsync {
 				password.checkPasswordInRules { _, reasons ->
-					context?.apply {
-						runOnUiThread {
-							if (reasons == UnsafeReasons.None) {
-								callback(password, walletName)
-							} else {
-								alert(reasons.info)
-								failedCallback()
-							}
+					GoldStoneAPI.context.runOnUiThread {
+						if (reasons == UnsafeReasons.None) {
+							callback(password, walletName)
+						} else {
+							context.alert(reasons.info)
+							failedCallback()
 						}
 					}
 				}

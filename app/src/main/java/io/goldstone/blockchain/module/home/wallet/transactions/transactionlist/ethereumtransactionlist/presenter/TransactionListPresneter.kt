@@ -11,6 +11,8 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -429,7 +431,7 @@ class TransactionListPresenter(
 									transaction,
 									false,
 									CryptoSymbol.eth,
-									CryptoUtils.toCountByDecimal(transaction.value.toDouble()).toString(),
+									transaction.value.toDouble().toEthCount().toString(),
 									transaction.to
 								)
 								completeMark()

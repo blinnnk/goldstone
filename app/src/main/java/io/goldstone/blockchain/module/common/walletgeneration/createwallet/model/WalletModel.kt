@@ -67,9 +67,7 @@ data class WalletTable(
 				GoldStoneDataBase.database.walletDao().apply {
 					getWalletByAddress(address)?.let {
 						update(it.apply { this.encryptMnemonic = encryptMnemonic })
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
 			}
@@ -176,10 +174,10 @@ data class WalletTable(
 					findWhichIsUsing(true)?.let {
 						update(it.apply { it.isUsing = false })
 					}
-					getWalletByAddress(walletAddress)?.let {
-						update(it.apply { it.isUsing = true })
+					getWalletByAddress(walletAddress)?.let { wallet ->
+						update(wallet.apply { wallet.isUsing = true })
 						GoldStoneAPI.context.runOnUiThread {
-							callback(it)
+							callback(wallet)
 						}
 					}
 				}
@@ -190,13 +188,13 @@ data class WalletTable(
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let { delete(it) }
-					getAllWallets().let {
-						it.isEmpty() isTrue {
+					getAllWallets().let { wallets ->
+						wallets.isEmpty() isTrue {
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						} otherwise {
-							update(it.first().apply { isUsing = true })
+							update(wallets.first().apply { isUsing = true })
 							GoldStoneAPI.context.runOnUiThread {
-								Config.updateCurrentIsWatchOnlyOrNot(it.first().isWatchOnly.orFalse())
+								Config.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 								callback()
 							}
 						}

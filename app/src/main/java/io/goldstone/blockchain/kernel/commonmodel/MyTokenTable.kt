@@ -132,34 +132,34 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao().apply {
 					getCurrentChainTokenByContractAndAddress(contract, address).let {
 						it?.let { delete(it) }
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
 			}
 		}
 		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
-			GoldStoneDataBase.database.myTokenDao().apply {
-				val allTokens = getAllTokensBy(address)
-				if (allTokens.isEmpty()) {
-					GoldStoneAPI.context.runOnUiThread {
-						callback()
-					}
-					return
-				}
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = allTokens.size
-					override fun concurrentJobs() {
-						allTokens.forEach {
-							delete(it)
-							completeMark()
+			doAsync {
+				GoldStoneDataBase.database.myTokenDao().apply {
+					val allTokens = getAllTokensBy(address)
+					if (allTokens.isEmpty()) {
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
 						}
+						return@doAsync
 					}
-					
-					override fun mergeCallBack() = callback()
-				}.start()
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount: Int = allTokens.size
+						override fun concurrentJobs() {
+							allTokens.forEach {
+								delete(it)
+								completeMark()
+							}
+						}
+						
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
 		}
 		

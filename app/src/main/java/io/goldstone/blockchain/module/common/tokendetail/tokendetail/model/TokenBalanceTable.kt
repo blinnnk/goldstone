@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
@@ -62,23 +63,25 @@ data class TokenBalanceTable(
 		}
 		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
-			GoldStoneDataBase.database.tokenBalanceDao().apply {
-				val balances = getTokenBalanceByAddress(address)
-				if (balances.isEmpty()) {
-					GoldStoneAPI.context.runOnUiThread { callback() }
-					return
-				}
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount = balances.size
-					override fun concurrentJobs() {
-						balances.forEach {
-							delete(it)
-							completeMark()
-						}
+			doAsync {
+				GoldStoneDataBase.database.tokenBalanceDao().apply {
+					val balances = getTokenBalanceByAddress(address)
+					if (balances.isEmpty()) {
+						GoldStoneAPI.context.runOnUiThread { callback() }
+						return@doAsync
 					}
-					
-					override fun mergeCallBack() = callback()
-				}.start()
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount = balances.size
+						override fun concurrentJobs() {
+							balances.forEach {
+								delete(it)
+								completeMark()
+							}
+						}
+						
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
 		}
 	}

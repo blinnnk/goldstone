@@ -33,6 +33,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	private val pathInput by lazy { RoundInput(context!!) }
 	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
+	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	override val presenter = MnemonicImportDetailPresenter(this)
@@ -68,6 +69,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					setPasswordSafeLevel()
 				}.into(this)
 				
+				repeatPassword.apply {
+					setPasswordInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					title = CreateWalletText.repeatPassword
+				}.into(this)
+				
 				hintInput.apply {
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -98,6 +105,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						pathInput,
 						mnemonicInput,
 						passwordInput,
+						repeatPassword,
 						hintInput,
 						agreementView.radioButton.isChecked,
 						walletNameInput

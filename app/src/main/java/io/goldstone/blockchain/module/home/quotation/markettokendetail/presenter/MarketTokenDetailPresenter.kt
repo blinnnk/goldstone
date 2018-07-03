@@ -188,16 +188,16 @@ class MarketTokenDetailPresenter(
 			getCurrencyInfoFromServer(info) { priceData ->
 				priceHistroy.model = priceData
 				QuotationSelectionTable.getSelectionByPair(info.pair) {
-					it?.apply {
-						GoldStoneDataBase
-							.database
-							.quotationSelectionDao()
-							.update(it.apply {
-								high24 = priceData.dayHighest
-								low24 = priceData.dayLow
-								highTotal = priceData.totalHighest
-								lowTotal = priceData.totalLow
-							})
+					doAsync {
+						if (it.isNull()) return@doAsync
+						else
+							GoldStoneDataBase.database.quotationSelectionDao()
+								.update(it!!.apply {
+									high24 = priceData.dayHighest
+									low24 = priceData.dayLow
+									highTotal = priceData.totalHighest
+									lowTotal = priceData.totalLow
+								})
 					}
 				}
 			}

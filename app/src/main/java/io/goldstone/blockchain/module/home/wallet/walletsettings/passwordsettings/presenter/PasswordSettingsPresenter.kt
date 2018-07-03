@@ -25,12 +25,14 @@ class PasswordSettingsPresenter(
 	fun updatePassword(
 		oldPasswordInput: EditText,
 		newPasswordInput: EditText,
+		repeatPasswordInput: EditText,
 		passwordHint: EditText,
 		callback: () -> Unit
 	) {
 		CreateWalletPresenter.checkInputValue(
 			"",
 			newPasswordInput.text.toString(),
+			repeatPasswordInput.text.toString(),
 			true,
 			fragment.context,
 			callback // error callback

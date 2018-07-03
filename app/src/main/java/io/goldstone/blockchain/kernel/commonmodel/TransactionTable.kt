@@ -344,23 +344,25 @@ data class TransactionTable(
 		}
 		
 		fun deleteByAddress(address: String, callback: () -> Unit) {
-			GoldStoneDataBase.database.transactionDao().apply {
-				val data = getAllTransactionsByAddress(address)
-				if (data.isEmpty()) {
-					GoldStoneAPI.context.runOnUiThread { callback() }
-					return
-				}
-				object : ConcurrentCombine() {
-					override var asyncCount: Int = data.size
-					override fun concurrentJobs() {
-						data.forEach {
-							delete(it)
-							completeMark()
-						}
+			doAsync {
+				GoldStoneDataBase.database.transactionDao().apply {
+					val data = getAllTransactionsByAddress(address)
+					if (data.isEmpty()) {
+						GoldStoneAPI.context.runOnUiThread { callback() }
+						return@doAsync
 					}
-					
-					override fun mergeCallBack() = callback()
-				}.start()
+					object : ConcurrentCombine() {
+						override var asyncCount: Int = data.size
+						override fun concurrentJobs() {
+							data.forEach {
+								delete(it)
+								completeMark()
+							}
+						}
+						
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
 		}
 		

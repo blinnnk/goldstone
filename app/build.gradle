@@ -23,7 +23,7 @@ android {
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 4
-    versionName "1.0.2"
+    versionName "1.1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
      kotlinOptions.allWarningsAsErrors = true // 1.2.50 报错
     renderscriptSupportModeEnabled true
@@ -33,7 +33,7 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi", "armeabi-v7a" , "x86" // PC 调试的时候恢复 `x86`
+      abiFilters "armeabi", "armeabi-v7a"//, "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages
@@ -79,15 +79,13 @@ dependencies {
   // Kotlin
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
   // Anko
-  implementation('org.jetbrains.anko:anko:0.10.5') {
-    exclude group: 'com.google.android', module: 'android'
-  }
+  implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.3.1.2'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.8'
   // Crypto Bitcoin
-  implementation 'org.bitcoinj:bitcoinj-core:0.14.7'
+  // implementation 'org.bitcoinj:bitcoinj-core:0.14.7'
   // Support PBKDF2withHmacSHA512 Below Api 26
   implementation 'com.madgag.spongycastle:core:1.58.0.0'
   implementation 'com.madgag.spongycastle:prov:1.58.0.0'

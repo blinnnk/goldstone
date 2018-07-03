@@ -16,6 +16,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
@@ -164,7 +165,7 @@ class TokenDetailPresenter(
 					// 有数据后重新执行从数据库拉取数据
 					loadDataFromDatabaseOrElse()
 				} otherwise {
-					context?.runOnUiThread {
+					GoldStoneAPI.context.runOnUiThread {
 						// 链上和本地都没有数据就更新一个空数组作为默认
 						updateChartBy(arrayListOf())
 						removeLoadingView()
