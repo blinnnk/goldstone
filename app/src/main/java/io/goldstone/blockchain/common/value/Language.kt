@@ -2891,8 +2891,7 @@ object DateAndTimeText {
 			minute,
 			second,
 			ago,
-			HoneyLanguage.getLanguageByCode(currentLanguage)
-				.equals(HoneyLanguage.English.language, true)
+			HoneyLanguage.getPluralLanguageCode().any { it == currentLanguage }
 		)
 	}
 }

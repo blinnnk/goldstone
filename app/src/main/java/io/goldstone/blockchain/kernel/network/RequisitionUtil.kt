@@ -146,6 +146,14 @@ object RequisitionUtil {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
 						else response.body()?.string().orEmpty()
+					// 结果返回为 `Empty` 或 `Null`
+					if (data.isNullOrBlank()) {
+						LogUtil.error("$keyName data.isNullOrBlank")
+						errorCallback(Exception())
+						GoldStoneCode.showErrorCodeReason(data)
+						return
+					}
+					
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()

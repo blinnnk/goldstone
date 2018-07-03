@@ -22,6 +22,7 @@ object BackupServerChecker {
 		if (
 			error.toString().contains("timeout")
 			|| error.toString().contains("StringIndexOutOfBoundsException")
+			|| error.toString().contains("java.lang.Exception")
 		) {
 			checkWhetherNeedToSwitchToBackupServer(
 				{
