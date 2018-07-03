@@ -143,7 +143,7 @@ class ProfilePresenter(
 		}.start {
 			doAsync {
 				download(newVersionUrl, newVersionName, newVersionDescription)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+				fragment.context?.runOnUiThread { callback() }
 			}
 		}
 	}

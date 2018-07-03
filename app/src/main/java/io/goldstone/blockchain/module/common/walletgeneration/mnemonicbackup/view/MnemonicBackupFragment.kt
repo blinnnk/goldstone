@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.vi
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.setMargins
@@ -69,19 +68,6 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 				}.click {
 					presenter.goToMnemonicConfirmation(mnemonicCode)
 				}.into(this)
-			}
-		}
-	}
-	
-	override fun onHiddenChanged(hidden: Boolean) {
-		super.onHiddenChanged(hidden)
-		val current = activity
-		if (current is SplashActivity && !hidden) {
-			current.backEvent = Runnable {
-				getParentFragment<WalletGenerationFragment> {
-					presenter.removeSelfFromActivity()
-					current.backEvent = null
-				}
 			}
 		}
 	}

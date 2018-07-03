@@ -35,10 +35,16 @@ class KeystoreExportPresenter(
 		}
 		WalletTable.getCurrentWallet {
 			doAsync {
-				fragment.context?.getKeystoreFile(it!!.address, passwordInput.text.toString(), {
-					GoldStoneAPI.context.runOnUiThread { hold("") }
-				}) {
-					fragment.context?.runOnUiThread { hold(it) }
+				fragment.context?.getKeystoreFile(
+					it!!.address,
+					passwordInput.text.toString(),
+					{
+						hold("")
+					}
+				) { it ->
+					GoldStoneAPI.context.runOnUiThread {
+						hold(it)
+					}
 				}
 			}
 		}

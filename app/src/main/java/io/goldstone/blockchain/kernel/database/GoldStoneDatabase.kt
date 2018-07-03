@@ -44,7 +44,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun currencyDao(): SupportCurrencyDao
 	
 	companion object {
-		const val databaseVersion = 2
+		const val databaseVersion = 3
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 		
@@ -52,7 +52,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 			database =
 				Room.databaseBuilder(context, GoldStoneDataBase::class.java, databaseName)
 					.addMigrations()
-					.allowMainThreadQueries()
+					.fallbackToDestructiveMigration()
 					.build()
 		}
 	}

@@ -29,7 +29,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 
 /**
@@ -225,17 +225,13 @@ fun Context.registerDevice(
 					{
 						// Error Callback
 						LogUtil.error("registerDevice")
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+						callback()
 					}
 				) {
 					// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
 					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
 						saveDataToSharedPreferences(SharesPreference.registerPush, token)
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+						uiThread { callback() }
 					}
 				}
 			}

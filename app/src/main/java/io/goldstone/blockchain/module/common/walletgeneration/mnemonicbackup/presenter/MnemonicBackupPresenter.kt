@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.presenter
 
 import android.os.Bundle
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -66,6 +67,17 @@ class MnemonicBackupPresenter(
 					overlayView.header.showCloseButton(false)
 					overlayView.header.showBackButton(true) {
 						parent.presenter.showWalletSettingListFragment()
+					}
+				}
+			}
+		}
+		
+		fragment.activity?.let {
+			if (it is SplashActivity) {
+				it.backEvent = Runnable {
+					fragment.getParentFragment<WalletGenerationFragment> {
+						presenter.removeSelfFromActivity()
+						it.backEvent = null
 					}
 				}
 			}

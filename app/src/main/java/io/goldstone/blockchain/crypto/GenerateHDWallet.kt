@@ -105,7 +105,7 @@ fun Context.getWalletByPrivateKey(
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
-	errorCallback: () -> Unit = {},
+	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
@@ -117,7 +117,7 @@ fun Context.getKeystoreFile(
 					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
 				} catch (error: Exception) {
 					runOnUiThread {
-						errorCallback()
+						errorCallback(error)
 						alert(CommonText.wrongPassword)
 					}
 					LogUtil.error("getKeystoreFile", error)
@@ -130,18 +130,18 @@ fun Context.getKeystoreFile(
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
-	errorCallback: () -> Unit = {},
+	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
 	getKeystoreFile(walletAddress, password, errorCallback) {
 		WalletUtil.getKeyPairFromWalletFile(
 			it,
-			password
-		) {
-			GoldStoneAPI.context.runOnUiThread { errorCallback() }
-			LogUtil.error("getPrivateKey", it)
-		}?.let {
-			hold(it.privateKey.toString(16))
+			password,
+			errorCallback
+		)?.let {
+			runOnUiThread {
+				hold(it.privateKey.toString(16))
+			}
 		}
 	}
 }

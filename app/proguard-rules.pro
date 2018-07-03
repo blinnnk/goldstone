@@ -132,14 +132,21 @@
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
+
+# GoldStone
+-dontwarn io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.**
+-dontwarn io.goldstone.blockchain.module.common.walletimport.**
+-dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
+-dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
+
 # Kotlinx
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
--keepclassmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+-keep,includedescriptorclasses class io.goldstone.blockchain.**$$serializer { *; }
+-keepclassmembers class io.goldstone.blockchain.** {
     *** Companion;
 }
--keepclasseswithmembers class io.goldstone.blockchain.** { # <-- change package name to your app's
+-keepclasseswithmembers class io.goldstone.blockchain.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

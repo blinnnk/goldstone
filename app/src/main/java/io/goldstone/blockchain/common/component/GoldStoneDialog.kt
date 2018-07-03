@@ -185,7 +185,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 				setImage(R.drawable.node_error_banner)
 				setContent(
-					ChainID.getChainNameByID(Config.getCurrentChain()) + " ERROR",
+					Config.getCurrentChainName() + " ERROR",
 					"there are some errors on this chain, please search more information on internet"
 				)
 			}

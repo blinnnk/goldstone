@@ -31,8 +31,8 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.topPadding
+import org.jetbrains.anko.uiThread
 
 /**
  * @date 23/03/2018 3:45 PM
@@ -187,10 +187,10 @@ class WalletDetailPresenter(
 							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
 						).toLong()
 						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
-						GoldStoneAPI.getUnreadCount(goldStoneID, time) {
-							GoldStoneAPI.context.runOnUiThread {
-								if (it.isNotEmpty() && it.toIntOrNull().orZero() > 0) {
-									fragment.setNotificationUnreadCount(it)
+						GoldStoneAPI.getUnreadCount(goldStoneID, time) { unreadCount ->
+							uiThread {
+								if (unreadCount.isNotEmpty() && unreadCount.toIntOrNull().orZero() > 0) {
+									fragment.setNotificationUnreadCount(unreadCount)
 								} else {
 									fragment.recoveryNotifyButtonStyle()
 								}

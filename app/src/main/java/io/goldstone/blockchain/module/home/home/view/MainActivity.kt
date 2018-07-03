@@ -69,12 +69,10 @@ class MainActivity : AppCompatActivity() {
 	fun sendAnalyticsData(className: String) {
 		tracker?.setScreenName(className)
 		tracker?.send(
-			HitBuilders.ScreenViewBuilder()
-				.setCustomDimension(
-					ApkChannel.Google.code,
-					ApkChannel.Google.value
-				)
-				.build()
+			HitBuilders.ScreenViewBuilder().setCustomDimension(
+				ApkChannel.Google.code,
+				ApkChannel.Google.value
+			).build()
 		)
 	}
 	

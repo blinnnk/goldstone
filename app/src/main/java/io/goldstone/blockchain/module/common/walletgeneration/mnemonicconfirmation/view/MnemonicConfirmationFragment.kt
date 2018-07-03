@@ -158,10 +158,10 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-		backEventFroSplashActivity()
+		backEventForSplashActivity()
 	}
 	
-	private fun backEventFroSplashActivity() {
+	private fun backEventForSplashActivity() {
 		val currentActivity = activity
 		if (currentActivity is SplashActivity) {
 			currentActivity.backEvent = Runnable {

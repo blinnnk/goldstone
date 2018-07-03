@@ -3,12 +3,14 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
+import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -18,6 +20,7 @@ import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.generateWallet
@@ -65,6 +68,7 @@ class CreateWalletPresenter(
 		checkInputValue(
 			nameText,
 			passwordText,
+			repeatPasswordText,
 			isAgree,
 			fragment.context,
 			callback
@@ -154,9 +158,14 @@ class CreateWalletPresenter(
 	}
 	
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
-		showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
-			CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments, false
-		)
+		// 创建钱包一旦成功跳转到 `备份助记词` 界面就不准许再回到创建的界面防止重复创建账号
+		// 所以这里使用了覆盖 `Fragment` 的方法
+		fragment.getParentFragment<WalletGenerationFragment> {
+			replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
+				putAll(arguments)
+			}
+			headerTitle = CreateWalletText.mnemonicBackUp
+		}
 	}
 	
 	override fun onFragmentShowFromHidden() {
@@ -170,10 +179,8 @@ class CreateWalletPresenter(
 			passwordInput.apply {
 				val password = text.toString()
 				password.checkPasswordInRules { SafeLevel, _ ->
-					context?.apply {
-						runOnUiThread {
-							setAlertStyle(SafeLevel)
-						}
+					context?.runOnUiThread {
+						setAlertStyle(SafeLevel)
 					}
 				}
 			}
@@ -203,6 +210,7 @@ class CreateWalletPresenter(
 		fun checkInputValue(
 			name: String,
 			password: String,
+			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
 			failedCallback: () -> Unit = {},
@@ -218,20 +226,24 @@ class CreateWalletPresenter(
 				failedCallback()
 				return
 			}
+			
+			if (password != repeatPassword) {
+				context?.alert(CreateWalletText.passwordRepeatAlert)
+				failedCallback()
+				return
+			}
 			val walletName =
 				if (name.isEmpty()) generateDefaultName()
 				else name
 			
 			doAsync {
 				password.checkPasswordInRules { _, reasons ->
-					context?.apply {
-						runOnUiThread {
-							if (reasons == UnsafeReasons.None) {
-								callback(password, walletName)
-							} else {
-								alert(reasons.info)
-								failedCallback()
-							}
+					GoldStoneAPI.context.runOnUiThread {
+						if (reasons == UnsafeReasons.None) {
+							callback(password, walletName)
+						} else {
+							context.alert(reasons.info)
+							failedCallback()
 						}
 					}
 				}

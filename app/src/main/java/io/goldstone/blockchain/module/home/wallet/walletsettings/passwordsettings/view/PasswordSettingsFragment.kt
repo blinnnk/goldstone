@@ -30,6 +30,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 	private val oldPassword by lazy { RoundInput(context!!) }
 	private val newPassword by lazy { RoundInput(context!!) }
 	private val passwordHint by lazy { RoundInput(context!!) }
+	private val repeatPassword by lazy { RoundInput(context!!) }
 	val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PasswordSettingsPresenter(this)
 	
@@ -48,7 +49,13 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 			}.into(this)
-
+			
+			repeatPassword.apply {
+				title = CreateWalletText.repeatPassword
+				setPasswordInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+			}.into(this)
+			
 			passwordHint.apply {
 				title = CreateWalletText.hint
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -63,6 +70,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				presenter.updatePassword(
 					oldPassword,
 					newPassword,
+					repeatPassword,
 					passwordHint
 				) {
 					it.showLoadingStatus(false)
