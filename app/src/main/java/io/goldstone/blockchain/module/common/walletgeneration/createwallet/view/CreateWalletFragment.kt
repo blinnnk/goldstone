@@ -96,7 +96,9 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 				
 				agreementView.apply {
 					radioButton.onClick { setRadioStatus() }
-					textView.onClick { presenter.showAgreementFragment() }
+					textView.onClick {
+						presenter.showAgreementFragment()
+					}
 				}.into(this)
 				
 				createButton.apply {
@@ -104,7 +106,10 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 					setGrayStyle(20.uiPX())
 				}.click {
 					it.showLoadingStatus()
-					presenter.generateWalletWith(agreementView.radioButton.isChecked, hintInput) {
+					presenter.generateWalletWith(
+						agreementView.radioButton.isChecked,
+						hintInput
+					) {
 						it.showLoadingStatus(false)
 					}
 				}.into(this)
@@ -118,7 +123,10 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 	) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.updateConfirmButtonStyle(
-			nameEditText, passwordEditText, repeatPasswordEditText, createButton
+			nameEditText,
+			passwordEditText,
+			repeatPasswordEditText,
+			createButton
 		)
 	}
 }

@@ -3,12 +3,14 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
+import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -18,6 +20,7 @@ import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.generateWallet
@@ -155,9 +158,14 @@ class CreateWalletPresenter(
 	}
 	
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
-		showTargetFragment<MnemonicBackupFragment, WalletGenerationFragment>(
-			CreateWalletText.mnemonicBackUp, CreateWalletText.create, arguments, false
-		)
+		// 创建钱包一旦成功跳转到 `备份助记词` 界面就不准许再回到创建的界面防止重复创建账号
+		// 所以这里使用了覆盖 `Fragment` 的方法
+		fragment.getParentFragment<WalletGenerationFragment> {
+			replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
+				putAll(arguments)
+			}
+			headerTitle = CreateWalletText.mnemonicBackUp
+		}
 	}
 	
 	override fun onFragmentShowFromHidden() {
