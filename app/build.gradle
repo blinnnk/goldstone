@@ -22,10 +22,10 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 4
+    versionCode 5
     versionName "1.1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-     kotlinOptions.allWarningsAsErrors = true
+    kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
     vectorDrawables.useSupportLibrary = true
     manifestPlaceholders = [
@@ -54,7 +54,6 @@ android {
       signingConfig signingConfigs.release
     }
   }
-
   kapt {
     generateStubs = true
   }
@@ -81,7 +80,7 @@ dependencies {
   // Anko
   implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.1.2'
+  implementation 'com.blinnnk:honeyui:0.3.1.5'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.8'
   // Crypto Bitcoin

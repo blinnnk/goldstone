@@ -65,7 +65,7 @@ class QRView(context: Context) : LinearLayout(context) {
 
 	fun getAddress(): String = address.text.toString()
 
-	fun showCopyButtons() {
+	private fun showCopyButtons() {
 		copyAddressButton.apply {
 			text = CommonText.copyAddress
 			setBlueStyle()

@@ -144,19 +144,21 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}.apply {
 				if (isEmpty()) return
 				forEach { server ->
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.apply {
-							getTokenBySymbolAndContractFromAllChains(
-								server.symbol,
-								server.contract
-							).let {
-								if (it.isNotEmpty()) {
-									update(it[0].apply { iconUrl = server.iconUrl })
+					doAsync {
+						GoldStoneDataBase
+							.database
+							.defaultTokenDao()
+							.apply {
+								getTokenBySymbolAndContractFromAllChains(
+									server.symbol,
+									server.contract
+								).let {
+									if (it.isNotEmpty()) {
+										update(it[0].apply { iconUrl = server.iconUrl })
+									}
 								}
 							}
-						}
+					}
 				}
 			}
 		}

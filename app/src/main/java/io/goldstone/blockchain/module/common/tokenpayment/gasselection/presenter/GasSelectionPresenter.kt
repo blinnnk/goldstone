@@ -143,6 +143,12 @@ class GasSelectionPresenter(
 		}
 	}
 	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		// 页面销毁的时候重置默认选项
+		currentMinerType = MinerFeeType.Recommend.content
+	}
+	
 	private fun getUnitSymbol(): String {
 		return if (rootFragment?.token?.symbol.equals(CryptoSymbol.etc, true))
 			CryptoSymbol.etc

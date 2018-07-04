@@ -46,7 +46,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		
 		verticalLayout {
 			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), 150.uiPX()).apply {
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), 140.uiPX()).apply {
 					leftMargin = (ScreenSize.Width * 0.1).toInt()
 					addRule(CENTER_VERTICAL)
 				}
