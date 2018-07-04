@@ -23,6 +23,12 @@ enum class HoneyLanguage(
 			return Config.getCurrentLanguageCode() in 0 .. 5
 		}
 		
+		fun getPluralLanguageCode(): ArrayList<Int> {
+			return arrayListOf(
+				HoneyLanguage.English.code
+			)
+		}
+		
 		fun getLanguageCode(language: String): Int {
 			return when (language) {
 				HoneyLanguage.English.language -> HoneyLanguage.English.code

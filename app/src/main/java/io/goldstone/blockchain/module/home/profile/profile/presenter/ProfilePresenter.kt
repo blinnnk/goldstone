@@ -179,6 +179,21 @@ class ProfilePresenter(
 		}
 	}
 	
+	private var clickTimes = 10
+	private var hasShownGoldStoneID = false
+	// 这个方法是为了内部使用的隐藏方法
+	fun showGoldStoneID() {
+		clickTimes -= 1
+		if (clickTimes <= 0 && !hasShownGoldStoneID) {
+			hasShownGoldStoneID = true
+			AppConfigTable.getAppConfig {
+				it?.apply {
+					fragment.context.alert(it.goldStoneID)
+				}
+			}
+		}
+	}
+	
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguageCode())
 }

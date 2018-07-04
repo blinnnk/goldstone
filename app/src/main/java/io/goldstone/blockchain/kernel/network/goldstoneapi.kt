@@ -463,7 +463,7 @@ object GoldStoneAPI {
 		hold: (ArrayList<ChartModel>) -> Unit
 	) {
 		requestData<ChartModel>(
-			APIPath.getQuotationCurrencyChart(pair, period, size),
+			APIPath.getQuotationCurrencyChart(APIPath.currentUrl, pair, period, size),
 			"point_list",
 			errorCallback = errorCallback,
 			isEncrypt = true
@@ -478,7 +478,7 @@ object GoldStoneAPI {
 		hold: (JSONObject) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getQuotationCurrencyInfo(pair),
+			APIPath.getQuotationCurrencyInfo(APIPath.currentUrl, pair),
 			"",
 			true,
 			errorCallback,
