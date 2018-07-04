@@ -46,9 +46,6 @@ private fun checkCode(dec: Int): String {
 /**
  * `hash` 值转换为 `Decimal`
  */
-/**
- * `hash` 值转换为 `Decimal`
- */
 fun String.hexToDecimal(): Double {
 	// 以太坊的地址都是含有 `0x` 开头, 这里首先去掉 `0x`
 	var hexNum =

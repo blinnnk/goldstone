@@ -166,7 +166,7 @@ fun Context.deleteAccount(
 				targentAccountIndex = index
 			}
 			if (isEnd && !targentAccountIndex.isNull()) {
-				// 先通过解锁来严重密码的正确性, 在通过结果执行删除钱包操作
+				// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
 				var isCorrect: Boolean
 				try {
 					keyStore.unlock(keyStore.accounts.get(targentAccountIndex!!), password)

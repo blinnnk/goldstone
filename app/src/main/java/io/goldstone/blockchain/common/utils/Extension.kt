@@ -67,6 +67,9 @@ fun Context.showAlertView(
 				}
 			}
 		}
+		onCancelled {
+			cancelAction()
+		}
 		yesButton { if (showEditText) input?.apply(action) else action(input) }
 		noButton { cancelAction() }
 	}.show()

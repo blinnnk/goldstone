@@ -8,6 +8,7 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.ReasonText
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import com.blinnnk.util.replaceFragmentAndSetArgument
@@ -235,9 +236,12 @@ class CreateWalletPresenter(
 			val walletName =
 				if (name.isEmpty()) generateDefaultName()
 				else name
+			val reason = ReasonText().apply {
+				passwordCount = CreateWalletText.lackNumberCount
+			}
 			
 			doAsync {
-				password.checkPasswordInRules { _, reasons ->
+				password.checkPasswordInRules(reason) { _, reasons ->
 					GoldStoneAPI.context.runOnUiThread {
 						if (reasons == UnsafeReasons.None) {
 							callback(password, walletName)

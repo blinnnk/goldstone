@@ -58,5 +58,8 @@ object CryptoName {
 }
 
 enum class ChainType(val id: Long) {
-	BTC(0), LTC(2), ETH(60), ETC(61)
+	BTC(0),
+	LTC(2),
+	ETH(60),
+	ETC(61)
 }

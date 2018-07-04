@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -129,9 +130,12 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 		})
 	}
 	
-	fun setHeaderSymbol(symbol: String) {
+	fun setHeaderSymbol(symbol: String, isDeposit: Boolean = false) {
+		val prefix =
+			if (isDeposit) CommonText.deposit.toLowerCase().toUpperCaseFirstLetter()
+			else CommonText.send.toLowerCase().toUpperCaseFirstLetter()
 		description.text =
-			"${PrepareTransferText.sendAmountPrefix} $symbol ${PrepareTransferText.sendAmountSuffix}"
+			"$prefix $symbol ${PrepareTransferText.sendAmountSuffix}"
 	}
 	
 	fun getValue(): String {

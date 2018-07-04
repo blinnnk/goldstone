@@ -9,5 +9,6 @@ enum class ApkChannel(
 	val code: Int
 ) {
 	Home("Home", 1),
-	Google("Google", 2)
+	Google("Google", 2),
+	Vivo("Vivo", 3)
 }

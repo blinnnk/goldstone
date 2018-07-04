@@ -87,7 +87,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	}
 	
 	fun setInputViewDescription(symbol: String) {
-		inputView.setHeaderSymbol(symbol)
+		inputView.setHeaderSymbol(symbol, true)
 	}
 	
 	private fun setAddressText() {

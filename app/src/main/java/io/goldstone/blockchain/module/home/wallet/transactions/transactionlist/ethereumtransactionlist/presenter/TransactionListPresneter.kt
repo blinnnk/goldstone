@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
-import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -87,7 +86,6 @@ class TransactionListPresenter(
 		localData: ArrayList<TransactionListModel>,
 		callback: (hasData: Boolean) -> Unit
 	) {
-		// 本地可能存在 `pending` 状态的账目, 所以获取最近的 `blockNumber` 先剥离掉 `pending` 的类型
 		val currentBlockNumber =
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber ?: "0"
 		// 本地若有数据获取本地最近一条数据的 `BlockNumber` 作为 StartBlock 尝试拉取最新的数据
@@ -227,9 +225,7 @@ class TransactionListPresenter(
 				
 				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
-					arrayListOf<TransactionTable>().apply {
-						addAll(chainData)
-						addAll(logData)
+					chainData.plus(logData).apply {
 					}.filter {
 						it.to.isNotEmpty()
 					}.distinctBy {
