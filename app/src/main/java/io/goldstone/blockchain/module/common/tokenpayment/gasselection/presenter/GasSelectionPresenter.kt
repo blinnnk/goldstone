@@ -85,7 +85,7 @@ class GasSelectionPresenter(
 					currentMinerType,
 					getUnitSymbol()
 				)
-				if (model.currentType == currentMinerType) {
+				if (model.type == currentMinerType) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -141,12 +141,6 @@ class GasSelectionPresenter(
 				}
 			}
 		}
-	}
-	
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		// 页面销毁的时候重置默认选项
-		currentMinerType = MinerFeeType.Recommend.content
 	}
 	
 	private fun getUnitSymbol(): String {
@@ -412,7 +406,7 @@ class GasSelectionPresenter(
 	
 	private fun getGasUnitCount(info: String): Double {
 		return if (info.length > 3) {
-			info.replace(" ", "").substring(0, info.lastIndex - 3).toDouble()
+			info.substringBefore(" ").toDoubleOrNull().orZero()
 		} else {
 			0.0
 		}
@@ -423,8 +417,11 @@ class GasSelectionPresenter(
 		hold: (String) -> Unit
 	) {
 		val chainCoinContract =
-			if (rootFragment?.token?.contract.equals(CryptoValue.etcContract, true))
-				CryptoValue.etcContract
+			if (rootFragment?.token?.contract.equals(
+					CryptoValue.etcContract,
+					true
+				)
+			) CryptoValue.etcContract
 			else CryptoValue.ethContract
 		DefaultTokenTable.getCurrentChainTokenByContract(chainCoinContract) {
 			hold(

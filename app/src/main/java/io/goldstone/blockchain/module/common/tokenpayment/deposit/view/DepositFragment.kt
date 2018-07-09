@@ -3,12 +3,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.deposit.view
 import android.graphics.Bitmap
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
@@ -17,10 +15,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRView
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.*
 
 /**
  * @date 2018/5/7 11:40 PM
@@ -49,8 +44,12 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			prepareSymbolPrice()
 			
 			inputView.inputTextListener {
-				inputView.updateCurrencyValue(symbolPrice * if (it.isEmpty()) 0.0 else it.toDouble())
-				presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
+				inputView.updateCurrencyValue(symbolPrice)
+				if (it.toDoubleOrNull().isNull()) {
+					context.alert(AlertText.transferUnvalidInputFromat)
+				} else {
+					presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
+				}
 			}
 		}
 	}

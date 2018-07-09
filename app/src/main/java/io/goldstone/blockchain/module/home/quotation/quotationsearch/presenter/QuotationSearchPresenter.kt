@@ -66,6 +66,10 @@ class QuotationSearchPresenter(
 				fragment.context?.alert(it.toString().showAfterColonContent())
 			}
 		) { searchList ->
+			if (searchList.isEmpty()) {
+				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
+				return@getMarketSearchList
+			}
 			// 获取本地自己选中的列表
 			QuotationSelectionTable.getMySelections { selectedList ->
 				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
