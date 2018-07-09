@@ -155,14 +155,43 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "再次輸入密碼"
 		else -> ""
 	}
+	val illegalSymbol = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Passwords can only use numbers, letters, and punctuation except for spaces."
+		HoneyLanguage.Chinese.code -> "密码仅可以使用数字、字母及除空格外的半角标点符号"
+		HoneyLanguage.Japanese.code -> "パスワードは空白以外の数字、文字、半角の句読点のみを使用できます"
+		HoneyLanguage.Korean.code -> "암호는 공백을 제외하고 숫자, 문자 및 반자체 구두점 만 사용할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Пароли могут использовать только числа, буквы и знаки препинания, за исключением пробелов."
+		HoneyLanguage.TraditionalChinese.code -> "密碼僅可以使用數字、字母及除空格外的半角標點符號"
+		else -> ""
+	}
 	@JvmField
-	val lackNumberCount = when (currentLanguage) {
-		HoneyLanguage.English.code -> "lack of number"
-		HoneyLanguage.Chinese.code -> "密码至少需要8位"
-		HoneyLanguage.Japanese.code -> "lack of number"
-		HoneyLanguage.Korean.code -> "lack of number"
-		HoneyLanguage.Russian.code -> "lack of number"
-		HoneyLanguage.TraditionalChinese.code -> "lack of number"
+	val bothNumberAndLetter = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please include both uppercase and lowercase letters and numbers in your password."
+		HoneyLanguage.Chinese.code -> "请在密码中同时包含大小写字母与数字"
+		HoneyLanguage.Japanese.code -> "パスワードに大文字と小文字の両方を入力してください。"
+		HoneyLanguage.Korean.code -> "암호에 대문자와 소문자 및 숫자를 모두 포함하십시오."
+		HoneyLanguage.Russian.code -> "В свой пароль укажите как прописные, так и строчные буквы и цифры."
+		HoneyLanguage.TraditionalChinese.code -> "請在密碼中同時包含大小寫字母與數字"
+		else -> ""
+	}
+	@JvmField
+	val tooMuchSame = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There are too many duplicate characters in the password, which is not very safe."
+		HoneyLanguage.Chinese.code -> "您设置的密码中重复字符过多，不太安全哟"
+		HoneyLanguage.Japanese.code -> "設定したパスワードに重複した文字が多すぎます。これはあまり安全ではありません。"
+		HoneyLanguage.Korean.code -> "설정 한 비밀번호에 중복 문자가 너무 많아 안전하지 않습니다."
+		HoneyLanguage.Russian.code -> "В пароле слишком много повторяющихся символов, что не очень безопасно."
+		HoneyLanguage.TraditionalChinese.code -> "您設置的密碼中重複字符過多，不太安全喲"
+		else -> ""
+	}
+	@JvmField
+	val passwordCount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Password requires 8 characters at least."
+		HoneyLanguage.Chinese.code -> "密码需要至少8位字符"
+		HoneyLanguage.Japanese.code -> "パスワードは少なくとも8文字必要です"
+		HoneyLanguage.Korean.code -> "비밀번호는 8 자 이상이어야합니다."
+		HoneyLanguage.Russian.code -> "Пароль требует не менее 8 символов"
+		HoneyLanguage.TraditionalChinese.code -> "密碼需要至少8位字符"
 		else -> ""
 	}
 	@JvmField
@@ -616,11 +645,21 @@ object TransactionText {
 	@JvmField
 	val etherScanTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Etherscan Details"
-		HoneyLanguage.Chinese.code -> "EtherScan详情"
-		HoneyLanguage.Japanese.code -> "EtherScan詳細"
+		HoneyLanguage.Chinese.code -> "EtherScan 详情"
+		HoneyLanguage.Japanese.code -> "EtherScan 詳細"
 		HoneyLanguage.Korean.code -> "EtherScan 구체상황"
 		HoneyLanguage.Russian.code -> "Подробности EtherScan"
-		HoneyLanguage.TraditionalChinese.code -> "EtherScan詳情"
+		HoneyLanguage.TraditionalChinese.code -> "EtherScan 詳情"
+		else -> ""
+	}
+	@JvmField
+	val gasTracker = when (currentLanguage) {
+		HoneyLanguage.English.code -> "GasTracker"
+		HoneyLanguage.Chinese.code -> "GasTracker 详情"
+		HoneyLanguage.Japanese.code -> "GasTracker 詳細"
+		HoneyLanguage.Korean.code -> "GasTracker 구체상황"
+		HoneyLanguage.Russian.code -> "Подробности GasTracker"
+		HoneyLanguage.TraditionalChinese.code -> "GasTracker 詳情"
 		else -> ""
 	}
 	@JvmField

@@ -18,6 +18,11 @@ class WebViewPresenter(
 	override val fragment: WebViewFragment
 ) : BasePresenter<WebViewFragment>() {
 	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		setBackEvent()
+	}
+	
 	fun setBackEvent() {
 		fragment.parentFragment?.apply {
 			when (this) {

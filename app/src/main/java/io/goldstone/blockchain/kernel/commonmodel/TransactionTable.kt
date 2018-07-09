@@ -188,10 +188,7 @@ data class TransactionTable(
 		data.safeGet("input"),
 		when {
 			isETC -> CryptoValue.etcContract
-			CryptoUtils.isERC20TransferByInputCode(
-				data.safeGet
-				("input")
-			) -> data.safeGet("to")
+			CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")) -> data.safeGet("to")
 			else -> CryptoValue.ethContract
 		},
 		"",

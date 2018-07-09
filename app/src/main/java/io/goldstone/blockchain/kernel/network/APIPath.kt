@@ -20,7 +20,7 @@ object APIPath {
 		currentUrl = newUrl
 	}
 	
-	const val serverStatus = "${WebUrl.backUpServer}/index/serverStatus"
+	const val serverStatus = "https://gs.blinnnk.com/index/serverStatus"
 	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }

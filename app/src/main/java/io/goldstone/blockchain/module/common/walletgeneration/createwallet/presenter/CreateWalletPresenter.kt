@@ -237,7 +237,15 @@ class CreateWalletPresenter(
 				if (name.isEmpty()) generateDefaultName()
 				else name
 			val reason = ReasonText().apply {
-				passwordCount = CreateWalletText.lackNumberCount
+				passwordCount = CreateWalletText.passwordCount
+				illegalSymbol = CreateWalletText.illegalSymbol
+				tooMuchSameValue = CreateWalletText.tooMuchSame
+				bothNumberAndLetter = CreateWalletText.bothNumberAndLetter
+				capitalAndLowercase = CreateWalletText.bothNumberAndLetter
+				weak = CreateWalletText.safetyLevelWeak
+				strong = CreateWalletText.safetyLevelStrong
+				normal = CreateWalletText.safetyLevelNoraml
+				high = CreateWalletText.safetyLevelHigh
 			}
 			
 			doAsync {

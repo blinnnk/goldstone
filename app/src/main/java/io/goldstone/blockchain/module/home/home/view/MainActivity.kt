@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity() {
 		tracker?.setScreenName(className)
 		tracker?.send(
 			HitBuilders.ScreenViewBuilder().setCustomDimension(
-				ApkChannel.Vivo.code,
-				ApkChannel.Vivo.value
+				currentChannel.code,
+				currentChannel.value
 			).build()
 		)
 	}

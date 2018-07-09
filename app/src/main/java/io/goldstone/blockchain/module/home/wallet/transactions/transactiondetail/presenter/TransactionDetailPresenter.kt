@@ -144,15 +144,26 @@ class TransactionDetailPresenter(
 			)
 		}
 		fragment.parentFragment.apply {
+			val webTitle =
+				if (
+					dataFromList?.symbol
+					?: data?.token?.contract
+					?: notificationData?.symbol ==
+					CryptoSymbol.etc
+				) {
+					TransactionText.gasTracker
+				} else {
+					TransactionText.etherScanTransaction
+				}
 			when (this) {
 				is TransactionFragment -> presenter.showTargetFragment<WebViewFragment>(
-					TransactionText.etherScanTransaction, TransactionText.detail, argument
+					webTitle, TransactionText.detail, argument
 				)
 				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(
-					TransactionText.etherScanTransaction, TokenDetailText.tokenDetail, argument
+					webTitle, TokenDetailText.tokenDetail, argument
 				)
 				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(
-					TransactionText.etherScanTransaction, NotificationText.notification, argument
+					webTitle, NotificationText.notification, argument
 				)
 			}
 		}

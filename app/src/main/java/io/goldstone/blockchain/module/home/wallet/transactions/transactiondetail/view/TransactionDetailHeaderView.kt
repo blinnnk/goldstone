@@ -133,7 +133,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 							HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 42.uiPX()
+						y += 51.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()
