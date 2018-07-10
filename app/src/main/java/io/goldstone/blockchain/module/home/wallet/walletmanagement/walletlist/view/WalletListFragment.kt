@@ -6,9 +6,9 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter.WalletListPresenter
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -34,9 +34,8 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
-		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.walletSettings
-			presenter.showWalletSettingListFragment()
+		getParentFragment<ProfileOverlayFragment> {
+			presenter.removeSelfFromActivity()
 		}
 	}
 }

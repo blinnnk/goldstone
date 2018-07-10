@@ -60,6 +60,11 @@ class ProfilePresenter(
 					ProfileText.chain,
 					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.mainnet else ChainText.testnet
 				),
+				ProfileModel(
+					R.drawable.wallet_icon,
+					ProfileText.walletManager,
+					Config.getCurrentName()
+				),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),

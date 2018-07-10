@@ -2,14 +2,12 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
-import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -18,7 +16,6 @@ import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view.WalletAddingMethodFragment
-import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -56,23 +53,17 @@ class WalletSettingsPresenter(
 	}
 	
 	fun showWalletSettingListFragment() {
-		setCustomHeader {
-			showWalletListFragment()
-		}
+		setCustomHeader()
 		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)
 	}
 	
-	private fun setCustomHeader(manageEvent: () -> Unit) {
+	private fun setCustomHeader() {
 		fragment.apply {
 			customHeader = {
 				layoutParams.height = 200.uiPX()
 				if (header.isNull()) {
 					header = WalletSettingsHeader(context)
 					addView(header)
-					manageButton = fragment.generateManageButton().click {
-						manageEvent()
-					}
-					manageButton?.into(this)
 				} else {
 					overlayView.header.apply {
 						showBackButton(false)
@@ -80,20 +71,8 @@ class WalletSettingsPresenter(
 						showAddButton(false)
 					}
 					header?.visibility = View.VISIBLE
-					manageButton?.visibility = View.VISIBLE
 				}
 			}
-		}
-	}
-	
-	private fun showWalletListFragment() {
-		fragment.apply {
-			headerTitle = WalletText.wallet
-			overlayView.header.showAddButton(true, false) {
-				showWalletAddingMethodFragment()
-			}
-			recoveryHeaderStyle()
-			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
 		}
 	}
 	
@@ -102,11 +81,6 @@ class WalletSettingsPresenter(
 			WalletText.assetChart,
 			CurrentWalletText.Wallets
 		)
-	}
-	
-	fun showWalletAddingMethodFragment() {
-		fragment.overlayView.header.showAddButton(false)
-		showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
 	}
 	
 	private fun showHintEditorFragment() {
@@ -193,7 +167,6 @@ class WalletSettingsPresenter(
 	private fun WalletSettingsFragment.recoveryHeaderStyle() {
 		recoveryOverlayHeader()
 		header?.visibility = View.GONE
-		manageButton?.visibility = View.GONE
 		overlayView.apply {
 			header.showBackButton(true) {
 				showWalletSettingListFragment()
