@@ -32,11 +32,12 @@ class PrivateKeyExportPresenter(
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
 		WalletTable.getCurrentWallet {
 			doAsync {
-				fragment.context?.getPrivateKey(it!!.address, passwordInput.text.toString(), {
-					fragment.context?.runOnUiThread { hold("") }
-				}) {
-					fragment.context?.runOnUiThread { hold(it) }
-				}
+				fragment.context
+					?.getPrivateKey(it!!.currentEthSeriesAddress, passwordInput.text.toString(), {
+						fragment.context?.runOnUiThread { hold("") }
+					}) {
+						fragment.context?.runOnUiThread { hold(it) }
+					}
 			}
 		}
 	}

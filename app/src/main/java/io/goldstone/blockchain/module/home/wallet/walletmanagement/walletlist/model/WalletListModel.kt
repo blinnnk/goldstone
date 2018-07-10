@@ -20,7 +20,7 @@ data class WalletListModel(
 	constructor(data: WalletTable, balance: Double) : this(
 		data.id,
 		data.name,
-		data.address,
+		data.currentEthSeriesAddress,
 		balance,
 		UIUtils.generateAvatar(data.id),
 		data.isWatchOnly,

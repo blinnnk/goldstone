@@ -121,7 +121,16 @@ class CreateWalletPresenter(
 		doAsync {
 			generateWallet(password) { mnemonicCode, address ->
 				// 将基础的不存在安全问题的信息插入数据库
-				WalletTable.insert(WalletTable(0, name, address, true, hint)) {
+				WalletTable.insert(
+					WalletTable(
+						0,
+						name,
+						address,
+						true,
+						hint,
+						ethSeriesAddresses = address
+					)
+				) {
 					generateMyTokenInfo(address, {
 						LogUtil.error("generateWalletWith")
 					}) {

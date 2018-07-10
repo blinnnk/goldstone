@@ -77,7 +77,8 @@ class WalletImportPresenter(
 							false,
 							0.0,
 							null,
-							true
+							true,
+							ethSeriesAddresses = address
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息

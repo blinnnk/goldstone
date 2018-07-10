@@ -47,7 +47,7 @@ class WatchOnlyImportPresenter(
 					WalletTable(
 						0,
 						name = name,
-						address = address.hex,
+						currentEthSeriesAddress = address.hex,
 						isUsing = true,
 						isWatchOnly = true,
 						hasBackUpMnemonic = true
