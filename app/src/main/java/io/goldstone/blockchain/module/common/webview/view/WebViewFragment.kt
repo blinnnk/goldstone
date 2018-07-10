@@ -42,7 +42,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			backgroundColor = Spectrum.white
 			
-			
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
 				showWebView()
 			} otherwise {

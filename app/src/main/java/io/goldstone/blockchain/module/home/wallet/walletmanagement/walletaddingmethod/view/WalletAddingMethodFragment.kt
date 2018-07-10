@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.presenter.WalletAddingMethodPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
@@ -80,7 +81,7 @@ class WalletAddingMethodFragment : BaseFragment<WalletAddingMethodPresenter>() {
 		activity: MainActivity?,
 		parent: Fragment?
 	) {
-		getParentFragment<WalletSettingsFragment> {
+		getParentFragment<ProfileOverlayFragment> {
 			headerTitle = CurrentWalletText.Wallets
 			presenter.popFragmentFrom<WalletAddingMethodFragment>()
 		}

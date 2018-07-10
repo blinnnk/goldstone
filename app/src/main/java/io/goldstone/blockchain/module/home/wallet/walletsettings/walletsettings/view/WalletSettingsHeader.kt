@@ -1,27 +1,18 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCircleBorder
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
 
 /**
@@ -32,7 +23,6 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 	
 	val walletInfo = TwoLineTitles(context)
 	val avatarImage = ImageView(context)
-	private val copyButton = TextView(context)
 	
 	init {
 		orientation = VERTICAL
@@ -63,23 +53,9 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 			}
 			.into(this)
 		
-		copyButton
-			.apply {
-				text = WalletSettingsText.copy
-				textSize = fontSize(12)
-				textColor = Spectrum.white
-				typeface = GoldStoneFont.black(context)
-				gravity = Gravity.CENTER_HORIZONTAL
-				addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
-				onClick {
-					context.clickToCopy(walletInfo.getSubtitleValue())
-				}
-			}
-			.into(this)
 		
 		walletInfo.setMargins<LinearLayout.LayoutParams> {
 			topMargin = 10.uiPX()
 		}
-		copyButton.setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 	}
 }

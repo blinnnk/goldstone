@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.profile.profileoverlay.presenter
 
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.util.addFragmentAndSetArgument
+import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
@@ -14,6 +15,8 @@ import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragme
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view.WalletAddingMethodFragment
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 
 /**
  * @date 26/03/2018 12:56 AM
@@ -41,6 +44,7 @@ class ProfileOverlayPresenter(
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
+			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
 			ProfileText.privacy -> showPrivacyFragment()
 			ProfileText.terms -> showTermsFragment()
@@ -50,10 +54,25 @@ class ProfileOverlayPresenter(
 		}
 	}
 	
+	private fun showWalletListFragment() {
+		fragment.apply {
+			headerTitle = WalletText.wallet
+			overlayView.header.showAddButton(true, true) {
+				showWalletAddingMethodFragment()
+			}
+			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
+		}
+	}
+	
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
 		}
+	}
+	
+	private fun showWalletAddingMethodFragment() {
+		fragment.overlayView.header.showAddButton(false)
+		showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
 	}
 	
 	private fun showPrivacyFragment() {

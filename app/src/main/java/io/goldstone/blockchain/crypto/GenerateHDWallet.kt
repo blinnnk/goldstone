@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.ethereum.geth.Geth
@@ -86,7 +87,7 @@ fun Context.getWalletByPrivateKey(
 	val currentPrivateKey = privateKey.toBigInteger(16)
 	/** Get Public Key and Private Key*/
 	val publicKey = ECKeyPair(currentPrivateKey, publicKeyFromPrivate(currentPrivateKey)).getAddress()
-	val address = "0x" + publicKey.toLowerCase()
+	val address = publicKey.prepend0xPrefix()
 	/** Format PrivateKey */
 	val keyString = when {
 		privateKey.substring(0, 1) == "0" -> "0" + currentPrivateKey.toString(16)

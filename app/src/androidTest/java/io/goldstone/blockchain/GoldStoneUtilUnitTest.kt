@@ -9,6 +9,9 @@ import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import org.bitcoinj.core.NetworkParameters
+import org.bitcoinj.wallet.DeterministicSeed
+import org.bitcoinj.wallet.Wallet
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,16 +56,17 @@ class GoldStoneUtilUnitTest {
 	
 	@Test
 	fun getBitcoinAddress() {
-//		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
-//		val wallet = Wallet.fromSeed(
-//			NetworkParameters.fromID(NetworkParameters.ID_MAINNET),
-//			DeterministicSeed(seedCode, null, "", 0L)
-//		)
-//		val changeAddress = wallet.currentChangeAddress()
-//		val freshAddress = wallet.freshReceiveAddress()
-//		val currentAddress = wallet.currentReceiveAddress()
-//		LogUtil.debug(
-//			"getBitcoinAddress",
-//			"currentAddress$currentAddress freshAddress$freshAddress change$changeAddress")
+		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
+		val wallet = Wallet.fromSeed(
+			NetworkParameters.fromID(NetworkParameters.ID_MAINNET),
+			DeterministicSeed(seedCode, null, "", 0L)
+		)
+		val changeAddress = wallet.currentChangeAddress()
+		val freshAddress = wallet.freshReceiveAddress()
+		val currentAddress = wallet.currentReceiveAddress()
+		LogUtil.debug(
+			"getBitcoinAddress",
+			"currentAddress$currentAddress freshAddress$freshAddress change$changeAddress"
+		)
 	}
 }

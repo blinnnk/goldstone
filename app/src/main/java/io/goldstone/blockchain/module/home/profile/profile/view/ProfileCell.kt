@@ -82,7 +82,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				title.y -= 19.uiPX().toFloat()
 				icon.y -= 17.uiPX()
 				info.y -= 10.uiPX()
-				arrowIcon.y += 14.uiPX()
+				arrowIcon.y += 18.uiPX()
 			}
 			hasLayouted = true
 		}

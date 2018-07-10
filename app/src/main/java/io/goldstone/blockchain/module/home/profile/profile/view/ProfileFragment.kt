@@ -92,6 +92,6 @@ enum class ProfileCellType(val index: Int) {
 	CurrencySettings(1),
 	Language(2),
 	ChainNode(3),
-	Pin(4),
-	AboutUs(5)
+	Pin(5),
+	AboutUs(6)
 }
