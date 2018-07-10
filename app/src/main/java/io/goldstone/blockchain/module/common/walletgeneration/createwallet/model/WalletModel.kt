@@ -29,20 +29,23 @@ data class WalletTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var name: String,
-	var address: String,
+	var currentEthSeriesAddress: String, // currentEthSeriesAddress
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
-	var hasBackUpMnemonic: Boolean = false
+	var hasBackUpMnemonic: Boolean = false,
+	var currentBtcSeriesAddress: String = "",
+	var ethSeriesAddresses: String = "",
+	var btcSeriesAddresses: String = ""
 ) : Serializable {
 	
 	companion object {
 		
 		fun insert(
 			model: WalletTable,
-			callback: () -> Unit = {}
+			callback: () -> Unit
 		) {
 			coroutinesTask(
 				{
@@ -98,7 +101,7 @@ data class WalletTable(
 				{
 					GoldStoneDataBase.database.walletDao().getAllWallets()
 				}) {
-				callback(it.map { it.address }.toArrayList())
+				callback(it.map { it.currentEthSeriesAddress }.toArrayList())
 			}
 		}
 		
@@ -113,7 +116,7 @@ data class WalletTable(
 		
 		fun getCurrentWalletAddress(hold: String.() -> Unit) {
 			WalletTable.getCurrentWallet {
-				hold(it!!.address)
+				hold(it!!.currentEthSeriesAddress)
 			}
 		}
 		
@@ -268,7 +271,7 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 	
-	@Query("SELECT * FROM wallet WHERE address LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentEthSeriesAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
 	
 	@Query("SELECT * FROM wallet")

@@ -1,36 +1,34 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.CustomTargetTextStyle
-import com.blinnnk.extension.into
+import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
+import org.jetbrains.anko.*
 
 /**
- * @date 25/04/2018 8:56 AM
+ * @date 2018/7/11 1:20 AM
  * @author KaySaith
  */
-open class GraySqualCell(context: Context) : RelativeLayout(context) {
+open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) {
 	
 	protected val title = TextView(context).apply {
 		textSize = fontSize(12)
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.black(context)
 		textColor = GrayScale.gray
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		x += 20.uiPX()
@@ -42,15 +40,24 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		typeface = GoldStoneFont.heavy(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		x -= 20.uiPX()
-		gravity = Gravity.END or Gravity.CENTER_VERTICAL
+		gravity = Gravity.CENTER_VERTICAL
 	}
-	private val arrow by lazy {
+	private val copyButton by lazy {
 		ImageView(context).apply {
-			imageResource = R.drawable.arrow_icon
+			imageResource = R.drawable.copy_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			setColorFilter(GrayScale.midGray)
 			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
+		}
+	}
+	private val moreButton by lazy {
+		ImageView(context).apply {
+			imageResource = R.drawable.more_icon
+			scaleType = ImageView.ScaleType.CENTER_INSIDE
+			setColorFilter(GrayScale.midGray)
+			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
 	
@@ -62,37 +69,16 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		backgroundColor = GrayScale.whiteGray
 		this.addView(title)
 		this.addView(subtitle)
+		subtitle.leftPadding = 40.uiPX()
+		this.addView(copyButton)
+		copyButton.setAlignParentRight()
+		copyButton.x -= 30.uiPX()
+		this.addView(moreButton)
+		moreButton.setAlignParentRight()
 	}
 	
 	fun <T : CharSequence> setTitle(text: T) {
 		title.text = text
-	}
-	
-	fun showArrow() {
-		arrow.into(this)
-		arrow.setAlignParentRight()
-		subtitle.x -= 20.uiPX()
-	}
-	
-	fun setPriceTitle(text: String) {
-		title.text =
-			CustomTargetTextStyle(
-				QuotationText.highAndLow,
-				"$text ${QuotationText.highAndLow}",
-				GrayScale.black,
-				9.uiPX(),
-				true,
-				false
-			)
-	}
-	
-	fun setPricesubtitle(
-		text: String,
-		currency: String
-	) {
-		subtitle.visibility = View.VISIBLE
-		subtitle.text =
-			CustomTargetTextStyle(currency, "$text  $currency", GrayScale.black, 8.uiPX(), true, false)
 	}
 	
 	fun setTitle(text: String) {

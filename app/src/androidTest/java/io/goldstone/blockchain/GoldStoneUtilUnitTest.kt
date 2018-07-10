@@ -72,10 +72,9 @@ class GoldStoneUtilUnitTest {
 	}
 	
 	@Test
-	fun getWalletByEthseriesAddress() {
-		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
-		WalletTable.getWalletByEthSeriesAddress(address) {
-			System.out.println("***$it")
+	fun getCurrentWallet() {
+		WalletTable.getCurrentWallet {
+			LogUtil.debug("getWalletByEthseriesAddress + $positon", it.toString())
 		}
 	}
 }
