@@ -43,7 +43,7 @@ class WalletSettingsListPresenter(
 			Config.getCurrentBalance().formatCurrency() + " (${Config.getCurrencyCode()})"
 		WalletTable.getCurrentWallet { wallet ->
 			arrayListOf(
-				WalletSettingsListModel(WalletSettingsText.checkQRCode),
+				WalletSettingsListModel(WalletSettingsText.viewAddresses),
 				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
 				WalletSettingsListModel(WalletSettingsText.walletName, Config.getCurrentName()),
 				WalletSettingsListModel(WalletSettingsText.hint, "******"),

@@ -1411,13 +1411,13 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val checkQRCode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check QR Code"
-		HoneyLanguage.Chinese.code -> "查看二维码"
-		HoneyLanguage.Japanese.code -> "QRコードをチェックする"
-		HoneyLanguage.Korean.code -> "QR코드 보기"
-		HoneyLanguage.Russian.code -> "Просмотреть QR-код"
-		HoneyLanguage.TraditionalChinese.code -> "查看二維碼"
+	val viewAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "View All Addresses"
+		HoneyLanguage.Chinese.code -> "View All Addresses"
+		HoneyLanguage.Japanese.code -> "View All Addresses"
+		HoneyLanguage.Korean.code -> "View All Addresses"
+		HoneyLanguage.Russian.code -> "View All Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "View All Addresses"
 		else -> ""
 	}
 	@JvmField
