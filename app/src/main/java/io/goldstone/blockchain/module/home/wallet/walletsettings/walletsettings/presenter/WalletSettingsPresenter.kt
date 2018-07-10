@@ -44,7 +44,7 @@ class WalletSettingsPresenter(
 			WalletSettingsText.walletName -> showWalletNameEditorFragment()
 			WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
 			WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
-			WalletSettingsText.checkQRCode -> showQRCodeFragment()
+			WalletSettingsText.viewAddresses -> showAllMyAddressesFragment()
 			WalletSettingsText.hint -> showHintEditorFragment()
 			WalletSettingsText.walletSettings -> showWalletSettingListFragment()
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
@@ -60,7 +60,7 @@ class WalletSettingsPresenter(
 	private fun setCustomHeader() {
 		fragment.apply {
 			customHeader = {
-				layoutParams.height = 200.uiPX()
+				layoutParams.height = 160.uiPX()
 				if (header.isNull()) {
 					header = WalletSettingsHeader(context)
 					addView(header)
@@ -141,6 +141,14 @@ class WalletSettingsPresenter(
 		}
 	}
 	
+	private fun showAllMyAddressesFragment() {
+		fragment.apply {
+			recoveryHeaderStyle()
+			replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content)
+		}
+	}
+	
+	// ToDo Move to the specific address cell button
 	private fun showQRCodeFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
@@ -179,7 +187,8 @@ class WalletSettingsPresenter(
 		fragment.header?.apply {
 			walletInfo.apply {
 				title.text = Config.getCurrentName()
-				subtitle.text = Config.getCurrentAddress()
+				// ToDo Get All addresses from database and show them here
+				subtitle.text = "there are 5 addresses in this wallet"
 			}
 			avatarImage.glideImage(UIUtils.generateAvatar(Config.getCurrentID()))
 		}

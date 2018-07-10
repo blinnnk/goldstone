@@ -4,14 +4,15 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.blinnnk.extension.addCircleBorder
+import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
 
@@ -23,39 +24,42 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 	
 	val walletInfo = TwoLineTitles(context)
 	val avatarImage = ImageView(context)
+	private val avatarSize = 75.uiPX()
 	
 	init {
-		orientation = VERTICAL
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), matchParent)
-		
-		x += 50.uiPX()
-		y += 20.uiPX()
-		
-		gravity = Gravity.CENTER_HORIZONTAL
-		
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
+		y += 10.uiPX()
+		x += PaddingSize.device
+		gravity = Gravity.CENTER_VERTICAL
 		
 		verticalLayout {
-			gravity = Gravity.CENTER
-			lparams(76.uiPX(), 76.uiPX())
-			addCircleBorder(80.uiPX(), 3.uiPX(), Spectrum.white)
+			addCorner(avatarSize, Spectrum.white)
+			gravity = Gravity.START
+			lparams {
+				width = avatarSize
+				height = avatarSize
+				margin = 10.uiPX()
+				elevation = 10.uiPX().toFloat()
+			}
 			avatarImage
 				.apply {
-					layoutParams = LinearLayout.LayoutParams(70.uiPX(), 70.uiPX())
+					scaleX = 1.01f
+					scaleY = 1.01f
+					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				}
 				.into(this)
 		}
 		
 		walletInfo
 			.apply {
-				setBigWhiteStyle(fontSize(16).toInt())
-				isCenter = true
+				setBigWhiteStyle()
 				subtitle.gravity = Gravity.CENTER_HORIZONTAL
 			}
 			.into(this)
 		
 		
 		walletInfo.setMargins<LinearLayout.LayoutParams> {
-			topMargin = 10.uiPX()
+			leftMargin = 10.uiPX()
 		}
 	}
 }

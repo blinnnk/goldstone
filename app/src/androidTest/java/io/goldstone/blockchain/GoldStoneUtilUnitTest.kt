@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.wallet.DeterministicSeed
@@ -68,5 +69,13 @@ class GoldStoneUtilUnitTest {
 			"getBitcoinAddress",
 			"currentAddress$currentAddress freshAddress$freshAddress change$changeAddress"
 		)
+	}
+	
+	@Test
+	fun getWalletByEthseriesAddress() {
+		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
+		WalletTable.getWalletByEthSeriesAddress(address) {
+			System.out.println("***$it")
+		}
 	}
 }
