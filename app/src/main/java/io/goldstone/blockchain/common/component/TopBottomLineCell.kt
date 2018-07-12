@@ -14,7 +14,6 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -29,8 +28,8 @@ import org.jetbrains.anko.wrapContent
  */
 open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	
-	private val titleHeight = 30.uiPX()
-	protected val title = TextView(context).apply {
+	private val titleHeight = 40.uiPX()
+	private val title = TextView(context).apply {
 		typeface = GoldStoneFont.medium(context)
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -49,7 +48,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	init {
 		orientation = VERTICAL
 		this.setWillNotDraw(false)
-		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 		titleLayout = relativeLayout {
 			lparams(matchParent, titleHeight)
 			title.into(this)
@@ -58,16 +57,16 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	
 	private val paint = Paint().apply {
 		isAntiAlias = true
-		color = GrayScale.lightGray
+		color = GrayScale.midGray
 		style = Paint.Style.FILL
 	}
 	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		showTopLine.isTrue {
-			canvas?.drawLine(0f, 0f, width.toFloat(), BorderSize.default, paint)
+			canvas?.drawLine(0f, 0f, width.toFloat(), 0f, paint)
 		}
-		canvas?.drawLine(0f, height - BorderSize.default, width.toFloat(), height.toFloat(), paint)
+		canvas?.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), paint)
 	}
 	
 	fun setTitle(
@@ -86,5 +85,9 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 			.click { event() }
 			.into(titleLayout)
 		button.setAlignParentRight()
+	}
+	
+	fun updateButtonTitle(text: String) {
+		button.text = text
 	}
 }

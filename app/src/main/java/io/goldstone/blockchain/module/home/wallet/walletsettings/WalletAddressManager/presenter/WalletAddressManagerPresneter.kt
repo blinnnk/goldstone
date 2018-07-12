@@ -5,6 +5,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
@@ -98,11 +100,32 @@ class WalletAddressManagerPresneter(
 		}
 	}
 	
+	fun createNewEthereumChildAddress(password: String, hold: (List<String>) -> Unit) {
+		WalletTable.getWalletWithLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
+			wallet.encryptMnemonic?.let {
+				val mnemonic = JavaKeystoreUtil().decryptData(it)
+				val newAddressIndex = ethereumChildAddressIndex + 1
+				val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
+				fragment.context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
+					it?.let {
+						WalletTable.updateEthereumSeriesAddresses(it, newAddressIndex) {
+							hold(convertToChildAddresses(it))
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	fun createNewBitcoinChildAddress() {
+		// TODO
+	}
+	
 	private fun convertToChildAddresses(seriesAddress: String): List<String> {
 		return if (seriesAddress.contains(",")) {
-			seriesAddress.split(",")
+			seriesAddress.split(",").map { it.substringBeforeLast("|") }
 		} else {
-			listOf(seriesAddress)
+			listOf(seriesAddress.substringBeforeLast("|"))
 		}
 	}
 }

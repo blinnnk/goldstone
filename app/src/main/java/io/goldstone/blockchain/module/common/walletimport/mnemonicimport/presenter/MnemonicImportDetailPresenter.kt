@@ -6,7 +6,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.getWalletByMnemonic
+import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
@@ -71,6 +71,7 @@ class MnemonicImportDetailPresenter(
 				importWallet(
 					mnemonicContent,
 					ethereumPath,
+					bitcoinPath,
 					passwordValue,
 					walletName,
 					hintInput.text?.toString(),
@@ -82,7 +83,8 @@ class MnemonicImportDetailPresenter(
 	
 	private fun importWallet(
 		mnemonic: String,
-		pathValue: String,
+		ethereumPath: String,
+		bitcoinPath: String,
 		password: String,
 		name: String,
 		hint: String? = null,
@@ -90,16 +92,21 @@ class MnemonicImportDetailPresenter(
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
-		fragment.context?.getWalletByMnemonic(
+		fragment.context?.getEthereumWalletByMnemonic(
 			mnemonic,
-			pathValue,
+			ethereumPath,
 			password
 		) { address ->
-			address?.let {
-				WalletImportPresenter.insertWalletToDatabase(
-					fragment, it, name, encryptMnemonic, hint, callback
-				)
-			}
+			WalletImportPresenter.insertWalletToDatabase(
+				fragment,
+				address.orEmpty(),
+				name,
+				encryptMnemonic,
+				ethereumPath,
+				bitcoinPath,
+				hint,
+				callback
+			)
 		}
 	}
 	

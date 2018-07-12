@@ -54,7 +54,7 @@ class TokenSocialMedia(
 	private var container: GridLayout
 	
 	init {
-		title.text = QuotationText.socimalMedia
+		setTitle(QuotationText.socimalMedia)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 140.uiPX())
 		container = gridLayout {
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)

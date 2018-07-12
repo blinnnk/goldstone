@@ -12,6 +12,8 @@ import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.component.TopBottomLineCell
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -27,34 +29,39 @@ class EthereumSeriesAddress(
 	private val hold: ImageView.() -> Unit
 ) : TopBottomLineCell(context) {
 	
+	private val cellLayout = verticalLayout {
+		lparams(matchParent, matchParent)
+	}
 	var checkAllEvent: Runnable? = null
 	var model: List<String>? by observing(null) {
+		cellLayout.removeAllViewsInLayout()
 		model?.apply {
-			layoutParams.height += size * 45.uiPX() - 25.uiPX()
-			verticalLayout {
-				forEachIndexed { index, address ->
-					GraySqualCellWithButtons(context)
-						.apply cell@{
-							copyButton.onClick {
-								context.clickToCopy(address)
-								copyButton.preventDuplicateClicks()
-							}
-							hold(moreButton)
-							setTitle("${index + 1}.")
-							setSubtitle(CryptoUtils.scaleMiddleAddress(address))
-						}
-						.into(this@EthereumSeriesAddress)
-				}
-				y -= 10.uiPX()
-			}.setAlignParentBottom()
+			layoutParams.height = size * 50.uiPX() + 50.uiPX()
+			requestLayout()
+			forEachIndexed { index, address ->
+				GraySqualCellWithButtons(context).apply cell@{
+					copyButton.onClick {
+						context.clickToCopy(address)
+						copyButton.preventDuplicateClicks()
+					}
+					hold(moreButton)
+					setTitle("$index.")
+					setSubtitle(CryptoUtils.scaleMiddleAddress(address))
+				}.into(cellLayout)
+				// 默认最多显示 `5` 条地址
+				if (index >= 5) return@forEachIndexed
+			}
+			updateButtonTitle("Check All (${model?.size})")
 		}
 	}
 	
 	init {
-		LinearLayout.LayoutParams(matchParent, 0)
-		title.text = "Ethereum Series Address"
-		showButton("Check All (8)") {
+		showTopLine = true
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 0)
+		setTitle(WalletSettingsText.ethereumSeriesAddress)
+		showButton("Check All Addresses") {
 			checkAllEvent?.run()
 		}
+		cellLayout.setAlignParentBottom()
 	}
 }

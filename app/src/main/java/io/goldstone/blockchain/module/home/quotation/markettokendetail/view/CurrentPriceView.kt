@@ -75,9 +75,8 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	
 	init {
 		orientation = VERTICAL
-		title.text = QuotationText.currentPrice
+		setTitle(QuotationText.currentPrice)
 		showTopLine = true
-		
 		priceTitles.apply {
 			textColor = GrayScale.black
 			textSize = fontSize(24)

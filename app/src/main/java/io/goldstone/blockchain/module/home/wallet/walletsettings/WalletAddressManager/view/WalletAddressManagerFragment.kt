@@ -8,12 +8,12 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.MiniOverlay
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.WalletSettingsText
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.WalletAddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -62,7 +62,8 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick {
-								if (title.equals(WalletSettingsText.newEthereumAddress, true)) {
+								verifyPassword {
+									createChildAddressByButtonTitle(title, it)
 								}
 								cell.preventDuplicateClicks()
 							}
@@ -77,8 +78,32 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 		}
 	}
 	
-	private fun createNewEthereumChildAddress() {
+	private fun verifyPassword(callback: (password: String) -> Unit) {
+		context?.showAlertView(
+			WalletSettingsText.deleteInfoTitle,
+			WalletSettingsText.deleteInfoSubtitle,
+			!Config.getCurrentIsWatchOnlyOrNot()
+		) {
+			val password = it?.text.toString()
+			context?.verifyKeystorePassword(password) {
+				if (it) {
+					callback(password)
+				} else {
+					context.alert(CommonText.wrongPassword)
+				}
+			}
+		}
+		creatorDashBoard?.removeSelf()
+	}
 	
+	private fun createChildAddressByButtonTitle(title: String, password: String) {
+		if (title.equals(WalletSettingsText.newEthereumAddress, true)) {
+			presenter.createNewEthereumChildAddress(password) {
+				ethereumAddress.model = it
+			}
+		} else {
+			presenter.createNewBitcoinChildAddress()
+		}
 	}
 	
 	private fun showCellMoreDashboard(top: Float) {

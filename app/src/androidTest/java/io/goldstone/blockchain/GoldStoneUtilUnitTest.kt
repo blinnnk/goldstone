@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain
 
 import android.support.test.filters.LargeTest
@@ -6,11 +8,15 @@ import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.getAddress
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import junit.framework.Assert
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.wallet.DeterministicSeed
 import org.bitcoinj.wallet.Wallet
@@ -23,6 +29,7 @@ import org.junit.runner.RunWith
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneUtilUnitTest {
@@ -80,11 +87,35 @@ class GoldStoneUtilUnitTest {
 	}
 	
 	@Test
+	fun getLatestEthereumChildAddressIndex() {
+		WalletTable.getWalletWithLatestChildAddressIndex { _, ethereumChildAddressIndex ->
+			LogUtil.debug("getLatestEthereumChildAddressIndex + $positon", "$ethereumChildAddressIndex")
+		}
+	}
+	
+	@Test
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
 		System.out.println(entropy)
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
 		System.out.println(decryptEntropy)
+	}
+	
+	@Test
+	fun newEthereumChildAddress() {
+		WalletTable.getWalletWithLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
+			wallet.encryptMnemonic?.let {
+				val mnemonic = JavaKeystoreUtil().decryptData(it)
+				val index = ethereumChildAddressIndex + 1
+				val childPath = wallet.ethPath.substringBeforeLast("/") + "/" + index
+				val masterKey = Mnemonic.mnemonicToKey(mnemonic, childPath)
+				val current = masterKey.keyPair.getAddress().prepend0xPrefix()
+				Assert.assertTrue(
+					"wrong address value", current.equals
+				("0x6e3df901a984d50b68355eede503cbfc1ead8f13", true)
+				)
+			}
+		}
 	}
 }

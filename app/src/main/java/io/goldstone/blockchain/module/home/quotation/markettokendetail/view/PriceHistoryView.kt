@@ -71,8 +71,8 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 	private val totalPrice = GraySqualCell(context)
 	
 	init {
-		title.text = QuotationText.priceHistory
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 140.uiPX())
+		setTitle(QuotationText.priceHistory)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		
 		dayPrice.setPriceTitle(DateAndTimeText.hours)
 		totalPrice.setPriceTitle(DateAndTimeText.total)
@@ -80,7 +80,6 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 		verticalLayout {
 			dayPrice.into(this)
 			totalPrice.into(this)
-			y -= 10.uiPX()
 		}.setAlignParentBottom()
 	}
 }

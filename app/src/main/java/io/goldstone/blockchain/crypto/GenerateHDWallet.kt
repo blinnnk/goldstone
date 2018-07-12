@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
@@ -51,12 +50,7 @@ fun Context.generateWallet(
 	}
 }
 
-//fun Context.generateChildECKeyPairByEncryptMnemonic(encryptMnemonic: String) {
-//	val decryptMnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-//
-//}
-
-fun Context.getWalletByMnemonic(
+fun Context.getEthereumWalletByMnemonic(
 	mnemonicCode: String,
 	pathValue: String,
 	password: String,
@@ -76,7 +70,7 @@ fun Context.getWalletByMnemonic(
 	try {
 		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
 	} catch (error: Exception) {
-		println(error)
+		println("getEthereumWalletByMnemonic$error")
 	}
 	hold(address)
 }
@@ -140,12 +134,14 @@ fun Context.getPrivateKey(
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
+	System.out.println("hello 1")
 	getKeystoreFile(walletAddress, password, errorCallback) {
 		WalletUtil.getKeyPairFromWalletFile(
 			it,
 			password,
 			errorCallback
 		)?.let {
+			System.out.println("hello 2")
 			runOnUiThread {
 				hold(it.privateKey.toString(16))
 			}
@@ -173,22 +169,35 @@ fun Context.deleteAccount(
 				targentAccountIndex = index
 			}
 			if (isEnd && !targentAccountIndex.isNull()) {
-				// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
-				var isCorrect: Boolean
-				try {
-					keyStore.unlock(keyStore.accounts.get(targentAccountIndex!!), password)
-					isCorrect = true
-				} catch (error: Exception) {
-					callback(false)
-					isCorrect = false
-					LogUtil.error("deleteAccount", error)
-				}
-				if (isCorrect) {
-					keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
-					callback(true)
+				verifyKeystorePassword(password) {
+					if (it) {
+						keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
+						callback(true)
+					} else {
+						callback(false)
+					}
 				}
 			}
 		}
+	}
+}
+
+fun Context.verifyKeystorePassword(password: String, hold: (Boolean) -> Unit) {
+	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
+	var isCorrect: Boolean
+	try {
+		keyStore.unlock(keyStore.accounts.get(0), password)
+		isCorrect = true
+	} catch (error: Exception) {
+		hold(false)
+		isCorrect = false
+		LogUtil.error("wrong keystore password", error)
+	}
+	if (isCorrect) {
+		keyStore.lock(keyStore.accounts.get(0).address)
+		hold(true)
 	}
 }
 

@@ -40,8 +40,8 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 	private val startDate = GraySqualCell(context)
 	
 	init {
-		title.text = QuotationText.tokenInformation
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 240.uiPX())
+		setTitle(QuotationText.tokenInformation)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 250.uiPX())
 		verticalLayout {
 			rank.into(this)
 			avalibaleSupply.into(this)
@@ -52,7 +52,6 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 			avalibaleSupply.setTitle(QuotationText.totalSupply)
 			marketCap.setTitle(QuotationText.marketCap)
 			startDate.setTitle(QuotationText.startDate)
-			y -= 10.uiPX()
 		}.setAlignParentBottom()
 	}
 }
