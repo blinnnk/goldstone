@@ -9,19 +9,18 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
-import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view.WalletAddingMethodFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.WalletAddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.WalletAddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsHeader
@@ -43,13 +42,10 @@ class WalletSettingsPresenter(
 		when (title) {
 			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
 			WalletSettingsText.walletName -> showWalletNameEditorFragment()
-			WalletSettingsText.exportPrivateKey -> showPrivateKeyExportFragment()
-			WalletSettingsText.exportKeystore -> showKeystoreExportFragment()
 			WalletSettingsText.viewAddresses -> showAllMyAddressesFragment()
 			WalletSettingsText.hint -> showHintEditorFragment()
 			WalletSettingsText.walletSettings -> showWalletSettingListFragment()
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
-			WalletSettingsText.balance -> showAssetPieChartFragment()
 		}
 	}
 	
@@ -75,13 +71,6 @@ class WalletSettingsPresenter(
 				}
 			}
 		}
-	}
-	
-	private fun showAssetPieChartFragment() {
-		showTargetFragment<WalletAddingMethodFragment>(
-			WalletText.assetChart,
-			CurrentWalletText.Wallets
-		)
 	}
 	
 	private fun showHintEditorFragment() {
@@ -124,36 +113,10 @@ class WalletSettingsPresenter(
 		}
 	}
 	
-	private fun showPrivateKeyExportFragment() {
-		fragment.apply {
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-				recoveryHeaderStyle()
-				replaceFragmentAndSetArgument<PrivateKeyExportFragment>(ContainerID.content)
-			}
-		}
-	}
-	
-	private fun showKeystoreExportFragment() {
-		fragment.apply {
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
-				recoveryHeaderStyle()
-				replaceFragmentAndSetArgument<KeystoreExportFragment>(ContainerID.content)
-			}
-		}
-	}
-	
 	private fun showAllMyAddressesFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
 			replaceFragmentAndSetArgument<WalletAddressManagerFragment>(ContainerID.content)
-		}
-	}
-	
-	// ToDo Move to the specific address cell button
-	private fun showQRCodeFragment() {
-		fragment.apply {
-			recoveryHeaderStyle()
-			replaceFragmentAndSetArgument<QRCodeFragment>(ContainerID.content)
 		}
 	}
 	

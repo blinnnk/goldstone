@@ -185,3 +185,9 @@ fun Activity.hasNotchInScreen(): Boolean {
 		return ret
 	}
 }
+
+fun View.getViewAbsolutelyPositionInScreen(): IntArray {
+	val coords = intArrayOf(0, 0)
+	getLocationOnScreen(coords)
+	return coords
+}

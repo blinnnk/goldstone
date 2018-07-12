@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.DialogText
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -34,7 +33,7 @@ class MnemonicConfirmationPresenter(
 		current: String
 	) {
 		compareMnemonicCode(correct, current) isTrue {
-			validAndContinue(correct)
+			validAndContinue()
 		} otherwise {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}
@@ -44,28 +43,26 @@ class MnemonicConfirmationPresenter(
 		return correct.equals(current, true)
 	}
 	
-	private fun validAndContinue(mnemonic: String) {
+	private fun validAndContinue() {
 		val currentActivity = fragment.activity
-		WalletTable.deleteEncryptMnemonicAfterUserHasBackUp(mnemonic) {
-			when (currentActivity) {
-				is MainActivity -> {
-					fragment.getParentFragment<WalletSettingsFragment> {
-						context?.showSucceedDialog {
-							presenter.removeSelfFromActivity()
-						}
-					}
-					
-					fragment.getParentFragment<WalletGenerationFragment> {
-						context?.showSucceedDialog {
-							presenter.removeSelfFromActivity()
-							fragment.activity?.jump<SplashActivity>()
-						}
+		when (currentActivity) {
+			is MainActivity -> {
+				fragment.getParentFragment<WalletSettingsFragment> {
+					context?.showSucceedDialog {
+						presenter.removeSelfFromActivity()
 					}
 				}
 				
-				is SplashActivity -> {
-					fragment.activity?.jump<SplashActivity>()
+				fragment.getParentFragment<WalletGenerationFragment> {
+					context?.showSucceedDialog {
+						presenter.removeSelfFromActivity()
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
+			}
+			
+			is SplashActivity -> {
+				fragment.activity?.jump<SplashActivity>()
 			}
 		}
 	}

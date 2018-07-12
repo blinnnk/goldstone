@@ -1,11 +1,18 @@
 package io.goldstone.blockchain.module.home.profile.profileoverlay.presenter
 
+import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
+import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.replaceFragmentAndSetArgument
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.component.MiniOverlay
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
@@ -15,8 +22,8 @@ import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragme
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletaddingmethod.view.WalletAddingMethodFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 26/03/2018 12:56 AM
@@ -58,9 +65,31 @@ class ProfileOverlayPresenter(
 		fragment.apply {
 			headerTitle = WalletText.wallet
 			overlayView.header.showAddButton(true, true) {
-				showWalletAddingMethodFragment()
+				showWalletAddingMethodDashboard()
 			}
 			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
+		}
+	}
+	
+	private fun showWalletAddingMethodDashboard() {
+		val menuData = listOf(
+			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
+			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet)
+		)
+		fragment.getMainActivity()?.getMainContainer()?.apply {
+			val mini = MiniOverlay(context) { cell, title ->
+				cell.onClick {
+					if (title.equals(CreateWalletText.create, true)) {
+						showCreateWalletFragment()
+					} else {
+						showImportWalletFragment()
+					}
+					cell.preventDuplicateClicks()
+				}
+			}
+			mini.model = menuData
+			mini.into(this)
+			mini.setTopLeft()
 		}
 	}
 	
@@ -70,9 +99,12 @@ class ProfileOverlayPresenter(
 		}
 	}
 	
-	private fun showWalletAddingMethodFragment() {
-		fragment.overlayView.header.showAddButton(false)
-		showTargetFragment<WalletAddingMethodFragment>(WalletText.addWallet, CurrentWalletText.Wallets)
+	private fun showImportWalletFragment() {
+		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.main)
+	}
+	
+	private fun showCreateWalletFragment() {
+		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.main)
 	}
 	
 	private fun showPrivacyFragment() {

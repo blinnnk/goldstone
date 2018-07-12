@@ -278,6 +278,49 @@ object CreateWalletText {
 
 object ImportWalletText {
 	
+	@JvmField
+	val path = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Path"
+		HoneyLanguage.Chinese.code -> "Path"
+		HoneyLanguage.Japanese.code -> "Path"
+		HoneyLanguage.Korean.code -> "Path"
+		HoneyLanguage.Russian.code -> "Path"
+		HoneyLanguage.TraditionalChinese.code -> "Path"
+		else -> ""
+	}
+	
+	@JvmField
+	val customBitcoinPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Bitcoin Path"
+		HoneyLanguage.Chinese.code -> "Custom Bitcoin Path"
+		HoneyLanguage.Japanese.code -> "Custom Bitcoin Path"
+		HoneyLanguage.Korean.code -> "Custom Bitcoin Path"
+		HoneyLanguage.Russian.code -> "Custom Bitcoin Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Bitcoin Path"
+		else -> ""
+	}
+	
+	@JvmField
+	val customEthereumPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Ethereum Path"
+		HoneyLanguage.Chinese.code -> "Custom Ethereum Path"
+		HoneyLanguage.Japanese.code -> "Custom Ethereum Path"
+		HoneyLanguage.Korean.code -> "Custom Ethereum Path"
+		HoneyLanguage.Russian.code -> "Custom Ethereum Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Ethereum Path"
+		else -> ""
+	}
+	
+	@JvmField
+	val defaultPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Default Path"
+		HoneyLanguage.Chinese.code -> "Default Path"
+		HoneyLanguage.Japanese.code -> "Default Path"
+		HoneyLanguage.Korean.code -> "Default Path"
+		HoneyLanguage.Russian.code -> "Default Path"
+		HoneyLanguage.TraditionalChinese.code -> "Default Path"
+		else -> ""
+	}
 	
 	@JvmField
 	val importWallet = when (currentLanguage) {
@@ -528,16 +571,6 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
-	val manage = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MANAGE"
-		HoneyLanguage.Chinese.code -> "管理钱包"
-		HoneyLanguage.Japanese.code -> "ウォレットの管理"
-		HoneyLanguage.Korean.code -> "나의지갑 관리하기"
-		HoneyLanguage.Russian.code -> "Управление Кошельком"
-		HoneyLanguage.TraditionalChinese.code -> "管理錢包"
-		else -> ""
-	}
-	@JvmField
 	val section = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Tokens:"
 		HoneyLanguage.Chinese.code -> "我的资产:"
@@ -615,6 +648,26 @@ object WalletText {
 		HoneyLanguage.Korean.code -> "내"
 		HoneyLanguage.Russian.code -> "Мое"
 		HoneyLanguage.TraditionalChinese.code -> "我的"
+		else -> ""
+	}
+	@JvmField
+	val setDefaultAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Set Default Address"
+		HoneyLanguage.Chinese.code -> "Set Default Address"
+		HoneyLanguage.Japanese.code -> "Set Default Address"
+		HoneyLanguage.Korean.code -> "Set Default Address"
+		HoneyLanguage.Russian.code -> "Set Default Address"
+		HoneyLanguage.TraditionalChinese.code -> "Set Default Address"
+		else -> ""
+	}
+	@JvmField
+	val showQRCode = when (currentLanguage) {
+		HoneyLanguage.English.code -> "QR Code"
+		HoneyLanguage.Chinese.code -> "QR Code"
+		HoneyLanguage.Japanese.code -> "QR Code"
+		HoneyLanguage.Korean.code -> "QR Code"
+		HoneyLanguage.Russian.code -> "QR Code"
+		HoneyLanguage.TraditionalChinese.code -> "QR Code"
 		else -> ""
 	}
 }
@@ -1399,7 +1452,6 @@ object Alert {
 
 object WalletSettingsText {
 	
-	
 	@JvmField
 	val copy = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click to Copy Address"
@@ -1408,6 +1460,26 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "클릭하여 주소 복제"
 		HoneyLanguage.Russian.code -> "Нажмите, чтобы скопировать адрес"
 		HoneyLanguage.TraditionalChinese.code -> "點擊複製地址"
+		else -> ""
+	}
+	@JvmField
+	val newEthereumAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New Ethereum Address"
+		HoneyLanguage.Chinese.code -> "New Ethereum Address"
+		HoneyLanguage.Japanese.code -> "New Ethereum Address"
+		HoneyLanguage.Korean.code -> "New Ethereum Address"
+		HoneyLanguage.Russian.code -> "New Ethereum Address"
+		HoneyLanguage.TraditionalChinese.code -> "New Ethereum Address"
+		else -> ""
+	}
+	@JvmField
+	val newBitcoinAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New Bitcoin Address"
+		HoneyLanguage.Chinese.code -> "New Bitcoin Address"
+		HoneyLanguage.Japanese.code -> "New Bitcoin Address"
+		HoneyLanguage.Korean.code -> "New Bitcoin Address"
+		HoneyLanguage.Russian.code -> "New Bitcoin Address"
+		HoneyLanguage.TraditionalChinese.code -> "New Bitcoin Address"
 		else -> ""
 	}
 	@JvmField

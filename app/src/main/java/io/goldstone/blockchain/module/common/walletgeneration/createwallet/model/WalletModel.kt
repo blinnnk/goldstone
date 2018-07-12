@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DialogText
-import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert
@@ -72,17 +71,6 @@ data class WalletTable(
 						update(it.apply { this.encryptMnemonic = encryptMnemonic })
 						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
-				}
-			}
-		}
-		
-		fun deleteEncryptMnemonicAfterUserHasBackUp(mnemonic: String, callback: () -> Unit) {
-			getAll {
-				find {
-					!it.encryptMnemonic.isNull()
-					&& JavaKeystoreUtil().decryptData(it.encryptMnemonic!!).equals(mnemonic, true)
-				}?.isNotNull {
-					updateHasBackedUpStatus(callback)
 				}
 			}
 		}
@@ -159,7 +147,6 @@ data class WalletTable(
 						findWhichIsUsing(true)?.let {
 							update(it.apply {
 								hasBackUpMnemonic = true
-								encryptMnemonic = null
 							})
 						}
 					}

@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.getWalletByMnemonic
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -21,7 +22,8 @@ class MnemonicImportDetailPresenter(
 ) : BasePresenter<MnemonicImportDetailFragment>() {
 	
 	fun importWalletByMnemonic(
-		pathInput: EditText,
+		ethereumPath: String,
+		bitcoinPath: String,
 		mnemonicInput: EditText,
 		passwordInput: EditText,
 		repeatPasswordInput: EditText,
@@ -30,7 +32,13 @@ class MnemonicImportDetailPresenter(
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
-		if (pathInput.text.isNotEmpty() && !isVaildPath(pathInput.text.toString())) {
+		if (ethereumPath.isNotEmpty() && !isVaildPath(ethereumPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			callback()
+			return
+		}
+		
+		if (bitcoinPath.isNotEmpty() && !isVaildPath(bitcoinPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			callback()
 			return
@@ -41,10 +49,7 @@ class MnemonicImportDetailPresenter(
 			callback()
 			return
 		}
-		val pathValue =
-			if (pathInput.text.isEmpty()) "m/44'/60'/0'/0/0"
-			else pathInput.text.toString()
-		
+		// TODO 需要处理 `Bitcoin` 的 `Path` 创建逻辑
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),
@@ -65,7 +70,7 @@ class MnemonicImportDetailPresenter(
 			} otherwise {
 				importWallet(
 					mnemonicContent,
-					pathValue,
+					ethereumPath,
 					passwordValue,
 					walletName,
 					hintInput.text?.toString(),
@@ -83,6 +88,8 @@ class MnemonicImportDetailPresenter(
 		hint: String? = null,
 		callback: () -> Unit
 	) {
+		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
+		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
 		fragment.context?.getWalletByMnemonic(
 			mnemonic,
 			pathValue,
@@ -90,7 +97,7 @@ class MnemonicImportDetailPresenter(
 		) { address ->
 			address?.let {
 				WalletImportPresenter.insertWalletToDatabase(
-					fragment, it, name, hint, callback
+					fragment, it, name, encryptMnemonic, hint, callback
 				)
 			}
 		}
