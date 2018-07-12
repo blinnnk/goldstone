@@ -47,7 +47,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						showCloseButton(true)
 					}
 				}
-				// 恢复 `TransactionListFragment` 的视图
+	
 				if (viewPagerSize > 0) {
 					(size - viewPagerSize - 1 until size).forEach {
 						showChildFragment(this[it])

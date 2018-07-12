@@ -96,8 +96,8 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 		parent: Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.walletSettings
-			presenter.showWalletSettingListFragment()
+			headerTitle = WalletSettingsText.viewAddresses
+			presenter.popFragmentFrom<PrivateKeyExportFragment>()
 		}
 	}
 }

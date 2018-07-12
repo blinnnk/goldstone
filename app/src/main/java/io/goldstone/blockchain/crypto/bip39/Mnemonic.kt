@@ -22,7 +22,7 @@ object Mnemonic {
 	 * Generates a seed buffer from a mnemonic phrase according to the BIP39 spec.
 	 * The mnemonic phrase is given as a list of words and the seed can be salted using a password
 	 */
-	private fun mnemonicToSeed(phrase: String, password: String = ""): ByteArray {
+	fun mnemonicToSeed(phrase: String, password: String = ""): ByteArray {
 		return mnemonicToSeed(phrase.split(" ").toTypedArray(), password)
 	}
 	
@@ -33,7 +33,6 @@ object Mnemonic {
 	private fun mnemonicToSeed(words: Array<String>, password: String = ""): ByteArray {
 		val pass = words.joinToString(" ")
 		val salt = "mnemonic$password"
-		
 		val keyFactory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
 		val spec = PBEKeySpec(pass.toCharArray(), salt.toByteArray(), 2048, 512)
 		return keyFactory.generateSecret(spec).encoded
@@ -42,7 +41,7 @@ object Mnemonic {
 	/**
 	 * Converts a phrase (list of words) into a [ByteArray] entropy buffer according to the BIP39 spec
 	 */
-	private fun mnemonicToEntropy(phrase: String): ByteArray {
+	fun mnemonicToEntropy(phrase: String): ByteArray {
 		return mnemonicToEntropy(phrase.split(" ").toTypedArray())
 	}
 	
@@ -73,8 +72,8 @@ object Mnemonic {
 		val hash = entropy.sha256()
 		val hashBits = hash.toBitArray()
 		// Check all the checksum bits.
-		for (i in 0 until numChecksumBits)
-			if (bitArray[numEntropyBits + i] != hashBits[i])
+		for (index in 0 until numChecksumBits)
+			if (bitArray[numEntropyBits + index] != hashBits[index])
 				throw IllegalArgumentException("mnemonic checksum does not match")
 		
 		return entropy
@@ -88,7 +87,7 @@ object Mnemonic {
 	/**
 	 * Converts an entropy buffer to a list of words according to the BIP39 spec
 	 */
-	private fun entropyToMnemonic(entropy: ByteArray): String {
+	fun entropyToMnemonic(entropy: ByteArray): String {
 		if (entropy.size % 4 > 0)
 			throw RuntimeException("Entropy not multiple of 32 bits.")
 		

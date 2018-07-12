@@ -54,6 +54,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 	}
 	
 	private var hasTopLine = false
+	private var hasBottomLine = true
 	
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
@@ -69,17 +70,24 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 			)
 		}
 		
-		canvas?.drawLine(
-			PaddingSize.device.toFloat(),
-			height - BorderSize.default,
-			(width - PaddingSize.device).toFloat(),
-			height - BorderSize.default,
-			paint
-		)
+		if (hasBottomLine) {
+			canvas?.drawLine(
+				PaddingSize.device.toFloat(),
+				height - BorderSize.default,
+				(width - PaddingSize.device).toFloat(),
+				height - BorderSize.default,
+				paint
+			)
+		}
 	}
 	
 	fun hasTopLine() {
 		hasTopLine = true
+		invalidate()
+	}
+	
+	fun removeBottomLine() {
+		hasBottomLine = false
 		invalidate()
 	}
 	

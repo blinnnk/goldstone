@@ -131,12 +131,9 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		invalidate()
 	}
 	
-	fun setBlueStyle(top: Int? = null) {
+	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
 		textSize = 14.uiPX().toFloat()
-		layoutParams = LinearLayout.LayoutParams(
-			ScreenSize.widthWithPadding,
-			buttonHeight
-		).apply {
+		layoutParams = LinearLayout.LayoutParams(width, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}

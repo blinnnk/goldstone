@@ -18,7 +18,10 @@ import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 25/04/2018 8:06 AM
@@ -26,18 +29,17 @@ import org.jetbrains.anko.*
  */
 open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	
+	private val titleHeight = 30.uiPX()
 	protected val title = TextView(context).apply {
-		textSize = fontSize(12)
-		textColor = GrayScale.gray
 		typeface = GoldStoneFont.medium(context)
-		layoutParams = RelativeLayout.LayoutParams(wrapContent, 30.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
 	}
 	protected val button = TextView(context).apply {
 		textSize = fontSize(12)
 		textColor = Spectrum.green
 		typeface = GoldStoneFont.medium(context)
-		layoutParams = RelativeLayout.LayoutParams(wrapContent, 30.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		gravity = Gravity.END
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
 	}
@@ -49,7 +51,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		this.setWillNotDraw(false)
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 		titleLayout = relativeLayout {
-			lparams(matchParent, wrapContent)
+			lparams(matchParent, titleHeight)
 			title.into(this)
 		}
 	}
@@ -68,8 +70,14 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		canvas?.drawLine(0f, height - BorderSize.default, width.toFloat(), height.toFloat(), paint)
 	}
 	
-	fun setTitle(text: String) {
+	fun setTitle(
+		text: String,
+		textSize: Float = fontSize(12),
+		textColor: Int = GrayScale.midGray
+	) {
 		title.text = text
+		title.textSize = textSize
+		title.textColor = textColor
 	}
 	
 	fun showButton(text: String, event: () -> Unit) {

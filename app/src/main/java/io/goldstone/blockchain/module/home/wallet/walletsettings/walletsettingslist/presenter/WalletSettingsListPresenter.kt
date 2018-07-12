@@ -48,8 +48,6 @@ class WalletSettingsListPresenter(
 				WalletSettingsListModel(WalletSettingsText.walletName, Config.getCurrentName()),
 				WalletSettingsListModel(WalletSettingsText.hint, "******"),
 				WalletSettingsListModel(WalletSettingsText.passwordSettings),
-				WalletSettingsListModel(WalletSettingsText.exportPrivateKey),
-				WalletSettingsListModel(WalletSettingsText.exportKeystore),
 				WalletSettingsListModel(
 					WalletSettingsText.backUpMnemonic,
 					WalletSettingsText.safeAttention

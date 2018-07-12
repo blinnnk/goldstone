@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
@@ -49,6 +50,11 @@ fun Context.generateWallet(
 		LogUtil.error("generateWallet", error)
 	}
 }
+
+//fun Context.generateChildECKeyPairByEncryptMnemonic(encryptMnemonic: String) {
+//	val decryptMnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+//
+//}
 
 fun Context.getWalletByMnemonic(
 	mnemonicCode: String,

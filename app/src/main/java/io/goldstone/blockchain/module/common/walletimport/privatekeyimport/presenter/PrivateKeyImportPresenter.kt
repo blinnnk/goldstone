@@ -98,6 +98,7 @@ class PrivateKeyImportPresenter(
 						fragment,
 						it,
 						name,
+						"",
 						hint,
 						callback
 					)

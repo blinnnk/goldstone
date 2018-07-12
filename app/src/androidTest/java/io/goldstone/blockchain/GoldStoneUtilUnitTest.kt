@@ -5,6 +5,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -76,5 +77,14 @@ class GoldStoneUtilUnitTest {
 		WalletTable.getCurrentWallet {
 			LogUtil.debug("getWalletByEthseriesAddress + $positon", it.toString())
 		}
+	}
+	
+	@Test
+	fun cryptoMnemonic() {
+		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
+		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
+		System.out.println(entropy)
+		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
+		System.out.println(decryptEntropy)
 	}
 }

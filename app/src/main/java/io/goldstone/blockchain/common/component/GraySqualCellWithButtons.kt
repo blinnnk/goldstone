@@ -42,7 +42,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		gravity = Gravity.CENTER_VERTICAL
 	}
-	private val copyButton by lazy {
+	val copyButton by lazy {
 		ImageView(context).apply {
 			imageResource = R.drawable.copy_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -51,7 +51,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
-	private val moreButton by lazy {
+	val moreButton by lazy {
 		ImageView(context).apply {
 			imageResource = R.drawable.more_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE

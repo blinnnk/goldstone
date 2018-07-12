@@ -30,6 +30,7 @@ object ElementID {
 	const val buttonLoading = 20015
 	const val contentScrollview = 20016
 	const val mask = 20017
+	const val miniOverlay = 20018
 }
 
 object ViewPagerID {

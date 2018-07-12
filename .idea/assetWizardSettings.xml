@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.3%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_content_copy_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio%203.3%20Preview.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_close_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,11 +28,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="height" value="36" />
-                            <entry key="outputName" value="copy_icon" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="import_wallet_icon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/etc.svg" />
-                            <entry key="width" value="36" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/import_wallet.svg" />
                           </map>
                         </option>
                       </PersistentState>
