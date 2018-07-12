@@ -19,9 +19,8 @@ import org.jetbrains.anko.textColor
  * @date 25/04/2018 9:42 AM
  * @author KaySaith
  */
-
 class TokenInfoView(context: Context) : TopBottomLineCell(context) {
-
+	
 	private val contentView = TextView(context).apply {
 		gravity = Gravity.TOP
 		text = QuotationText.tokenDescriptionPlaceHolder
@@ -30,18 +29,16 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 		typeface = GoldStoneFont.medium(context)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 105.uiPX())
 	}
-
+	
 	init {
-		title.text = QuotationText.tokenDescription
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 145.uiPX())
+		setTitle(QuotationText.tokenDescription)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
 		contentView.into(this)
-		contentView.y -= 10.uiPX()
 		contentView.setAlignParentBottom()
 	}
-
+	
 	fun setTokenDescription(content: String) {
 		// 描述第一位存储了语言码, 如果语言格式不对也要重新拉取数据
 		contentView.text = if (content.length > 1) content.substring(1) else return
 	}
-
 }

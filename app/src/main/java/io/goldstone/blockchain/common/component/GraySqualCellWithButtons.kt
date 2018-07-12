@@ -26,6 +26,7 @@ import org.jetbrains.anko.*
  */
 open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) {
 	
+	private val cellHeight = 45.uiPX()
 	protected val title = TextView(context).apply {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.black(context)
@@ -47,7 +48,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 			imageResource = R.drawable.copy_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			setColorFilter(GrayScale.midGray)
-			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
+			layoutParams = RelativeLayout.LayoutParams(cellHeight, matchParent)
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
@@ -56,13 +57,13 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 			imageResource = R.drawable.more_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			setColorFilter(GrayScale.midGray)
-			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
+			layoutParams = RelativeLayout.LayoutParams(cellHeight, matchParent)
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
 	
 	init {
-		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 45.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
 		setMargins<RelativeLayout.LayoutParams> {
 			bottomMargin = 5.uiPX()
 		}

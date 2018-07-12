@@ -36,11 +36,21 @@ class WalletImportPresenter(
 	
 	companion object {
 		
+		fun childAddressValue(address: String, index: Int): String {
+			return "$address|$index"
+		}
+		
+		fun getAddressIndexFromPath(path: String): Int {
+			return path.substringAfterLast("/").toInt()
+		}
+		
 		fun insertWalletToDatabase(
 			fragment: Fragment,
 			address: String,
 			name: String,
 			encryptMnemonic: String,
+			ethereumPath: String,
+			bitcoinPath: String,
 			hint: String?,
 			callback: () -> Unit
 		) {
@@ -58,7 +68,12 @@ class WalletImportPresenter(
 							0.0,
 							encryptMnemonic,
 							true,
-							ethSeriesAddresses = address
+							ethSeriesAddresses = childAddressValue(
+								address,
+								getAddressIndexFromPath(ethereumPath)
+							),
+							ethPath = ethereumPath,
+							btcPath = bitcoinPath
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息

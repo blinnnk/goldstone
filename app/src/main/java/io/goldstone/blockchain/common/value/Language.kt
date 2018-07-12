@@ -1593,6 +1593,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val ethereumSeriesAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Ethereum Series Address"
+		HoneyLanguage.Chinese.code -> "Ethereum Series Address"
+		HoneyLanguage.Japanese.code -> "Ethereum Series Address"
+		HoneyLanguage.Korean.code -> "Ethereum Series Address"
+		HoneyLanguage.Russian.code -> "Ethereum Series Address"
+		HoneyLanguage.TraditionalChinese.code -> "Ethereum Series Address"
+		else -> ""
+	}
+	@JvmField
 	val backUpMnemonicGotBefore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the mnemonic words in order, so as to ensure that your backup is correct."
 		HoneyLanguage.Chinese.code -> "按顺序点选助记词中的单词，以确保您的备份正确。"

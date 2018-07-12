@@ -51,15 +51,14 @@ class TokenInfoLink(
 	private val whitePaper = GraySqualCell(context).apply { showArrow() }
 	
 	init {
-		title.text = QuotationText.tokenInfoLink
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 140.uiPX())
+		setTitle(QuotationText.tokenInfoLink)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		verticalLayout {
 			website.into(this)
 			whitePaper.into(this)
 			
 			website.setTitle(QuotationText.website)
 			whitePaper.setTitle(QuotationText.whitePaper)
-			y -= 10.uiPX()
 		}.setAlignParentBottom()
 	}
 }

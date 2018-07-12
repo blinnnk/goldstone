@@ -18,7 +18,10 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -146,35 +149,32 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			lateinit var ethereumPathEdiTtext: TitleEditText
 			lateinit var bitcoinPathEditText: TitleEditText
 			DashboardOverlay(context) {
-				TopBottomLineCell(context)
-					.apply {
-						layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
-						leftPadding = 20.uiPX()
-						rightPadding = 20.uiPX()
-						setTitle(ImportWalletText.customEthereumPath, fontSize(14))
-					}
-					.into(this)
-				ethereumPathEdiTtext = TitleEditText(context)
-					.apply {
+				TopBottomLineCell(context).apply {
+					layoutParams = LinearLayout.LayoutParams(
+						ScreenSize.widthWithPadding - 40.uiPX(),
+						100.uiPX()
+					)
+					setTitle(ImportWalletText.customEthereumPath, fontSize(14))
+					ethereumPathEdiTtext = TitleEditText(context).apply {
 						setTitle(DefaultPath.ethPathHeader)
 						getEditText().setText(DefaultPath.default)
 					}
-				ethereumPathEdiTtext.into(this)
+					ethereumPathEdiTtext.into(this)
+				}.into(this)
 				
 				TopBottomLineCell(context)
 					.apply {
-						layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
-						leftPadding = 20.uiPX()
-						rightPadding = 20.uiPX()
+						layoutParams = LinearLayout.LayoutParams(
+							ScreenSize.widthWithPadding - 40.uiPX(),
+							100.uiPX()
+						)
 						setTitle(ImportWalletText.customBitcoinPath, fontSize(14))
-					}
-					.into(this)
-				bitcoinPathEditText = TitleEditText(context)
-					.apply {
-						setTitle(DefaultPath.btcPathHeader)
-						getEditText().setText(DefaultPath.default)
-					}
-				bitcoinPathEditText.into(this)
+						bitcoinPathEditText = TitleEditText(context).apply {
+							setTitle(DefaultPath.btcPathHeader)
+							getEditText().setText(DefaultPath.default)
+						}
+						bitcoinPathEditText.into(this)
+					}.into(this)
 			}.apply {
 				confirmEvent = Runnable {
 					customEthPath = DefaultPath.ethPathHeader + ethereumPathEdiTtext.getText()

@@ -17,7 +17,7 @@ import org.jetbrains.anko.*
  */
 class TitleEditText(context: Context) : RelativeLayout(context) {
 	
-	private val viewHeight = 60.uiPX()
+	private val viewHeight = 50.uiPX()
 	private val titleView = textView {
 		gravity = Gravity.CENTER_VERTICAL
 		textColor = GrayScale.black
@@ -34,8 +34,6 @@ class TitleEditText(context: Context) : RelativeLayout(context) {
 	
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, viewHeight)
-		leftPadding = 20.uiPX()
-		rightPadding = 20.uiPX()
 		editText.setAlignParentRight()
 	}
 	

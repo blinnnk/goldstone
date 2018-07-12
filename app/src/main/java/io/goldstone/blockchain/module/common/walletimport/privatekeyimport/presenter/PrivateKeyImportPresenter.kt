@@ -99,6 +99,8 @@ class PrivateKeyImportPresenter(
 						it,
 						name,
 						"",
+						"",
+						"",
 						hint,
 						callback
 					)

@@ -24,6 +24,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.generateWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -33,6 +34,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
+import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -128,7 +130,11 @@ class CreateWalletPresenter(
 						address,
 						true,
 						hint,
-						ethSeriesAddresses = address
+						ethSeriesAddresses = WalletImportPresenter.childAddressValue(
+							address, WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+						),
+						ethPath = DefaultPath.ethPath,
+						btcPath = DefaultPath.btcPath
 					)
 				) {
 					generateMyTokenInfo(address, {
@@ -138,7 +144,7 @@ class CreateWalletPresenter(
 						val arguments = Bundle().apply {
 							putString(ArgumentKey.mnemonicCode, mnemonicCode)
 						}
-						// 防止用户跳过助记词, 会在完成助记词后清除记录的加密数据
+						// 防止用户跳过助记词, 把使用 `RSA` 加密后的住几次存入数据库
 						saveEncryptMnemonic(mnemonicCode, address) {
 							fragment.context?.runOnUiThread {
 								showMnemonicBackupFragment(arguments)
@@ -160,7 +166,8 @@ class CreateWalletPresenter(
 	) {
 		mnemonic?.let {
 			WalletTable.saveEncryptMnemonicIfUserSkip(
-				JavaKeystoreUtil().encryptData(it), address
+				JavaKeystoreUtil().encryptData(it),
+				address
 			) {
 				callback()
 			}

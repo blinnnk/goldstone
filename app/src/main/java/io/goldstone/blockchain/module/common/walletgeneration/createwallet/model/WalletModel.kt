@@ -37,7 +37,9 @@ data class WalletTable(
 	var hasBackUpMnemonic: Boolean = false,
 	var currentBtcSeriesAddress: String = "",
 	var ethSeriesAddresses: String = "",
-	var btcSeriesAddresses: String = ""
+	var btcSeriesAddresses: String = "",
+	var ethPath: String = "",
+	var btcPath: String = ""
 ) : Serializable {
 	
 	companion object {
@@ -102,6 +104,26 @@ data class WalletTable(
 				}) { hold(it) }
 		}
 		
+		fun getWalletWithLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				ethereumChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					// 清理数据格式
+					val pureAddresses = if (ethSeriesAddresses.contains(",")) {
+						ethSeriesAddresses.replace(",", "")
+					} else {
+						ethSeriesAddresses
+					}
+					// 获取最近的 `Address Index` 数值
+					hold(this, pureAddresses.substringAfterLast("|").toInt())
+				}
+			}
+		}
+		
 		fun getCurrentWalletAddress(hold: String.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				hold(it!!.currentEthSeriesAddress)
@@ -137,6 +159,28 @@ data class WalletTable(
 					}
 				}) {
 				callback()
+			}
+		}
+		
+		fun updateEthereumSeriesAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (ethereumSeriesAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.ethSeriesAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								ethSeriesAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
 			}
 		}
 		
