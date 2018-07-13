@@ -46,7 +46,7 @@ class WalletAddressManagerPresneter(
 	private fun getCurrentWalletEthereumSeriesAddress() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
-				fragment.setEthereumAddressModel(convertToChildAddresses(ethSeriesAddresses))
+				fragment.setEthereumAddressModel(convertToChildAddresses(ethAddresses))
 			}
 		}
 	}
@@ -95,7 +95,7 @@ class WalletAddressManagerPresneter(
 	private fun getCurrentWalletBtcSeriesAddress() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
-				fragment.setEthereumAddressModel(convertToChildAddresses(btcSeriesAddresses))
+				fragment.setEthereumAddressModel(convertToChildAddresses(btcAddresses))
 			}
 		}
 	}

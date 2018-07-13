@@ -28,18 +28,20 @@ data class WalletTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var name: String,
-	var currentEthSeriesAddress: String, // currentEthSeriesAddress
+	var currentETHAndERCAddress: String,
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
 	var hasBackUpMnemonic: Boolean = false,
-	var currentBtcSeriesAddress: String = "",
-	var ethSeriesAddresses: String = "",
-	var btcSeriesAddresses: String = "",
+	var ethAddresses: String = "",
+	var btcAddresses: String = "",
+	var btcAddressesSecrets: String = "",
 	var ethPath: String = "",
-	var btcPath: String = ""
+	var btcPath: String = "",
+	var currentBTCAddress: String = "",
+	var currentBTCSecret: String = ""
 ) : Serializable {
 	
 	companion object {
@@ -91,7 +93,7 @@ data class WalletTable(
 				{
 					GoldStoneDataBase.database.walletDao().getAllWallets()
 				}) {
-				callback(it.map { it.currentEthSeriesAddress }.toArrayList())
+				callback(it.map { it.currentETHAndERCAddress }.toArrayList())
 			}
 		}
 		
@@ -113,10 +115,10 @@ data class WalletTable(
 			WalletTable.getCurrentWallet {
 				it?.apply {
 					// 清理数据格式
-					val pureAddresses = if (ethSeriesAddresses.contains(",")) {
-						ethSeriesAddresses.replace(",", "")
+					val pureAddresses = if (ethAddresses.contains(",")) {
+						ethAddresses.replace(",", "")
 					} else {
-						ethSeriesAddresses
+						ethAddresses
 					}
 					// 获取最近的 `Address Index` 数值
 					hold(this, pureAddresses.substringAfterLast("|").toInt())
@@ -126,7 +128,7 @@ data class WalletTable(
 		
 		fun getCurrentWalletAddress(hold: String.() -> Unit) {
 			WalletTable.getCurrentWallet {
-				hold(it!!.currentEthSeriesAddress)
+				hold(it!!.currentETHAndERCAddress)
 			}
 		}
 		
@@ -171,9 +173,9 @@ data class WalletTable(
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
 						it.apply {
-							val addresses = this.ethSeriesAddresses + "," + newAddress + "|$newAddressIndex"
+							val addresses = this.ethAddresses + "," + newAddress + "|$newAddressIndex"
 							update(this.apply {
-								ethSeriesAddresses = addresses
+								ethAddresses = addresses
 							})
 							GoldStoneAPI.context.runOnUiThread {
 								callback(addresses)
@@ -181,21 +183,6 @@ data class WalletTable(
 						}
 					}
 				}
-			}
-		}
-		
-		private fun updateHasBackedUpStatus(callback: () -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().apply {
-						findWhichIsUsing(true)?.let {
-							update(it.apply {
-								hasBackUpMnemonic = true
-							})
-						}
-					}
-				}) {
-				callback()
 			}
 		}
 		
@@ -302,7 +289,7 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 	
-	@Query("SELECT * FROM wallet WHERE currentEthSeriesAddress LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
 	
 	@Query("SELECT * FROM wallet")

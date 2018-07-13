@@ -37,7 +37,6 @@ data class ExtendedKey(
 			val pub = keyPair.getCompressedPublicKey()
 			if (isHardened(element)) {
 				val privateKeyPaddedBytes = keyPair.privateKey.toBytesPadded(PRIVATE_KEY_SIZE)
-				
 				extended = ByteBuffer
 					.allocate(privateKeyPaddedBytes.size + 5)
 					.order(ByteOrder.BIG_ENDIAN)
@@ -161,13 +160,13 @@ data class ExtendedKey(
 				val seedKey = SecretKeySpec(BITCOIN_SEED, "HmacSHA512")
 				mac.init(seedKey)
 				val lr = mac.doFinal(seed)
-				val l = Arrays.copyOfRange(lr, 0, PRIVATE_KEY_SIZE)
+				val privateKey = Arrays.copyOfRange(lr, 0, PRIVATE_KEY_SIZE)
 				val r = Arrays.copyOfRange(lr, PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
-				val m = BigInteger(1, l)
+				val m = BigInteger(1, privateKey)
 				if (m >= CURVE.n) {
 					throw KeyException("Master key creation resulted in a key with higher modulus. Suggest deriving the next increment.")
 				}
-				val keyPair = ECKeyPair.create(l)
+				val keyPair = ECKeyPair.create(privateKey)
 				return if (publicKeyOnly) {
 					val pubKeyPair = ECKeyPair(BigInteger.ZERO, keyPair.publicKey)
 					ExtendedKey(pubKeyPair, r, 0, 0, 0)

@@ -36,7 +36,7 @@ class KeystoreExportPresenter(
 		WalletTable.getCurrentWallet {
 			doAsync {
 				fragment.context?.getKeystoreFile(
-					it!!.currentEthSeriesAddress,
+					it!!.currentETHAndERCAddress,
 					passwordInput.text.toString(),
 					{
 						hold("")

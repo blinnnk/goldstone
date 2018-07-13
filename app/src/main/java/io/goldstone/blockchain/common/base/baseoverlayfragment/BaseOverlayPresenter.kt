@@ -47,13 +47,13 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						showCloseButton(true)
 					}
 				}
-	
+				
 				if (viewPagerSize > 0) {
 					(size - viewPagerSize - 1 until size).forEach {
 						showChildFragment(this[it])
 					}
 				} else {
-					this[size - 2]?.let {
+					this[size - 1]?.let {
 						showChildFragment(it)
 					}
 				}

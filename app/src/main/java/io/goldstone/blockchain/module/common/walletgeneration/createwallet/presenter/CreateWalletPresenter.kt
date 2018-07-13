@@ -130,7 +130,7 @@ class CreateWalletPresenter(
 						address,
 						true,
 						hint,
-						ethSeriesAddresses = WalletImportPresenter.childAddressValue(
+						ethAddresses = WalletImportPresenter.childAddressValue(
 							address, WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
 						),
 						ethPath = DefaultPath.ethPath,

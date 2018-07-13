@@ -68,7 +68,7 @@ class WalletImportPresenter(
 							0.0,
 							encryptMnemonic,
 							true,
-							ethSeriesAddresses = childAddressValue(
+							ethAddresses = childAddressValue(
 								address,
 								getAddressIndexFromPath(ethereumPath)
 							),
