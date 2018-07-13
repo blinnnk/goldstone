@@ -76,6 +76,7 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	init {
 		orientation = VERTICAL
 		setTitle(QuotationText.currentPrice)
+		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 		showTopLine = true
 		priceTitles.apply {
 			textColor = GrayScale.black

@@ -8,6 +8,7 @@ import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.getAddress
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
@@ -17,9 +18,6 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
-import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.wallet.DeterministicSeed
-import org.bitcoinj.wallet.Wallet
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +27,7 @@ import org.junit.runner.RunWith
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION", "NAME_SHADOWING")
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneUtilUnitTest {
@@ -66,17 +64,17 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getBitcoinAddress() {
 		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
-		val wallet = Wallet.fromSeed(
-			NetworkParameters.fromID(NetworkParameters.ID_MAINNET),
-			DeterministicSeed(seedCode, null, "", 0L)
-		)
-		val changeAddress = wallet.currentChangeAddress()
-		val freshAddress = wallet.freshReceiveAddress()
-		val currentAddress = wallet.currentReceiveAddress()
-		LogUtil.debug(
-			"getBitcoinAddress",
-			"currentAddress$currentAddress freshAddress$freshAddress change$changeAddress"
-		)
+		
+		BTCUtils.getBitcoinWalletByMnemonic(seedCode) { address, secret ->
+			LogUtil.debug("getBitcoinAddress", "$address and $secret")
+			
+			BTCUtils.getPublicKeyFromBase58PrivateKey(secret, false) {
+				LogUtil.debug(
+					"getBitcoinAddress",
+					"**$it"
+				)
+			}
+		}
 	}
 	
 	@Test
@@ -97,9 +95,8 @@ class GoldStoneUtilUnitTest {
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
-		System.out.println(entropy)
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
-		System.out.println(decryptEntropy)
+		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
 	}
 	
 	@Test

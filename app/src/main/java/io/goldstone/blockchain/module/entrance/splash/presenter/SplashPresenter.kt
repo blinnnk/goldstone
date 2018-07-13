@@ -33,7 +33,7 @@ class SplashPresenter(val activity: SplashActivity) {
 						Config.updateCurrentID(it.id)
 						Config.updateCurrentBalance(it.balance.orElse(0.0))
 						Config.updateCurrentName(it.name)
-						Config.updateCurrentAddress(it.currentEthSeriesAddress)
+						Config.updateCurrentAddress(it.currentETHAndERCAddress)
 						activity.jump<MainActivity>()
 					}
 				}

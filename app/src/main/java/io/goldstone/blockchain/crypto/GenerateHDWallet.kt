@@ -134,14 +134,12 @@ fun Context.getPrivateKey(
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
-	System.out.println("hello 1")
 	getKeystoreFile(walletAddress, password, errorCallback) {
 		WalletUtil.getKeyPairFromWalletFile(
 			it,
 			password,
 			errorCallback
 		)?.let {
-			System.out.println("hello 2")
 			runOnUiThread {
 				hold(it.privateKey.toString(16))
 			}

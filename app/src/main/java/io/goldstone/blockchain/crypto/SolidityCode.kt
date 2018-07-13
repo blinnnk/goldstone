@@ -42,6 +42,12 @@ object CryptoValue {
 		(!it.equals(ethContract, true)
 		 && !it.equals(etcContract, true))
 	}
+	val chainType: (path: String) -> Int = {
+		it.replace("'", "").split("/")[2].toInt()
+	}
+	val isBtcTest: (chainType: Int) -> Boolean = {
+		it == ChainType.BTCTest.id
+	}
 }
 
 object CryptoSymbol {
@@ -57,8 +63,9 @@ object CryptoName {
 	const val etc = "Ethereum Classic"
 }
 
-enum class ChainType(val id: Long) {
+enum class ChainType(val id: Int) {
 	BTC(0),
+	BTCTest(1),
 	LTC(2),
 	ETH(60),
 	ETC(61)
@@ -67,6 +74,7 @@ enum class ChainType(val id: Long) {
 object DefaultPath {
 	const val ethPath = "m/44'/60'/0'/0/0"
 	const val btcPath = "m/44'/0'/0'/0/0"
+	const val btcTestPath = "m/44'/1'/0'/0/0"
 	const val ethPathHeader = "m/44'/60'"
 	const val btcPathHeader = "m/44'/0'"
 	const val default = "0'/0/0"
