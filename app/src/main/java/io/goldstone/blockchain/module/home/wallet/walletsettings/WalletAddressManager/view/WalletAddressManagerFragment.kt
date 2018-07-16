@@ -26,11 +26,31 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>() {
 	
-	private val ethereumAddress by lazy {
-		EthereumSeriesAddress(context!!) {
-			onClick {
-				showCellMoreDashboard(getViewAbsolutelyPositionInScreen()[1].toFloat())
-				preventDuplicateClicks()
+	private val ethereumAddresses by lazy {
+		AddressesListView(context!!) { cell, address ->
+			cell.onClick {
+				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
+				cell.preventDuplicateClicks()
+			}
+		}
+	}
+	private val ethereumClassicAddresses by lazy {
+		AddressesListView(context!!) { cell, address ->
+			cell.onClick {
+				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
+				cell.preventDuplicateClicks()
+			}
+		}
+	}
+	private val bitcoinAddresses by lazy {
+		AddressesListView(context!!) { cell, address ->
+			cell.onClick {
+				showCellMoreDashboard(
+					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					true
+				)
+				cell.preventDuplicateClicks()
 			}
 		}
 	}
@@ -46,13 +66,26 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 					leftPadding = PaddingSize.device
 					topPadding = 20.uiPX()
 				}
-				ethereumAddress.into(this)
+				ethereumAddresses.into(this)
+				ethereumClassicAddresses.into(this)
+				bitcoinAddresses.into(this)
 			}
 		}
 	}
 	
-	fun setEthereumAddressModel(model: List<String>) {
-		ethereumAddress.model = model
+	fun setEthereumAddressesModel(model: List<String>) {
+		ethereumAddresses.setTitle(WalletSettingsText.ethereumSeriesAddress)
+		ethereumAddresses.model = model
+	}
+	
+	fun setEthereumClassicAddressesModel(model: List<String>) {
+		ethereumClassicAddresses.setTitle(WalletSettingsText.ethereumClassicAddress)
+		ethereumClassicAddresses.model = model
+	}
+	
+	fun setBitcoinAddressesModel(model: List<String>) {
+		bitcoinAddresses.setTitle(WalletSettingsText.bitcoinAddress)
+		bitcoinAddresses.model = model
 	}
 	
 	private fun showChildAddressCreatorDashboard() {
@@ -97,16 +130,28 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 	}
 	
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
-		if (title.equals(WalletSettingsText.newEthereumAddress, true)) {
-			presenter.createNewEthereumChildAddress(password) {
-				ethereumAddress.model = it
+		when (title) {
+			WalletSettingsText.newETHAndERCAddress -> {
+				presenter.createNewETHAndERCChildAddress(password) {
+					ethereumAddresses.model = it
+				}
 			}
-		} else {
-			presenter.createNewBitcoinChildAddress()
+			
+			WalletSettingsText.newETCAddress -> {
+				presenter.createNewETCChildAddress(password) {
+					ethereumClassicAddresses.model = it
+				}
+			}
+			
+			WalletSettingsText.newBTCAddress -> {
+				presenter.createNewBTCChildAddress(password) {
+					bitcoinAddresses.model = it
+				}
+			}
 		}
 	}
 	
-	private fun showCellMoreDashboard(top: Float) {
+	private fun showCellMoreDashboard(top: Float, address: String, isBTC: Boolean = false) {
 		getMainActivity()?.getMainContainer()?.apply {
 			if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 				creatorDashBoard = MiniOverlay(context) { cell, title ->
@@ -115,14 +160,19 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 							WalletText.setDefaultAddress -> {
 							}
 							
-							WalletText.showQRCode -> presenter.showQRCodeFragment()
-							WalletSettingsText.exportPrivateKey -> presenter.showPrivateKeyExportFragment()
-							WalletSettingsText.exportKeystore -> presenter.showKeystoreExportFragment()
+							WalletText.showQRCode -> presenter.showQRCodeFragment(address)
+							
+							WalletSettingsText.exportPrivateKey -> {
+								if (isBTC)  presenter.showBTCPrivateKeyExportFragment(address)
+								else presenter.showPrivateKeyExportFragment(address)
+							}
+							
+							WalletSettingsText.exportKeystore -> presenter.showKeystoreExportFragment(address)
 						}
 						cell.preventDuplicateClicks()
 					}
 				}
-				creatorDashBoard?.model = presenter.getCellDashboardMenu()
+				creatorDashBoard?.model = presenter.getCellDashboardMenu(isBTC)
 				creatorDashBoard?.into(this)
 				creatorDashBoard?.setTopValue(top)
 			}

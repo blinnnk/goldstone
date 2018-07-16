@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import com.blinnnk.animation.scale
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
@@ -78,6 +79,7 @@ class MiniOverlay(
 	
 	fun setTopRight() {
 		if (this::dashBoard.isInitialized) {
+			dashBoard.scale(2)
 			dashBoard.y = 20.uiPX().toFloat()
 			dashBoard.x -= 20.uiPX()
 			dashBoard.setAlignParentRight()
@@ -94,6 +96,7 @@ class MiniOverlay(
 	
 	fun setTopLeft() {
 		if (this::dashBoard.isInitialized) {
+			dashBoard.scale(1)
 			dashBoard.y = 20.uiPX().toFloat()
 			dashBoard.x = 20.uiPX().toFloat()
 		}

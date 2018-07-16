@@ -110,10 +110,10 @@ data class WalletTable(
 				}) { hold(it) }
 		}
 		
-		fun getWalletWithLatestChildAddressIndex(
+		fun getETHAndERCWalletLatestChildAddressIndex(
 			hold: (
 				wallet: WalletTable,
-				ethereumChildAddressIndex: Int
+				ethChildAddressIndex: Int
 			) -> Unit
 		) {
 			WalletTable.getCurrentWallet {
@@ -130,7 +130,67 @@ data class WalletTable(
 			}
 		}
 		
-		fun getCurrentWalletAddress(hold: String.() -> Unit) {
+		fun getETCWalletLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				etcChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					// 清理数据格式
+					val pureAddresses = if (etcAddresses.contains(",")) {
+						etcAddresses.replace(",", "")
+					} else {
+						etcAddresses
+					}
+					// 获取最近的 `Address Index` 数值
+					hold(this, pureAddresses.substringAfterLast("|").toInt())
+				}
+			}
+		}
+		
+		fun getBTCWalletLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				btcChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					// 清理数据格式
+					val pureAddresses = if (btcAddresses.contains(",")) {
+						btcAddresses.replace(",", "")
+					} else {
+						btcAddresses
+					}
+					// 获取最近的 `Address Index` 数值
+					hold(this, pureAddresses.substringAfterLast("|").toInt())
+				}
+			}
+		}
+		
+		fun getBTCTestWalletLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				btcTestChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					// 清理数据格式
+					val pureAddresses = if (btcTestAddresses.contains(",")) {
+						btcTestAddresses.replace(",", "")
+					} else {
+						btcTestAddresses
+					}
+					// 获取最近的 `Address Index` 数值
+					hold(this, pureAddresses.substringAfterLast("|").toInt())
+				}
+			}
+		}
+		
+		fun getCurrentWalletETHAndERCAddress(hold: String.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				hold(it!!.currentETHAndERCAddress)
 			}
@@ -168,7 +228,7 @@ data class WalletTable(
 			}
 		}
 		
-		fun updateEthereumSeriesAddresses(
+		fun updateETHAndERCAddresses(
 			newAddress: String,
 			newAddressIndex: Int,
 			callback: (ethereumSeriesAddresses: String) -> Unit
@@ -180,6 +240,72 @@ data class WalletTable(
 							val addresses = this.ethAddresses + "," + newAddress + "|$newAddressIndex"
 							update(this.apply {
 								ethAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateETCAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (ethereumClassicAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.etcAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								etcAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateBTCAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (bitcoinAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.btcAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								btcAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateBTCTestAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (bitcoinAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.btcTestAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								btcTestAddresses = addresses
 							})
 							GoldStoneAPI.context.runOnUiThread {
 								callback(addresses)

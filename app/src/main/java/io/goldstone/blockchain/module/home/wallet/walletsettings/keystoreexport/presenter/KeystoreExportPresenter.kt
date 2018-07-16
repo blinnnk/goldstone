@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 import android.widget.EditText
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.getKeystoreFile
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -19,6 +19,8 @@ import org.jetbrains.anko.support.v4.toast
 class KeystoreExportPresenter(
 	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
+	
+	private val address by lazy { fragment.arguments?.getString(ArgumentKey.address) }
 	
 	fun getKeystoreByAddress(
 		passwordInput: EditText,
@@ -33,10 +35,10 @@ class KeystoreExportPresenter(
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		WalletTable.getCurrentWallet {
+		address?.let {
 			doAsync {
 				fragment.context?.getKeystoreFile(
-					it!!.currentETHAndERCAddress,
+					it,
 					passwordInput.text.toString(),
 					{
 						hold("")

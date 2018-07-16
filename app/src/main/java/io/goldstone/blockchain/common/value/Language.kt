@@ -288,7 +288,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val customBitcoinPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Bitcoin Path"
@@ -299,7 +298,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Custom Bitcoin Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val customEthereumPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Ethereum Path"
@@ -310,7 +308,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Custom Ethereum Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
@@ -321,7 +318,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Default Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val importWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import Wallet"
@@ -1463,23 +1459,33 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val newEthereumAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New Ethereum Address"
-		HoneyLanguage.Chinese.code -> "New Ethereum Address"
-		HoneyLanguage.Japanese.code -> "New Ethereum Address"
-		HoneyLanguage.Korean.code -> "New Ethereum Address"
-		HoneyLanguage.Russian.code -> "New Ethereum Address"
-		HoneyLanguage.TraditionalChinese.code -> "New Ethereum Address"
+	val newETHAndERCAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New ETH & ERC Address"
+		HoneyLanguage.Chinese.code -> "New ETH & ERC Address"
+		HoneyLanguage.Japanese.code -> "New ETH & ERC Address"
+		HoneyLanguage.Korean.code -> "New ETH & ERC Address"
+		HoneyLanguage.Russian.code -> "New ETH & ERC Address"
+		HoneyLanguage.TraditionalChinese.code -> "New ETH & ERC Address"
 		else -> ""
 	}
 	@JvmField
-	val newBitcoinAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New Bitcoin Address"
-		HoneyLanguage.Chinese.code -> "New Bitcoin Address"
-		HoneyLanguage.Japanese.code -> "New Bitcoin Address"
-		HoneyLanguage.Korean.code -> "New Bitcoin Address"
-		HoneyLanguage.Russian.code -> "New Bitcoin Address"
-		HoneyLanguage.TraditionalChinese.code -> "New Bitcoin Address"
+	val newETCAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New ETC Address"
+		HoneyLanguage.Chinese.code -> "New ETC Address"
+		HoneyLanguage.Japanese.code -> "New ETC Address"
+		HoneyLanguage.Korean.code -> "New ETC Address"
+		HoneyLanguage.Russian.code -> "New ETC Address"
+		HoneyLanguage.TraditionalChinese.code -> "New ETC Address"
+		else -> ""
+	}
+	@JvmField
+	val newBTCAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New BTC Address"
+		HoneyLanguage.Chinese.code -> "New BTC Address"
+		HoneyLanguage.Japanese.code -> "New BTC Address"
+		HoneyLanguage.Korean.code -> "New BTC Address"
+		HoneyLanguage.Russian.code -> "New BTC Address"
+		HoneyLanguage.TraditionalChinese.code -> "New BTC Address"
 		else -> ""
 	}
 	@JvmField
@@ -1600,6 +1606,26 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "Ethereum Series Address"
 		HoneyLanguage.Russian.code -> "Ethereum Series Address"
 		HoneyLanguage.TraditionalChinese.code -> "Ethereum Series Address"
+		else -> ""
+	}
+	@JvmField
+	val ethereumClassicAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Ethereum Classic Address"
+		HoneyLanguage.Chinese.code -> "Ethereum Classic Address"
+		HoneyLanguage.Japanese.code -> "Ethereum Classic Address"
+		HoneyLanguage.Korean.code -> "Ethereum Classic Address"
+		HoneyLanguage.Russian.code -> "Ethereum Classic Address"
+		HoneyLanguage.TraditionalChinese.code -> "Ethereum Classic Address"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Bitcoin Address"
+		HoneyLanguage.Chinese.code -> "Bitcoin Address"
+		HoneyLanguage.Japanese.code -> "Bitcoin Address"
+		HoneyLanguage.Korean.code -> "Bitcoin Address"
+		HoneyLanguage.Russian.code -> "Bitcoin Address"
+		HoneyLanguage.TraditionalChinese.code -> "Bitcoin Address"
 		else -> ""
 	}
 	@JvmField
