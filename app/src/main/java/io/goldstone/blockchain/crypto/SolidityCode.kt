@@ -72,9 +72,12 @@ enum class ChainType(val id: Int) {
 }
 
 object DefaultPath {
+	// Path
 	const val ethPath = "m/44'/60'/0'/0/0"
+	const val etcPath = "m/44'/61'/0'/0/0"
 	const val btcPath = "m/44'/0'/0'/0/0"
 	const val btcTestPath = "m/44'/1'/0'/0/0"
+	// Header Value
 	const val ethPathHeader = "m/44'/60'"
 	const val btcPathHeader = "m/44'/0'"
 	const val default = "0'/0/0"

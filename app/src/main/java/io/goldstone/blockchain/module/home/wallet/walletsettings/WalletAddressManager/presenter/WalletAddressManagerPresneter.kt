@@ -24,7 +24,7 @@ class WalletAddressManagerPresneter(
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		getCurrentWalletEthereumSeriesAddress()
+		getEthereumAddresses()
 	}
 	
 	override fun onFragmentShowFromHidden() {
@@ -43,10 +43,26 @@ class WalletAddressManagerPresneter(
 		}
 	}
 	
-	private fun getCurrentWalletEthereumSeriesAddress() {
+	private fun getEthereumAddresses() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
 				fragment.setEthereumAddressModel(convertToChildAddresses(ethAddresses))
+			}
+		}
+	}
+	
+	private fun getBitcoinAddresses() {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				fragment.setEthereumAddressModel(convertToChildAddresses(btcAddresses))
+			}
+		}
+	}
+	
+	private fun getEthereumClassicAddresses() {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				fragment.setEthereumAddressModel(convertToChildAddresses(etcAddresses))
 			}
 		}
 	}
@@ -92,14 +108,6 @@ class WalletAddressManagerPresneter(
 		)
 	}
 	
-	private fun getCurrentWalletBtcSeriesAddress() {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				fragment.setEthereumAddressModel(convertToChildAddresses(btcAddresses))
-			}
-		}
-	}
-	
 	fun createNewEthereumChildAddress(password: String, hold: (List<String>) -> Unit) {
 		WalletTable.getWalletWithLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
 			wallet.encryptMnemonic?.let {
@@ -107,10 +115,8 @@ class WalletAddressManagerPresneter(
 				val newAddressIndex = ethereumChildAddressIndex + 1
 				val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
 				fragment.context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
-					it?.let {
-						WalletTable.updateEthereumSeriesAddresses(it, newAddressIndex) {
-							hold(convertToChildAddresses(it))
-						}
+					WalletTable.updateEthereumSeriesAddresses(it, newAddressIndex) {
+						hold(convertToChildAddresses(it))
 					}
 				}
 			}

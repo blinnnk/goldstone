@@ -8,6 +8,8 @@ import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.MultiChainAddresses
+import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -96,11 +98,10 @@ class PrivateKeyImportPresenter(
 				address?.let {
 					WalletImportPresenter.insertWalletToDatabase(
 						fragment,
-						it,
+						MultiChainAddresses(it, it, "", ""),
 						name,
 						"",
-						"",
-						"",
+						MultiChainPath("", "", "", ""),
 						hint,
 						callback
 					)

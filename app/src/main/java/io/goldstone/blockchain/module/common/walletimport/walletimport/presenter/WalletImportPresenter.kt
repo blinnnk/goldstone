@@ -9,6 +9,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.MultiChainAddresses
+import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -46,41 +48,60 @@ class WalletImportPresenter(
 		
 		fun insertWalletToDatabase(
 			fragment: Fragment,
-			address: String,
+			multiChainAddresses: MultiChainAddresses,
 			name: String,
 			encryptMnemonic: String,
-			ethereumPath: String,
-			bitcoinPath: String,
+			multiChainPath: MultiChainPath,
 			hint: String?,
 			callback: () -> Unit
 		) {
-			WalletTable.getWalletByAddress(address) {
+			WalletTable.getWalletByAddress(multiChainAddresses.ethAddress) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
 					WalletTable.insert(
 						WalletTable(
 							0,
 							name,
-							address,
-							true,
-							hint,
-							false,
-							0.0,
-							encryptMnemonic,
-							true,
+							currentETHAndERCAddress = multiChainAddresses.ethAddress,
+							currentETCAddress = multiChainAddresses.etcAddress,
+							currentBTCAddress = multiChainAddresses.btcTestAddress,
+							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
+							isUsing = true,
+							hint = hint,
+							isWatchOnly = false,
+							balance = 0.0,
+							encryptMnemonic = encryptMnemonic,
+							hasBackUpMnemonic = true,
 							ethAddresses = childAddressValue(
-								address,
-								getAddressIndexFromPath(ethereumPath)
+								multiChainAddresses.ethAddress,
+								getAddressIndexFromPath(multiChainPath.ethPath)
 							),
-							ethPath = ethereumPath,
-							btcPath = bitcoinPath
+							etcAddresses = childAddressValue(
+								multiChainAddresses.etcAddress,
+								getAddressIndexFromPath(multiChainPath.etcPath)
+							),
+							btcAddresses = childAddressValue(
+								multiChainAddresses.btcAddress,
+								getAddressIndexFromPath(multiChainPath.btcPath)
+							),
+							btcTestAddresses = childAddressValue(
+								multiChainAddresses.btcTestAddress,
+								getAddressIndexFromPath(multiChainPath.btcTestPath)
+							),
+							ethPath = multiChainPath.ethPath,
+							btcPath = multiChainPath.btcPath,
+							etcPath = multiChainPath.etcPath,
+							btcTestPath = multiChainPath.btcTestPath
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息
-						CreateWalletPresenter.generateMyTokenInfo(address, {
-							LogUtil.error("insertWalletToDatabase")
-							callback()
-						}) {
+						CreateWalletPresenter.generateMyTokenInfo(
+							multiChainAddresses.ethAddress,
+							{
+								LogUtil.error("insertWalletToDatabase")
+								callback()
+							}
+						) {
 							fragment.activity?.jump<SplashActivity>()
 						}
 						// 注册钱包地址用于发送 `Push`

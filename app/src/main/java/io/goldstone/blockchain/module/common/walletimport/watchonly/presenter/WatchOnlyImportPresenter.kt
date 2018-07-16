@@ -50,7 +50,18 @@ class WatchOnlyImportPresenter(
 						currentETHAndERCAddress = address.hex,
 						isUsing = true,
 						isWatchOnly = true,
-						hasBackUpMnemonic = true
+						hasBackUpMnemonic = true,
+						currentBTCTestAddress = "",
+						currentBTCAddress = "",
+						currentETCAddress = "",
+						ethPath = "",
+						etcPath = "",
+						btcPath = "",
+						btcTestPath = "",
+						ethAddresses = "",
+						etcAddresses = "",
+						btcAddresses = "",
+						btcTestAddresses = ""
 					)
 				) {
 					CreateWalletPresenter.generateMyTokenInfo(

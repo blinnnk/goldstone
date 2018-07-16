@@ -29,19 +29,23 @@ data class WalletTable(
 	var id: Int,
 	var name: String,
 	var currentETHAndERCAddress: String,
+	var currentETCAddress: String,
+	var currentBTCAddress: String,
+	var currentBTCTestAddress: String,
+	var ethAddresses: String, //format - "address|index,0x288832ds23...|0"
+	var btcAddresses: String,
+	var btcTestAddresses: String,
+	var etcAddresses: String,
+	var ethPath: String,
+	var etcPath: String,
+	var btcPath: String,
+	var btcTestPath: String,
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
-	var hasBackUpMnemonic: Boolean = false,
-	var ethAddresses: String = "",
-	var btcAddresses: String = "",
-	var btcAddressesSecrets: String = "",
-	var ethPath: String = "",
-	var btcPath: String = "",
-	var currentBTCAddress: String = "",
-	var currentBTCSecret: String = ""
+	var hasBackUpMnemonic: Boolean = false
 ) : Serializable {
 	
 	companion object {

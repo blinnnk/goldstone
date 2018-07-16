@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.DefaultPath
+import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -40,7 +41,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	override val presenter = MnemonicImportDetailPresenter(this)
 	// Default Value
 	private var customEthPath = DefaultPath.ethPath
+	private var customEtcPath = DefaultPath.etcPath
 	private var customBtcPath = DefaultPath.btcPath
+	private var customBtcTestPath = DefaultPath.btcTestPath
 	
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -111,8 +114,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(
-						customEthPath,
-						customBtcPath,
+						MultiChainPath(
+							customEthPath,
+							customEtcPath,
+							customBtcPath,
+							customBtcTestPath
+						),
 						mnemonicInput,
 						passwordInput,
 						repeatPassword,

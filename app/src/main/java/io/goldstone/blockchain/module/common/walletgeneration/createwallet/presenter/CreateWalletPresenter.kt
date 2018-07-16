@@ -25,7 +25,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.generateWallet
+import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -121,31 +121,54 @@ class CreateWalletPresenter(
 		callback: () -> Unit
 	) {
 		doAsync {
-			generateWallet(password) { mnemonicCode, address ->
+			GenerateMultiChainWallet.create(
+				this@generateWalletWith,
+				password
+			) { multiChainAddresses, mnemonic ->
 				// 将基础的不存在安全问题的信息插入数据库
 				WalletTable.insert(
 					WalletTable(
 						0,
 						name,
-						address,
-						true,
-						hint,
+						multiChainAddresses.ethAddress,
+						multiChainAddresses.etcAddress,
+						multiChainAddresses.btcAddress,
+						multiChainAddresses.btcTestAddress,
 						ethAddresses = WalletImportPresenter.childAddressValue(
-							address, WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+							multiChainAddresses.ethAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+						),
+						etcAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.etcAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+						),
+						btcAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.btcAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+						),
+						btcTestAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.btcTestAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
 						),
 						ethPath = DefaultPath.ethPath,
-						btcPath = DefaultPath.btcPath
+						btcPath = DefaultPath.btcPath,
+						etcPath = DefaultPath.etcPath,
+						btcTestPath = DefaultPath.btcTestPath,
+						hint = hint,
+						isUsing = true
 					)
 				) {
-					generateMyTokenInfo(address, {
-						LogUtil.error("generateWalletWith")
-					}) {
+					generateMyTokenInfo(
+						multiChainAddresses.ethAddress,
+						{
+							LogUtil.error("generateWalletWith")
+						}) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
-							putString(ArgumentKey.mnemonicCode, mnemonicCode)
+							putString(ArgumentKey.mnemonicCode, mnemonic)
 						}
 						// 防止用户跳过助记词, 把使用 `RSA` 加密后的住几次存入数据库
-						saveEncryptMnemonic(mnemonicCode, address) {
+						saveEncryptMnemonic(mnemonic, multiChainAddresses.ethAddress) {
 							fragment.context?.runOnUiThread {
 								showMnemonicBackupFragment(arguments)
 								callback()

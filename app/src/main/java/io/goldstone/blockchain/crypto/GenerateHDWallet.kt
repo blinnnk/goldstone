@@ -26,10 +26,10 @@ import java.io.File
  */
 fun Context.generateWallet(
 	password: String,
+	path: String = DefaultPath.ethPath,
 	holdAddress: (mnemonicCode: String, address: String) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
-	val path = "m/44'/60'/0'/0/0"
 	try {
 		/** Generate Mnemonic */
 		val mnemonicCode = Mnemonic.generateMnemonic()
@@ -54,7 +54,7 @@ fun Context.getEthereumWalletByMnemonic(
 	mnemonicCode: String,
 	pathValue: String,
 	password: String,
-	hold: (address: String?) -> Unit
+	hold: (address: String) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "keystore") }
 	/** Generate HD Wallet */
