@@ -29,6 +29,7 @@ object ArgumentKey {
 	const val isMainnet = "isMainnet"
 	const val address = "address"
 	const val isBTCAddress = "isBTCAddress"
+	const val coinType = "coinType"
 }
 
 object IntentKey {

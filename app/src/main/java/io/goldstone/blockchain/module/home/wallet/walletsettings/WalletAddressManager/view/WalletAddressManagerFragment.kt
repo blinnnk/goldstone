@@ -26,7 +26,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>() {
 	
-	private val ethereumAddresses by lazy {
+	private val ethAndERCAddresses by lazy {
 		AddressesListView(context!!) { cell, address ->
 			cell.onClick {
 				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
@@ -34,7 +34,7 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 			}
 		}
 	}
-	private val ethereumClassicAddresses by lazy {
+	private val etcAddresses by lazy {
 		AddressesListView(context!!) { cell, address ->
 			cell.onClick {
 				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
@@ -42,7 +42,7 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 			}
 		}
 	}
-	private val bitcoinAddresses by lazy {
+	private val btcAddresses by lazy {
 		AddressesListView(context!!) { cell, address ->
 			cell.onClick {
 				showCellMoreDashboard(
@@ -66,26 +66,30 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 					leftPadding = PaddingSize.device
 					topPadding = 20.uiPX()
 				}
-				ethereumAddresses.into(this)
-				ethereumClassicAddresses.into(this)
-				bitcoinAddresses.into(this)
+				ethAndERCAddresses.into(this)
+				etcAddresses.into(this)
+				btcAddresses.into(this)
+				
+				ethAndERCAddresses.checkAllEvent = presenter.showAllETHAndERCAddresses()
+				etcAddresses.checkAllEvent = presenter.showAllETCAddresses()
+				btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
 			}
 		}
 	}
 	
-	fun setEthereumAddressesModel(model: List<String>) {
-		ethereumAddresses.setTitle(WalletSettingsText.ethereumSeriesAddress)
-		ethereumAddresses.model = model
+	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
+		ethAndERCAddresses.setTitle(WalletSettingsText.ethereumSeriesAddress)
+		ethAndERCAddresses.model = model
 	}
 	
-	fun setEthereumClassicAddressesModel(model: List<String>) {
-		ethereumClassicAddresses.setTitle(WalletSettingsText.ethereumClassicAddress)
-		ethereumClassicAddresses.model = model
+	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {
+		etcAddresses.setTitle(WalletSettingsText.ethereumClassicAddress)
+		etcAddresses.model = model
 	}
 	
-	fun setBitcoinAddressesModel(model: List<String>) {
-		bitcoinAddresses.setTitle(WalletSettingsText.bitcoinAddress)
-		bitcoinAddresses.model = model
+	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
+		btcAddresses.setTitle(WalletSettingsText.bitcoinAddress)
+		btcAddresses.model = model
 	}
 	
 	private fun showChildAddressCreatorDashboard() {
@@ -133,19 +137,19 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 		when (title) {
 			WalletSettingsText.newETHAndERCAddress -> {
 				presenter.createNewETHAndERCChildAddress(password) {
-					ethereumAddresses.model = it
+					ethAndERCAddresses.model = it
 				}
 			}
 			
 			WalletSettingsText.newETCAddress -> {
 				presenter.createNewETCChildAddress(password) {
-					ethereumClassicAddresses.model = it
+					etcAddresses.model = it
 				}
 			}
 			
 			WalletSettingsText.newBTCAddress -> {
 				presenter.createNewBTCChildAddress(password) {
-					bitcoinAddresses.model = it
+					btcAddresses.model = it
 				}
 			}
 		}
@@ -163,7 +167,7 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 							WalletText.showQRCode -> presenter.showQRCodeFragment(address)
 							
 							WalletSettingsText.exportPrivateKey -> {
-								if (isBTC)  presenter.showBTCPrivateKeyExportFragment(address)
+								if (isBTC) presenter.showBTCPrivateKeyExportFragment(address)
 								else presenter.showPrivateKeyExportFragment(address)
 							}
 							

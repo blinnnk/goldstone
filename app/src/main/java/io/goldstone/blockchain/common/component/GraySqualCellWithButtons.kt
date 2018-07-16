@@ -82,12 +82,17 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		title.text = text
 	}
 	
-	fun setTitle(text: String) {
-		title.text = text
-	}
-	
 	fun setSubtitle(text: String) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = if (text.length > 36) text.substring(0, 36) + "..." else text
+	}
+	
+	fun updateBackgroundColor(color: Int = Spectrum.whiteYellow) {
+		backgroundColor = color
+		title.textColor = GrayScale.Opacity2Black
+		moreButton.setColorFilter(GrayScale.black)
+		moreButton.alpha = 0.2f
+		copyButton.setColorFilter(GrayScale.black)
+		copyButton.alpha = 0.2f
 	}
 }

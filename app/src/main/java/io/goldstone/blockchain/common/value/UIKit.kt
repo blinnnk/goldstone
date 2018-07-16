@@ -44,6 +44,8 @@ object Spectrum {
 	@JvmField
 	val white = Color.parseColor("#FFFFFFFF")
 	@JvmField
+	val whiteYellow = Color.parseColor("#FFFFF58B")
+	@JvmField
 	val blue = Color.parseColor("#FF235682")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
