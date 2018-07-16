@@ -1499,6 +1499,46 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val allETHAndERCAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All ETH & ERC Addresses"
+		HoneyLanguage.Chinese.code -> "All ETH & ERC Addresses"
+		HoneyLanguage.Japanese.code -> "All ETH & ERC Addresses"
+		HoneyLanguage.Korean.code -> "All ETH & ERC Addresses"
+		HoneyLanguage.Russian.code -> "All ETH & ERC Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "All ETH & ERC Addresses"
+		else -> ""
+	}
+	@JvmField
+	val allETCAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All ETC Addresses"
+		HoneyLanguage.Chinese.code -> "All ETC Addresses"
+		HoneyLanguage.Japanese.code -> "All ETC Addresses"
+		HoneyLanguage.Korean.code -> "All ETC Addresses"
+		HoneyLanguage.Russian.code -> "All ETC Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "All ETC Addresses"
+		else -> ""
+	}
+	@JvmField
+	val allBtCAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All BTC Addresses"
+		HoneyLanguage.Chinese.code -> "All BTC Addresses"
+		HoneyLanguage.Japanese.code -> "All BTC Addresses"
+		HoneyLanguage.Korean.code -> "All BTC Addresses"
+		HoneyLanguage.Russian.code -> "All BTC Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "All BTC Addresses"
+		else -> ""
+	}
+	@JvmField
+	val allBtCTestAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All BTC Test Addresses"
+		HoneyLanguage.Chinese.code -> "All BTC Test Addresses"
+		HoneyLanguage.Japanese.code -> "All BTC Test Addresses"
+		HoneyLanguage.Korean.code -> "All BTC Test Addresses"
+		HoneyLanguage.Russian.code -> "All BTC Test Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "All BTC Test Addresses"
+		else -> ""
+	}
+	@JvmField
 	val balance = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Balance"
 		HoneyLanguage.Chinese.code -> "余额"
@@ -1599,6 +1639,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val defaultAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Default Address"
+		HoneyLanguage.Chinese.code -> "Default Address"
+		HoneyLanguage.Japanese.code -> "Default Address"
+		HoneyLanguage.Korean.code -> "Default Address"
+		HoneyLanguage.Russian.code -> "Default Address"
+		HoneyLanguage.TraditionalChinese.code -> "Default Address"
+		else -> ""
+	}
+	@JvmField
 	val ethereumSeriesAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ethereum Series Address"
 		HoneyLanguage.Chinese.code -> "Ethereum Series Address"
@@ -1626,6 +1676,16 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "Bitcoin Address"
 		HoneyLanguage.Russian.code -> "Bitcoin Address"
 		HoneyLanguage.TraditionalChinese.code -> "Bitcoin Address"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinTestAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Bitcoin Test Address"
+		HoneyLanguage.Chinese.code -> "Bitcoin Test Address"
+		HoneyLanguage.Japanese.code -> "Bitcoin Test Address"
+		HoneyLanguage.Korean.code -> "Bitcoin Test Address"
+		HoneyLanguage.Russian.code -> "Bitcoin Test Address"
+		HoneyLanguage.TraditionalChinese.code -> "Bitcoin Test Address"
 		else -> ""
 	}
 	@JvmField

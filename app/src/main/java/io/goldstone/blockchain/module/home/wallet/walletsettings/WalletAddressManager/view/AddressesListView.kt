@@ -34,23 +34,23 @@ class AddressesListView(
 	}
 	private val maxCount = 5
 	var checkAllEvent: Runnable? = null
-	var model: List<String>? by observing(null) {
+	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
 			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 50.uiPX()
 			requestLayout()
-			reversed().forEachIndexed { index, address ->
+			reversed().forEachIndexed { index, data ->
 				// 默认最多显示 `5` 条地址
 				if (index >= maxCount) return@forEachIndexed
 				GraySqualCellWithButtons(context).apply cell@{
 					copyButton.onClick {
-						context.clickToCopy(address)
+						context.clickToCopy(data.first)
 						copyButton.preventDuplicateClicks()
 					}
-					hold(moreButton, address)
-					setTitle("${size - index}.")
-					setSubtitle(CryptoUtils.scaleMiddleAddress(address))
+					hold(moreButton, data.first)
+					setTitle("${data.second}.")
+					setSubtitle(CryptoUtils.scaleMiddleAddress(data.first))
 				}.into(cellLayout)
 			}
 			updateButtonTitle("Check All (${model?.size})")
