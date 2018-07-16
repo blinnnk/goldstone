@@ -70,7 +70,7 @@ fun Context.getEthereumWalletByMnemonic(
 	try {
 		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
 	} catch (error: Exception) {
-		println("getEthereumWalletByMnemonic$error")
+		println("getEthereumWalletByMnemonic $error")
 	}
 	hold(address)
 }

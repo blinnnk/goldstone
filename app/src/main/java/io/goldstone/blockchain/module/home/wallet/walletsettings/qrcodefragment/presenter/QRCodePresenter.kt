@@ -16,9 +16,9 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.QRText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import org.jetbrains.anko.support.v4.toast
 import java.io.File
@@ -29,20 +29,21 @@ import java.util.*
  * @date 26/03/2018 11:07 PM
  * @author KaySaith
  */
-
 open class QRCodePresenter(
 	override val fragment: QRCodeFragment
 ) : BasePresenter<QRCodeFragment>() {
-
+	
+	private val address by lazy { fragment.arguments?.getString(ArgumentKey.address) }
+	
 	override fun onFragmentViewCreated() {
-		WalletTable.getCurrentWalletAddress {
-			fragment.setAddressText(this)
-			fragment.setQRImage(generateQRCode(this))
+		address?.let {
+			fragment.setAddressText(it)
+			fragment.setQRImage(generateQRCode(it))
 		}
 	}
-
+	
 	companion object {
-
+		
 		fun generateQRCode(content: String): Bitmap? {
 			return try {
 				val size = (ScreenSize.Width * 0.8).toInt()
@@ -53,7 +54,7 @@ open class QRCodePresenter(
 				null
 			}
 		}
-
+		
 		fun saveQRCodeImageToAlbum(
 			content: String,
 			fragment: Fragment,
@@ -70,7 +71,7 @@ open class QRCodePresenter(
 				fragment.toast(QRText.savedAttention)
 			}
 		}
-
+		
 		fun shareQRImage(
 			fragment: Fragment,
 			content: String
@@ -82,7 +83,7 @@ open class QRCodePresenter(
 				fragment.activity?.startActivity(Intent.createChooser(intent, QRText.shareQRTitle))
 			}
 		}
-
+		
 		fun scanQRCode(fragment: Fragment) {
 			val integrator = IntentIntegrator.forSupportFragment(fragment)
 			integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
@@ -94,7 +95,7 @@ open class QRCodePresenter(
 			integrator.setBarcodeImageEnabled(true)
 			integrator.initiateScan()
 		}
-
+		
 		private fun saveImage(
 			bitmap: Bitmap,
 			fragment: Fragment,
@@ -109,7 +110,6 @@ open class QRCodePresenter(
 			val fileName = "Image-$n.jpg"
 			val file = File(myDirector, fileName)
 			if (file.exists()) file.delete()
-
 			val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
 			val contentUri = Uri.fromFile(file)
 			mediaScanIntent.data = contentUri

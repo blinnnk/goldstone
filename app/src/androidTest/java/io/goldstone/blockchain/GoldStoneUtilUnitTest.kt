@@ -86,7 +86,7 @@ class GoldStoneUtilUnitTest {
 	
 	@Test
 	fun getLatestEthereumChildAddressIndex() {
-		WalletTable.getWalletWithLatestChildAddressIndex { _, ethereumChildAddressIndex ->
+		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
 			LogUtil.debug("getLatestEthereumChildAddressIndex + $positon", "$ethereumChildAddressIndex")
 		}
 	}
@@ -101,7 +101,7 @@ class GoldStoneUtilUnitTest {
 	
 	@Test
 	fun newEthereumChildAddress() {
-		WalletTable.getWalletWithLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
+		WalletTable.getETHAndERCWalletLatestChildAddressIndex() { wallet, ethereumChildAddressIndex ->
 			wallet.encryptMnemonic?.let {
 				val mnemonic = JavaKeystoreUtil().decryptData(it)
 				val index = ethereumChildAddressIndex + 1

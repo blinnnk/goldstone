@@ -28,7 +28,7 @@ class DepositPresenter(
 	
 	fun generateQRCode(amount: Double = 0.0, callback: () -> Unit = {}) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			WalletTable.getCurrentWalletAddress {
+			WalletTable.getCurrentWalletETHAndERCAddress {
 				val chainParameter = if (amount == 0.0) "" else "?amount=$amount"
 				val tokenParameter = if (amount == 0.0) "" else "?amount=$amount?token=${token?.contract}"
 				val content = when (token?.symbol) {

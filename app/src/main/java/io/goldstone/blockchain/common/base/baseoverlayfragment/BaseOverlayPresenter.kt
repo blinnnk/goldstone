@@ -53,8 +53,14 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						showChildFragment(this[it])
 					}
 				} else {
-					this[size - 1]?.let {
-						showChildFragment(it)
+					if (size == 2) {
+						this[size - 2]?.let {
+							showChildFragment(it)
+						}
+					} else {
+						this[size - 1]?.let {
+							showChildFragment(it)
+						}
 					}
 				}
 			}

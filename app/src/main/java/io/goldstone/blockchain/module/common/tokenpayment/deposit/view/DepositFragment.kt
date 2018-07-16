@@ -90,7 +90,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	}
 	
 	private fun setAddressText() {
-		WalletTable.getCurrentWalletAddress {
+		WalletTable.getCurrentWalletETHAndERCAddress {
 			qrView.setAddressText(this)
 		}
 	}
