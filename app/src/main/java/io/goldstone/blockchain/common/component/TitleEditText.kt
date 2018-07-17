@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -8,6 +9,7 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
@@ -21,12 +23,13 @@ class TitleEditText(context: Context) : RelativeLayout(context) {
 	private val titleView = textView {
 		gravity = Gravity.CENTER_VERTICAL
 		textColor = GrayScale.black
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.black(context)
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, viewHeight)
 	}
 	private val editText = editText {
 		layoutParams = RelativeLayout.LayoutParams(200.uiPX(), matchParent)
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.black(context)
+		backgroundTintList = ColorStateList.valueOf(Spectrum.blue)
 		textColor = GrayScale.black
 		textSize = fontSize(14)
 		hint = "0'/0/0"

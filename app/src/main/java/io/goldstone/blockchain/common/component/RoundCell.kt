@@ -37,7 +37,7 @@ class RoundCell(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(cellHeight, cellHeight)
 	}
 	private val subtitleView = textView {
-		textSize = fontSize(14)
+		textSize = fontSize(12)
 		textColor = GrayScale.midGray
 		typeface = GoldStoneFont.heavy(context)
 		gravity = Gravity.CENTER_VERTICAL or Gravity.END
