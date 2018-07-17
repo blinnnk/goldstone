@@ -61,7 +61,7 @@ class MnemonicImportDetailPresenter(
 			callback()
 			return
 		}
-		// TODO 需要处理 `Bitcoin` 的 `Path` 创建逻辑
+
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),

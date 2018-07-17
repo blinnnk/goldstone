@@ -5,7 +5,9 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -15,6 +17,7 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 2018/7/16 9:54 PM
@@ -23,7 +26,6 @@ import org.jetbrains.anko.*
 class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 	
 	private val defaultTitle = textView {
-		text = WalletSettingsText.defaultAddress
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.heavy(context)
 		textColor = GrayScale.black
@@ -44,12 +46,19 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		defaultTitle.text = WalletSettingsText.defaultAddress
 		currentAddress.into(this)
 		allAddressTitle.into(this)
 		currentAddress.updateBackgroundColor()
 	}
 	
-	fun setDefaultAddress(index: String, address: String, chainType: Int) {
+	fun setDefaultAddress(
+		index: String,
+		address: String,
+		chainType: Int,
+		showDashboardEvent: GraySqualCellWithButtons.() -> Unit
+	) {
+		setClickEvent(address, showDashboardEvent)
 		currentAddress.setTitle(index)
 		val halfSize = if (chainType == ChainType.BTC.id) 12 else 14
 		currentAddress.setSubtitle(CryptoUtils.scaleMiddleAddress(address, halfSize))
@@ -69,6 +78,16 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 			ChainType.BTCTest.id -> {
 				allAddressTitle.text = WalletSettingsText.allBtCTestAddresses
 			}
+		}
+	}
+	
+	private fun setClickEvent(address: String, showDashboardEvent: GraySqualCellWithButtons.() -> Unit) {
+		currentAddress.copyButton.onClick {
+			currentAddress.context.clickToCopy(address)
+		}
+		currentAddress.moreButton.onClick {
+			showDashboardEvent(currentAddress)
+			currentAddress.preventDuplicateClicks()
 		}
 	}
 }

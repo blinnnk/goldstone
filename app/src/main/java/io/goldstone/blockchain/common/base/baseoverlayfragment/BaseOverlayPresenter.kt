@@ -53,7 +53,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						showChildFragment(this[it])
 					}
 				} else {
-					if (size == 2) {
+					if (size >= 2) {
 						this[size - 2]?.let {
 							showChildFragment(it)
 						}
@@ -94,7 +94,9 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	}
 	
 	inline fun <reified T : Fragment> BaseOverlayFragment<*>.addSubFragment(
-		bundle: Bundle, previousTitle: String, viewPagerSize: Int
+		bundle: Bundle,
+		previousTitle: String,
+		viewPagerSize: Int
 	) {
 		addFragmentAndSetArgument<T>(ContainerID.content) {
 			putAll(bundle)

@@ -13,23 +13,29 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.WalletAddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.support.v4.toast
 
 /**
  * @date 2018/7/11 12:44 AM
  * @author KaySaith
  */
-class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>() {
+class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	
 	private val ethAndERCAddresses by lazy {
 		AddressesListView(context!!) { cell, address ->
 			cell.onClick {
-				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
+				showCellMoreDashboard(
+					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.ETH.id
+				)
 				cell.preventDuplicateClicks()
 			}
 		}
@@ -37,7 +43,11 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 	private val etcAddresses by lazy {
 		AddressesListView(context!!) { cell, address ->
 			cell.onClick {
-				showCellMoreDashboard(cell.getViewAbsolutelyPositionInScreen()[1].toFloat(), address)
+				showCellMoreDashboard(
+					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.ETC.id
+				)
 				cell.preventDuplicateClicks()
 			}
 		}
@@ -48,14 +58,13 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 				showCellMoreDashboard(
 					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					true
+					ChainType.BTC.id
 				)
 				cell.preventDuplicateClicks()
 			}
 		}
 	}
-	var creatorDashBoard: MiniOverlay? = null
-	override val presenter = WalletAddressManagerPresneter(this)
+	override val presenter = AddressManagerPresneter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
 		showChildAddressCreatorDashboard()
@@ -97,7 +106,7 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 			overlayView.header.showAddButton(true, false) {
 				getMainActivity()?.getMainContainer()?.apply {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
-						creatorDashBoard = MiniOverlay(context) { cell, title ->
+						val creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick {
 								verifyPassword {
 									createChildAddressByButtonTitle(title, it)
@@ -105,10 +114,10 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 								cell.preventDuplicateClicks()
 							}
 						}
-						creatorDashBoard?.model =
-							this@WalletAddressManagerFragment.presenter.getAddressCreatorMenu()
-						creatorDashBoard?.into(this)
-						creatorDashBoard?.setTopRight()
+						creatorDashBoard.model =
+							this@AddressManagerFragment.presenter.getAddressCreatorMenu()
+						creatorDashBoard.into(this)
+						creatorDashBoard.setTopRight()
 					}
 				}
 			}
@@ -130,7 +139,7 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 				}
 			}
 		}
-		creatorDashBoard?.removeSelf()
+		AddressManagerFragment.removeDashboard(this)
 	}
 	
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
@@ -155,37 +164,84 @@ class WalletAddressManagerFragment : BaseFragment<WalletAddressManagerPresneter>
 		}
 	}
 	
-	private fun showCellMoreDashboard(top: Float, address: String, isBTC: Boolean = false) {
-		getMainActivity()?.getMainContainer()?.apply {
-			if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
-				creatorDashBoard = MiniOverlay(context) { cell, title ->
-					cell.onClick {
-						when (title) {
-							WalletText.setDefaultAddress -> {
-							}
-							
-							WalletText.showQRCode -> presenter.showQRCodeFragment(address)
-							
-							WalletSettingsText.exportPrivateKey -> {
-								if (isBTC) presenter.showBTCPrivateKeyExportFragment(address)
-								else presenter.showPrivateKeyExportFragment(address)
-							}
-							
-							WalletSettingsText.exportKeystore -> presenter.showKeystoreExportFragment(address)
-						}
-						cell.preventDuplicateClicks()
+	private fun showCellMoreDashboard(
+		top: Float,
+		address: String,
+		coinType: Int
+	) {
+		val isBTC = ChainType.BTC.id == coinType
+		AddressManagerFragment.showMoreDashboard(
+			this,
+			top,
+			isBTC,
+			setDefaultAddressEvent = {
+				AddressManagerPresneter.setDefaultAddress(coinType, address) {
+					when (coinType) {
+						ChainType.ETH.id -> presenter.getEthereumAddresses()
+						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
+						ChainType.BTC.id -> presenter.getBitcoinAddresses()
+						ChainType.BTCTest.id -> presenter.getBitcoinAddresses()
 					}
+					toast(CommonText.succeed)
+					AddressManagerFragment.removeDashboard(this)
 				}
-				creatorDashBoard?.model = presenter.getCellDashboardMenu(isBTC)
-				creatorDashBoard?.into(this)
-				creatorDashBoard?.setTopValue(top)
-			}
-		}
+			},
+			qrCellClickEvent = { presenter.showQRCodeFragment(address) },
+			exportPrivateKey = { presenter.showKeystoreExportFragment(address) },
+			keystoreCellClickEvent = { presenter.showPrivateKeyExportFragment(address) },
+			exportBTCPrivateKey = { presenter.showBTCPrivateKeyExportFragment(address) }
+		)
 	}
 	
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
 			presenter.showWalletSettingListFragment()
+		}
+	}
+	
+	companion object {
+		
+		fun showMoreDashboard(
+			fragment: Fragment,
+			top: Float,
+			isBTC: Boolean = false,
+			hasDefaultCell: Boolean = true,
+			setDefaultAddressEvent: () -> Unit,
+			qrCellClickEvent: () -> Unit,
+			exportBTCPrivateKey: () -> Unit,
+			exportPrivateKey: () -> Unit,
+			keystoreCellClickEvent: () -> Unit
+		) {
+			fragment.getMainActivity()?.getMainContainer()?.apply {
+				if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
+					val creatorDashBoard = MiniOverlay(context) { cell, title ->
+						cell.onClick {
+							when (title) {
+								WalletText.setDefaultAddress -> setDefaultAddressEvent()
+								WalletText.showQRCode -> qrCellClickEvent()
+								
+								WalletSettingsText.exportPrivateKey -> {
+									if (isBTC) exportBTCPrivateKey()
+									else exportPrivateKey()
+								}
+								
+								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
+							}
+							cell.preventDuplicateClicks()
+						}
+					}
+					creatorDashBoard.model =
+						AddressManagerPresneter.getCellDashboardMenu(isBTC, hasDefaultCell)
+					creatorDashBoard.into(this)
+					creatorDashBoard.setTopValue(top)
+				}
+			}
+		}
+		
+		fun removeDashboard(fragment: Fragment) {
+			fragment.getMainActivity()?.getMainContainer()?.apply {
+				findViewById<MiniOverlay>(ElementID.miniOverlay)?.removeSelf()
+			}
 		}
 	}
 }

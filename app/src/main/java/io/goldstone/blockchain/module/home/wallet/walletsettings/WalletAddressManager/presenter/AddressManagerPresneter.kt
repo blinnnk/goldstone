@@ -15,20 +15,20 @@ import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.SingleChainAddressesFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.WalletAddressManagerFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**
  * @date 2018/7/11 12:44 AM
  * @author KaySaith
  */
-class WalletAddressManagerPresneter(
-	override val fragment: WalletAddressManagerFragment
-) : BasePresenter<WalletAddressManagerFragment>() {
+class AddressManagerPresneter(
+	override val fragment: AddressManagerFragment
+) : BasePresenter<AddressManagerFragment>() {
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -53,7 +53,7 @@ class WalletAddressManagerPresneter(
 		}
 	}
 	
-	private fun getEthereumAddresses() {
+	fun getEthereumAddresses() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
 				fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
@@ -61,7 +61,7 @@ class WalletAddressManagerPresneter(
 		}
 	}
 	
-	private fun getEthereumClassicAddresses() {
+	fun getEthereumClassicAddresses() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
 				fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
@@ -69,28 +69,11 @@ class WalletAddressManagerPresneter(
 		}
 	}
 	
-	private fun getBitcoinAddresses() {
+	fun getBitcoinAddresses() {
 		WalletTable.getCurrentWallet {
 			it?.apply {
 				fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
 			}
-		}
-	}
-	
-	fun getCellDashboardMenu(isBTC: Boolean = false): List<Pair<Int, String>> {
-		return if (isBTC) {
-			listOf(
-				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
-				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey)
-			)
-		} else {
-			listOf(
-				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
-				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
-				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey)
-			)
 		}
 	}
 	
@@ -104,7 +87,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.creatorDashBoard?.removeSelf()
+			AddressManagerFragment.removeDashboard(fragment)
 			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportPrivateKey,
 				WalletSettingsText.viewAddresses,
@@ -115,7 +98,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showBTCPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.creatorDashBoard?.removeSelf()
+			AddressManagerFragment.removeDashboard(fragment)
 			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportPrivateKey,
 				WalletSettingsText.viewAddresses,
@@ -129,7 +112,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showKeystoreExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			fragment.creatorDashBoard?.removeSelf()
+			AddressManagerFragment.removeDashboard(fragment)
 			showTargetFragment<KeystoreExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportKeystore,
 				WalletSettingsText.viewAddresses,
@@ -139,7 +122,7 @@ class WalletAddressManagerPresneter(
 	}
 	
 	fun showQRCodeFragment(address: String) {
-		fragment.creatorDashBoard?.removeSelf()
+		AddressManagerFragment.removeDashboard(fragment)
 		showTargetFragment<QRCodeFragment, WalletSettingsFragment>(
 			WalletText.showQRCode,
 			WalletSettingsText.viewAddresses,
@@ -221,7 +204,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showAllETHAndERCAddresses(): Runnable {
 		return Runnable {
-			showTargetFragment<SingleChainAddressesFragment, WalletSettingsFragment>(
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETHAndERCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
@@ -231,7 +214,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showAllETCAddresses(): Runnable {
 		return Runnable {
-			showTargetFragment<SingleChainAddressesFragment, WalletSettingsFragment>(
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
@@ -241,7 +224,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
-			showTargetFragment<SingleChainAddressesFragment, WalletSettingsFragment>(
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBtCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
@@ -251,7 +234,7 @@ class WalletAddressManagerPresneter(
 	
 	fun showAllBTCTestAddresses(): Runnable {
 		return Runnable {
-			showTargetFragment<SingleChainAddressesFragment, WalletSettingsFragment>(
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBtCTestAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTCTest.id) }
@@ -260,6 +243,30 @@ class WalletAddressManagerPresneter(
 	}
 	
 	companion object {
+		
+		fun setDefaultAddress(
+			chainType: Int,
+			defaultAddress: String,
+			callback: () -> Unit
+		) {
+			WalletTable.updateCurrentAddressByChainType(chainType, defaultAddress, callback)
+		}
+		
+		fun getCellDashboardMenu(
+			isBTC: Boolean = false,
+			hasDefaultCell: Boolean = true
+		): ArrayList<Pair<Int, String>> {
+			return arrayListOf(
+				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
+				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
+				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
+				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey)
+			).apply {
+				if (isBTC) remove(find { it.second == WalletSettingsText.exportKeystore })
+				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
+			}
+		}
+		
 		fun convertToChildAddresses(seriesAddress: String): List<Pair<String, String>> {
 			return if (seriesAddress.contains(",")) {
 				seriesAddress.split(",").map {

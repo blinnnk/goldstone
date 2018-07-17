@@ -9,7 +9,8 @@ import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
  * @author KaySaith
  */
 class ChainAddressesAdapter(
-	override val dataSet: ArrayList<Pair<String, String>>
+	override val dataSet: ArrayList<Pair<String, String>>,
+	private val hold: ChainAddressesCell.() -> Unit
 ) : HoneyBaseAdapterWithHeaderAndFooter<Pair<String, String>, ChainAddressesHeaderView, ChainAddressesCell, View>() {
 	
 	override fun generateFooter(context: Context) = View(context)
@@ -17,5 +18,6 @@ class ChainAddressesAdapter(
 	override fun generateCell(context: Context) = ChainAddressesCell(context)
 	override fun ChainAddressesCell.bindCell(data: Pair<String, String>, position: Int) {
 		model = data
+		hold(this)
 	}
 }

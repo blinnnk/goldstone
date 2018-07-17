@@ -64,7 +64,7 @@ class WalletImportPresenter(
 							name,
 							currentETHAndERCAddress = multiChainAddresses.ethAddress,
 							currentETCAddress = multiChainAddresses.etcAddress,
-							currentBTCAddress = multiChainAddresses.btcTestAddress,
+							currentBTCAddress = multiChainAddresses.btcAddress,
 							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
 							isUsing = true,
 							hint = hint,
