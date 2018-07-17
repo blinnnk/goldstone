@@ -118,7 +118,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
-						presenter.getBitcoinAddresses()
+						if (Config.isTestEnvironment()) {
+							presenter.getBitcoinTestAddresses()
+						} else {
+							presenter.getBitcoinAddresses()
+						}
 					} else {
 						attentionView.into(this)
 					}

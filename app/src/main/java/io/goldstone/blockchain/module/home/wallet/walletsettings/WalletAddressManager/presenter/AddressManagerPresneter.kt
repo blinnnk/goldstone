@@ -98,6 +98,14 @@ class AddressManagerPresneter(
 		}
 	}
 	
+	fun getBitcoinTestAddresses() {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
+			}
+		}
+	}
+	
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
 		return listOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
