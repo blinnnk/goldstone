@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -34,6 +35,7 @@ class AddressManagerPresneter(
 	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
+		getMultiChainAddresses()
 		getEthereumAddresses()
 		getEthereumClassicAddresses()
 		getBitcoinAddresses()
@@ -52,6 +54,21 @@ class AddressManagerPresneter(
 					presenter.showWalletSettingListFragment()
 				}
 				showCloseButton(false)
+			}
+		}
+	}
+	
+	private fun getMultiChainAddresses() {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				val addresses =
+					arrayListOf(
+						Pair(currentETHAndERCAddress, CryptoSymbol.erc),
+						Pair(currentETHAndERCAddress, CryptoSymbol.eth),
+						Pair(currentETCAddress, CryptoSymbol.etc),
+						Pair(currentBTCAddress, CryptoSymbol.btc)
+					)
+				fragment.setMultiChainAddresses(addresses)
 			}
 		}
 	}

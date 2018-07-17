@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -34,7 +35,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
 	}
-	protected val button = TextView(context).apply {
+	private val button = TextView(context).apply {
 		textSize = fontSize(12)
 		textColor = Spectrum.green
 		typeface = GoldStoneFont.medium(context)
@@ -85,6 +86,10 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 			.click { event() }
 			.into(titleLayout)
 		button.setAlignParentRight()
+	}
+	
+	fun hideButton() {
+		button.visibility = View.GONE
 	}
 	
 	fun updateButtonTitle(text: String) {

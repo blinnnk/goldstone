@@ -111,6 +111,18 @@ data class WalletTable(
 				}) { hold(it) }
 		}
 		
+		fun getCurrentAddresses(hold: (List<String>) -> Unit) {
+			WalletTable.getCurrentWallet {
+				val currentAddresses = if (!it.isNull()) listOf(
+					it!!.currentBTCAddress,
+					it.currentBTCTestAddress,
+					it.currentETCAddress,
+					it.currentETHAndERCAddress
+				) else listOf()
+				hold(currentAddresses)
+			}
+		}
+		
 		fun getETHAndERCWalletLatestChildAddressIndex(
 			hold: (
 				wallet: WalletTable,
