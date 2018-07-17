@@ -29,36 +29,39 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	
 	private val ethAndERCAddresses by lazy {
-		AddressesListView(context!!) { cell, address ->
+		AddressesListView(context!!) { cell, address, isDefault ->
 			cell.onClick {
 				showCellMoreDashboard(
 					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					ChainType.ETH.id
+					ChainType.ETH.id,
+					!isDefault
 				)
 				cell.preventDuplicateClicks()
 			}
 		}
 	}
 	private val etcAddresses by lazy {
-		AddressesListView(context!!) { cell, address ->
+		AddressesListView(context!!) { cell, address, isDefault ->
 			cell.onClick {
 				showCellMoreDashboard(
 					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					ChainType.ETC.id
+					ChainType.ETC.id,
+					!isDefault
 				)
 				cell.preventDuplicateClicks()
 			}
 		}
 	}
 	private val btcAddresses by lazy {
-		AddressesListView(context!!) { cell, address ->
+		AddressesListView(context!!) { cell, address, isDefault ->
 			cell.onClick {
 				showCellMoreDashboard(
 					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					ChainType.BTC.id
+					ChainType.BTC.id,
+					!isDefault
 				)
 				cell.preventDuplicateClicks()
 			}
@@ -101,14 +104,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		btcAddresses.model = model
 	}
 	
-	private fun showChildAddressCreatorDashboard() {
+	fun showChildAddressCreatorDashboard() {
 		getParentFragment<WalletSettingsFragment> {
 			overlayView.header.showAddButton(true, false) {
 				getMainActivity()?.getMainContainer()?.apply {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick {
-								verifyPassword {
+								AddressManagerFragment.verifyPassword(this@getParentFragment) {
 									createChildAddressByButtonTitle(title, it)
 								}
 								cell.preventDuplicateClicks()
@@ -124,40 +127,22 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	
-	private fun verifyPassword(callback: (password: String) -> Unit) {
-		context?.showAlertView(
-			WalletSettingsText.deleteInfoTitle,
-			WalletSettingsText.deleteInfoSubtitle,
-			!Config.getCurrentIsWatchOnlyOrNot()
-		) {
-			val password = it?.text.toString()
-			context?.verifyKeystorePassword(password) {
-				if (it) {
-					callback(password)
-				} else {
-					context.alert(CommonText.wrongPassword)
-				}
-			}
-		}
-		AddressManagerFragment.removeDashboard(this)
-	}
-	
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
 		when (title) {
 			WalletSettingsText.newETHAndERCAddress -> {
-				presenter.createNewETHAndERCChildAddress(password) {
+				AddressManagerPresneter.createETHAndERCAddress(context, password) {
 					ethAndERCAddresses.model = it
 				}
 			}
 			
 			WalletSettingsText.newETCAddress -> {
-				presenter.createNewETCChildAddress(password) {
+				AddressManagerPresneter.createETCAddress(context, password) {
 					etcAddresses.model = it
 				}
 			}
 			
 			WalletSettingsText.newBTCAddress -> {
-				presenter.createNewBTCChildAddress(password) {
+				AddressManagerPresneter.createBTCAddress(context, password) {
 					btcAddresses.model = it
 				}
 			}
@@ -167,13 +152,15 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	private fun showCellMoreDashboard(
 		top: Float,
 		address: String,
-		coinType: Int
+		coinType: Int,
+		hasDefaultCell: Boolean
 	) {
 		val isBTC = ChainType.BTC.id == coinType
 		AddressManagerFragment.showMoreDashboard(
 			this,
 			top,
 			isBTC,
+			hasDefaultCell,
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
 					when (coinType) {
@@ -200,6 +187,27 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	}
 	
 	companion object {
+		
+		fun verifyPassword(
+			fragment: Fragment,
+			callback: (password: String) -> Unit
+		) {
+			fragment.context?.showAlertView(
+				WalletSettingsText.deleteInfoTitle,
+				WalletSettingsText.deleteInfoSubtitle,
+				!Config.getCurrentIsWatchOnlyOrNot()
+			) {
+				val password = it?.text.toString()
+				fragment.context?.verifyKeystorePassword(password) {
+					if (it) {
+						callback(password)
+					} else {
+						fragment.context.alert(CommonText.wrongPassword)
+					}
+				}
+			}
+			AddressManagerFragment.removeDashboard(fragment)
+		}
 		
 		fun showMoreDashboard(
 			fragment: Fragment,
