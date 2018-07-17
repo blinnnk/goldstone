@@ -420,6 +420,29 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "這個地址已經導入過了"
 		else -> ""
 	}
+	
+	@JvmField
+	val keystoreEthOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		HoneyLanguage.Chinese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		HoneyLanguage.Japanese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		HoneyLanguage.Korean.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		HoneyLanguage.Russian.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		HoneyLanguage.TraditionalChinese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
+		else -> ""
+	}
+	
+	@JvmField
+	val notBip44WalletAttention = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		HoneyLanguage.Chinese.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		HoneyLanguage.Japanese.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		HoneyLanguage.Korean.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		HoneyLanguage.Russian.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		HoneyLanguage.TraditionalChinese.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
+		else -> ""
+	}
+	
 	@JvmField
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter password and then click confirm to get your keystore"

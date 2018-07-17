@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.walletimport.keystoreimport.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -36,7 +35,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = KeystoreImportPresenter(this)
 	
-	@SuppressLint("SetTextI18n")
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -44,17 +42,24 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				lparams(matchParent, matchParent)
 				attentionView.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-					text = ImportWalletText.keystoreIntro
+					text = CustomTargetTextStyle(
+						ImportWalletText.keystoreEthOnly,
+						ImportWalletText.keystoreIntro + "\n" + ImportWalletText.keystoreEthOnly,
+						Spectrum.green,
+						fontSize(12.uiPX()).toInt(),
+						false,
+						false
+					)
 				}.into(this)
 				
 				keystoreEditText.apply {
 					hint = ImportWalletText.keystoreHint
-					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				}.into(this)
 				
 				nameInput.apply {
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
 				
