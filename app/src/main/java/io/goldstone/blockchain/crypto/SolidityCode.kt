@@ -24,6 +24,7 @@ object SolidityCode {
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
 	const val bitcoinAddressLength = 34 // 包含 `0x`
+	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	// GoldStone 业务约定的值
@@ -49,6 +50,24 @@ object CryptoValue {
 	val isBtcTest: (chainType: Int) -> Boolean = {
 		it == ChainType.BTCTest.id
 	}
+	
+	enum class PrivateKeyType(val content: String) {
+		ETHERCAndETC("ETH, ERC20 And ETC"),
+		BTC("BTC"),
+		BTCTest("BTC Test");
+		
+		companion object {
+			fun getTypeByContent(content: String): PrivateKeyType {
+				return when (content) {
+					ETHERCAndETC.content -> ETHERCAndETC
+					BTC.content -> BTC
+					else -> BTCTest
+				}
+			}
+		}
+	}
+	
+	val basicLockKey = "1111111111111111111111111111111111111111111111111111111111111111"
 }
 
 object CryptoSymbol {

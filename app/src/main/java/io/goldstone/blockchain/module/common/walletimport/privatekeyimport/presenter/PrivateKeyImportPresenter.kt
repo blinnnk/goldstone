@@ -7,9 +7,12 @@ import com.blinnnk.extension.removeStartAndEndValue
 import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
 import io.goldstone.blockchain.crypto.MultiChainPath
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -26,6 +29,7 @@ class PrivateKeyImportPresenter(
 ) : BasePresenter<PrivateKeyImportFragment>() {
 	
 	fun importWalletByPrivateKey(
+		type: CryptoValue.PrivateKeyType,
 		privateKeyInput: EditText,
 		passwordInput: EditText,
 		repeatPasswordInput: EditText,
@@ -50,14 +54,40 @@ class PrivateKeyImportPresenter(
 				callback()
 			}
 		) { passwordValue, walletName ->
-			importWallet(
-				privateKeyInput.text.toString(),
-				passwordValue,
-				walletName,
-				fragment,
-				hintInput.text?.toString(),
-				callback
-			)
+			when (type) {
+				CryptoValue.PrivateKeyType.ETHERCAndETC ->
+					PrivateKeyImportPresenter.importWallet(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment,
+						hintInput.text?.toString(),
+						callback
+					)
+				CryptoValue.PrivateKeyType.BTC ->
+					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment,
+						hintInput.text?.toString(),
+						false,
+						callback
+					)
+				
+				CryptoValue.PrivateKeyType.BTCTest -> {
+					Config.updateIsTestEnvironment(true)
+					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment,
+						hintInput.text?.toString(),
+						true,
+						callback
+					)
+				}
+			}
 		}
 	}
 	
@@ -67,6 +97,41 @@ class PrivateKeyImportPresenter(
 	}
 	
 	companion object {
+		fun importWalletByBTCPrivateKey(
+			privateKey: String,
+			password: String,
+			name: String,
+			fragment: Fragment,
+			hint: String?,
+			isTest: Boolean,
+			callback: () -> Unit
+		) {
+			if (privateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
+				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback()
+				return
+			}
+			fragment.context?.getWalletByPrivateKey(CryptoValue.basicLockKey, password) { _ ->
+				// use ethereum geth keystore to verify btc user password, this value is unuseful
+				// just ignore the value
+				BTCUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
+					WalletImportPresenter.insertWalletToDatabase(
+						fragment,
+						MultiChainAddresses(
+							"",
+							"",
+							if (isTest) "" else address,
+							if (isTest) address else ""
+						),
+						name,
+						"",
+						MultiChainPath("", "", "", ""),
+						hint,
+						callback
+					)
+				}
+			}
+		}
 		
 		/**
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的

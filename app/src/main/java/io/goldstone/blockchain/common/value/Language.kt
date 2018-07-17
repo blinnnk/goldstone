@@ -280,14 +280,26 @@ object ImportWalletText {
 	
 	@JvmField
 	val path = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Path"
-		HoneyLanguage.Chinese.code -> "Path"
-		HoneyLanguage.Japanese.code -> "Path"
-		HoneyLanguage.Korean.code -> "Path"
-		HoneyLanguage.Russian.code -> "Path"
-		HoneyLanguage.TraditionalChinese.code -> "Path"
+		HoneyLanguage.English.code -> "PATH"
+		HoneyLanguage.Chinese.code -> "PATH"
+		HoneyLanguage.Japanese.code -> "PATH"
+		HoneyLanguage.Korean.code -> "PATH"
+		HoneyLanguage.Russian.code -> "PATH"
+		HoneyLanguage.TraditionalChinese.code -> "PATH"
 		else -> ""
 	}
+	
+	@JvmField
+	val walletType = when (currentLanguage) {
+		HoneyLanguage.English.code -> "TYPE"
+		HoneyLanguage.Chinese.code -> "TYPE"
+		HoneyLanguage.Japanese.code -> "TYPE"
+		HoneyLanguage.Korean.code -> "TYPE"
+		HoneyLanguage.Russian.code -> "TYPE"
+		HoneyLanguage.TraditionalChinese.code -> "TYPE"
+		else -> ""
+	}
+	
 	@JvmField
 	val customBitcoinPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Bitcoin Path"

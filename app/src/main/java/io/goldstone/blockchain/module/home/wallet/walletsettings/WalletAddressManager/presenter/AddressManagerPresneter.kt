@@ -7,10 +7,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.WalletSettingsText
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -60,7 +57,12 @@ class AddressManagerPresneter(
 			it?.apply {
 				val addresses =
 					arrayListOf<Pair<String, String>>().apply {
-						if (!currentBTCAddress.isEmpty()) add(Pair(currentBTCAddress, CryptoSymbol.btc))
+						// 如果是测试环境展示 `BTCTest Address`
+						if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+							add(Pair(currentBTCAddress, CryptoSymbol.btc))
+						} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+							add(Pair(currentBTCTestAddress, CryptoSymbol.btc))
+						}
 						if (currentETHAndERCAddress.isNotEmpty()) {
 							add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
 							add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))

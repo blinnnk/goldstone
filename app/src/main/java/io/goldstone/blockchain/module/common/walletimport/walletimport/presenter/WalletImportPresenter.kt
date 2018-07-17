@@ -38,6 +38,7 @@ class WalletImportPresenter(
 	
 	companion object {
 		
+		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
 			return if (index == -1) ""
 			else "$address|$index"
@@ -57,7 +58,16 @@ class WalletImportPresenter(
 			hint: String?,
 			callback: () -> Unit
 		) {
-			WalletTable.getWalletByAddress(multiChainAddresses.ethAddress) {
+			// 不为空的地址进行
+			val currentAddress =
+				arrayListOf(
+					multiChainAddresses.etcAddress,
+					multiChainAddresses.etcAddress,
+					multiChainAddresses.btcAddress,
+					multiChainAddresses.btcTestAddress
+				).find { it.isNotEmpty() }.orEmpty()
+			
+			WalletTable.getWalletByAddress(currentAddress) {
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
 					WalletTable.insert(

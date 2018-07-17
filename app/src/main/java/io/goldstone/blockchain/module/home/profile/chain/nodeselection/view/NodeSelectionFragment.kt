@@ -8,10 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainText
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
@@ -25,7 +22,9 @@ import org.jetbrains.anko.*
  */
 class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	
-	private val isMainnet by lazy { arguments?.getBoolean(ArgumentKey.isMainnet) }
+	private val isMainnet by lazy {
+		arguments?.getBoolean(ArgumentKey.isMainnet)
+	}
 	private val nodeList: (isMainnet: Boolean) -> ArrayList<Pair<String, String>> = {
 		if (it) mainnetNodeList
 		else testnetNodeList
@@ -102,9 +101,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					setBlueStyle(50.uiPX())
 				}.click {
 					isMainnet?.let {
-						selectedNode.forEach {
-							if (it.first == CryptoName.eth) presenter.updateERC20TestChainID(it.second)
-							else presenter.updateETCTestChainID(it.second)
+						selectedNode.forEach { pair ->
+							if (pair.first == CryptoName.eth) presenter.updateERC20TestChainID(pair.second)
+							else presenter.updateETCTestChainID(pair.second)
+							// 更新是否是测试环境的参数
+							Config.updateIsTestEnvironment(testnetNodeList.any { it.second == pair.second })
 						}
 						presenter.updateDatabaseThenJump(it)
 					}

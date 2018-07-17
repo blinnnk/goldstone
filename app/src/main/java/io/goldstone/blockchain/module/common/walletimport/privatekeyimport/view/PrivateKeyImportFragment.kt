@@ -4,14 +4,17 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.base.BaseRadioCell
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -30,10 +33,12 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	private val privateKeyInput by lazy { WalletEditText(context!!) }
 	private val passwordHintInput by lazy { RoundInput(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
+	private val typeSettings by lazy { RoundCell(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
+	private var defaultType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
 	override val presenter = PrivateKeyImportPresenter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -47,9 +52,22 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				}.into(this)
 				
+				typeSettings
+					.apply {
+						setTitles(ImportWalletText.walletType, defaultType)
+						setMargins<RelativeLayout.LayoutParams> {
+							topMargin = 20.uiPX()
+							bottomMargin = 10.uiPX()
+						}
+					}
+					.click {
+						showWalletTypeDashboard()
+					}
+					.into(this)
+				
 				nameInput.apply {
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
 				
@@ -93,6 +111,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
+						CryptoValue.PrivateKeyType.getTypeByContent(defaultType),
 						privateKeyInput,
 						passwordInput,
 						repeatPassword,
@@ -120,6 +139,45 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					}
 				}.into(this)
 			}
+		}
+	}
+	
+	private val walletType =
+		arrayListOf(
+			CryptoValue.PrivateKeyType.ETHERCAndETC.content,
+			CryptoValue.PrivateKeyType.BTC.content,
+			CryptoValue.PrivateKeyType.BTCTest.content
+		)
+	
+	private fun showWalletTypeDashboard() {
+		getParentContainer()?.apply {
+			DashboardOverlay(context) {
+				// 取消所有选中样式的函数内方法
+				fun recoveryRadioChecked() {
+					(0 until walletType.size).forEach {
+						findViewById<BaseRadioCell>(it)?.checkedStatus = false
+					}
+				}
+				// 加载视图
+				walletType.forEachIndexed { index, it ->
+					BaseRadioCell(context).apply {
+						id = index
+						if (it.equals(defaultType, true)) {
+							checkedStatus = true
+						}
+						setTitle(it)
+						setGrayStyle()
+					}.click {
+						recoveryRadioChecked()
+						defaultType = it.getTitle()
+						typeSettings.setTitles(ImportWalletText.walletType, defaultType)
+						it.checkedStatus = true
+					}.into(this)
+				}
+			}.apply {
+				confirmEvent = Runnable {
+				}
+			}.into(this)
 		}
 	}
 	
