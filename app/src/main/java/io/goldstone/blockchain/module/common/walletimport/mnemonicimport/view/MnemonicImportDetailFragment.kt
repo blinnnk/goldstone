@@ -40,10 +40,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	private val agreementView by lazy { AgreementView(context!!) }
 	override val presenter = MnemonicImportDetailPresenter(this)
 	// Default Value
-	private var customEthPath = DefaultPath.ethPath
-	private var customEtcPath = DefaultPath.etcPath
-	private var customBtcPath = DefaultPath.btcPath
-	private var customBtcTestPath = DefaultPath.btcTestPath
+	private var defaultPath = arrayListOf(
+		DefaultPath.ethPath,
+		DefaultPath.etcPath,
+		DefaultPath.btcPath,
+		DefaultPath.btcTestPath
+	)
 	
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -115,10 +117,10 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(
 						MultiChainPath(
-							customEthPath,
-							customEtcPath,
-							customBtcPath,
-							customBtcTestPath
+							defaultPath[0],
+							defaultPath[1],
+							defaultPath[2],
+							defaultPath[3]
 						),
 						mnemonicInput,
 						passwordInput,
@@ -151,41 +153,38 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		}
 	}
 	
+	private val pathInfo = listOf(
+		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
+		Pair(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader),
+		Pair(ImportWalletText.customBitcoinPath, DefaultPath.btcPathHeader),
+		Pair(ImportWalletText.customBTCTestPath, DefaultPath.btcTestPathHeader)
+	)
+	
 	private fun showPatSettingsDashboard() {
 		getParentContainer()?.apply {
-			lateinit var ethereumPathEdiTtext: TitleEditText
-			lateinit var bitcoinPathEditText: TitleEditText
 			DashboardOverlay(context) {
-				TopBottomLineCell(context).apply {
-					layoutParams = LinearLayout.LayoutParams(
-						ScreenSize.widthWithPadding - 40.uiPX(),
-						100.uiPX()
-					)
-					setTitle(ImportWalletText.customEthereumPath, fontSize(14))
-					ethereumPathEdiTtext = TitleEditText(context).apply {
-						setTitle(DefaultPath.ethPathHeader)
-						getEditText().setText(DefaultPath.default)
-					}
-					ethereumPathEdiTtext.into(this)
-				}.into(this)
-				
-				TopBottomLineCell(context)
-					.apply {
+				pathInfo.forEachIndexed { index, it ->
+					TopBottomLineCell(context).apply {
 						layoutParams = LinearLayout.LayoutParams(
 							ScreenSize.widthWithPadding - 40.uiPX(),
 							100.uiPX()
 						)
-						setTitle(ImportWalletText.customBitcoinPath, fontSize(14))
-						bitcoinPathEditText = TitleEditText(context).apply {
-							setTitle(DefaultPath.btcPathHeader)
+						setTitle(it.first, fontSize(14))
+						TitleEditText(context).apply {
+							tag = "pathEdit$index"
+							setTitle(it.second)
 							getEditText().setText(DefaultPath.default)
-						}
-						bitcoinPathEditText.into(this)
+						}.into(this)
 					}.into(this)
+				}
 			}.apply {
 				confirmEvent = Runnable {
-					customEthPath = DefaultPath.ethPathHeader + ethereumPathEdiTtext.getText()
-					customBtcPath = DefaultPath.btcPathHeader + bitcoinPathEditText.getText()
+					defaultPath.clear()
+					pathInfo.forEachIndexed { index, pair ->
+						findViewWithTag<TitleEditText>("pathEdit$index")?.let {
+							defaultPath.add(pair.second + it.getText())
+						}
+					}
 				}
 			}.into(this)
 		}

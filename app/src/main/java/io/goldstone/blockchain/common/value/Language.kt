@@ -308,6 +308,28 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Custom Ethereum Path"
 		else -> ""
 	}
+	
+	@JvmField
+	val customBTCTestPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Bitcoin Test Path"
+		HoneyLanguage.Chinese.code -> "Custom Bitcoin Test Path"
+		HoneyLanguage.Japanese.code -> "Custom Bitcoin Test Path"
+		HoneyLanguage.Korean.code -> "Custom Bitcoin Test Path"
+		HoneyLanguage.Russian.code -> "Custom Bitcoin Test Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Bitcoin Test Path"
+		else -> ""
+	}
+	@JvmField
+	val customEthereumClassicPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Ethereum Classic Path"
+		HoneyLanguage.Chinese.code -> "Custom Ethereum Classic Path"
+		HoneyLanguage.Japanese.code -> "Custom Ethereum Classic Path"
+		HoneyLanguage.Korean.code -> "Custom Ethereum Classic Path"
+		HoneyLanguage.Russian.code -> "Custom Ethereum Classic Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Classic Ethereum Path"
+		else -> ""
+	}
+	
 	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
