@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
@@ -15,6 +12,7 @@ import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.component.TopBottomLineCell
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
@@ -40,18 +38,30 @@ class AddressesListView(
 			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 50.uiPX()
 			requestLayout()
-			reversed().forEachIndexed { index, data ->
-				// 默认最多显示 `5` 条地址
-				if (index >= maxCount) return@forEachIndexed
-				GraySqualCellWithButtons(context).apply cell@{
-					copyButton.onClick {
-						context.clickToCopy(data.first)
-						copyButton.preventDuplicateClicks()
-					}
-					hold(moreButton, data.first)
-					setTitle("${data.second}.")
-					setSubtitle(CryptoUtils.scaleMiddleAddress(data.first))
-				}.into(cellLayout)
+			WalletTable.getCurrentWallet {
+				val currentAddresses =
+					if (!it.isNull()) listOf(
+						it!!.currentBTCAddress,
+						it.currentBTCTestAddress,
+						it.currentETCAddress,
+						it.currentETHAndERCAddress
+					) else listOf()
+				reversed().forEachIndexed { index, data ->
+					// 默认最多显示 `5` 条地址
+					if (index >= maxCount) return@forEachIndexed
+					GraySqualCellWithButtons(context).apply cell@{
+						// 如果列表中有默认地址那么更改样式
+						if (currentAddresses.any { it.equals(data.first, true) })
+							updateBackgroundColor()
+						copyButton.onClick {
+							context.clickToCopy(data.first)
+							copyButton.preventDuplicateClicks()
+						}
+						hold(moreButton, data.first)
+						setTitle("${data.second}.")
+						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first))
+					}.into(cellLayout)
+				}
 			}
 			updateButtonTitle("Check All (${model?.size})")
 		}

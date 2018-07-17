@@ -29,7 +29,7 @@ object BTCUtils {
 		hold(address, secret)
 	}
 	
-	fun getKeyPairFromBase58PrivateKey(
+	private fun getKeyPairFromBase58PrivateKey(
 		privateKey: String,
 		isTest: Boolean,
 		hold: (ECKey) -> Unit

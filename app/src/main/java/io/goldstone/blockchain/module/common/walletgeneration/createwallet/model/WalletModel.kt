@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert
@@ -309,6 +310,64 @@ data class WalletTable(
 							})
 							GoldStoneAPI.context.runOnUiThread {
 								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateCurrentAddressByChainType(
+			chainType: Int,
+			newAddress: String,
+			callback: () -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				doAsync {
+					it?.apply {
+						when (chainType) {
+							ChainType.ETH.id -> {
+								GoldStoneDataBase.database.walletDao().update(
+									this.apply {
+										currentETHAndERCAddress = newAddress
+									}
+								)
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
+							}
+							
+							ChainType.ETC.id -> {
+								GoldStoneDataBase.database.walletDao().update(
+									this.apply {
+										currentETCAddress = newAddress
+									}
+								)
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
+							}
+							
+							ChainType.BTC.id -> {
+								GoldStoneDataBase.database.walletDao().update(
+									this.apply {
+										currentBTCAddress = newAddress
+									}
+								)
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
+							}
+							
+							ChainType.BTCTest.id -> {
+								GoldStoneDataBase.database.walletDao().update(
+									this.apply {
+										currentBTCTestAddress = newAddress
+									}
+								)
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
 							}
 						}
 					}

@@ -20,7 +20,7 @@ class ChainAddressesCell(context: Context) : LinearLayout(context) {
 		cell.setTitle(model.second)
 		cell.setSubtitle(CryptoUtils.scaleMiddleAddress(model.first))
 	}
-	private val cell = GraySqualCellWithButtons(context)
+	val cell = GraySqualCellWithButtons(context)
 	
 	init {
 		orientation = VERTICAL
