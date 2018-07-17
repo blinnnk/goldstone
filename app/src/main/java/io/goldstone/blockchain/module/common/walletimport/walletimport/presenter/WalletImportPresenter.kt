@@ -39,11 +39,13 @@ class WalletImportPresenter(
 	companion object {
 		
 		fun childAddressValue(address: String, index: Int): String {
-			return "$address|$index"
+			return if (index == -1) ""
+			else "$address|$index"
 		}
 		
 		fun getAddressIndexFromPath(path: String): Int {
-			return path.substringAfterLast("/").toInt()
+			return if (path.isEmpty()) -1
+			else path.substringAfterLast("/").toInt()
 		}
 		
 		fun insertWalletToDatabase(

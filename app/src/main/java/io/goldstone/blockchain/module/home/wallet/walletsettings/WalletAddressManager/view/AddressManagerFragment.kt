@@ -1,12 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
 
 import android.support.v4.app.Fragment
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.preventDuplicateClicks
+import android.widget.LinearLayout
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.MiniOverlay
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -16,6 +15,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -47,6 +47,13 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				)
 				moreButton.preventDuplicateClicks()
 			}
+		}
+	}
+	private val attentionView by lazy {
+		AttentionTextView(context!!).apply {
+			text = ImportWalletText.notBip44WalletAttention
+			setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
+			isCenter()
 		}
 	}
 	private val ethAndERCAddresses by lazy {
@@ -100,12 +107,22 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					topPadding = 20.uiPX()
 				}
 				currentMultiChainAddresses.into(this)
-				ethAndERCAddresses.into(this)
-				etcAddresses.into(this)
-				btcAddresses.into(this)
-				ethAndERCAddresses.checkAllEvent = presenter.showAllETHAndERCAddresses()
-				etcAddresses.checkAllEvent = presenter.showAllETCAddresses()
-				btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
+				// 不为空才显示 `bip44` 规则的子地址界面
+				WalletTable.getCurrentWallet {
+					if (it?.ethAddresses?.isNotEmpty() == true) {
+						ethAndERCAddresses.into(this)
+						etcAddresses.into(this)
+						btcAddresses.into(this)
+						ethAndERCAddresses.checkAllEvent = presenter.showAllETHAndERCAddresses()
+						etcAddresses.checkAllEvent = presenter.showAllETCAddresses()
+						btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
+						presenter.getEthereumAddresses()
+						presenter.getEthereumClassicAddresses()
+						presenter.getBitcoinAddresses()
+					} else {
+						attentionView.into(this)
+					}
+				}
 			}
 		}
 	}
@@ -200,8 +217,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				}
 			},
 			qrCellClickEvent = { presenter.showQRCodeFragment(address) },
-			exportPrivateKey = { presenter.showKeystoreExportFragment(address) },
-			keystoreCellClickEvent = { presenter.showPrivateKeyExportFragment(address) },
+			exportPrivateKey = { presenter.showPrivateKeyExportFragment(address) },
+			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) },
 			exportBTCPrivateKey = { presenter.showBTCPrivateKeyExportFragment(address) }
 		)
 	}

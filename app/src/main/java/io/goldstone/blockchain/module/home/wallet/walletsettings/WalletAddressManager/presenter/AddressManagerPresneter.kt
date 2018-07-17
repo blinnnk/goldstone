@@ -36,9 +36,6 @@ class AddressManagerPresneter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		getMultiChainAddresses()
-		getEthereumAddresses()
-		getEthereumClassicAddresses()
-		getBitcoinAddresses()
 	}
 	
 	override fun onFragmentShowFromHidden() {
@@ -62,12 +59,14 @@ class AddressManagerPresneter(
 		WalletTable.getCurrentWallet {
 			it?.apply {
 				val addresses =
-					arrayListOf(
-						Pair(currentETHAndERCAddress, CryptoSymbol.erc),
-						Pair(currentETHAndERCAddress, CryptoSymbol.eth),
-						Pair(currentETCAddress, CryptoSymbol.etc),
-						Pair(currentBTCAddress, CryptoSymbol.btc)
-					)
+					arrayListOf<Pair<String, String>>().apply {
+						if (!currentBTCAddress.isEmpty()) add(Pair(currentBTCAddress, CryptoSymbol.btc))
+						if (currentETHAndERCAddress.isNotEmpty()) {
+							add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
+							add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
+							add(Pair(currentETCAddress, CryptoSymbol.etc))
+						}
+					}
 				fragment.setMultiChainAddresses(addresses)
 			}
 		}
