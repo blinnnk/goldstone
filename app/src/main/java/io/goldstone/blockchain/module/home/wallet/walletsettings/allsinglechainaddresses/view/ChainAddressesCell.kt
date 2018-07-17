@@ -17,7 +17,7 @@ import org.jetbrains.anko.wrapContent
 class ChainAddressesCell(context: Context) : LinearLayout(context) {
 	
 	var model: Pair<String, String> by observing(Pair("", "")) {
-		cell.setTitle(model.second)
+		cell.setTitle("${model.second}.")
 		cell.setSubtitle(CryptoUtils.scaleMiddleAddress(model.first))
 	}
 	val cell = GraySqualCellWithButtons(context)

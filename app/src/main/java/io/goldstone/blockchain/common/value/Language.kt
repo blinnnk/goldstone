@@ -1649,6 +1649,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val currentMultiChainAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Current Multi-Chain Addresses"
+		HoneyLanguage.Chinese.code -> "Current Multi-Chain Addresses"
+		HoneyLanguage.Japanese.code -> "Current Multi-Chain Addresses"
+		HoneyLanguage.Korean.code -> "Current Multi-Chain Addresses"
+		HoneyLanguage.Russian.code -> "Current Multi-Chain Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "Current Multi-Chain Addresses"
+		else -> ""
+	}
+	@JvmField
 	val ethereumSeriesAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ethereum Series Address"
 		HoneyLanguage.Chinese.code -> "Ethereum Series Address"

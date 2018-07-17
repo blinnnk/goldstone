@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.RippleMode
@@ -70,7 +71,6 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		backgroundColor = GrayScale.whiteGray
 		this.addView(title)
 		this.addView(subtitle)
-		subtitle.leftPadding = 40.uiPX()
 		this.addView(copyButton)
 		copyButton.setAlignParentRight()
 		copyButton.x -= 30.uiPX()
@@ -80,6 +80,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 	
 	fun <T : CharSequence> setTitle(text: T) {
 		title.text = text
+		subtitle.leftPadding = 25.uiPX() + text.measureTextWidth(13.uiPX().toFloat()).toInt()
 	}
 	
 	fun setSubtitle(text: String) {

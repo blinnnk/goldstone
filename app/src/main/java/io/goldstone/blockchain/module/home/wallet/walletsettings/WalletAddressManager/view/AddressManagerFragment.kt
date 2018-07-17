@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
@@ -28,42 +29,62 @@ import org.jetbrains.anko.support.v4.toast
  */
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	
-	private val ethAndERCAddresses by lazy {
-		AddressesListView(context!!) { cell, address, isDefault ->
-			cell.onClick {
+	private val currentMultiChainAddresses by lazy {
+		AddressesListView(context!!) { moreButton, address, isDefault, title ->
+			val chainTYpe = when (title) {
+				CryptoSymbol.eth -> ChainType.ETH.id
+				CryptoSymbol.etc -> ChainType.ETC.id
+				CryptoSymbol.btc -> ChainType.BTC.id
+				CryptoSymbol.erc -> ChainType.ETH.id
+				else -> ChainType.BTCTest.id
+			}
+			moreButton.onClick {
 				showCellMoreDashboard(
-					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					chainTYpe,
+					!isDefault
+				)
+				moreButton.preventDuplicateClicks()
+			}
+		}
+	}
+	private val ethAndERCAddresses by lazy {
+		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
+				showCellMoreDashboard(
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
 					ChainType.ETH.id,
 					!isDefault
 				)
-				cell.preventDuplicateClicks()
+				moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 	private val etcAddresses by lazy {
-		AddressesListView(context!!) { cell, address, isDefault ->
-			cell.onClick {
+		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
 				showCellMoreDashboard(
-					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
 					ChainType.ETC.id,
 					!isDefault
 				)
-				cell.preventDuplicateClicks()
+				moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 	private val btcAddresses by lazy {
-		AddressesListView(context!!) { cell, address, isDefault ->
-			cell.onClick {
+		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
 				showCellMoreDashboard(
-					cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
 					ChainType.BTC.id,
 					!isDefault
 				)
-				cell.preventDuplicateClicks()
+				moreButton.preventDuplicateClicks()
 			}
 		}
 	}
@@ -78,15 +99,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					leftPadding = PaddingSize.device
 					topPadding = 20.uiPX()
 				}
+				currentMultiChainAddresses.into(this)
 				ethAndERCAddresses.into(this)
 				etcAddresses.into(this)
 				btcAddresses.into(this)
-				
 				ethAndERCAddresses.checkAllEvent = presenter.showAllETHAndERCAddresses()
 				etcAddresses.checkAllEvent = presenter.showAllETCAddresses()
 				btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
 			}
 		}
+	}
+	
+	fun setMultiChainAddresses(model: List<Pair<String, String>>) {
+		currentMultiChainAddresses.setTitle(WalletSettingsText.currentMultiChainAddresses)
+		currentMultiChainAddresses.model = model
 	}
 	
 	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {

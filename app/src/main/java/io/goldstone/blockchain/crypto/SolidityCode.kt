@@ -56,7 +56,7 @@ object CryptoSymbol {
 	const val etc = "ETC"
 	const val btc = "BTC"
 	const val ltc = "LTC"
-	const val erc = "ERC20"
+	const val erc = "ERC"
 }
 
 object CryptoName {

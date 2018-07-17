@@ -24,7 +24,12 @@ import org.jetbrains.anko.verticalLayout
  */
 class AddressesListView(
 	context: Context,
-	private val hold: (cell: ImageView, address: String, isDefault: Boolean) -> Unit
+	private val hold: (
+		moreButton: ImageView,
+		address: String,
+		isDefault: Boolean,
+		title: String
+	) -> Unit
 ) : TopBottomLineCell(context) {
 	
 	private val cellLayout = verticalLayout {
@@ -35,17 +40,19 @@ class AddressesListView(
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
+			var halfSize = 14
+			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做锁进
+			if (this[0].second.toIntOrNull().isNull()) {
+				halfSize = 12
+				hideButton()
+			} else {
+				updateButtonTitle("Check All (${model?.size})")
+			}
+			// 最多只显示 `5` 个链下地址
 			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 50.uiPX()
 			requestLayout()
-			WalletTable.getCurrentWallet {
-				val currentAddresses =
-					if (!it.isNull()) listOf(
-						it!!.currentBTCAddress,
-						it.currentBTCTestAddress,
-						it.currentETCAddress,
-						it.currentETHAndERCAddress
-					) else listOf()
+			WalletTable.getCurrentAddresses { currentAddresses ->
 				reversed().forEachIndexed { index, data ->
 					var isDefault = false
 					// 默认最多显示 `5` 条地址
@@ -61,13 +68,13 @@ class AddressesListView(
 							context.clickToCopy(data.first)
 							copyButton.preventDuplicateClicks()
 						}
-						hold(moreButton, data.first, isDefault)
+						hold(moreButton, data.first, isDefault, data.second)
 						setTitle("${data.second}.")
-						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first))
+						
+						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, halfSize))
 					}.into(cellLayout)
 				}
 			}
-			updateButtonTitle("Check All (${model?.size})")
 		}
 	}
 	
