@@ -24,7 +24,15 @@ object Config {
 			isEncrypt
 		)
 	
-	// TODO 等 `GoldStone` 自己的加密 `ETC` 节点上线这里需要额外判断
+	fun isTestEnvironment(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isTestEnvironment)
+	
+	fun updateIsTestEnvironment(isTest: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.isTestEnvironment,
+			isTest
+		)
+	
 	fun isEncryptETCNodeRequest(): Boolean =
 		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isEncryptETCNodeRequest)
 	

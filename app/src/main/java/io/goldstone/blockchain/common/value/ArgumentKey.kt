@@ -57,4 +57,5 @@ object SharesPreference {
 	const val isNotchScreen = "isNotchScreen"
 	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
+	const val isTestEnvironment = "isTestEnvironment"
 }

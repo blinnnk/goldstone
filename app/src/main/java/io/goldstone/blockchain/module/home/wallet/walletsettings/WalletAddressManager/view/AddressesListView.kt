@@ -43,7 +43,7 @@ class AddressesListView(
 			var halfSize = 14
 			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做锁进
 			if (this[0].second.toIntOrNull().isNull()) {
-				halfSize = 12
+				halfSize = 11
 				hideButton()
 			} else {
 				updateButtonTitle("Check All (${model?.size})")

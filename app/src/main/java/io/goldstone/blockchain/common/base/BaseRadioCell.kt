@@ -69,4 +69,12 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		}
 		icon?.imageResource = image
 	}
+	
+	fun setTitle(text: String) {
+		title.text = text
+	}
+	
+	fun getTitle(): String {
+		return title.text.toString()
+	}
 }

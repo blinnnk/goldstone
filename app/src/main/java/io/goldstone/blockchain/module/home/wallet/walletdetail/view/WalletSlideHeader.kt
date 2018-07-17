@@ -90,11 +90,10 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 	
 	companion object {
 		fun setBalanceInfo(): String {
-			return if (Config.getCurrentChain() == ChainID.Main.id) {
+			return if (!Config.isTestEnvironment()) {
 				WalletText.totalAssets + " " + Config.getCurrencyCode()
 			} else {
-				(if (Config.getCurrentChain() != ChainID.Main.id) ChainText.testnet else "") + " · " +
-				WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
+				ChainText.testnet + " · " + WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
 			}
 		}
 	}
