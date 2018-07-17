@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view
 
+import android.os.Bundle
+import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.clickToCopy
@@ -33,5 +35,10 @@ class ChainAddressesFragment
 				presenter.showMoreDashboard(cell, model.first, coinType.orZero())
 			}
 		}
+	}
+	
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.updateAddAddressEvent()
 	}
 }

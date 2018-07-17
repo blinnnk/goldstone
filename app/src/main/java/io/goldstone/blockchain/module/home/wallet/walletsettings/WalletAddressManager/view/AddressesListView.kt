@@ -24,7 +24,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class AddressesListView(
 	context: Context,
-	private val hold: (cell: ImageView, address: String) -> Unit
+	private val hold: (cell: ImageView, address: String, isDefault: Boolean) -> Unit
 ) : TopBottomLineCell(context) {
 	
 	private val cellLayout = verticalLayout {
@@ -47,17 +47,21 @@ class AddressesListView(
 						it.currentETHAndERCAddress
 					) else listOf()
 				reversed().forEachIndexed { index, data ->
+					var isDefault = false
 					// 默认最多显示 `5` 条地址
 					if (index >= maxCount) return@forEachIndexed
 					GraySqualCellWithButtons(context).apply cell@{
 						// 如果列表中有默认地址那么更改样式
-						if (currentAddresses.any { it.equals(data.first, true) })
+						if (currentAddresses.any { it.equals(data.first, true) }) {
+							isDefault = true
 							updateBackgroundColor()
+						}
+						
 						copyButton.onClick {
 							context.clickToCopy(data.first)
 							copyButton.preventDuplicateClicks()
 						}
-						hold(moreButton, data.first)
+						hold(moreButton, data.first, isDefault)
 						setTitle("${data.second}.")
 						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first))
 					}.into(cellLayout)

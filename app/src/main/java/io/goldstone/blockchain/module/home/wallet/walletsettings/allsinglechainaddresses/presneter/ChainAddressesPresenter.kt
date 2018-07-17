@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
@@ -58,6 +59,7 @@ class ChainAddressesPresenter(
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
 					updateData()
 					AddressManagerFragment.removeDashboard(fragment)
+					updateDefaultStyle(coinType)
 					fragment.toast(CommonText.succeed)
 				}
 			},
@@ -72,6 +74,63 @@ class ChainAddressesPresenter(
 				showPrivateKeyExportFragment(address, isBTC)
 			}
 		)
+	}
+	
+	fun updateAddAddressEvent() {
+		fragment.getParentFragment<WalletSettingsFragment> {
+			overlayView.header.showAddButton(true, false) {
+				AddressManagerFragment.verifyPassword(this) {
+					when (fragment.coinType) {
+						ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(context, it) {
+							updateAddressManagerDataBy(ChainType.ETH.id, it)
+							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+						}
+						ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(context, it) {
+							updateAddressManagerDataBy(ChainType.ETC.id, it)
+							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+						}
+						ChainType.BTC.id -> AddressManagerPresneter.createBTCAddress(context, it) {
+							updateAddressManagerDataBy(ChainType.BTC.id, it)
+							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+						}
+						ChainType.BTCTest.id -> AddressManagerPresneter.createBTCTestAddress(context, it) {
+							updateAddressManagerDataBy(ChainType.BTCTest.id, it)
+							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private fun updateAddressManagerDataBy(coinType: Int, data: ArrayList<Pair<String, String>>) {
+		fragment.parentFragment?.childFragmentManager?.fragments?.find {
+			it is AddressManagerFragment
+		}?.let {
+			if (it is AddressManagerFragment) {
+				when (coinType) {
+					ChainType.ETH.id -> it.setEthereumAddressesModel(data)
+					ChainType.ETC.id -> it.setEthereumClassicAddressesModel(data)
+					ChainType.BTC.id -> it.setBitcoinAddressesModel(data)
+					ChainType.BTCTest.id -> it.setBitcoinAddressesModel(data)
+				}
+			}
+		}
+	}
+	
+	private fun updateDefaultStyle(coinType: Int) {
+		fragment.parentFragment?.childFragmentManager?.fragments?.find {
+			it is AddressManagerFragment
+		}?.let {
+			if (it is AddressManagerFragment) {
+				when (coinType) {
+					ChainType.ETH.id -> it.presenter.getEthereumAddresses()
+					ChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
+					ChainType.BTC.id -> it.presenter.getBitcoinAddresses()
+					ChainType.BTCTest.id -> it.presenter.getBitcoinAddresses()
+				}
+			}
+		}
 	}
 	
 	private fun showQRCode(address: String) {

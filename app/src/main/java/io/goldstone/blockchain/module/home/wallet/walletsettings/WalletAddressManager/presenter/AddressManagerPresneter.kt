@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter
 
+import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
@@ -40,6 +42,7 @@ class AddressManagerPresneter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
+		fragment.showChildAddressCreatorDashboard()
 	}
 	
 	fun setBackEvent() {
@@ -130,78 +133,6 @@ class AddressManagerPresneter(
 		)
 	}
 	
-	fun createNewETHAndERCChildAddress(password: String, hold: (List<Pair<String, String>>) -> Unit) {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-			wallet.encryptMnemonic?.let {
-				val mnemonic = JavaKeystoreUtil().decryptData(it)
-				val newAddressIndex = childAddressIndex + 1
-				val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
-				fragment.context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
-					WalletTable.updateETHAndERCAddresses(it, newAddressIndex) {
-						hold(convertToChildAddresses(it))
-					}
-				}
-			}
-		}
-	}
-	
-	fun createNewETCChildAddress(password: String, hold: (List<Pair<String, String>>) -> Unit) {
-		WalletTable.getETCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-			wallet.encryptMnemonic?.let {
-				val mnemonic = JavaKeystoreUtil().decryptData(it)
-				val newAddressIndex = childAddressIndex + 1
-				val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
-				fragment.context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
-					WalletTable.updateETCAddresses(it, newAddressIndex) {
-						hold(convertToChildAddresses(it))
-					}
-				}
-			}
-		}
-	}
-	
-	fun createNewBTCChildAddress(password: String, hold: (List<Pair<String, String>>) -> Unit) {
-		fragment.context?.verifyKeystorePassword(password) {
-			if (it) {
-				WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let {
-						val mnemonic = JavaKeystoreUtil().decryptData(it)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
-							WalletTable.updateBTCAddresses(address, newAddressIndex) {
-								hold(convertToChildAddresses(it))
-							}
-						}
-					}
-				}
-			} else {
-				fragment.context.alert(CommonText.wrongPassword)
-			}
-		}
-	}
-	
-	fun createNewBTCTestChildAddress(password: String, hold: (List<Pair<String, String>>) -> Unit) {
-		fragment.context?.verifyKeystorePassword(password) {
-			if (it) {
-				WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let {
-						val mnemonic = JavaKeystoreUtil().decryptData(it)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
-							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
-								hold(convertToChildAddresses(it))
-							}
-						}
-					}
-				}
-			} else {
-				fragment.context.alert(CommonText.wrongPassword)
-			}
-		}
-	}
-	
 	fun showAllETHAndERCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
@@ -243,6 +174,94 @@ class AddressManagerPresneter(
 	}
 	
 	companion object {
+		
+		fun createETHAndERCAddress(
+			context: Context?,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let {
+					val mnemonic = JavaKeystoreUtil().decryptData(it)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
+					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
+						WalletTable.updateETHAndERCAddresses(it, newAddressIndex) {
+							hold(convertToChildAddresses(it).toArrayList())
+						}
+					}
+				}
+			}
+		}
+		
+		fun createETCAddress(
+			context: Context?,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			WalletTable.getETCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let {
+					val mnemonic = JavaKeystoreUtil().decryptData(it)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
+					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
+						WalletTable.updateETCAddresses(it, newAddressIndex) {
+							hold(convertToChildAddresses(it).toArrayList())
+						}
+					}
+				}
+			}
+		}
+		
+		fun createBTCAddress(
+			context: Context?,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			context?.verifyKeystorePassword(password) {
+				if (it) {
+					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+						wallet.encryptMnemonic?.let {
+							val mnemonic = JavaKeystoreUtil().decryptData(it)
+							val newAddressIndex = childAddressIndex + 1
+							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
+							BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+								WalletTable.updateBTCAddresses(address, newAddressIndex) {
+									hold(convertToChildAddresses(it).toArrayList())
+								}
+							}
+						}
+					}
+				} else {
+					context.alert(CommonText.wrongPassword)
+				}
+			}
+		}
+		
+		fun createBTCTestAddress(
+			context: Context?,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			context?.verifyKeystorePassword(password) {
+				if (it) {
+					WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+						wallet.encryptMnemonic?.let {
+							val mnemonic = JavaKeystoreUtil().decryptData(it)
+							val newAddressIndex = childAddressIndex + 1
+							val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
+							BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+								WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
+									hold(convertToChildAddresses(it).toArrayList())
+								}
+							}
+						}
+					}
+				} else {
+					context.alert(CommonText.wrongPassword)
+				}
+			}
+		}
 		
 		fun setDefaultAddress(
 			chainType: Int,
@@ -298,21 +317,15 @@ class AddressManagerPresneter(
 			WalletTable.getCurrentWallet {
 				it?.apply {
 					when (chainType) {
-						ChainType.ETH.id -> {
-							hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-						}
-						
-						ChainType.ETC.id -> {
-							hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-						}
-						
-						ChainType.BTC.id -> {
-							hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-						}
-						
-						ChainType.BTCTest.id -> {
-							hold(getTargetAddressIndex(btcTestAddresses, currentBTCTestAddress))
-						}
+						ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+						ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
+						ChainType.BTC.id -> hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
+						ChainType.BTCTest.id -> hold(
+							getTargetAddressIndex(
+								btcTestAddresses,
+								currentBTCTestAddress
+							)
+						)
 					}
 				}
 			}
