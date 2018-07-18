@@ -160,6 +160,10 @@ fun Double.toEthCount(): Double {
 	return this / 1000000000000000000.0
 }
 
+fun Double.toBTCCount(): Double {
+	return this / 100000000.0
+}
+
 fun Double.toGasValue(): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 9

@@ -104,7 +104,7 @@ class WalletDetailFragment :
 			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
 		overlay.isNull() isTrue {
 			super.setBackEvent(mainActivity)
-		} otherwise  {
+		} otherwise {
 			overlay?.remove()
 			mainActivity?.backEvent = null
 		}

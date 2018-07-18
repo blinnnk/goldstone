@@ -184,7 +184,7 @@ object RequisitionUtil {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: (Exception) -> Unit = {},
+		crossinline errorCallback: (Exception) -> Unit,
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
@@ -193,22 +193,18 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		val request = Request.Builder().url(api).build()
+		val request =
+			Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
 				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 				LogUtil.error(keyName, error)
 			}
 			
-			override fun onResponse(
-				call: Call,
-				response: Response
-			) {
+			override fun onResponse(call: Call, response: Response) {
 				val data = response.body()?.string()
 				try {
-					val dataObject =
-						data?.toJsonObject()
-						?: JSONObject("")
+					val dataObject = data?.toJsonObject() ?: JSONObject("")
 					val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 					if (justGetData) {
 						hold(listOf(jsonData as T))
