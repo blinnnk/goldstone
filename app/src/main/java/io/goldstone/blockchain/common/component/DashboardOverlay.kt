@@ -10,6 +10,7 @@ import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.base.BaseRadioCell
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -21,7 +22,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 2018/7/12 3:57 PM
  * @author KaySaith
  */
-class DashboardOverlay(
+open class DashboardOverlay(
 	context: Context,
 	hold: LinearLayout.() -> Unit
 ) : RelativeLayout(context) {
@@ -62,5 +63,41 @@ class DashboardOverlay(
 	
 	private fun removeSelf() {
 		(parent as? ViewGroup)?.removeView(this)
+	}
+}
+
+abstract class RadioDashboard {
+	
+	abstract val cellContent: ArrayList<String>
+	abstract var defaultRadio: String
+	abstract fun afterSelected()
+	
+	fun inTo(parent: ViewGroup?) {
+		parent?.apply {
+			DashboardOverlay(context) {
+				// 取消所有选中样式的函数内方法
+				fun recoveryRadioChecked() {
+					(0 until cellContent.size).forEach {
+						findViewById<BaseRadioCell>(it)?.checkedStatus = false
+					}
+				}
+				// 加载视图
+				cellContent.forEachIndexed { index, it ->
+					BaseRadioCell(context).apply {
+						id = index
+						if (it.equals(defaultRadio, true)) {
+							checkedStatus = true
+						}
+						setTitle(it)
+						setGrayStyle()
+					}.click {
+						recoveryRadioChecked()
+						defaultRadio = it.getTitle()
+						afterSelected()
+						it.checkedStatus = true
+					}.into(this)
+				}
+			}.into(this)
+		}
 	}
 }

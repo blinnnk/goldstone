@@ -237,9 +237,9 @@ class CreateWalletPresenter(
 				localTokens.isEmpty() isTrue {
 					errorCallback(Exception())
 					// 本地没有数据从服务器获取数据
-					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-						serverTokens.completeAddressInfo(addresses, callback)
-					}
+					//					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+					//						serverTokens.completeAddressInfo(addresses, callback)
+					//					}
 				} otherwise {
 					localTokens.completeAddressInfo(addresses, callback)
 				}
@@ -327,34 +327,41 @@ class CreateWalletPresenter(
 							ChainID.Main.id,
 							ChainID.Ropsten.id,
 							ChainID.Kovan.id,
-							ChainID.Rinkeby.id ->
+							ChainID.Rinkeby.id -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
 									MyTokenTable.insert(
 										MyTokenTable(it, currentAddresses.ethAddress),
 										it.chain_id
 									)
 								}
-							ChainID.ETCMain.id, ChainID.ETCTest.id ->
+							}
+							
+							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
 									MyTokenTable.insert(
 										MyTokenTable(it, currentAddresses.etcAddress),
 										it.chain_id
 									)
 								}
-							ChainID.BTCMain.id ->
+							}
+							
+							ChainID.BTCMain.id -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
 									MyTokenTable.insert(
 										MyTokenTable(it, currentAddresses.btcAddress),
 										it.chain_id
 									)
 								}
-							ChainID.BTCTest.id ->
+							}
+							
+							ChainID.BTCTest.id -> {
 								if (currentAddresses.btcTestAddress.isNotEmpty()) {
 									MyTokenTable.insert(
 										MyTokenTable(it, currentAddresses.btcTestAddress),
 										it.chain_id
 									)
 								}
+							}
 						}
 						completeMark()
 					}
