@@ -6,12 +6,14 @@ import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -56,15 +58,21 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun getCurrentChainTokensWithAddress(
-			walletAddress: String = Config.getCurrentAddress(),
+		fun getMyTokensWithAddresses(
 			callback: (ArrayList<MyTokenTable>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(walletAddress)
-				}) {
-				callback(it.toArrayList())
+			WalletTable.getCurrentAddresses { addresses ->
+				doAsync {
+					var allTokens = listOf<MyTokenTable>()
+					addresses.forEachOrEnd { item, isEnd ->
+						allTokens += GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(item)
+						if (isEnd) {
+							GoldStoneAPI.context.runOnUiThread {
+								callback(allTokens.toArrayList())
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -76,7 +84,7 @@ data class MyTokenTable(
 		) {
 			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
 				// Check current wallet has more than on token or not
-				MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
+				MyTokenTable.getMyTokensWithAddresses { myTokens ->
 					hold(myTokens, defaultTokens)
 				}
 			}
@@ -167,37 +175,51 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			errorCallback: (error: Exception?, reason: String?) -> Unit,
-			ownerAddress: String = Config.getCurrentAddress(),
 			callback: () -> Unit
 		) {
-			doAsync {
-				GoldStoneDataBase.database.apply {
-					// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-					myTokenDao().getCurrentChainTokensBy(ownerAddress).find {
-						it.contract.equals(contract, true)
-					}.isNull() isTrue {
-						if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
-							getBalanceAndInsertWithSymbolAndContract(
-								symbol,
-								contract,
-								ownerAddress,
-								errorCallback,
-								callback
-							)
-						} else {
-							insert(
-								MyTokenTable(
-									0,
-									ownerAddress,
+			WalletTable.getCurrentWallet {
+				doAsync {
+					val currentAddress = when (symbol) {
+						CryptoSymbol.etc -> it?.currentETCAddress
+						
+						CryptoSymbol.btc -> {
+							if (Config.isTestEnvironment()) {
+								it?.currentBTCTestAddress
+							} else {
+								it?.currentETCAddress
+							}
+						}
+						
+						else -> it?.currentETHAndERCAddress
+					}.orEmpty()
+					GoldStoneDataBase.database.apply {
+						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+						myTokenDao().getCurrentChainTokensBy(currentAddress).find {
+							it.contract.equals(contract, true)
+						}.isNull() isTrue {
+							if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+								getBalanceAndInsertWithSymbolAndContract(
 									symbol,
-									0.0,
 									contract,
-									CryptoValue.chainID(contract)
+									currentAddress,
+									errorCallback,
+									callback
 								)
-							)
-							// 没有网络不用检查间隔直接插入数据库
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
+							} else {
+								insert(
+									MyTokenTable(
+										0,
+										currentAddress,
+										symbol,
+										0.0,
+										contract,
+										CryptoValue.chainID(contract)
+									)
+								)
+								// 没有网络不用检查间隔直接插入数据库
+								GoldStoneAPI.context.runOnUiThread {
+									callback()
+								}
 							}
 						}
 					}
@@ -283,6 +305,10 @@ data class MyTokenTable(
 						callback(balance)
 					}
 				}
+			// TODO BTC Balance
+				contract.equals(CryptoValue.btcContract, true) -> {
+					callback(11.12)
+				}
 				
 				else -> DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
@@ -300,13 +326,14 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun updateCurrentWalletBalanceWithContract(
+		fun updateBalanceWithContract(
 			balance: Double,
+			address: String,
 			contract: String
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getCurrentChainTokenByContractAndAddress(contract, Config.getCurrentAddress()).let {
+					getCurrentChainTokenByContractAndAddress(contract, address).let {
 						it?.let {
 							update(it.apply { this.balance = balance })
 						}
@@ -328,17 +355,21 @@ interface MyTokenDao {
 		etcChain: String = Config.getETCCurrentChain()
 	): MyTokenTable?
 	
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain) ")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
 		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain()
+		etcChain: String = Config.getETCCurrentChain(),
+		btcChain: String = Config.getBTCCurrentChain()
 	): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAllTokensBy(
 		walletAddress: String
 	): List<MyTokenTable>
+	
+	@Query("SELECT * FROM myTokens")
+	fun getAll(): List<MyTokenTable>
 	
 	@Insert
 	fun insert(token: MyTokenTable)

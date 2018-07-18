@@ -288,7 +288,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "PATH"
 		else -> ""
 	}
-	
 	@JvmField
 	val walletType = when (currentLanguage) {
 		HoneyLanguage.English.code -> "TYPE"
@@ -299,7 +298,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "TYPE"
 		else -> ""
 	}
-	
 	@JvmField
 	val customBitcoinPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Bitcoin Path"
@@ -320,7 +318,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Custom Ethereum Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val customBTCTestPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Bitcoin Test Path"
@@ -341,7 +338,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Custom Classic Ethereum Path"
 		else -> ""
 	}
-	
 	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
@@ -432,7 +428,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "這個地址已經導入過了"
 		else -> ""
 	}
-	
 	@JvmField
 	val keystoreEthOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
@@ -443,7 +438,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
 		else -> ""
 	}
-	
 	@JvmField
 	val notBip44WalletAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
@@ -454,7 +448,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
 		else -> ""
 	}
-	
 	@JvmField
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter password and then click confirm to get your keystore"
@@ -2866,6 +2859,26 @@ object ChainText {
 		HoneyLanguage.Korean.code -> "ETC Mainnet (GasTracker)"
 		HoneyLanguage.Russian.code -> "ETC Mainnet (GasTracker)"
 		HoneyLanguage.TraditionalChinese.code -> "ETC Mainnet (GasTracker)"
+		else -> ""
+	}
+	@JvmField
+	val btcMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BTC Mainnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "BTC Mainnet (GoldStone)"
+		HoneyLanguage.Japanese.code -> "BTC Mainnet (GoldStone)"
+		HoneyLanguage.Korean.code -> "BTC Mainnet (GoldStone)"
+		HoneyLanguage.Russian.code -> "BTC Mainnet (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "BTC Mainnet (GoldStone)"
+		else -> ""
+	}
+	@JvmField
+	val btcTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.Japanese.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.Korean.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.Russian.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "BTC Testnet (GoldStone)"
 		else -> ""
 	}
 }

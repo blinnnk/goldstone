@@ -20,12 +20,10 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
+import io.goldstone.blockchain.crypto.MultiChainAddresses
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -159,7 +157,7 @@ class CreateWalletPresenter(
 					)
 				) {
 					generateMyTokenInfo(
-						multiChainAddresses.ethAddress,
+						multiChainAddresses,
 						{
 							LogUtil.error("generateWalletWith")
 						}) {
@@ -230,19 +228,21 @@ class CreateWalletPresenter(
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
 		fun generateMyTokenInfo(
-			ownerAddress: String,
+			addresses: MultiChainAddresses,
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
 		) {
 			// 首先从本地查找数据
 			DefaultTokenTable.getAllTokens { localTokens ->
 				localTokens.isEmpty() isTrue {
+					errorCallback(Exception())
 					// 本地没有数据从服务器获取数据
 					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-						serverTokens.completeAddressInfo(ownerAddress, callback)
+						serverTokens.completeAddressInfo(addresses, callback)
 					}
 				} otherwise {
-					localTokens.completeAddressInfo(ownerAddress, callback)
+					System.out.println("####$addresses")
+					localTokens.completeAddressInfo(addresses, callback)
 				}
 			}
 		}
@@ -302,30 +302,62 @@ class CreateWalletPresenter(
 		}
 		
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
-			ownerAddress: String,
+			currentAddresses: MultiChainAddresses,
 			callback: () -> Unit
 		) {
 			filter {
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
 				TinyNumberUtils.isTrue(it.forceShow)
 			}.apply {
+				System.out.println("%$$$$$$#$this")
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/
-				insertNewAccount(ownerAddress, callback)
+				insertNewAccount(currentAddresses, callback)
 			}
 		}
 		
 		private fun List<DefaultTokenTable>.insertNewAccount(
-			address: String,
+			currentAddresses: MultiChainAddresses,
 			callback: () -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach {
-						// 创建新账号的默认 `Token` 会插入到所有链上的默认列表
-						MyTokenTable.insert(MyTokenTable(it, address), it.chain_id)
+						when (it.chain_id) {
+							ChainID.Main.id,
+							ChainID.Ropsten.id,
+							ChainID.Kovan.id,
+							ChainID.Rinkeby.id ->
+								if (currentAddresses.ethAddress.isNotEmpty()) {
+									MyTokenTable.insert(
+										MyTokenTable(it, currentAddresses.ethAddress),
+										it.chain_id
+									)
+								}
+							ChainID.ETCMain.id, ChainID.ETCTest.id ->
+								if (currentAddresses.etcAddress.isNotEmpty()) {
+									MyTokenTable.insert(
+										MyTokenTable(it, currentAddresses.etcAddress),
+										it.chain_id
+									)
+								}
+							ChainID.BTCMain.id ->
+								if (currentAddresses.btcAddress.isNotEmpty()) {
+									MyTokenTable.insert(
+										MyTokenTable(it, currentAddresses.btcAddress),
+										it.chain_id
+									)
+								}
+							ChainID.BTCTest.id ->
+								if (currentAddresses.btcTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(
+										MyTokenTable(it, currentAddresses.btcTestAddress),
+										it.chain_id
+									)
+								}
+						}
 						completeMark()
 					}
 				}

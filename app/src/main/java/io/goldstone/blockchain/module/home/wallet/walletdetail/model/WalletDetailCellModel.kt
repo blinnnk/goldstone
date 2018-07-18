@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -56,14 +55,14 @@ data class WalletDetailCellModel(
 		}
 		
 		fun getLocalModels(
-			walletAddress: String = Config.getCurrentAddress(),
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			MyTokenTable.getCurrentChainTokensWithAddress(walletAddress) { myTokens ->
+			MyTokenTable.getMyTokensWithAddresses { myTokens ->
+				System.out.println("%%%%%$myTokens")
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getCurrentChainTokensWithAddress
+					return@getMyTokensWithAddresses
 				}
 				DefaultTokenTable.getCurrentChainTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
@@ -90,7 +89,6 @@ data class WalletDetailCellModel(
 		
 		fun getChainModels(
 			fragment: WalletDetailFragment,
-			walletAddress: String = Config.getCurrentAddress(),
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
 			/** 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记 */
@@ -98,12 +96,13 @@ data class WalletDetailCellModel(
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
 			// 获取我的钱包的 `Token` 列表
-			MyTokenTable.getCurrentChainTokensWithAddress(walletAddress) { myTokens ->
+			MyTokenTable.getMyTokensWithAddresses { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getCurrentChainTokensWithAddress
+					return@getMyTokensWithAddresses
 				}
+				System.out.println("#####$myTokens")
 				// 首先更新 `MyToken` 的 `Price`
 				myTokens.updateMyTokensPrices(
 					{
@@ -112,6 +111,7 @@ data class WalletDetailCellModel(
 						return@updateMyTokensPrices
 					}
 				) {
+					System.out.println("hello 1900")
 					DefaultTokenTable.getCurrentChainTokens { localTokens ->
 						object : ConcurrentAsyncCombine() {
 							val tokenList = ArrayList<WalletDetailCellModel>()
@@ -124,15 +124,19 @@ data class WalletDetailCellModel(
 										// 链上查余额
 										MyTokenTable.getBalanceWithContract(
 											targetToken.contract,
-											walletAddress,
+											token.ownerAddress,
 											false,
 											{ error, reason ->
 												completeMark()
 												fragment.context?.apply { chainError(reason, error, this) }
 											}
-										) {
-											MyTokenTable.updateCurrentWalletBalanceWithContract(it, targetToken.contract)
-											tokenList.add(WalletDetailCellModel(targetToken, it))
+										) { balance ->
+											MyTokenTable.updateBalanceWithContract(
+												balance,
+												targetToken.contract,
+												token.ownerAddress
+											)
+											tokenList.add(WalletDetailCellModel(targetToken, balance))
 											completeMark()
 										}
 									}

@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.MultiChainAddresses
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -65,7 +66,12 @@ class WatchOnlyImportPresenter(
 					)
 				) {
 					CreateWalletPresenter.generateMyTokenInfo(
-						address.hex,
+						MultiChainAddresses(
+							address.hex,
+							address.hex,
+							"",
+							""
+						),
 						{
 							LogUtil.error(this.javaClass.simpleName)
 							callback()

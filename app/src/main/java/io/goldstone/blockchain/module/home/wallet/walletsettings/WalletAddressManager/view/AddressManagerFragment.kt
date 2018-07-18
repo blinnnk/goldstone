@@ -124,10 +124,17 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 							presenter.getBitcoinAddresses()
 						}
 					} else {
+						removeHeaderAddButton()
 						attentionView.into(this)
 					}
 				}
 			}
+		}
+	}
+	
+	private fun removeHeaderAddButton() {
+		getParentFragment<WalletSettingsFragment> {
+			overlayView.header.showAddButton(false)
 		}
 	}
 	

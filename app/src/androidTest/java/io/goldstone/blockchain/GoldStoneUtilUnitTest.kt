@@ -15,9 +15,11 @@ import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
+import org.jetbrains.anko.doAsync
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -81,6 +83,15 @@ class GoldStoneUtilUnitTest {
 	fun getCurrentWallet() {
 		WalletTable.getCurrentWallet {
 			LogUtil.debug("getWalletByEthseriesAddress + $positon", it.toString())
+		}
+	}
+	
+	@Test
+	fun getMyTokenTable() {
+		doAsync {
+			GoldStoneDataBase.database.myTokenDao().getAll().let {
+				LogUtil.debug("getMyTokenTable", "$it")
+			}
 		}
 	}
 	

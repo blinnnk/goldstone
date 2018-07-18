@@ -106,7 +106,7 @@ class TokenSearchPresenter(
 		) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getCurrentChainTokensWithAddress { localTokens ->
+				MyTokenTable.getMyTokensWithAddresses { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {

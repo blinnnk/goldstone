@@ -49,7 +49,7 @@ class TokenManagementListPresenter(
 				
 				override fun concurrentJobs() {
 					defaultTokens.forEach { default ->
-						MyTokenTable.getCurrentChainTokensWithAddress { myTokens ->
+						MyTokenTable.getMyTokensWithAddresses { myTokens ->
 							default.isUsed = !myTokens.find {
 								default.contract.equals(it.contract, true)
 							}.isNull()

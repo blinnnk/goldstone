@@ -152,6 +152,35 @@ object Config {
 			chainName
 		)
 	
+	fun getBTCCurrentChain(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
+				.equals("Default", true)
+		) {
+			ChainID.BTCMain.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
+		}
+	
+	fun updateBTCCurrentChain(chainID: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainID)
+	
+	fun getBTCCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.btcCurrentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.btcMain
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChainName)
+		}
+	
+	fun updateBTCCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.btcCurrentChainName,
+			chainName
+		)
+	
 	/** Wallet Info Config */
 	fun getCurrencyCode(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)

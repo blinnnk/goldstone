@@ -37,13 +37,15 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.eth, ChainText.rinkeby),
 		Pair(CryptoName.eth, ChainText.infuraRinkeby),
 		Pair(CryptoName.etc, ChainText.goldStoneEtcMorderTest),
-		Pair(CryptoName.etc, ChainText.etcMorden)
+		Pair(CryptoName.etc, ChainText.etcMorden),
+		Pair(CryptoName.btc, ChainText.btcTest)
 	)
 	private val mainnetNodeList = arrayListOf(
 		Pair(CryptoName.eth, ChainText.goldStoneMain),
 		Pair(CryptoName.eth, ChainText.infuraMain),
 		Pair(CryptoName.etc, ChainText.goldStoneEtcMain),
-		Pair(CryptoName.etc, ChainText.etcMainGasTracker)
+		Pair(CryptoName.etc, ChainText.etcMainGasTracker),
+		Pair(CryptoName.btc, ChainText.btcMain)
 	)
 	private val confirmButton by lazy {
 		RoundButton(context!!)
@@ -64,6 +66,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					// Section Header
 					when (chain.first) {
 						CryptoName.eth -> NodeSelectionSectionCell(context).ethType().into(this)
+						CryptoName.btc -> NodeSelectionSectionCell(context).btcType().into(this)
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
 					// Nodes of One Chain
@@ -103,6 +106,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					isMainnet?.let {
 						selectedNode.forEach { pair ->
 							if (pair.first == CryptoName.eth) presenter.updateERC20TestChainID(pair.second)
+							if (pair.first == CryptoName.btc) presenter.updateBTCTestChainID(pair.second)
 							else presenter.updateETCTestChainID(pair.second)
 							// 更新是否是测试环境的参数
 							Config.updateIsTestEnvironment(testnetNodeList.any { it.second == pair.second })
@@ -117,6 +121,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private fun getChainTypeByName(name: String): ChainType {
 		return when (name) {
 			CryptoName.eth -> ChainType.ETH
+			CryptoName.btc -> ChainType.BTC
 			else -> ChainType.ETC
 		}
 	}

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 
 /**
@@ -92,4 +93,16 @@ data class MultiChainAddresses(
 	val etcAddress: String,
 	val btcAddress: String,
 	val btcTestAddress: String
-)
+) {
+	
+	companion object {
+		fun getNotEmptyAddresses(addresses: MultiChainAddresses): ArrayList<String> {
+			return arrayListOf(
+				addresses.ethAddress,
+				addresses.etcAddress,
+				addresses.btcAddress,
+				addresses.btcTestAddress
+			).filter { it.isNotEmpty() }.toArrayList()
+		}
+	}
+}
