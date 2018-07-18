@@ -189,16 +189,6 @@ class AddressManagerPresneter(
 		}
 	}
 	
-	fun showAllBTCTestAddresses(): Runnable {
-		return Runnable {
-			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtCTestAddresses,
-				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTCTest.id) }
-			)
-		}
-	}
-	
 	companion object {
 		
 		fun createETHAndERCAddress(
@@ -345,13 +335,19 @@ class AddressManagerPresneter(
 					when (chainType) {
 						ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
 						ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-						ChainType.BTC.id -> hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-						ChainType.BTCTest.id -> hold(
-							getTargetAddressIndex(
-								btcTestAddresses,
-								currentBTCTestAddress
-							)
-						)
+						
+						ChainType.BTC.id -> {
+							if (Config.isTestEnvironment()) {
+								hold(
+									getTargetAddressIndex(
+										btcTestAddresses,
+										currentBTCTestAddress
+									)
+								)
+							} else {
+								hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
+							}
+						}
 					}
 				}
 			}

@@ -45,11 +45,12 @@ object CryptoValue {
 		(!it.equals(ethContract, true)
 		 && !it.equals(etcContract, true))
 	}
-	val chainType: (path: String) -> Int = {
+	val pathCointType: (path: String) -> Int = {
 		it.replace("'", "").split("/")[2].toInt()
 	}
-	val isBtcTest: (chainType: Int) -> Boolean = {
-		it == ChainType.BTCTest.id
+	// 比特的 `Bip44` 的比特币测试地址的  `CoinType` 为 `1`
+	val isBTCTest: (pathCointType: Int) -> Boolean = {
+		it == 1
 	}
 	
 	enum class PrivateKeyType(val content: String) {
@@ -87,7 +88,6 @@ object CryptoName {
 
 enum class ChainType(val id: Int) {
 	BTC(0),
-	BTCTest(1),
 	LTC(2),
 	ETH(60),
 	ETC(61),

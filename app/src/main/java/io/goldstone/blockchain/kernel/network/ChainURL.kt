@@ -36,6 +36,13 @@ object ChainURL {
 			else -> ChainURL.etcMain
 		}
 	}
+	val currentBTCChain: (currentChainName: String) -> String = {
+		when (it) {
+			ChainText.btcMain -> ChainURL.btcMain
+			ChainText.btcTest -> ChainURL.btcTest
+			else -> ChainURL.btcMain
+		}
+	}
 	val uncryptChainName = listOf(
 		ChainText.etcMorden,
 		ChainText.etcMainGasTracker,
@@ -56,6 +63,7 @@ object ChainURL {
 		return when (type) {
 			ChainType.ETH -> Config.getCurrentChainName()
 			ChainType.ETC -> Config.getETCCurrentChainName()
+			ChainType.BTC -> Config.getBTCCurrentChain()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -64,6 +72,7 @@ object ChainURL {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
+			symbol.equals(CryptoSymbol.btc, true) -> Config.getBTCCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -72,6 +81,7 @@ object ChainURL {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
 			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
+			symbol.equals(CryptoSymbol.btc, true) -> ChainType.BTC
 			else -> ChainType.ETH
 		}
 	}
@@ -94,6 +104,9 @@ object ChainURL {
 	private const val ropsten = "https://eth-node-ropsten.goldstone.io/eth"
 	private const val kovan = "https://eth-node-kovan.goldstone.io/eth"
 	private const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
+	/** BTC Chain Address */
+	private const val btcMain = "http://goldstone:goldstone@119.28.221.153:8332"
+	private const val btcTest = "http://goldstone:goldstone@150.109.41.22:18332"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMorderTest = "https://web3.gastracker.io/morden"

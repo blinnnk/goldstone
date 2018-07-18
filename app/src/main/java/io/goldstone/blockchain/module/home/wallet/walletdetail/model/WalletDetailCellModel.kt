@@ -58,7 +58,6 @@ data class WalletDetailCellModel(
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
 			MyTokenTable.getMyTokensWithAddresses { myTokens ->
-				System.out.println("%%%%%$myTokens")
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
@@ -102,7 +101,6 @@ data class WalletDetailCellModel(
 					hold(arrayListOf())
 					return@getMyTokensWithAddresses
 				}
-				System.out.println("#####$myTokens")
 				// 首先更新 `MyToken` 的 `Price`
 				myTokens.updateMyTokensPrices(
 					{
@@ -111,7 +109,6 @@ data class WalletDetailCellModel(
 						return@updateMyTokensPrices
 					}
 				) {
-					System.out.println("hello 1900")
 					DefaultTokenTable.getCurrentChainTokens { localTokens ->
 						object : ConcurrentAsyncCombine() {
 							val tokenList = ArrayList<WalletDetailCellModel>()

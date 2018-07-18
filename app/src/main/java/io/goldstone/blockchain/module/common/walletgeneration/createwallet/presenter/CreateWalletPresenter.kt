@@ -241,7 +241,6 @@ class CreateWalletPresenter(
 						serverTokens.completeAddressInfo(addresses, callback)
 					}
 				} otherwise {
-					System.out.println("####$addresses")
 					localTokens.completeAddressInfo(addresses, callback)
 				}
 			}
@@ -309,7 +308,6 @@ class CreateWalletPresenter(
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
 				TinyNumberUtils.isTrue(it.forceShow)
 			}.apply {
-				System.out.println("%$$$$$$#$this")
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/

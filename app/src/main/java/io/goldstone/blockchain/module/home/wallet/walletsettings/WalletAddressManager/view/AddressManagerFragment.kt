@@ -34,9 +34,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			val chainTYpe = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
 				CryptoSymbol.etc -> ChainType.ETC.id
-				CryptoSymbol.btc -> ChainType.BTC.id
 				CryptoSymbol.erc -> ChainType.ETH.id
-				else -> ChainType.BTCTest.id
+				else -> ChainType.BTC.id
 			}
 			moreButton.onClick {
 				showCellMoreDashboard(
@@ -220,8 +219,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-						ChainType.BTC.id -> presenter.getBitcoinAddresses()
-						ChainType.BTCTest.id -> presenter.getBitcoinAddresses()
+						
+						ChainType.BTC.id -> {
+							if (Config.isTestEnvironment()) {
+								presenter.getBitcoinTestAddresses()
+							} else {
+								presenter.getBitcoinAddresses()
+							}
+						}
 					}
 					toast(CommonText.succeed)
 					AddressManagerFragment.removeDashboard(this)

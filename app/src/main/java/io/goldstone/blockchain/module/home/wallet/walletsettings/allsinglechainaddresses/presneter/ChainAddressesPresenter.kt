@@ -7,10 +7,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.WalletSettingsText
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
@@ -93,10 +90,6 @@ class ChainAddressesPresenter(
 							updateAddressManagerDataBy(ChainType.BTC.id, it)
 							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 						}
-						ChainType.BTCTest.id -> AddressManagerPresneter.createBTCTestAddress(context, it) {
-							updateAddressManagerDataBy(ChainType.BTCTest.id, it)
-							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
-						}
 					}
 				}
 			}
@@ -112,7 +105,6 @@ class ChainAddressesPresenter(
 					ChainType.ETH.id -> it.setEthereumAddressesModel(data)
 					ChainType.ETC.id -> it.setEthereumClassicAddressesModel(data)
 					ChainType.BTC.id -> it.setBitcoinAddressesModel(data)
-					ChainType.BTCTest.id -> it.setBitcoinAddressesModel(data)
 				}
 			}
 		}
@@ -126,8 +118,14 @@ class ChainAddressesPresenter(
 				when (coinType) {
 					ChainType.ETH.id -> it.presenter.getEthereumAddresses()
 					ChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
-					ChainType.BTC.id -> it.presenter.getBitcoinAddresses()
-					ChainType.BTCTest.id -> it.presenter.getBitcoinAddresses()
+					
+					ChainType.BTC.id -> {
+						if (Config.isTestEnvironment()) {
+							it.presenter.getBitcoinTestAddresses()
+						} else {
+							it.presenter.getBitcoinAddresses()
+						}
+					}
 				}
 			}
 		}
@@ -202,18 +200,13 @@ class ChainAddressesPresenter(
 					}
 					
 					ChainType.BTC.id -> {
+						val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
+						val currentAddress =
+							if (Config.isTestEnvironment()) currentBTCTestAddress else currentBTCAddress
 						fragment.asyncData =
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses).toArrayList()
+							AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
 						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
-							setDefaultAddress(it, currentBTCAddress, ChainType.BTC.id)
-						}
-					}
-					
-					else -> {
-						fragment.asyncData =
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).toArrayList()
-						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTCTest.id) {
-							setDefaultAddress(it, currentBTCTestAddress, ChainType.BTCTest.id)
+							setDefaultAddress(it, currentAddress, ChainType.BTC.id)
 						}
 					}
 				}
