@@ -37,6 +37,13 @@ class NodeSelectionPresenter(
 		Config.updateEncryptETCNodeRequest(checkIsEncryptETCNode(nodeName))
 	}
 	
+	fun updateBTCTestChainID(nodeName: String) {
+		Config.updateBTCCurrentChainName(nodeName)
+		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
+		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
+		// TODO 加密节点需求
+	}
+	
 	fun updateDatabaseThenJump(isMainnet: Boolean) {
 		AppConfigTable.updateChainStatus(isMainnet) {
 			fragment.activity?.jump<SplashActivity>()
@@ -51,6 +58,14 @@ class NodeSelectionPresenter(
 						ChainText.goldStoneMain
 					} else {
 						Config.getCurrentChainName()
+					}
+				}
+				
+				ChainType.BTC -> {
+					if(Config.getBTCCurrentChain() != ChainID.BTCMain.id) {
+						ChainText.btcMain
+					} else {
+						Config.getBTCCurrentChainName()
 					}
 				}
 				
@@ -69,6 +84,14 @@ class NodeSelectionPresenter(
 						ChainText.ropsten
 					} else {
 						Config.getCurrentChainName()
+					}
+				}
+				
+				ChainType.BTC -> {
+					if(Config.getBTCCurrentChain() == ChainID.BTCMain.id) {
+						ChainText.btcTest
+					} else {
+						Config.getBTCCurrentChainName()
 					}
 				}
 				

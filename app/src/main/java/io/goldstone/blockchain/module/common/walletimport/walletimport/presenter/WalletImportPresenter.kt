@@ -108,7 +108,7 @@ class WalletImportPresenter(
 					) {
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(
-							multiChainAddresses.ethAddress,
+							multiChainAddresses,
 							{
 								LogUtil.error("insertWalletToDatabase")
 								callback()

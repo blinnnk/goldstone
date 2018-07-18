@@ -54,6 +54,13 @@ class NodeSelectionSectionCell(context: Context) : LinearLayout(context) {
 		return this
 	}
 	
+	fun btcType(): NodeSelectionSectionCell {
+		icon.imageResource = R.drawable.btc_icon
+		titles.title.text = CryptoSymbol.btc
+		titles.subtitle.text = CryptoName.btc
+		return this
+	}
+	
 	fun etcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.etc_icon
 		titles.title.text = CryptoSymbol.etc

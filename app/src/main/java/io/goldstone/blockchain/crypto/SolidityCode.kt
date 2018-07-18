@@ -23,13 +23,14 @@ object SolidityCode {
 
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
-	const val bitcoinAddressLength = 34 // 包含 `0x`
+	const val bitcoinAddressLength = 34
 	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	// GoldStone 业务约定的值
 	const val ethContract = "0x60"
 	const val etcContract = "0x61"
+	const val btcContract = "0x0"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
@@ -67,7 +68,7 @@ object CryptoValue {
 		}
 	}
 	
-	val basicLockKey = "1111111111111111111111111111111111111111111111111111111111111111"
+	const val basicLockKey = "1111111111111111111111111111111111111111111111111111111111111111"
 }
 
 object CryptoSymbol {
@@ -81,6 +82,7 @@ object CryptoSymbol {
 object CryptoName {
 	const val eth = "Ethereum"
 	const val etc = "Ethereum Classic"
+	const val btc = "Bitcoin"
 }
 
 enum class ChainType(val id: Int) {
@@ -88,7 +90,8 @@ enum class ChainType(val id: Int) {
 	BTCTest(1),
 	LTC(2),
 	ETH(60),
-	ETC(61)
+	ETC(61),
+	ERC(100) // 需要调大不然可能会和自然 `Type` 冲突
 }
 
 object DefaultPath {

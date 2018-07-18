@@ -15,7 +15,6 @@ enum class ChainID(val id: String) {
 	ETCMain("61"),
 	ETCTest("62"),
 	BTCMain("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"),
-	BTCRegtest("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"),
 	BTCTest("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"),
 	LTCMain("12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2");
 	
@@ -25,7 +24,7 @@ enum class ChainID(val id: String) {
 			return arrayListOf(
 				ChainID.ETCTest.id,
 				ChainID.BTCTest.id,
-				ChainID.BTCRegtest.id,
+				ChainID.BTCTest.id,
 				ChainID.Ropsten.id,
 				ChainID.Kovan.id,
 				ChainID.Rinkeby.id
@@ -45,14 +44,14 @@ enum class ChainID(val id: String) {
 		
 		fun getChainNameByID(chainID: String): String {
 			return when (chainID) {
-				// Third Pardy Nodes
+			// Third Pardy Nodes
 				Kovan.id -> ChainText.infuraKovan
 				Ropsten.id -> ChainText.infuraRopsten
 				Main.id -> ChainText.infuraMain
 				Rinkeby.id -> ChainText.infuraRinkeby
 				ETCTest.id -> ChainText.etcMorden
 				ETCMain.id -> ChainText.etcMainGasTracker
-				// GoldStone Nodes
+			// GoldStone Nodes
 				Main.id -> ChainText.goldStoneMain
 				Ropsten.id -> ChainText.ropsten
 				Kovan.id -> ChainText.kovan
@@ -80,6 +79,9 @@ enum class ChainID(val id: String) {
 				ChainText.goldStoneEtcMain -> ETCMain.id
 				ChainText.goldStoneEtcMorderTest -> ETCTest.id
 				ChainText.etcMainGasTracker -> ETCMain.id
+			// BTC Node
+				ChainText.btcMain -> BTCMain.id
+				ChainText.btcTest -> BTCTest.id
 				else -> Main.id
 			}
 		}

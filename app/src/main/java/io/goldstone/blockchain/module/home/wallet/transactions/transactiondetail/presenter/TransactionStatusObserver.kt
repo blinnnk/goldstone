@@ -283,7 +283,7 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		) {
-			MyTokenTable.updateCurrentWalletBalanceWithContract(it, contract)
+			MyTokenTable.updateBalanceWithContract(it, contract, Config.getCurrentAddress())
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}

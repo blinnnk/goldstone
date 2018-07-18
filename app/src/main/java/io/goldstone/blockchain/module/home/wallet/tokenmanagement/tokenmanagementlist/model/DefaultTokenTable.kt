@@ -363,24 +363,27 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :ercChain OR chain_id LIKE :etcChain")
+	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :ercChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain")
 	fun getCurrentChainTokens(
 		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain()
+		etcChain: String = Config.getETCCurrentChain(),
+		btcChain: String = Config.getBTCCurrentChain()
 	): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain)")
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain)")
 	fun getDefaultTokens(
 		isDefault: Boolean = true,
 		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain()
+		etcChain: String = Config.getETCCurrentChain(),
+		btcChain: String = Config.getBTCCurrentChain()
 	): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain)")
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain)")
 	fun getCurrentChainTokenByContract(
 		contract: String,
 		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain()
+		etcChain: String = Config.getETCCurrentChain(),
+		btcChain: String = Config.getBTCCurrentChain()
 	): DefaultTokenTable?
 	
 	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND contract LIKE :contract")
