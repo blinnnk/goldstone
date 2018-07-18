@@ -6,7 +6,9 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.getAddress
@@ -16,6 +18,7 @@ import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -108,6 +111,19 @@ class GoldStoneUtilUnitTest {
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
 		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
+	}
+	
+	@Test
+	fun getCoinInfo() {
+		GoldStoneAPI.getTokenInfoFromMarket(
+			CryptoSymbol.btc,
+			ChainID.BTCMain.id,
+			{
+				LogUtil.error("getCoinInfo", it)
+			}
+		) {
+			LogUtil.debug("getCoinInfo", "$it")
+		}
 	}
 	
 	@Test

@@ -361,22 +361,19 @@ data class WalletTable(
 							}
 							
 							ChainType.BTC.id -> {
-								GoldStoneDataBase.database.walletDao().update(
-									this.apply {
-										currentBTCAddress = newAddress
-									}
-								)
-								GoldStoneAPI.context.runOnUiThread {
-									callback()
+								if (Config.isTestEnvironment()) {
+									GoldStoneDataBase.database.walletDao().update(
+										this.apply {
+											currentBTCTestAddress = newAddress
+										}
+									)
+								} else {
+									GoldStoneDataBase.database.walletDao().update(
+										this.apply {
+											currentBTCAddress = newAddress
+										}
+									)
 								}
-							}
-							
-							ChainType.BTCTest.id -> {
-								GoldStoneDataBase.database.walletDao().update(
-									this.apply {
-										currentBTCTestAddress = newAddress
-									}
-								)
 								GoldStoneAPI.context.runOnUiThread {
 									callback()
 								}

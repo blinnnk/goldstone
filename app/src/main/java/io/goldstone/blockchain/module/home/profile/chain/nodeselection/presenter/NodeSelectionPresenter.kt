@@ -62,7 +62,7 @@ class NodeSelectionPresenter(
 				}
 				
 				ChainType.BTC -> {
-					if(Config.getBTCCurrentChain() != ChainID.BTCMain.id) {
+					if (Config.getBTCCurrentChain() != ChainID.BTCMain.id) {
 						ChainText.btcMain
 					} else {
 						Config.getBTCCurrentChainName()
@@ -88,7 +88,7 @@ class NodeSelectionPresenter(
 				}
 				
 				ChainType.BTC -> {
-					if(Config.getBTCCurrentChain() == ChainID.BTCMain.id) {
+					if (Config.getBTCCurrentChain() == ChainID.BTCMain.id) {
 						ChainText.btcTest
 					} else {
 						Config.getBTCCurrentChainName()

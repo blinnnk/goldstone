@@ -10,10 +10,8 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.WalletSettingsText
-import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.*
@@ -72,16 +70,17 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 			}
 			
 			ChainType.BTC.id -> {
-				allAddressTitle.text = WalletSettingsText.allBtCAddresses
-			}
-			
-			ChainType.BTCTest.id -> {
-				allAddressTitle.text = WalletSettingsText.allBtCTestAddresses
+				allAddressTitle.text =
+					if (Config.isTestEnvironment()) WalletSettingsText.allBtCTestAddresses
+					else WalletSettingsText.allBtCAddresses
 			}
 		}
 	}
 	
-	private fun setClickEvent(address: String, showDashboardEvent: GraySqualCellWithButtons.() -> Unit) {
+	private fun setClickEvent(
+		address: String,
+		showDashboardEvent: GraySqualCellWithButtons.() -> Unit
+	) {
 		currentAddress.copyButton.onClick {
 			currentAddress.context.clickToCopy(address)
 		}
