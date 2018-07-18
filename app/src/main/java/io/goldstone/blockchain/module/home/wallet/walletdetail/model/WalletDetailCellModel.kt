@@ -130,8 +130,8 @@ data class WalletDetailCellModel(
 										) { balance ->
 											MyTokenTable.updateBalanceWithContract(
 												balance,
-												targetToken.contract,
-												token.ownerAddress
+												token.ownerAddress,
+												targetToken.contract
 											)
 											tokenList.add(WalletDetailCellModel(targetToken, balance))
 											completeMark()

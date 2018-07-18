@@ -44,4 +44,7 @@ object WebUrl {
 	val normalServer = "https://api1.goldstone.io"
 	const
 	val normalSocket = "wss://api1.goldstone.io/ws"
+	
+	const val btcMain = "https://blockchain.info"
+	const val btcTest = "https://testnet.blockchain.info"
 }
