@@ -68,11 +68,23 @@ fun Context.getEthereumWalletByMnemonic(
 	val address = "0x" + publicKey.toLowerCase()
 	/** Import Private Key to Keystore */
 	try {
-		keyStore.importECDSAKey(masterKey.privateKey.toString(16).hexToByteArray(), password)
+		keyStore.importECDSAKey(
+			keyString(masterKey.privateKey.toString(16)).hexToByteArray(),
+			password
+		)
 	} catch (error: Exception) {
 		println("getEthereumWalletByMnemonic $error")
 	}
 	hold(address)
+}
+
+val keyString: (secret: String) -> String = {
+	val currentPrivateKey = it.toBigInteger(16)
+	when {
+		it.substring(0, 1) == "0" -> "0" + currentPrivateKey.toString(16)
+		it.length == 63 -> "0" + currentPrivateKey.toString(16)
+		else -> currentPrivateKey.toString(16)
+	}
 }
 
 fun Context.getWalletByPrivateKey(
@@ -89,14 +101,9 @@ fun Context.getWalletByPrivateKey(
 	val publicKey = ECKeyPair(currentPrivateKey, publicKeyFromPrivate(currentPrivateKey)).getAddress()
 	val address = publicKey.prepend0xPrefix()
 	/** Format PrivateKey */
-	val keyString = when {
-		privateKey.substring(0, 1) == "0" -> "0" + currentPrivateKey.toString(16)
-		privateKey.length == 63 -> "0" + currentPrivateKey.toString(16)
-		else -> currentPrivateKey.toString(16)
-	}
 	/** Import Private Key to Keystore */
 	try {
-		keyStore.importECDSAKey(keyString.hexToByteArray(), password)
+		keyStore.importECDSAKey(keyString(privateKey).hexToByteArray(), password)
 	} catch (error: Exception) {
 		println(error)
 	}

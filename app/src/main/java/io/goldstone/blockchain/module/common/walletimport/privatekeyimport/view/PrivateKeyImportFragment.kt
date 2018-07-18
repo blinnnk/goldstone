@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.BaseRadioCell
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -38,7 +36,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var defaultType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
+	private var currentType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
 	override val presenter = PrivateKeyImportPresenter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -54,14 +52,20 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				
 				typeSettings
 					.apply {
-						setTitles(ImportWalletText.walletType, defaultType)
-						setMargins<RelativeLayout.LayoutParams> {
+						setMargins<LinearLayout.LayoutParams> {
 							topMargin = 20.uiPX()
 							bottomMargin = 10.uiPX()
 						}
+						setTitles(ImportWalletText.walletType, currentType)
 					}
 					.click {
-						showWalletTypeDashboard()
+						showWalletTypeDashboard(
+							this@PrivateKeyImportFragment,
+							currentType
+						) {
+							currentType = it
+							typeSettings.setTitles(ImportWalletText.walletType, it)
+						}
 					}
 					.into(this)
 				
@@ -111,7 +115,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
-						CryptoValue.PrivateKeyType.getTypeByContent(defaultType),
+						CryptoValue.PrivateKeyType.getTypeByContent(currentType),
 						privateKeyInput,
 						passwordInput,
 						repeatPassword,
@@ -142,48 +146,31 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		}
 	}
 	
-	private val walletType =
-		arrayListOf(
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content,
-			CryptoValue.PrivateKeyType.BTC.content,
-			CryptoValue.PrivateKeyType.BTCTest.content
-		)
-	
-	private fun showWalletTypeDashboard() {
-		getParentContainer()?.apply {
-			DashboardOverlay(context) {
-				// 取消所有选中样式的函数内方法
-				fun recoveryRadioChecked() {
-					(0 until walletType.size).forEach {
-						findViewById<BaseRadioCell>(it)?.checkedStatus = false
-					}
-				}
-				// 加载视图
-				walletType.forEachIndexed { index, it ->
-					BaseRadioCell(context).apply {
-						id = index
-						if (it.equals(defaultType, true)) {
-							checkedStatus = true
-						}
-						setTitle(it)
-						setGrayStyle()
-					}.click {
-						recoveryRadioChecked()
-						defaultType = it.getTitle()
-						typeSettings.setTitles(ImportWalletText.walletType, defaultType)
-						it.checkedStatus = true
-					}.into(this)
-				}
-			}.apply {
-				confirmEvent = Runnable {
-				}
-			}.into(this)
-		}
-	}
-	
 	private fun RoundInput.setPasswordSafeLevel() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
+		}
+	}
+	
+	companion object {
+		fun showWalletTypeDashboard(
+			fragment: BaseFragment<*>,
+			type: String,
+			updateCurrentType: (String) -> Unit
+		) {
+			object : RadioDashboard() {
+				override val cellContent =
+					arrayListOf(
+						CryptoValue.PrivateKeyType.ETHERCAndETC.content,
+						CryptoValue.PrivateKeyType.BTC.content,
+						CryptoValue.PrivateKeyType.BTCTest.content
+					)
+				override var defaultRadio = type
+				
+				override fun afterSelected() {
+					updateCurrentType(defaultRadio)
+				}
+			}.inTo(fragment.getParentContainer())
 		}
 	}
 }

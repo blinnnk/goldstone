@@ -9,9 +9,9 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
-import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -27,34 +27,49 @@ class WatchOnlyImportPresenter(
 	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
 	
+	private var currentETHAndERCAddress = ""
+	private var currentBTCAddress = ""
+	private var currentBTCTestAddress = ""
+	private var currentETCAddress = ""
+	
 	fun importWatchOnlyWallet(
+		chainType: ChainType,
 		addressInput: EditText,
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
 		// 默认去除所有的空格
-		val address = Address(addressInput.text.toString().replace(" ", ""))
-		if (!address.isValid()) {
-			fragment.context?.alert(ImportWalletText.addressFromatAlert)
-			callback()
-			return
+		val address = addressInput.text.toString().replace(" ", "")
+		if (chainType == ChainType.BTC) {
+			if (address.length != CryptoValue.bitcoinAddressLength) {
+				fragment.context?.alert(ImportWalletText.addressFromatAlert)
+				callback()
+				return
+			}
+		} else {
+			if (address.length != CryptoValue.bip39AddressLength) {
+				fragment.context?.alert(ImportWalletText.addressFromatAlert)
+				callback()
+				return
+			}
 		}
 		val name = if (nameInput.text.toString().isEmpty()) nameInput.hint.toString()
 		else nameInput.text.toString()
-		
-		WalletTable.getWalletByAddress(address.hex) {
+		// 准备对应的地址
+		setAddressByChainType(address, chainType)
+		WalletTable.getWalletByAddress(address) {
 			it.isNull() isTrue {
 				WalletTable.insert(
 					WalletTable(
 						0,
 						name = name,
-						currentETHAndERCAddress = address.hex,
+						currentETHAndERCAddress = currentETHAndERCAddress,
 						isUsing = true,
 						isWatchOnly = true,
 						hasBackUpMnemonic = true,
-						currentBTCTestAddress = "",
-						currentBTCAddress = "",
-						currentETCAddress = "",
+						currentBTCTestAddress = currentBTCTestAddress,
+						currentBTCAddress = currentBTCAddress,
+						currentETCAddress = currentETCAddress,
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
@@ -67,10 +82,10 @@ class WatchOnlyImportPresenter(
 				) {
 					CreateWalletPresenter.generateMyTokenInfo(
 						MultiChainAddresses(
-							address.hex,
-							address.hex,
-							"",
-							""
+							currentETHAndERCAddress,
+							currentETCAddress,
+							currentBTCAddress,
+							currentBTCTestAddress
 						),
 						{
 							LogUtil.error(this.javaClass.simpleName)
@@ -86,6 +101,19 @@ class WatchOnlyImportPresenter(
 			} otherwise {
 				fragment.context?.alert(ImportWalletText.existAddress)
 				callback()
+			}
+		}
+	}
+	
+	private fun setAddressByChainType(address: String, chainType: ChainType) {
+		when (chainType) {
+			ChainType.ETH -> {
+				currentETHAndERCAddress = address
+				currentETCAddress = address
+			}
+			
+			else -> {
+				currentBTCAddress = address
 			}
 		}
 	}

@@ -118,7 +118,7 @@ data class WalletTable(
 					it.currentBTCTestAddress,
 					it.currentETCAddress,
 					it.currentETHAndERCAddress
-				) else listOf()
+				).filter { it.isNotEmpty() }.distinctBy { it } else listOf()
 				hold(currentAddresses)
 			}
 		}

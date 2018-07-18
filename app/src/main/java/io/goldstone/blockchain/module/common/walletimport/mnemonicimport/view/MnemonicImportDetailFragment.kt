@@ -60,7 +60,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				pathSettings
 					.apply {
 						setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
-						setMargins<RelativeLayout.LayoutParams> {
+						setMargins<LinearLayout.LayoutParams> {
 							topMargin = 20.uiPX()
 							bottomMargin = 10.uiPX()
 						}
