@@ -63,7 +63,7 @@ class ClassicTransactionListPresenter(
 			hold: (ArrayList<TransactionListModel>) -> Unit = {}
 		) {
 			TransactionTable.getETCTransactionsByAddress(
-				Config.getCurrentAddress()
+				Config.getCurrentETCAddress()
 			) {
 				TransactionListPresenter.checkAddressNameInContacts(it) {
 					hold(it)
@@ -90,7 +90,7 @@ class ClassicTransactionListPresenter(
 		) {
 			GoldStoneAPI.getETCTransactions(
 				Config.getETCCurrentChain(),
-				Config.getCurrentAddress(),
+				Config.getCurrentETCAddress(),
 				blockNumber,
 				{
 					LogUtil.error("loadDataFromChain", it)
@@ -117,7 +117,7 @@ class ClassicTransactionListPresenter(
 					finalNewData.insertDataToDataBase()
 					// Copy 出燃气费的部分
 					val feeData = finalNewData.filter {
-						it.from.equals(Config.getCurrentAddress(), true)
+						it.from.equals(Config.getCurrentETCAddress(), true)
 					}.apply {
 						forEach { it.isFee = true }
 					}

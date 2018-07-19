@@ -4,8 +4,8 @@ package io.goldstone.blockchain.common.value
  * @date 26/03/2018 1:03 AM
  * @author KaySaith
  */
-
 object ArgumentKey {
+	
 	const val walletSettingsTitle = "walletSettingsTitle"
 	const val profileTitle = "profileTitle"
 	const val mnemonicCode = "mnemonicCode"
@@ -51,11 +51,14 @@ object SharesPreference {
 	const val maxWalletID = "maxWalletID"
 	const val activityIsResult = "activityIsResult"
 	const val currentAddress = "currentAddress"
+	const val currentEthereumAddress = "currentEthereumAddress"
+	const val currentETCAddress = "currentETCAddress"
+	const val currentBTCAddress = "currentBTCAddress"
+	const val currentBTCTestAddress = "currentBTCTestAddress"
 	const val currentName = "currentName"
 	const val currentBalance = "currentBalance"
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
-	const val instaBugStatus = "instaBugStatus"
 	const val isNotchScreen = "isNotchScreen"
 	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"

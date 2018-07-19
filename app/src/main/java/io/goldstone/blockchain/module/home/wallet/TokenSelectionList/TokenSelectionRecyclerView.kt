@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil.getAddressBySymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -74,7 +75,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 			token: DefaultTokenTable,
 			putArgument: Bundle.() -> Unit
 		) {
-			MyTokenTable.getCurrentChainTokenBalanceByContract(token.contract) {
+			MyTokenTable.getTokenBalance(token.contract, getAddressBySymbol(token.symbol)) {
 				// 准备数据
 				val model = WalletDetailCellModel(token, it.orElse(0.0), true)
 				// 显示 `ContentOverlay`

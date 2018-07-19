@@ -241,7 +241,7 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun getCurrentChainTokenByContract(
+		fun getCurrentChainToken(
 			contract: String,
 			ercChain: String = Config.getCurrentChain(),
 			etcChain: String = Config.getETCCurrentChain(),

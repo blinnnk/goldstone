@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter.ClassicTransactionListPresenter
@@ -39,6 +40,9 @@ class TokenDetailPresenter(
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 	
 	private var allData: ArrayList<TransactionListModel>? = null
+	private val token by lazy {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+	}
 	
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		loadDataFromDatabaseOrElse()
@@ -132,18 +136,39 @@ class TokenDetailPresenter(
 	private fun loadDataFromDatabaseOrElse(
 		withoutLocalDataCallback: () -> Unit = {}
 	) {
-		// 内存里面没有数据首先从本地数据库查询数据
-		TransactionTable.getCurrentChainByAddressAndContract(
-			Config.getCurrentAddress(),
-			fragment.token?.contract.orEmpty(),
-			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
-		) { transactions ->
-			transactions.isNotEmpty() isTrue {
-				fragment.updateChartBy(transactions)
-				fragment.removeLoadingView()
-			} otherwise {
-				withoutLocalDataCallback()
-				LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
+		fun getDataByAddress(address: String) {
+			// 内存里面没有数据首先从本地数据库查询数据
+			TransactionTable.getCurrentChainByAddressAndContract(
+				address,
+				fragment.token?.contract.orEmpty(),
+				ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
+			) { transactions ->
+				transactions.isNotEmpty() isTrue {
+					fragment.updateChartBy(transactions, address)
+					fragment.removeLoadingView()
+				} otherwise {
+					withoutLocalDataCallback()
+					LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
+				}
+			}
+		}
+		
+		WalletTable.getWalletType {
+			when (it) {
+				WalletType.MultiChain -> {
+					if (token?.symbol.equals(CryptoSymbol.etc)) {
+						getDataByAddress(Config.getCurrentETCAddress())
+					} else {
+						getDataByAddress(Config.getCurrentEthereumAddress())
+					}
+				}
+				
+				WalletType.ETHERCAndETCOnly ->
+					getDataByAddress(Config.getCurrentEthereumAddress())
+				
+				else -> {
+					// TODO BTC and BTCTest Logic of Getting Transactions
+				}
 			}
 		}
 	}
@@ -167,7 +192,7 @@ class TokenDetailPresenter(
 				} otherwise {
 					GoldStoneAPI.context.runOnUiThread {
 						// 链上和本地都没有数据就更新一个空数组作为默认
-						updateChartBy(arrayListOf())
+						updateChartBy(arrayListOf(), Config.getCurrentEthereumAddress())
 						removeLoadingView()
 					}
 				}
@@ -184,13 +209,16 @@ class TokenDetailPresenter(
 			}
 	}
 	
-	private fun TokenDetailFragment.updateChartBy(data: ArrayList<TransactionListModel>) {
+	private fun TokenDetailFragment.updateChartBy(
+		data: ArrayList<TransactionListModel>,
+		walletAddress: String
+	) {
 		allData = data
 		TransactionListPresenter.checkAddressNameInContacts(data) {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract!!) {
+				data.prepareTokenHistoryBalance(token?.contract!!, walletAddress) {
 					it.updateChartAndHeaderData()
 				}
 			} otherwise {
@@ -234,11 +262,12 @@ class TokenDetailPresenter(
 	
 	private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: String,
+		walletAddress: String,
 		callback: (ArrayList<TokenBalanceTable>) -> Unit
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
-		MyTokenTable.getCurrentChainTokenBalanceByContract(contract) { todayBalance ->
-			if (todayBalance.isNull()) return@getCurrentChainTokenBalanceByContract
+		MyTokenTable.getTokenBalance(contract, walletAddress) { todayBalance ->
+			if (todayBalance.isNull()) return@getTokenBalance
 			// 计算过去7天的所有余额
 			generateHistoryBalance(todayBalance!!) { history ->
 				coroutinesTask(
@@ -246,7 +275,7 @@ class TokenDetailPresenter(
 						history.forEachIndexed { index, data ->
 							TokenBalanceTable.insertOrUpdate(
 								contract,
-								Config.getCurrentAddress(),
+								Config.getCurrentEthereumAddress(),
 								data.date,
 								// 插入今日的余额数据
 								if (index == 0) todayBalance else data.balance

@@ -130,7 +130,7 @@ data class TransactionTable(
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
-		data.fromAddress != Config.getCurrentAddress(),
+		data.fromAddress != Config.getCurrentEthereumAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
 		Config.getCurrentAddress()
@@ -160,7 +160,7 @@ data class TransactionTable(
 		data.isReceive,
 		true,
 		data.symbol,
-		Config.getCurrentAddress(),
+		Config.getCurrentEthereumAddress(),
 		data.to,
 		false,
 		data.logIndex
@@ -225,10 +225,10 @@ data class TransactionTable(
 		"",
 		"0",
 		"",
-		data.from != Config.getCurrentAddress(),
+		data.from != Config.getCurrentETCAddress(),
 		false,
 		CryptoSymbol.etc,
-		Config.getCurrentAddress(),
+		Config.getCurrentETCAddress(),
 		tokenReceiveAddress = data.to,
 		chainID = Config.getETCCurrentChain(),
 		isFee = data.isFee,
@@ -245,12 +245,12 @@ data class TransactionTable(
 			tokenReceiveAddress: String?
 		) {
 			transaction.apply {
-				this.isReceive = Config.getCurrentAddress().equals(tokenReceiveAddress, true)
+				this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
 				this.isERC20Token = isERC20Token
 				this.symbol = symbol
 				this.value = value
 				this.tokenReceiveAddress = tokenReceiveAddress
-				this.recordOwnerAddress = Config.getCurrentAddress()
+				this.recordOwnerAddress = Config.getCurrentEthereumAddress()
 				this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
 			}
 		}

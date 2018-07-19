@@ -33,7 +33,7 @@ data class TokenBalanceTable(
 		
 		fun getBalanceByContract(
 			contract: String,
-			address: String = Config.getCurrentAddress(),
+			address: String = Config.getCurrentEthereumAddress(),
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
 			coroutinesTask(

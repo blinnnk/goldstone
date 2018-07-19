@@ -423,7 +423,7 @@ class GasSelectionPresenter(
 				)
 			) CryptoValue.etcContract
 			else CryptoValue.ethContract
-		DefaultTokenTable.getCurrentChainTokenByContract(chainCoinContract) {
+		DefaultTokenTable.getCurrentChainToken(chainCoinContract) {
 			hold(
 				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
 			)
