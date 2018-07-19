@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toUnitValue
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -86,8 +87,10 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				receipt.minerFee,
 				receipt.memo,
-				if (receipt.isReceived) receipt.targetAddress else Config.getCurrentAddress(),
-				if (receipt.isReceived) Config.getCurrentAddress() else receipt.targetAddress,
+				if (receipt.isReceived) receipt.targetAddress
+				else WalletUtil.getAddressBySymbol(receipt.symbol),
+				if (receipt.isReceived) WalletUtil.getAddressBySymbol(receipt.symbol)
+				else receipt.targetAddress,
 				receipt.transactionHash,
 				receipt.blockNumber,
 				receipt.date,
@@ -99,8 +102,8 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				if (receipt.isReceive) receipt.to else Config.getCurrentAddress(),
-				if (receipt.isReceive) Config.getCurrentAddress() else receipt.to,
+				if (receipt.isReceive) receipt.to else WalletUtil.getAddressBySymbol(receipt.symbol),
+				if (receipt.isReceive) WalletUtil.getAddressBySymbol(receipt.symbol) else receipt.to,
 				currentHash,
 				receipt.blockNumber,
 				date,
@@ -112,7 +115,7 @@ fun TransactionDetailPresenter.generateModels(
 			arrayListOf(
 				minerFee,
 				memo,
-				Config.getCurrentAddress(),
+				WalletUtil.getAddressBySymbol(data?.token?.symbol ?: notificationData?.symbol.orEmpty()),
 				data?.address ?: "",
 				currentHash,
 				"Waiting...",
@@ -141,13 +144,13 @@ fun TransactionDetailPresenter.generateModels(
 }
 
 private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
-	DefaultTokenTable.getCurrentChainTokenByContract(contract) {
+	DefaultTokenTable.getCurrentChainToken(contract) {
 		it?.apply {
 			if (name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
 					contract,
 					{ error, reason ->
-						LogUtil.error("getCurrentChainTokenByContract $reason", error)
+						LogUtil.error("getCurrentChainToken $reason", error)
 					},
 					ChainURL.getChainNameBySymbol(symbol)
 				) {

@@ -29,6 +29,10 @@ class SplashPresenter(val activity: SplashActivity) {
 			isNotEmpty() isTrue {
 				WalletTable.getCurrentWallet {
 					it?.apply {
+						Config.updateCurrentEthereumAddress(it.currentETHAndERCAddress)
+						Config.updateCurrentBTCAddress(it.currentBTCAddress)
+						Config.updateCurrentBTCTestAddress(it.currentBTCTestAddress)
+						Config.updateCurrentETCAddress(it.currentETCAddress)
 						Config.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
 						Config.updateCurrentID(it.id)
 						Config.updateCurrentBalance(it.balance.orElse(0.0))

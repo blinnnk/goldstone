@@ -53,7 +53,7 @@ class TokenSearchPresenter(
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
 			model?.let { searchToken ->
-				DefaultTokenTable.getCurrentChainTokenByContract(searchToken.contract) { localToken ->
+				DefaultTokenTable.getCurrentChainToken(searchToken.contract) { localToken ->
 					localToken.isNotNull {
 						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
 						DefaultTokenTable.updateTokenDefaultStatus(

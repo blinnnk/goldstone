@@ -57,7 +57,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	private var symbolPrice: Double = 0.0
 	private fun prepareSymbolPrice() {
 		getParentFragment<TokenDetailOverlayFragment> {
-			DefaultTokenTable.getCurrentChainTokenByContract(token?.contract!!) {
+			DefaultTokenTable.getCurrentChainToken(token?.contract!!) {
 				symbolPrice = it?.price.orElse(0.0)
 			}
 		}

@@ -63,7 +63,7 @@ class TransactionListPresenter(
 	
 	private var hasUpdate = false
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getERCTransactionsByAddress(Config.getCurrentAddress()) {
+		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
 			checkAddressNameInContacts(it) {
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				// Save a copy into memory for imporving the speed of next time to view
@@ -149,7 +149,7 @@ class TransactionListPresenter(
 		) {
 			getTransactionsFromEtherScan(startBlock, errorCallback) {
 				it isTrue {
-					TransactionTable.getERCTransactionsByAddress(Config.getCurrentAddress()) {
+					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
 						checkAddressNameInContacts(it) { hold(it) }
 					}
 				} otherwise {
@@ -245,7 +245,7 @@ class TransactionListPresenter(
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				getTransactionsByAddress(
-					Config.getCurrentAddress(),
+					Config.getCurrentEthereumAddress(),
 					Config.getCurrentChain()
 				).let { localData ->
 					newData.filterNot { new ->

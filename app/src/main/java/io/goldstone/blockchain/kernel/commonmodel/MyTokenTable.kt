@@ -12,9 +12,9 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -110,8 +110,9 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun getCurrentChainTokenBalanceByContract(
+		fun getTokenBalance(
 			contract: String,
+			walletAddress: String,
 			callback: (Double?) -> Unit
 		) {
 			coroutinesTask(
@@ -121,12 +122,12 @@ data class MyTokenTable(
 						.myTokenDao()
 						.getCurrentChainTokenByContractAndAddress(
 							contract,
-							Config.getCurrentAddress()
+							walletAddress
 						)
 				}) { token ->
 				if (token.isNull()) callback(null)
 				else {
-					DefaultTokenTable.getCurrentChainTokenByContract(contract) {
+					DefaultTokenTable.getCurrentChainToken(contract) {
 						callback(CryptoUtils.toCountByDecimal(token!!.balance, it!!.decimals))
 					}
 				}
@@ -315,7 +316,7 @@ data class MyTokenTable(
 					}
 				}
 				
-				else -> DefaultTokenTable.getCurrentChainTokenByContract(contract) { token ->
+				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerAddress, errorCallback,
