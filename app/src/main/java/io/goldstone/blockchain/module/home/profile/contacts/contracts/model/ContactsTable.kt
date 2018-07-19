@@ -15,10 +15,19 @@ data class ContactTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int = 0, var avatar: String = "",
 	var name: String = "",
-	var address: String = ""
+	var ethERCAndETCAddress: String,
+	var bitMainnetCoinAddress: String,
+	var bitTestnetCoinAddress: String
 ) : Serializable {
 	
-	@Ignore constructor() : this(0, "", "", "")
+	@Ignore constructor() : this(
+		0,
+		"",
+		"",
+		"",
+		"",
+		""
+	)
 	
 	companion object {
 		
@@ -26,9 +35,10 @@ data class ContactTable(
 			contact: ContactTable,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask({
-				               GoldStoneDataBase.database.contactDao().insert(contact)
-			               }) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.contactDao().insert(contact)
+				}) {
 				callback()
 			}
 		}

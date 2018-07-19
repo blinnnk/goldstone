@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -90,7 +89,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				text = CommonText.startImporting.toUpperCase()
 			}.click {
 				it.showLoadingStatus()
-				presenter.importWatchOnlyWallet(getChainTypeBy(currentType), addressInput, nameInput) {
+				presenter.importWatchOnlyWallet(currentType, addressInput, nameInput) {
 					it.showLoadingStatus(false)
 				}
 			}.into(this)
@@ -110,14 +109,6 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					}
 				}
 			}.into(this)
-		}
-	}
-	
-	private fun getChainTypeBy(currentType: String): ChainType {
-		return when (currentType) {
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> ChainType.ETH
-			CryptoValue.PrivateKeyType.BTCTest.content -> ChainType.BTC
-			else -> ChainType.BTC
 		}
 	}
 }

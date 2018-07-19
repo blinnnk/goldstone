@@ -12,6 +12,7 @@ data class WalletListModel(
 	var id: Int = 0,
 	var addressName: String = "",
 	var address: String = "",
+	var subtitle: String = "",
 	var count: Double = 0.0,
 	var avatar: Int = 0,
 	var isWatchOnly: Boolean = false,
@@ -21,7 +22,8 @@ data class WalletListModel(
 	constructor(data: WalletTable, balance: Double) : this(
 		data.id,
 		data.name,
-		showSubtitleByType(data),
+		showSubtitleByType(data, true),
+		showSubtitleByType(data, false),
 		balance,
 		UIUtils.generateAvatar(data.id),
 		data.isWatchOnly,
@@ -29,7 +31,7 @@ data class WalletListModel(
 	)
 	
 	companion object {
-		fun showSubtitleByType(wallet: WalletTable): String {
+		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
 			return if (wallet.currentETHAndERCAddress.isEmpty()) {
 				if (wallet.currentBTCTestAddress.isEmpty()) {
 					wallet.currentBTCAddress
@@ -39,7 +41,11 @@ data class WalletListModel(
 			} else if (wallet.currentBTCAddress.isEmpty()) {
 				wallet.currentETHAndERCAddress
 			} else {
-				WalletText.multiChainWallet
+				if (isAddress) {
+					wallet.currentETHAndERCAddress
+				} else {
+					WalletText.multiChainWallet
+				}
 			}
 		}
 	}

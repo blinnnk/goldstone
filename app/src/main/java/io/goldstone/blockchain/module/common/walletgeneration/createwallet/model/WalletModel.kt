@@ -520,7 +520,7 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 	
-	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCTestAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
 	
 	@Query("SELECT * FROM wallet")

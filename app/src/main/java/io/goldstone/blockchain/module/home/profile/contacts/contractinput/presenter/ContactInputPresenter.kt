@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -31,55 +32,98 @@ class ContactInputPresenter(
 ) : BasePresenter<ContactInputFragment>() {
 	
 	private var nameText = ""
-	private var addressText = ""
+	private var ethERCAndETCAddressText = ""
+	private var btcMainnetAddressText = ""
+	private var btcTestnetAddressText = ""
 	
-	fun getAddressIfExist(nameInput: EditText) {
+	fun getAddressIfExist(
+		ethERCAndETCInput: EditText,
+		btcMainnetInput: EditText,
+		btcTestnetInput: EditText
+	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddress?.let {
-				nameInput.setText(it)
-				addressText = it
+				ethERCAndETCInput.setText(it)
+				// ToDO 从账单快捷添加地址的功能
+				btcMainnetInput.setText("btc")
+				btcTestnetInput.setText("btc test")
+				ethERCAndETCAddressText = it
 			}
 		}
 	}
 	
 	fun addContact() {
+		// 名字必须不为空
 		if (nameText.isEmpty()) {
 			fragment.context?.alert(ContactText.emptyNameAlert)
 			return
 		}
-		
-		if (addressText.isEmpty()) {
+		// 至少有一个地址输入框有输入
+		if ((
+				ethERCAndETCAddressText.count()
+				+ btcMainnetAddressText.count()
+				+ btcTestnetAddressText.count()
+		    ) == 0
+		) {
 			fragment.context?.alert(ContactText.emptyAddressAlert)
 			return
 		}
-		
-		if (Address(addressText).isValid() && nameText.isNotEmpty()) {
-			ContactTable.insertContact(
-				ContactTable(0, "", nameText, addressText)
-			) {
-				// 通信录的地址是实时显示到账单的, 当通信录有更新的时候清空缓存中的数据
-				memoryTransactionListData = null
-				fragment.getParentFragment<ProfileOverlayFragment> {
-					if (!contactAddress.isNullOrBlank()) {
-						// 从账单详情快捷添加地址进入的页面
-						replaceFragmentAndSetArgument<ContactFragment>(ContainerID.content)
-						activity?.apply { SoftKeyboard.hide(this) }
-					} else {
-						presenter.popFragmentFrom<ContactInputFragment>()
-					}
+		System.out.println("hello 1")
+		// 检查是否是合规的以太坊或以太经典的地址格式
+		if (!Address(ethERCAndETCAddressText).isValid() && ethERCAndETCAddressText.isNotEmpty()) {
+			fragment.context?.alert(ContactText.wrongAddressFormat)
+			return
+		}
+		System.out.println("hello 2")
+		// 检查是否是合规的测试网比特币私钥地址格式
+		if (
+			btcTestnetAddressText.isNotEmpty() &&
+			!BitCoinUtils.isValidTestnetAddress(btcTestnetAddressText)
+		) {
+			fragment.context?.alert(ContactText.wrongAddressFormat)
+			return
+		}
+		System.out.println("hello 3 $btcMainnetAddressText")
+		// 检查是否是合规的主网比特币私钥地址格式
+		if (
+			btcMainnetAddressText.isNotEmpty() &&
+			!BitCoinUtils.isValidMainnetAddress(btcMainnetAddressText)
+		) {
+			fragment.context?.alert(ContactText.wrongAddressFormat)
+			return
+		}
+		System.out
+			.println("eth$ethERCAndETCAddressText btc$btcMainnetAddressText test$btcTestnetAddressText")
+		// 符合以上规则的可以进入插入地址
+		ContactTable.insertContact(
+			ContactTable(
+				0,
+				"",
+				nameText,
+				ethERCAndETCAddressText,
+				btcMainnetAddressText,
+				btcTestnetAddressText
+			)
+		) {
+			// 通信录的地址是实时显示到账单的, 当通信录有更新的时候清空缓存中的数据
+			memoryTransactionListData = null
+			fragment.getParentFragment<ProfileOverlayFragment> {
+				if (!contactAddress.isNullOrBlank()) {
+					// 从账单详情快捷添加地址进入的页面
+					replaceFragmentAndSetArgument<ContactFragment>(ContainerID.content)
+					activity?.apply { SoftKeyboard.hide(this) }
+				} else {
+					presenter.popFragmentFrom<ContactInputFragment>()
 				}
-			}
-		} else {
-			if (nameText.isNotEmpty()) {
-				fragment.context?.alert(ContactText.wrongAddressFormat)
-				return
 			}
 		}
 	}
 	
 	fun setConfirmButtonStyle(
 		nameInput: EditText,
-		addressInput: EditText,
+		ethERCAndETCInput: EditText,
+		btcMainnetInput: EditText,
+		btcTestnetInput: EditText,
 		confirmButton: RoundButton
 	) {
 		nameInput.addTextChangedListener(object : TextWatcher {
@@ -105,9 +149,55 @@ class ContactInputPresenter(
 			}
 		})
 		
-		addressInput.addTextChangedListener(object : TextWatcher {
+		ethERCAndETCInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				addressText = text.orElse("").toString()
+				ethERCAndETCAddressText = text.orElse("").toString()
+				setStyle(confirmButton)
+			}
+			
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+			
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+		})
+		
+		btcMainnetInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				btcMainnetAddressText = text.orElse("").toString()
+				setStyle(confirmButton)
+			}
+			
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+			
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+		})
+		
+		btcTestnetInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				btcTestnetAddressText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
 			
@@ -130,7 +220,15 @@ class ContactInputPresenter(
 	}
 	
 	private fun setStyle(confirmButton: RoundButton) {
-		if (nameText.count() * addressText.count() != 0) {
+		if (
+			nameText.count()
+			* (
+				ethERCAndETCAddressText.count()
+				+ btcMainnetAddressText.count()
+				+ btcTestnetAddressText.count()
+			  )
+			!= 0
+		) {
 			confirmButton.setBlueStyle(20.uiPX())
 		} else {
 			confirmButton.setGrayStyle(20.uiPX())

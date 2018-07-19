@@ -27,10 +27,10 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
 	var model: WalletListModel by observing(WalletListModel()) {
 		info.apply {
 			title.text = CryptoUtils.scaleTo16(model.addressName)
-			subtitle.text = if (model.address.equals(WalletText.multiChainWallet, true)) {
-				model.address.scaleTo(24)
+			subtitle.text = if (model.subtitle.equals(WalletText.multiChainWallet, true)) {
+				model.subtitle.scaleTo(24)
 			} else {
-				model.address.scaleTo(18)
+				model.subtitle.scaleTo(18)
 			}
 		}
 		

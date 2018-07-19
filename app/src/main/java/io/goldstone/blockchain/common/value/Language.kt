@@ -418,7 +418,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "這不是正確格式的私鑰"
 		else -> ""
 	}
-	
 	@JvmField
 	val unvalidTestnetBTCPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Not the correct bitcoin test network private key address format"
@@ -429,7 +428,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Not the correct bitcoin test network private key address format"
 		else -> ""
 	}
-	
 	@JvmField
 	val unvalidMainnetBTCPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Not the correct bitcoin main network private key address format"
@@ -440,7 +438,6 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Not the correct bitcoin main network private key address format"
 		else -> ""
 	}
-	
 	@JvmField
 	val existAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This address has already been imported"
@@ -729,7 +726,6 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Set Default Address"
 		else -> ""
 	}
-	
 	@JvmField
 	val multiChainWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "this is multi-chain wallet"
@@ -740,7 +736,6 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "this is multi-chain wallet"
 		else -> ""
 	}
-	
 	@JvmField
 	val showQRCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR Code"
@@ -1319,7 +1314,6 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
 		else -> ""
 	}
-	
 	@JvmField
 	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current wallet is watch-only. This operation is not allowed."
@@ -2711,14 +2705,32 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "聯繫人名稱"
 		else -> ""
 	}
-	@JvmField
-	val hint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter address that you want to store"
-		HoneyLanguage.Chinese.code -> "在此输入您希望保存的钱包地址"
-		HoneyLanguage.Japanese.code -> "ここにお客様が保存したいウォレットアドレスを入力ください"
-		HoneyLanguage.Korean.code -> "귀하가 저장을 희망하는 지갑주소"
-		HoneyLanguage.Russian.code -> "Введите здесь адрес кошелька, который вы хотите сохранить"
-		HoneyLanguage.TraditionalChinese.code -> "輸入您想要存儲的地址"
+	val ethERCAndETChint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		HoneyLanguage.Korean.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		HoneyLanguage.Russian.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
+		else -> ""
+	}
+	val btcMainnetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Korean.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Russian.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter Bitcoin Mainnet address that you want to store"
+		else -> ""
+	}
+	
+	val btcTestnetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Bitcoin Testnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter Bitcoin Testnet address that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter Bitcoin Testnet address that you want to store"
+		HoneyLanguage.Korean.code -> "Enter Bitcoin Testnet address that you want to store"
+		HoneyLanguage.Russian.code -> "Enter Bitcoin Testnet address that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter Bitcoin Testnet address that you want to store"
 		else -> ""
 	}
 }

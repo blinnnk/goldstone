@@ -53,7 +53,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
 			clickEvent = Runnable {
-				presenter.showPaymentPrepareFragment(model.address)
+				presenter.showPaymentPrepareFragment(model.ethERCAndETCAddress)
 			}
 		}
 	}
