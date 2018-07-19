@@ -21,9 +21,11 @@ import io.goldstone.blockchain.common.component.ValueInputView
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -80,8 +82,9 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 						
 						from.apply {
 							setTitle(PrepareTransferText.from)
-							setSubtitle(CryptoUtils.scaleMiddleAddress(Config.getCurrentAddress().toUpperCase()))
 						}.into(this)
+						
+						setFromAddress()
 					}.into(this)
 					
 					TopBottomLineCell(context).apply {
@@ -145,6 +148,26 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	override fun onResume() {
 		super.onResume()
 		inputView.setFoucs()
+	}
+	
+	private fun setFromAddress() {
+		WalletTable.getCurrentWallet {
+			it?.apply {
+				from.setSubtitle(
+					CryptoUtils.scaleMiddleAddress(
+						when (rootFragment?.token?.symbol) {
+							CryptoSymbol.btc -> {
+								if (Config.isTestEnvironment()) currentBTCTestAddress
+								else currentBTCAddress
+							}
+							
+							CryptoSymbol.etc -> currentETCAddress
+							else -> currentETHAndERCAddress
+						}
+					)
+				)
+			}
+		}
 	}
 	
 	fun getMemoContent(): String {

@@ -13,8 +13,10 @@ import java.io.Serializable
 @Entity(tableName = "contact")
 data class ContactTable(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int = 0, var avatar: String = "",
+	var id: Int = 0,
+	var avatar: String = "",
 	var name: String = "",
+	var defaultAddress: String,
 	var ethERCAndETCAddress: String,
 	var bitMainnetCoinAddress: String,
 	var bitTestnetCoinAddress: String
@@ -22,6 +24,7 @@ data class ContactTable(
 	
 	@Ignore constructor() : this(
 		0,
+		"",
 		"",
 		"",
 		"",

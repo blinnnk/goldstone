@@ -91,12 +91,42 @@ data class WalletTable(
 			}
 		}
 		
-		fun getAllAddresses(callback: ArrayList<String>.() -> Unit = {}) {
+		fun getAllETHAndERCAddresses(callback: ArrayList<String>.() -> Unit = {}) {
 			coroutinesTask(
 				{
 					GoldStoneDataBase.database.walletDao().getAllWallets()
 				}) {
-				callback(it.map { it.currentETHAndERCAddress }.toArrayList())
+				callback(
+					it.map {
+						it.currentETHAndERCAddress
+					}.toArrayList()
+				)
+			}
+		}
+		
+		fun getAllBTCMainnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.walletDao().getAllWallets()
+				}) {
+				callback(
+					it.map {
+						it.currentBTCAddress
+					}.toArrayList()
+				)
+			}
+		}
+		
+		fun getAllBTCTestnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.walletDao().getAllWallets()
+				}) {
+				callback(
+					it.map {
+						it.currentBTCTestAddress
+					}.toArrayList()
+				)
 			}
 		}
 		

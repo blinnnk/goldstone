@@ -117,7 +117,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getMyContactTable() {
 		ContactTable.getAllContacts {
-			System.out.println(it)
+			LogUtil.debug("getMyContactTable", "$it")
 		}
 	}
 	
