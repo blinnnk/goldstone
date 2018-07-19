@@ -34,7 +34,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = KeystoreImportPresenter(this)
-	
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -51,7 +50,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						false
 					)
 				}.into(this)
-				
 				keystoreEditText.apply {
 					hint = ImportWalletText.keystoreHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }

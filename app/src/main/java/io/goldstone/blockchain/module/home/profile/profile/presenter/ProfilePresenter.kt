@@ -58,7 +58,7 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.chain_icon,
 					ProfileText.chain,
-					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.mainnet else ChainText.testnet
+					if (Config.isTestEnvironment()) ChainText.testnet else ChainText.mainnet
 				),
 				ProfileModel(
 					R.drawable.wallet_icon,

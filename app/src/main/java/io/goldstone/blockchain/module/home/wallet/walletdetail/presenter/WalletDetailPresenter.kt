@@ -283,7 +283,11 @@ class WalletDetailPresenter(
 				it?.model = WalletDetailHeaderModel(
 					null,
 					Config.getCurrentName(),
-					CryptoUtils.scaleAddress(Config.getCurrentAddress()),
+					if (Config.getCurrentAddress().equals(WalletText.multiChainWallet, true)) {
+						Config.getCurrentAddress().scaleTo(18)
+					} else {
+						CryptoUtils.scaleMiddleAddress(Config.getCurrentAddress())
+					},
 					totalBalance.toString()
 				)
 			}

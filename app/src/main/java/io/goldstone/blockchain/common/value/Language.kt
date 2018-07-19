@@ -418,6 +418,29 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "這不是正確格式的私鑰"
 		else -> ""
 	}
+	
+	@JvmField
+	val unvalidTestnetBTCPrivateKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Not the correct bitcoin test network private key address format"
+		HoneyLanguage.Chinese.code -> "Not the correct bitcoin test network private key address format"
+		HoneyLanguage.Japanese.code -> "Not the correct bitcoin test network private key address format"
+		HoneyLanguage.Korean.code -> "Not the correct bitcoin test network private key address format"
+		HoneyLanguage.Russian.code -> "Not the correct bitcoin test network private key address format"
+		HoneyLanguage.TraditionalChinese.code -> "Not the correct bitcoin test network private key address format"
+		else -> ""
+	}
+	
+	@JvmField
+	val unvalidMainnetBTCPrivateKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Not the correct bitcoin main network private key address format"
+		HoneyLanguage.Chinese.code -> "Not the correct bitcoin main network private key address format"
+		HoneyLanguage.Japanese.code -> "Not the correct bitcoin main network private key address format"
+		HoneyLanguage.Korean.code -> "Not the correct bitcoin main network private key address format"
+		HoneyLanguage.Russian.code -> "Not the correct bitcoin main network private key address format"
+		HoneyLanguage.TraditionalChinese.code -> "Not the correct bitcoin main network private key address format"
+		else -> ""
+	}
+	
 	@JvmField
 	val existAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This address has already been imported"
@@ -706,6 +729,18 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Set Default Address"
 		else -> ""
 	}
+	
+	@JvmField
+	val multiChainWallet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "this is multi-chain wallet"
+		HoneyLanguage.Chinese.code -> "this is multi-chain wallet"
+		HoneyLanguage.Japanese.code -> "this is multi-chain wallet"
+		HoneyLanguage.Korean.code -> "this is multi-chain wallet"
+		HoneyLanguage.Russian.code -> "this is multi-chain wallet"
+		HoneyLanguage.TraditionalChinese.code -> "this is multi-chain wallet"
+		else -> ""
+	}
+	
 	@JvmField
 	val showQRCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR Code"
@@ -1274,6 +1309,16 @@ object CommonText {
 
 object AlertText {
 	
+	@JvmField
+	val btcWalletOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.Chinese.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.Japanese.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.Korean.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.Russian.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.TraditionalChinese.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		else -> ""
+	}
 	
 	@JvmField
 	val watchOnly = when (currentLanguage) {

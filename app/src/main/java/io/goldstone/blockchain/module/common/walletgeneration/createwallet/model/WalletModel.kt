@@ -6,9 +6,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.value.AlertText
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -120,6 +118,41 @@ data class WalletTable(
 					it.currentETHAndERCAddress
 				).filter { it.isNotEmpty() }.distinctBy { it } else listOf()
 				hold(currentAddresses)
+			}
+		}
+		
+		fun getWalletType(hold: (WalletType) -> Unit) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					if (currentETHAndERCAddress.isEmpty()) {
+						if (currentBTCTestAddress.isEmpty()) {
+							hold(WalletType.BTCOnly)
+							return@apply
+						}
+						if (currentBTCAddress.isEmpty()) {
+							hold(WalletType.BTCTestOnly)
+						}
+					} else if (currentBTCAddress.isEmpty()) {
+						hold(WalletType.ETHERCAndETCOnly)
+					} else {
+						hold(WalletType.MultiChain)
+					}
+				}
+			}
+		}
+		
+		fun getWalletSubtitleByType(hold: (subtitle: String) -> Unit) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					WalletTable.getWalletType { type ->
+						when (type) {
+							WalletType.ETHERCAndETCOnly -> hold(currentETHAndERCAddress)
+							WalletType.BTCOnly -> hold(currentBTCAddress)
+							WalletType.BTCTestOnly -> hold(currentBTCTestAddress)
+							WalletType.MultiChain -> hold(WalletText.multiChainWallet)
+						}
+					}
+				}
 			}
 		}
 		

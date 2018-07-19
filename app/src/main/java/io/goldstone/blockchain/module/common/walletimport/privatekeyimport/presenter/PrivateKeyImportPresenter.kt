@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
 import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -110,6 +111,20 @@ class PrivateKeyImportPresenter(
 				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
 				callback()
 				return
+			}
+			// 检查比特币私钥地址格式是否是对应的网络
+			if (isTest) {
+				if (!BitCoinUtils.isValidTestnetPrivateKey(privateKey)) {
+					fragment.context?.alert(ImportWalletText.unvalidTestnetBTCPrivateKey)
+					callback()
+					return
+				}
+			} else {
+				if (BitCoinUtils.isValidTestnetPrivateKey(privateKey)) {
+					fragment.context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
+					callback()
+					return
+				}
 			}
 			fragment.context?.getWalletByPrivateKey(CryptoValue.basicLockKey, password) { _ ->
 				// use ethereum geth keystore to verify btc user password, this value is unuseful
