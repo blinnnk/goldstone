@@ -9,8 +9,11 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -28,20 +31,40 @@ class TokenManagementListPresenter(
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 	
 	override fun updateData() {
-		// 首先显示内存中的数据
-		if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
-		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
-		fragment.getParentFragment<TokenManagementFragment> {
-			afterSetHeightAnimation = Runnable { prepareMyDefaultTokens() }
+		checkWalletType {
+			// 首先显示内存中的数据
+			if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
+			// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
+			fragment.getParentFragment<TokenManagementFragment> {
+				afterSetHeightAnimation = Runnable { prepareMyDefaultTokens(it) }
+			}
 		}
 	}
 	
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
-		prepareMyDefaultTokens()
+		updateData()
 	}
 	
-	private fun prepareMyDefaultTokens() {
+	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
+		WalletTable.getWalletType {
+			when (it) {
+				WalletType.BTCTestOnly, WalletType.BTCOnly -> {
+					fragment.showAttentionView()
+				}
+				
+				WalletType.ETHERCAndETCOnly -> {
+					callback(true)
+				}
+				
+				else -> {
+					callback(false)
+				}
+			}
+		}
+	}
+	
+	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {
 		// 在异步线程更新数据
 		DefaultTokenTable.getDefaultTokens { defaultTokens ->
 			object : ConcurrentAsyncCombine() {
@@ -61,7 +84,14 @@ class TokenManagementListPresenter(
 				override fun mergeCallBack() {
 					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						memoryTokenData = sortedList
+						if (isETHERCAndETCOnly) {
+							sortedList.filterNot { it.symbol.equals(CryptoSymbol.btc, true) }.let {
+								memoryTokenData = it.toArrayList()
+							}
+						} else {
+							memoryTokenData = sortedList
+						}
+						
 						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
 					} else {
 						return

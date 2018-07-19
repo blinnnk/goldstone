@@ -19,12 +19,11 @@ import org.jetbrains.anko.textColor
  * @date 23/03/2018 2:20 AM
  * @author KaySaith
  */
-
 class WalletEditText(context: Context) : EditText(context) {
-
+	
 	init {
 		addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX()).apply {
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 80.uiPX()).apply {
 			topMargin = 40.uiPX()
 			padding = 20.uiPX()
 		}
@@ -34,5 +33,4 @@ class WalletEditText(context: Context) : EditText(context) {
 		typeface = GoldStoneFont.heavy(context)
 		gravity = Gravity.START
 	}
-
 }

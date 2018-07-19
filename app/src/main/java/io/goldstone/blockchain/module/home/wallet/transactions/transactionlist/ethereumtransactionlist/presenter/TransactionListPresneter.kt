@@ -115,7 +115,7 @@ class TransactionListPresenter(
 					transactions.forEachOrEnd { item, isEnd ->
 						item.addressName =
 							contacts.find {
-								it.address.equals(item.targetAddress, true)
+								it.ethERCAndETCAddress.equals(item.targetAddress, true)
 							}?.name ?: item.targetAddress
 						if (isEnd) {
 							callback()

@@ -8,10 +8,13 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
+import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -33,30 +36,42 @@ class WatchOnlyImportPresenter(
 	private var currentETCAddress = ""
 	
 	fun importWatchOnlyWallet(
-		chainType: ChainType,
+		addressType: String,
 		addressInput: EditText,
 		nameInput: EditText,
 		callback: () -> Unit
 	) {
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
-		if (chainType == ChainType.BTC) {
-			if (address.length != CryptoValue.bitcoinAddressLength) {
-				fragment.context?.alert(ImportWalletText.addressFromatAlert)
-				callback()
-				return
+		when (addressType) {
+			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
+				if (!Address(address).isValid()) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
 			}
-		} else {
-			if (address.length != CryptoValue.bip39AddressLength) {
-				fragment.context?.alert(ImportWalletText.addressFromatAlert)
-				callback()
-				return
+			
+			CryptoValue.PrivateKeyType.BTC.content -> {
+				if (!BitCoinUtils.isValidMainnetAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
+			}
+			
+			else -> {
+				if (!BitCoinUtils.isValidTestnetAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
 			}
 		}
 		val name = if (nameInput.text.toString().isEmpty()) nameInput.hint.toString()
 		else nameInput.text.toString()
 		// 准备对应的地址
-		setAddressByChainType(address, chainType)
+		setAddressByChainType(address, addressType)
 		WalletTable.getWalletByAddress(address) {
 			it.isNull() isTrue {
 				WalletTable.insert(
@@ -105,15 +120,20 @@ class WatchOnlyImportPresenter(
 		}
 	}
 	
-	private fun setAddressByChainType(address: String, chainType: ChainType) {
-		when (chainType) {
-			ChainType.ETH -> {
+	private fun setAddressByChainType(address: String, addressType: String) {
+		when (addressType) {
+			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
 				currentETHAndERCAddress = address
 				currentETCAddress = address
 			}
 			
-			else -> {
+			CryptoValue.PrivateKeyType.BTC.content -> {
 				currentBTCAddress = address
+			}
+			
+			else -> {
+				Config.updateIsTestEnvironment(true)
+				currentBTCTestAddress = address
 			}
 		}
 	}

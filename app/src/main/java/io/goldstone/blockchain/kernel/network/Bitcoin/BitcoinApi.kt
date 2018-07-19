@@ -1,9 +1,8 @@
-package io.goldstone.blockchain.kernel.network.Bitcoin
+package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import org.json.JSONObject
 

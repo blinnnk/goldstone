@@ -110,7 +110,7 @@ class TransactionDetailPresenter(
 	fun showAddContactsButton(cell: TransactionDetailCell) {
 		ContactTable.getAllContacts {
 			if (it.find { contact ->
-					contact.address.equals(cell.model.info, true)
+					contact.ethERCAndETCAddress.equals(cell.model.info, true)
 				}.isNull()) {
 				cell.showAddContactButton {
 					onClick {

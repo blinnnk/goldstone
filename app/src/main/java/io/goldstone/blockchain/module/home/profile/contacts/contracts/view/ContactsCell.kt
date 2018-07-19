@@ -36,7 +36,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	var model: ContactTable by observing(ContactTable()) {
 		info.apply {
 			title.text = model.name
-			subtitle.text = CryptoUtils.scaleMiddleAddress(model.address)
+			subtitle.text = CryptoUtils.scaleMiddleAddress(model.ethERCAndETCAddress)
 		}
 		model.name.isNotEmpty() isTrue {
 			fontIcon.text = model.name.substring(0, 1).toUpperCase()

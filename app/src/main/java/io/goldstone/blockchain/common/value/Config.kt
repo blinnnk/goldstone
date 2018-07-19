@@ -48,12 +48,6 @@ object Config {
 	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 	
-	fun getInstaBugStatus(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.instaBugStatus)
-	
-	fun updateInstaBugStatus(statisCode: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.instaBugStatus, statisCode)
-	
 	fun getCurrentAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentAddress)
 	

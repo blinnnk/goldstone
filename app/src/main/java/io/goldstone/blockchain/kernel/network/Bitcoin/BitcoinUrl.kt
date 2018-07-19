@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network.Bitcoin
+package io.goldstone.blockchain.kernel.network.bitcoin
 
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl

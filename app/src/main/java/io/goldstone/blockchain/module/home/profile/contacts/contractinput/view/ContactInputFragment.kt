@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -31,7 +32,9 @@ import org.jetbrains.anko.verticalLayout
 class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 	
 	private val nameInput by lazy { RoundInput(context!!) }
-	private val addressInput by lazy { WalletEditText(context!!) }
+	private val ethERCAndETCAddressInput by lazy { WalletEditText(context!!) }
+	private val btcMainnetAddressInput by lazy { WalletEditText(context!!) }
+	private val btcTestnetAddressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = ContactInputPresenter(this)
 	
@@ -45,9 +48,20 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 			}.into(this)
 			
-			addressInput.apply {
+			ethERCAndETCAddressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.hint
+				hint = ContactText.ethERCAndETChint
+			}.into(this)
+			
+			btcMainnetAddressInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				hint = ContactText.btcMainnetAddress
+			}.into(this)
+			
+			btcTestnetAddressInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				hint = ContactText.btcTestnetAddress
+				visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
 			}.into(this)
 			
 			confirmButton.apply {
@@ -57,7 +71,11 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				presenter.addContact()
 			}.into(this)
 			
-			presenter.getAddressIfExist(addressInput)
+			presenter.getAddressIfExist(
+				ethERCAndETCAddressInput,
+				btcMainnetAddressInput,
+				btcTestnetAddressInput
+			)
 		}
 	}
 	
@@ -66,7 +84,13 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter.setConfirmButtonStyle(nameInput, addressInput, confirmButton)
+		presenter.setConfirmButtonStyle(
+			nameInput,
+			ethERCAndETCAddressInput,
+			btcMainnetAddressInput,
+			btcTestnetAddressInput,
+			confirmButton
+		)
 	}
 	
 	override fun setBaseBackEvent(

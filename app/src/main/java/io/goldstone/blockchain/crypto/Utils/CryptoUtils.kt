@@ -2,7 +2,6 @@ package io.goldstone.blockchain.crypto.utils
 
 import android.text.format.DateUtils
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
@@ -75,10 +74,6 @@ object CryptoUtils {
 	
 	fun toValueWithDecimal(count: Double, decimal: Double = 18.0): BigInteger {
 		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
-	}
-	
-	fun toCountByDecimalAndValue(value: String, decimal: Double = 18.0): String {
-		return (value.toDoubleOrNull().orZero() / Math.pow(10.0, decimal)).toString()
 	}
 	
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
