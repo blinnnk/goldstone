@@ -2,7 +2,9 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.isValid
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.NetworkParameters
 
@@ -47,4 +49,17 @@ object BitCoinUtils {
 		return if (address.isEmpty() || address.length != CryptoValue.bitcoinAddressLength) false
 		else address.substring(0, 1).toIntOrNull().isNull()
 	}
+	
+	fun isValidMultiChainAddress(address: String): AddressType? {
+		return when {
+			Address(address).isValid() -> AddressType.ETHERCOrETC
+			isValidMainnetAddress(address) -> AddressType.BTC
+			isValidTestnetAddress(address) -> AddressType.BTCTest
+			else -> null
+		}
+	}
+}
+
+enum class AddressType {
+	ETHERCOrETC, BTC, BTCTest
 }

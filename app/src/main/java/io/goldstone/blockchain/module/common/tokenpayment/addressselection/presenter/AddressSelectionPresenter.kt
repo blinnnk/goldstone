@@ -6,9 +6,10 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.bitcoin.AddressType
+import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils.isValidMultiChainAddress
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -27,6 +28,10 @@ import org.jetbrains.anko.yesButton
 class AddressSelectionPresenter(
 	override val fragment: AddressSelectionFragment
 ) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
+	
+	val token by lazy {
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+	}
 	
 	override fun updateData() {
 		updateAddressList {
@@ -84,12 +89,8 @@ class AddressSelectionPresenter(
 		address: String,
 		count: Double = 0.0
 	) {
-		Address(address).isValid() isFalse {
-			fragment.context?.alert(ImportWalletText.addressFromatAlert)
-			return
-		}
-		WalletTable.getAllAddresses {
-			any { it.equals(address, true) } isTrue {
+		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
+			localAddresses.any { it.equals(address, true) } isTrue {
 				fragment.alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle
@@ -102,6 +103,26 @@ class AddressSelectionPresenter(
 			} otherwise {
 				goToPaymentPrepareFragment(address, count)
 			}
+		}
+		
+		when (isValidMultiChainAddress(address)) {
+			null -> {
+				fragment.context?.alert(ImportWalletText.addressFromatAlert)
+				return
+			}
+			
+			AddressType.ETHERCOrETC ->
+				WalletTable.getAllETHAndERCAddresses {
+					showAlertIfLocalExistThisAddress(this)
+				}
+			AddressType.BTC ->
+				WalletTable.getAllBTCMainnetAddresses {
+					showAlertIfLocalExistThisAddress(this)
+				}
+			AddressType.BTCTest ->
+				WalletTable.getAllBTCTestnetAddresses {
+					showAlertIfLocalExistThisAddress(this)
+				}
 		}
 	}
 	
@@ -146,7 +167,22 @@ class AddressSelectionPresenter(
 				fragment.asyncData = arrayListOf()
 			} otherwise {
 				if (fragment.asyncData.isNullOrEmpty()) {
-					fragment.asyncData = it
+					// 根据当前的 `Coin Type` 来选择展示地址的哪一项
+					fragment.asyncData = if (token?.symbol.equals(CryptoSymbol.btc, true)) {
+						it.map {
+							it.apply {
+								defaultAddress =
+									if (Config.isTestEnvironment()) it.bitTestnetCoinAddress
+									else it.bitMainnetCoinAddress
+							}
+						}.toArrayList()
+					} else {
+						it.map {
+							it.apply {
+								defaultAddress = ethERCAndETCAddress
+							}
+						}.toArrayList()
+					}
 				} else {
 					diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)
 				}

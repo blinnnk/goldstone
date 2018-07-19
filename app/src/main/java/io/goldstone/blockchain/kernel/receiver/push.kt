@@ -146,7 +146,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		}
 		
 		fun registerWalletAddressForPush() {
-			WalletTable.getAllAddresses {
+			WalletTable.getAllETHAndERCAddresses {
 				AppConfigTable.getAppConfig { config ->
 					// 把地址转换成 `JsonArray` 格式
 					toJsonArray {

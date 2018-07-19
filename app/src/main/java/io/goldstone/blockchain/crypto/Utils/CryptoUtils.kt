@@ -44,7 +44,7 @@ object CryptoUtils {
 		else address.substring(0, 32) + "..."
 	}
 	
-	fun scaleMiddleAddress(address: String, halfSize: Int = 14): String {
+	fun scaleMiddleAddress(address: String, halfSize: Int = 12): String {
 		return if (address.length > 2) address.substring(0, halfSize) + " ··· " + address.substring(
 			address.length - halfSize,
 			address.length

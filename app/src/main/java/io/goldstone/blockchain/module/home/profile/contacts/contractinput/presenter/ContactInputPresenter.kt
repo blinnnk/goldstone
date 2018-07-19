@@ -68,13 +68,11 @@ class ContactInputPresenter(
 			fragment.context?.alert(ContactText.emptyAddressAlert)
 			return
 		}
-		System.out.println("hello 1")
 		// 检查是否是合规的以太坊或以太经典的地址格式
 		if (!Address(ethERCAndETCAddressText).isValid() && ethERCAndETCAddressText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat)
 			return
 		}
-		System.out.println("hello 2")
 		// 检查是否是合规的测试网比特币私钥地址格式
 		if (
 			btcTestnetAddressText.isNotEmpty() &&
@@ -83,7 +81,6 @@ class ContactInputPresenter(
 			fragment.context?.alert(ContactText.wrongAddressFormat)
 			return
 		}
-		System.out.println("hello 3 $btcMainnetAddressText")
 		// 检查是否是合规的主网比特币私钥地址格式
 		if (
 			btcMainnetAddressText.isNotEmpty() &&
@@ -92,14 +89,13 @@ class ContactInputPresenter(
 			fragment.context?.alert(ContactText.wrongAddressFormat)
 			return
 		}
-		System.out
-			.println("eth$ethERCAndETCAddressText btc$btcMainnetAddressText test$btcTestnetAddressText")
 		// 符合以上规则的可以进入插入地址
 		ContactTable.insertContact(
 			ContactTable(
 				0,
 				"",
 				nameText,
+				"",
 				ethERCAndETCAddressText,
 				btcMainnetAddressText,
 				btcTestnetAddressText
