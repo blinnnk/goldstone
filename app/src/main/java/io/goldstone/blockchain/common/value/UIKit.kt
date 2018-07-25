@@ -44,23 +44,13 @@ object Spectrum {
 	@JvmField
 	val white = Color.parseColor("#FFFFFFFF")
 	@JvmField
-	val whiteYellow = Color.parseColor("#FFFFF58B")
-	@JvmField
 	val blue = Color.parseColor("#FF235682")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
-	val tree = Color.parseColor("#FF10B571")
-	@JvmField
-	val blueGreen = Color.parseColor("#FF008489")
-	@JvmField
-	val opacity5Green = Color.parseColor("#801CC881")
-	@JvmField
 	val opacity8Green = Color.parseColor("#CC1CC881")
 	@JvmField
 	val lightGreen = Color.parseColor("#801CC881")
-	@JvmField
-	val softGreen = Color.parseColor("#80D4FFCF")
 	@JvmField
 	val darkBlue = Color.parseColor("#FF0863B8")
 	@JvmField
@@ -68,7 +58,7 @@ object Spectrum {
 	@JvmField
 	val lightRed = Color.parseColor("#FFFF6464")
 	@JvmField
-	val yellow = Color.parseColor("#FFFFF871")
+	val yellow = Color.parseColor("#FFFFF988")
 	@JvmField
 	val opacity1White = Color.parseColor("#1AFFFFFF")
 	@JvmField

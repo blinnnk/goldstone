@@ -178,7 +178,7 @@ object RequisitionUtil {
 		}
 	}
 	
-	/** 请求 ehterScan 的数据是明文请求不需要加密 */
+	/** 请求 ehterScan, blockchain.info 的数据是明文请求不需要加密 */
 	@JvmStatic
 	inline fun <reified T> requestUncryptoData(
 		api: String,
@@ -237,7 +237,6 @@ object RequisitionUtil {
 					val sign =
 						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
 							.getObjectMD5HexString()
-							.removePrefix("0x")
 					val request =
 						Request.Builder()
 							.url(path)
@@ -276,7 +275,6 @@ object RequisitionUtil {
 					val sign =
 						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
 							.getObjectMD5HexString()
-							.removePrefix("0x")
 					val request =
 						Request.Builder()
 							.url(api)
@@ -300,7 +298,7 @@ object RequisitionUtil {
 		}
 	}
 	
-	fun callEthBy(
+	fun callChainBy(
 		body: RequestBody,
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		chainName: String = Config.getCurrentChainName(),
@@ -364,7 +362,16 @@ object RequisitionUtil {
 		}
 		return when {
 			data.isNullOrBlank() -> return ""
-			errorData.isNotEmpty() -> JSONObject(errorData).safeGet("message")
+			
+			errorData.isNotEmpty() -> {
+				try {
+					if (errorData.equals("null", true)) ""
+					else JSONObject(errorData).safeGet("message")
+				} catch (error: Exception) {
+					"$error"
+				}
+			}
+			
 			else -> ""
 		}
 	}

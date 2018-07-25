@@ -59,7 +59,18 @@ fun createTransactionWithDefaults(
 	txHash: String? = null,
 	value: BigInteger
 ) =
-	Transaction(chain, creationEpochSecond, from, gasLimit, gasPrice, input, nonce, to, txHash, value)
+	Transaction(
+		chain,
+		creationEpochSecond,
+		from,
+		gasLimit,
+		gasPrice,
+		input,
+		nonce,
+		to,
+		txHash,
+		value
+	)
 
 fun Transaction.signViaEIP155(key: ECKeyPair, chainDefinition: ChainDefinition): SignatureData {
 	val signatureData =

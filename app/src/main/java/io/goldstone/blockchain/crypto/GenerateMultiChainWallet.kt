@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto
 import android.content.Context
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 
 /**
  * @date 2018/7/14 12:20 PM
@@ -30,11 +31,11 @@ object GenerateMultiChainWallet {
 				path.etcPath,
 				password
 			) { etcAddress ->
-				BTCUtils.getBitcoinWalletByMnemonic(
+				BTCWalletUtils.getBitcoinWalletByMnemonic(
 					mnemonic,
 					path.btcPath
 				) { btcAddress, _ ->
-					BTCUtils.getBitcoinWalletByMnemonic(
+					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
 					) { btcTestAddress, _ ->
@@ -65,11 +66,11 @@ object GenerateMultiChainWallet {
 				path.etcPath,
 				password
 			) { etcAddress ->
-				BTCUtils.getBitcoinWalletByMnemonic(
+				BTCWalletUtils.getBitcoinWalletByMnemonic(
 					mnemonic,
 					path.btcPath
 				) { btcAddress, _ ->
-					BTCUtils.getBitcoinWalletByMnemonic(
+					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
 					) { btcTestAddress, _ ->

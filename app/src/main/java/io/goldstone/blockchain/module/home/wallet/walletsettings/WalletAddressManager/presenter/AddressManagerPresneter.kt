@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
@@ -241,7 +242,7 @@ class AddressManagerPresneter(
 							val mnemonic = JavaKeystoreUtil().decryptData(it)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
-							BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
 								}
@@ -266,7 +267,7 @@ class AddressManagerPresneter(
 							val mnemonic = JavaKeystoreUtil().decryptData(it)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
-							BTCUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
 								WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
 								}

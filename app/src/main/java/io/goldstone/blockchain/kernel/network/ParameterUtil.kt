@@ -35,6 +35,7 @@ object ParameterUtil {
 		method: String,
 		id: Int,
 		hasLatest: Boolean,
+		isRPC2: Boolean,
 		vararg parameters: T?
 	): String {
 		var content = ""
@@ -47,8 +48,9 @@ object ParameterUtil {
 		val finalParameter =
 			if (content.isEmpty()) ""
 			else content.substringBeforeLast(",") + latest
+		val rpcVersion = if (isRPC2) 2.0 else 1.0
 		val rpcContent =
-			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
+			"{\"jsonrpc\":\"$rpcVersion\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
 		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
 	
@@ -56,6 +58,7 @@ object ParameterUtil {
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,
 		hasLatest: Boolean,
+		isRPC2: Boolean,
 		vararg parameters: Pair<String, T>
 	): String {
 		var content = ""
@@ -66,8 +69,10 @@ object ParameterUtil {
 			content += "\"${it.first}\":$value,"
 		}
 		val latest = if (hasLatest) ",\"latest\"" else ""
+		val rpcVersion = if (isRPC2) 2.0 else 1.0
 		val rpcContent =
-			"{\"jsonrpc\":\"2.0\", \"method\":\"$method\", \"params\":[{${content.substringBeforeLast(",")}}$latest],\"id\":1}"
+			"{\"jsonrpc\":\"$rpcVersion\", \"method\":\"$method\", \"params\":[{${content
+				.substringBeforeLast(",")}}$latest],\"id\":1}"
 		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
 }

@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.getAddress
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
@@ -65,22 +64,6 @@ class GoldStoneUtilUnitTest {
 	fun hextStringConverter() {
 		LogUtil.debug(positon, "你好".toCryptHexString())
 		LogUtil.debug(positon, "e7bb86e88a82".toUpperCase().toStringFromHex())
-	}
-	
-	@Test
-	fun getBitcoinAddress() {
-		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
-		
-		BTCUtils.getBitcoinWalletByMnemonic(seedCode) { address, secret ->
-			LogUtil.debug("getBitcoinAddress", "$address and $secret")
-			
-			BTCUtils.getPublicKeyFromBase58PrivateKey(secret, false) {
-				LogUtil.debug(
-					"getBitcoinAddress",
-					"**$it"
-				)
-			}
-		}
 	}
 	
 	@Test

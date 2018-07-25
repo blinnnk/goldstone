@@ -15,7 +15,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -76,7 +76,7 @@ class ContactInputPresenter(
 		// 检查是否是合规的测试网比特币私钥地址格式
 		if (
 			btcTestnetAddressText.isNotEmpty() &&
-			!BitCoinUtils.isValidTestnetAddress(btcTestnetAddressText)
+			!BTCUtils.isValidTestnetAddress(btcTestnetAddressText)
 		) {
 			fragment.context?.alert(ContactText.wrongAddressFormat)
 			return
@@ -84,7 +84,7 @@ class ContactInputPresenter(
 		// 检查是否是合规的主网比特币私钥地址格式
 		if (
 			btcMainnetAddressText.isNotEmpty() &&
-			!BitCoinUtils.isValidMainnetAddress(btcMainnetAddressText)
+			!BTCUtils.isValidMainnetAddress(btcMainnetAddressText)
 		) {
 			fragment.context?.alert(ContactText.wrongAddressFormat)
 			return

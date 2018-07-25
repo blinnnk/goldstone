@@ -159,6 +159,10 @@ fun Double.toBTCCount(): Double {
 	return this / 100000000.0
 }
 
+fun Long.toBTCCount(): Double {
+	return this / 100000000.0
+}
+
 fun Double.toGasValue(): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 9
@@ -231,7 +235,7 @@ fun <T : List<*>> T.getObjectMD5HexString(): String {
 	return try {
 		val byteArray = this.toString().toByteArray()
 		val md = MessageDigest.getInstance("MD5")
-		md.digest(byteArray).toHexString()
+		md.digest(byteArray).toNoPrefixHexString()
 	} catch (error: Exception) {
 		println(error)
 		"error"
@@ -242,7 +246,7 @@ fun String.getObjectMD5HexString(): String {
 	return try {
 		val byteArray = this.toByteArray()
 		val md = MessageDigest.getInstance("MD5")
-		md.digest(byteArray).toHexString()
+		md.digest(byteArray).toNoPrefixHexString()
 	} catch (error: Exception) {
 		println(error)
 		"error"

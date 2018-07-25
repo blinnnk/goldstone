@@ -71,12 +71,13 @@ class ProfileOverlayPresenter(
 		}
 	}
 	
-	lateinit var mini: MiniOverlay
+	private lateinit var mini: MiniOverlay
 	private fun showWalletAddingMethodDashboard() {
 		val menuData = listOf(
 			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
 			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet)
 		)
+		
 		fragment.getMainActivity()?.getMainContainer()?.apply {
 			mini = MiniOverlay(context) { cell, title ->
 				cell.onClick {

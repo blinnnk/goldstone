@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
-import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils.isValidMultiChainAddress
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils.isValidMultiChainAddress
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment

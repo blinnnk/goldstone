@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
-import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -53,7 +53,7 @@ class WatchOnlyImportPresenter(
 			}
 			
 			CryptoValue.PrivateKeyType.BTC.content -> {
-				if (!BitCoinUtils.isValidMainnetAddress(address)) {
+				if (!BTCUtils.isValidMainnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
 					return
@@ -61,7 +61,7 @@ class WatchOnlyImportPresenter(
 			}
 			
 			else -> {
-				if (!BitCoinUtils.isValidTestnetAddress(address)) {
+				if (!BTCUtils.isValidTestnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
 					return

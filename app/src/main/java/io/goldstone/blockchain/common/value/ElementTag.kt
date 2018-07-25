@@ -12,7 +12,6 @@ object FragmentTag {
 	const val profile = "profile"
 	const val profileOverlay = "profileOverlay"
 	const val transaction = "transaction"
-	const val transactionList = "transactionList"
 	const val quotation = "quotation"
 	const val walletCreation = "walletCreation"
 	const val mnemonicImportDetail = "mnemonicImportDetail"
@@ -36,8 +35,4 @@ object ErrorTag {
 
 object ValueTag {
 	const val emptyPrice = "--"
-}
-
-object ConfigTag {
-	const val instaBug = "useInstaBug"
 }

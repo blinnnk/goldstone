@@ -10,7 +10,7 @@ import org.bitcoinj.core.*
  * @date 2018/7/13 12:13 PM
  * @author KaySaith
  */
-object BTCUtils {
+object BTCWalletUtils {
 	
 	fun getBitcoinWalletByMnemonic(
 		mnemonicCode: String,
