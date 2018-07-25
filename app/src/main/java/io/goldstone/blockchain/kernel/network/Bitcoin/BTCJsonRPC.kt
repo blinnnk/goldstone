@@ -18,11 +18,12 @@ import org.json.JSONObject
 object BTCJsonRPC {
 	
 	/**
-	 * 计算制定 `Block Number` 的数字来查询燃气费的使用的价格平均
+	 * 估算交易在 `nblocks` 个区块开始确认的每千字节的大致费用,
+	 * 如果没有足够的交易和区块用来估算则会返回一个负值，-1 表示交易费为 0
 	 */
 	fun estimatesmartFee(
 		chainName: String,
-		targetBlock: Int,
+		blocks: Int,
 		hold: (Double?) -> Unit
 	) {
 		RequestBody.create(
@@ -33,7 +34,7 @@ object BTCJsonRPC {
 				1,
 				false,
 				false,
-				targetBlock // Target block number
+				blocks
 			)
 		).let {
 			RequisitionUtil.callChainBy(

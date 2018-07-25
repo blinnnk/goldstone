@@ -94,6 +94,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
+	
 	override val presenter = AddressManagerPresneter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -195,8 +196,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 			
 			WalletSettingsText.newBTCAddress -> {
-				AddressManagerPresneter.createBTCAddress(context, password) {
-					btcAddresses.model = it
+				if (Config.isTestEnvironment()) {
+					AddressManagerPresneter.createBTCTestAddress(context, password) {
+						btcAddresses.model = it
+					}
+				} else {
+					AddressManagerPresneter.createBTCAddress(context, password) {
+						btcAddresses.model = it
+					}
 				}
 			}
 		}

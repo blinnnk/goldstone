@@ -103,7 +103,6 @@ class BitcoinUnitTest {
 	@Test
 	fun signRawTransaction() {
 		BitcoinApi.getUnspentListByAddress("mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw") {
-			System.out.println("**$it")
 			BTCTransactionUtils.generateSignedRawTransaction(
 				3000000,
 				1000000,
@@ -113,7 +112,7 @@ class BitcoinUnitTest {
 				"cPoTY5H8dmo6Dd3MroXrg9xeKghi2CrV31HFn6kzWGb1XGAv1CRm",
 				true
 			).let {
-				System.out.println("___$it")
+				LogUtil.debug("$positon signRawTransaction", it)
 			}
 		}
 	}

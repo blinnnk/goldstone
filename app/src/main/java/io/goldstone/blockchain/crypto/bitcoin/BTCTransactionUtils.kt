@@ -35,7 +35,7 @@ object BTCTransactionUtils {
 		unspentModel: List<UnspentModel>,
 		base58Privatekey: String,
 		isTest: Boolean
-	): String {
+	): BTCSignedModel {
 		val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
 		//传入主网参数
 		val transaction = Transaction(net)
@@ -68,7 +68,7 @@ object BTCTransactionUtils {
 			Coin.valueOf(sendValue),
 			Address.fromBase58(net, targetAddress)
 		)
-		//消费列表总金额 - 已经转账的金额 - 手续费 就等于需要返回给自己的金额了,  你不能在转账的钱上面减去手续费吧, 哈哈
+		//消费列表总金额 - 已经转账的金额 - 手续费 就等于需要返回给自己的金额了
 		val leave = money - sendValue - fee
 		//输出-转给自己
 		if (leave > 0) {
@@ -83,7 +83,7 @@ object BTCTransactionUtils {
 			val outPoint = TransactionOutPoint(net, it.index, it.hash)
 			transaction.addSignedInput(outPoint, it.script, ecKey, Transaction.SigHash.ALL, true)
 		}
-		return HEX.encode(transaction.bitcoinSerialize())
+		return BTCSignedModel(HEX.encode(transaction.bitcoinSerialize()), transaction.messageSize)
 	}
 	
 	@JvmStatic
