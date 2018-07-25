@@ -24,6 +24,8 @@ object ChainURL {
 			ChainText.infuraKovan -> ChainURL.infuraKovan
 			ChainText.infuraRinkeby -> ChainURL.infuraRinkeby
 			ChainText.infuraMain -> ChainURL.infuraMain
+			ChainText.btcTest -> ChainURL.btcTest
+			ChainText.btcMain -> ChainURL.btcMain
 			else -> ChainURL.main
 		}
 	}
@@ -105,8 +107,8 @@ object ChainURL {
 	private const val kovan = "https://eth-node-kovan.goldstone.io/eth"
 	private const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
 	/** BTC Chain Address */
-	private const val btcMain = "http://goldstone:goldstone@119.28.221.153:8332"
-	private const val btcTest = "http://goldstone:goldstone@150.109.41.22:18332"
+	private const val btcMain = "https://btc-node-mainnet.goldstone.io/btc"
+	private const val btcTest = "https://btc-node-testnet.goldstone.io/btc"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMorderTest = "https://web3.gastracker.io/morden"
@@ -117,6 +119,11 @@ object ChainURL {
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
+	
+	@JvmStatic
+	fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
+		return !ChainURL.uncryptChainName.any { it.equals(name, true) }
+	}
 }
 
 private val infuraKeys = arrayListOf(

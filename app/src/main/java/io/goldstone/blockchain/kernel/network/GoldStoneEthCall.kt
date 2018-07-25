@@ -15,7 +15,7 @@ import io.goldstone.blockchain.crypto.EthereumMethod
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.callEthBy
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.callChainBy
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
@@ -31,7 +31,7 @@ object GoldStoneEthCall {
 	
 	lateinit var context: Context
 	@JvmStatic
-	private val contentType = MediaType.parse("application/json; charset=utf-8")
+	val contentType = MediaType.parse("application/json; charset=utf-8")
 	
 	/**
 	 * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
@@ -83,14 +83,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
+				true,
 				hash
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -117,10 +118,11 @@ object GoldStoneEthCall {
 				EthereumMethod.GetTransactionCount.method,
 				1,
 				true,
+				true,
 				address
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -142,14 +144,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBlockNumber.method,
 				83,
 				false,
+				true,
 				null
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -172,15 +175,16 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBlockByHash.method,
 				1,
 				false,
+				true,
 				blockHash,
 				true
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -207,14 +211,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionByHash.method,
 				1,
 				false,
+				true,
 				hash
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -250,14 +255,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTransactionReceiptByHash.method,
 				1,
 				false,
+				true,
 				hash
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -284,15 +290,16 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetEstimateGas.method,
 				false,
+				true,
 				Pair("to", to),
 				Pair("from", from),
 				Pair("data", data)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -321,14 +328,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.SendRawTransaction.method,
 				1,
 				false,
+				true,
 				signTransactions
 			)
 		).let {
-			callEthBy(it, errorCallback, chainName) {
+			callChainBy(it, errorCallback, chainName) {
 				holdValue(it)
 			}
 		}
@@ -345,14 +353,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenBalance.method,
+				true,
 				true,
 				Pair("to", contractAddress),
 				Pair("data", EthereumMethod.GetTokenBalance.code withAddress address)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -373,14 +382,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetSymbol.method,
+				true,
 				true,
 				Pair("to", contractAddress),
 				Pair("data", EthereumMethod.GetSymbol.code)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -403,14 +413,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenDecimal.method,
+				true,
 				true,
 				Pair("to", contractAddress),
 				Pair("data", EthereumMethod.GetTokenDecimal.code)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -433,14 +444,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTokenName.method,
+				true,
 				true,
 				Pair("to", contractAddress),
 				Pair("data", EthereumMethod.GetTokenName.code)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -462,14 +474,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetBalance.method,
 				1,
+				true,
 				true,
 				address
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -491,14 +504,15 @@ object GoldStoneEthCall {
 		RequestBody.create(
 			contentType,
 			ParameterUtil.preparePairJsonRPC(
-				getCurrentEncryptStatusByNodeName(chainName),
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				EthereumMethod.GetTotalSupply.method,
+				true,
 				true,
 				Pair("to", contractAddress),
 				Pair("data", EthereumMethod.GetTotalSupply.code)
 			)
 		).let {
-			callEthBy(
+			callChainBy(
 				it,
 				{ error, reason ->
 					errorCallback(error, reason)
@@ -526,10 +540,5 @@ object GoldStoneEthCall {
 			ChainType.ETH -> Config.isEncryptERCNodeRequest()
 			else -> Config.isEncryptERCNodeRequest()
 		}
-	}
-	
-	@JvmStatic
-	private fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
-		return !ChainURL.uncryptChainName.any { it.equals(name, true) }
 	}
 }

@@ -13,7 +13,7 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
 import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.bitcoin.BitCoinUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -114,13 +114,13 @@ class PrivateKeyImportPresenter(
 			}
 			// 检查比特币私钥地址格式是否是对应的网络
 			if (isTest) {
-				if (!BitCoinUtils.isValidTestnetPrivateKey(privateKey)) {
+				if (!BTCUtils.isValidTestnetPrivateKey(privateKey)) {
 					fragment.context?.alert(ImportWalletText.unvalidTestnetBTCPrivateKey)
 					callback()
 					return
 				}
 			} else {
-				if (BitCoinUtils.isValidTestnetPrivateKey(privateKey)) {
+				if (!BTCUtils.isValidMainnetPrivateKey(privateKey)) {
 					fragment.context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
 					callback()
 					return
@@ -129,7 +129,7 @@ class PrivateKeyImportPresenter(
 			fragment.context?.getWalletByPrivateKey(CryptoValue.basicLockKey, password) { _ ->
 				// use ethereum geth keystore to verify btc user password, this value is unuseful
 				// just ignore the value
-				BTCUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
+				BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
 					WalletImportPresenter.insertWalletToDatabase(
 						fragment,
 						MultiChainAddresses(

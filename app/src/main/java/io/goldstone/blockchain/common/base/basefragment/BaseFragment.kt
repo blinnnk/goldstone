@@ -22,7 +22,6 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment() {
 	
 	abstract val presenter: T
-	
 	abstract fun AnkoContext<Fragment>.initView()
 	
 	override fun onAttach(context: Context?) {

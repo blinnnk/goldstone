@@ -311,7 +311,7 @@ data class MyTokenTable(
 				
 				contract.equals(CryptoValue.btcContract, true) -> {
 					BitcoinApi.getBalanceByAddress(ownerAddress) {
-						val balance = if (convertByDecimal) it.toBTCCount() else it
+						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
 				}

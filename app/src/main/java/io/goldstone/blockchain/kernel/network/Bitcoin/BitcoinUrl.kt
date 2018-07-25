@@ -13,4 +13,11 @@ object BitcoinUrl {
 	val getBalance: (header: String, address: String) -> String = { header, address ->
 		"$header/balance?active=$address"
 	}
+	val getUnspentInfo: (header: String, address: String) -> String = { header, address ->
+		"$header/unspent?active=$address"
+	}
+}
+
+object BitcoinRPC {
+	const val createRawTransaction = "createrawtransaction"
 }

@@ -265,6 +265,7 @@ class GoldStoneEthereumUnitTest {
 			EthereumMethod.GetBlockNumber.method,
 			1,
 			false,
+			true,
 			"hello"
 		).let {
 			LogUtil.debug(positon + "prepareJsonRPCParam", it)

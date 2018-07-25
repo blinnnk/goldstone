@@ -23,12 +23,12 @@ import kotlin.experimental.and
  * [BitcoinJ ECKey](https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/ECKey.java) implementation.
  */
 private val CURVE_PARAMS = CustomNamedCurves.getByName("secp256k1")
-val CURVE = ECDomainParameters(
-	CURVE_PARAMS.curve, CURVE_PARAMS.g, CURVE_PARAMS.n, CURVE_PARAMS.h)
+val CURVE = ECDomainParameters(CURVE_PARAMS.curve, CURVE_PARAMS.g, CURVE_PARAMS.n, CURVE_PARAMS.h)
 private val HALF_CURVE_ORDER = CURVE_PARAMS.n.shiftRight(1)
 
-@Deprecated("Please use extension function signMessage on ECKeyPair",
-            ReplaceWith("keyPair.signMessage(message)")
+@Deprecated(
+	"Please use extension function signMessage on ECKeyPair",
+	ReplaceWith("keyPair.signMessage(message)")
 )
 fun signMessage(message: ByteArray, keyPair: ECKeyPair) = keyPair.signMessage(message)
 
@@ -38,10 +38,8 @@ fun signMessage(message: ByteArray, keyPair: ECKeyPair) = keyPair.signMessage(me
  *
  * @return [SignatureData] containing the (r,s,v) components
  */
-
 fun ECKeyPair.signMessage(message: ByteArray) =
 	signMessageHash(message.keccak(), this, true)
-
 
 /**
  * Signs the the [messageHash] buffer with the private key in the given [keyPair].
@@ -51,13 +49,17 @@ fun ECKeyPair.signMessage(message: ByteArray) =
  *
  * @return [SignatureData] containing the (r,s,v) components
  */
-fun signMessageHash(messageHash: ByteArray, keyPair: ECKeyPair, toCanonical: Boolean = true): SignatureData {
+fun signMessageHash(
+	messageHash: ByteArray,
+	keyPair: ECKeyPair,
+	toCanonical: Boolean = true
+): SignatureData {
 	val privateKey = keyPair.privateKey
 	val publicKey = keyPair.publicKey
 	val sig = sign(messageHash, privateKey, toCanonical)
 	// Now we have to work backwards to figure out the recId needed to recover the public key
 	var recId = -1
-	for (i in 0..3) {
+	for (i in 0 .. 3) {
 		val k = recoverFromSignature(i, sig, messageHash)
 		if (k != null && k == publicKey) {
 			recId = i
@@ -66,22 +68,24 @@ fun signMessageHash(messageHash: ByteArray, keyPair: ECKeyPair, toCanonical: Boo
 	}
 	if (recId == -1) {
 		throw RuntimeException(
-			"Could not construct a recoverable key. This should never happen.")
+			"Could not construct a recoverable key. This should never happen."
+		)
 	}
 	val headerByte = recId + 27
-	
 	val v = headerByte.toByte()
 	
 	return SignatureData(sig.r, sig.s, v)
 }
 
-private fun sign(transactionHash: ByteArray, privateKey: BigInteger, canonical: Boolean): ECDSASignature {
+private fun sign(
+	transactionHash: ByteArray,
+	privateKey: BigInteger,
+	canonical: Boolean
+): ECDSASignature {
 	val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-	
 	val ecPrivateKeyParameters = ECPrivateKeyParameters(privateKey, CURVE)
 	signer.init(true, ecPrivateKeyParameters)
 	val components = signer.generateSignature(transactionHash)
-	
 	val signature = ECDSASignature(components[0], components[1])
 	return if (canonical) {
 		signature.toCanonicalised()
@@ -116,12 +120,15 @@ private fun sign(transactionHash: ByteArray, privateKey: BigInteger, canonical: 
  * @param message org.kethereum.crypto.Hash of the data that was signed.
  * @return An ECKey containing only the public part, or null if recovery wasn't possible.
  */
-private fun recoverFromSignature(recId: Int, sig: ECDSASignature, message: ByteArray?): BigInteger? {
+private fun recoverFromSignature(
+	recId: Int,
+	sig: ECDSASignature,
+	message: ByteArray?
+): BigInteger? {
 	require(recId >= 0) { "recId must be positive" }
 	require(sig.r.signum() >= 0) { "r must be positive" }
 	require(sig.s.signum() >= 0) { "s must be positive" }
 	require(message != null) { "message cannot be null" }
-	
 	// 1.0 For j from 0 to h   (h == recId here and the loop is outside this function)
 	//   1.1 Let x = r + jn
 	val n = CURVE.n  // Curve order.
@@ -168,7 +175,6 @@ private fun recoverFromSignature(recId: Int, sig: ECDSASignature, message: ByteA
 	val srInv = rInv.multiply(sig.s).mod(n)
 	val eInvrInv = rInv.multiply(eInv).mod(n)
 	val q = ECAlgorithms.sumOfTwoMultiplies(CURVE.g, eInvrInv, r, srInv)
-	
 	val qBytes = q.getEncoded(false)
 	// We remove the prefix
 	return BigInteger(1, Arrays.copyOfRange(qBytes, 1, qBytes.size))
@@ -195,19 +201,17 @@ private fun decompressKey(xBN: BigInteger, yBit: Boolean): ECPoint {
  */
 @Throws(SignatureException::class)
 fun signedMessageToKey(message: ByteArray, signatureData: SignatureData): BigInteger {
-	
 	val header = signatureData.v and 0xFF.toByte()
 	// The header byte: 0x1B = first key with even y, 0x1C = first key with odd y,
 	//                  0x1D = second key with even y, 0x1E = second key with odd y
 	if (header < 27 || header > 34) {
 		throw SignatureException("Header byte out of range: $header")
 	}
-	
 	val sig = ECDSASignature(signatureData.r, signatureData.s)
-	
 	val messageHash = message.keccak()
 	val recId = header - 27
-	return recoverFromSignature(recId, sig, messageHash) ?: throw SignatureException("Could not recover public key from signature")
+	return recoverFromSignature(recId, sig, messageHash)
+	       ?: throw SignatureException("Could not recover public key from signature")
 }
 
 /**
@@ -218,7 +222,6 @@ fun signedMessageToKey(message: ByteArray, signatureData: SignatureData): BigInt
  */
 fun publicKeyFromPrivate(privateKey: BigInteger): BigInteger {
 	val point = publicPointFromPrivate(privateKey)
-	
 	val encoded = point.getEncoded(false)
 	return BigInteger(1, Arrays.copyOfRange(encoded, 1, encoded.size))  // remove prefix
 }

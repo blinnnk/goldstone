@@ -5,7 +5,7 @@ import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.getPrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -91,7 +91,7 @@ class PrivateKeyExportPresenter(
 					val targetPath = btcPath.substringBeforeLast("/") + "/" + addressIndex
 					val mnemonicCode = JavaKeystoreUtil().decryptData(encryptMnemonic!!)
 					// 获取该 `Address` 的 `PrivateKey`
-					BTCUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
+					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
 						hold(secret)
 					}
 				}

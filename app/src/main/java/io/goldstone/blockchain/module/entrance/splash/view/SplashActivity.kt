@@ -124,7 +124,7 @@ class SplashActivity : AppCompatActivity() {
 	private fun updateAgreement() {
 		AppConfigTable.getAppConfig {
 			it?.apply {
-				val md5 = terms.getObjectMD5HexString().removePrefix("0x")
+				val md5 = terms.getObjectMD5HexString()
 				GoldStoneAPI.getTerms(md5, {
 					LogUtil.error("updateAgreement", it)
 				}) {

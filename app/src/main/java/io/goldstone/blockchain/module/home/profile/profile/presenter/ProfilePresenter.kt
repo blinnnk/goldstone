@@ -154,13 +154,13 @@ class ProfilePresenter(
 	}
 	
 	private fun download(url: String, title: String, description: String) {
-		val request = DownloadManager.Request(Uri.parse(url))
-		request.setDescription(description)
-		request.setTitle(title)
-		request.allowScanningByMediaScanner()
-		request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-		request
-			.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title.apk")
+		val request = DownloadManager.Request(Uri.parse(url)).apply {
+			setDescription(description)
+			setTitle(title)
+			allowScanningByMediaScanner()
+			setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title.apk")
+		}
 		// get download service and enqueue file
 		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 		manager.enqueue(request)
@@ -184,9 +184,9 @@ class ProfilePresenter(
 		}
 	}
 	
+	// 这个方法是为了内部使用的隐藏方法
 	private var clickTimes = 10
 	private var hasShownGoldStoneID = false
-	// 这个方法是为了内部使用的隐藏方法
 	fun showGoldStoneID() {
 		clickTimes -= 1
 		if (clickTimes <= 0 && !hasShownGoldStoneID) {

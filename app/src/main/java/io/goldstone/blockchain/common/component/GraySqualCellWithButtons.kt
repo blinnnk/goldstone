@@ -88,7 +88,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		subtitle.text = if (text.length > 36) text.substring(0, 36) + "..." else text
 	}
 	
-	fun updateBackgroundColor(color: Int = Spectrum.whiteYellow) {
+	fun updateBackgroundColor(color: Int = Spectrum.yellow) {
 		backgroundColor = color
 		title.textColor = GrayScale.Opacity2Black
 		moreButton.setColorFilter(GrayScale.black)
