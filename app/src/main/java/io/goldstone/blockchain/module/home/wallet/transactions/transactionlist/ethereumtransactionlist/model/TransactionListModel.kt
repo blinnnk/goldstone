@@ -6,9 +6,12 @@ import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.DateAndTimeText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import java.io.Serializable
@@ -46,8 +49,7 @@ data class TransactionListModel(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
 				DateAndTimeText.getDateText()
-			).apply {
-			} + descriptionText(
+			) + descriptionText(
 				data.isReceive,
 				data.tokenReceiveAddress.orEmpty(),
 				data.fromAddress
@@ -70,6 +72,37 @@ data class TransactionListModel(
 		data.contractAddress,
 		data.isFailed,
 		data.isFee
+	)
+	
+	constructor(data: BitcoinTransactionTable) : this(
+		if (data.to.equals(data.recordAddress, true)) data.fromAddress else data.to,
+		CryptoUtils.scaleTo32(
+			HoneyDateUtil.getSinceTime(
+				data.timeStamp.toMillsecond(),
+				DateAndTimeText.getDateText()
+			) + descriptionText(
+				data.to.equals(data.recordAddress, true),
+				data.to,
+				data.fromAddress
+			)
+		), // 副标题的生成
+		data.value.toDouble().toBTCCount(),
+		CryptoSymbol.btc,
+		data.to.equals(data.recordAddress, true),
+		TimeUtils.formatDate(data.timeStamp), // 拼接时间
+		data.to,
+		data.blockNumber,
+		data.hash,
+		"",
+		data.fee,
+		"",
+		false,
+		data.timeStamp,
+		data.value,
+		false,
+		CryptoValue.btcContract,
+		false,
+		false
 	)
 	
 	companion object {

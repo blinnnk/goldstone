@@ -23,6 +23,7 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
 class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	
 	var isETCListShown: Runnable? = null
+	var isBTCListShown: Runnable? = null
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
 	}
@@ -40,6 +41,7 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 			menuBar.setMemnuTitles(
 				arrayListOf(
 					CryptoSymbol.eth + "/" + CryptoSymbol.erc,
+					CryptoSymbol.btc,
 					CryptoSymbol.etc
 				)
 			) { button, id ->
@@ -59,7 +61,8 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 				}
 				
 				onPageSelected {
-					if (it == 1) isETCListShown?.run()
+					if (it == 1) isBTCListShown?.run()
+					if (it == 2) isETCListShown?.run()
 				}
 			}
 		}
@@ -70,6 +73,6 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	}
 	
 	companion object {
-		const val viewPagerSize = 2
+		const val viewPagerSize = 3
 	}
 }

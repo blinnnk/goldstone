@@ -27,7 +27,7 @@ import org.jetbrains.anko.wrapContent
 class ViewPagerMenu(context: Context) : LinearLayout(context) {
 	
 	private var titles: ArrayList<String> by observing(arrayListOf()) {
-		val unitWidth = if (titles.size < 3) ScreenSize.Width / titles.size else 100.uiPX()
+		val unitWidth = if (titles.size < 4) ScreenSize.Width / titles.size else 100.uiPX()
 		underLineWidth = unitWidth.toFloat()
 		titles.forEachIndexed { index, content ->
 			textView(content) {
