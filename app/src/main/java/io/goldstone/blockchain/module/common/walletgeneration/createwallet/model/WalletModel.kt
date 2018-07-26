@@ -8,6 +8,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
+import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert
@@ -137,6 +139,30 @@ data class WalletTable(
 						balance = Config.getCurrentBalance()
 					}
 				}) { hold(it) }
+		}
+		
+		fun getBTCPrivateKey(address: String, isTest: Boolean, hold: (String) -> Unit) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					val addresses = if (isTest) btcTestAddresses else btcAddresses
+					// 解析当前地址的 `Address Index`
+					val addressIndex = if (addresses.contains(",")) {
+						addresses.split(",").find {
+							it.contains(address)
+						}?.substringAfter("|")?.toInt()
+					} else {
+						addresses.substringAfter("|").toInt()
+					}
+					val path = if (isTest) btcTestPath else btcPath
+					// 生成对应的 `Path`
+					val targetPath = path.substringBeforeLast("/") + "/" + addressIndex
+					val mnemonicCode = JavaKeystoreUtil().decryptData(encryptMnemonic!!)
+					// 获取该 `Address` 的 `PrivateKey`
+					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
+						hold(secret)
+					}
+				}
+			}
 		}
 		
 		fun getCurrentAddresses(hold: (List<String>) -> Unit) {

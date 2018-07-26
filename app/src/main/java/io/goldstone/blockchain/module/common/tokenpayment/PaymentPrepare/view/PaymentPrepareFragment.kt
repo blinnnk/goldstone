@@ -25,7 +25,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -36,7 +35,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	
-	val address by lazy { arguments?.getString(ArgumentKey.paymentAddress) }
+	val address by lazy {
+		arguments?.getString(ArgumentKey.paymentAddress)
+	}
 	val count by lazy {
 		arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0)
 	}
@@ -62,58 +63,16 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				verticalLayout {
 					gravity = Gravity.CENTER_HORIZONTAL
 					lparams(matchParent, matchParent)
-					addView(inputView.apply {
-						if (count > 0) {
-							setInputValue(count)
-						}
-					})
 					
-					TopBottomLineCell(context).apply {
-						layoutParams =
-							LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 150.uiPX()).apply {
-								topMargin = 10.uiPX()
-							}
-						setTitle(PrepareTransferText.accountInfo)
-						
-						sendInfo.apply {
-							setTitle(PrepareTransferText.send)
-							setSubtitle(CryptoUtils.scaleMiddleAddress(address?.toUpperCase().orEmpty()))
-						}.into(this)
-						
-						from.apply {
-							setTitle(PrepareTransferText.from)
-						}.into(this)
-						
-						setFromAddress()
-					}.into(this)
+					inputView.into(this)
 					
-					TopBottomLineCell(context).apply {
-						layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
-						setTitle(PrepareTransferText.memoInformation)
-						memo.apply {
-							setTitle(PrepareTransferText.memo)
-							setSubtitle(PrepareTransferText.addAMemo)
-							showArrow()
-							addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
-						}.click {
-							container.showMemoInputView {
-								if (it.isNotEmpty()) {
-									memoData = it
-									memo.setSubtitle(it)
-								} else {
-									memo.setSubtitle(PrepareTransferText.addAMemo)
-								}
-							}
-						}.into(this)
-					}.into(this)
+					showAccountInfo()
+					// `BTC` 不支持链上 `Memo` 所以判断是否显示 `Memo` 设置的入口
+					if (!rootFragment?.token?.symbol.equals(CryptoSymbol.btc, true)) {
+						showMemoCell()
+					}
 					
-					TopBottomLineCell(context).apply {
-						layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
-						setTitle(PrepareTransferText.currentPrice)
-						price.apply {
-							setTitle(PrepareTransferText.price)
-						}.into(this)
-					}.into(this)
+					showUnitPrice()
 					
 					confirmButton.apply {
 						setGrayStyle(20.uiPX())
@@ -129,6 +88,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 					}.into(this)
 					// 扫描二维码进入后的样式判断
 					if (count > 0) {
+						inputView.setInputValue(count)
 						confirmButton.setBlueStyle(20.uiPX())
 					}
 				}
@@ -150,26 +110,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		inputView.setFoucs()
 	}
 	
-	private fun setFromAddress() {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				from.setSubtitle(
-					CryptoUtils.scaleMiddleAddress(
-						when (rootFragment?.token?.symbol) {
-							CryptoSymbol.btc -> {
-								if (Config.isTestEnvironment()) currentBTCTestAddress
-								else currentBTCAddress
-							}
-							
-							CryptoSymbol.etc -> currentETCAddress
-							else -> currentETHAndERCAddress
-						}
-					)
-				)
-			}
-		}
-	}
-	
 	fun getMemoContent(): String {
 		return memoData
 	}
@@ -178,17 +118,80 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		return if (inputView.getValue().isEmpty()) 0.0 else inputView.getValue().toDouble()
 	}
 	
-	private fun resetBackButtonEvent() {
-		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
-		rootFragment?.apply {
-			overlayView.header.showBackButton(true) {
-				if (memoInputView.isNull()) {
-					setValueHeader(token)
-					presenter.popFragmentFrom<PaymentPrepareFragment>()
-				} else {
-					removeMemoInputView()
-				}
+	fun setSymbolAndPrice(symbol: String, price: String) {
+		this.inputView.setHeaderSymbol(symbol)
+		this.price.setSubtitle(price)
+	}
+	
+	override fun setBaseBackEvent(
+		activity: MainActivity?,
+		parent: Fragment?
+	) {
+		if (memoInputView.isNull()) {
+			getParentFragment<TokenDetailOverlayFragment>()?.let {
+				presenter.backEvent(it)
 			}
+		} else {
+			removeMemoInputView()
+		}
+	}
+	
+	private fun LinearLayout.showMemoCell() {
+		TopBottomLineCell(context).apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			setTitle(PrepareTransferText.memoInformation)
+			memo.apply {
+				setTitle(PrepareTransferText.memo)
+				setSubtitle(PrepareTransferText.addAMemo)
+				showArrow()
+				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
+			}.click {
+				container.showMemoInputView {
+					if (it.isNotEmpty()) {
+						memoData = it
+						memo.setSubtitle(it)
+					} else {
+						memo.setSubtitle(PrepareTransferText.addAMemo)
+					}
+				}
+			}.into(this)
+		}.into(this)
+	}
+	
+	private fun LinearLayout.showAccountInfo() {
+		TopBottomLineCell(context).apply {
+			layoutParams =
+				LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 150.uiPX()).apply {
+					topMargin = 10.uiPX()
+				}
+			setTitle(PrepareTransferText.accountInfo)
+			
+			sendInfo.apply {
+				setTitle(PrepareTransferText.send)
+				setSubtitle(CryptoUtils.scaleMiddleAddress(address.orEmpty()))
+			}.into(this)
+			
+			from.apply {
+				setTitle(PrepareTransferText.from)
+			}.into(this)
+			
+			setFromAddress()
+		}.into(this)
+	}
+	
+	private fun LinearLayout.showUnitPrice() {
+		TopBottomLineCell(context).apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			setTitle(PrepareTransferText.currentPrice)
+			price.apply {
+				setTitle(PrepareTransferText.price)
+			}.into(this)
+		}.into(this)
+	}
+	
+	private fun setFromAddress() {
+		presenter.getFromAddress {
+			from.setSubtitle(CryptoUtils.scaleMiddleAddress(it))
 		}
 	}
 	
@@ -229,21 +232,17 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 	
-	fun setSymbolAndPrice(symbol: String, price: String) {
-		this.inputView.setHeaderSymbol(symbol)
-		this.price.setSubtitle(price)
-	}
-	
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
-		if (memoInputView.isNull()) {
-			getParentFragment<TokenDetailOverlayFragment>()?.let {
-				presenter.backEvent(it)
+	private fun resetBackButtonEvent() {
+		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
+		rootFragment?.apply {
+			overlayView.header.showBackButton(true) {
+				if (memoInputView.isNull()) {
+					setValueHeader(token)
+					presenter.popFragmentFrom<PaymentPrepareFragment>()
+				} else {
+					removeMemoInputView()
+				}
 			}
-		} else {
-			removeMemoInputView()
 		}
 	}
 }

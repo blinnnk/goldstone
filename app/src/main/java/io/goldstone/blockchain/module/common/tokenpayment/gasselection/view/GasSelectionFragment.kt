@@ -15,9 +15,12 @@ import io.goldstone.blockchain.common.component.ExplanationTitle
 import io.goldstone.blockchain.common.component.GraySqualCell
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.confirmTransfer
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.transferBTC
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
@@ -69,8 +72,18 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 					getConfirmButton {
 						onClick {
 							showLoadingStatus()
-							presenter.confirmTransfer(footer) {
-								showLoadingStatus(false, Spectrum.white, CommonText.next)
+							if (presenter.isBTC()) {
+								presenter.transferBTC {
+									BTCJsonRPC.sendRawTransaction(
+										Config.isTestEnvironment(),
+										it.signedMessage
+									) {
+									}
+								}
+							} else {
+								presenter.confirmTransfer(footer) {
+									showLoadingStatus(false, Spectrum.white, CommonText.next)
+								}
 							}
 						}
 					}

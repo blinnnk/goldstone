@@ -882,6 +882,16 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
+	val satoshiValue = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Satoshi Value"
+		HoneyLanguage.Chinese.code -> "Satoshi Value"
+		HoneyLanguage.Japanese.code -> "Satoshi Value"
+		HoneyLanguage.Korean.code -> "Satoshi Value"
+		HoneyLanguage.Russian.code -> "Satoshi Value"
+		HoneyLanguage.TraditionalChinese.code -> "Satoshi Value"
+		else -> ""
+	}
+	@JvmField
 	val noMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't a memo."
 		HoneyLanguage.Chinese.code -> "没有备注信息"

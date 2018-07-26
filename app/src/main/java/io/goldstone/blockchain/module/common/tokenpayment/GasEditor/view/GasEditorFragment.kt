@@ -4,9 +4,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -29,82 +27,90 @@ import org.jetbrains.anko.verticalLayout
  * @date 2018/5/8 3:22 PM
  * @author KaySaith
  */
-
 class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
-
-	val minLimit by lazy { arguments?.getLong(ArgumentKey.gasLimit) }
+	
+	val isBTC by lazy {
+		arguments?.getBoolean(ArgumentKey.isBTC).orFalse()
+	}
+	val getGasSize: () -> Long? = {
+		arguments?.getLong(ArgumentKey.gasSize)
+	}
 	private val gasPriceInput by lazy { RoundInput(context!!) }
 	private val gasLimitInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val speedLevelBar by lazy { GasSpeedLevelBar(context!!) }
-
 	override val presenter = GasEditorPresenter(this)
-
+	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-
+			
 			gasPriceInput.apply {
 				setNumberInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
-				title = TransactionText.gasPrice
+				title = TransactionText.satoshiValue
 			}.into(this)
-
-			gasLimitInput.apply {
-				setNumberInput()
-				hint = minLimit.toString()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-				title = TransactionText.gasLimit
-			}.into(this)
-
+			// 只有 `ETH ERC20 or ETC` 才有 `GasLimit` 的概念
+			if (!isBTC) {
+				gasLimitInput.apply {
+					setNumberInput()
+					hint = getGasSize().toString()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+					title = TransactionText.gasLimit
+				}.into(this)
+			}
+			
 			speedLevelBar.apply {
 				setMargins<RelativeLayout.LayoutParams> { topMargin = 30.uiPX() }
 			}.into(this)
-
+			
 			confirmButton.apply {
 				text = CommonText.confirm
 				setBlueStyle(20.uiPX())
 			}.click {
-				presenter.confirmGasCustom(gasPrice, gasLimit)
+				presenter.confirmGasCustom(gasPrice, dataSize)
 			}.into(this)
-
 			setProcessValue()
 		}
 	}
-
-	private var fast = MinerFeeType.Fast.value * 21000
-	private val currentValue: (gasPrice: Long, gasLimit: Long) -> Double = { gasPrice, gasLimit ->
-		(gasPrice * gasLimit) / fast.toDouble()
+	
+	private val currentValue: (
+		gasPrice: Long,
+		gasSize: Long
+	) -> Double = { gasPrice, gasSize ->
+		val fast = MinerFeeType.Fast.value * gasSize
+		val btcFast = MinerFeeType.Fast.satoshi * gasSize
+		(gasPrice * gasSize) / (if (isBTC) btcFast else fast).toDouble()
 	}
-
 	private var gasPrice: Long by observing(0L) {
-		speedLevelBar.setProgressValue(currentValue(gasPrice, gasLimit))
+		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))
 	}
-
-	private var gasLimit: Long by observing(0L) {
-		speedLevelBar.setProgressValue(currentValue(gasPrice, gasLimit))
+	private var dataSize: Long by observing(0L) {
+		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))
 	}
-
+	
 	private fun setProcessValue() {
 		gasPriceInput.let { price ->
 			price.afterTextChanged = Runnable {
 				price.getContent {
-					gasPrice = if (it.isEmpty()) 0L
-					else it.toLong()
+					gasPrice = if (it.isEmpty()) 0L else it.toLong()
 				}
 			}
 		}
-		gasLimitInput.let { limit ->
-			limit.afterTextChanged = Runnable {
-				limit.getContent {
-					gasLimit = if (it.isEmpty()) 0L
-					else it.toLong()
+		if (isBTC) {
+			dataSize = getGasSize().orElse(0L)
+		} else {
+			gasLimitInput.let { limit ->
+				limit.afterTextChanged = Runnable {
+					limit.getContent {
+						dataSize = if (it.isEmpty()) 0L else it.toLong()
+					}
 				}
 			}
 		}
 	}
-
+	
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

@@ -18,3 +18,10 @@ data class PaymentPrepareModel(
 	val memo: String,
 	var gasPrice: BigInteger = BigInteger.ZERO
 ) : Serializable
+
+data class PaymentPrepareBTCModel(
+	val toAddress: String,
+	val fromAddress: String,
+	val value: Long,
+	val estimateFeePerByte: Long
+) : Serializable
