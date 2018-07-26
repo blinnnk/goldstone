@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter
 
+import android.support.v4.app.Fragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -11,6 +12,8 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.insertCustomBTCSatoshi
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.insertCustomGasData
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import java.io.Serializable
 
@@ -30,25 +33,40 @@ class GasEditorPresenter(
 			return
 		}
 		
-		if (gasLimit < fragment.minLimit ?: CryptoValue.ethMinGasLimit) {
+		if (gasLimit < fragment.getGasSize() ?: CryptoValue.ethMinGasLimit) {
 			fragment.context?.alert(
-				"${AlertText.gasLimitValue} ${fragment.minLimit ?: CryptoValue.ethMinGasLimit}"
+				"${AlertText.gasLimitValue} ${fragment.getGasSize() ?: CryptoValue.ethMinGasLimit}"
 			)
 			return
 		}
 		
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			childFragmentManager.fragments.forEach {
-				if (it is GasSelectionFragment) {
-					MinerFeeType.Custom.value = gasPrice
-					it.arguments?.putSerializable(
-						ArgumentKey.gasEditor,
-						GasFee(gasLimit, gasPrice)
-					)
-					it.presenter.insertCustomGasData()
-				}
+				it.updateGasSelectionList(gasLimit, gasPrice)
 				presenter.popFragmentFrom<GasEditorFragment>()
 				headerTitle = TokenDetailText.paymentValue
+			}
+		}
+	}
+	
+	private fun Fragment.updateGasSelectionList(gasLimit: Long, gasPrice: Long) {
+		if (fragment.isBTC) {
+			if (this is GasSelectionFragment) {
+				MinerFeeType.Custom.satoshi = gasPrice
+				arguments?.putSerializable(
+					ArgumentKey.gasEditor,
+					GasFee(gasLimit, gasPrice)
+				)
+				presenter.insertCustomBTCSatoshi()
+			}
+		} else {
+			if (this is GasSelectionFragment) {
+				MinerFeeType.Custom.value = gasPrice
+				arguments?.putSerializable(
+					ArgumentKey.gasEditor,
+					GasFee(gasLimit, gasPrice)
+				)
+				presenter.insertCustomGasData()
 			}
 		}
 	}

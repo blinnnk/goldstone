@@ -159,6 +159,10 @@ fun Double.toBTCCount(): Double {
 	return this / 100000000.0
 }
 
+fun Double.toSatoshi(): Long {
+	return (this * 100000000.0).toLong()
+}
+
 fun Long.toBTCCount(): Double {
 	return this / 100000000.0
 }

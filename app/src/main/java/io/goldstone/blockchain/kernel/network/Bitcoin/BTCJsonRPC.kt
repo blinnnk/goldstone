@@ -50,4 +50,61 @@ object BTCJsonRPC {
 			}
 		}
 	}
+	
+	fun getCurrentBlockHeight(
+		isTest: Boolean,
+		hold: (Int?) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareJsonRPC(
+				isTest,
+				BitcoinMethod.Getblockcount.method,
+				1,
+				false,
+				false,
+				null
+			)
+		).let {
+			RequisitionUtil.callChainBy(
+				it,
+				{ error, reason ->
+					LogUtil.error("getblockHeight $reason", error)
+				},
+				if (isTest) ChainText.btcTest else ChainText.btcMain
+			) {
+				hold(if (it.isNotEmpty()) it.toInt() else null)
+			}
+		}
+	}
+	
+	fun sendRawTransaction(
+		isTest: Boolean,
+		signedMessage: String,
+		hold: (String?) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareJsonRPC(
+				isTest,
+				BitcoinMethod.SendRawtTansaction.method,
+				1,
+				false,
+				false,
+				signedMessage,
+				true // anyone can pay by this signed message
+			)
+		).let {
+			RequisitionUtil.callChainBy(
+				it,
+				{ error, reason ->
+					LogUtil.error("SendRawtTansaction $reason", error)
+				},
+				if (isTest) ChainText.btcTest else ChainText.btcMain
+			) {
+				// Return Transaction hash
+				hold(if (it.isNotEmpty()) it else null)
+			}
+		}
+	}
 }

@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.utils.toGWeiValue
-import io.goldstone.blockchain.crypto.utils.toGasValue
-import io.goldstone.blockchain.crypto.utils.toGwei
-import io.goldstone.blockchain.crypto.utils.toUnitValue
+import io.goldstone.blockchain.crypto.utils.*
 
 /**
  * @date 2018/5/16 11:37 PM
@@ -36,6 +33,20 @@ data class GasSelectionModel(
 		unitSymbol
 	)
 	
+	constructor(
+		id: Int,
+		price: Long, // Satoshi
+		bytes: Int,
+		currentType: String
+	) : this(
+		id,
+		"${(price * bytes).toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		"≈ $price Satoshi  * $bytes bytes",
+		calculateBTCType(id, price),
+		currentType,
+		CryptoSymbol.btc
+	)
+	
 	companion object {
 		fun calculateType(id: Int, gWei: Double): String {
 			return if (id == 3) MinerFeeType.Custom.content
@@ -44,6 +55,18 @@ data class GasSelectionModel(
 					MinerFeeType.Cheap.value -> MinerFeeType.Cheap.content
 					MinerFeeType.Fast.value -> MinerFeeType.Fast.content
 					MinerFeeType.Recommend.value -> MinerFeeType.Recommend.content
+					else -> MinerFeeType.Custom.content
+				}
+			}
+		}
+		
+		fun calculateBTCType(id: Int, satoshi: Long): String {
+			return if (id == 3) MinerFeeType.Custom.content
+			else {
+				when (satoshi) {
+					MinerFeeType.Cheap.satoshi -> MinerFeeType.Cheap.content
+					MinerFeeType.Fast.satoshi -> MinerFeeType.Fast.content
+					MinerFeeType.Recommend.satoshi -> MinerFeeType.Recommend.content
 					else -> MinerFeeType.Custom.content
 				}
 			}

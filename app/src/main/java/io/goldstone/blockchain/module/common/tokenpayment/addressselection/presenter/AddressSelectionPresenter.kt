@@ -89,41 +89,77 @@ class AddressSelectionPresenter(
 		address: String,
 		count: Double = 0.0
 	) {
+		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
 		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
 			localAddresses.any { it.equals(address, true) } isTrue {
-				fragment.alert(
+				alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle
 				) {
-					yesButton {
-						goToPaymentPrepareFragment(address, count)
-					}
-					noButton { }
-				}.show()
+					goToPaymentPrepareFragment(address, count)
+				}
 			} otherwise {
 				goToPaymentPrepareFragment(address, count)
 			}
 		}
-		
+		// 检查地址是否合规
 		when (isValidMultiChainAddress(address)) {
 			null -> {
 				fragment.context?.alert(ImportWalletText.addressFromatAlert)
 				return
 			}
 			
-			AddressType.ETHERCOrETC ->
+			AddressType.ETHERCOrETC -> {
+				if (token?.symbol.equals(CryptoSymbol.btc, true)) {
+					fragment.context.alert(
+						"this is not a valid bitcoin address"
+					)
+					return
+				}
+				
 				WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
-			AddressType.BTC ->
+			}
+			
+			AddressType.BTC -> {
+				if (Config.isTestEnvironment()) {
+					fragment.context.alert(
+						"this is a mainnet address, please switch your local net " +
+						"setting in settings first"
+					)
+					return
+				}
 				WalletTable.getAllBTCMainnetAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
-			AddressType.BTCTest ->
+			}
+			
+			AddressType.BTCTest -> {
+				if (!Config.isTestEnvironment()) {
+					fragment.context.alert(
+						"this is a testnet address, please switch your local net " +
+						"setting in settings first"
+					)
+					return
+				}
 				WalletTable.getAllBTCTestnetAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
+			}
 		}
+	}
+	
+	private fun alert(title: String, subtitle: String, callback: () -> Unit) {
+		fragment.alert(
+			title,
+			subtitle
+		) {
+			yesButton {
+				callback()
+			}
+			noButton { }
+		}.show()
 	}
 	
 	private fun goToPaymentPrepareFragment(

@@ -4,10 +4,9 @@ import android.widget.EditText
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.getPrivateKey
-import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.jetbrains.anko.doAsync
@@ -77,25 +76,7 @@ class PrivateKeyExportPresenter(
 		}
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
 		address?.let { address ->
-			WalletTable.getCurrentWallet {
-				it?.apply {
-					// 解析当前地址的 `Address Index`
-					val addressIndex = if (btcAddresses.contains(",")) {
-						btcAddresses.split(",").find {
-							it.contains(address)
-						}?.substringAfter("|")?.toInt()
-					} else {
-						btcAddresses.substringAfter("|").toInt()
-					}
-					// 生成对应的 `Path`
-					val targetPath = btcPath.substringBeforeLast("/") + "/" + addressIndex
-					val mnemonicCode = JavaKeystoreUtil().decryptData(encryptMnemonic!!)
-					// 获取该 `Address` 的 `PrivateKey`
-					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
-						hold(secret)
-					}
-				}
-			}
+			WalletTable.getBTCPrivateKey(address, Config.isTestEnvironment(), hold)
 		}
 	}
 }
