@@ -47,6 +47,11 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 					preventDuplicateClicks()
 				}
 			}
+			priceAlarmClockListButton.apply {
+				onClick {
+					presenter.showQuotationManagement()
+				}
+			}
 		}
 	}
 	

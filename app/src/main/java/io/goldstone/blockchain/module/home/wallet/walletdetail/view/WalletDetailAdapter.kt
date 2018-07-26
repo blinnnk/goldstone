@@ -17,47 +17,47 @@ import org.jetbrains.anko.matchParent
  * @author KaySaith
  */
 class WalletDetailAdapter(
-	override val dataSet: ArrayList<WalletDetailCellModel>,
-	private val holdCell: WalletDetailCell.() -> Unit,
-	private val holdHeader: WalletDetailHeaderView.() -> Unit
+  override val dataSet: ArrayList<WalletDetailCellModel>,
+  private val holdCell: WalletDetailCell.() -> Unit,
+  private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
-	
-	override fun generateCell(context: Context) =
-		WalletDetailCell(context)
-	
-	private var hasHiddenSoftNavigationBar = false
-	override fun generateFooter(context: Context) =
-		View(context).apply {
-			val barHeight =
-				if (
-					(!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
-					|| Config.isNotchScreen()
-				) {
-					60.uiPX()
-				} else 10.uiPX()
-			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
-		}
-	
-	override fun generateHeader(context: Context) =
-		WalletDetailHeaderView(context).apply {
-			/**
-			 * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
-			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
-			 */
-			keyboardHeightListener {
-				if (it < 0) {
-					hasHiddenSoftNavigationBar = true
-				}
-			}
-			holdHeader(this)
-		}
-	
-	override fun WalletDetailCell.bindCell(
-		data: WalletDetailCellModel,
-		position: Int
-	) {
-		model = data
-		holdCell(this)
-	}
+  HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
+
+  override fun generateCell(context: Context) =
+    WalletDetailCell(context)
+
+  private var hasHiddenSoftNavigationBar = false
+  override fun generateFooter(context: Context) =
+    View(context).apply {
+      val barHeight =
+        if (
+          (!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
+          || Config.isNotchScreen()
+        ) {
+          60.uiPX()
+        } else 10.uiPX()
+      layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
+    }
+
+  override fun generateHeader(context: Context) =
+    WalletDetailHeaderView(context).apply {
+      /**
+       * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
+       * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
+       */
+      keyboardHeightListener {
+        if (it < 0) {
+          hasHiddenSoftNavigationBar = true
+        }
+      }
+      holdHeader(this)
+    }
+
+  override fun WalletDetailCell.bindCell(
+    data: WalletDetailCellModel,
+    position: Int
+  ) {
+    model = data
+    holdCell(this)
+  }
 }
