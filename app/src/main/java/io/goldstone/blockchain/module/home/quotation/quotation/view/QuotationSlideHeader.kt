@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -57,9 +58,10 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 
     priceAlarmClockListButton.apply {
       title = QuotationText.priceAlarmClockList
-      src = R.drawable.avatar_1
+      src = R.drawable.avatar_koala
       x -= PaddingSize.device
       y = 15.uiPX().toFloat()
+      visibility = View.GONE
     }.into(this)
 
     priceAlarmClockListButton.apply {
