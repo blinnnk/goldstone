@@ -17,61 +17,67 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationModel>() {
-	
-	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
-	override val presenter = QuotationPresenter(this)
-	
-	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<QuotationModel>?
-	) {
-		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
-			onClick {
-				presenter.showMarketTokenDetailFragment(model)
-				preventDuplicateClicks()
-			}
-		}
-	}
-	
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
-		super.onViewCreated(view, savedInstanceState)
-		wrapper.addView(slideHeader)
-		
-		slideHeader.apply {
-			addTokenButton.apply {
-				onClick {
-					presenter.showQuotationManagement()
-					preventDuplicateClicks()
-				}
-			}
-		}
-	}
-	
-	override fun emptyClickEvent() {
-		presenter.showQuotationManagement()
-	}
-	
-	private var isShow = false
-	private val headerHeight = 50.uiPX()
-	
-	override fun observingRecyclerViewVerticalOffset(
-		offset: Int,
-		range: Int
-	) {
-		if (offset >= headerHeight && !isShow) {
-			slideHeader.onHeaderShowedStyle()
-			isShow = true
-		}
-		if (offset < headerHeight && isShow) {
-			slideHeader.onHeaderHidesStyle()
-			isShow = false
-		}
-	}
-	
-	override fun setBackEvent(mainActivity: MainActivity?) {
-		mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
-	}
+
+  private val slideHeader by lazy { QuotationSlideHeader(context!!) }
+  override val presenter = QuotationPresenter(this)
+
+  override fun setRecyclerViewAdapter(
+    recyclerView: BaseRecyclerView,
+    asyncData: ArrayList<QuotationModel>?
+  ) {
+    recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
+      onClick {
+        presenter.showMarketTokenDetailFragment(model)
+        preventDuplicateClicks()
+      }
+    }
+  }
+
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?
+  ) {
+    super.onViewCreated(view, savedInstanceState)
+    wrapper.addView(slideHeader)
+
+    slideHeader.apply {
+      addTokenButton.apply {
+        onClick {
+          presenter.showQuotationManagement()
+          preventDuplicateClicks()
+        }
+      }
+      priceAlarmClockListButton.apply {
+        onClick {
+          presenter.showPriceAlarmManagement()
+          preventDuplicateClicks()
+        }
+      }
+    }
+  }
+
+  override fun emptyClickEvent() {
+    presenter.showQuotationManagement()
+  }
+
+  private var isShow = false
+  private val headerHeight = 50.uiPX()
+
+  override fun observingRecyclerViewVerticalOffset(
+    offset: Int,
+    range: Int
+  ) {
+    if (offset >= headerHeight && !isShow) {
+      slideHeader.onHeaderShowedStyle()
+      isShow = true
+    }
+    if (offset < headerHeight && isShow) {
+      slideHeader.onHeaderHidesStyle()
+      isShow = false
+    }
+  }
+
+  override fun setBackEvent(mainActivity: MainActivity?) {
+    mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
+  }
 }
