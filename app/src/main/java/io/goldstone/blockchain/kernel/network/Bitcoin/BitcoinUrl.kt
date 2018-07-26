@@ -16,6 +16,9 @@ object BitcoinUrl {
 	val getUnspentInfo: (header: String, address: String) -> String = { header, address ->
 		"$header/unspent?active=$address"
 	}
+	val getTransactions: (header: String, address: String) -> String = { header, address ->
+		"$header/rawaddr/$address"
+	}
 }
 
 object BitcoinRPC {

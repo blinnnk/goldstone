@@ -22,6 +22,9 @@ object FragmentTag {
 	const val notification = "notification"
 	const val tokenManagement = "tokenManagement"
 	const val tokenDetail = "tokenDetail"
+	const val etcTransactions = "etcTransactions"
+	const val btcTransactions = "btcTransactions"
+	const val ethERC20Transactions = "ethERC20Transactions"
 }
 
 object LogTag {

@@ -4,6 +4,7 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -23,6 +24,29 @@ object BitcoinApi {
 		) {
 			val count = JSONObject(this[0]).safeGet("final_balance").toLongOrNull() ?: 0L
 			hold(count)
+		}
+	}
+	
+	fun getBTCTransactions(
+		address: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (List<JSONObject>) -> Unit
+	) {
+		RequisitionUtil.requestUncryptoData<String>(
+			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl, address),
+			"txs",
+			true,
+			{
+				errorCallback(it)
+				LogUtil.error("getBTCTransactions", it)
+			}
+		) {
+			val jsonArray = JSONArray(this[0])
+			var data = listOf<JSONObject>()
+			(0 until jsonArray.length()).forEach {
+				data += JSONObject(jsonArray[it].toString())
+			}
+			hold(data)
 		}
 	}
 	

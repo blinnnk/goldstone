@@ -26,7 +26,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
 		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
 		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
-		(SupportCurrencyTable::class)],
+		(SupportCurrencyTable::class), (BitcoinTransactionTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )
@@ -42,6 +42,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun notificationDao(): NotificationDao
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
+	abstract fun bitcoinTransactionDao(): BitcoinTransactionDao
 	
 	companion object {
 		const val databaseVersion = 3
