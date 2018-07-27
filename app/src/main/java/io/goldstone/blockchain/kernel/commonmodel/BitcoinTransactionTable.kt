@@ -2,6 +2,8 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
+import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -121,6 +123,18 @@ data class BitcoinTransactionTable(
 			return changeAddress
 		}
 		
+		fun getTransactionsByAddress(
+			address: String,
+			hold: (List<BitcoinTransactionTable>) -> Unit
+		) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.bitcoinTransactionDao().getDataByAddress(address)
+				}) {
+				hold(it)
+			}
+		}
+		
 		private fun getFeeSatoshi(data: JSONObject, myAddress: String): String {
 			val inputs = JSONArray(data.safeGet("inputs"))
 			var totalValue = 0L
@@ -142,6 +156,9 @@ interface BitcoinTransactionDao {
 	
 	@Query("SELECT * FROM bitcoinTransactionList")
 	fun getAll(): List<BitcoinTransactionTable>
+	
+	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address")
+	fun getDataByAddress(address: String): List<BitcoinTransactionTable>
 	
 	@Insert
 	fun insert(table: BitcoinTransactionTable)
