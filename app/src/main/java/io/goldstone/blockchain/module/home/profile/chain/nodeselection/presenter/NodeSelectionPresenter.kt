@@ -40,8 +40,6 @@ class NodeSelectionPresenter(
 	fun updateBTCTestChainID(nodeName: String) {
 		Config.updateBTCCurrentChainName(nodeName)
 		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
-		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
-		// TODO 加密节点需求
 	}
 	
 	fun updateDatabaseThenJump(isMainnet: Boolean) {

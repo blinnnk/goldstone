@@ -6,8 +6,10 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -50,6 +52,23 @@ data class WalletTable(
 ) : Serializable {
 	
 	companion object {
+		
+		fun getAddressBySymbol(symbol: String?): String {
+			return when {
+				symbol.equals(CryptoSymbol.btc, true) -> {
+					if (Config.isTestEnvironment()) {
+						Config.getCurrentBTCTestAddress()
+					} else {
+						Config.getCurrentBTCAddress()
+					}
+				}
+				
+				symbol.equals(CryptoSymbol.etc, true) ->
+					Config.getCurrentETCAddress()
+				else ->
+					Config.getCurrentEthereumAddress()
+			}
+		}
 		
 		fun insert(
 			model: WalletTable,
@@ -158,8 +177,12 @@ data class WalletTable(
 					val targetPath = path.substringBeforeLast("/") + "/" + addressIndex
 					val mnemonicCode = JavaKeystoreUtil().decryptData(encryptMnemonic!!)
 					// 获取该 `Address` 的 `PrivateKey`
-					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
-						hold(secret)
+					try {
+						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
+							hold(secret)
+						}
+					} catch (error: Exception) {
+						LogUtil.error("getBTCPrivateKey", error)
 					}
 				}
 			}

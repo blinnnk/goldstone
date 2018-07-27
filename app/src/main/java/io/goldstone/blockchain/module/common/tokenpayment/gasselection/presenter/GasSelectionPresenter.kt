@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.os.Bundle
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
+import com.blinnnk.util.SoftKeyboard
+import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
@@ -23,6 +25,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -150,7 +154,7 @@ class GasSelectionPresenter(
 		return prepareModel?.count?.toBigDecimal() ?: BigDecimal.ZERO
 	}
 	
-	fun isBTC(): Boolean {
+	private fun isBTC(): Boolean {
 		return getToken()?.symbol.equals(CryptoSymbol.btc, true)
 	}
 	
@@ -184,6 +188,27 @@ class GasSelectionPresenter(
 			}) {
 			if (isBTC()) transferBTC(it?.text.toString(), callback)
 			else transfer(it?.text.toString(), callback)
+		}
+	}
+	
+	/**
+	 * 转账开始后跳转到转账监听界面
+	 */
+	fun goToTransactionDetailFragment(receiptModel: ReceiptModel) {
+		// 准备跳转到下一个界面
+		fragment.getParentFragment<TokenDetailOverlayFragment> {
+			// 如果有键盘收起键盘
+			activity?.apply { SoftKeyboard.hide(this) }
+			removeChildFragment(fragment)
+			
+			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+				putSerializable(ArgumentKey.transactionDetail, receiptModel)
+			}
+			overlayView.header.apply {
+				showBackButton(false)
+				showCloseButton(true)
+			}
+			headerTitle = TokenDetailText.transferDetail
 		}
 	}
 	

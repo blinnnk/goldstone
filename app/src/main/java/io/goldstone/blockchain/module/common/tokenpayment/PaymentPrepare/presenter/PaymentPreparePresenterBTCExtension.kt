@@ -7,9 +7,12 @@ import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.utils.toSatoshi
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/7/25 3:13 PM
@@ -42,13 +45,15 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	BTCJsonRPC.estimatesmartFee(chainName, 3) {
 		if (it.orZero() > 0) {
 			val feePerByte = it.orZero().toSatoshi() / 1000
-			getFromAddress {
-				PaymentPrepareBTCModel(
-					fragment.address.orEmpty(),
-					it,
-					count.toSatoshi(),
-					feePerByte
-				).let(hold)
+			PaymentPrepareBTCModel(
+				fragment.address.orEmpty(),
+				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				count.toSatoshi(),
+				feePerByte
+			).let {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(it)
+				}
 			}
 		}
 	}

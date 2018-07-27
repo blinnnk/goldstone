@@ -105,7 +105,7 @@ class TransactionListPresenter(
 	companion object {
 		
 		fun checkAddressNameInContacts(
-			transactions: ArrayList<TransactionListModel>,
+			transactions: List<TransactionListModel>,
 			callback: () -> Unit
 		) {
 			ContactTable.getAllContacts { contacts ->

@@ -2,15 +2,18 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.utils.toBTCCount
+import io.goldstone.blockchain.crypto.walletfile.WalletUtil
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -101,10 +104,13 @@ class TransactionDetailPresenter(
 		)
 	}
 	
-	fun getUnitSymbol(): String {
+	private fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return if (symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
-		else CryptoSymbol.eth
+		return when {
+			symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
+			symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+			else -> CryptoSymbol.eth
+		}
 	}
 	
 	fun showAddContactsButton(cell: TransactionDetailCell) {
@@ -166,6 +172,95 @@ class TransactionDetailPresenter(
 					webTitle, NotificationText.notification, argument
 				)
 			}
+		}
+	}
+	
+	// 根据传入转账信息类型, 来生成对应的更新界面的数据
+	fun TransactionDetailPresenter.generateModels(
+		receipt: Any? = null
+	): ArrayList<TransactionDetailModel> {
+		val minerFee =
+			if (data.isNull()) dataFromList?.minerFee
+			else "${data?.minnerFee} ${getUnitSymbol()}"
+		val timstamp =
+			data?.timestamp
+			?: notificationData?.timeStamp.orElse(0L)
+			?: dataFromList?.timeStamp?.toLong().orElse(0L)
+		val date = TimeUtils.formatDate(timstamp.toMillsecond())
+		val memo =
+			if (data?.memo.isNull()) TransactionText.noMemo
+			else data?.memo
+		val receiptData = when (receipt) {
+			is TransactionListModel -> {
+				arrayListOf(
+					receipt.minerFee,
+					receipt.memo,
+					if (receipt.isReceived) receipt.targetAddress
+					else WalletUtil.getAddressBySymbol(receipt.symbol),
+					if (receipt.isReceived) WalletUtil.getAddressBySymbol(receipt.symbol)
+					else receipt.targetAddress,
+					receipt.transactionHash,
+					receipt.blockNumber,
+					receipt.date,
+					receipt.url
+				)
+			}
+			
+			is TransactionTable -> {
+				arrayListOf(
+					minerFee,
+					memo,
+					if (receipt.isReceive) receipt.to else WalletUtil.getAddressBySymbol(receipt.symbol),
+					if (receipt.isReceive) WalletUtil.getAddressBySymbol(receipt.symbol) else receipt.to,
+					currentHash,
+					receipt.blockNumber,
+					date,
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+				)
+			}
+			
+			is BitcoinTransactionTable -> {
+				arrayListOf(
+					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+					memo,
+					receipt.fromAddress,
+					receipt.to,
+					currentHash,
+					receipt.blockNumber,
+					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),
+					TransactionListModel.generateTransactionURL(currentHash, CryptoSymbol.btc)
+				)
+			}
+			
+			else -> {
+				arrayListOf(
+					minerFee,
+					memo,
+					WalletUtil.getAddressBySymbol(data?.token?.symbol ?: notificationData?.symbol.orEmpty()),
+					data?.toAddress.orEmpty(),
+					currentHash,
+					"Waiting...",
+					date,
+					TransactionListModel.generateTransactionURL(
+						currentHash,
+						data?.token?.symbol ?: notificationData?.symbol
+					)
+				)
+			}
+		}
+		arrayListOf(
+			TransactionText.minerFee,
+			TransactionText.memo,
+			CommonText.from,
+			CommonText.to,
+			TransactionText.transactionHash,
+			TransactionText.blockNumber,
+			TransactionText.transactionDate,
+			TransactionText.url
+		).mapIndexed { index, it ->
+			TransactionDetailModel(receiptData[index].toString(), it)
+		}.let {
+			return it.toArrayList()
 		}
 	}
 	

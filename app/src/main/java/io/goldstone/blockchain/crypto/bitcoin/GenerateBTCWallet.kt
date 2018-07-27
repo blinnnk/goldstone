@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import org.bitcoinj.core.*
@@ -14,7 +13,7 @@ object BTCWalletUtils {
 	
 	fun getBitcoinWalletByMnemonic(
 		mnemonicCode: String,
-		path: String = DefaultPath.btcPath,
+		path: String,
 		hold: (address: String, secret: String) -> Unit
 	) {
 		val seed = Mnemonic.mnemonicToSeed(mnemonicCode, "")

@@ -2,18 +2,19 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
-import com.blinnnk.util.SoftKeyboard
-import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
@@ -22,7 +23,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -38,11 +38,25 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 ) {
 	when {
 	// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
-		token?.contract.equals(CryptoValue.ethContract, true)
-			or token?.contract.equals(CryptoValue.etcContract, true) -> {
+		token?.contract.equals(CryptoValue.ethContract, true) -> {
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
-				Config.getCurrentAddress(),
+				Config.getCurrentEthereumAddress(),
+				true,
+				{ error, reason ->
+					fragment.context?.apply {
+						GoldStoneDialog.chainError(reason, error, this)
+					}
+				}
+			) {
+				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
+			}
+		}
+		
+		token?.contract.equals(CryptoValue.etcContract, true) -> {
+			MyTokenTable.getBalanceWithContract(
+				token?.contract!!,
+				Config.getCurrentETCAddress(),
 				true,
 				{ error, reason ->
 					fragment.context?.apply {
@@ -59,7 +73,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			// 首先查询 `Token Balance` 余额
 			MyTokenTable.getBalanceWithContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentAddress(),
+				Config.getCurrentEthereumAddress(),
 				true,
 				{ error, reason ->
 					fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
@@ -68,7 +82,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				// 查询 `ETH` 余额
 				MyTokenTable.getBalanceWithContract(
 					CryptoValue.ethContract,
-					Config.getCurrentAddress(),
+					Config.getCurrentEthereumAddress(),
 					true,
 					{ error, reason ->
 						LogUtil.error("checkBalanceIsValid $reason", error)
@@ -89,7 +103,7 @@ fun GasSelectionPresenter.prepareToTransfer(
 	callback: () -> Unit
 ) {
 	checkBalanceIsValid(getToken()) {
-		fragment.context?.runOnUiThread {
+		GoldStoneAPI.context.runOnUiThread {
 			isTrue {
 				showConfirmAttentionView(footer, callback)
 			} otherwise {
@@ -118,11 +132,16 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
+private fun GasSelectionPresenter.getETHERC20OrETCAddress(): String {
+	return if (getToken()?.symbol.equals(CryptoSymbol.etc, true)) Config.getCurrentETCAddress()
+	else Config.getCurrentEthereumAddress()
+}
+
 fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 	doAsync {
 		// 获取当前账户的私钥
 		fragment.context?.getPrivateKey(
-			Config.getCurrentAddress(),
+			getETHERC20OrETCAddress(),
 			password,
 			{
 				callback()
@@ -173,10 +192,11 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 					// 主线程跳转到账目详情界面
 					fragment.context?.runOnUiThread {
 						goToTransactionDetailFragment(
-							toWalletAddress,
-							this@model,
-							countWithDecimal,
-							taxHash
+							prepareReceiptModel(
+								this@model,
+								countWithDecimal,
+								taxHash
+							)
 						)
 						callback()
 						fragment.showMaskView(false)
@@ -187,39 +207,21 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 	}
 }
 
-/**
- * 转账开始后跳转到转账监听界面
- */
-private fun GasSelectionPresenter.goToTransactionDetailFragment(
-	toWalletAddress: String,
+private fun GasSelectionPresenter.prepareReceiptModel(
 	raw: PaymentPrepareModel,
 	value: BigInteger,
 	taxHash: String
-) {
-	// 准备跳转到下一个界面
-	fragment.getParentFragment<TokenDetailOverlayFragment> {
-		// 如果有键盘收起键盘
-		activity?.apply { SoftKeyboard.hide(this) }
-		removeChildFragment(fragment)
-		val model = ReceiptModel(
-			toWalletAddress,
-			raw.gasLimit,
-			raw.gasPrice,
-			value,
-			token!!,
-			taxHash,
-			System.currentTimeMillis(),
-			prepareModel?.memo
-		)
-		addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-			putSerializable(ArgumentKey.transactionDetail, model)
-		}
-		overlayView.header.apply {
-			showBackButton(false)
-			showCloseButton(true)
-		}
-		headerTitle = TokenDetailText.transferDetail
-	}
+): ReceiptModel {
+	return ReceiptModel(
+		raw.fromAddress,
+		raw.toWalletAddress,
+		(raw.gasLimit * raw.gasPrice).toDouble().toEthCount().toBigDecimal().toString(),
+		value,
+		getToken()!!,
+		taxHash,
+		System.currentTimeMillis(),
+		prepareModel?.memo
+	)
 }
 
 fun GasSelectionPresenter.prepareGasLimit(gasPrice: Long): Long {
@@ -274,14 +276,14 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			symbol = token!!.symbol
 			timeStamp =
 				(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
-			fromAddress = Config.getCurrentAddress()
+			fromAddress = getETHERC20OrETCAddress()
 			this.value = CryptoUtils
 				.toCountByDecimal(value.toDouble(), token!!.decimal).formatCount()
 			hash = taxHash
 			gasPrice = getSelectedGasPrice(currentMinerType).toString()
 			gasUsed = raw.gasLimit.toString()
 			isPending = true
-			recordOwnerAddress = Config.getCurrentAddress()
+			recordOwnerAddress = getETHERC20OrETCAddress()
 			tokenReceiveAddress = toWalletAddress
 			isERC20Token = token!!.symbol == CryptoSymbol.eth
 			nonce = raw.nonce.toString()

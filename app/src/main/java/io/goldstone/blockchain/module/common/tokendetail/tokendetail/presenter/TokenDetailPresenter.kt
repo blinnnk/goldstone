@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -25,6 +26,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.bitcointransactionlistPresenter.BitcoinTransactionListPresenter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter.ClassicTransactionListPresenter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
@@ -39,7 +41,7 @@ class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 	
-	private var allData: ArrayList<TransactionListModel>? = null
+	private var allData: List<TransactionListModel>? = null
 	private val token by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 	}
@@ -83,7 +85,7 @@ class TokenDetailPresenter(
 	
 	fun showAllData() {
 		allData?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it)
+			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
 	}
 	
@@ -121,54 +123,107 @@ class TokenDetailPresenter(
 	}
 	
 	private var hasUpdateETCData = false
+	private var hasUpdateBTCData = false
 	private var hasUpdateERCData = false
 	
 	private fun TokenDetailFragment.loadDataFromChain() {
-		if (token?.symbol.equals(CryptoSymbol.etc, true)) {
-			if (!hasUpdateETCData) loadETCChainData()
-			hasUpdateETCData = true
-		} else {
-			if (!hasUpdateERCData) loadERCChainData()
-			hasUpdateERCData = true
+		when {
+			token?.symbol.equals(CryptoSymbol.etc, true) -> {
+				if (!hasUpdateETCData) loadETCChainData()
+				hasUpdateETCData = true
+			}
+			
+			token?.symbol.equals(CryptoSymbol.btc, true) -> {
+				if (!hasUpdateBTCData) loadBTCChainData()
+				hasUpdateBTCData = true
+			}
+			
+			else -> {
+				if (!hasUpdateERCData) loadERCChainData()
+				hasUpdateERCData = true
+			}
 		}
 	}
 	
 	private fun loadDataFromDatabaseOrElse(
 		withoutLocalDataCallback: () -> Unit = {}
 	) {
-		fun getDataByAddress(address: String) {
-			// 内存里面没有数据首先从本地数据库查询数据
-			TransactionTable.getCurrentChainByAddressAndContract(
-				address,
-				fragment.token?.contract.orEmpty(),
-				ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
-			) { transactions ->
-				transactions.isNotEmpty() isTrue {
-					fragment.updateChartBy(transactions, address)
-					fragment.removeLoadingView()
-				} otherwise {
-					withoutLocalDataCallback()
-					LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
-				}
-			}
-		}
-		
 		WalletTable.getWalletType {
 			when (it) {
 				WalletType.MultiChain -> {
-					if (token?.symbol.equals(CryptoSymbol.etc)) {
-						getDataByAddress(Config.getCurrentETCAddress())
-					} else {
-						getDataByAddress(Config.getCurrentEthereumAddress())
+					when {
+						token?.symbol.equals(CryptoSymbol.etc) -> getETHERC20OrETCData(
+							Config.getCurrentETCAddress(),
+							withoutLocalDataCallback
+						)
+						
+						token?.symbol.equals(CryptoSymbol.btc) -> {
+							if (Config.isTestEnvironment()) {
+								getBTCData(
+									Config.getCurrentBTCTestAddress(),
+									withoutLocalDataCallback
+								)
+							} else {
+								getBTCData(
+									Config.getCurrentBTCAddress(),
+									withoutLocalDataCallback
+								)
+							}
+						}
+						
+						else -> getETHERC20OrETCData(
+							Config.getCurrentEthereumAddress(),
+							withoutLocalDataCallback
+						)
 					}
 				}
 				
 				WalletType.ETHERCAndETCOnly ->
-					getDataByAddress(Config.getCurrentEthereumAddress())
+					getETHERC20OrETCData(
+						Config.getCurrentEthereumAddress(),
+						withoutLocalDataCallback
+					)
 				
 				else -> {
-					// TODO BTC and BTCTest Logic of Getting Transactions
+					// TODO BTC Type
 				}
+			}
+		}
+	}
+	
+	private fun getETHERC20OrETCData(
+		address: String,
+		callback: () -> Unit
+	) {
+		TransactionTable.getCurrentChainByAddressAndContract(
+			address,
+			fragment.token?.contract.orEmpty(),
+			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
+		) { transactions ->
+			transactions.isNotEmpty() isTrue {
+				fragment.updateChartBy(transactions, address)
+				fragment.removeLoadingView()
+			} otherwise {
+				callback()
+				LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
+			}
+		}
+	}
+	
+	private fun getBTCData(
+		address: String,
+		callback: () -> Unit
+	) {
+		BitcoinTransactionTable.getTransactionsByAddress(address) { transactions ->
+			transactions.isNotEmpty() isTrue {
+				fragment.updateChartBy(
+					transactions.map { TransactionListModel(it) }.sortedByDescending { it.timeStamp },
+					address
+				)
+				fragment.removeLoadingView()
+			} otherwise {
+				callback()
+				LogUtil.debug(this.javaClass.simpleName, "There isn't Bitcoin Local Data")
 			}
 		}
 	}
@@ -202,20 +257,34 @@ class TokenDetailPresenter(
 	
 	private fun TokenDetailFragment.loadETCChainData() {
 		showLoadingView(LoadingText.transactionData)
-		ClassicTransactionListPresenter
-			.getValidETCTransactionsFromChain(arrayListOf()) {
+		ClassicTransactionListPresenter.getETCTransactionsFromChain(arrayListOf()) {
+			fragment.removeLoadingView()
+			loadDataFromDatabaseOrElse()
+		}
+	}
+	
+	private fun TokenDetailFragment.loadBTCChainData() {
+		showLoadingView(LoadingText.transactionData)
+		BitcoinTransactionListPresenter.loadTransactionsFromChain(
+			BitcoinTransactionListPresenter.pageSize,
+			arrayListOf(),
+			{
 				fragment.removeLoadingView()
-				loadDataFromDatabaseOrElse()
+				// TODO ERROR Alert
 			}
+		) {
+			fragment.context?.runOnUiThread { fragment.removeLoadingView() }
+			loadDataFromDatabaseOrElse()
+		}
 	}
 	
 	private fun TokenDetailFragment.updateChartBy(
-		data: ArrayList<TransactionListModel>,
+		data: List<TransactionListModel>,
 		walletAddress: String
 	) {
 		allData = data
 		TransactionListPresenter.checkAddressNameInContacts(data) {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(data)
+			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
 				data.prepareTokenHistoryBalance(token?.contract!!, walletAddress) {
@@ -260,7 +329,7 @@ class TokenDetailPresenter(
 		}
 	}
 	
-	private fun ArrayList<TransactionListModel>.prepareTokenHistoryBalance(
+	private fun List<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: String,
 		walletAddress: String,
 		callback: (ArrayList<TokenBalanceTable>) -> Unit
@@ -293,7 +362,7 @@ class TokenDetailPresenter(
 	
 	data class DateBalance(val date: Long, val balance: Double)
 	
-	private fun ArrayList<TransactionListModel>.generateHistoryBalance(
+	private fun List<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,
 		callback: (ArrayList<DateBalance>) -> Unit
 	) {

@@ -1,11 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 
 /**
  * @date 2018/6/6 4:26 PM
@@ -18,47 +17,38 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 		fragment.asyncData = generateModels()
 		val headerData = TransactionHeaderModel(
 			count,
-			address,
+			toAddress,
 			token.symbol,
 			true
 		)
 		updateHeaderValue(headerData)
 		headerModel = headerData
-		observerTransaction()
+		if (token.symbol.equals(CryptoSymbol.btc, true)) {
+			observerBTCTransaction()
+		} else {
+			// 监听 `ETH, ERC20 or ETC` 的转账状态
+			observerTransaction()
+		}
 	}
 }
 
-// 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-fun TransactionDetailPresenter.getTransactionFromChain() {
-	GoldStoneEthCall.getTransactionByHash(
-		currentHash,
-		getCurrentChainName(),
-		errorCallback = { error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-		}
-	) {
-		fragment.context?.runOnUiThread {
-			fragment.asyncData?.clear()
-			fragment.asyncData?.addAll(generateModels(it))
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, 6)
-		}
-		// 成功获取数据后在异步线程更新数据库记录
-		updateDataInDatabase(it.blockNumber)
-	}
-}
-
-// 自动监听交易完成后, 将转账信息插入数据库
-private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String) {
-	GoldStoneDataBase.database.transactionDao().apply {
-		getTransactionByTaxHash(currentHash).let {
-			it.forEach {
-				update(it.apply {
-					this.blockNumber = blockNumber
-					isPending = false
-					hasError = "0"
-					txreceipt_status = "1"
-				})
+fun TransactionDetailPresenter.showConformationInterval(
+	intervalCount: Int
+) {
+	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
+		it?.apply {
+			headerModel?.let {
+				updateHeaderValue(it)
 			}
+			updateConformationBar(intervalCount)
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateConformationBarFinished() {
+	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
+		it?.apply {
+			updateConformationBar(CryptoValue.confirmBlockNumber)
 		}
 	}
 }

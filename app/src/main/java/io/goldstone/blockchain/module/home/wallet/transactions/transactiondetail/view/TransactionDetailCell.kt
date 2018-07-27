@@ -18,6 +18,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import org.jetbrains.anko.*
@@ -42,7 +43,11 @@ open class TransactionDetailCell(context: Context) : RelativeLayout(context) {
 					model.description.equals(CommonText.from, true)
 					|| model.description.equals(CommonText.to, true)
 				) {
-					CryptoUtils.scaleMiddleAddress(model.info, 18)
+					// 比特币地址大小写排版过长, 这里判断了一下
+					val isBTCDetail =
+						BTCUtils.isValidMainnetAddress(model.info) ||
+						BTCUtils.isValidTestnetAddress(model.info)
+					CryptoUtils.scaleMiddleAddress(model.info, if (isBTCDetail) 14 else 18)
 				} else {
 					model.info
 				}

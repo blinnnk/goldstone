@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONArray
@@ -62,6 +63,52 @@ object BitcoinApi {
 			}
 		) {
 			hold(if (isNotEmpty()) this else listOf())
+		}
+	}
+	
+	fun getTransactionByHash(
+		hash: String,
+		address: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (BitcoinTransactionTable?) -> Unit
+	) {
+		RequisitionUtil.requestUncryptoData<String>(
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl, hash),
+			"",
+			true,
+			{
+				errorCallback(it)
+				LogUtil.error("Bitcoin getTransactionByHash", it)
+			}
+		) {
+			hold(
+				if (isNotEmpty()) {
+					BitcoinTransactionTable(JSONObject(this[0]), address)
+				} else null
+			)
+		}
+	}
+	
+	fun getBlockNumberByTransactionHash(
+		hash: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (Int?) -> Unit
+	) {
+		RequisitionUtil.requestUncryptoData<String>(
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl, hash),
+			"",
+			true,
+			{
+				hold(null)
+				errorCallback(it)
+				LogUtil.error("getBlockNumberByTransactionHash", it)
+			}
+		) {
+			hold(
+				if (isNotEmpty()) {
+					JSONObject(this[0]).safeGet("block_height").toIntOrNull()
+				} else null
+			)
 		}
 	}
 }

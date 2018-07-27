@@ -15,9 +15,9 @@ import org.json.JSONObject
 data class BitcoinTransactionTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
-	val blockNumber: String,
-	val transactionIndex: Int,
-	val timeStamp: String,
+	var blockNumber: String,
+	var transactionIndex: Int,
+	var timeStamp: String,
 	val hash: String,
 	val fromAddress: String,
 	val to: String,
@@ -25,7 +25,8 @@ data class BitcoinTransactionTable(
 	val changeAddress: String,
 	val value: String,
 	val fee: String,
-	val size: String
+	var size: String,
+	var isPending: Boolean
 ) {
 	
 	constructor(
@@ -43,7 +44,8 @@ data class BitcoinTransactionTable(
 		getChangeAddress(data),
 		getTransactionValue(data, myAddress),
 		getFeeSatoshi(data, myAddress),
-		data.safeGet("size")
+		data.safeGet("size"),
+		false
 	)
 	
 	companion object {
@@ -129,10 +131,35 @@ data class BitcoinTransactionTable(
 		) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.bitcoinTransactionDao().getDataByAddress(address)
+					GoldStoneDataBase
+						.database
+						.bitcoinTransactionDao()
+						.getDataByAddress(address)
 				}) {
 				hold(it)
 			}
+		}
+		
+		fun updateLocalDataByHash(
+			hash: String,
+			newData: BitcoinTransactionTable,
+			isPending: Boolean
+		) {
+			GoldStoneDataBase
+				.database
+				.bitcoinTransactionDao()
+				.apply {
+					getTransactionByHash(hash)
+						?.let {
+							update(it.apply {
+								blockNumber = newData.blockNumber
+								transactionIndex = newData.transactionIndex
+								timeStamp = newData.timeStamp
+								size = newData.size
+								this.isPending = isPending
+							})
+						}
+				}
 		}
 		
 		private fun getFeeSatoshi(data: JSONObject, myAddress: String): String {
@@ -159,6 +186,9 @@ interface BitcoinTransactionDao {
 	
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address")
 	fun getDataByAddress(address: String): List<BitcoinTransactionTable>
+	
+	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash")
+	fun getTransactionByHash(hash: String): BitcoinTransactionTable?
 	
 	@Insert
 	fun insert(table: BitcoinTransactionTable)

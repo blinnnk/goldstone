@@ -25,6 +25,7 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -190,9 +191,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 	
 	private fun setFromAddress() {
-		presenter.getFromAddress {
-			from.setSubtitle(CryptoUtils.scaleMiddleAddress(it))
-		}
+		from.setSubtitle(
+			CryptoUtils.scaleMiddleAddress(
+				WalletTable.getAddressBySymbol(presenter.getToken()?.symbol)
+			)
+		)
 	}
 	
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
