@@ -14,6 +14,7 @@ import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
+import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
 import java.io.Serializable
 
 /**
@@ -94,8 +95,8 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		"",
-		data.fee,
-		"",
+		"${data.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		generateTransactionURL(data.hash, CryptoSymbol.btc),
 		false,
 		data.timeStamp,
 		data.value,
@@ -107,10 +108,12 @@ data class TransactionListModel(
 	
 	companion object {
 		fun generateTransactionURL(taxHash: String, symbol: String?): String {
-			return if (symbol.equals(CryptoSymbol.etc, true)) {
-				EtherScanApi.gasTrackerHeader(taxHash)
-			} else {
-				EtherScanApi.transactionDetail(taxHash)
+			return when {
+				symbol.equals(CryptoSymbol.etc, true) ->
+					EtherScanApi.gasTrackerHeader(taxHash)
+				symbol.equals(CryptoSymbol.btc, true) ->
+					bitcoinTransactionDetail(taxHash)
+				else -> EtherScanApi.transactionDetail(taxHash)
 			}
 		}
 		
