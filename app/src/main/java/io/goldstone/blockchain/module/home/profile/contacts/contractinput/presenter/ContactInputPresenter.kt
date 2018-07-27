@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContactText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
@@ -43,11 +44,22 @@ class ContactInputPresenter(
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddress?.let {
-				ethERCAndETCInput.setText(it)
-				// ToDO 从账单快捷添加地址的功能
-				btcMainnetInput.setText("btc")
-				btcTestnetInput.setText("btc test")
-				ethERCAndETCAddressText = it
+				when (BTCUtils.isValidMultiChainAddress(it)) {
+					AddressType.ETHERCOrETC -> {
+						ethERCAndETCInput.setText(it)
+						ethERCAndETCAddressText = it
+					}
+					
+					AddressType.BTC -> {
+						btcMainnetInput.setText(it)
+						btcMainnetAddressText = it
+					}
+					
+					AddressType.BTCTest -> {
+						btcTestnetInput.setText(it)
+						btcTestnetAddressText = it
+					}
+				}
 			}
 		}
 	}

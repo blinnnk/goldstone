@@ -112,7 +112,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		} else {
 			showPendingIcon(false)
 			if (!headerModel.isReceive) {
-				icon.iconColor = Spectrum.yellow
+				icon.iconColor = Spectrum.DarkYellow
 				icon.src = R.drawable.send_icon
 				icon.setColorFilter(GrayScale.Opacity5Black)
 			} else {

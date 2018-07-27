@@ -53,6 +53,7 @@ object BTCJsonRPC {
 	
 	fun getCurrentBlockHeight(
 		isTest: Boolean,
+		errorCallback: (Exception?) -> Unit,
 		hold: (Int?) -> Unit
 	) {
 		RequestBody.create(
@@ -69,6 +70,7 @@ object BTCJsonRPC {
 			RequisitionUtil.callChainBy(
 				it,
 				{ error, reason ->
+					errorCallback(error)
 					LogUtil.error("getblockHeight $reason", error)
 				},
 				if (isTest) ChainText.btcTest else ChainText.btcMain

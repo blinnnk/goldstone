@@ -86,24 +86,24 @@ class AddressSelectionPresenter(
 	}
 	
 	fun showPaymentPrepareFragment(
-		address: String,
+		toAddress: String,
 		count: Double = 0.0
 	) {
 		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
 		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
-			localAddresses.any { it.equals(address, true) } isTrue {
+			localAddresses.any { it.equals(toAddress, true) } isTrue {
 				alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle
 				) {
-					goToPaymentPrepareFragment(address, count)
+					goToPaymentPrepareFragment(toAddress, count)
 				}
 			} otherwise {
-				goToPaymentPrepareFragment(address, count)
+				goToPaymentPrepareFragment(toAddress, count)
 			}
 		}
 		// 检查地址是否合规
-		when (isValidMultiChainAddress(address)) {
+		when (isValidMultiChainAddress(toAddress)) {
 			null -> {
 				fragment.context?.alert(ImportWalletText.addressFromatAlert)
 				return

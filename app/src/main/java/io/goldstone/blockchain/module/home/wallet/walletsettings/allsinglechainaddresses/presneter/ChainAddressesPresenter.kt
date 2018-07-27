@@ -188,6 +188,7 @@ class ChainAddressesPresenter(
 							AddressManagerPresneter.convertToChildAddresses(ethAddresses).toArrayList()
 						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETH.id) {
 							setDefaultAddress(it, currentETHAndERCAddress, ChainType.ETH.id)
+							Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 						}
 					}
 					
@@ -196,6 +197,7 @@ class ChainAddressesPresenter(
 							AddressManagerPresneter.convertToChildAddresses(etcAddresses).toArrayList()
 						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETC.id) {
 							setDefaultAddress(it, currentETCAddress, ChainType.ETC.id)
+							Config.updateCurrentETCAddress(currentETCAddress)
 						}
 					}
 					
@@ -207,6 +209,9 @@ class ChainAddressesPresenter(
 							AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
 						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
 							setDefaultAddress(it, currentAddress, ChainType.BTC.id)
+							if (Config.isTestEnvironment())
+								Config.updateCurrentBTCTestAddress(btcTestAddresses)
+							else Config.updateCurrentBTCAddress(btcAddresses)
 						}
 					}
 				}

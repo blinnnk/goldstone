@@ -58,7 +58,10 @@ object Config {
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 	
 	fun updateCurrentEthereumAddress(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEthereumAddress, address)
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.currentEthereumAddress,
+			address
+		)
 	
 	fun getCurrentETCAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentETCAddress)
@@ -76,8 +79,10 @@ object Config {
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCTestAddress)
 	
 	fun updateCurrentBTCTestAddress(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBTCTestAddress, address)
-	
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.currentBTCTestAddress,
+			address
+		)
 	
 	fun getCurrentName(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentName)

@@ -198,7 +198,7 @@ object RequisitionUtil {
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
 				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
-				LogUtil.error(keyName, error)
+				LogUtil.error("$api $keyName", error)
 			}
 			
 			override fun onResponse(call: Call, response: Response) {

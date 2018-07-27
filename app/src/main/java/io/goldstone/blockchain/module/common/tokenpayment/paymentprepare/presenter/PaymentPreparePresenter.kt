@@ -11,7 +11,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -56,41 +55,6 @@ class PaymentPreparePresenter(
 		fragment.apply {
 			headerTitle = TokenDetailText.address
 			presenter.popFragmentFrom<PaymentPrepareFragment>()
-		}
-	}
-	
-	fun getFromAddress(hold: (String) -> Unit) {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				hold(
-					when (rootFragment?.token?.symbol) {
-						CryptoSymbol.btc -> {
-							if (Config.isTestEnvironment()) currentBTCTestAddress
-							else currentBTCAddress
-						}
-						
-						CryptoSymbol.etc -> currentETCAddress
-						else -> currentETHAndERCAddress
-					}
-				)
-			}
-		}
-	}
-	
-	fun getCurrentChainTypeAddress(): String {
-		return when {
-			getToken()?.symbol.equals(CryptoSymbol.btc, true) -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCTestAddress()
-				} else {
-					Config.getCurrentBTCAddress()
-				}
-			}
-			
-			getToken()?.symbol.equals(CryptoSymbol.etc, true) ->
-				Config.getCurrentETCAddress()
-			else ->
-				Config.getCurrentEthereumAddress()
 		}
 	}
 	

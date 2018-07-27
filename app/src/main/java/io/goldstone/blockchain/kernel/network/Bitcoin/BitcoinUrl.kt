@@ -25,4 +25,10 @@ object BitcoinUrl {
 		// `limit` 每页 `10` 条数据
 		"$header/rawaddr/$address?limit=$pageSize&offset=$offset"
 	}
+	val getTransactionByHash: (
+		header: String,
+		hash: String
+	) -> String = { header, hash ->
+		"$header/rawtx/$hash"
+	}
 }

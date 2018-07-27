@@ -17,6 +17,7 @@ import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import java.math.BigInteger
 
 /**
@@ -57,7 +58,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
 		},
 		chainType,
-		getCurrentChainTypeAddress()
+		WalletTable.getAddressBySymbol(getToken()?.symbol)
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 	}
@@ -94,7 +95,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		getCurrentChainTypeAddress(),
+		WalletTable.getAddressBySymbol(getToken()?.symbol),
 		data,
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
@@ -104,6 +105,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
+				WalletTable.getAddressBySymbol(getToken()?.symbol),
 				nonce,
 				limit,
 				to,

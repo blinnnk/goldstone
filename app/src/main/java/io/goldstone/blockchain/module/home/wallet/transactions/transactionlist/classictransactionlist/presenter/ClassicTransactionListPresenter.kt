@@ -46,7 +46,7 @@ class ClassicTransactionListPresenter(
 			diffAndUpdateSingleCellAdapterData<ClassicTransactionListAdapter>(it)
 			if (!hasUpdateChainData) {
 				// 异步查询网络数据并决定是否更新
-				getValidETCTransactionsFromChain(it) {
+				getETCTransactionsFromChain(it) {
 					removeLoadingView()
 					showChainData()
 					hasUpdateChainData = true
@@ -71,7 +71,7 @@ class ClassicTransactionListPresenter(
 			}
 		}
 		
-		fun getValidETCTransactionsFromChain(
+		fun getETCTransactionsFromChain(
 			localData: ArrayList<TransactionListModel>,
 			callback: () -> Unit
 		) {
