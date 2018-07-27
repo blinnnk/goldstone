@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
-import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
+ * @rewriteDate 26/07/2018 3:30 PM
+ * @rewriter wcx
+ * @description 修改avatar通过id获取
  */
 data class WalletListModel(
 	var id: Int = 0,
@@ -18,18 +20,19 @@ data class WalletListModel(
 	var isWatchOnly: Boolean = false,
 	var isUsing: Boolean = false
 ) {
-	
+
 	constructor(data: WalletTable, balance: Double) : this(
 		data.id,
 		data.name,
 		showSubtitleByType(data, true),
 		showSubtitleByType(data, false),
 		balance,
-		UIUtils.generateAvatar(data.id),
+		//修改
+		data.id,
 		data.isWatchOnly,
 		data.isUsing
 	)
-	
+
 	companion object {
 		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
 			return if (wallet.currentETHAndERCAddress.isEmpty()) {
