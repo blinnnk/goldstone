@@ -29,11 +29,13 @@ object BitcoinApi {
 	
 	fun getBTCTransactions(
 		address: String,
+		pageSize: Int,
+		offset: Int,
 		errorCallback: (Exception) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl, address, pageSize, offset),
 			"txs",
 			true,
 			{

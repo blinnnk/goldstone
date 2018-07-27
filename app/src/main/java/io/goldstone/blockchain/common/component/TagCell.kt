@@ -18,13 +18,12 @@ import org.jetbrains.anko.*
  * @date 2018/5/13 10:19 PM
  * @author KaySaith
  */
-
 class TagCell(context: Context) : LinearLayout(context) {
-
+	
 	private val number = TextView(context)
 	private val title = TextView(context)
 	private var tagLayout: LinearLayout
-
+	
 	init {
 		layoutParams = LinearLayout.LayoutParams(wrapContent, 47.uiPX())
 		leftPadding = 5.uiPX()
@@ -41,7 +40,7 @@ class TagCell(context: Context) : LinearLayout(context) {
 				x = 6.uiPX().toFloat()
 				addCorner(15.uiPX(), GrayScale.black)
 			}.into(this)
-
+			
 			title.apply {
 				textColor = GrayScale.black
 				textSize = fontSize(15)
@@ -49,19 +48,18 @@ class TagCell(context: Context) : LinearLayout(context) {
 				typeface = GoldStoneFont.black(context)
 				layoutParams = LinearLayout.LayoutParams(0, matchParent)
 			}.into(this)
-
+			
 			addCorner(42, GrayScale.whiteGray)
 		}
 	}
-
+	
 	fun setNumberAndText(number: Int, title: String) {
 		this.number.text = number.toString()
 		this.title.text = title
-
+		
 		tagLayout.layoutParams.width =
 			42.uiPX() + this.title.text.measureTextWidth(15.uiPX().toFloat()).toInt() + 20.uiPX()
 		this.title.layoutParams.width = tagLayout.layoutParams.width - 36.uiPX()
 		requestLayout()
 	}
-
 }
