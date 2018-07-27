@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 31/03/2018 8:09 PM
@@ -103,6 +104,10 @@ object EtherScanApi {
 	}
 	val gasTrackerHeader: (taxHash: String) -> String = {
 		"https://gastracker.io/tx/$it"
+	}
+	
+	val bitcoinTransactionDetail: (taxHash: String) -> String = {
+		"${BitcoinUrl.currentUrl}/tx/$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"

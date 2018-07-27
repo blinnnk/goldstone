@@ -39,10 +39,36 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
-		//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
-		if (!symbol.equals(CryptoSymbol.etc, true)) {
-			checkTokenNameInfoOrUpdate()
+		
+		when {
+			symbol.equals(CryptoSymbol.btc, true) -> {
+				dataFromList?.let {
+					fragment.asyncData = generateModels(it)
+					updateHeaderValue(headerData)
+					fragment.removeLoadingView()
+				}
+			}
+			
+			symbol.equals(CryptoSymbol.etc, true) ->
+				getETHERC20OrETCMemo(headerData)
+			
+			else -> {
+				//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取
+				// 未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
+				checkTokenNameInfoOrUpdate()
+				getETHERC20OrETCMemo(headerData)
+			}
 		}
+		
+		if (isPending) {
+			// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
+			observerTransaction()
+		}
+	}
+}
+
+private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: TransactionHeaderModel) {
+	dataFromList?.apply {
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
@@ -59,10 +85,6 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 			}?.memo = memo
 			
 			updateHeaderValue(headerData)
-		}
-		if (isPending) {
-			// 异步从链上查一下这条 `taxHash` 是否有最新的状态变化
-			observerTransaction()
 		}
 	}
 }
