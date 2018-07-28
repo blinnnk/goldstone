@@ -103,7 +103,7 @@ data class MyTokenTable(
 						.myTokenDao()
 						.getCurrentChainTokenByContractAndAddress(
 							contract,
-							Config.getCurrentAddress()
+							WalletTable.getAddressByContract(contract)
 						)
 				}) {
 				callback(it)
@@ -136,7 +136,7 @@ data class MyTokenTable(
 		
 		fun deleteByContract(
 			contract: String,
-			address: String = Config.getCurrentAddress(),
+			address: String,
 			callback: () -> Unit = {}
 		) {
 			doAsync {

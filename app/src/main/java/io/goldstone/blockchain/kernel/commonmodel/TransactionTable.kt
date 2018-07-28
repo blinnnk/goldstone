@@ -133,7 +133,7 @@ data class TransactionTable(
 		data.fromAddress != Config.getCurrentEthereumAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
-		Config.getCurrentAddress()
+		Config.getCurrentEthereumAddress()
 	)
 	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -194,10 +194,13 @@ data class TransactionTable(
 		"",
 		"",
 		"",
-		data.safeGet("from") != Config.getCurrentAddress(),
+		!data.safeGet("from").equals(
+			if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+			true
+		),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		Config.getCurrentAddress(),
+		if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
 		chainID = chainID
 	)
@@ -225,7 +228,7 @@ data class TransactionTable(
 		"",
 		"0",
 		"",
-		data.from != Config.getCurrentETCAddress(),
+		!data.from.equals(Config.getCurrentETCAddress(), true),
 		false,
 		CryptoSymbol.etc,
 		Config.getCurrentETCAddress(),

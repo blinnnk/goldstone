@@ -52,7 +52,7 @@ class SquareIcon(
 				topMargin = UIUtils.subtractThenHalf(iconSize, imageSize)
 				leftMargin = UIUtils.subtractThenHalf(iconSize, imageSize)
 			}
-			scaleType = ImageView.ScaleType.CENTER_CROP
+			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			setColorFilter(Spectrum.white)
 		}.into(this)
 	}

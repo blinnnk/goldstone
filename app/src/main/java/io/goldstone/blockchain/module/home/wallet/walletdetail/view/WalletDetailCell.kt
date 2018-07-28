@@ -34,6 +34,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 				when (symbol) {
 					CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
 					CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
+					CryptoSymbol.btc -> icon.image.imageResource = R.drawable.btc_icon
 					else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 				}
 			}

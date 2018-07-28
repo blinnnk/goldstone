@@ -105,9 +105,8 @@ object EtherScanApi {
 	val gasTrackerHeader: (taxHash: String) -> String = {
 		"https://gastracker.io/tx/$it"
 	}
-	
 	val bitcoinTransactionDetail: (taxHash: String) -> String = {
-		"${BitcoinUrl.currentUrl}/tx/$it"
+		"${BitcoinUrl.currentUrl()}/tx/$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"

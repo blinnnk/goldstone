@@ -261,21 +261,22 @@ class AddressManagerPresneter(
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
 			context?.verifyKeystorePassword(password) {
-				if (it) {
-					WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-						wallet.encryptMnemonic?.let {
-							val mnemonic = JavaKeystoreUtil().decryptData(it)
-							val newAddressIndex = childAddressIndex + 1
-							val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
-							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
-								WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
-									hold(convertToChildAddresses(it).toArrayList())
-								}
+				if (!it) {
+					context.alert(CommonText.wrongPassword)
+					return@verifyKeystorePassword
+				}
+				
+				WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let {
+						val mnemonic = JavaKeystoreUtil().decryptData(it)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
+						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
 					}
-				} else {
-					context.alert(CommonText.wrongPassword)
 				}
 			}
 		}
