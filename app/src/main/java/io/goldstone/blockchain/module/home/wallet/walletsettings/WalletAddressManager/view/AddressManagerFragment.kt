@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
@@ -94,7 +95,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	
 	override val presenter = AddressManagerPresneter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -307,7 +307,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					creatorDashBoard.model =
 						AddressManagerPresneter.getCellDashboardMenu(isBTC, hasDefaultCell)
 					creatorDashBoard.into(this)
-					creatorDashBoard.setTopValue(top)
+					// 防止超出屏幕便捷的尺寸弥补
+					val overHeightSize = ScreenSize.fullHeight - creatorDashBoard.getOverlayHeight() - top
+					creatorDashBoard.setTopValue(top + if (overHeightSize < 0f) overHeightSize else 0f)
 				}
 			}
 		}

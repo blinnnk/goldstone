@@ -122,7 +122,10 @@ class TokenManagementListPresenter(
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteByContract(token.contract) {
+				MyTokenTable.deleteByContract(
+					token.contract,
+					WalletTable.getAddressBySymbol(token.symbol)
+				) {
 					switch.isClickable = true
 					updateWalletDetailData(context)
 				}

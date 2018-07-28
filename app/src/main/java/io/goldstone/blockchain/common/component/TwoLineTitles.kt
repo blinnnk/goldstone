@@ -32,10 +32,16 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	var isFloatRight by observing(false) {
 		gravity = Gravity.END
 	}
-	var isCenter by observing(false) {
-		gravity = Gravity.CENTER_HORIZONTAL
-		subtitle.gravity = Gravity.CENTER_HORIZONTAL
-		title.gravity = Gravity.CENTER_HORIZONTAL
+	var isCenter: Boolean by observing(false) {
+		if (isCenter) {
+			gravity = Gravity.CENTER_HORIZONTAL
+			subtitle.gravity = Gravity.CENTER_HORIZONTAL
+			title.gravity = Gravity.CENTER_HORIZONTAL
+		} else {
+			gravity = Gravity.START
+			subtitle.gravity = Gravity.START
+			title.gravity = Gravity.START
+		}
 	}
 	
 	init {

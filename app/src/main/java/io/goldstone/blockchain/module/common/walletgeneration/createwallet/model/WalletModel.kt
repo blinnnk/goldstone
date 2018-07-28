@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -35,7 +36,7 @@ data class WalletTable(
 	var currentETCAddress: String,
 	var currentBTCAddress: String,
 	var currentBTCTestAddress: String,
-	var ethAddresses: String, //format - "address|index,0x288832ds23...|0"
+	var ethAddresses: String, // format - "address|index,0x288832ds23...|0"
 	var btcAddresses: String,
 	var btcTestAddresses: String,
 	var etcAddresses: String,
@@ -53,6 +54,28 @@ data class WalletTable(
 	
 	companion object {
 		
+		fun getWalletAddressCount(hold: (Int) -> Unit) {
+			WalletTable.getCurrentWallet {
+				it?.apply {
+					WalletTable.getWalletType {
+						when (it) {
+							WalletType.MultiChain -> {
+								val ethAddressCount = ethAddresses.split(",").size
+								val etcAddressCount = etcAddresses.split(",").size
+								val btcAddressCount = btcAddresses.split(",").size
+								val btcTestAddressCount = btcTestAddresses.split(",").size
+								hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount)
+							}
+							
+							WalletType.ETHERCAndETCOnly -> hold(1)
+							WalletType.BTCTestOnly -> hold(1)
+							WalletType.BTCOnly -> hold(1)
+						}
+					}
+				}
+			}
+		}
+		
 		fun getAddressBySymbol(symbol: String?): String {
 			return when {
 				symbol.equals(CryptoSymbol.btc, true) -> {
@@ -64,6 +87,23 @@ data class WalletTable(
 				}
 				
 				symbol.equals(CryptoSymbol.etc, true) ->
+					Config.getCurrentETCAddress()
+				else ->
+					Config.getCurrentEthereumAddress()
+			}
+		}
+		
+		fun getAddressByContract(contract: String): String {
+			return when {
+				contract.equals(CryptoValue.btcContract, true) -> {
+					if (Config.isTestEnvironment()) {
+						Config.getCurrentBTCTestAddress()
+					} else {
+						Config.getCurrentBTCAddress()
+					}
+				}
+				
+				contract.equals(CryptoValue.etcContract, true) ->
 					Config.getCurrentETCAddress()
 				else ->
 					Config.getCurrentEthereumAddress()
@@ -90,7 +130,7 @@ data class WalletTable(
 		
 		fun saveEncryptMnemonicIfUserSkip(
 			encryptMnemonic: String,
-			address: String = Config.getCurrentAddress(),
+			address: String,
 			callback: () -> Unit
 		) {
 			doAsync {

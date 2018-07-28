@@ -16,7 +16,7 @@ object BitcoinApi {
 	
 	fun getBalanceByAddress(address: String, hold: (Long) -> Unit) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getBalance(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getBalance(BitcoinUrl.currentUrl(), address),
 			address,
 			true,
 			{
@@ -36,7 +36,7 @@ object BitcoinApi {
 		hold: (List<JSONObject>) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl, address, pageSize, offset),
+			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl(), address, pageSize, offset),
 			"txs",
 			true,
 			{
@@ -55,7 +55,7 @@ object BitcoinApi {
 	
 	fun getUnspentListByAddress(address: String, hold: (List<UnspentModel>) -> Unit) {
 		RequisitionUtil.requestUncryptoData<UnspentModel>(
-			BitcoinUrl.getUnspentInfo(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getUnspentInfo(BitcoinUrl.currentUrl(), address),
 			"unspent_outputs",
 			false,
 			{
@@ -73,7 +73,7 @@ object BitcoinApi {
 		hold: (BitcoinTransactionTable?) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl, hash),
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
 			"",
 			true,
 			{
@@ -95,7 +95,7 @@ object BitcoinApi {
 		hold: (Int?) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl, hash),
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
 			"",
 			true,
 			{

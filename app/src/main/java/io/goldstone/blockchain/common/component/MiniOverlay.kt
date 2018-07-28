@@ -29,6 +29,7 @@ class MiniOverlay(
 	private val hold: (cell: BaseCell, title: String) -> Unit
 ) : RelativeLayout(context) {
 	
+	private var overlayHeight = 0
 	private lateinit var dashBoard: ViewGroup
 	private val contentHeight = 26.uiPX()
 	var model: List<Pair<Int, String>> by observing(listOf()) {
@@ -61,10 +62,8 @@ class MiniOverlay(
 				}.into(this)
 			}
 		}.apply {
-			layoutParams = RelativeLayout.LayoutParams(
-				220.uiPX(),
-				40.uiPX() * model.size + 20.uiPX()
-			)
+			overlayHeight = 40.uiPX() * model.size + 20.uiPX()
+			layoutParams = RelativeLayout.LayoutParams(220.uiPX(), overlayHeight)
 		}
 	}
 	
@@ -76,6 +75,8 @@ class MiniOverlay(
 			removeSelf()
 		}
 	}
+	
+	fun getOverlayHeight() = overlayHeight
 	
 	fun setTopRight() {
 		if (this::dashBoard.isInitialized) {

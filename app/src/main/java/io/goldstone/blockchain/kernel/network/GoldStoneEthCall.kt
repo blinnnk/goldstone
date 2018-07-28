@@ -108,7 +108,7 @@ object GoldStoneEthCall {
 	fun getUsableNonce(
 		errorCallback: (error: Exception?, reason: String?) -> Unit,
 		chainType: ChainType,
-		address: String = Config.getCurrentAddress(),
+		address: String,
 		holdValue: (BigInteger) -> Unit
 	) {
 		RequestBody.create(
