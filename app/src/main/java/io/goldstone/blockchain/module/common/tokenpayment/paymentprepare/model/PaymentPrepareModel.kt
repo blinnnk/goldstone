@@ -23,6 +23,8 @@ data class PaymentPrepareModel(
 data class PaymentPrepareBTCModel(
 	val toAddress: String,
 	val fromAddress: String,
+	val changeAddress: String,
 	val value: Long,
-	val estimateFeePerByte: Long
+	val estimateFeePerByte: Long,
+	val signedMessageSize: Long
 ) : Serializable

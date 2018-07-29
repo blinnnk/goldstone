@@ -8,6 +8,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
@@ -39,6 +40,12 @@ class WalletSettingsPresenter(
 	
 	override fun onFragmentViewCreated() {
 		showCurrentWalletInfo()
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		// 页面销毁的时候更新钱包首页, 刷新余额以及更新钱包地址的可能
+		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	fun showTargetFragmentByTitle(title: String) {

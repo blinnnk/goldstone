@@ -8,19 +8,19 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
-import io.goldstone.blockchain.crypto.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.crypto.verifyKeystorePassword
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.jetbrains.anko.doAsync
 
 /**
  * @date 2018/7/11 12:44 AM
@@ -201,7 +201,13 @@ class AddressManagerPresneter(
 					val mnemonic = JavaKeystoreUtil().decryptData(it)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
+					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
+						insertNewAddressToMyToken(
+							CryptoSymbol.eth,
+							CryptoValue.etcContract,
+							address,
+							if (Config.isTestEnvironment()) Config.getCurrentChain() else ChainID.ETCMain.id
+						)
 						WalletTable.updateETHAndERCAddresses(it, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
@@ -220,7 +226,14 @@ class AddressManagerPresneter(
 					val mnemonic = JavaKeystoreUtil().decryptData(it)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) {
+					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						insertNewAddressToMyToken(
+							CryptoSymbol.etc,
+							CryptoValue.etcContract,
+							address,
+							if (Config.isTestEnvironment()) ChainID.ETCTest.id else ChainID.ETCMain.id
+						)
 						WalletTable.updateETCAddresses(it, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
@@ -242,6 +255,13 @@ class AddressManagerPresneter(
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
 							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+								insertNewAddressToMyToken(
+									CryptoSymbol.btc,
+									CryptoValue.btcContract,
+									address,
+									ChainID.BTCMain.id
+								)
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
 								}
@@ -271,6 +291,13 @@ class AddressManagerPresneter(
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
 						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							insertNewAddressToMyToken(
+								CryptoSymbol.btc,
+								CryptoValue.btcContract,
+								address,
+								ChainID.BTCTest.id
+							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
@@ -352,6 +379,25 @@ class AddressManagerPresneter(
 					}
 				}
 			}
+		}
+		
+		private fun insertNewAddressToMyToken(
+			symbol: String,
+			contract: String,
+			address: String,
+			chain: String
+		) {
+			DefaultTokenTable
+				.getTokenBySymbolAndContractFromAllChains(
+					symbol,
+					contract
+				) {
+					it?.let {
+						doAsync {
+							MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chain }, address), chain)
+						}
+					}
+				}
 		}
 	}
 }

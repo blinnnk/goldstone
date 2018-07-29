@@ -2561,6 +2561,26 @@ object PrepareTransferText {
 		else -> ""
 	}
 	@JvmField
+	val customChangeAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Change Address"
+		HoneyLanguage.Chinese.code -> "Custom Change Address"
+		HoneyLanguage.Japanese.code -> "Custom Change Address"
+		HoneyLanguage.Korean.code -> "Custom Change Address"
+		HoneyLanguage.Russian.code -> "Custom Change Address"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Change Address"
+		else -> ""
+	}
+	@JvmField
+	val changeAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Change Address"
+		HoneyLanguage.Chinese.code -> "Change Address"
+		HoneyLanguage.Japanese.code -> "Change Address"
+		HoneyLanguage.Korean.code -> "Change Address"
+		HoneyLanguage.Russian.code -> "Change Address"
+		HoneyLanguage.TraditionalChinese.code -> "Change Address"
+		else -> ""
+	}
+	@JvmField
 	val addAMemo = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add a Memo"
 		HoneyLanguage.Chinese.code -> "添加备注"
@@ -2733,7 +2753,6 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "Enter Bitcoin Mainnet address that you want to store"
 		else -> ""
 	}
-	
 	val btcTestnetAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Testnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "Enter Bitcoin Testnet address that you want to store"

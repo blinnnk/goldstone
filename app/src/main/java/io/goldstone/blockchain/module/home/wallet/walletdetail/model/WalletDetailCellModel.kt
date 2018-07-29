@@ -57,11 +57,11 @@ data class WalletDetailCellModel(
 		fun getLocalModels(
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			MyTokenTable.getMyTokensWithAddresses { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getMyTokensWithAddresses
+					return@getMyTokens
 				}
 				DefaultTokenTable.getCurrentChainTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
@@ -95,11 +95,11 @@ data class WalletDetailCellModel(
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
 			// 获取我的钱包的 `Token` 列表
-			MyTokenTable.getMyTokensWithAddresses { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getMyTokensWithAddresses
+					return@getMyTokens
 				}
 				// 首先更新 `MyToken` 的 `Price`
 				myTokens.updateMyTokensPrices(

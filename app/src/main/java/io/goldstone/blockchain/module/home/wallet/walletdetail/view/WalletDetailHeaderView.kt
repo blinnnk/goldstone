@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.R
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.Gravity
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -31,6 +30,7 @@ import org.jetbrains.anko.*
  * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
+  
   private val avatarBitmap = UnlimitedAvatar(
     Config.getCurrentID(),
     context

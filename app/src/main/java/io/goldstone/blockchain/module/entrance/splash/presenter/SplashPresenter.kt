@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 /**
  * @date 30/03/2018 2:21 AM
@@ -29,18 +30,22 @@ class SplashPresenter(val activity: SplashActivity) {
 			isNotEmpty() isTrue {
 				WalletTable.getCurrentWallet {
 					it?.apply {
-						Config.updateCurrentEthereumAddress(it.currentETHAndERCAddress)
-						Config.updateCurrentBTCAddress(it.currentBTCAddress)
-						Config.updateCurrentBTCTestAddress(it.currentBTCTestAddress)
-						Config.updateCurrentETCAddress(it.currentETCAddress)
-						Config.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
-						Config.updateCurrentID(it.id)
-						Config.updateCurrentBalance(it.balance.orElse(0.0))
-						Config.updateCurrentName(it.name)
-						WalletTable.getWalletSubtitleByType {
-							Config.updateCurrentAddress(it)
+						doAsync {
+							Config.updateCurrentEthereumAddress(it.currentETHAndERCAddress)
+							Config.updateCurrentBTCAddress(it.currentBTCAddress)
+							Config.updateCurrentBTCTestAddress(it.currentBTCTestAddress)
+							Config.updateCurrentETCAddress(it.currentETCAddress)
+							Config.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
+							Config.updateCurrentID(it.id)
+							Config.updateCurrentBalance(it.balance.orElse(0.0))
+							Config.updateCurrentName(it.name)
+							WalletTable.getWalletSubtitleByType {
+								Config.updateCurrentAddress(it)
+							}
+							uiThread {
+								activity.jump<MainActivity>()
+							}
 						}
-						activity.jump<MainActivity>()
 					}
 				}
 			}

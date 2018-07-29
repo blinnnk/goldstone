@@ -14,10 +14,8 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.GraySqualCell
-import io.goldstone.blockchain.common.component.RoundButton
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.component.ValueInputView
+import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -25,6 +23,7 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
@@ -49,10 +48,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private val sendInfo by lazy { GraySqualCell(context!!) }
 	private val from by lazy { GraySqualCell(context!!) }
 	private val memo by lazy { GraySqualCell(context!!) }
+	private val customChangeAddressCell by lazy { GraySqualCell(context!!) }
 	private val price by lazy { GraySqualCell(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
+	private var changeAddress: String = WalletTable.getAddressBySymbol(CryptoSymbol.btc)
 	private lateinit var container: RelativeLayout
 	override val presenter = PaymentPreparePresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
@@ -68,8 +69,10 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 					inputView.into(this)
 					
 					showAccountInfo()
-					// `BTC` 不支持链上 `Memo` 所以判断是否显示 `Memo` 设置的入口
-					if (!rootFragment?.token?.symbol.equals(CryptoSymbol.btc, true)) {
+					// `BTC` 于 ETH, ERC20, ETC 显示不同的配置信息
+					if (rootFragment?.token?.symbol.equals(CryptoSymbol.btc, true)) {
+						showCustomChangeAddressCell()
+					} else {
 						showMemoCell()
 					}
 					
@@ -124,6 +127,14 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		this.price.setSubtitle(price)
 	}
 	
+	fun updateChangeAddress(address: String) {
+		customChangeAddressCell.setSubtitle(address)
+	}
+	
+	fun getChangeAddress(): String {
+		return changeAddress
+	}
+	
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?
@@ -157,6 +168,52 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				}
 			}.into(this)
 		}.into(this)
+	}
+	
+	private fun LinearLayout.showCustomChangeAddressCell() {
+		TopBottomLineCell(context).apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			setTitle(PrepareTransferText.customChangeAddress)
+			customChangeAddressCell.apply {
+				setTitle(PrepareTransferText.changeAddress)
+				setSubtitle(CryptoUtils.scaleTo16(changeAddress))
+				showArrow()
+				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
+			}.click {
+				showCustomChangeAddressOverlay()
+			}.into(this)
+		}.into(this)
+	}
+	
+	private fun showCustomChangeAddressOverlay() {
+		getParentContainer()?.apply {
+			val addressInput = WalletEditText(context)
+			DashboardOverlay(context) {
+				textView {
+					text = PrepareTransferText.customChangeAddress
+					textSize = fontSize(16)
+					textColor = GrayScale.black
+					typeface = GoldStoneFont.black(context)
+					gravity = Gravity.CENTER_HORIZONTAL
+				}
+				addressInput.apply {
+					setMargins<LinearLayout.LayoutParams> {
+						width = ScreenSize.widthWithPadding - 40.uiPX()
+						topMargin = 10.uiPX()
+					}
+					hint = changeAddress
+				}
+				addressInput.into(this)
+			}.apply {
+				confirmEvent = Runnable {
+					val customAddress = addressInput.text?.toString().orEmpty()
+					presenter.isValidAddressOrElse(customAddress) isTrue {
+						// 更新默认的自定义找零地址
+						changeAddress = customAddress
+					}
+				}
+			}.into(this)
+		}
 	}
 	
 	private fun LinearLayout.showAccountInfo() {

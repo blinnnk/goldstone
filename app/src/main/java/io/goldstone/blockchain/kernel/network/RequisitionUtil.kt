@@ -13,16 +13,11 @@ import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.experimental.suspendCoroutine
 
 /**
  * @date 2018/6/12 4:34 PM
@@ -227,67 +222,6 @@ object RequisitionUtil {
 		})
 	}
 	
-	/** 请求三方的数据是明文请求不需要加密， 协程底层方法 */
-	@JvmStatic
-	inline fun <reified T> requestUncryptoChildJSONObject(
-		api: String,
-		crossinline errorCallback: (Throwable) -> Unit,
-		vararg childKeys: String
-	): Deferred<T?> {
-		val client =
-			OkHttpClient
-				.Builder()
-				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
-				.build()
-		val request =
-			Request.Builder().url(api).build()
-		return async(CommonPool, CoroutineStart.LAZY) {
-			val result = suspendCoroutine<T?> { coroutine ->
-				client.newCall(request).enqueue(object : Callback {
-					override fun onFailure(call: Call, error: IOException) {
-						GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
-						LogUtil.error(api, error)
-						coroutine.resumeWithException(error)
-						coroutine.resume(null)
-					}
-					
-					override fun onResponse(call: Call, response: Response) {
-						val data = response.body()?.string()
-						try {
-							val dataObject = data?.toJsonObject() ?: JSONObject("")
-							var parentData = dataObject.safeGet(childKeys[0])
-							childKeys.forEachIndexed { index, item ->
-								if (index > 0) {
-									parentData = JSONObject(parentData).safeGet(item)
-								}
-								
-								if (index == childKeys.lastIndex) {
-									val result = when (T::class.java) {
-										Long::class.java -> parentData.toLongOrNull() as? T
-										Boolean::class.java -> parentData.toBoolean() as? T
-										Int::class.java -> parentData.toIntOrNull() as? T
-										Double::class.java -> parentData.toDoubleOrNull() as? T
-										Float::class.java -> parentData.toFloatOrNull() as? T
-										else -> parentData as? T
-									}
-									coroutine.resume(result)
-								}
-							}
-						} catch (error: Exception) {
-							GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
-							LogUtil.error(childKeys[0], error)
-							coroutine.resumeWithException(error)
-							GoldStoneCode.showErrorCodeReason(data)
-							coroutine.resume(null)
-						}
-					}
-				})
-			}
-			result
-		}
-	}
-	
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
 	fun getcryptoRequest(
 		body: RequestBody,
@@ -410,64 +344,6 @@ object RequisitionUtil {
 					}
 				}
 			})
-		}
-	}
-	
-	/**
-	 *
-	 */
-	fun callChain(
-		body: RequestBody,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
-		chainName: String = Config.getCurrentChainName()
-	): Deferred<String> {
-		val isEncrypt = ChainURL.uncryptChainName.none { it.equals(chainName, true) }
-		val client = OkHttpClient
-			.Builder()
-			.connectTimeout(40, TimeUnit.SECONDS)
-			.readTimeout(60, TimeUnit.SECONDS)
-			.build()
-		val chainUrl =
-			if (ChainURL.etcChainName.any { it.equals(chainName, true) })
-				ChainURL.currentETCChain(chainName)
-			else ChainURL.currentChain(chainName)
-		return async(CommonPool, CoroutineStart.LAZY) {
-			val result = suspendCoroutine<String> { coroutine ->
-				getcryptoRequest(body, chainUrl, isEncrypt) {
-					client.newCall(it).enqueue(object : Callback {
-						override fun onFailure(call: Call, error: IOException) {
-							coroutine.resumeWithException(error)
-							GoldStoneAPI.context.runOnUiThread {
-								errorCallback(error, "Call Ethereum Failured")
-							}
-						}
-						
-						override fun onResponse(call: Call, response: Response) {
-							val data =
-								if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
-								else response.body()?.string().orEmpty()
-							checkChainErrorCode(data).let {
-								if (it.isNotEmpty()) {
-									GoldStoneAPI.context.runOnUiThread {
-										errorCallback(null, it)
-									}
-									return
-								}
-							}
-							try {
-								val dataObject = data?.toJsonObject() ?: JSONObject("")
-								coroutine.resume(dataObject.safeGet("result"))
-							} catch (error: Exception) {
-								coroutine.resumeWithException(error)
-								GoldStoneAPI.context.runOnUiThread {
-									errorCallback(error, "onResponse Error in $chainName")
-								}
-							}
-						}
-					})
-				}
-			}
-			result
 		}
 	}
 	

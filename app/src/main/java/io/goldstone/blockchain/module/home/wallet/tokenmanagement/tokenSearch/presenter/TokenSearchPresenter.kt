@@ -81,7 +81,13 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it, this)
+				TokenManagementListPresenter.updateMyTokensInfoBy(
+					switch,
+					it,
+					ChainID.getChainIDBySymbol
+					(it.symbol),
+					this
+				)
 			}
 		}
 	}
@@ -106,7 +112,7 @@ class TokenSearchPresenter(
 		) { result ->
 			result.isNullOrEmpty() isFalse {
 				// 从服务器请求目标结果
-				MyTokenTable.getMyTokensWithAddresses { localTokens ->
+				MyTokenTable.getMyTokens { localTokens ->
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {

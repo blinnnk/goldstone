@@ -35,7 +35,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 27/03/2018 3:27 AM
  * @author KaySaith
  * @description
- * 这个界面由三个入场景公用, 分别是账单列表，转账完成或通知中心进入, `fragment` 承担了多重身份
+ * 这个界面由三个入场景公用, 分别是账单列表，转账完成和通知中心进入, `fragment` 承担了多重身份
  * 固再次需要注意.
  */
 class TransactionDetailPresenter(
@@ -179,9 +179,7 @@ class TransactionDetailPresenter(
 	fun TransactionDetailPresenter.generateModels(
 		receipt: Any? = null
 	): ArrayList<TransactionDetailModel> {
-		val minerFee =
-			if (data.isNull()) dataFromList?.minerFee
-			else "${data?.minnerFee} ${getUnitSymbol()}"
+		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
 		val timstamp =
 			data?.timestamp
 			?: notificationData?.timeStamp.orElse(0L)
@@ -208,7 +206,7 @@ class TransactionDetailPresenter(
 			
 			is TransactionTable -> {
 				arrayListOf(
-					minerFee,
+					formatedMinnerFee(),
 					memo,
 					if (receipt.isReceive) receipt.to else WalletUtil.getAddressBySymbol(receipt.symbol),
 					if (receipt.isReceive) WalletUtil.getAddressBySymbol(receipt.symbol) else receipt.to,
@@ -234,9 +232,11 @@ class TransactionDetailPresenter(
 			
 			else -> {
 				arrayListOf(
-					minerFee,
+					formatedMinnerFee(),
 					memo,
-					WalletUtil.getAddressBySymbol(data?.token?.symbol ?: notificationData?.symbol.orEmpty()),
+					WalletUtil.getAddressBySymbol(
+						data?.token?.symbol ?: notificationData?.symbol.orEmpty()
+					),
 					data?.toAddress.orEmpty(),
 					currentHash,
 					"Waiting...",
@@ -262,6 +262,15 @@ class TransactionDetailPresenter(
 		}.let {
 			return it.toArrayList()
 		}
+	}
+	
+	private fun formatedMinnerFee(): String? {
+		val dataMinerFee =
+			if (data?.token?.symbol.equals(CryptoSymbol.btc, true))
+				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
+			else data?.minnerFee
+		return if (data.isNull()) dataFromList?.minerFee
+		else "$dataMinerFee ${getUnitSymbol()}"
 	}
 	
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {

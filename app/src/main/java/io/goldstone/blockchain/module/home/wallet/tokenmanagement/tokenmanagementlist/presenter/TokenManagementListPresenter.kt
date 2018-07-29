@@ -72,7 +72,7 @@ class TokenManagementListPresenter(
 				
 				override fun concurrentJobs() {
 					defaultTokens.forEach { default ->
-						MyTokenTable.getMyTokensWithAddresses { myTokens ->
+						MyTokenTable.getMyTokens { myTokens ->
 							default.isUsed = !myTokens.find {
 								default.contract.equals(it.contract, true)
 							}.isNull()
@@ -91,7 +91,6 @@ class TokenManagementListPresenter(
 						} else {
 							memoryTokenData = sortedList
 						}
-						
 						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
 					} else {
 						return
@@ -106,6 +105,7 @@ class TokenManagementListPresenter(
 		fun updateMyTokensInfoBy(
 			switch: HoneyBaseSwitch,
 			token: DefaultTokenTable,
+			chainID: String,
 			context: Context
 		) {
 			switch.isClickable = false
@@ -114,6 +114,7 @@ class TokenManagementListPresenter(
 				MyTokenTable.insertBySymbolAndContract(
 					token.symbol,
 					token.contract,
+					chainID,
 					{ error, reason ->
 						GoldStoneDialog.chainError(reason, error, context)
 					}) {

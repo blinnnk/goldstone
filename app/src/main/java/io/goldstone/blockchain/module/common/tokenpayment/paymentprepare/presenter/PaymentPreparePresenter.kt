@@ -44,7 +44,7 @@ class PaymentPreparePresenter(
 		} else {
 			fragment.toast(LoadingText.calculateGas)
 			if (getToken()?.symbol.equals(CryptoSymbol.btc, true)) {
-				prepareBTCPaymentModel(count, callback)
+				prepareBTCPaymentModel(count, fragment.getChangeAddress(), callback)
 			} else {
 				prepareETHERC20ETCPaymentModel(count, callback)
 			}

@@ -36,7 +36,7 @@ data class GasSelectionModel(
 	constructor(
 		id: Int,
 		price: Long, // Satoshi
-		bytes: Int,
+		bytes: Long,
 		currentType: String
 	) : this(
 		id,
