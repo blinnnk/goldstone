@@ -39,7 +39,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		hold: (
 			symbol: String,
@@ -59,7 +59,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		hold: (
 			symbol: String,
@@ -76,7 +76,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (String) -> Unit
 	) {
@@ -106,7 +106,7 @@ object GoldStoneEthCall {
 	
 	@JvmStatic
 	fun getUsableNonce(
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainType: ChainType,
 		address: String,
 		holdValue: (BigInteger) -> Unit
@@ -137,7 +137,7 @@ object GoldStoneEthCall {
 	
 	@JvmStatic
 	fun getBlockNumber(
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Int) -> Unit
 	) {
@@ -168,7 +168,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Long) -> Unit
 	) {
@@ -205,7 +205,7 @@ object GoldStoneEthCall {
 		hash: String,
 		chainName: String,
 		unfinishedCallback: () -> Unit = {},
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		holdValue: (TransactionTable) -> Unit
 	) {
 		RequestBody.create(
@@ -248,7 +248,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getReceiptByHash(
 		hash: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Boolean) -> Unit
 	) {
@@ -283,7 +283,7 @@ object GoldStoneEthCall {
 		to: String,
 		from: String,
 		data: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (BigInteger) -> Unit
 	) {
@@ -321,7 +321,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun sendRawTransaction(
 		signTransactions: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (String) -> Unit
 	) {
@@ -346,7 +346,7 @@ object GoldStoneEthCall {
 	fun getTokenBalanceWithContract(
 		contractAddress: String,
 		address: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
@@ -375,7 +375,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenSymbolByContract(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (String) -> Unit = {}
 	) {
@@ -406,7 +406,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenDecimal(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
@@ -437,7 +437,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenName(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (String) -> Unit
 	) {
@@ -467,7 +467,7 @@ object GoldStoneEthCall {
 	
 	fun getEthBalance(
 		address: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
@@ -497,7 +497,7 @@ object GoldStoneEthCall {
 	
 	fun getTokenTotalSupply(
 		contractAddress: String,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Double) -> Unit
 	) {

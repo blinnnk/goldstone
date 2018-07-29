@@ -5,6 +5,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
+import kotlinx.coroutines.experimental.Deferred
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -32,7 +33,7 @@ object BitcoinApi {
 		address: String,
 		pageSize: Int,
 		offset: Int,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
@@ -69,7 +70,7 @@ object BitcoinApi {
 	fun getTransactionByHash(
 		hash: String,
 		address: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (Throwable) -> Unit,
 		hold: (BitcoinTransactionTable?) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
@@ -91,24 +92,16 @@ object BitcoinApi {
 	
 	fun getBlockNumberByTransactionHash(
 		hash: String,
-		errorCallback: (Exception) -> Unit,
-		hold: (Int?) -> Unit
-	) {
-		RequisitionUtil.requestUncryptoData<String>(
+		errorCallback: (Throwable) -> Unit
+	): Deferred<Int?> {
+		return RequisitionUtil.requestUncryptoChildJSONObject(
 			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
-			"",
-			true,
 			{
-				hold(null)
 				errorCallback(it)
 				LogUtil.error("getBlockNumberByTransactionHash", it)
-			}
-		) {
-			hold(
-				if (isNotEmpty()) {
-					JSONObject(this[0]).safeGet("block_height").toIntOrNull()
-				} else null
-			)
-		}
+			},
+			"",
+			"block_height"
+		)
 	}
 }

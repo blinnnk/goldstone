@@ -6,6 +6,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
@@ -54,6 +55,8 @@ class ChainAddressesPresenter(
 			hasDefaultCell,
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
+					// 更新钱包默认地址, 同时更新首页的数据
+					updateWalletDetail()
 					updateData()
 					AddressManagerFragment.removeDashboard(fragment)
 					updateDefaultStyle(coinType)
@@ -94,6 +97,10 @@ class ChainAddressesPresenter(
 				}
 			}
 		}
+	}
+	
+	private fun updateWalletDetail() {
+		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	private fun updateAddressManagerDataBy(coinType: Int, data: ArrayList<Pair<String, String>>) {

@@ -115,8 +115,8 @@ class TransactionListPresenter(
 					transactions.forEachOrEnd { item, isEnd ->
 						item.addressName =
 							contacts.find {
-								it.ethERCAndETCAddress.equals(item.targetAddress, true)
-							}?.name ?: item.targetAddress
+								it.ethERCAndETCAddress.equals(item.toAddress, true)
+							}?.name ?: item.toAddress
 						if (isEnd) {
 							callback()
 						}
@@ -144,7 +144,7 @@ class TransactionListPresenter(
 		
 		fun getTokenTransactions(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			getTransactionsFromEtherScan(startBlock, errorCallback) {
@@ -161,7 +161,7 @@ class TransactionListPresenter(
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun getTransactionsFromEtherScan(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			hold: (hasNewData: Boolean) -> Unit
 		) {
 			// 请求所有链上的数据
@@ -176,7 +176,7 @@ class TransactionListPresenter(
 		
 		private fun mergeETHAndERC20Incoming(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			hold: (List<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
 			return object : ConcurrentAsyncCombine() {

@@ -2,7 +2,8 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
-import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
 import org.json.JSONObject
@@ -22,7 +23,6 @@ data class BitcoinTransactionTable(
 	val fromAddress: String,
 	val to: String,
 	val recordAddress: String,
-	val changeAddress: String,
 	val value: String,
 	val fee: String,
 	var size: String,
@@ -39,11 +39,10 @@ data class BitcoinTransactionTable(
 		data.safeGet("time"),
 		data.safeGet("hash"),
 		getFromAddress(data),
-		getToAddress(data, myAddress),
+		getToAddresses(data).toString(),
 		myAddress,
-		getChangeAddress(data),
 		getTransactionValue(data, myAddress),
-		getFeeSatoshi(data, myAddress),
+		getFeeSatoshi(data),
 		data.safeGet("size"),
 		false
 	)
@@ -56,88 +55,59 @@ data class BitcoinTransactionTable(
 			).safeGet("addr")
 		}
 		
-		private fun getToAddress(
-			data: JSONObject,
-			myAddress: String
-		): String {
+		private fun getToAddresses(
+			data: JSONObject
+		): List<String> {
 			val out = JSONArray(data.safeGet("out"))
-			var toAddress = ""
+			var toAddresses = listOf<String>()
 			(0 until out.length()).forEach {
-				// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
-				if (getFromAddress(data).equals(myAddress, true)) {
-					val outAddress = JSONObject(out[0].toString()).safeGet("addr")
-					if (
-						!outAddress.equals(myAddress, true)
-						&& !outAddress.equals(getChangeAddress(data), true)
-					) {
-						toAddress = outAddress
-					}
-				} else {
-					// 如果发起地址里面没有我的地址, 那么接收地址就是我
-					toAddress = myAddress
-				}
+				toAddresses += JSONObject(out[it].toString()).safeGet("addr")
 			}
-			return toAddress
+			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
+			return toAddresses.filterNot { it.equals(getFromAddress(data), true) }
 		}
 		
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
-			val out = JSONArray(data.safeGet("out"))
-			return if (
-				!getFromAddress(data).equals(myAddress, true)
-				&& getChangeAddress(data).equals(myAddress, true)
-			) {
-				getChangeValue(data)
-			} else {
-				JSONObject(out[0].toString()).safeGet("value")
-			}
+			return (getTotalValue(data) - getFeeSatoshi(data).toLong() - getChangeValue(
+				myAddress,
+				data
+			).toLong()).toString()
 		}
 		
+		/**
+		 * 理论上, 比特币的转账地址都可以定义为找零地址, 而若当用户更改不为人所知的自己可以控制的 `ChangeAddress`
+		 * 我们是无从得知的。这里我们假定输出地址就是发起转账的地址为找零地址。并把对应的 `Value` 定义为 `ChangeValue`、
+		 * 或发起地址不为我自己, `Out` 地址中去除我的地址的部分为 `ChangeValue`
+		 */
 		private fun getChangeValue(
+			toAddress: String,
 			data: JSONObject
 		): String {
 			val out = JSONArray(data.safeGet("out"))
-			var changeValue = ""
+			var changeValue = 0L
+			val mineIsTo = getFromAddress(data).equals(toAddress, true)
 			(0 until out.length()).forEach {
-				changeValue =
-					if (JSONObject(out[it].toString()).safeGet("n").toIntOrNull() == 1) {
-						JSONObject(out[it].toString()).safeGet("value")
+				val child = JSONObject(out[it].toString())
+				changeValue +=
+					if (child.safeGet("addr").equals(toAddress, true) == mineIsTo) {
+						child.safeGet("value").toLong()
 					} else {
-						"0"
+						0L
 					}
 			}
-			return changeValue
-		}
-		
-		private fun getChangeAddress(
-			data: JSONObject
-		): String {
-			val out = JSONArray(data.safeGet("out"))
-			var changeAddress = ""
-			(0 until out.length()).forEach {
-				changeAddress =
-					if (JSONObject(out[it].toString()).safeGet("n").toIntOrNull() == 1) {
-						JSONObject(out[it].toString()).safeGet("addr")
-					} else {
-						""
-					}
-			}
-			// 如果用户没有设置找零那么意味着没有第二个输出, 其余的都被当作燃气费
-			return changeAddress
+			return changeValue.toString()
 		}
 		
 		fun getTransactionsByAddress(
 			address: String,
 			hold: (List<BitcoinTransactionTable>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.bitcoinTransactionDao()
-						.getDataByAddress(address)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase
+					.database
+					.bitcoinTransactionDao()
+					.getDataByAddress(address)
+			} then (hold)
 		}
 		
 		fun updateLocalDataByHash(
@@ -162,7 +132,7 @@ data class BitcoinTransactionTable(
 				}
 		}
 		
-		private fun getFeeSatoshi(data: JSONObject, myAddress: String): String {
+		private fun getTotalValue(data: JSONObject): Long {
 			val inputs = JSONArray(data.safeGet("inputs"))
 			var totalValue = 0L
 			(0 until inputs.length()).forEach {
@@ -170,10 +140,20 @@ data class BitcoinTransactionTable(
 					JSONObject(inputs[it].toString()).safeGet("prev_out")
 				).safeGet("value").toLong()
 			}
-			return (totalValue - getTransactionValue(
-				data,
-				myAddress
-			).toLong() - getChangeValue(data).toLong()).toString()
+			return totalValue
+		}
+		
+		private fun getTotalOutValue(data: JSONObject): Long {
+			val out = JSONArray(data.safeGet("out"))
+			var totalValue = 0L
+			(0 until out.length()).forEach {
+				totalValue += JSONObject(out[it].toString()).safeGet("value").toLong()
+			}
+			return totalValue
+		}
+		
+		private fun getFeeSatoshi(data: JSONObject): String {
+			return (getTotalValue(data) - getTotalOutValue(data)).toString()
 		}
 	}
 }

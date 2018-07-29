@@ -2,9 +2,10 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -94,20 +95,17 @@ data class MyTokenTable(
 		
 		fun getCurrentChainTokenByContract(
 			contract: String,
-			callback: (MyTokenTable?) -> Unit
+			hold: (MyTokenTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.myTokenDao()
-						.getCurrentChainTokenByContractAndAddress(
-							contract,
-							WalletTable.getAddressByContract(contract)
-						)
-				}) {
-				callback(it)
-			}
+			load {
+				GoldStoneDataBase
+					.database
+					.myTokenDao()
+					.getCurrentChainTokenByContractAndAddress(
+						contract,
+						WalletTable.getAddressByContract(contract)
+					)
+			} then (hold)
 		}
 		
 		fun getTokenBalance(
@@ -115,16 +113,15 @@ data class MyTokenTable(
 			walletAddress: String,
 			callback: (Double?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.myTokenDao()
-						.getCurrentChainTokenByContractAndAddress(
-							contract,
-							walletAddress
-						)
-				}) { token ->
+			load {
+				GoldStoneDataBase
+					.database
+					.myTokenDao()
+					.getCurrentChainTokenByContractAndAddress(
+						contract,
+						walletAddress
+					)
+			} then { token ->
 				if (token.isNull()) callback(null)
 				else {
 					DefaultTokenTable.getCurrentChainToken(contract) {
@@ -177,7 +174,7 @@ data class MyTokenTable(
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: String,
-			errorCallback: (error: Exception?, reason: String?) -> Unit,
+			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: () -> Unit
 		) {
 			WalletTable.getCurrentWallet {
@@ -234,7 +231,7 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			ownerAddress: String,
-			errorCallback: (error: Exception?, reason: String?) -> Unit,
+			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: () -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
@@ -282,7 +279,7 @@ data class MyTokenTable(
 			contract: String,
 			ownerAddress: String,
 			convertByDecimal: Boolean = false,
-			errorCallback: (error: Exception?, reason: String?) -> Unit,
+			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`

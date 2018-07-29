@@ -9,10 +9,12 @@ import android.util.Log
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import junit.framework.Assert.assertTrue
@@ -149,6 +151,15 @@ class GoldStoneServerUnitTest {
 			}
 		) {
 			LogUtil.debug("getETCTransactions", "$it")
+		}
+	}
+	
+	@Test
+	fun getBitcoinBlockHeight() {
+		BTCJsonRPC.getBTCChainBlockHeight(true) {
+			// Error
+		} then {
+			LogUtil.debug("getBitcoinBlockHeight", "$it")
 		}
 	}
 }

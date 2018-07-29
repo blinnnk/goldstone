@@ -5,8 +5,9 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -36,11 +37,10 @@ data class TokenBalanceTable(
 			address: String = Config.getCurrentEthereumAddress(),
 			hold: (ArrayList<TokenBalanceTable>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.tokenBalanceDao()
-						.getTokenBalanceByContractAndAddress(address, contract)
-				}) {
+			load {
+				GoldStoneDataBase.database.tokenBalanceDao()
+					.getTokenBalanceByContractAndAddress(address, contract)
+			} then {
 				hold(it.toArrayList())
 			}
 		}

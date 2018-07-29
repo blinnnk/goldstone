@@ -23,12 +23,13 @@ import java.io.Serializable
  */
 data class TransactionListModel(
 	var addressName: String,
+	var fromAddress: String,
 	val addressInfo: String,
 	var count: Double,
 	val symbol: String,
 	val isReceived: Boolean,
 	val date: String,
-	val targetAddress: String,
+	val toAddress: String,
 	val blockNumber: String,
 	val transactionHash: String,
 	var memo: String,
@@ -46,6 +47,7 @@ data class TransactionListModel(
 	constructor(data: TransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else data.tokenReceiveAddress.orEmpty(),
+		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
@@ -76,22 +78,23 @@ data class TransactionListModel(
 	)
 	
 	constructor(data: BitcoinTransactionTable) : this(
-		if (data.to.equals(data.recordAddress, true)) data.fromAddress else data.to,
+		if (!data.fromAddress.equals(data.recordAddress, true)) data.fromAddress else formatToAddress(data.to),
+		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
 				DateAndTimeText.getDateText()
 			) + descriptionText(
-				data.to.equals(data.recordAddress, true),
-				data.to,
+				data.to.contains(data.recordAddress, true),
+				formatToAddress(data.to),
 				data.fromAddress
 			)
 		), // 副标题的生成
 		data.value.toDouble().toBTCCount(),
 		CryptoSymbol.btc,
-		data.to.equals(data.recordAddress, true),
+		!data.fromAddress.equals(data.recordAddress, true),
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
-		data.to,
+		formatToAddress(data.to),
 		data.blockNumber,
 		data.hash,
 		"",
@@ -107,6 +110,15 @@ data class TransactionListModel(
 	)
 	
 	companion object {
+		fun formatToAddress(toAddress: String): String {
+			var formatedAddresses = ""
+			val addresses = toAddress.substring(1, toAddress.count() - 1).split(",")
+			addresses.forEachIndexed { index, item ->
+				formatedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
+			}
+			return formatedAddresses
+		}
+		
 		fun generateTransactionURL(taxHash: String, symbol: String?): String {
 			return when {
 				symbol.equals(CryptoSymbol.etc, true) ->

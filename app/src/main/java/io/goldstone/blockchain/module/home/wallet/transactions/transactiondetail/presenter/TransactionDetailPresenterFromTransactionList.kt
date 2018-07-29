@@ -20,7 +20,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 	dataFromList?.apply {
 		val headerData = TransactionHeaderModel(
 			count,
-			targetAddress,
+			if (isReceived) fromAddress else toAddress,
 			symbol,
 			isPending,
 			isReceived,

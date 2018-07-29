@@ -3,10 +3,11 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import android.content.Context
 import com.blinnnk.extension.*
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -114,15 +115,14 @@ data class WalletTable(
 			model: WalletTable,
 			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().apply {
-						findWhichIsUsing(true)?.let {
-							update(it.apply { isUsing = false })
-						}
-						insert(model)
-					}.findWhichIsUsing(true)
-				}) {
+			load {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						update(it.apply { isUsing = false })
+					}
+					insert(model)
+				}.findWhichIsUsing(true)
+			} then {
 				Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
 				callback()
 			}
@@ -144,19 +144,17 @@ data class WalletTable(
 		}
 		
 		fun getAll(callback: ArrayList<WalletTable>.() -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().getAllWallets()
-				}) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then {
 				callback(it.toArrayList())
 			}
 		}
 		
 		fun getAllETHAndERCAddresses(callback: ArrayList<String>.() -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().getAllWallets()
-				}) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then {
 				callback(
 					it.map {
 						it.currentETHAndERCAddress
@@ -166,10 +164,9 @@ data class WalletTable(
 		}
 		
 		fun getAllBTCMainnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().getAllWallets()
-				}) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then {
 				callback(
 					it.map {
 						it.currentBTCAddress
@@ -179,10 +176,9 @@ data class WalletTable(
 		}
 		
 		fun getAllBTCTestnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().getAllWallets()
-				}) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then {
 				callback(
 					it.map {
 						it.currentBTCTestAddress
@@ -192,12 +188,13 @@ data class WalletTable(
 		}
 		
 		fun getCurrentWallet(hold: (WalletTable?) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-						balance = Config.getCurrentBalance()
-					}
-				}) { hold(it) }
+			load {
+				GoldStoneDataBase
+					.database
+					.walletDao()
+					.findWhichIsUsing(true)
+					?.apply { balance = Config.getCurrentBalance() }
+			} then (hold)
 		}
 		
 		fun getBTCPrivateKey(address: String, isTest: Boolean, hold: (String) -> Unit) {
@@ -365,14 +362,13 @@ data class WalletTable(
 			newName: String,
 			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().apply {
-						findWhichIsUsing(true)?.let {
-							update(it.apply { name = newName })
-						}
+			load {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						update(it.apply { name = newName })
 					}
-				}) {
+				}
+			} then {
 				callback()
 			}
 		}
@@ -381,14 +377,13 @@ data class WalletTable(
 			newHint: String,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().apply {
-						findWhichIsUsing(true)?.let {
-							update(it.apply { hint = newHint })
-						}
+			load {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						update(it.apply { hint = newHint })
 					}
-				}) {
+				}
+			} then {
 				callback()
 			}
 		}
@@ -494,6 +489,7 @@ data class WalletTable(
 								GoldStoneDataBase.database.walletDao().update(
 									this.apply {
 										currentETHAndERCAddress = newAddress
+										Config.updateCurrentEthereumAddress(newAddress)
 									}
 								)
 								GoldStoneAPI.context.runOnUiThread {
@@ -505,6 +501,7 @@ data class WalletTable(
 								GoldStoneDataBase.database.walletDao().update(
 									this.apply {
 										currentETCAddress = newAddress
+										Config.updateCurrentETCAddress(newAddress)
 									}
 								)
 								GoldStoneAPI.context.runOnUiThread {
@@ -517,12 +514,14 @@ data class WalletTable(
 									GoldStoneDataBase.database.walletDao().update(
 										this.apply {
 											currentBTCTestAddress = newAddress
+											Config.updateCurrentBTCTestAddress(newAddress)
 										}
 									)
 								} else {
 									GoldStoneDataBase.database.walletDao().update(
 										this.apply {
 											currentBTCAddress = newAddress
+											Config.updateCurrentBTCAddress(newAddress)
 										}
 									)
 								}
@@ -587,14 +586,11 @@ data class WalletTable(
 		
 		fun getWalletByAddress(
 			address: String,
-			callback: (WalletTable?) -> Unit
+			hold: (WalletTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
-				}) {
-				callback(it)
-			}
+			load {
+				GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
+			} then (hold)
 		}
 		
 		fun checkIsWatchOnlyAndHasBackupOrElse(

@@ -195,10 +195,10 @@ class TransactionDetailPresenter(
 				arrayListOf(
 					receipt.minerFee,
 					receipt.memo,
-					if (receipt.isReceived) receipt.targetAddress
+					if (receipt.isReceived) receipt.fromAddress
 					else WalletUtil.getAddressBySymbol(receipt.symbol),
 					if (receipt.isReceived) WalletUtil.getAddressBySymbol(receipt.symbol)
-					else receipt.targetAddress,
+					else receipt.toAddress,
 					receipt.transactionHash,
 					receipt.blockNumber,
 					receipt.date,

@@ -3,13 +3,9 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.util.coroutinesTask
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -339,18 +335,17 @@ class TokenDetailPresenter(
 			if (todayBalance.isNull()) return@getTokenBalance
 			// 计算过去7天的所有余额
 			generateHistoryBalance(todayBalance!!) { history ->
-				coroutinesTask(
-					{
-						history.forEachIndexed { index, data ->
-							TokenBalanceTable.insertOrUpdate(
-								contract,
-								Config.getCurrentEthereumAddress(),
-								data.date,
-								// 插入今日的余额数据
-								if (index == 0) todayBalance else data.balance
-							)
-						}
-					}) {
+				load {
+					history.forEachIndexed { index, data ->
+						TokenBalanceTable.insertOrUpdate(
+							contract,
+							Config.getCurrentEthereumAddress(),
+							data.date,
+							// 插入今日的余额数据
+							if (index == 0) todayBalance else data.balance
+						)
+					}
+				} then {
 					// 更新数据完毕后在主线程从新从数据库获取数据
 					TokenBalanceTable.getBalanceByContract(contract) {
 						callback(it)

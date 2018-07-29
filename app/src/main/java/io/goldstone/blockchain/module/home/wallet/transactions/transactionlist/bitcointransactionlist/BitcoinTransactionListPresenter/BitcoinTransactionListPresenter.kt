@@ -73,7 +73,7 @@ class BitcoinTransactionListPresenter(
 		fun loadTransactionsFromChain(
 			pageSize: Int,
 			localData: List<BitcoinTransactionTable>,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			successCallback: (List<TransactionListModel>) -> Unit
 		) {
 			val offset =

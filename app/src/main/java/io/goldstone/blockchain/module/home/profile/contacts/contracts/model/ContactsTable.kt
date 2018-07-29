@@ -2,7 +2,8 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
@@ -38,19 +39,17 @@ data class ContactTable(
 			contact: ContactTable,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().insert(contact)
-				}) {
+			load {
+				GoldStoneDataBase.database.contactDao().insert(contact)
+			} then {
 				callback()
 			}
 		}
 		
 		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().getAllContacts()
-				}) {
+			load {
+				GoldStoneDataBase.database.contactDao().getAllContacts()
+			} then {
 				callback(it.toArrayList())
 			}
 		}
@@ -59,12 +58,11 @@ data class ContactTable(
 			id: Int,
 			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().apply {
-						getContacts(id)?.let { delete(it) }
-					}
-				}) {
+			load {
+				GoldStoneDataBase.database.contactDao().apply {
+					getContacts(id)?.let { delete(it) }
+				}
+			} then {
 				callback()
 			}
 		}

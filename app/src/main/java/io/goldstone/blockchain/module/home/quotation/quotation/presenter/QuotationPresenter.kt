@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import com.blinnnk.extension.*
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -163,16 +164,15 @@ class QuotationPresenter(
 		data: CurrencyPriceInfoModel,
 		isDisconnected: Boolean
 	) {
-		coroutinesTask(
-			{
-				asyncData?.find {
-					it.pair.equals(data.pair, true)
-				}?.apply {
-					this.price = data.price
-					this.percent = data.percent
-					this.isDisconnected = isDisconnected
-				}
-			}) {
+		load {
+			asyncData?.find {
+				it.pair.equals(data.pair, true)
+			}?.apply {
+				this.price = data.price
+				this.percent = data.percent
+				this.isDisconnected = isDisconnected
+			}
+		} then {
 			it?.let {
 				recyclerView.adapter.notifyDataSetChanged()
 			}
