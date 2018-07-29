@@ -39,7 +39,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 	protected val subtitle = TextView(context).apply {
 		visibility = View.GONE
 		textSize = fontSize(12)
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.black(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		gravity = Gravity.CENTER_VERTICAL

@@ -394,7 +394,10 @@ class AddressManagerPresneter(
 				) {
 					it?.let {
 						doAsync {
-							MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chain }, address), chain)
+							MyTokenTable.insert(
+								MyTokenTable(it.apply { chain_id = chain }, address),
+								chain
+							)
 						}
 					}
 				}

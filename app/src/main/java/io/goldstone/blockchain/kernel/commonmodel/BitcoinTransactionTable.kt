@@ -164,7 +164,7 @@ interface BitcoinTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList")
 	fun getAll(): List<BitcoinTransactionTable>
 	
-	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address")
+	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address  ORDER BY timeStamp DESC")
 	fun getDataByAddress(address: String): List<BitcoinTransactionTable>
 	
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash")
