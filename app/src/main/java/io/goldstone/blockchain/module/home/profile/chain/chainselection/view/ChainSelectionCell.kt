@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.chain.chainselection.view
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -16,7 +15,10 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/5/11 4:27 PM

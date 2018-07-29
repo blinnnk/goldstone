@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.common.webview.presenter
 
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.common.value.CreateWalletText
+import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.value.NotificationText
+import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -33,11 +35,6 @@ class WebViewPresenter(
 				
 				is NotificationFragment -> {
 					headerTitle = NotificationText.notification
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-				
-				is TokenDetailOverlayFragment -> {
-					headerTitle = TokenDetailText.tokenDetail
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
 				

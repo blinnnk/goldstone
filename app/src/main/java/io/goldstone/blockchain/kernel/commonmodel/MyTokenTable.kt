@@ -6,8 +6,8 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -47,7 +47,7 @@ data class MyTokenTable(
 	
 	companion object {
 		
-		fun insert(model: MyTokenTable, chainID: String = Config.getCurrentChain()) {
+		fun insert(model: MyTokenTable, chainID: String) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
 				if (getCurrentChainTokenByContractAndAddress(
@@ -191,24 +191,13 @@ data class MyTokenTable(
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: String,
+			chainID: String,
 			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: () -> Unit
 		) {
 			WalletTable.getCurrentWallet {
 				doAsync {
-					val currentAddress = when (symbol) {
-						CryptoSymbol.etc -> it?.currentETCAddress
-						
-						CryptoSymbol.btc -> {
-							if (Config.isTestEnvironment()) {
-								it?.currentBTCTestAddress
-							} else {
-								it?.currentETCAddress
-							}
-						}
-						
-						else -> it?.currentETHAndERCAddress
-					}.orEmpty()
+					val currentAddress = WalletTable.getAddressBySymbol(symbol)
 					GoldStoneDataBase.database.apply {
 						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 						myTokenDao().getCurrentChainTokensBy(currentAddress).find {
@@ -231,7 +220,8 @@ data class MyTokenTable(
 										0.0,
 										contract,
 										CryptoValue.chainID(contract)
-									)
+									),
+									chainID
 								)
 								// 没有网络不用检查间隔直接插入数据库
 								GoldStoneAPI.context.runOnUiThread {
@@ -257,13 +247,18 @@ data class MyTokenTable(
 				ownerAddress,
 				false,
 				errorCallback
-			) {
+			) { balance ->
 				val contractAddress: String
 				val chainID: String
 				when {
 					contract.equals(CryptoValue.etcContract, true) -> {
 						contractAddress = CryptoValue.etcContract
 						chainID = Config.getETCCurrentChain()
+					}
+					
+					contract.equals(CryptoValue.btcContract, true) -> {
+						contractAddress = CryptoValue.btcContract
+						chainID = if (Config.isTestEnvironment()) ChainID.BTCTest.id else ChainID.BTCMain.id
 					}
 					
 					contract.equals(CryptoValue.ethContract, true) -> {
@@ -281,10 +276,11 @@ data class MyTokenTable(
 						0,
 						ownerAddress,
 						symbol,
-						it,
+						balance,
 						contractAddress,
 						chainID
-					)
+					),
+					chainID
 				)
 				GoldStoneAPI.context.runOnUiThread {
 					callback()

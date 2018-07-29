@@ -20,6 +20,19 @@ enum class ChainID(val id: String) {
 	
 	companion object {
 		
+		fun getChainIDBySymbol(symbol: String): String {
+			return when {
+				symbol.equals(CryptoSymbol.btc, true) -> {
+					if (Config.isTestEnvironment()) ChainID.BTCTest.id
+					else ChainID.BTCMain.id
+				}
+				
+				symbol.equals(CryptoSymbol.etc, true) ->
+					Config.getETCCurrentChain()
+				else -> Config.getCurrentChain()
+			}
+		}
+		
 		fun getTestChains(): ArrayList<String> {
 			return arrayListOf(
 				ChainID.ETCTest.id,
@@ -83,14 +96,6 @@ enum class ChainID(val id: String) {
 				ChainText.btcMain -> BTCMain.id
 				ChainText.btcTest -> BTCTest.id
 				else -> Main.id
-			}
-		}
-		
-		fun getChainIDBySymbol(symbol: String?): String {
-			return when (symbol) {
-				CryptoSymbol.etc -> Config.getETCCurrentChain()
-				CryptoSymbol.btc -> Config.getBTCCurrentChain()
-				else -> Config.getCurrentChain()
 			}
 		}
 	}

@@ -70,7 +70,9 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
 					// Nodes of One Chain
-					val chainChild = nodes.filter { it.first == chain.first }
+					val chainChild = nodes.filter {
+						it.first.equals(chain.first, true)
+					}
 					// Generate cell with chain and node data
 					chainChild.forEachIndexed { index, pair ->
 						var isSelected = false
@@ -85,7 +87,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						/**
 						 * `ID` 用 `10` 为波段进行区分, ETH 0～10 ， ETC 10~20
 						 */
-						val id = index + if (pair.first.equals(CryptoName.etc, true)) 10 else 0
+						val id = index + when {
+							pair.first.equals(CryptoName.etc, true) -> 10
+							pair.first.equals(CryptoName.btc, true) -> 20
+							else -> 0
+						}
 						NodeSelectionCell(context).setData(pair.second, isSelected, id).click {
 							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
@@ -105,9 +111,13 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}.click {
 					isMainnet?.let {
 						selectedNode.forEach { pair ->
-							if (pair.first == CryptoName.eth) presenter.updateERC20TestChainID(pair.second)
-							if (pair.first == CryptoName.btc) presenter.updateBTCTestChainID(pair.second)
-							else presenter.updateETCTestChainID(pair.second)
+							when {
+								pair.first.equals(CryptoName.eth, true) ->
+									presenter.updateERC20TestChainID(pair.second)
+								pair.first.equals(CryptoName.btc, true) ->
+									presenter.updateBTCTestChainID(pair.second)
+								else -> presenter.updateETCTestChainID(pair.second)
+							}
 							// 更新是否是测试环境的参数
 							Config.updateIsTestEnvironment(testnetNodeList.any { it.second == pair.second })
 						}
@@ -129,6 +139,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
 		val start = when (type) {
 			ChainType.ETC -> 10
+			ChainType.BTC -> 20
 			else -> 0
 		}
 		(start until maxIndex + start).forEach {

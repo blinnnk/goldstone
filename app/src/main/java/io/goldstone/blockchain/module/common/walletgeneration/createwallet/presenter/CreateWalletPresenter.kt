@@ -237,9 +237,9 @@ class CreateWalletPresenter(
 				localTokens.isEmpty() isTrue {
 					errorCallback(Exception())
 					// 本地没有数据从服务器获取数据
-					//					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-					//						serverTokens.completeAddressInfo(addresses, callback)
-					//					}
+					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+						serverTokens.completeAddressInfo(addresses, callback)
+					}
 				} otherwise {
 					localTokens.completeAddressInfo(addresses, callback)
 				}

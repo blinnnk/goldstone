@@ -21,10 +21,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 27/03/2018 3:33 AM
@@ -46,7 +43,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		
 		verticalLayout {
 			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), 140.uiPX()).apply {
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), wrapContent).apply {
 					leftMargin = (ScreenSize.Width * 0.1).toInt()
 					addRule(CENTER_VERTICAL)
 				}
@@ -97,7 +94,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		info.title.text =
 			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
-		info.subtitle.text = headerModel.address.toUpperCase()
+		info.subtitle.text = headerModel.address
 		
 		if (headerModel.isError) {
 			icon.iconColor = Spectrum.lightRed
@@ -133,7 +130,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 							HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 51.uiPX()
+						y += 56.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

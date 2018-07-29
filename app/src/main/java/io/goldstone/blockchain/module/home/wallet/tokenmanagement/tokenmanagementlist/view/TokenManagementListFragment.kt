@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
@@ -40,11 +41,14 @@ class TokenManagementListFragment :
 						isUsed = switch.isChecked
 					}
 					// 更新数据库
-					TokenManagementListPresenter.updateMyTokensInfoBy(
-						switch,
-						model,
-						this@TokenManagementListFragment.context!!
-					)
+					this@TokenManagementListFragment.context?.apply {
+						TokenManagementListPresenter.updateMyTokensInfoBy(
+							switch,
+							model,
+							ChainID.getChainIDBySymbol(model.symbol),
+							this
+						)
+					}
 				}
 			}
 		}
