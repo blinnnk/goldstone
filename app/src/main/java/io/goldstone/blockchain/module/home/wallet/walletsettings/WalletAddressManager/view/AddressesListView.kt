@@ -35,7 +35,8 @@ class AddressesListView(
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
 	}
-	private val maxCount = 5
+
+	private val maxCount = 4
 	var checkAllEvent: Runnable? = null
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
@@ -48,14 +49,14 @@ class AddressesListView(
 			} else {
 				updateButtonTitle("Check All (${model?.size})")
 			}
-			// 最多只显示 `5` 个链下地址
+			// 最多只显示 `4` 个链下地址
 			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 50.uiPX()
 			requestLayout()
 			WalletTable.getCurrentAddresses { currentAddresses ->
 				reversed().forEachIndexed { index, data ->
 					var isDefault = false
-					// 默认最多显示 `5` 条地址
+					// 默认最多显示 `4` 条地址
 					if (index >= maxCount) return@forEachIndexed
 					GraySqualCellWithButtons(context).apply cell@{
 						// 如果列表中有默认地址那么更改样式

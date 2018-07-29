@@ -46,6 +46,7 @@ class QRView(context: Context) : LinearLayout(context) {
 		}.into(this)
 
 		address.apply {
+			isCenter()
 			setMargins<LinearLayout.LayoutParams> { topMargin = (-15).uiPX() }
 		}.into(this)
 
