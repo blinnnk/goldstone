@@ -2,11 +2,12 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -238,18 +239,16 @@ class WalletDetailPresenter(
 			fragment.updateHeaderValue()
 		} else {
 			try {
-				coroutinesTask(
-					{
-						/** 先按照资产情况排序, 资产为零的按照权重排序 */
-						val currencyList = data.filter { it.currency > 0.0 }
-						val weightList = data.filter { it.currency == 0.0 }
-						currencyList.sortedByDescending {
-							it.currency
-						}.plus(weightList.sortedByDescending {
-							it.weight
-						}).toArrayList()
-					}
-				) {
+				load {
+					/** 先按照资产情况排序, 资产为零的按照权重排序 */
+					val currencyList = data.filter { it.currency > 0.0 }
+					val weightList = data.filter { it.currency == 0.0 }
+					currencyList.sortedByDescending {
+						it.currency
+					}.plus(weightList.sortedByDescending {
+						it.weight
+					}).toArrayList()
+				} then {
 					diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 					fragment.updateHeaderValue()
 				}

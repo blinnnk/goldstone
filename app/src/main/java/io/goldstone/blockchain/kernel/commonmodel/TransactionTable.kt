@@ -5,9 +5,10 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.ConcurrentCombine
-import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -263,13 +264,12 @@ data class TransactionTable(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
+			} then {
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -283,13 +283,12 @@ data class TransactionTable(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getETCTransactionsByAddress(address)
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getETCTransactionsByAddress(address)
+			} then {
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -419,13 +418,10 @@ data class TransactionTable(
 			isReceived: Boolean,
 			hold: (TransactionTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.transactionDao()
-						.getByTaxHashAndReceivedStatus(hash, isReceived)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase.database.transactionDao()
+					.getByTaxHashAndReceivedStatus(hash, isReceived)
+			} then (hold)
 		}
 	}
 }

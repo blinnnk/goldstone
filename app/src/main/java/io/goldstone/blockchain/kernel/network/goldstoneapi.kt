@@ -251,7 +251,7 @@ object GoldStoneAPI {
 	
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (Throwable) -> Unit,
 		address: String = Config.getCurrentEthereumAddress(),
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
@@ -271,7 +271,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (Throwable) -> Unit,
 		address: String = Config.getCurrentEthereumAddress(),
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {

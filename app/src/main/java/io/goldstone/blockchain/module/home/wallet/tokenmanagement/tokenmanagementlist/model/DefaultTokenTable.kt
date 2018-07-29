@@ -5,10 +5,11 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -164,28 +165,25 @@ data class DefaultTokenTable(
 	companion object {
 		
 		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
 		
 		fun getCurrentChainTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
 		
 		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
@@ -196,13 +194,12 @@ data class DefaultTokenTable(
 			hold: (decimal: Double?) -> Unit
 		) {
 			// 首先从本地数据库查询数据
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract)
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.defaultTokenDao()
+					.getCurrentChainTokenByContract(contract)
+			} then {
 				if (it.isNull()) {
 					// 如果本地没有数据就从网络获取
 					GoldStoneEthCall.getTokenDecimal(
@@ -226,13 +223,12 @@ data class DefaultTokenTable(
 			contract: String,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getTokenBySymbolAndContractFromAllChains(symbol, contract)
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.defaultTokenDao()
+					.getTokenBySymbolAndContractFromAllChains(symbol, contract)
+			} then {
 				if (it.isNotEmpty()) {
 					hold(it[0])
 				} else {
@@ -247,15 +243,12 @@ data class DefaultTokenTable(
 			etcChain: String = Config.getETCCurrentChain(),
 			hold: (DefaultTokenTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract, ercChain, etcChain)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase
+					.database
+					.defaultTokenDao()
+					.getCurrentChainTokenByContract(contract, ercChain, etcChain)
+			} then (hold)
 		}
 		
 		fun updateOrInsertCoinInfo(

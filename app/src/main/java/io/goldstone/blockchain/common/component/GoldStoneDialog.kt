@@ -191,7 +191,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}
 		
-		fun chainError(reason: String?, error: Exception?, context: Context) {
+		fun chainError(reason: String?, error: Throwable?, context: Context) {
 			if (reason.equals(ErrorTag.chain, true)) {
 				GoldStoneDialog.showChainErrorDialog(context)
 			}

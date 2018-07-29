@@ -4,8 +4,9 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -96,12 +97,9 @@ data class QuotationSelectionTable(
 			pair: String,
 			hold: (QuotationSelectionTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
+			} then (hold)
 		}
 		
 		fun removeSelectionBy(
@@ -123,13 +121,12 @@ data class QuotationSelectionTable(
 		}
 		
 		fun getMySelections(hold: (ArrayList<QuotationSelectionTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.quotationSelectionDao()
-						.getQuotationSelfSelections()
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.quotationSelectionDao()
+					.getQuotationSelfSelections()
+			} then {
 				hold(it.toArrayList())
 			}
 		}

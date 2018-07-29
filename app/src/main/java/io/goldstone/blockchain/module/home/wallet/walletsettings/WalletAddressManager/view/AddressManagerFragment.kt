@@ -223,6 +223,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			hasDefaultCell,
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
+					// 更新默认地址后同时更新首页的列表
+					updateWalletDetail()
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
@@ -244,6 +246,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) },
 			exportBTCPrivateKey = { presenter.showBTCPrivateKeyExportFragment(address) }
 		)
+	}
+	
+	private fun updateWalletDetail() {
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {

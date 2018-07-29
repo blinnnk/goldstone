@@ -8,8 +8,9 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R.raw.terms
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.ProfileText
@@ -45,10 +46,9 @@ data class AppConfigTable(
 	
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.appConfigDao().getAppConfig()
-				}) {
+			load {
+				GoldStoneDataBase.database.appConfigDao().getAppConfig()
+			} then {
 				it.isNotEmpty() isTrue {
 					hold(it[0])
 				} otherwise {

@@ -4,9 +4,10 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONObject
 
@@ -56,10 +57,9 @@ data class NotificationTable(
 	
 	companion object {
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.notificationDao().getAllNotifications()
-				}) {
+			load {
+				GoldStoneDataBase.database.notificationDao().getAllNotifications()
+			} then {
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}

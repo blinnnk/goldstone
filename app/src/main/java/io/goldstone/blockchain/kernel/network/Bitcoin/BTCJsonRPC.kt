@@ -8,6 +8,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod
+import kotlinx.coroutines.experimental.Deferred
 import okhttp3.RequestBody
 import org.json.JSONObject
 
@@ -51,11 +52,10 @@ object BTCJsonRPC {
 		}
 	}
 	
-	fun getCurrentBlockHeight(
+	fun getBTCChainBlockHeight(
 		isTest: Boolean,
-		errorCallback: (Exception?) -> Unit,
-		hold: (Int?) -> Unit
-	) {
+		errorCallback: (Throwable?) -> Unit
+	): Deferred<String?> {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
@@ -67,16 +67,14 @@ object BTCJsonRPC {
 				null
 			)
 		).let {
-			RequisitionUtil.callChainBy(
+			return RequisitionUtil.callChain(
 				it,
 				{ error, reason ->
 					errorCallback(error)
 					LogUtil.error("getblockHeight $reason", error)
 				},
 				if (isTest) ChainText.btcTest else ChainText.btcMain
-			) {
-				hold(if (it.isNotEmpty()) it.toInt() else null)
-			}
+			)
 		}
 	}
 	

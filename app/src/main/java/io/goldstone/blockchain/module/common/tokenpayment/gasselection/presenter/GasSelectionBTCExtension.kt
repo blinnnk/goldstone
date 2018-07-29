@@ -86,13 +86,7 @@ fun GasSelectionPresenter.transferBTC(
 							) { hash ->
 								hash?.let {
 									// 插入 `Pending` 数据到本地数据库
-									insertBTCPendingDataDatabase(
-										this,
-										fee,
-										signedModel.messageSize,
-										it,
-										fromAddress
-									)
+									insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
 									// 跳转到章党详情界面
 									GoldStoneAPI.context.runOnUiThread {
 										goToTransactionDetailFragment(
@@ -161,8 +155,7 @@ private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
 	raw: PaymentPrepareBTCModel,
 	fee: Long,
 	size: Int,
-	taxHash: String,
-	changeAddress: String
+	taxHash: String
 ) {
 	fragment.getParentFragment<TokenDetailOverlayFragment> {
 		val myAddress =
@@ -178,7 +171,6 @@ private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
 			myAddress,
 			raw.toAddress,
 			myAddress,
-			changeAddress,
 			raw.value.toString(),
 			fee.toString(),
 			size.toString(),
