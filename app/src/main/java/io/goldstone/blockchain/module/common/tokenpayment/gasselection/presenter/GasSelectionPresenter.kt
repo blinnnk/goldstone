@@ -82,7 +82,7 @@ class GasSelectionPresenter(
 					GasSelectionModel(
 						index,
 						minner.toString().toLong(),
-						226,
+						prepareBTCModel?.signedMessageSize ?: 226,
 						currentMinerType
 					)
 				else
@@ -122,7 +122,9 @@ class GasSelectionPresenter(
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
-						if (isBTC()) 226 else prepareModel?.gasLimit?.toLong().orElse(0L)
+						if (isBTC()) {
+							prepareBTCModel?.signedMessageSize ?: 226L
+						} else prepareModel?.gasLimit?.toLong().orElse(0L)
 					)
 					putBoolean(
 						ArgumentKey.isBTC,
@@ -158,7 +160,7 @@ class GasSelectionPresenter(
 		return getToken()?.symbol.equals(CryptoSymbol.btc, true)
 	}
 	
-	fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
+	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
 		return when {
 			getDecimalCount().isNull() -> return true
 			

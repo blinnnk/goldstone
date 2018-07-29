@@ -15,12 +15,12 @@ data class WalletListModel(
 	var addressName: String = "",
 	var address: String = "",
 	var subtitle: String = "",
-	var count: Double = 0.0,
+	var balance: Double = 0.0,
 	var avatar: Int = 0,
 	var isWatchOnly: Boolean = false,
 	var isUsing: Boolean = false
 ) {
-
+	
 	constructor(data: WalletTable, balance: Double) : this(
 		data.id,
 		data.name,
@@ -32,7 +32,7 @@ data class WalletListModel(
 		data.isWatchOnly,
 		data.isUsing
 	)
-
+	
 	companion object {
 		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
 			return if (wallet.currentETHAndERCAddress.isEmpty()) {

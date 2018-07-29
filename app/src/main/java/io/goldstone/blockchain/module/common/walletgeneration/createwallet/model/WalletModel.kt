@@ -237,6 +237,15 @@ data class WalletTable(
 			}
 		}
 		
+		fun getAddressesByWallet(wallet: WalletTable): List<String> {
+			return listOf(
+				wallet.currentBTCAddress,
+				wallet.currentBTCTestAddress,
+				wallet.currentETCAddress,
+				wallet.currentETHAndERCAddress
+			).filter { it.isNotEmpty() }.distinctBy { it }
+		}
+		
 		fun getWalletType(hold: (WalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				it?.apply {

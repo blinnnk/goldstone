@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -34,21 +37,25 @@ abstract class BTCTransactionStatusObserver {
 		doAsync {
 			if (currentBlockNumber.isNull()) {
 				BitcoinApi.getBlockNumberByTransactionHash(
-					hash
+					hash,
+					{
+						// TODO ERROR Alert
+						LogUtil.error("Observering getBlockNumberByTransactionHash", it)
+					}
 				) {
-					// TODO ERROR Alert
-					LogUtil.error("Observering getBlockNumberByTransactionHash", it)
-				} then {
 					removeObserver()
 					currentBlockNumber = it
 					handler.postDelayed(reDo, retryTime)
 				}
 			} else {
-				BTCJsonRPC.getBTCChainBlockHeight(Config.isTestEnvironment()) {
-					removeObserver()
-					// TODO ERROR Alert
-				} then {
-					it?.toIntOrNull()?.let {
+				BTCJsonRPC.getCurrentBlockHeight(
+					Config.isTestEnvironment(),
+					{
+						removeObserver()
+						// TODO ERROR Alert
+					}
+				) {
+					it?.let {
 						val blockInterval = it - currentBlockNumber!!
 						val hasConfirmed = blockInterval > targetIntervla
 						if (hasConfirmed) {

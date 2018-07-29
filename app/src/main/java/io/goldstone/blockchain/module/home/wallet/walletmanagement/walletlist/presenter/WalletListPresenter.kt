@@ -48,15 +48,17 @@ class WalletListPresenter(
 	private fun updateAllWalletBalance(hold: ArrayList<WalletListModel>.() -> Unit) {
 		val data = ArrayList<WalletListModel>()
 		// 获取全部本机钱包
-		WalletTable.getAll {
+		WalletTable.getAll all@{
 			// 获取全部本地记录的 `Token` 信息
 			DefaultTokenTable.getCurrentChainTokens { allTokens ->
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount = size
 					override fun concurrentJobs() {
-						forEach { wallet ->
+						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensWithAddresses {
+							MyTokenTable.getMyTokensByAddress(
+								WalletTable.getAddressesByWallet(wallet)
+							) {
 								if (it.isEmpty()) {
 									data.add(WalletListModel(wallet, 0.0))
 									completeMark()

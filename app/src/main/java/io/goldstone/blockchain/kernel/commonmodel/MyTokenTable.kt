@@ -61,7 +61,7 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun getMyTokensWithAddresses(
+		fun getMyTokens(
 			callback: (ArrayList<MyTokenTable>) -> Unit
 		) {
 			WalletTable.getCurrentAddresses { addresses ->
@@ -79,6 +79,23 @@ data class MyTokenTable(
 			}
 		}
 		
+		fun getMyTokensByAddress(
+			addresses: List<String>,
+			hold: (ArrayList<MyTokenTable>) -> Unit
+		) {
+			doAsync {
+				var allTokens = listOf<MyTokenTable>()
+				addresses.forEachOrEnd { item, isEnd ->
+					allTokens += GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(item)
+					if (isEnd) {
+						GoldStoneAPI.context.runOnUiThread {
+							hold(allTokens.toArrayList())
+						}
+					}
+				}
+			}
+		}
+		
 		fun getCurrentChainDefaultAndMyTokens(
 			hold: (
 				myTokens: ArrayList<MyTokenTable>,
@@ -87,7 +104,7 @@ data class MyTokenTable(
 		) {
 			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
 				// Check current wallet has more than on token or not
-				MyTokenTable.getMyTokensWithAddresses { myTokens ->
+				MyTokenTable.getMyTokens { myTokens ->
 					hold(myTokens, defaultTokens)
 				}
 			}

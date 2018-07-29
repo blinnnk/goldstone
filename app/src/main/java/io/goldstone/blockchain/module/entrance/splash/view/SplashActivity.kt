@@ -23,6 +23,7 @@ import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter.Companion.updateShareContentFromServer
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import me.itangqi.waveloadingview.WaveLoadingView
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.matchParent
 
 /**
@@ -96,12 +97,14 @@ class SplashActivity : AppCompatActivity() {
 				// Add currency data from local JSON file
 				presenter.apply {
 					initSupportCurrencyList {
-						// 更新分享的文案内容
-						updateShareContentFromServer()
-						// 更新用户条款如果有必要
-						updateAgreement()
-						// insert support currency list from local json
-						updateCurrencyRateFromServer(this@config)
+						doAsync {
+							// 更新分享的文案内容
+							updateShareContentFromServer()
+							// 更新用户条款如果有必要
+							updateAgreement()
+							// insert support currency list from local json
+							updateCurrencyRateFromServer(this@config)
+						}
 						// check network to get default toke list
 						initDefaultTokenByNetWork {
 							hasAccountThenLogin()

@@ -75,7 +75,7 @@ fun GasSelectionPresenter.transferBTC(
 							value,
 							fee,
 							toAddress,
-							fromAddress,
+							changeAddress,
 							unspents,
 							secret,
 							Config.isTestEnvironment()
