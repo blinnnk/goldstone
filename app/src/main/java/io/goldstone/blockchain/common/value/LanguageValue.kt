@@ -76,9 +76,5 @@ enum class HoneyLanguage(
 				else -> 100
 			}
 		}
-		
-		fun getCurrentSymbol(): String {
-			return HoneyLanguage.getLanguageSymbol(Config.getCurrentLanguageCode())
-		}
 	}
 }

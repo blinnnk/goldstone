@@ -14,7 +14,6 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
@@ -51,15 +50,11 @@ class TokenManagementListPresenter(
 			when (it) {
 				WalletType.BTCTestOnly, WalletType.BTCOnly -> {
 					fragment.showAttentionView()
-				}
-				
-				WalletType.ETHERCAndETCOnly -> {
-					callback(true)
-				}
-				
-				else -> {
 					callback(false)
 				}
+				
+				WalletType.ETHERCAndETCOnly -> callback(true)
+				else -> callback(false)
 			}
 		}
 	}
@@ -82,10 +77,13 @@ class TokenManagementListPresenter(
 				}
 				
 				override fun mergeCallBack() {
-					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
+					val sortedList =
+						defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) {
-							sortedList.filterNot { it.symbol.equals(CryptoSymbol.btc, true) }.let {
+							sortedList.filterNot {
+								it.symbol.equals(CryptoSymbol.btc, true)
+							}.let {
 								memoryTokenData = it.toArrayList()
 							}
 						} else {
@@ -119,7 +117,6 @@ class TokenManagementListPresenter(
 						GoldStoneDialog.chainError(reason, error, context)
 					}) {
 					switch.isClickable = true
-					updateWalletDetailData(context)
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
@@ -128,13 +125,8 @@ class TokenManagementListPresenter(
 					WalletTable.getAddressBySymbol(token.symbol)
 				) {
 					switch.isClickable = true
-					updateWalletDetailData(context)
 				}
 			}
-		}
-		
-		private fun updateWalletDetailData(context: Context) {
-			(context as? MainActivity)?.getWalletDetailFragment()?.presenter?.updateData()
 		}
 	}
 }

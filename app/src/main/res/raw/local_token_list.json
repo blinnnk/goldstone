@@ -4371,7 +4371,7 @@
   },
   {
     "name": "Ethereum",
-    "weight": 10000,
+    "weight": 9999,
     "total_supply": 99922665,
     "type": 0,
     "symbol": "ETH",
@@ -4394,7 +4394,7 @@
   },
   {
     "name": "Ethereum",
-    "weight": 10000,
+    "weight": 9999,
     "total_supply": 99922665,
     "type": 0,
     "symbol": "ETH",
@@ -4417,7 +4417,7 @@
   },
   {
     "name": "Ethereum",
-    "weight": 10000,
+    "weight": 9999,
     "total_supply": 99922665,
     "type": 0,
     "symbol": "ETH",
@@ -4440,7 +4440,7 @@
   },
   {
     "name": "Ethereum",
-    "weight": 10000,
+    "weight": 9999,
     "total_supply": 99922665,
     "type": 0,
     "symbol": "ETH",
@@ -4831,7 +4831,7 @@
   },
   {
     "name": "Ethereum Classic",
-    "weight": 10000,
+    "weight": 9998,
     "total_supply": 102436699,
     "type": 61,
     "symbol": "ETC",
@@ -4853,7 +4853,7 @@
   },
   {
     "name": "Ethereum Classic",
-    "weight": 10000,
+    "weight": 9998,
     "total_supply": 102436699,
     "type": 61,
     "symbol": "ETC",

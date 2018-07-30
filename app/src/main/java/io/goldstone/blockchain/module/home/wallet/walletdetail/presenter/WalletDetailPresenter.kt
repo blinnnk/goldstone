@@ -234,10 +234,7 @@ class WalletDetailPresenter(
 	}
 	
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
-		if (data.isEmpty()) {
-			diffAndUpdateAdapterData<WalletDetailAdapter>(data)
-			fragment.updateHeaderValue()
-		} else {
+		if (data.isNotEmpty()) {
 			try {
 				load {
 					/** 先按照资产情况排序, 资产为零的按照权重排序 */

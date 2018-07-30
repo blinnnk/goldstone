@@ -190,8 +190,9 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 	) {
 		GoldStoneAPI.context.runOnUiThread {
 			fragment.asyncData?.clear()
-			fragment.asyncData?.addAll(generateModels(it))
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, 7)
+			val data = generateModels(it)
+			fragment.asyncData?.addAll(data)
+			fragment.recyclerView.adapter.notifyItemRangeChanged(1, data.size)
 		}
 		// Update Database
 		it?.let {

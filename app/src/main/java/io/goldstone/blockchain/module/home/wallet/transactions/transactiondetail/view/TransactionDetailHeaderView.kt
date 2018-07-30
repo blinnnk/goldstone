@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.*
@@ -120,17 +121,18 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	}
 	
 	private fun showPendingIcon(status: Boolean = true) {
-		pendingIcon.isNotNull {
+		pendingIcon isNotNull {
 			if (!status) removeView(pendingIcon)
 		} otherwise {
 			if (status) {
 				pendingIcon =
 					ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
 						indeterminateDrawable.setColorFilter(
-							HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY
+							HoneyColor.HoneyWhite,
+							android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 56.uiPX()
+						y += icon.getViewAbsolutelyPositionInScreen()[1] - 58.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

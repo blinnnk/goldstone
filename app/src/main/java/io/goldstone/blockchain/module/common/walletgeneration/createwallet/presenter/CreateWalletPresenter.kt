@@ -174,7 +174,7 @@ class CreateWalletPresenter(
 						}
 					}
 					
-					XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		}

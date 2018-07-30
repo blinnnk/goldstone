@@ -116,7 +116,7 @@ class WalletSettingsListPresenter(
 						// delete wallet record in `walletTable`
 						WalletTable.deleteCurrentWallet {
 							// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-							XinGePushReceiver.registerWalletAddressForPush()
+							XinGePushReceiver.registerAddressesForPush(true)
 							activity?.jump<SplashActivity>()
 						}
 					}
@@ -131,7 +131,7 @@ class WalletSettingsListPresenter(
 				TokenBalanceTable.deleteByAddress(address) {
 					WalletTable.deleteCurrentWallet {
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-						XinGePushReceiver.registerWalletAddressForPush()
+						XinGePushReceiver.registerAddressesForPush(true)
 						fragment.getMainActivity()?.removeLoadingView()
 						fragment.activity?.jump<SplashActivity>()
 					}

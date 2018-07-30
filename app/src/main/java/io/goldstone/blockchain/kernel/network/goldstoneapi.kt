@@ -341,6 +341,7 @@ object GoldStoneAPI {
 		}
 	}
 	
+	// TODO 旧的注册地址接口需要移除
 	fun registerWalletAddress(
 		addressList: JsonArray,
 		deviceID: String,
@@ -358,6 +359,26 @@ object GoldStoneAPI {
 			postRequest(
 				it,
 				APIPath.updateAddress(APIPath.currentUrl),
+				errorCallback,
+				true
+			) {
+				hold(it)
+			}
+		}
+	}
+	
+	fun registerWalletAddresses(
+		content: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (String) -> Unit
+	) {
+		RequestBody.create(
+			requestContentType,
+			content
+		).let {
+			postRequest(
+				it,
+				APIPath.updateAddresses(APIPath.currentUrl),
 				errorCallback,
 				true
 			) {

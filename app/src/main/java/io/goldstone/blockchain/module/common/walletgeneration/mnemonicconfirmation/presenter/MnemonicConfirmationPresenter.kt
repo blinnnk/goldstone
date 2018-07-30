@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.DialogText
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -33,7 +34,9 @@ class MnemonicConfirmationPresenter(
 		current: String
 	) {
 		compareMnemonicCode(correct, current) isTrue {
-			validAndContinue()
+			WalletTable.updateHasBackupMnemonic {
+				validAndContinue()
+			}
 		} otherwise {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}

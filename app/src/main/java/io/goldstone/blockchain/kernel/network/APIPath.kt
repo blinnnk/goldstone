@@ -25,7 +25,8 @@ object APIPath {
 	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
-	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" }
+	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" } // 旧需要移除
+	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
 	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }

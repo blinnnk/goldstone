@@ -88,6 +88,7 @@ object CryptoName {
 
 enum class ChainType(val id: Int) {
 	BTC(0),
+	BTCTest(1),
 	LTC(2),
 	ETH(60),
 	ETC(61),
