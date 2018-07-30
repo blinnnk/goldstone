@@ -20,7 +20,13 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import org.jetbrains.anko.*
 
 @Suppress("DEPRECATION")
@@ -46,6 +52,32 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				showWebView()
 			} otherwise {
 				showLocalContent()
+			}
+		}
+	}
+	
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		super.setBaseBackEvent(activity, parent)
+		// 这里高度复用导致了一些耦合, 暂时额外判断. 之后重构再优化. By KaySaith
+		parentFragment.apply {
+			when (this) {
+				is TokenDetailOverlayFragment -> {
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is NotificationFragment -> {
+					headerTitle = NotificationText.notification
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is WalletGenerationFragment -> {
+					headerTitle = CreateWalletText.create
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is QuotationOverlayFragment -> {
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
 			}
 		}
 	}

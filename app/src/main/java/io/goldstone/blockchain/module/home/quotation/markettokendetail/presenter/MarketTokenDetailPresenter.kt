@@ -66,7 +66,6 @@ class MarketTokenDetailPresenter(
 		}
 		
 		fragment.currencyInfo?.apply {
-			fragment.getMainActivity()?.showLoadingView()
 			QuotationSelectionTable.getSelectionByPair(pair) {
 				it?.apply {
 					val data: String? = when (period) {
@@ -90,7 +89,7 @@ class MarketTokenDetailPresenter(
 							val databaseTime = it.maxBy {
 								it.timestamp
 							}?.timestamp?.toLongOrNull().orElse(0)
-							/** 校验数据库的数据时间是否有效，是否需要更新 */
+							// 校验数据库的数据时间是否有效，是否需要更新
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
 								isTrue {
 									// 合规就更新本地数据库的数据
@@ -209,6 +208,7 @@ class MarketTokenDetailPresenter(
 		period: String,
 		dateType: Int
 	) {
+		fragment.getMainActivity()?.showLoadingView()
 		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8, {
 			// Show the error exception to user
 			fragment.context.alert(it.toString().showAfterColonContent())
@@ -395,5 +395,14 @@ class MarketTokenDetailPresenter(
 		currentSocket?.closeSocket()
 		
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
+		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
+		fragment.getParentFragment<QuotationOverlayFragment> {
+			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
+		}
 	}
 }

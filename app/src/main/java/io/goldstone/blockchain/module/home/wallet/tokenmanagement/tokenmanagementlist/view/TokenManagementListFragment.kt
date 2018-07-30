@@ -10,6 +10,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -26,6 +27,7 @@ class TokenManagementListFragment :
 	
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	override val presenter = TokenManagementListPresenter(this)
+	private var hasInsertToken = false
 	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
@@ -33,6 +35,7 @@ class TokenManagementListFragment :
 	) {
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
 			switch.onClick {
+				hasInsertToken = true
 				model?.let { model ->
 					// 更新内存数据防止上下滑动导致的复用问题
 					asyncData?.find {
@@ -54,9 +57,18 @@ class TokenManagementListFragment :
 		}
 	}
 	
+	override fun onDestroy() {
+		super.onDestroy()
+		if (hasInsertToken) updateWalletDetailData()
+	}
+	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
+	}
+	
+	private fun updateWalletDetailData() {
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	fun showAttentionView() {

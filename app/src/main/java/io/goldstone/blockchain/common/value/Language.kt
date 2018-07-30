@@ -9,7 +9,8 @@ import com.blinnnk.util.HoneyDateUtil
  * @author KaySaith
  */
 var currentLanguage = when {
-	Config.getCurrentLanguageCode() == 100 -> HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+	Config.getCurrentLanguageCode() == 100 ->
+		HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 	HoneyLanguage.currentLanguageIsSupported() -> Config.getCurrentLanguageCode()
 	else -> HoneyLanguage.English.code
 }

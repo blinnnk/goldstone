@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -28,39 +29,45 @@ abstract class TransactionStatusObserver {
 	abstract val chainID: String
 	private var isFailed: Boolean? = null
 	private val retryTime = 6000L
+	private var transaction: TransactionTable? = null
 	
 	open fun checkStatusByTransaction() {
 		doAsync {
-			GoldStoneEthCall.getTransactionByHash(
-				transactionHash,
-				ChainID.getChainNameByID(chainID),
-				{
+			if (transaction.isNull()) {
+				GoldStoneEthCall.getTransactionByHash(
+					transactionHash,
+					ChainID.getChainNameByID(chainID),
+					{
+						removeObserver()
+						handler.postDelayed(reDo, retryTime)
+					},
+					{ error, reason ->
+						removeObserver()
+						LogUtil.error("checkStatus getTransactionByHash $reason", error)
+					}
+				) { data ->
+					transaction = data
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
-				},
-				{ error, reason ->
-					removeObserver()
-					LogUtil.error("checkStatus getTransactionByHash $reason", error)
 				}
-			) { transaction ->
+			} else {
 				GoldStoneEthCall.getBlockNumber(
 					{ error, reason ->
 						LogUtil.error("checkStatus getBlockNumber $reason", error)
 					},
 					ChainID.getChainNameByID(chainID)
 				) { blockNumber ->
-					isFailed?.let { failed ->
+					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
+					val hasConfirmed = blockInterval > targetIntervla
+					val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
+					if (!isFailed.isNull() || hasConfirmed) {
 						GoldStoneAPI.context.runOnUiThread {
-							val blockInterval = blockNumber - transaction.blockNumber.toInt()
-							val hasConfirmed = blockInterval > targetIntervla
-							val hasError = TinyNumberUtils.isTrue(transaction.hasError)
 							getStatus(
 								hasConfirmed,
 								blockInterval,
 								hasError,
-								failed
+								isFailed.orFalse()
 							)
-							
 							if (hasConfirmed || hasError) {
 								removeObserver()
 							} else {
@@ -69,14 +76,13 @@ abstract class TransactionStatusObserver {
 								handler.postDelayed(reDo, retryTime)
 							}
 						}
-					}
-					// 只判断一次是否是失败的交易
-					if (isFailed.isNull()) {
+					} else {
 						if (ChainURL.etcChainName.any {
 								it.equals(ChainID.getChainNameByID(chainID), true)
 							}) {
 							isFailed = false
 							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+							removeObserver()
 							handler.postDelayed(reDo, retryTime)
 						} else {
 							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
@@ -98,6 +104,7 @@ abstract class TransactionStatusObserver {
 									removeObserver()
 								} else {
 									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+									removeObserver()
 									handler.postDelayed(reDo, retryTime)
 								}
 							}
@@ -143,7 +150,9 @@ fun TransactionDetailPresenter.observerTransaction() {
 		) {
 			if (confirmed || hasError || isFailed) {
 				onTransactionSucceed(hasError, isFailed)
-				updateWalletDetailValue(data?.fromAddress!!, currentActivity)
+				val address =
+					data?.fromAddress ?: dataFromList?.fromAddress ?: notificationData?.fromAddress.orEmpty()
+				updateWalletDetailValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
 				}
@@ -210,8 +219,9 @@ private fun TransactionDetailPresenter.getTransactionFromChain() {
 	) {
 		fragment.context?.runOnUiThread {
 			fragment.asyncData?.clear()
+			val data = generateModels(it)
 			fragment.asyncData?.addAll(generateModels(it))
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, 6)
+			fragment.recyclerView.adapter.notifyItemRangeChanged(1, data.size)
 		}
 		// 成功获取数据后在异步线程更新数据库记录
 		updateDataInDatabase(it.blockNumber)

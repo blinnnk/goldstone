@@ -16,6 +16,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class QuotationManagementFragment :
 	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
 	
+	private var willDeletePair = listOf<String>()
 	override val presenter = QuotationManagementPresenter(this)
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
@@ -24,10 +25,25 @@ class QuotationManagementFragment :
 		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
 			cell.switch.onClick {
 				cell.searchModel?.apply {
-					asyncData?.find { it.pair == pair }?.isSelecting = cell.switch.isChecked
-					QuotationSelectionTable.removeSelectionBy(pair)
+					// 更新内存里面的数据防止复用的时候出错
+					asyncData?.find {
+						it.pair.equals(pair, true)
+					}?.isSelecting = cell.switch.isChecked
+					// 更新标记, 来在页面销毁的时候决定是否集中处理逻辑
+					if (cell.switch.isChecked) {
+						willDeletePair -= pair
+					} else {
+						willDeletePair += pair
+					}
 				}
 			}
+		}
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		willDeletePair.forEach { pair ->
+			QuotationSelectionTable.removeSelectionBy(pair)
 		}
 	}
 	
