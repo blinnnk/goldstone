@@ -12,6 +12,8 @@ import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommitionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -197,8 +199,8 @@ class AddressManagerPresneter(
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
 			WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-				wallet.encryptMnemonic?.let {
-					val mnemonic = JavaKeystoreUtil().decryptData(it)
+				wallet.encryptMnemonic?.let { seed ->
+					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
@@ -208,7 +210,11 @@ class AddressManagerPresneter(
 							address,
 							if (Config.isTestEnvironment()) Config.getCurrentChain() else ChainID.ETCMain.id
 						)
-						WalletTable.updateETHAndERCAddresses(it, newAddressIndex) {
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommitionModel(address, ChainType.ETH.id, 1)
+						)
+						WalletTable.updateETHAndERCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
 					}
@@ -222,8 +228,8 @@ class AddressManagerPresneter(
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
 			WalletTable.getETCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-				wallet.encryptMnemonic?.let {
-					val mnemonic = JavaKeystoreUtil().decryptData(it)
+				wallet.encryptMnemonic?.let { seed ->
+					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
@@ -234,7 +240,11 @@ class AddressManagerPresneter(
 							address,
 							if (Config.isTestEnvironment()) ChainID.ETCTest.id else ChainID.ETCMain.id
 						)
-						WalletTable.updateETCAddresses(it, newAddressIndex) {
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommitionModel(address, ChainType.ETC.id, 1)
+						)
+						WalletTable.updateETCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
 					}
@@ -261,6 +271,10 @@ class AddressManagerPresneter(
 									CryptoValue.btcContract,
 									address,
 									ChainID.BTCMain.id
+								)
+								// 注册新增的子地址
+								XinGePushReceiver.registerSingleAddress(
+									AddressCommitionModel(address, ChainType.BTC.id, 1)
 								)
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
@@ -297,6 +311,10 @@ class AddressManagerPresneter(
 								CryptoValue.btcContract,
 								address,
 								ChainID.BTCTest.id
+							)
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommitionModel(address, ChainType.BTCTest.id, 1)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())

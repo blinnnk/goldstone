@@ -397,6 +397,18 @@ data class WalletTable(
 			}
 		}
 		
+		fun updateHasBackupMnemonic(callback: () -> Unit) {
+			load {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						update(it.apply { hasBackUpMnemonic = true })
+					}
+				}
+			} then {
+				callback()
+			}
+		}
+		
 		fun updateETHAndERCAddresses(
 			newAddress: String,
 			newAddressIndex: Int,

@@ -51,7 +51,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 		NetworkUtil.hasNetwork(context) isTrue {
 			AppConfigTable.getAppConfig {
 				it?.isRegisteredAddresses?.isFalse {
-					XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		} otherwise {

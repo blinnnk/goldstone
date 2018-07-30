@@ -111,7 +111,7 @@ class WatchOnlyImportPresenter(
 						callback()
 					}
 					// 注册钱包地址用于发送 `Push`
-					XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerAddressesForPush()
 				}
 			} otherwise {
 				fragment.context?.alert(ImportWalletText.existAddress)

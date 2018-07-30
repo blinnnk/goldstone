@@ -260,7 +260,18 @@ class TransactionDetailPresenter(
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let {
-			return it.toArrayList()
+			return if (
+				data?.token?.symbol.equals(CryptoSymbol.btc, true)
+				|| dataFromList?.symbol.equals(CryptoSymbol.btc, true)
+				|| notificationData?.symbol.equals(CryptoSymbol.btc, true)
+			) {
+				// 如果是 `比特币` 账单不显示 `Memo`
+				it.filterNot {
+					it.description.equals(TransactionText.memo, true)
+				}.toArrayList()
+			} else {
+				it.toArrayList()
+			}
 		}
 	}
 	
@@ -275,11 +286,10 @@ class TransactionDetailPresenter(
 	
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
 		parentFragment?.let { parent ->
-			if (parent is BaseOverlayFragment<*>) {
+			if (parent is BaseOverlayFragment<*>)
 				parent.overlayView.header.backButton.onClick {
 					runBackEventBy(parent)
 				}
-			}
 		}
 	}
 }
