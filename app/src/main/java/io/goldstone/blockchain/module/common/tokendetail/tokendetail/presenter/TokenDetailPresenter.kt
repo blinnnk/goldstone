@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -210,7 +210,7 @@ class TokenDetailPresenter(
 		address: String,
 		callback: () -> Unit
 	) {
-		BitcoinTransactionTable.getTransactionsByAddress(address) { transactions ->
+		BitcoinSeriesTransactionTable.getTransactionsByAddress(address) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(
 					transactions.map { TransactionListModel(it) }.sortedByDescending { it.timeStamp },

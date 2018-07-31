@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
 
 import android.support.v4.app.Fragment
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -217,7 +218,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	) {
 		val isBTC = ChainType.BTC.id == coinType
 		AddressManagerFragment.showMoreDashboard(
-			this,
+			getParentContainer(),
 			top,
 			isBTC,
 			hasDefaultCell,
@@ -258,8 +259,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	
+	override fun onDestroyView() {
+		super.onDestroyView()
+		removeDashboard(this)
+	}
+	
 	companion object {
-		
 		fun verifyPassword(
 			fragment: Fragment,
 			callback: (password: String) -> Unit
@@ -282,7 +287,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 		
 		fun showMoreDashboard(
-			fragment: Fragment,
+			container: ViewGroup?,
 			top: Float,
 			isBTC: Boolean = false,
 			hasDefaultCell: Boolean = true,
@@ -292,7 +297,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			exportPrivateKey: () -> Unit,
 			keystoreCellClickEvent: () -> Unit
 		) {
-			fragment.getMainActivity()?.getMainContainer()?.apply {
+			container?.apply {
 				if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 					val creatorDashBoard = MiniOverlay(context) { cell, title ->
 						cell.onClick {

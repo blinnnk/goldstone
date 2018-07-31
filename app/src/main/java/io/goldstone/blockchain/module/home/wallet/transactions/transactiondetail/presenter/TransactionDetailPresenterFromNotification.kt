@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
@@ -11,10 +12,13 @@ import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toUnitValue
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
@@ -27,40 +31,51 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 fun TransactionDetailPresenter.updateDataFromNotification() {
+	System.out.println("hello fuck $notificationData")
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
-		/**
-		 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
-		 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
-		 */
-		TransactionTable.getByHashAndReceivedStatus(
-			transaction.hash,
-			transaction.isReceived
-		) { localTransaction ->
-			if (localTransaction.isNull()) {
-				// 如果本地没有数据从链上查询所有需要的数据
-				fragment.apply {
-					showLoadingView(LoadingText.transactionData)
-					updateByNotificationHash(transaction) {
-						removeLoadingView()
-					}
+		if (transaction.symbol.equals(CryptoSymbol.btc, true)) {
+			getBitcoinSeriesTransaction(transaction)
+		} else {
+			/**
+			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
+			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+			 */
+			getETHERC20OrETCTransaction(transaction)
+		}
+	}
+}
+
+fun TransactionDetailPresenter.getETHERC20OrETCTransaction(
+	transaction: NotificationTransactionInfo
+) {
+	TransactionTable.getByHashAndReceivedStatus(
+		transaction.hash,
+		transaction.isReceived
+	) { localTransaction ->
+		if (localTransaction.isNull()) {
+			// 如果本地没有数据从链上查询所有需要的数据
+			fragment.apply {
+				showLoadingView(LoadingText.transactionData)
+				updateByNotificationHash(transaction) {
+					removeLoadingView()
 				}
-			} else {
-				// 本地有数据直接展示本地数据
-				localTransaction?.apply {
-					fragment.asyncData = generateModels(TransactionListModel(this))
-					val headerData = TransactionHeaderModel(
-						notificationData?.value ?: value.toDouble(),
-						if (isReceive) fromAddress else tokenReceiveAddress ?: to,
-						symbol,
-						false,
-						isReceive,
-						hasError == "1"
-					)
-					updateHeaderValue(headerData)
-					headerModel = headerData
-				}
+			}
+		} else {
+			// 本地有数据直接展示本地数据
+			localTransaction?.apply {
+				fragment.asyncData = generateModels(TransactionListModel(this))
+				val headerData = TransactionHeaderModel(
+					notificationData?.value ?: value.toDouble(),
+					if (isReceive) fromAddress else tokenReceiveAddress ?: to,
+					symbol,
+					false,
+					isReceive,
+					hasError == "1"
+				)
+				updateHeaderValue(headerData)
+				headerModel = headerData
 			}
 		}
 	}
@@ -112,6 +127,71 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	}
 }
 
+fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
+	info: NotificationTransactionInfo
+) {
+	System.out.println("hello 1")
+	BitcoinSeriesTransactionTable.getTransactionsByHash(
+		currentHash,
+		info.isReceived
+	) { localTransaction ->
+		System.out.println("hello 2 $localTransaction")
+		if (localTransaction.isNull()) {
+			fragment.apply {
+				showLoadingView(LoadingText.transactionData)
+				updateBTCTransactionByNotificationHash(info) {
+					removeLoadingView()
+				}
+			}
+		} else {
+			// 本地有数据直接展示本地数据
+			localTransaction?.apply {
+				fragment.asyncData = generateModels(TransactionListModel(this))
+				val headerData = TransactionHeaderModel(
+					notificationData?.value ?: value.toDouble(),
+					if (isReceive) fromAddress else to,
+					symbol,
+					false,
+					isReceive,
+					false
+				)
+				updateHeaderValue(headerData)
+				headerModel = headerData
+			}
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
+	info: NotificationTransactionInfo,
+	callback: () -> Unit
+) {
+	System.out.println("hello 3")
+	BitcoinApi.getTransactionByHash(
+		currentHash,
+		info.fromAddress,
+		{
+			LogUtil.error("updateBTCTransactionByNotificationHash", it)
+			fragment.context?.alert(it.toString())
+		}
+	) { receipt ->
+		System.out.println("hello receipt $receipt")
+		// 通过 `Notification` 获取确实信息
+		receipt?.apply {
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+		}?.toAsyncData()?.let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
+			}
+		}
+	}
+}
+
 private fun TransactionDetailPresenter.updateHeaderFromNotification(
 	info: NotificationTransactionInfo
 ) {
@@ -133,6 +213,33 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		if (memo.isEmpty()) TransactionText.noMemo else memo,
 		fromAddress,
 		to,
+		hash,
+		blockNumber,
+		TimeUtils.formatDate(timeStamp),
+		TransactionListModel.generateTransactionURL(hash, symbol)
+	)
+	arrayListOf(
+		TransactionText.minerFee,
+		TransactionText.memo,
+		CommonText.from,
+		CommonText.to,
+		TransactionText.transactionHash,
+		TransactionText.blockNumber,
+		TransactionText.transactionDate,
+		TransactionText.url
+	).mapIndexed { index, it ->
+		TransactionDetailModel(receiptData[index], it)
+	}.let {
+		return it.toArrayList()
+	}
+}
+
+private fun BitcoinSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
+	val receiptData = arrayListOf(
+		"${fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		"",
+		fromAddress,
+		TransactionListModel.formatToAddress(to),
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(timeStamp),

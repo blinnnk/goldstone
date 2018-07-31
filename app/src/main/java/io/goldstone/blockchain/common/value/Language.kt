@@ -793,6 +793,16 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
+	val blockChainInfo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BlockChain Info"
+		HoneyLanguage.Chinese.code -> "BlockChain Info"
+		HoneyLanguage.Japanese.code -> "BlockChain Info"
+		HoneyLanguage.Korean.code -> "BlockChain Info"
+		HoneyLanguage.Russian.code -> "BlockChain Info"
+		HoneyLanguage.TraditionalChinese.code -> "BlockChain Info"
+		else -> ""
+	}
+	@JvmField
 	val url = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Open URL"
 		HoneyLanguage.Chinese.code -> "从网址打开"

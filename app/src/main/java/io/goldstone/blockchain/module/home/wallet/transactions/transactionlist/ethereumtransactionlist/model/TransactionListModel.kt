@@ -11,7 +11,7 @@ import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
@@ -77,8 +77,10 @@ data class TransactionListModel(
 		data.isFee
 	)
 	
-	constructor(data: BitcoinTransactionTable) : this(
-		if (!data.fromAddress.equals(data.recordAddress, true)) data.fromAddress else formatToAddress(data.to),
+	constructor(data: BitcoinSeriesTransactionTable) : this(
+		if (!data.fromAddress.equals(data.recordAddress, true)) data.fromAddress else formatToAddress(
+			data.to
+		),
 		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
@@ -92,7 +94,7 @@ data class TransactionListModel(
 		), // 副标题的生成
 		data.value.toDouble().toBTCCount(),
 		CryptoSymbol.btc,
-		!data.fromAddress.equals(data.recordAddress, true),
+		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
 		formatToAddress(data.to),
 		data.blockNumber,
@@ -106,13 +108,17 @@ data class TransactionListModel(
 		false,
 		CryptoValue.btcContract,
 		false,
-		false
+		data.isFee
 	)
 	
 	companion object {
 		fun formatToAddress(toAddress: String): String {
 			var formatedAddresses = ""
-			val addresses = toAddress.substring(1, toAddress.count() - 1).split(",")
+			// `ToAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
+			// `Start And End` 的值设定不同
+			val miroSetIndex = if (toAddress.contains("[")) 1 else 0
+			val addresses =
+				toAddress.substring(miroSetIndex, toAddress.count() - miroSetIndex).split(",")
 			addresses.forEachIndexed { index, item ->
 				formatedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
 			}

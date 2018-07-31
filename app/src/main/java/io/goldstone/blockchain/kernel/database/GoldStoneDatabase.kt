@@ -26,7 +26,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
 		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
 		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
-		(SupportCurrencyTable::class), (BitcoinTransactionTable::class)],
+		(SupportCurrencyTable::class), (BitcoinSeriesTransactionTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )

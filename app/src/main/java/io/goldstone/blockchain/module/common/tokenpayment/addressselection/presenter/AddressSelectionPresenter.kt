@@ -208,8 +208,8 @@ class AddressSelectionPresenter(
 						it.map {
 							it.apply {
 								defaultAddress =
-									if (Config.isTestEnvironment()) it.bitTestnetCoinAddress
-									else it.bitMainnetCoinAddress
+									if (Config.isTestEnvironment()) it.btcTestnetAddress
+									else it.btcMainnetAddress
 							}
 						}.toArrayList()
 					} else {

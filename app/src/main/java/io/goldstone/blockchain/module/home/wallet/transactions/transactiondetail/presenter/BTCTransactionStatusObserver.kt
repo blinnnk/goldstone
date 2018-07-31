@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
@@ -196,7 +196,7 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 		}
 		// Update Database
 		it?.let {
-			BitcoinTransactionTable.updateLocalDataByHash(currentHash, it, isPending)
+			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, isPending)
 		}
 	}
 }

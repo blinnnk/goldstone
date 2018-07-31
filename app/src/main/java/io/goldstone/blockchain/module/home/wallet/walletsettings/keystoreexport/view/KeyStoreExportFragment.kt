@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
@@ -13,6 +15,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
@@ -91,6 +94,15 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 					it.showLoadingStatus(false)
 				}
 			}.into(this)
+		}
+	}
+	
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		parentFragment?.let {
+			if (it is BaseOverlayFragment<*>) {
+				it.overlayView.header.showAddButton(false)
+			}
 		}
 	}
 	

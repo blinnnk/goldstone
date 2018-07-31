@@ -41,8 +41,8 @@ class AddressesListView(
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
-			var halfSize = 14
-			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做锁进
+			var halfSize = 13
+			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
 			if (this[0].second.toIntOrNull().isNull()) {
 				halfSize = 11
 				hideButton()

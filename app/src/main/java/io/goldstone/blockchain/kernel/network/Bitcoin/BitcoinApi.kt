@@ -2,7 +2,8 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONArray
@@ -70,7 +71,7 @@ object BitcoinApi {
 		hash: String,
 		address: String,
 		errorCallback: (Throwable) -> Unit,
-		hold: (BitcoinTransactionTable?) -> Unit
+		hold: (BitcoinSeriesTransactionTable?) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
 			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
@@ -83,7 +84,12 @@ object BitcoinApi {
 		) {
 			hold(
 				if (isNotEmpty()) {
-					BitcoinTransactionTable(JSONObject(this[0]), address)
+					BitcoinSeriesTransactionTable(
+						JSONObject(this[0]),
+						CryptoSymbol.btc,
+						address,
+						false
+					)
 				} else null
 			)
 		}

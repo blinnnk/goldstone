@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -20,7 +20,7 @@ import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -139,27 +139,20 @@ class TransactionDetailPresenter(
 		}
 	}
 	
-	fun showEtherScanTransactionFragment() {
+	fun showTransactionWebFragment() {
+		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
 		val argument = Bundle().apply {
 			putString(
 				ArgumentKey.webViewUrl,
-				TransactionListModel.generateTransactionURL(
-					currentHash,
-					dataFromList?.symbol ?: data?.token?.contract ?: notificationData?.symbol
-				)
+				TransactionListModel.generateTransactionURL(currentHash, symbol)
 			)
 		}
 		fragment.parentFragment.apply {
 			val webTitle =
-				if (
-					dataFromList?.symbol
-					?: data?.token?.contract
-					?: notificationData?.symbol ==
-					CryptoSymbol.etc
-				) {
-					TransactionText.gasTracker
-				} else {
-					TransactionText.etherScanTransaction
+				when {
+					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
+					symbol.equals(CryptoSymbol.btc, true) -> TransactionText.blockChainInfo
+					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
 				is TransactionFragment -> presenter.showTargetFragment<WebViewFragment>(
@@ -217,7 +210,7 @@ class TransactionDetailPresenter(
 				)
 			}
 			
-			is BitcoinTransactionTable -> {
+			is BitcoinSeriesTransactionTable -> {
 				arrayListOf(
 					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
 					memo,

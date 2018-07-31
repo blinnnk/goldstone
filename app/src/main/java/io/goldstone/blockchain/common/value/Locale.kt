@@ -16,31 +16,9 @@ object CountryCode {
 			"cn",
 			"CN"
 		)
-	val korean =
-		Locale(
-			"kr",
-			"KR"
-		)
-	val japan =
-		Locale(
-			"ja",
-			"JP"
-		)
-	val russia =
-		Locale(
-			"ru",
-			"RU"
-		)
-	val america =
-		Locale(
-			"en",
-			"US"
-		)
-
 	val currentCurrency =
 		Currency.getInstance(Resources.getSystem().configuration.locale).currencyCode!!
 	val currentCountry = Resources.getSystem().configuration.locale.country!!
-	val currentLanguage = Resources.getSystem().configuration.locale.displayLanguage!!
 	val currentLanguageSymbol = Resources.getSystem().configuration.locale.language!!
 
 }

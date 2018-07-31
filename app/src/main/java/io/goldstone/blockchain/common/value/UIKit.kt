@@ -23,8 +23,6 @@ object GrayScale {
 	@JvmField
 	val gray = Color.parseColor("#FFAAAAAA")
 	@JvmField
-	val darkGray = Color.parseColor("#FFA1A1A1")
-	@JvmField
 	val midGray = Color.parseColor("#FFCCCCCC")
 	@JvmField
 	val Opacity1Black = Color.parseColor("#1A000000")
@@ -35,8 +33,6 @@ object GrayScale {
 	@JvmField
 	val Opacity5Black = Color.parseColor("#80000000")
 	@JvmField
-	val Opacity7Black = Color.parseColor("#B3000000")
-	@JvmField
 	val Opacity8Black = Color.parseColor("#CC000000")
 }
 
@@ -45,6 +41,10 @@ object Spectrum {
 	val white = Color.parseColor("#FFFFFFFF")
 	@JvmField
 	val blue = Color.parseColor("#FF235682")
+	@JvmField
+	val deepBlue = Color.parseColor("#FF17446B")
+	@JvmField
+	val lightBlue = Color.parseColor("#FF2882D2")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
@@ -69,11 +69,11 @@ object Spectrum {
 	val opacity2White = Color.parseColor("#33FFFFFF")
 	@JvmField
 	val opacity5White = Color.parseColor("#80FFFFFF")
+	@JvmField
+	val opacity8White = Color.parseColor("#CCFFFFFF")
 }
 
 object ShadowSize {
-	@JvmField
-	val Button = 10.uiPX().toFloat()
 	@JvmField
 	val Header = 3.uiPX().toFloat()
 	@JvmField
@@ -85,8 +85,6 @@ object PaddingSize {
 	val device = 20.uiPX()
 	@JvmField
 	val content = 10.uiPX()
-	@JvmField
-	val lineSpace = 2.uiPX()
 }
 
 object CornerSize {
@@ -96,8 +94,6 @@ object CornerSize {
 	val default = 10.uiPX().toFloat()
 	@JvmField
 	val middle = 15.uiPX().toFloat()
-	@JvmField
-	val big = 25.uiPX().toFloat()
 }
 
 object BorderSize {
@@ -120,11 +116,6 @@ object CommonCellSize {
 	val rightPadding = 30.uiPX()
 	@JvmField
 	val iconPadding = 40.uiPX()
-}
-
-object BasicSize {
-	@JvmField
-	val overlayMinHeight = 250.uiPX()
 }
 
 object TransactionSize {

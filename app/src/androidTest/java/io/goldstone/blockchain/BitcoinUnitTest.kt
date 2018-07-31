@@ -10,16 +10,9 @@ import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import junit.framework.Assert.fail
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.Sha256Hash
-import org.bitcoinj.core.Transaction
-import org.bitcoinj.core.Utils
-import org.bitcoinj.crypto.TransactionSignature
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 /**
  * @date 2018/6/9 7:25 PM
@@ -55,27 +48,6 @@ class BitcoinUnitTest {
 					it
 				)
 			}
-		}
-	}
-	
-	@Test
-	@Throws(Exception::class)
-	fun testCreatedSigAndPubkeyAreCanonical() {
-		// Tests that we will not generate non-canonical pubkeys or signatures
-		// We dump failed data to error log because this test is not expected to be deterministic
-		val key = ECKey()
-		if (!ECKey.isPubKeyCanonical(key.pubKey)) {
-			LogUtil.debug("testCreatedSigAndPubkeyAreCanonical", Utils.HEX.encode(key.pubKey))
-			fail()
-		}
-		val hash = ByteArray(32)
-		Random().nextBytes(hash)
-		val sigBytes = key.sign(Sha256Hash.wrap(hash)).encodeToDER()
-		val encodedSig = Arrays.copyOf(sigBytes, sigBytes.size + 1)
-		encodedSig[sigBytes.size] = Transaction.SigHash.ALL.byteValue()
-		if (!TransactionSignature.isEncodingCanonical(encodedSig)) {
-			LogUtil.debug("testCreatedSigAndPubkeyAreCanonical", Utils.HEX.encode(sigBytes))
-			fail()
 		}
 	}
 }
