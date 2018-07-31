@@ -58,7 +58,6 @@ data class WalletDetailCellModel(
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
 			MyTokenTable.getMyTokens { myTokens ->
-				System.out.println("myTokens $myTokens")
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())

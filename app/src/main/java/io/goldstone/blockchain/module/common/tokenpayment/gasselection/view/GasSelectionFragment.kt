@@ -87,7 +87,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 								putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas)
 							}
 						)
-						presenter.recoverHeader()
+						recoverHeader()
 					}
 				}.into(this)
 			}

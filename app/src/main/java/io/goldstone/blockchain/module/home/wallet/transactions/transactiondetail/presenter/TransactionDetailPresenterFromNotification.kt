@@ -31,7 +31,6 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 fun TransactionDetailPresenter.updateDataFromNotification() {
-	System.out.println("hello fuck $notificationData")
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
@@ -130,12 +129,10 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 	info: NotificationTransactionInfo
 ) {
-	System.out.println("hello 1")
 	BitcoinSeriesTransactionTable.getTransactionsByHash(
 		currentHash,
 		info.isReceived
 	) { localTransaction ->
-		System.out.println("hello 2 $localTransaction")
 		if (localTransaction.isNull()) {
 			fragment.apply {
 				showLoadingView(LoadingText.transactionData)
@@ -166,7 +163,6 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	info: NotificationTransactionInfo,
 	callback: () -> Unit
 ) {
-	System.out.println("hello 3")
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
@@ -175,7 +171,6 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 			fragment.context?.alert(it.toString())
 		}
 	) { receipt ->
-		System.out.println("hello receipt $receipt")
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()

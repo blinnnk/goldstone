@@ -279,10 +279,12 @@ class TransactionDetailPresenter(
 	
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
 		parentFragment?.let { parent ->
-			if (parent is BaseOverlayFragment<*>)
+			if (parent is BaseOverlayFragment<*>) {
+				parent.headerTitle = TransactionText.detail
 				parent.overlayView.header.backButton.onClick {
 					runBackEventBy(parent)
 				}
+			}
 		}
 	}
 }

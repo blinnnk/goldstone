@@ -154,7 +154,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			setTitle(PrepareTransferText.memoInformation)
 			memo.apply {
 				setTitle(PrepareTransferText.memo)
-				setSubtitle(PrepareTransferText.addAMemo)
+				setSubtitle(CryptoUtils.scaleTo32(PrepareTransferText.addAMemo))
 				showArrow()
 				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
 			}.click {

@@ -63,6 +63,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		parentFragment.apply {
 			when (this) {
 				is TokenDetailOverlayFragment -> {
+					headerTitle = TransactionText.detail
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
 				

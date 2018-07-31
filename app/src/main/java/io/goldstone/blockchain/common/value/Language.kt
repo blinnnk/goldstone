@@ -643,7 +643,7 @@ object WalletText {
 		HoneyLanguage.Chinese.code -> "我的资产:"
 		HoneyLanguage.Japanese.code -> "私の資産："
 		HoneyLanguage.Korean.code -> "나의자산:"
-		HoneyLanguage.Russian.code -> "Управление Средствами:"
+		HoneyLanguage.Russian.code -> "Мой токен:"
 		HoneyLanguage.TraditionalChinese.code -> "我的資產:"
 		else -> ""
 	}
@@ -1059,7 +1059,7 @@ object TokenDetailText {
 	}
 	@JvmField
 	val tokenDetail = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token Description"
+		HoneyLanguage.English.code -> "Token Detail"
 		HoneyLanguage.Chinese.code -> "代币详情"
 		HoneyLanguage.Japanese.code -> "トークン詳細"
 		HoneyLanguage.Korean.code -> "Token 소개"
@@ -2019,7 +2019,7 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "软件版本"
 		HoneyLanguage.Japanese.code -> "ソフトウェアバージョン"
 		HoneyLanguage.Korean.code -> "소프트웨어 버전"
-		HoneyLanguage.Russian.code -> "Версия программного обеспечения"
+		HoneyLanguage.Russian.code -> "Информация о версии"
 		HoneyLanguage.TraditionalChinese.code -> "Version"
 		else -> ""
 	}
@@ -3259,7 +3259,7 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "小时"
 		HoneyLanguage.Japanese.code -> "時間"
 		HoneyLanguage.Korean.code -> "시간"
-		HoneyLanguage.Russian.code -> " час/часов"
+		HoneyLanguage.Russian.code -> " ЧАС"
 		HoneyLanguage.TraditionalChinese.code -> "小時"
 		else -> ""
 	}
@@ -3269,7 +3269,7 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "日"
 		HoneyLanguage.Japanese.code -> "日"
 		HoneyLanguage.Korean.code -> "주간"
-		HoneyLanguage.Russian.code -> " день/дней"
+		HoneyLanguage.Russian.code -> "ДЕНЬ"
 		HoneyLanguage.TraditionalChinese.code -> "日"
 		else -> ""
 	}
@@ -3279,7 +3279,7 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "周"
 		HoneyLanguage.Japanese.code -> "週間"
 		HoneyLanguage.Korean.code -> "주"
-		HoneyLanguage.Russian.code -> " недели/недель"
+		HoneyLanguage.Russian.code -> "ЧЖОУ"
 		HoneyLanguage.TraditionalChinese.code -> "周"
 		else -> ""
 	}
@@ -3289,7 +3289,7 @@ object DateAndTimeText {
 		HoneyLanguage.Chinese.code -> "月"
 		HoneyLanguage.Japanese.code -> "ヶ月"
 		HoneyLanguage.Korean.code -> "달"
-		HoneyLanguage.Russian.code -> " месяца"
+		HoneyLanguage.Russian.code -> "МЕСЯЦ"
 		HoneyLanguage.TraditionalChinese.code -> "月"
 		else -> ""
 	}

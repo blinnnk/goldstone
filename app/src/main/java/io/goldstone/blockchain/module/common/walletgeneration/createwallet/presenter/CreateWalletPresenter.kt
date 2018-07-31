@@ -308,7 +308,6 @@ class CreateWalletPresenter(
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
 				TinyNumberUtils.isTrue(it.forceShow)
 			}.apply {
-				System.out.println("***$this")
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/
@@ -330,7 +329,6 @@ class CreateWalletPresenter(
 							ChainID.Kovan.id,
 							ChainID.Rinkeby.id -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									System.out.println("fuck ${it.chain_id}")
 									MyTokenTable.insert(
 										MyTokenTable(it, currentAddresses.ethAddress),
 										it.chain_id
