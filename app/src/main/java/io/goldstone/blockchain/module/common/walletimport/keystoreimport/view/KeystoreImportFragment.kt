@@ -46,14 +46,8 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				lparams(matchParent, matchParent)
 				attentionView.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-					text = CustomTargetTextStyle(
-						ImportWalletText.keystoreEthOnly,
-						ImportWalletText.keystoreIntro + "\n" + ImportWalletText.keystoreEthOnly,
-						Spectrum.green,
-						fontSize(12.uiPX()).toInt(),
-						false,
-						false
-					)
+					text = ImportWalletText.keystoreIntro
+					isCenter()
 				}.into(this)
 				keystoreEditText.apply {
 					hint = ImportWalletText.keystoreHint
