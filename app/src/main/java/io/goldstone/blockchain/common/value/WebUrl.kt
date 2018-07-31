@@ -34,17 +34,12 @@ object WebUrl {
 		"$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/watchOnlyWallet"
 	@JvmStatic
 	val whatIsGas = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/gas"
-	
 	const
 	val backUpServer = "https://goldstone-api1.naonaola.com"
 	const
 	val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
-	
-	const
-	val normalServer = "https://api1.goldstone.io"
-	const
-	val normalSocket = "wss://api1.goldstone.io/ws"
-	
+	const val normalServer = "https://api1.goldstone.io"
+	const val normalSocket = "wss://api1.goldstone.io/ws"
 	const val btcMain = "https://blockchain.info"
 	const val btcTest = "https://testnet.blockchain.info"
 }

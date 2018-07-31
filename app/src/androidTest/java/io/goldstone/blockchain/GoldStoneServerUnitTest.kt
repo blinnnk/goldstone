@@ -7,7 +7,6 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmpty
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
@@ -76,18 +75,15 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getNotificationList() {
 		NotificationTable.getAllNotifications { localData ->
-			AppConfigTable.getAppConfig { config ->
-				val latestTime = localData.maxBy { it.createTime }?.createTime
-				val requestTime = if (latestTime.isNull()) 0 else latestTime!!
-				GoldStoneAPI.getNotificationList(
-					config?.goldStoneID.orEmpty(),
-					requestTime,
-					{
-						LogUtil.error("$positon getNotificationList", it)
-					}
-				) {
-					Log.d("$positon + getNotificationList", it.toString())
+			val latestTime = localData.maxBy { it.createTime }?.createTime
+			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
+			GoldStoneAPI.getNotificationList(
+				requestTime,
+				{
+					LogUtil.error("$positon getNotificationList", it)
 				}
+			) {
+				Log.d("$positon + getNotificationList", it.toString())
 			}
 		}
 	}

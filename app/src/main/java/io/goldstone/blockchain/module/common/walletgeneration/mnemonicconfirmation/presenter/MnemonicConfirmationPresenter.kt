@@ -84,7 +84,7 @@ class MnemonicConfirmationPresenter(
 	override fun onFragmentShowFromHidden() {
 		fragment.parentFragment.apply {
 			fun BaseOverlayFragment<*>.resetEvent() {
-				headerTitle = CreateWalletText.mnemonicBackUp
+				headerTitle = CreateWalletText.mnemonicConfirmation
 				overlayView.header.showCloseButton(false)
 				overlayView.header.showBackButton(true) {
 					presenter.popFragmentFrom<MnemonicConfirmationFragment>()

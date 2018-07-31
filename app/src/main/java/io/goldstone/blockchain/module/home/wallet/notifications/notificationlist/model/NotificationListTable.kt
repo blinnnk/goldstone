@@ -4,12 +4,16 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONObject
+import java.io.Serializable
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -76,6 +80,16 @@ data class NotificationTable(
 			} else ""
 		}
 		
+		fun getBTCTransactionData(extra: String, isFrom: Boolean): List<ExtraTransactionModel> {
+			val option = if (isFrom) "from" else "to"
+			return if (extra.isNotEmpty()) {
+				val gson = Gson()
+				val collectionType = object : TypeToken<Collection<ExtraTransactionModel>>() {}.type
+				val jsonData = JSONObject(extra).safeGet(option)
+				gson.fromJson(jsonData, collectionType)
+			} else listOf()
+		}
+		
 		fun getToAddress(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("to")
@@ -131,3 +145,21 @@ interface NotificationDao {
 	@Update
 	fun update(notification: NotificationTable)
 }
+
+data class NotificationTransactionInfo(
+	val hash: String,
+	val chainID: String,
+	val isReceived: Boolean,
+	val symbol: String,
+	val value: Double,
+	val timeStamp: Long,
+	val toAddress: String,
+	val fromAddress: String
+) : Serializable
+
+data class ExtraTransactionModel(
+	@SerializedName("value")
+	val value: String,
+	@SerializedName("address")
+	val address: String
+)

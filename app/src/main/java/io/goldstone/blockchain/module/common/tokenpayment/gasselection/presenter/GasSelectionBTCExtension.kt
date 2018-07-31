@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
@@ -162,8 +162,9 @@ private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
 			if (Config.isTestEnvironment())
 				Config.getCurrentBTCTestAddress()
 			else Config.getCurrentBTCAddress()
-		BitcoinTransactionTable(
+		BitcoinSeriesTransactionTable(
 			0,
+			getToken()?.symbol.orEmpty(),
 			"Waiting",
 			0,
 			System.currentTimeMillis().toString(),
@@ -171,14 +172,24 @@ private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
 			myAddress,
 			raw.toAddress,
 			myAddress,
+			false,
 			raw.value.toString(),
 			fee.toString(),
 			size.toString(),
+			false,
 			true
 		).apply {
+			// 插入 PendingData
 			GoldStoneDataBase.database
 				.bitcoinTransactionDao()
 				.insert(this)
+			// 插入 FeeData
+			GoldStoneDataBase.database
+				.bitcoinTransactionDao()
+				.insert(this.apply {
+					isPending = false
+					isFee = true
+				})
 		}
 	}
 }

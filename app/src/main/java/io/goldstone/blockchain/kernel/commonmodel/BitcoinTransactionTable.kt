@@ -13,27 +13,33 @@ import org.json.JSONObject
  * @author KaySaith
  */
 @Entity(tableName = "bitcoinTransactionList")
-data class BitcoinTransactionTable(
+data class BitcoinSeriesTransactionTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
+	var symbol: String,
 	var blockNumber: String,
 	var transactionIndex: Int,
 	var timeStamp: String,
 	val hash: String,
 	val fromAddress: String,
 	val to: String,
-	val recordAddress: String,
+	var recordAddress: String,
+	var isReceive: Boolean,
 	val value: String,
 	val fee: String,
 	var size: String,
+	var isFee: Boolean,
 	var isPending: Boolean
 ) {
 	
 	constructor(
 		data: JSONObject,
-		myAddress: String
+		symbol: String,
+		myAddress: String,
+		isFee: Boolean
 	) : this(
 		0,
+		symbol,
 		data.safeGet("block_height"),
 		data.safeGet("tx_index").toInt(),
 		data.safeGet("time"),
@@ -41,9 +47,11 @@ data class BitcoinTransactionTable(
 		getFromAddress(data),
 		getToAddresses(data).toString(),
 		myAddress,
+		!getFromAddress(data).equals(myAddress, true),
 		getTransactionValue(data, myAddress),
 		getFeeSatoshi(data),
 		data.safeGet("size"),
+		isFee,
 		false
 	)
 	
@@ -100,7 +108,7 @@ data class BitcoinTransactionTable(
 		
 		fun getTransactionsByAddress(
 			address: String,
-			hold: (List<BitcoinTransactionTable>) -> Unit
+			hold: (List<BitcoinSeriesTransactionTable>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase
@@ -110,9 +118,22 @@ data class BitcoinTransactionTable(
 			} then (hold)
 		}
 		
+		fun getTransactionsByHash(
+			hash: String,
+			isReceive: Boolean,
+			hold: (BitcoinSeriesTransactionTable?) -> Unit
+		) {
+			load {
+				GoldStoneDataBase
+					.database
+					.bitcoinTransactionDao()
+					.getDataByHash(hash, isReceive)
+			} then (hold)
+		}
+		
 		fun updateLocalDataByHash(
 			hash: String,
-			newData: BitcoinTransactionTable,
+			newData: BitcoinSeriesTransactionTable,
 			isPending: Boolean
 		) {
 			GoldStoneDataBase
@@ -162,20 +183,23 @@ data class BitcoinTransactionTable(
 interface BitcoinTransactionDao {
 	
 	@Query("SELECT * FROM bitcoinTransactionList")
-	fun getAll(): List<BitcoinTransactionTable>
+	fun getAll(): List<BitcoinSeriesTransactionTable>
 	
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address  ORDER BY timeStamp DESC")
-	fun getDataByAddress(address: String): List<BitcoinTransactionTable>
+	fun getDataByAddress(address: String): List<BitcoinSeriesTransactionTable>
+	
+	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
+	fun getDataByHash(hash: String, isReceive: Boolean): BitcoinSeriesTransactionTable?
 	
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash")
-	fun getTransactionByHash(hash: String): BitcoinTransactionTable?
+	fun getTransactionByHash(hash: String): BitcoinSeriesTransactionTable?
 	
 	@Insert
-	fun insert(table: BitcoinTransactionTable)
+	fun insert(table: BitcoinSeriesTransactionTable)
 	
 	@Update
-	fun update(table: BitcoinTransactionTable)
+	fun update(table: BitcoinSeriesTransactionTable)
 	
 	@Delete
-	fun delete(table: BitcoinTransactionTable)
+	fun delete(table: BitcoinSeriesTransactionTable)
 }

@@ -53,6 +53,8 @@ data class MyTokenTable(
 				if (getCurrentChainTokenByContractAndAddress(
 						model.contract,
 						model.ownerAddress,
+						chainID,
+						chainID,
 						chainID
 					).isNull()
 				) {

@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -9,31 +12,19 @@ import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import java.io.Serializable
 
 /**
  * @date 25/03/2018 1:49 AM
  * @author KaySaith
  */
-data class NotificationTransactionInfo(
-	val hash: String,
-	val chainID: String,
-	val isReceived: Boolean,
-	val symbol: String,
-	val value: Double,
-	val timeStamp: Long,
-	val toAddress: String,
-	val fromAddress: String
-) : Serializable
-
 class NotificationListPresenter(
 	override val fragment: NotificationListFragment
 ) : BaseRecyclerPresenter<NotificationListFragment, NotificationTable>() {
@@ -92,26 +83,23 @@ class NotificationListPresenter(
 	}
 	
 	private fun updateDataFromServer(requestTime: Long) {
-		AppConfigTable.getAppConfig { config ->
-			GoldStoneAPI.getNotificationList(
-				config?.goldStoneID.orEmpty(),
-				requestTime,
-				{
-					showServerErrorDialog()
-				}
-			) {
-				fragment.removeLoadingView()
-				it.isNotEmpty() isTrue {
-					NotificationTable.insertData(it) {
-						getDataFromDatabase()
-					}
+		GoldStoneAPI.getNotificationList(
+			requestTime,
+			{
+				showServerErrorDialog()
+			}
+		) {
+			fragment.removeLoadingView()
+			it.isNotEmpty() isTrue {
+				NotificationTable.insertData(it) {
+					getDataFromDatabase()
 				}
 			}
 		}
 	}
 	
 	private fun showServerErrorDialog() {
-		// error call back
+		// Error callback
 		fragment.context?.let {
 			GoldStoneDialog.show(it) {
 				showOnlyConfirmButton {

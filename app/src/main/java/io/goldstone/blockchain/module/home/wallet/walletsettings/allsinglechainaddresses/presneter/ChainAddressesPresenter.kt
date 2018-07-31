@@ -49,7 +49,7 @@ class ChainAddressesPresenter(
 	) {
 		val isBTC = coinType == ChainType.BTC.id
 		AddressManagerFragment.showMoreDashboard(
-			fragment,
+			fragment.wrapper,
 			cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 			isBTC,
 			hasDefaultCell,

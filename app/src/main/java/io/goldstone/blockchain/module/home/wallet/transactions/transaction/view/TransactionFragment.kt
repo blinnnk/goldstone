@@ -24,6 +24,7 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	
 	var isETCListShown: Runnable? = null
 	var isBTCListShown: Runnable? = null
+	
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
 	}

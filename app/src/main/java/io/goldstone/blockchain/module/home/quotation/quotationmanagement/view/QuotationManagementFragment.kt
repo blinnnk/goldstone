@@ -31,19 +31,21 @@ class QuotationManagementFragment :
 					}?.isSelecting = cell.switch.isChecked
 					// 更新标记, 来在页面销毁的时候决定是否集中处理逻辑
 					if (cell.switch.isChecked) {
-						willDeletePair -= pair
-					} else {
 						willDeletePair += pair
+					} else {
+						willDeletePair.filterNot { it.equals(pair, true) }
 					}
 				}
 			}
 		}
 	}
 	
-	override fun onDestroy() {
-		super.onDestroy()
-		willDeletePair.forEach { pair ->
-			QuotationSelectionTable.removeSelectionBy(pair)
+	override fun onDetach() {
+		super.onDetach()
+		asyncData?.filter {
+			!it.isSelecting
+		}?.forEach { pair ->
+			QuotationSelectionTable.removeSelectionBy(pair.pair)
 		}
 	}
 	

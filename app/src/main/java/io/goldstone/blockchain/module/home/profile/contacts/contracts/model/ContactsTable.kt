@@ -19,8 +19,8 @@ data class ContactTable(
 	var name: String = "",
 	var defaultAddress: String,
 	var ethERCAndETCAddress: String,
-	var bitMainnetCoinAddress: String,
-	var bitTestnetCoinAddress: String
+	var btcMainnetAddress: String,
+	var btcTestnetAddress: String
 ) : Serializable {
 	
 	@Ignore constructor() : this(

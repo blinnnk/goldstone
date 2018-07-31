@@ -43,7 +43,7 @@ class PasswordSettingsPresenter(
 				oldPasswordInput.text.toString(),
 				password,
 				{
-					//error callback
+					// error callback
 					callback()
 				}
 			) {

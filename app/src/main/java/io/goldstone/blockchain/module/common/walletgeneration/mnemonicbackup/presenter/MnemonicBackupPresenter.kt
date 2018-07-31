@@ -50,7 +50,7 @@ class MnemonicBackupPresenter(
 			
 			is WalletSettingsFragment -> {
 				showTargetFragment<MnemonicConfirmationFragment, WalletSettingsFragment>(
-					WalletSettingsText.walletSettings,
+					CreateWalletText.mnemonicConfirmation,
 					CreateWalletText.mnemonicBackUp,
 					argument
 				)
@@ -64,6 +64,7 @@ class MnemonicBackupPresenter(
 		when (parent) {
 			is WalletSettingsFragment -> {
 				parent.apply {
+					headerTitle = CreateWalletText.mnemonicBackUp
 					overlayView.header.showCloseButton(false)
 					overlayView.header.showBackButton(true) {
 						parent.presenter.showWalletSettingListFragment()
