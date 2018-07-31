@@ -450,16 +450,6 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val keystoreEthOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		HoneyLanguage.Chinese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		HoneyLanguage.Japanese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		HoneyLanguage.Korean.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		HoneyLanguage.Russian.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		HoneyLanguage.TraditionalChinese.code -> "The account of the keystore type currently only supports the eth, erc and etc wallet. The wallet imported by this method can only generate the account corresponding to the keystore."
-		else -> ""
-	}
-	@JvmField
 	val notBip44WalletAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
 		HoneyLanguage.Chinese.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
@@ -1326,6 +1316,28 @@ object CommonText {
 object AlertText {
 	
 	@JvmField
+	val testnetOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		HoneyLanguage.Chinese.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		HoneyLanguage.Japanese.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		HoneyLanguage.Korean.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		HoneyLanguage.Russian.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
+		else -> ""
+	}
+	
+	@JvmField
+	val mainnetOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		HoneyLanguage.Chinese.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		HoneyLanguage.Japanese.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		HoneyLanguage.Korean.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		HoneyLanguage.Russian.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		HoneyLanguage.TraditionalChinese.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
+		else -> ""
+	}
+	
+	@JvmField
 	val btcWalletOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
 		HoneyLanguage.Chinese.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
@@ -1891,7 +1903,6 @@ object WalletSettingsText {
 }
 
 object ProfileText {
-	
 	
 	@JvmField
 	val settings = when (currentLanguage) {
