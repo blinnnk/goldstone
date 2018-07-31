@@ -85,7 +85,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			}.click {
 				it.showLoadingStatus()
 				presenter.getPrivateKeyByAddress(passwordInput) {
-					if (isNotEmpty()) {
+					if (!isNullOrBlank()) {
 						privateKeyTextView.text = this
 					}
 					it.showLoadingStatus(false)

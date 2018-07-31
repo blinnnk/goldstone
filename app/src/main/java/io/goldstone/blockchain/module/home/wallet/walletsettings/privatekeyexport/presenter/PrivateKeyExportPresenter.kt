@@ -4,14 +4,15 @@ import android.widget.EditText
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.getPrivateKey
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.uiThread
 
 /**
  * @date 06/04/2018 1:02 AM
@@ -30,7 +31,7 @@ class PrivateKeyExportPresenter(
 	
 	fun getPrivateKeyByAddress(
 		passwordInput: EditText,
-		hold: String.() -> Unit
+		hold: String?.() -> Unit
 	) {
 		if (isBTCAddress == true) {
 			getBTCPrivateKeyByAddress(passwordInput, hold)
@@ -55,8 +56,9 @@ class PrivateKeyExportPresenter(
 				fragment.context?.getPrivateKey(
 					it,
 					passwordInput.text.toString(),
+					"keystore",
 					{
-						fragment.context?.runOnUiThread { hold("") }
+						uiThread { hold("") }
 					}
 				) {
 					fragment.context?.runOnUiThread { hold(it) }
@@ -67,16 +69,24 @@ class PrivateKeyExportPresenter(
 	
 	private fun getBTCPrivateKeyByAddress(
 		passwordInput: EditText,
-		hold: String.() -> Unit
+		hold: String?.() -> Unit
 	) {
-		if (passwordInput.text?.toString().isNullOrBlank()) {
+		val password = passwordInput.text?.toString().orEmpty()
+		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
-			hold("")
+			hold(null)
 			return
 		}
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
 		address?.let { address ->
-			WalletTable.getBTCPrivateKey(address, Config.isTestEnvironment(), hold)
+			doAsync {
+				val isTest = BTCUtils.isValidTestnetAddress(address)
+				fragment.context?.exportBase58PrivateKey(address, password, isTest) { secret ->
+					uiThread {
+						hold(secret)
+					}
+				}
+			}
 		}
 	}
 }

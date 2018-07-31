@@ -68,8 +68,6 @@ object CryptoValue {
 			}
 		}
 	}
-	
-	const val basicLockKey = "1111111111111111111111111111111111111111111111111111111111111111"
 }
 
 object CryptoSymbol {

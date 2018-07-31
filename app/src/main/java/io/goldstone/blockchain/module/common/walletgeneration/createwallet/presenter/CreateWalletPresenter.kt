@@ -230,7 +230,7 @@ class CreateWalletPresenter(
 		fun generateMyTokenInfo(
 			addresses: MultiChainAddresses,
 			errorCallback: (Exception) -> Unit,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			// 首先从本地查找数据
 			DefaultTokenTable.getAllTokens { localTokens ->
@@ -302,7 +302,7 @@ class CreateWalletPresenter(
 		
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			currentAddresses: MultiChainAddresses,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			filter {
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
@@ -311,7 +311,9 @@ class CreateWalletPresenter(
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/
-				insertNewAccount(currentAddresses, callback)
+				insertNewAccount(currentAddresses) {
+					callback(true)
+				}
 			}
 		}
 		

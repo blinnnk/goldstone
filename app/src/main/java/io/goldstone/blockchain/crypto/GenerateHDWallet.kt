@@ -113,10 +113,11 @@ fun Context.getWalletByPrivateKey(
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
+	fileName: String = "keystore",
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+	val keystoreFile by lazy { File(filesDir!!, fileName) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	(0 until keyStore.accounts.size()).forEach { index ->
 		keyStore.accounts.get(index).address.hex.let {
@@ -138,10 +139,16 @@ fun Context.getKeystoreFile(
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
+	fileName: String = "keystore",
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
-	getKeystoreFile(walletAddress, password, errorCallback) {
+	getKeystoreFile(
+		walletAddress,
+		password,
+		fileName,
+		errorCallback
+	) {
 		WalletUtil.getKeyPairFromWalletFile(
 			it,
 			password,
@@ -214,11 +221,16 @@ fun Context.updatePassword(
 	callback: () -> Unit
 ) {
 	doAsync {
-		getPrivateKey(walletAddress, oldPassword, {
-			runOnUiThread {
-				errorCallback()
+		getPrivateKey(
+			walletAddress,
+			oldPassword,
+			"keystore",
+			{
+				runOnUiThread {
+					errorCallback()
+				}
 			}
-		}) { privateKey ->
+		) { privateKey ->
 			deleteAccount(walletAddress, oldPassword) {
 				getWalletByPrivateKey(privateKey, newPassword) {
 					GoldStoneAPI.context.runOnUiThread {

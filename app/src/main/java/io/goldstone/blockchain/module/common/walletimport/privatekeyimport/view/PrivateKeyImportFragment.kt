@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -122,8 +123,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						agreementView.radioButton.isChecked,
 						nameInput,
 						passwordHintInput
-					) {
+					) { isSuccessful ->
 						it.showLoadingStatus(false)
+						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 				

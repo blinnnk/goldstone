@@ -334,7 +334,6 @@ class AddressManagerPresneter(
 		}
 		
 		fun getCellDashboardMenu(
-			isBTC: Boolean = false,
 			hasDefaultCell: Boolean = true
 		): ArrayList<Pair<Int, String>> {
 			return arrayListOf(
@@ -343,7 +342,6 @@ class AddressManagerPresneter(
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
 				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey)
 			).apply {
-				if (isBTC) remove(find { it.second == WalletSettingsText.exportKeystore })
 				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
 			}
 		}

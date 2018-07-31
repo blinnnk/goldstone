@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -127,8 +128,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						hintInput,
 						agreementView.radioButton.isChecked,
 						walletNameInput
-					) {
+					) { isScuccessful ->
 						it.showLoadingStatus(false)
+						if (isScuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 				
