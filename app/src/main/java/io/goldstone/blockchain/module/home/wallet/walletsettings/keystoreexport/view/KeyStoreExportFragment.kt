@@ -88,7 +88,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			}.click {
 				it.showLoadingStatus()
 				presenter.getKeystoreByAddress(passwordInput) {
-					if (isNotEmpty()) {
+					if (!isNullOrBlank()) {
 						privateKeyTextView.text = this
 					}
 					it.showLoadingStatus(false)

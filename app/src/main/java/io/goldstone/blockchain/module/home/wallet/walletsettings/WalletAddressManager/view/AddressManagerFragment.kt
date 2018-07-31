@@ -243,9 +243,13 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				}
 			},
 			qrCellClickEvent = { presenter.showQRCodeFragment(address) },
-			exportPrivateKey = { presenter.showPrivateKeyExportFragment(address) },
-			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) },
-			exportBTCPrivateKey = { presenter.showBTCPrivateKeyExportFragment(address) }
+			exportPrivateKey = {
+				presenter.showPrivateKeyExportFragment(address)
+			},
+			exportBTCPrivateKey = {
+				presenter.showBTCPrivateKeyExportFragment(address)
+			},
+			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) }
 		)
 	}
 	
@@ -316,7 +320,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						}
 					}
 					creatorDashBoard.model =
-						AddressManagerPresneter.getCellDashboardMenu(isBTC, hasDefaultCell)
+						AddressManagerPresneter.getCellDashboardMenu(hasDefaultCell)
 					creatorDashBoard.into(this)
 					// 防止超出屏幕便捷的尺寸弥补
 					val overHeightSize = ScreenSize.fullHeight - creatorDashBoard.getOverlayHeight() - top

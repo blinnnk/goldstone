@@ -30,35 +30,35 @@ class MnemonicImportDetailPresenter(
 		hintInput: EditText,
 		isAgree: Boolean,
 		nameInput: EditText,
-		callback: () -> Unit
+		callback: (Boolean) -> Unit
 	) {
 		if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
+			callback(false)
 			return
 		}
 		
 		if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
+			callback(false)
 			return
 		}
 		
 		if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
+			callback(false)
 			return
 		}
 		
 		if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
+			callback(false)
 			return
 		}
 		
 		mnemonicInput.text.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
-			callback()
+			callback(false)
 			return
 		}
 
@@ -68,7 +68,7 @@ class MnemonicImportDetailPresenter(
 			repeatPasswordInput.text.toString(),
 			isAgree,
 			fragment.context,
-			failedCallback = { callback() }) { passwordValue, walletName ->
+			failedCallback = { callback(false) }) { passwordValue, walletName ->
 			val mnemonicContent =
 				mnemonicInput
 					.text.toString()
@@ -78,7 +78,7 @@ class MnemonicImportDetailPresenter(
 			
 			Mnemonic.validateMnemonic(mnemonicContent) isFalse {
 				fragment.context?.alert(ImportWalletText.mnemonicAlert)
-				callback()
+				callback(false)
 			} otherwise {
 				importWallet(
 					mnemonicContent,
@@ -98,7 +98,7 @@ class MnemonicImportDetailPresenter(
 		password: String,
 		name: String,
 		hint: String? = null,
-		callback: () -> Unit
+		callback: (Boolean) -> Unit
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
@@ -109,7 +109,7 @@ class MnemonicImportDetailPresenter(
 			multiChainPath
 		) { multiChainAddresses ->
 			WalletImportPresenter.insertWalletToDatabase(
-				fragment,
+				fragment.context,
 				multiChainAddresses,
 				name,
 				encryptMnemonic,

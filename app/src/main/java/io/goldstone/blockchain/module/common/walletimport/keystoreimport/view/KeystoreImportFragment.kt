@@ -12,9 +12,12 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -28,11 +31,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val keystoreEditText by lazy { WalletEditText(context!!) }
+	private val typeSettings by lazy { RoundCell(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
+	private var currentType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
 	override val presenter = KeystoreImportPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -54,6 +59,25 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					hint = ImportWalletText.keystoreHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				}.into(this)
+				
+				typeSettings
+					.apply {
+						setMargins<LinearLayout.LayoutParams> {
+							topMargin = 20.uiPX()
+							bottomMargin = 10.uiPX()
+						}
+						setTitles(ImportWalletText.walletType, currentType)
+					}
+					.click {
+						PrivateKeyImportFragment.showWalletTypeDashboard(
+							this@KeystoreImportFragment,
+							currentType
+						) {
+							currentType = it
+							typeSettings.setTitles(ImportWalletText.walletType, it)
+						}
+					}
+					.into(this)
 				
 				nameInput.apply {
 					hint = UIUtils.generateDefaultName()
@@ -95,13 +119,15 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importKeystoreWallet(
+						currentType,
 						keystoreEditText.text.toString(),
 						passwordInput,
 						nameInput,
 						agreementView.radioButton.isChecked,
 						hintInput
-					) {
+					) { isSuccessful ->
 						it.showLoadingStatus(false)
+						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 				
