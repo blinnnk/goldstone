@@ -98,8 +98,13 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		parent: Fragment?
 	) {
 		getParentFragment<ProfileOverlayFragment> {
-			headerTitle = ProfileText.contacts
-			presenter.popFragmentFrom<ContactInputFragment>()
+			if (childFragmentManager.fragments.size <= 1) {
+				// 从账单详情添加快捷通讯录跳转过来, 是没有上级入口的. 这里直接销毁。
+				presenter.removeSelfFromActivity()
+			} else {
+				headerTitle = ProfileText.contacts
+				presenter.popFragmentFrom<ContactInputFragment>()
+			}
 		}
 	}
 }

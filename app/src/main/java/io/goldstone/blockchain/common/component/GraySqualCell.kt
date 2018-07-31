@@ -1,16 +1,15 @@
 package io.goldstone.blockchain.common.component
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.CustomTargetTextStyle
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -99,8 +98,13 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		title.text = text
 	}
 	
-	fun setSubtitle(text: String) {
+	@SuppressLint("SetTextI18n")
+	fun setSubtitle(content: String) {
 		subtitle.visibility = View.VISIBLE
-		subtitle.text = if (text.length > 36) text.substring(0, 36) + "..." else text
+		subtitle.text = object : FixTextLength() {
+			override var text = content
+			override val maxWidth = ScreenSize.widthWithPadding * 0.6f
+			override val textSize: Float = fontSize(12.uiPX())
+		}.getFixString()
 	}
 }

@@ -32,13 +32,6 @@ class TokenDetailOverlayPresenter(
 		}
 	}
 	
-	fun recoverHeader() {
-		fragment.apply {
-			overlayView.header.title.visibility = View.VISIBLE
-			valueHeader?.visibility = View.GONE
-		}
-	}
-	
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
 		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
 			fragment.context!!,
@@ -50,7 +43,7 @@ class TokenDetailOverlayPresenter(
 			if (isFromQuickTransfer) {
 				fragment.apply {
 					fragment.setValueHeader(token)
-					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content) {}
+					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.address
 				}
 			} else {

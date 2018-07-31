@@ -163,7 +163,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 	
-	fun searchInputLinstener(action: (String) -> Unit) {
+	fun searchInputLinstener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
+		searchInput.editText.setOnFocusChangeListener { _, isChanged ->
+			isFocus(isChanged)
+		}
 		searchInput.editText.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(content: Editable?) {
 				if (!content.isNullOrBlank()) {

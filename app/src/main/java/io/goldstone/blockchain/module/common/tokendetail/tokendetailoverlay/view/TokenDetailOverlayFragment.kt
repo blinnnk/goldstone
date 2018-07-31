@@ -23,7 +23,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
  */
 class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresenter>() {
 	
-	var valueHeader: TwoLineTitles? = null
 	val token by lazy {
 		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
 	}
@@ -34,6 +33,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 		arguments?.getBoolean(ArgumentKey.fromQuickDeposit).orFalse()
 	}
 	var confirmButton: RoundButton? = null
+	private var valueHeader: TwoLineTitles? = null
 	override val presenter = TokenDetailOverlayPresenter(this)
 	
 	override fun ViewGroup.initView() {
@@ -70,5 +70,15 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 		} otherwise {
 			valueHeader?.visibility = View.VISIBLE
 		}
+	}
+	
+	fun recoverHeader() {
+		overlayView.header.title.visibility = View.VISIBLE
+		valueHeader?.visibility = View.GONE
+	}
+	
+	fun recoveryValueHeader() {
+		overlayView.header.title.visibility = View.GONE
+		valueHeader?.visibility = View.VISIBLE
 	}
 }

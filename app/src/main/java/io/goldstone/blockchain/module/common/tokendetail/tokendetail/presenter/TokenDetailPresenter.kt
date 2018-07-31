@@ -46,6 +46,11 @@ class TokenDetailPresenter(
 		loadDataFromDatabaseOrElse()
 	}
 	
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		fragment.getParentFragment<TokenDetailOverlayFragment>()?.recoveryValueHeader()
+	}
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		updateEmptyCharData(fragment.token?.symbol.orEmpty())
@@ -102,11 +107,13 @@ class TokenDetailPresenter(
 			putSerializable(ArgumentKey.transactionFromList, model)
 		}
 		fragment
-			.getParentFragment<TokenDetailOverlayFragment>()
-			?.presenter
-			?.showTargetFragment<TransactionDetailFragment>(
-				TransactionText.detail, TokenDetailText.tokenDetail, argument
-			)
+			.getParentFragment<TokenDetailOverlayFragment> {
+				presenter.showTargetFragment<TransactionDetailFragment>(
+					TransactionText.detail,
+					TokenDetailText.tokenDetail, argument
+				)
+				recoverHeader()
+			}
 	}
 	
 	private fun prepareTokenDetailData() {

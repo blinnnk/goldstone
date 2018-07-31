@@ -30,6 +30,12 @@ class PaymentPreparePresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		setSymbol()
+		// 根据入口不同决定是否显示关闭按钮
+		rootFragment?.apply {
+			if (isFromQuickTransfer) {
+				overlayView.header.showCloseButton(false)
+			}
+		}
 	}
 	
 	fun getToken(): WalletDetailCellModel? {

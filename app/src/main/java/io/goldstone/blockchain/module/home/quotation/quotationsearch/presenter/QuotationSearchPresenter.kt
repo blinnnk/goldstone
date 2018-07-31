@@ -27,13 +27,19 @@ class QuotationSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 	
+	var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.searchInputLinstener {
-				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					searchTokenBy(it)
+			overlayView.header.searchInputLinstener(
+				{
+					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+					if (it) {
+						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+					}
 				}
+			) {
+				hasNetWork isTrue { searchTokenBy(it) }
 			}
 		}
 	}

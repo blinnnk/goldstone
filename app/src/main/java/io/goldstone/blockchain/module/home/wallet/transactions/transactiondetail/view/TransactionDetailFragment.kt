@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy
@@ -7,6 +8,7 @@ import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.TransactionDetailPresenter
@@ -37,6 +39,10 @@ class TransactionDetailFragment :
 				onClick {
 					if (model.description.equals(TransactionText.url, true)) {
 						presenter.showTransactionWebFragment()
+						// 还原 `Header` 样式
+						getParentFragment<TokenDetailOverlayFragment> {
+							recoverHeader()
+						}
 					} else {
 						this@cell.context?.clickToCopy(model.info)
 					}
