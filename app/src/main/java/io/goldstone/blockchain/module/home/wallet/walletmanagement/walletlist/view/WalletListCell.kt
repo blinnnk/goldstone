@@ -23,9 +23,9 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.mo
 /**
  * @date 24/03/2018 8:58 PM
  * @author KaySaith
- * @rewriteDate 26/07/2018 3:30 PM
+ * @rewriteDate 31/07/2018 17:25 PM
  * @rewriter wcx
- * @description 修改获取头像方法 UnlimitedAvatar
+ * @description 修复获取头像锯齿bug
  */
 class WalletListCell(context: Context) : BaseValueCell(context) {
 
@@ -45,6 +45,8 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
     }
 
     icon.apply {
+      UnlimitedAvatar.width = layoutParams.width
+      UnlimitedAvatar.height = layoutParams.height
       glideImage(UnlimitedAvatar(
         model.avatar,
         context

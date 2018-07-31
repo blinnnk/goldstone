@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.R
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
 import android.view.Gravity
@@ -26,15 +27,13 @@ import org.jetbrains.anko.*
 /**
  * @date 23/03/2018 4:21 PM
  * @author KaySaith
- * @rewriteDate 26/07/2018 3:30 PM
+ * @rewriteDate 31/07/2018 17:25 PM
  * @rewriter wcx
- * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
+ * @description 修复获取头像锯齿bug
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
-  private val avatarBitmap = UnlimitedAvatar(
-    Config.getCurrentID(),
-    context
-  ).generateImage()
+
+  private var avatarBitmap: Bitmap? = null
 
   var model: WalletDetailHeaderModel? by observing(null) {
     model?.apply {
@@ -148,6 +147,13 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
       setAlignParentRight()
       setAlignParentBottom()
     }
+
+    UnlimitedAvatar.width = currentAccount.avatar.layoutParams.width
+    UnlimitedAvatar.height = currentAccount.avatar.layoutParams.height
+    avatarBitmap = UnlimitedAvatar(
+      Config.getCurrentID(),
+      context
+    ).generateImage()
   }
 
   fun showLoadingView(status: Boolean) {

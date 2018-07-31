@@ -11,6 +11,9 @@ import java.util.*
  * @data 07/12/2018 18/56
  * @author wcx
  * @description 根据输入数字随机生成图片
+ * @rewriteDate 31/07/2018 17:25 PM
+ * @rewriter wcx
+ * @description 动态获取bitmap宽高
  */
 class UnlimitedAvatar(
   randomNumber: Int,
@@ -36,8 +39,8 @@ class UnlimitedAvatar(
     val frontBitmap = convertDrawable2BitmapByCanvas(iconDrawable!!)
 
     val backgroundBitmap = Bitmap.createBitmap(
-      iconDrawable.intrinsicWidth,
-      iconDrawable.intrinsicHeight,
+      width,
+      height,
       Bitmap.Config.ARGB_8888
     )
     backgroundBitmap.eraseColor(Color.parseColor(randomColor))
@@ -376,16 +379,16 @@ class UnlimitedAvatar(
   // 根据资源文件获取bitmap
   private fun convertDrawable2BitmapByCanvas(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
-      drawable.intrinsicWidth,
-      drawable.intrinsicHeight,
+      width,
+      height,
       if (drawable.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
     )
     val canvas = Canvas(bitmap)
     drawable.setBounds(
       0,
       0,
-      drawable.intrinsicWidth,
-      drawable.intrinsicHeight
+      width,
+      height
     )
     drawable.draw(canvas)
     return bitmap
@@ -398,5 +401,10 @@ class UnlimitedAvatar(
   fun getNameMark(): Int {
     nameMark = absoluteRandomNumber % imageArrayList.size
     return nameMark
+  }
+
+  companion object {
+    var width = 0
+    var height = 0
   }
 }

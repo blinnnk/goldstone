@@ -24,7 +24,7 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 	
 	val walletInfo = TwoLineTitles(context)
 	val avatarImage = ImageView(context)
-	private val avatarSize = 75.uiPX()
+	val avatarSize = 75.uiPX()
 	
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)

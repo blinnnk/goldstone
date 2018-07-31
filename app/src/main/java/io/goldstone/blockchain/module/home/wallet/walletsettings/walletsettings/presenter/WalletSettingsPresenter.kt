@@ -30,9 +30,9 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
 /**
  * @date 25/03/2018 6:30 PM
  * @author KaySaith
- * @rewriteDate 26/07/2018 3:30 PM
+ * @rewriteDate 31/07/2018 17:25 PM
  * @rewriter wcx
- * @description 修改获取头像方法 UnlimitedAvatar
+ * @description 修复获取头像锯齿bug
  */
 class WalletSettingsPresenter(
   override val fragment: WalletSettingsFragment
@@ -158,6 +158,8 @@ class WalletSettingsPresenter(
         // ToDo Get All addresses from database and show them here
         subtitle.text = "there are 5 addresses in this wallet"
       }
+      UnlimitedAvatar.width = avatarSize
+      UnlimitedAvatar.height = avatarSize
       avatarImage.glideImage(
         UnlimitedAvatar(
           Config.getCurrentID(),
