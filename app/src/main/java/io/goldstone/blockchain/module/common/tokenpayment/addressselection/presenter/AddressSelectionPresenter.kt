@@ -129,9 +129,15 @@ class AddressSelectionPresenter(
 						"setting in settings first"
 					)
 					return
-				}
-				WalletTable.getAllBTCMainnetAddresses {
-					showAlertIfLocalExistThisAddress(this)
+				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
+					fragment.context.alert(
+						"This is a invalid address type, Please check it agin"
+					)
+					return
+				} else {
+					WalletTable.getAllBTCMainnetAddresses {
+						showAlertIfLocalExistThisAddress(this)
+					}
 				}
 			}
 			
@@ -142,9 +148,15 @@ class AddressSelectionPresenter(
 						"setting in settings first"
 					)
 					return
-				}
-				WalletTable.getAllBTCTestnetAddresses {
-					showAlertIfLocalExistThisAddress(this)
+				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
+					fragment.context.alert(
+						"This is a invalid address type, Please check it agin"
+					)
+					return
+				} else {
+					WalletTable.getAllBTCTestnetAddresses {
+						showAlertIfLocalExistThisAddress(this)
+					}
 				}
 			}
 		}

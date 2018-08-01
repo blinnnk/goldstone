@@ -4,8 +4,8 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.ConcurrentCombine
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -347,10 +347,10 @@ data class TransactionTable(
 				GoldStoneDataBase.database.transactionDao().apply {
 					val data = getAllTransactionsByAddress(address)
 					if (data.isEmpty()) {
-						GoldStoneAPI.context.runOnUiThread { callback() }
+						callback()
 						return@doAsync
 					}
-					object : ConcurrentCombine() {
+					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = data.size
 						override fun concurrentJobs() {
 							data.forEach {
@@ -359,6 +359,7 @@ data class TransactionTable(
 							}
 						}
 						
+						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}
@@ -379,6 +380,7 @@ data class TransactionTable(
 						getInputCodeByHash(
 							hash,
 							{ error, reason ->
+								callback("")
 								LogUtil.error("getMemoByHashAndReceiveStatus $reason", error)
 							},
 							chainName

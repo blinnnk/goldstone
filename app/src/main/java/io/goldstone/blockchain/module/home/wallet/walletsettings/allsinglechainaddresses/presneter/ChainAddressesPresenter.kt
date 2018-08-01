@@ -78,7 +78,7 @@ class ChainAddressesPresenter(
 	
 	fun updateAddAddressEvent() {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showAddButton(true, false) {
+			showAddButton(true, false) {
 				AddressManagerFragment.verifyPassword(this) {
 					when (fragment.coinType) {
 						ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(context, it) {
@@ -89,9 +89,19 @@ class ChainAddressesPresenter(
 							updateAddressManagerDataBy(ChainType.ETC.id, it)
 							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 						}
-						ChainType.BTC.id -> AddressManagerPresneter.createBTCAddress(context, it) {
-							updateAddressManagerDataBy(ChainType.BTC.id, it)
-							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+						
+						ChainType.BTC.id -> {
+							if (Config.isTestEnvironment()) {
+								AddressManagerPresneter.createBTCTestAddress(context, it) {
+									updateAddressManagerDataBy(ChainType.BTCTest.id, it)
+									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+								}
+							} else {
+								AddressManagerPresneter.createBTCAddress(context, it) {
+									updateAddressManagerDataBy(ChainType.BTC.id, it)
+									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+								}
+							}
 						}
 					}
 				}
@@ -188,38 +198,36 @@ class ChainAddressesPresenter(
 	
 	override fun updateData() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				when (fragment.coinType) {
-					ChainType.ETH.id -> {
-						fragment.asyncData =
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses).toArrayList()
-						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETH.id) {
-							setDefaultAddress(it, currentETHAndERCAddress, ChainType.ETH.id)
-							Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
-						}
+			when (fragment.coinType) {
+				ChainType.ETH.id -> {
+					fragment.asyncData =
+						AddressManagerPresneter.convertToChildAddresses(ethAddresses).toArrayList()
+					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETH.id) {
+						setDefaultAddress(it, currentETHAndERCAddress, ChainType.ETH.id)
+						Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 					}
-					
-					ChainType.ETC.id -> {
-						fragment.asyncData =
-							AddressManagerPresneter.convertToChildAddresses(etcAddresses).toArrayList()
-						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETC.id) {
-							setDefaultAddress(it, currentETCAddress, ChainType.ETC.id)
-							Config.updateCurrentETCAddress(currentETCAddress)
-						}
+				}
+				
+				ChainType.ETC.id -> {
+					fragment.asyncData =
+						AddressManagerPresneter.convertToChildAddresses(etcAddresses).toArrayList()
+					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETC.id) {
+						setDefaultAddress(it, currentETCAddress, ChainType.ETC.id)
+						Config.updateCurrentETCAddress(currentETCAddress)
 					}
-					
-					ChainType.BTC.id -> {
-						val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
-						val currentAddress =
-							if (Config.isTestEnvironment()) currentBTCTestAddress else currentBTCAddress
-						fragment.asyncData =
-							AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
-						AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
-							setDefaultAddress(it, currentAddress, ChainType.BTC.id)
-							if (Config.isTestEnvironment())
-								Config.updateCurrentBTCTestAddress(btcTestAddresses)
-							else Config.updateCurrentBTCAddress(btcAddresses)
-						}
+				}
+				
+				ChainType.BTC.id -> {
+					val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
+					val currentAddress =
+						if (Config.isTestEnvironment()) currentBTCTestAddress else currentBTCAddress
+					fragment.asyncData =
+						AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
+					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
+						setDefaultAddress(it, currentAddress, ChainType.BTC.id)
+						if (Config.isTestEnvironment())
+							Config.updateCurrentBTCTestAddress(btcTestAddresses)
+						else Config.updateCurrentBTCAddress(btcAddresses)
 					}
 				}
 			}

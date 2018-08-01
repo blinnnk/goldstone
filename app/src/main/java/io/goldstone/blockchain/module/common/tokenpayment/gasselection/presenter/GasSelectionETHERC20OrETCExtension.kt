@@ -143,7 +143,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 		fragment.context?.getPrivateKey(
 			getETHERC20OrETCAddress(),
 			password,
-			"keystore",
+			CryptoValue.keystoreFilename,
 			{
 				callback()
 				fragment.showMaskView(false)

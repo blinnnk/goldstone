@@ -109,7 +109,12 @@ class BitcoinTransactionListPresenter(
 					// 本地的数据更新网络数据, 因为本地可能有  `Pending` 拼接的数据, 所以重复的都首先更新网络
 					!localTransaction?.apply {
 						BitcoinSeriesTransactionTable
-							.updateLocalDataByHash(hash, this, false)
+							.updateLocalDataByHash(
+								hash,
+								this,
+								false,
+								false
+							)
 					}.isNull()
 				}.map {
 					// 插入转账数据到数据库

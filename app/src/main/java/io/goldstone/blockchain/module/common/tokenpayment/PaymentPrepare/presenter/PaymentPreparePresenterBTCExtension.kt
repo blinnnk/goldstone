@@ -5,6 +5,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -74,31 +75,26 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 		}
 		// 签名测速总的签名后的信息的 `Size`
 		BitcoinApi.getUnspentListByAddress(myAddress) { unspents ->
-			WalletTable.getBTCPrivateKey(
-				myAddress,
+			val size = BTCTransactionUtils.generateSignedRawTransaction(
+				count.toSatoshi(),
+				1L,
+				fragment.address.orEmpty(),
+				changeAddress,
+				unspents,
+				CryptoValue.signedSecret, // 测算 `MessageSize` 的默认无效私钥
 				Config.isTestEnvironment()
-			) { secret ->
-				val size = BTCTransactionUtils.generateSignedRawTransaction(
-					count.toSatoshi(),
-					1L,
-					fragment.address.orEmpty(),
-					changeAddress,
-					unspents,
-					secret,
-					Config.isTestEnvironment()
-				).messageSize
-				val unitFee = feePerByte.orZero().toSatoshi() / 1000
-				PaymentPrepareBTCModel(
-					fragment.address.orEmpty(),
-					WalletTable.getAddressBySymbol(getToken()?.symbol),
-					changeAddress,
-					count.toSatoshi(),
-					unitFee,
-					size.toLong()
-				).let {
-					GoldStoneAPI.context.runOnUiThread {
-						hold(it)
-					}
+			).messageSize
+			val unitFee = feePerByte.orZero().toSatoshi() / 1000
+			PaymentPrepareBTCModel(
+				fragment.address.orEmpty(),
+				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				changeAddress,
+				count.toSatoshi(),
+				unitFee,
+				size.toLong()
+			).let {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(it)
 				}
 			}
 		}

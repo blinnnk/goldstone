@@ -9,6 +9,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -47,7 +48,7 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 		defaultTitle.text = WalletSettingsText.defaultAddress
 		currentAddress.into(this)
 		allAddressTitle.into(this)
-		currentAddress.updateBackgroundColor()
+		currentAddress.updateStyle(Companion.CellType.Default)
 	}
 	
 	fun setDefaultAddress(

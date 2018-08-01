@@ -43,7 +43,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 	
 	private fun showAddButton(status: Boolean = true) {
 		getParentFragment<ProfileOverlayFragment> {
-			overlayView.header.showAddButton(status) {
+			showAddButton(status) {
 				presenter.showContactInputFragment()
 			}
 		}

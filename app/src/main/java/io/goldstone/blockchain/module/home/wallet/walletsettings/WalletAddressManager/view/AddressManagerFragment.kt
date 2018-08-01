@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.MiniOverlay
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -31,7 +33,7 @@ import org.jetbrains.anko.support.v4.toast
  */
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	
-	private val currentMultiChainAddresses by lazy {
+	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!) { moreButton, address, isDefault, title ->
 			val chainTYpe = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
@@ -57,7 +59,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			isCenter()
 		}
 	}
-	private val ethAndERCAddresses by lazy {
+	private val ethAndERCAddressesView by lazy {
 		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
@@ -70,7 +72,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	private val etcAddresses by lazy {
+	private val etcAddressesView by lazy {
 		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
@@ -83,7 +85,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	private val btcAddresses by lazy {
+	private val btcAddressesView by lazy {
 		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
@@ -99,24 +101,25 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	override val presenter = AddressManagerPresneter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {
-		showChildAddressCreatorDashboard()
+		showCreatorDashboard()
 		scrollView {
 			lparams(matchParent, matchParent)
-			verticalLayout {
+			verticalLayout parent@{
 				lparams {
-					leftPadding = PaddingSize.device
+					width = matchParent
+					height = matchParent
 					topPadding = 20.uiPX()
 				}
-				currentMultiChainAddresses.into(this)
+				currentMultiChainAddressesView.into(this)
 				// 不为空才显示 `bip44` 规则的子地址界面
 				WalletTable.getCurrentWallet {
-					if (it?.ethAddresses?.isNotEmpty() == true) {
-						ethAndERCAddresses.into(this)
-						etcAddresses.into(this)
-						btcAddresses.into(this)
-						ethAndERCAddresses.checkAllEvent = presenter.showAllETHAndERCAddresses()
-						etcAddresses.checkAllEvent = presenter.showAllETCAddresses()
-						btcAddresses.checkAllEvent = presenter.showAllBTCAddresses()
+					if (ethAddresses.isNotEmpty()) {
+						ethAndERCAddressesView.into(this@parent)
+						etcAddressesView.into(this@parent)
+						btcAddressesView.into(this@parent)
+						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
+						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
+						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
 						if (Config.isTestEnvironment()) {
@@ -125,43 +128,41 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 							presenter.getBitcoinAddresses()
 						}
 					} else {
-						removeHeaderAddButton()
-						attentionView.into(this)
+						hideAddButton()
+						attentionView.into(this@parent)
 					}
 				}
 			}
 		}
 	}
 	
-	private fun removeHeaderAddButton() {
-		getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showAddButton(false)
-		}
+	private fun hideAddButton() {
+		getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 	}
 	
 	fun setMultiChainAddresses(model: List<Pair<String, String>>) {
-		currentMultiChainAddresses.setTitle(WalletSettingsText.currentMultiChainAddresses)
-		currentMultiChainAddresses.model = model
+		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
+		currentMultiChainAddressesView.model = model
 	}
 	
 	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
-		ethAndERCAddresses.setTitle(WalletSettingsText.ethereumSeriesAddress)
-		ethAndERCAddresses.model = model
+		ethAndERCAddressesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
+		ethAndERCAddressesView.model = model
 	}
 	
 	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {
-		etcAddresses.setTitle(WalletSettingsText.ethereumClassicAddress)
-		etcAddresses.model = model
+		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
+		etcAddressesView.model = model
 	}
 	
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
-		btcAddresses.setTitle(WalletSettingsText.bitcoinAddress)
-		btcAddresses.model = model
+		btcAddressesView.setTitle(WalletSettingsText.bitcoinAddress)
+		btcAddressesView.model = model
 	}
 	
-	fun showChildAddressCreatorDashboard() {
+	fun showCreatorDashboard() {
 		getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showAddButton(true, false) {
+			showAddButton(true, false) {
 				getMainActivity()?.getMainContainer()?.apply {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
@@ -186,24 +187,24 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		when (title) {
 			WalletSettingsText.newETHAndERCAddress -> {
 				AddressManagerPresneter.createETHAndERCAddress(context, password) {
-					ethAndERCAddresses.model = it
+					ethAndERCAddressesView.model = it
 				}
 			}
 			
 			WalletSettingsText.newETCAddress -> {
 				AddressManagerPresneter.createETCAddress(context, password) {
-					etcAddresses.model = it
+					etcAddressesView.model = it
 				}
 			}
 			
 			WalletSettingsText.newBTCAddress -> {
 				if (Config.isTestEnvironment()) {
 					AddressManagerPresneter.createBTCTestAddress(context, password) {
-						btcAddresses.model = it
+						btcAddressesView.model = it
 					}
 				} else {
 					AddressManagerPresneter.createBTCAddress(context, password) {
-						btcAddresses.model = it
+						btcAddressesView.model = it
 					}
 				}
 			}
@@ -279,7 +280,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				!Config.getCurrentIsWatchOnlyOrNot()
 			) {
 				val password = it?.text.toString()
-				fragment.context?.verifyKeystorePassword(password) {
+				// 多链钱包所有地址的 `Keystore` 密码都一样, 创建子账号前验证密码.
+				fragment.context?.verifyKeystorePassword(password, CryptoValue.keystoreFilename) {
 					if (it) {
 						callback(password)
 					} else {

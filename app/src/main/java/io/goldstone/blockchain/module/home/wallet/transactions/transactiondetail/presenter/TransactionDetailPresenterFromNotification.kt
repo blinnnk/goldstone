@@ -115,6 +115,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
 			this.memo = getMemoFromInputCode(receipt.input, CryptoValue.isToken(receipt.contractAddress))
+			this.fromAddress = info.fromAddress
 		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
 				if (fragment.asyncData.isNull()) fragment.asyncData = it

@@ -107,11 +107,11 @@ class WatchOnlyImportPresenter(
 							callback()
 						}
 					) {
-						fragment.activity?.jump<SplashActivity>()
 						callback()
+						// 注册钱包地址用于发送 `Push`
+						XinGePushReceiver.registerAddressesForPush()
+						fragment.activity?.jump<SplashActivity>()
 					}
-					// 注册钱包地址用于发送 `Push`
-					XinGePushReceiver.registerAddressesForPush()
 				}
 			} otherwise {
 				fragment.context?.alert(ImportWalletText.existAddress)

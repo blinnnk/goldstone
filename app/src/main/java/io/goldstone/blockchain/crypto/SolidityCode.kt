@@ -27,6 +27,9 @@ object CryptoValue {
 	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
+	// Bitcoin 转账前测算 `SignedSize` 需要用到私钥, 这里随便写一个紧用于提前预估 `SignedSize`
+	const val signedSecret = "cRKRm6mvfVrxDoStKhRETVZ91gcN13EBgCKhgCkVRw2DaWSByN94"
+	const val keystoreFilename = "keystore"
 	// GoldStone 业务约定的值
 	const val ethContract = "0x60"
 	const val etcContract = "0x61"

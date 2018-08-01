@@ -11,7 +11,6 @@ import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.extension.timeUpThen
-import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
@@ -76,8 +75,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		}
 	}
 	
-	var afterSetHeightAnimation: Runnable? = null
-	
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
 		presenter.onFragmentAttach()
@@ -105,10 +102,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			addView(overlayView, RelativeLayout.LayoutParams(matchParent, matchParent))
 			
 			overlayView.apply {
-				/** 执行伸展动画 */
-				AnimationDuration.Default timeUpThen {
-					afterSetHeightAnimation?.run()
-				}
 				/** 设置悬浮曾的 `Header` 初始状态 */
 				header.apply {
 					showBackButton(hasBackButton)
@@ -141,6 +134,14 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			showHomeFragment(false)
 			hideTabBarToAvoidOverdraw()
 		}
+	}
+	
+	fun showAddButton(
+		status: Boolean,
+		isLeft: Boolean = true,
+		clickEvent: () -> Unit = {}
+	) {
+		overlayView.header.showAddButton(status, isLeft, clickEvent)
 	}
 	
 	private fun showHomeFragment(isShow: Boolean) {

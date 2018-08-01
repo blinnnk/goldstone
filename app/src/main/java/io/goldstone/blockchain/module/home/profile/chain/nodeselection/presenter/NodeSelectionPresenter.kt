@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter
 
-import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
@@ -8,7 +7,6 @@ import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 
 /**
@@ -23,29 +21,23 @@ class NodeSelectionPresenter(
 	/**
 	 * `ChainID` 会重复使用导致获取 `ChainName` 并不能准确, 所以切换 `Chain` 的时候存储 `NodeName`
 	 */
-	fun updateERC20TestChainID(nodeName: String) {
+	fun updateERC20ChainID(nodeName: String) {
 		Config.updateCurrentChainName(nodeName)
 		Config.updateCurrentChain(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
 		Config.updateEncryptERCNodeRequest(checkIsEncryptERCNode(nodeName))
 	}
 	
-	fun updateETCTestChainID(nodeName: String) {
+	fun updateETCChainID(nodeName: String) {
 		Config.updateETCCurrentChainName(nodeName)
 		Config.updateETCCurrentChain(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
 		Config.updateEncryptETCNodeRequest(checkIsEncryptETCNode(nodeName))
 	}
 	
-	fun updateBTCTestChainID(nodeName: String) {
+	fun updateBTCChainID(nodeName: String) {
 		Config.updateBTCCurrentChainName(nodeName)
 		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
-	}
-	
-	fun updateDatabaseThenJump(isMainnet: Boolean) {
-		AppConfigTable.updateChainStatus(isMainnet) {
-			fragment.activity?.jump<SplashActivity>()
-		}
 	}
 	
 	fun getDefaultOrCurrentChainName(isMainnet: Boolean, type: ChainType): String {
@@ -53,7 +45,7 @@ class NodeSelectionPresenter(
 			when (type) {
 				ChainType.ETH -> {
 					if (Config.getCurrentChain() != ChainID.Main.id) {
-						ChainText.goldStoneMain
+						ChainText.infuraMain
 					} else {
 						Config.getCurrentChainName()
 					}
@@ -65,7 +57,7 @@ class NodeSelectionPresenter(
 				
 				else -> {
 					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) {
-						ChainText.goldStoneEtcMain
+						ChainText.etcMainGasTracker
 					} else {
 						Config.getETCCurrentChainName()
 					}
@@ -75,7 +67,7 @@ class NodeSelectionPresenter(
 			when (type) {
 				ChainType.ETH -> {
 					if (Config.getCurrentChain() == ChainID.Main.id) {
-						ChainText.ropsten
+						ChainText.infuraRopsten
 					} else {
 						Config.getCurrentChainName()
 					}
@@ -106,5 +98,45 @@ class NodeSelectionPresenter(
 		return TinyNumberUtils.allFalse(
 			nodeName.contains("gasTracker", true)
 		)
+	}
+	
+	companion object {
+		fun setAllTestnet(callback: () -> Unit) {
+			AppConfigTable.getAppConfig {
+				it?.apply {
+					AppConfigTable.updateChainStatus(false) {
+						Config.updateIsTestEnvironment(true)
+						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
+						Config.updateETCCurrentChain(ChainID.ETCTest.id)
+						Config.updateCurrentChain(
+							ChainID.getChainIDByName(currentETHERC20AndETCTestChainName)
+						)
+						Config.updateETCCurrentChainName(currentETCTestChainName)
+						Config.updateCurrentChainName(currentETHERC20AndETCTestChainName)
+						Config.updateBTCCurrentChainName(currentBTCTestChainName)
+						callback()
+					}
+				}
+			}
+		}
+		
+		fun setAllMainnet(callback: () -> Unit) {
+			AppConfigTable.getAppConfig {
+				it?.apply {
+					AppConfigTable.updateChainStatus(true) {
+						Config.updateIsTestEnvironment(false)
+						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
+						Config.updateETCCurrentChain(ChainID.ETCTest.id)
+						Config.updateCurrentChain(
+							ChainID.getChainIDByName(currentETHERC20AndETCChainName)
+						)
+						Config.updateETCCurrentChainName(currentETCChainName)
+						Config.updateCurrentChainName(currentETHERC20AndETCChainName)
+						Config.updateBTCCurrentChainName(currentBTCChainName)
+						callback()
+					}
+				}
+			}
+		}
 	}
 }

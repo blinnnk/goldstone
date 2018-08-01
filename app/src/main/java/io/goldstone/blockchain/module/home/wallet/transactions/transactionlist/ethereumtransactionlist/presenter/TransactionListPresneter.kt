@@ -115,7 +115,10 @@ class TransactionListPresenter(
 					transactions.forEachOrEnd { item, isEnd ->
 						item.addressName =
 							contacts.find {
+								// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
 								it.ethERCAndETCAddress.equals(item.toAddress, true)
+								|| it.btcTestnetAddress.contains(item.toAddress, true)
+								|| it.btcMainnetAddress.contains(item.toAddress, true)
 							}?.name ?: item.toAddress
 						if (isEnd) {
 							callback()

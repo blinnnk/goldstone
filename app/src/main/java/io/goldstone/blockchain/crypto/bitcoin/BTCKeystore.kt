@@ -83,6 +83,25 @@ fun Context.exportBase58KeyStoreFile(
 	)
 }
 
+fun Context.deleteBTCKeystoreAccount(
+	fileName: String,
+	password: String,
+	hold: (String?) -> Unit
+) {
+	val keystoreFile by lazy { File(filesDir!!, fileName) }
+	/** Generate Keystore */
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	getKeystoreFile(
+		keyStore.accounts[0].address.hex,
+		password,
+		fileName,
+		{
+			hold(null)
+		},
+		hold
+	)
+}
+
 fun Context.getBase58PrivateKeyByKeystoreFile(
 	keystoreFile: String,
 	password: String,

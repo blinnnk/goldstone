@@ -35,7 +35,7 @@ class TokenManagementListPresenter(
 			if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
 			// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 			fragment.getParentFragment<TokenManagementFragment> {
-				afterSetHeightAnimation = Runnable { prepareMyDefaultTokens(it) }
+				prepareMyDefaultTokens(it)
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
@@ -54,13 +53,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
 	private var changeAddress: String = WalletTable.getAddressBySymbol(CryptoSymbol.btc)
-	private lateinit var container: RelativeLayout
 	override val presenter = PaymentPreparePresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)
-			container = relativeLayout {
+			relativeLayout {
 				lparams(matchParent, matchParent)
 				verticalLayout {
 					gravity = Gravity.CENTER_HORIZONTAL
@@ -158,7 +156,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				showArrow()
 				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
 			}.click {
-				container.showMemoInputView {
+				getParentContainer()?.showMemoInputView {
 					if (it.isNotEmpty()) {
 						memoData = it
 						memo.setSubtitle(it)
@@ -257,6 +255,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
 		if (memoInputView.isNull()) {
+			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {
 				updateConfirmButtonEvent { button ->
 					button.onClick {
@@ -272,7 +271,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	
 	private fun removeMemoInputView() {
 		memoInputView?.updateAlphaAnimation(0f) {
-			container.removeView(memoInputView)
+			getParentContainer()?.removeView(memoInputView)
 			memoInputView = null
 		}
 	}

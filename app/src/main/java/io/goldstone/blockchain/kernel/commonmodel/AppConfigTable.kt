@@ -11,6 +11,7 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.HoneyLanguage
 import io.goldstone.blockchain.common.value.ProfileText
@@ -41,7 +42,13 @@ data class AppConfigTable(
 	var pushToken: String = "",
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
-	var terms: String = ""
+	var terms: String = "",
+	var currentETCTestChainName: String,
+	var currentETHERC20AndETCTestChainName: String,
+	var currentBTCTestChainName: String,
+	var currentETCChainName: String,
+	var currentBTCChainName: String,
+	var currentETHERC20AndETCChainName: String
 ) {
 	
 	companion object {
@@ -179,7 +186,39 @@ data class AppConfigTable(
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						update(it[0].apply { this.isMainnet = isMainnet })
+						update(it[0].apply {
+							this.isMainnet = isMainnet
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateChainInfo(
+			isMainnet: Boolean,
+			etcChainName: String,
+			ethERC20AndETCChainName: String,
+			btcChainName: String,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply {
+							this.isMainnet = isMainnet
+							if (isMainnet) {
+								currentBTCChainName = btcChainName
+								currentETCChainName = etcChainName
+								currentETHERC20AndETCChainName = ethERC20AndETCChainName
+							} else {
+								currentBTCTestChainName = btcChainName
+								currentETCTestChainName = etcChainName
+								currentETHERC20AndETCTestChainName = ethERC20AndETCChainName
+							}
+						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -239,7 +278,13 @@ data class AppConfigTable(
 							goldStoneID = goldStoneID,
 							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 							terms = getLocalTerms(),
-							isMainnet = true
+							isMainnet = true,
+							currentBTCChainName = ChainText.btcMain,
+							currentETCChainName = ChainText.etcMainGasTracker,
+							currentETHERC20AndETCChainName = ChainText.infuraMain,
+							currentBTCTestChainName = ChainText.btcTest,
+							currentETCTestChainName = ChainText.etcMorden,
+							currentETHERC20AndETCTestChainName = ChainText.infuraRopsten
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }

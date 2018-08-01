@@ -98,7 +98,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		parentFragment?.let {
 			if (it is BaseOverlayFragment<*>) {
-				it.overlayView.header.showAddButton(false)
+				it.showAddButton(false)
 			}
 		}
 	}

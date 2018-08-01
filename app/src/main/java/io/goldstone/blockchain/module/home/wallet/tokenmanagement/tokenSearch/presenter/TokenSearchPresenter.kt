@@ -10,10 +10,12 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
@@ -34,7 +36,7 @@ class TokenSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 	
-	var hasNetWork = true
+	private var canSearch = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
@@ -42,11 +44,20 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+						WalletTable.getWalletType { type ->
+							canSearch = if (type == WalletType.BTCTestOnly || type == WalletType.BTCOnly) {
+								fragment.context.alert(
+									"This is a single bitcoin chain wallet so you canot add other crypot currency"
+								)
+								false
+							} else {
+								NetworkUtil.hasNetworkWithAlert(context)
+							}
+						}
 					}
 				}
 			) {
-				hasNetWork isTrue {
+				canSearch isTrue {
 					searchTokenByContractOrSymbol(it) {
 						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
@@ -118,58 +129,62 @@ class TokenSearchPresenter(
 				)
 			}
 		) { result ->
-			result.isNullOrEmpty() isFalse {
-				// 从服务器请求目标结果
-				MyTokenTable.getMyTokens { localTokens ->
+			MyTokenTable.getMyTokens { localTokens ->
+				if (result.isNullOrEmpty()) {
+					// 从服务器请求目标结果
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
-							isDefault = localTokens.any {
+							val status = localTokens.any {
 								it.contract.equals(serverToken.contract, true)
 							}
+							isDefault = status
+							isUsed = status
 						}
 					}.let {
 						hold(it.toArrayList())
 					}
-				}
-			} otherwise {
-				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
-				isSearchingSymbol isFalse {
+				} else {
+					if (isSearchingSymbol) {
+						hold(arrayListOf())
+						return@getMyTokens
+					}
+					// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
-					MyTokenTable.getCurrentChainTokenByContract(content) {
-						GoldStoneEthCall.getTokenInfoByContractAddress(
-							content,
-							{ error, reason ->
-								fragment.context?.alert(reason ?: error.toString())
-							},
-							Config.getCurrentChainName()
-						) { symbol, name, decimal ->
-							if (symbol.isEmpty() || name.isEmpty()) {
-								hold(arrayListOf())
-							} else {
-								hold(
-									arrayListOf(
-										DefaultTokenTable(
-											0,
-											content,
-											"",
-											symbol,
-											TinyNumber.False.value,
-											0.0,
-											name,
-											decimal,
-											null,
-											false,
-											0,
-											ChainID.getChainIDBySymbol(symbol)
-										)
+					GoldStoneEthCall.getTokenInfoByContractAddress(
+						content,
+						{ error, reason ->
+							fragment.context?.alert(reason ?: error.toString())
+						},
+						Config.getCurrentChainName()
+					) { symbol, name, decimal ->
+						if (symbol.isEmpty() || name.isEmpty()) {
+							hold(arrayListOf())
+						} else {
+							val status = localTokens.any {
+								it.contract.equals(content, true)
+							}
+							hold(
+								arrayListOf(
+									DefaultTokenTable(
+										0,
+										content,
+										"",
+										symbol,
+										TinyNumber.False.value,
+										0.0,
+										name,
+										decimal,
+										null,
+										status,
+										0,
+										ChainID.getChainIDBySymbol(symbol),
+										isUsed = status
 									)
 								)
-							}
+							)
 						}
 					}
-				} otherwise {
-					hold(arrayListOf())
 				}
 			}
 		}

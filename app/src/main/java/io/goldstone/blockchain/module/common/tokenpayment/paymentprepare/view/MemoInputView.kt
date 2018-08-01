@@ -42,7 +42,9 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 	private var keyboardHeight = 0
 	
 	init {
-		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		isClickable = true
+		y = HomeSize.headerHeight.toFloat()
+		layoutParams = RelativeLayout.LayoutParams(matchParent, ScreenSize.heightWithOutHeader)
 		backgroundColor = Spectrum.white
 		inputView.apply {
 			textSize = fontSize(18)

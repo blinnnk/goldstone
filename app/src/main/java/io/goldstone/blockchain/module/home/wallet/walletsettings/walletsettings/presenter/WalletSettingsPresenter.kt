@@ -108,14 +108,12 @@ class WalletSettingsPresenter(
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
 				WalletTable.getCurrentWallet {
-					it?.apply {
-						encryptMnemonic?.let {
-							recoveryHeaderStyle()
-							val mnemonicCode = JavaKeystoreUtil()
-								.decryptData(it)
-							replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
-								putString(ArgumentKey.mnemonicCode, mnemonicCode)
-							}
+					encryptMnemonic?.let {
+						recoveryHeaderStyle()
+						val mnemonicCode = JavaKeystoreUtil()
+							.decryptData(it)
+						replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
+							putString(ArgumentKey.mnemonicCode, mnemonicCode)
 						}
 					}
 				}

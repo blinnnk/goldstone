@@ -72,7 +72,6 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 			memoryTransactionListData?.find {
 				it.transactionHash == dataFromList?.transactionHash
 			}?.memo = memo
-			
 			updateHeaderValue(headerData)
 		}
 	}

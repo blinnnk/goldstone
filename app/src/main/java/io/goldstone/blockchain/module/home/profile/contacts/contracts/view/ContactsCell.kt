@@ -14,6 +14,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -99,7 +100,9 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	private val deleteButton by lazy {
 		Button(context).apply {
 			text = CommonText.delete
-			textSize = fontSize(12)
+			textSize = fontSize(14)
+			typeface = GoldStoneFont.black(context)
+			textColor = Spectrum.white
 			layoutParams = RelativeLayout.LayoutParams(deleteButtonWidth, cellHeight)
 			x = ScreenSize.widthWithPadding.toFloat() + 3f
 			backgroundColor = Spectrum.red

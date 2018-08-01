@@ -136,7 +136,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.currentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.goldStoneMain
+			ChainText.infuraMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName)
 		}
@@ -162,7 +162,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.goldStoneEtcMain
+			ChainText.etcMainGasTracker
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
 		}

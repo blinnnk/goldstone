@@ -49,8 +49,10 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 				}
 				
 				if (viewPagerSize > 0) {
-					(size - viewPagerSize until size).forEach {
-						showChildFragment(this[it])
+					(0 until size).forEach {
+						if (this[it].isHidden) {
+							showChildFragment(this[it])
+						}
 					}
 				} else {
 					if (size >= 2) {

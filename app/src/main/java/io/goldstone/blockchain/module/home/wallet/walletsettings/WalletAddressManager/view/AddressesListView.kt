@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressm
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -9,8 +10,9 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion
 import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.matchParent
@@ -35,23 +37,20 @@ class AddressesListView(
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
 	}
-
 	private val maxCount = 4
 	var checkAllEvent: Runnable? = null
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
-			var halfSize = 13
 			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
 			if (this[0].second.toIntOrNull().isNull()) {
-				halfSize = 11
 				hideButton()
 			} else {
 				updateButtonTitle("Check All (${model?.size})")
 			}
 			// 最多只显示 `4` 个链下地址
 			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
-			layoutParams.height = limitCount * 50.uiPX() + 50.uiPX()
+			layoutParams.height = limitCount * 50.uiPX() + 60.uiPX()
 			requestLayout()
 			WalletTable.getCurrentAddresses { currentAddresses ->
 				reversed().forEachIndexed { index, data ->
@@ -62,7 +61,9 @@ class AddressesListView(
 						// 如果列表中有默认地址那么更改样式
 						if (currentAddresses.any { it.equals(data.first, true) }) {
 							isDefault = true
-							updateBackgroundColor()
+							updateStyle(Companion.CellType.Default)
+						} else {
+							updateStyle(Companion.CellType.Normal)
 						}
 						
 						copyButton.onClick {
@@ -72,7 +73,7 @@ class AddressesListView(
 						hold(moreButton, data.first, isDefault, data.second)
 						setTitle("${data.second}.")
 						
-						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, halfSize))
+						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 13))
 					}.into(cellLayout)
 				}
 			}
@@ -80,9 +81,11 @@ class AddressesListView(
 	}
 	
 	init {
+		setHorizontalPadding(PaddingSize.device.toFloat())
+		cellLayout.gravity = Gravity.CENTER_HORIZONTAL
 		showTopLine = true
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 0)
-		showButton("Check All Addresses") {
+		layoutParams = LinearLayout.LayoutParams(matchParent, 0)
+		showButton("Check All Addresses", PaddingSize.device) {
 			checkAllEvent?.run()
 		}
 		cellLayout.setAlignParentBottom()

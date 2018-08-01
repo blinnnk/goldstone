@@ -196,7 +196,9 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 		}
 		// Update Database
 		it?.let {
-			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, isPending)
+			// 更新本地的燃气费记录以及转账记录的相关信息
+			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, false, isPending)
+			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, true, isPending)
 		}
 	}
 }

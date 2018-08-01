@@ -18,10 +18,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 25/04/2018 8:06 AM
@@ -36,9 +33,9 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
 	}
 	private val button = TextView(context).apply {
-		textSize = fontSize(12)
+		textSize = fontSize(11)
 		textColor = Spectrum.green
-		typeface = GoldStoneFont.medium(context)
+		typeface = GoldStoneFont.heavy(context)
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		gravity = Gravity.END
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -61,13 +58,24 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		color = GrayScale.midGray
 		style = Paint.Style.FILL
 	}
+	private var horizontalPaddingSize = 0f
 	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		showTopLine.isTrue {
-			canvas?.drawLine(0f, 0f, width.toFloat(), 0f, paint)
+			canvas?.drawLine(horizontalPaddingSize, 0f, width - horizontalPaddingSize, 0f, paint)
 		}
-		canvas?.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), paint)
+		canvas?.drawLine(
+			horizontalPaddingSize, height.toFloat(), width - horizontalPaddingSize, height.toFloat(),
+			paint
+		)
+	}
+	
+	fun setHorizontalPadding(paddingSize: Float) {
+		horizontalPaddingSize = paddingSize
+		button.leftPadding = paddingSize.toInt()
+		title.leftPadding = paddingSize.toInt()
+		invalidate()
 	}
 	
 	fun setTitle(
@@ -80,12 +88,13 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		title.textColor = textColor
 	}
 	
-	fun showButton(text: String, event: () -> Unit) {
+	fun showButton(text: String, left: Int = 0, event: () -> Unit) {
+		button.x -= left
+		button.setAlignParentRight()
 		button
 			.apply { this.text = text }
 			.click { event() }
 			.into(titleLayout)
-		button.setAlignParentRight()
 	}
 	
 	fun hideButton() {

@@ -188,8 +188,11 @@ class GasSelectionPresenter(
 				}
 				fragment.showMaskView(false)
 			}) {
-			if (isBTC()) transferBTC(it?.text.toString(), callback)
-			else transfer(it?.text.toString(), callback)
+			if (isBTC()) {
+				prepareBTCModel?.apply {
+					transferBTC(this, it?.text.toString(), callback)
+				}
+			} else transfer(it?.text.toString(), callback)
 		}
 	}
 	

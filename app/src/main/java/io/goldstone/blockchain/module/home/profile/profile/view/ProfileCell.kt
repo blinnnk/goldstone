@@ -25,9 +25,8 @@ import org.jetbrains.anko.wrapContent
  * @date 25/03/2018 10:55 PM
  * @author KaySaith
  */
-
 class ProfileCell(context: Context) : BaseCell(context) {
-
+	
 	var upgradeEvent: Runnable? = null
 	var model: ProfileModel by observing(ProfileModel()) {
 		icon.src = model.icon
@@ -60,38 +59,10 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				model.info
 			}
 	}
-
-	private var hasLayouted = false
-
-	var isCenterInVertical: Boolean by observing(false) {
-		if(isCenterInVertical) {
-			title.setCenterInVertical()
-			icon.setCenterInVertical()
-			info.apply {
-				setCenterInVertical()
-				setAlignParentRight()
-			}
-		} else {
-			title.setAlignParentBottom()
-			icon.setAlignParentBottom()
-			info.apply {
-				setAlignParentBottom()
-				setAlignParentRight()
-			}
-			if (!hasLayouted) {
-				title.y -= 19.uiPX().toFloat()
-				icon.y -= 17.uiPX()
-				info.y -= 10.uiPX()
-				arrowIcon.y += 18.uiPX()
-			}
-			hasLayouted = true
-		}
-	}
-
 	private val icon by lazy { SquareIcon(context) }
 	private val title by lazy { TextView(context) }
 	private val info by lazy { TextView(context) }
-
+	
 	init {
 		icon.into(this)
 		title.apply {
@@ -100,7 +71,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			typeface = GoldStoneFont.heavy(context)
 			x += CommonCellSize.iconPadding
 		}.into(this)
-
+		
 		info.apply {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, 30.uiPX())
 			leftPadding = 10.uiPX()
@@ -109,7 +80,12 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			gravity = Gravity.CENTER_VERTICAL
 			x -= CommonCellSize.rightPadding
 		}.into(this)
-
+		
+		title.setCenterInVertical()
+		icon.setCenterInVertical()
+		info.apply {
+			setCenterInVertical()
+			setAlignParentRight()
+		}
 	}
-
 }
