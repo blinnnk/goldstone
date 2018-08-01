@@ -38,9 +38,6 @@ class SplashPresenter(val activity: SplashActivity) {
 						Config.updateCurrentID(id)
 						Config.updateCurrentBalance(balance.orElse(0.0))
 						Config.updateCurrentName(name)
-						WalletTable.getWalletSubtitleByType {
-							Config.updateCurrentAddress(it)
-						}
 						uiThread {
 							activity.jump<MainActivity>()
 						}
