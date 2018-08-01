@@ -8,17 +8,18 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion.CellType.Default
+import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -62,13 +63,18 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
+	private var lineView: View
 	
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
 		setMargins<RelativeLayout.LayoutParams> {
-			bottomMargin = 5.uiPX()
+			setMargins(5.uiPX(), 3.uiPX(), 5.uiPX(), 3.uiPX())
 		}
-		backgroundColor = GrayScale.whiteGray
+		addCorner(CornerSize.cell, GrayScale.whiteGray)
+		lineView = View(context).apply {
+			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+		}
+		this.addView(lineView)
 		this.addView(title)
 		this.addView(subtitle)
 		this.addView(copyButton)
@@ -88,12 +94,24 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		subtitle.text = if (text.length > 36) text.substring(0, 36) + "..." else text
 	}
 	
-	fun updateBackgroundColor(color: Int = Spectrum.yellow) {
-		backgroundColor = color
-		title.textColor = GrayScale.Opacity2Black
-		moreButton.setColorFilter(GrayScale.black)
-		moreButton.alpha = 0.2f
-		copyButton.setColorFilter(GrayScale.black)
-		copyButton.alpha = 0.2f
+	fun updateStyle(type: CellType = Normal) {
+		elevation = 3f
+		title.textColor = GrayScale.Opacity8Black
+		moreButton.setColorFilter(GrayScale.gray)
+		copyButton.setColorFilter(GrayScale.gray)
+		when (type) {
+			Normal -> lineView.visibility = View.GONE
+			
+			Default -> {
+				lineView.visibility = View.VISIBLE
+				lineView.backgroundColor = Spectrum.blue
+			}
+		}
+	}
+	
+	companion object {
+		enum class CellType {
+			Normal, Default
+		}
 	}
 }

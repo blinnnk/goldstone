@@ -73,7 +73,7 @@ class KeystoreExportPresenter(
 		fragment.context?.getKeystoreFile(
 			address,
 			passwordInput.text.toString(),
-			"keystore",
+			CryptoValue.keystoreFilename,
 			{
 				hold("")
 			}

@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
+import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -20,7 +20,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
@@ -35,7 +34,7 @@ fun GasSelectionPresenter.updateBTCGasSettings(container: LinearLayout) {
 			cell.model = GasSelectionModel(
 				index,
 				minner.toString().toLong(),
-				226,
+				prepareBTCModel?.signedMessageSize ?: 226,
 				currentMinerType
 			)
 		}
@@ -55,45 +54,45 @@ fun GasSelectionPresenter.insertCustomBTCSatoshi() {
 }
 
 fun GasSelectionPresenter.transferBTC(
+	prepareBTCModel: PaymentPrepareBTCModel,
 	password: String,
 	callback: () -> Unit
 ) {
-	fragment.context?.verifyKeystorePassword(password) {
-		if (!it) {
+	fragment.context?.exportBase58PrivateKey(
+		prepareBTCModel.fromAddress,
+		password,
+		Config.isTestEnvironment()
+	) { secret ->
+		if (secret.isNullOrBlank()) {
 			fragment.showMaskView(false)
 			fragment.context.alert(CommonText.wrongPassword)
 			callback()
 		} else {
-			prepareBTCModel?.apply model@{
-				WalletTable.getBTCPrivateKey(
-					fromAddress,
-					Config.isTestEnvironment()
-				) { secret ->
-					val fee = gasUsedGasFee?.toSatoshi()!!
-					BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
-						BTCTransactionUtils.generateSignedRawTransaction(
-							value,
-							fee,
-							toAddress,
-							changeAddress,
-							unspents,
-							secret,
-							Config.isTestEnvironment()
-						).let { signedModel ->
-							BTCJsonRPC.sendRawTransaction(
-								Config.isTestEnvironment(),
-								signedModel.signedMessage
-							) { hash ->
-								hash?.let {
-									// 插入 `Pending` 数据到本地数据库
-									insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
-									// 跳转到章党详情界面
-									GoldStoneAPI.context.runOnUiThread {
-										goToTransactionDetailFragment(
-											prepareReceiptModelFromBTC(this@model, fee, it)
-										)
-										callback()
-									}
+			prepareBTCModel.apply model@{
+				val fee = gasUsedGasFee?.toSatoshi()!!
+				BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
+					BTCTransactionUtils.generateSignedRawTransaction(
+						value,
+						fee,
+						toAddress,
+						changeAddress,
+						unspents,
+						secret!!,
+						Config.isTestEnvironment()
+					).let { signedModel ->
+						BTCJsonRPC.sendRawTransaction(
+							Config.isTestEnvironment(),
+							signedModel.signedMessage
+						) { hash ->
+							hash?.let {
+								// 插入 `Pending` 数据到本地数据库
+								insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
+								// 跳转到章党详情界面
+								GoldStoneAPI.context.runOnUiThread {
+									goToTransactionDetailFragment(
+										prepareReceiptModelFromBTC(this@model, fee, it)
+									)
+									callback()
 								}
 							}
 						}

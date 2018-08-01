@@ -43,8 +43,8 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			
 			currentAccount.info.title.text = object : FixTextLength() {
 				override var text = model?.name.orEmpty()
-				override val maxWidth = 30.uiPX().toFloat()
-				override val textSize: Float = fontSize(14)
+				override val maxWidth = 26.uiPX().toFloat()
+				override val textSize: Float = fontSize(16)
 			}.getFixString()
 			
 			currentAccount.info.subtitle.text = address

@@ -134,13 +134,14 @@ data class BitcoinSeriesTransactionTable(
 		fun updateLocalDataByHash(
 			hash: String,
 			newData: BitcoinSeriesTransactionTable,
+			isFee: Boolean,
 			isPending: Boolean
 		) {
 			GoldStoneDataBase
 				.database
 				.bitcoinTransactionDao()
 				.apply {
-					getTransactionByHash(hash)
+					getTransactionByHash(hash, isFee)
 						?.let {
 							update(it.apply {
 								blockNumber = newData.blockNumber
@@ -191,8 +192,8 @@ interface BitcoinTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
 	fun getDataByHash(hash: String, isReceive: Boolean): BitcoinSeriesTransactionTable?
 	
-	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash")
-	fun getTransactionByHash(hash: String): BitcoinSeriesTransactionTable?
+	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isFee LIKE :isFee")
+	fun getTransactionByHash(hash: String, isFee: Boolean): BitcoinSeriesTransactionTable?
 	
 	@Insert
 	fun insert(table: BitcoinSeriesTransactionTable)

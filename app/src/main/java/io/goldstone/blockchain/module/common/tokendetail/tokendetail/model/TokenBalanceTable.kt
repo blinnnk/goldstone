@@ -67,7 +67,7 @@ data class TokenBalanceTable(
 				GoldStoneDataBase.database.tokenBalanceDao().apply {
 					val balances = getTokenBalanceByAddress(address)
 					if (balances.isEmpty()) {
-						GoldStoneAPI.context.runOnUiThread { callback() }
+						callback()
 						return@doAsync
 					}
 					object : ConcurrentAsyncCombine() {
@@ -79,6 +79,7 @@ data class TokenBalanceTable(
 							}
 						}
 						
+						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}

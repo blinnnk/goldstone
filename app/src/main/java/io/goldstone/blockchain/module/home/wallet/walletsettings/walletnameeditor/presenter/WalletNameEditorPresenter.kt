@@ -15,11 +15,10 @@ import org.jetbrains.anko.toast
  * @date 26/03/2018 10:44 PM
  * @author KaySaith
  */
-
 class WalletNameEditorPresenter(
 	override val fragment: WalletNameEditorFragment
 ) : BasePresenter<WalletNameEditorFragment>() {
-
+	
 	fun changeWalletName(nameInput: EditText) {
 		nameInput.text.toString().let {
 			it.isEmpty() isTrue {
@@ -34,15 +33,12 @@ class WalletNameEditorPresenter(
 	
 	fun shouCurrentNameHint(nameInput: EditText) {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				nameInput.hint = name
-			}
+			nameInput.hint = name
 		}
 	}
-
+	
 	fun updateConfirmButtonStyle(nameInput: EditText) {
 		if (nameInput.text.isNotEmpty()) fragment.confirmButton.setBlueStyle()
 		else fragment.confirmButton.setGrayStyle()
 	}
-
 }

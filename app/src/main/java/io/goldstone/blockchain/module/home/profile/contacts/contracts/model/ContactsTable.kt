@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -46,11 +47,19 @@ data class ContactTable(
 			}
 		}
 		
-		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit = {}) {
+		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().getAllContacts()
 			} then {
 				callback(it.toArrayList())
+			}
+		}
+		
+		fun hasContacts(address: String, withoutContactOrElse: () -> Unit) {
+			load {
+				GoldStoneDataBase.database.contactDao().getContactByAddress(address)
+			} then {
+				if (it.isNull()) withoutContactOrElse()
 			}
 		}
 		
@@ -77,6 +86,9 @@ interface ContractDao {
 	
 	@Query("SELECT * FROM contact WHERE id LIKE :id")
 	fun getContacts(id: Int): ContactTable?
+	
+	@Query("SELECT * FROM contact WHERE (ethERCAndETCAddress LIKE :address OR btcMainnetAddress LIKE :address OR btcTestnetAddress LIKE :address)")
+	fun getContactByAddress(address: String): ContactTable?
 	
 	@Insert
 	fun insert(contact: ContactTable)

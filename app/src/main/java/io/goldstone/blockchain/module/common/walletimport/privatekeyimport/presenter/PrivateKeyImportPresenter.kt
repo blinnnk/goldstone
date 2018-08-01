@@ -7,9 +7,6 @@ import com.blinnnk.extension.removeStartAndEndValue
 import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.ChainText
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.MultiChainAddresses
@@ -19,11 +16,12 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllMainnet
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllTestnet
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -108,33 +106,6 @@ class PrivateKeyImportPresenter(
 	}
 	
 	companion object {
-		
-		fun setAllTestnet(callback: () -> Unit) {
-			Config.updateIsTestEnvironment(true)
-			Config.updateBTCCurrentChain(ChainID.BTCTest.id)
-			Config.updateETCCurrentChain(ChainID.ETCTest.id)
-			Config.updateCurrentChain(ChainID.Ropsten.id)
-			Config.updateETCCurrentChainName(ChainText.btcTest)
-			Config.updateCurrentChainName(ChainText.infuraRopsten)
-			Config.updateCurrentChainName(ChainText.etcMorden)
-			AppConfigTable.updateChainStatus(false) {
-				callback()
-			}
-		}
-		
-		fun setAllMainnet(callback: () -> Unit) {
-			Config.updateIsTestEnvironment(false)
-			Config.updateBTCCurrentChain(ChainID.BTCMain.id)
-			Config.updateETCCurrentChain(ChainID.ETCMain.id)
-			Config.updateCurrentChain(ChainID.Main.id)
-			Config.updateETCCurrentChainName(ChainText.etcMainGasTracker)
-			Config.updateCurrentChainName(ChainText.mainnet)
-			Config.updateCurrentChainName(ChainText.btcMain)
-			AppConfigTable.updateChainStatus(true) {
-				callback()
-			}
-		}
-		
 		fun importWalletByBTCPrivateKey(
 			privateKey: String,
 			password: String,

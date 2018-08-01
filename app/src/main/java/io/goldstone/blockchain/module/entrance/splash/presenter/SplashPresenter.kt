@@ -29,22 +29,20 @@ class SplashPresenter(val activity: SplashActivity) {
 		WalletTable.getAll {
 			isNotEmpty() isTrue {
 				WalletTable.getCurrentWallet {
-					it?.apply {
-						doAsync {
-							Config.updateCurrentEthereumAddress(it.currentETHAndERCAddress)
-							Config.updateCurrentBTCAddress(it.currentBTCAddress)
-							Config.updateCurrentBTCTestAddress(it.currentBTCTestAddress)
-							Config.updateCurrentETCAddress(it.currentETCAddress)
-							Config.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
-							Config.updateCurrentID(it.id)
-							Config.updateCurrentBalance(it.balance.orElse(0.0))
-							Config.updateCurrentName(it.name)
-							WalletTable.getWalletSubtitleByType {
-								Config.updateCurrentAddress(it)
-							}
-							uiThread {
-								activity.jump<MainActivity>()
-							}
+					doAsync {
+						Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
+						Config.updateCurrentBTCAddress(currentBTCAddress)
+						Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+						Config.updateCurrentETCAddress(currentETCAddress)
+						Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
+						Config.updateCurrentID(id)
+						Config.updateCurrentBalance(balance.orElse(0.0))
+						Config.updateCurrentName(name)
+						WalletTable.getWalletSubtitleByType {
+							Config.updateCurrentAddress(it)
+						}
+						uiThread {
+							activity.jump<MainActivity>()
 						}
 					}
 				}

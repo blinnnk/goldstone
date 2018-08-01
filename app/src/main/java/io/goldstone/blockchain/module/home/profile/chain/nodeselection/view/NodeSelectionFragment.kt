@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.view
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.jump
 import com.blinnnk.extension.orTrue
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -11,6 +12,8 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoName
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionSectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
@@ -22,7 +25,7 @@ import org.jetbrains.anko.*
  */
 class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	
-	private val isMainnet by lazy {
+	private val fromMainnetSetting by lazy {
 		arguments?.getBoolean(ArgumentKey.isMainnet)
 	}
 	private val nodeList: (isMainnet: Boolean) -> ArrayList<Pair<String, String>> = {
@@ -61,7 +64,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				lparams(matchParent, matchParent)
 				leftPadding = PaddingSize.device
 				rightPadding = PaddingSize.device
-				val nodes = nodeList(isMainnet.orTrue())
+				val nodes = nodeList(fromMainnetSetting.orTrue())
 				nodes.distinctBy { it.first }.forEach { chain ->
 					// Section Header
 					when (chain.first) {
@@ -77,7 +80,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					chainChild.forEachIndexed { index, pair ->
 						var isSelected = false
 						if (pair.second == presenter.getDefaultOrCurrentChainName(
-								isMainnet.orTrue(),
+								fromMainnetSetting.orTrue(),
 								getChainTypeByName(chain.first)
 							)
 						) {
@@ -109,19 +112,26 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					text = CommonText.confirm
 					setBlueStyle(50.uiPX())
 				}.click {
-					isMainnet?.let {
+					fromMainnetSetting?.let {
+						// 更新是否是测试环境的参数
+						Config.updateIsTestEnvironment(!it)
 						selectedNode.forEach { pair ->
 							when {
 								pair.first.equals(CryptoName.eth, true) ->
-									presenter.updateERC20TestChainID(pair.second)
+									presenter.updateERC20ChainID(pair.second)
 								pair.first.equals(CryptoName.btc, true) ->
-									presenter.updateBTCTestChainID(pair.second)
-								else -> presenter.updateETCTestChainID(pair.second)
+									presenter.updateBTCChainID(pair.second)
+								else -> presenter.updateETCChainID(pair.second)
 							}
-							// 更新是否是测试环境的参数
-							Config.updateIsTestEnvironment(testnetNodeList.any { it.second == pair.second })
 						}
-						presenter.updateDatabaseThenJump(it)
+						AppConfigTable.updateChainInfo(
+							it,
+							selectedNode.find { it.first.equals(CryptoName.etc, true) }?.second!!,
+							selectedNode.find { it.first.equals(CryptoName.eth, true) }?.second!!,
+							selectedNode.find { it.first.equals(CryptoName.btc, true) }?.second!!
+						) {
+							activity?.jump<SplashActivity>()
+						}
 					}
 				}.into(this)
 			}

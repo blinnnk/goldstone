@@ -45,17 +45,19 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			
+			val defaultPrice =
+				if (isBTC) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
 			gasPriceInput.apply {
 				setNumberInput()
+				setText(defaultPrice.toString())
 				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
-				title = TransactionText.satoshiValue
+				title = if (isBTC) TransactionText.satoshiValue else TransactionText.gasPrice
 			}.into(this)
 			// 只有 `ETH ERC20 or ETC` 才有 `GasLimit` 的概念
 			if (!isBTC) {
 				gasLimitInput.apply {
 					setNumberInput()
-					hint = getGasSize().toString()
+					setText(getGasSize().toString())
 					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 					title = TransactionText.gasLimit
 				}.into(this)

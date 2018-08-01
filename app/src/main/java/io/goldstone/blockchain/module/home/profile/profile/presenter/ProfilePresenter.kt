@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
+import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.SystemUtils
 import io.goldstone.blockchain.R
@@ -63,7 +63,11 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.wallet_icon,
 					ProfileText.walletManager,
-					Config.getCurrentName()
+					object : FixTextLength() {
+						override var text = Config.getCurrentName()
+						override val maxWidth = 40.uiPX().toFloat()
+						override val textSize: Float = fragment.view?.fontSize(14).orZero()
+					}.getFixString()
 				),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),

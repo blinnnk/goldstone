@@ -29,29 +29,15 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 		recyclerView.adapter = ProfileAdapter(asyncData.orEmptyArray()) { item, position ->
 			// 分配点击事件
 			item.apply {
-				// 调整布局
-				when (position) {
-					ProfileCellType.AboutUs.index -> {
-						item.layoutParams.height = 90.uiPX()
-						isCenterInVertical = false
+				// 增加查询 GoldStoneID 的快捷方法
+				when {
+					model.title.equals(ProfileText.version, true) -> onClick {
+						presenter.showGoldStoneID()
 					}
-					else -> {
-						// 增加查询 GoldStoneID 的快捷方法
-						if (model.title.equals(ProfileText.version, true)) {
-							onClick {
-								presenter.showGoldStoneID()
-							}
-						}
-						item.layoutParams.height = 60.uiPX()
-						isCenterInVertical = true
-					}
-				}
-				if (position == asyncData?.size) {
-					upgradeEvent = Runnable {
+					position == asyncData?.size -> upgradeEvent = Runnable {
 						presenter.showUpgradeDialog()
 					}
-				} else {
-					onClick {
+					else -> onClick {
 						presenter.showTargetFragment(model.title)
 						preventDuplicateClicks()
 					}

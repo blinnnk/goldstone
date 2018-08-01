@@ -104,7 +104,7 @@ object GoldStoneAPI {
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${Config.getCurrentChain()},${Config.getETCCurrentChain()}"
+				"${Config.getCurrentChain()},${Config.getETCCurrentChain()}${Config.getBTCCurrentChain()}"
 			),
 			"list",
 			errorCallback = errorCallback,

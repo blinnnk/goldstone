@@ -5,6 +5,7 @@ import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.getPrivateKey
@@ -56,7 +57,7 @@ class PrivateKeyExportPresenter(
 				fragment.context?.getPrivateKey(
 					it,
 					passwordInput.text.toString(),
-					"keystore",
+					CryptoValue.keystoreFilename,
 					{
 						uiThread { hold("") }
 					}

@@ -40,7 +40,7 @@ object CreateWalletText {
 	@JvmField
 	val passwordRules = when (currentLanguage) {
 		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters"
-		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，并少于8位"
+		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，不少于8位"
 		HoneyLanguage.Japanese.code -> "アルファベット大文字・小文字・数字を組み合わせた形で、8桁以下のより安全なパスワードを設定して下さい"
 		HoneyLanguage.Korean.code -> "더 안전한 비밀번호를 설정하고, 영문 대소문자와 숫자를 동시에 포함하되 최소 8자리 수여야 합니다"
 		HoneyLanguage.Russian.code -> "Пожалуйста настройте более безопасный пароль, который содержит как заглавные, так и строчные буквы, и как минимум одну цифру, пароль должен быть не более 8 символов"
@@ -1325,7 +1325,6 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "This is a btc testnet only account, you can't switch the chain net to mainnet"
 		else -> ""
 	}
-	
 	@JvmField
 	val mainnetOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
@@ -1336,7 +1335,6 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "This is a btc mainnet only account, you can't switch the chain net to testnet"
 		else -> ""
 	}
-	
 	@JvmField
 	val btcWalletOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
@@ -1900,6 +1898,18 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "還沒有填寫錢包名稱"
 		else -> ""
 	}
+	val switchChainNetAlert: (customContent: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "This wallet is a $it single-chain wallet. If you switch, we " +
+			                              "will switch the wallet's network settings to the test network."
+			HoneyLanguage.Chinese.code -> "This wallet is a $it single-chain wallet. If you switch, we will switch the wallet's network settings to the test network."
+			HoneyLanguage.Japanese.code -> "This wallet is a $it single-chain wallet. If you switch, we will switch the wallet's network settings to the test network."
+			HoneyLanguage.Korean.code -> "This wallet is a $it single-chain wallet. If you switch, we will switch the wallet's network settings to the test network."
+			HoneyLanguage.Russian.code -> "This wallet is a $it single-chain wallet. If you switch, we will switch the wallet's network settings to the test network."
+			HoneyLanguage.TraditionalChinese.code -> "This wallet is a $it single-chain wallet. If you switch, we will switch the wallet's network settings to the test network."
+			else -> ""
+		}
+	}
 }
 
 object ProfileText {
@@ -2227,9 +2237,9 @@ object QuotationText {
 	val market = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Markets"
 		HoneyLanguage.Chinese.code -> "市场行情"
-		HoneyLanguage.Japanese.code -> "リアルタイム市況"
+		HoneyLanguage.Japanese.code -> "市場状況"
 		HoneyLanguage.Korean.code -> "시장시세"
-		HoneyLanguage.Russian.code -> "Конъюнктура рынка"
+		HoneyLanguage.Russian.code -> "РЫНКИ"
 		HoneyLanguage.TraditionalChinese.code -> "市場行情"
 		else -> ""
 	}

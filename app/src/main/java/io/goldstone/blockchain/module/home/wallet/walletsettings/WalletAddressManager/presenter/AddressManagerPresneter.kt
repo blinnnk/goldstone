@@ -4,12 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
+import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -40,7 +42,11 @@ class AddressManagerPresneter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		fragment.showChildAddressCreatorDashboard()
+		WalletTable.getWalletType {
+			if (it == WalletType.MultiChain) {
+				fragment.showCreatorDashboard()
+			}
+		}
 	}
 	
 	fun setBackEvent() {
@@ -56,55 +62,45 @@ class AddressManagerPresneter(
 	
 	private fun getMultiChainAddresses() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				val addresses =
-					arrayListOf<Pair<String, String>>().apply {
-						// 如果是测试环境展示 `BTCTest Address`
-						if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-							add(Pair(currentBTCAddress, CryptoSymbol.btc))
-						} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-							add(Pair(currentBTCTestAddress, CryptoSymbol.btc))
-						}
-						if (currentETHAndERCAddress.isNotEmpty()) {
-							add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
-							add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
-							add(Pair(currentETCAddress, CryptoSymbol.etc))
-						}
+			val addresses =
+				arrayListOf<Pair<String, String>>().apply {
+					// 如果是测试环境展示 `BTCTest Address`
+					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+						add(Pair(currentBTCAddress, CryptoSymbol.btc))
+					} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCTestAddress, CryptoSymbol.btc))
 					}
-				fragment.setMultiChainAddresses(addresses)
-			}
+					if (currentETHAndERCAddress.isNotEmpty()) {
+						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
+						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
+						add(Pair(currentETCAddress, CryptoSymbol.etc))
+					}
+				}
+			fragment.setMultiChainAddresses(addresses)
 		}
 	}
 	
 	fun getEthereumAddresses() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
-			}
+			fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
 		}
 	}
 	
 	fun getEthereumClassicAddresses() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
-			}
+			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
 		}
 	}
 	
 	fun getBitcoinAddresses() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
-			}
+			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
 		}
 	}
 	
 	fun getBitcoinTestAddresses() {
 		WalletTable.getCurrentWallet {
-			it?.apply {
-				fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
-			}
+			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
 		}
 	}
 	
@@ -142,6 +138,8 @@ class AddressManagerPresneter(
 	}
 	
 	fun showKeystoreExportFragment(address: String) {
+		// 这个页面不限时 `Header` 上的加号按钮
+		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
 			AddressManagerFragment.removeDashboard(fragment)
 			showTargetFragment<KeystoreExportFragment, WalletSettingsFragment>(
@@ -153,6 +151,8 @@ class AddressManagerPresneter(
 	}
 	
 	fun showQRCodeFragment(address: String) {
+		// 这个页面不限时 `Header` 上的加号按钮
+		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 		AddressManagerFragment.removeDashboard(fragment)
 		showTargetFragment<QRCodeFragment, WalletSettingsFragment>(
 			WalletText.showQRCode,
@@ -257,14 +257,19 @@ class AddressManagerPresneter(
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
-			context?.verifyKeystorePassword(password) {
+			context?.verifyKeystorePassword(password, Config.getCurrentBTCAddress()) {
 				if (it) {
 					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
 						wallet.encryptMnemonic?.let {
 							val mnemonic = JavaKeystoreUtil().decryptData(it)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
-							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+							BTCWalletUtils.getBitcoinWalletByMnemonic(
+								mnemonic,
+								newChildPath
+							) { address, secret ->
+								// 存入 `KeyStore`
+								context.storeBase58PrivateKey(secret, address, password, false)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
 									CryptoSymbol.btc,
@@ -293,7 +298,7 @@ class AddressManagerPresneter(
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
-			context?.verifyKeystorePassword(password) {
+			context?.verifyKeystorePassword(password, Config.getCurrentBTCTestAddress()) {
 				if (!it) {
 					context.alert(CommonText.wrongPassword)
 					return@verifyKeystorePassword
@@ -304,7 +309,8 @@ class AddressManagerPresneter(
 						val mnemonic = JavaKeystoreUtil().decryptData(it)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, secret ->
+							context.storeBase58PrivateKey(secret, address, password, true)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
 								CryptoSymbol.btc,
@@ -375,22 +381,20 @@ class AddressManagerPresneter(
 				}
 			}
 			WalletTable.getCurrentWallet {
-				it?.apply {
-					when (chainType) {
-						ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-						ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-						
-						ChainType.BTC.id -> {
-							if (Config.isTestEnvironment()) {
-								hold(
-									getTargetAddressIndex(
-										btcTestAddresses,
-										currentBTCTestAddress
-									)
+				when (chainType) {
+					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
+					
+					ChainType.BTC.id -> {
+						if (Config.isTestEnvironment()) {
+							hold(
+								getTargetAddressIndex(
+									btcTestAddresses,
+									currentBTCTestAddress
 								)
-							} else {
-								hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-							}
+							)
+						} else {
+							hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
 						}
 					}
 				}

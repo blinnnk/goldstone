@@ -56,7 +56,7 @@ fun Context.getEthereumWalletByMnemonic(
 	password: String,
 	hold: (address: String) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+	val keystoreFile by lazy { File(filesDir!!, CryptoValue.keystoreFilename) }
 	/** Generate HD Wallet */
 	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
 	/** Generate Keystore */
@@ -90,9 +90,10 @@ val keyString: (secret: String) -> String = {
 fun Context.getWalletByPrivateKey(
 	privateKey: String,
 	password: String,
+	filename: String = CryptoValue.keystoreFilename,
 	hold: (address: String?) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+	val keystoreFile by lazy { File(filesDir!!, filename) }
 	/** Generate Keystore */
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	/** Convert PrivateKey To BigInteger */
@@ -113,23 +114,36 @@ fun Context.getWalletByPrivateKey(
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
-	fileName: String = "keystore",
+	filename: String,
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, fileName) }
+	val isBTCAccount = walletAddress.equals(filename, true)
+	val keystoreFile by lazy { File(filesDir!!, filename) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	(0 until keyStore.accounts.size()).forEach { index ->
-		keyStore.accounts.get(index).address.hex.let {
-			it.equals(walletAddress, true) isTrue {
-				try {
-					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
-				} catch (error: Exception) {
-					runOnUiThread {
-						errorCallback(error)
-						alert(CommonText.wrongPassword)
+	if (isBTCAccount) {
+		try {
+			hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)))
+		} catch (error: Exception) {
+			runOnUiThread {
+				errorCallback(error)
+				alert(CommonText.wrongPassword)
+			}
+			LogUtil.error("getKeystoreFile", error)
+		}
+	} else {
+		(0 until keyStore.accounts.size()).forEach { index ->
+			keyStore.accounts.get(index).address.hex.let {
+				it.equals(walletAddress, true) isTrue {
+					try {
+						hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)))
+					} catch (error: Exception) {
+						runOnUiThread {
+							errorCallback(error)
+							alert(CommonText.wrongPassword)
+						}
+						LogUtil.error("getKeystoreFile", error)
 					}
-					LogUtil.error("getKeystoreFile", error)
 				}
 			}
 		}
@@ -139,14 +153,14 @@ fun Context.getKeystoreFile(
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
-	fileName: String = "keystore",
+	filename: String,
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
 	getKeystoreFile(
 		walletAddress,
 		password,
-		fileName,
+		filename,
 		errorCallback
 	) {
 		WalletUtil.getKeyPairFromWalletFile(
@@ -164,24 +178,26 @@ fun Context.getPrivateKey(
 fun Context.deleteAccount(
 	walletAddress: String,
 	password: String,
+	filename: String,
 	callback: (correctPassword: Boolean) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+	val isBTCAccount = filename.equals(walletAddress, true)
+	val keystoreFile by lazy { File(filesDir!!, filename) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	// If there is't account found then return
 	if (keyStore.accounts.size() == 0L) {
 		callback(true)
 		return
 	}
-	var targentAccountIndex: Long? = null
+	var targentAccountIndex: Long? = if (isBTCAccount) 0 else null
 	
 	(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
 		keyStore.accounts.get(index).address.hex.let {
-			if (it.equals(walletAddress, true)) {
+			if (it.equals(walletAddress, true) && !isBTCAccount) {
 				targentAccountIndex = index
 			}
-			if (isEnd && !targentAccountIndex.isNull()) {
-				verifyKeystorePassword(password) {
+			if (isEnd && !targentAccountIndex.isNull() || isBTCAccount) {
+				verifyKeystorePassword(password, filename) {
 					if (it) {
 						keyStore.deleteAccount(keyStore.accounts.get(targentAccountIndex!!), password)
 						callback(true)
@@ -194,8 +210,8 @@ fun Context.deleteAccount(
 	}
 }
 
-fun Context.verifyKeystorePassword(password: String, hold: (Boolean) -> Unit) {
-	val keystoreFile by lazy { File(filesDir!!, "keystore") }
+fun Context.verifyKeystorePassword(password: String, fileName: String, hold: (Boolean) -> Unit) {
+	val keystoreFile by lazy { File(filesDir!!, fileName) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
 	var isCorrect: Boolean
@@ -217,24 +233,34 @@ fun Context.updatePassword(
 	walletAddress: String,
 	oldPassword: String,
 	newPassword: String,
-	errorCallback: () -> Unit = {},
+	filename: String,
+	errorCallback: (Throwable) -> Unit,
 	callback: () -> Unit
 ) {
+	val isBTCAccount = walletAddress.equals(filename, true)
 	doAsync {
 		getPrivateKey(
 			walletAddress,
 			oldPassword,
-			"keystore",
+			filename,
 			{
 				runOnUiThread {
-					errorCallback()
+					errorCallback(it)
 				}
 			}
 		) { privateKey ->
-			deleteAccount(walletAddress, oldPassword) {
-				getWalletByPrivateKey(privateKey, newPassword) {
-					GoldStoneAPI.context.runOnUiThread {
-						callback()
+			deleteAccount(walletAddress, oldPassword, filename) {
+				if (isBTCAccount) {
+					getWalletByPrivateKey(privateKey, newPassword, walletAddress) {
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				} else {
+					getWalletByPrivateKey(privateKey, newPassword) {
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
 					}
 				}
 			}

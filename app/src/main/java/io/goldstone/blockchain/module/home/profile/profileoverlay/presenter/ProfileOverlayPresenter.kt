@@ -64,7 +64,7 @@ class ProfileOverlayPresenter(
 	private fun showWalletListFragment() {
 		fragment.apply {
 			headerTitle = WalletText.wallet
-			overlayView.header.showAddButton(true, true) {
+			showAddButton(true, true) {
 				showWalletAddingMethodDashboard()
 			}
 			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)

@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.common.utils
 
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import kotlinx.coroutines.experimental.*
@@ -72,7 +70,6 @@ abstract class ConcurrentAsyncCombine {
 	open fun getResultInMainThread(): Boolean = true
 	
 	fun start() {
-		false.isTrue { } otherwise {}
 		doAsync { concurrentJobs() }
 	}
 	

@@ -155,12 +155,13 @@ class TokenDetailPresenter(
 			when (it) {
 				WalletType.MultiChain -> {
 					when {
-						token?.symbol.equals(CryptoSymbol.etc) -> getETHERC20OrETCData(
-							Config.getCurrentETCAddress(),
-							withoutLocalDataCallback
-						)
+						token?.symbol.equals(CryptoSymbol.etc, true) ->
+							getETHERC20OrETCData(
+								Config.getCurrentETCAddress(),
+								withoutLocalDataCallback
+							)
 						
-						token?.symbol.equals(CryptoSymbol.btc) -> {
+						token?.symbol.equals(CryptoSymbol.btc, true) -> {
 							if (Config.isTestEnvironment()) {
 								getBTCData(
 									Config.getCurrentBTCTestAddress(),
@@ -187,8 +188,18 @@ class TokenDetailPresenter(
 						withoutLocalDataCallback
 					)
 				
-				else -> {
-					// TODO BTC Type
+				WalletType.BTCTestOnly -> {
+					getBTCData(
+						Config.getCurrentBTCTestAddress(),
+						withoutLocalDataCallback
+					)
+				}
+				
+				WalletType.BTCOnly -> {
+					getBTCData(
+						Config.getCurrentBTCAddress(),
+						withoutLocalDataCallback
+					)
 				}
 			}
 		}

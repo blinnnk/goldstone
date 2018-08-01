@@ -50,7 +50,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getAppconfig() {
 		AppConfigTable.getAppConfig {
-			LogUtil.debug("$positon + getAppconfig", it.toString())
+			LogUtil.debug("$positon + getAppconfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
 	
@@ -69,7 +69,20 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getCurrentWallet() {
 		WalletTable.getCurrentWallet {
-			LogUtil.debug("getWalletByEthseriesAddress + $positon", it.toString())
+			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+		}
+	}
+	
+	@Test
+	fun getAllWallets() {
+		WalletTable.getAll {
+			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+		}
+	}
+	
+	@Test
+	fun getWatchOnlyAddress() {
+		WalletTable.getWatchOnlyWallet {
 		}
 	}
 	

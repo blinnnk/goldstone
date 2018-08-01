@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
-import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -114,26 +113,22 @@ class TransactionDetailPresenter(
 	}
 	
 	fun showAddContactsButton(cell: TransactionDetailCell) {
-		ContactTable.getAllContacts {
-			if (it.find { contact ->
-					contact.ethERCAndETCAddress.equals(cell.model.info, true)
-				}.isNull()) {
-				cell.showAddContactButton {
-					onClick {
-						fragment.parentFragment?.apply {
-							when (this) {
-								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-								is TransactionFragment -> presenter.removeSelfFromActivity()
-							}
+		ContactTable.hasContacts(cell.model.info) {
+			cell.showAddContactButton {
+				onClick {
+					fragment.parentFragment?.apply {
+						when (this) {
+							is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+							is TransactionFragment -> presenter.removeSelfFromActivity()
 						}
-						fragment.getMainActivity()?.apply {
-							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-								putString(ArgumentKey.address, cell.model.info)
-							}
-						}
-						preventDuplicateClicks()
 					}
+					fragment.getMainActivity()?.apply {
+						addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+							putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+							putString(ArgumentKey.address, cell.model.info)
+						}
+					}
+					preventDuplicateClicks()
 				}
 			}
 		}
@@ -175,20 +170,26 @@ class TransactionDetailPresenter(
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
 		val timstamp =
 			data?.timestamp
-			?: notificationData?.timeStamp.orElse(0L)
-			?: dataFromList?.timeStamp?.toLong().orElse(0L)
+			?: dataFromList?.timeStamp?.toLongOrNull()
+			?: dataFromList?.timeStamp?.toLongOrNull().orElse(0L)
 		val date = TimeUtils.formatDate(timstamp.toMillsecond())
 		val memo =
 			if (data?.memo.isNull()) TransactionText.noMemo
 			else data?.memo
+		val fromAddress = data?.fromAddress
+		                  ?: dataFromList?.fromAddress
+		                  ?: notificationData?.fromAddress
+		val symbol = data?.token?.symbol
+		             ?: dataFromList?.symbol
+		             ?: notificationData?.symbol.orEmpty()
 		val receiptData = when (receipt) {
 			is TransactionListModel -> {
 				arrayListOf(
 					receipt.minerFee,
 					receipt.memo,
 					if (receipt.isReceived) receipt.fromAddress
-					else WalletUtil.getAddressBySymbol(receipt.symbol),
-					if (receipt.isReceived) WalletUtil.getAddressBySymbol(receipt.symbol)
+					else fromAddress,
+					if (receipt.isReceived) fromAddress
 					else receipt.toAddress,
 					receipt.transactionHash,
 					receipt.blockNumber,
@@ -201,8 +202,10 @@ class TransactionDetailPresenter(
 				arrayListOf(
 					formatedMinnerFee(),
 					memo,
-					if (receipt.isReceive) receipt.to else WalletUtil.getAddressBySymbol(receipt.symbol),
-					if (receipt.isReceive) WalletUtil.getAddressBySymbol(receipt.symbol) else receipt.to,
+					if (receipt.isReceive) receipt.to
+					else fromAddress,
+					if (receipt.isReceive) fromAddress
+					else receipt.to,
 					currentHash,
 					receipt.blockNumber,
 					date,
@@ -227,17 +230,12 @@ class TransactionDetailPresenter(
 				arrayListOf(
 					formatedMinnerFee(),
 					memo,
-					WalletUtil.getAddressBySymbol(
-						data?.token?.symbol ?: notificationData?.symbol.orEmpty()
-					),
+					fromAddress,
 					data?.toAddress.orEmpty(),
 					currentHash,
 					"Waiting...",
 					date,
-					TransactionListModel.generateTransactionURL(
-						currentHash,
-						data?.token?.symbol ?: notificationData?.symbol
-					)
+					TransactionListModel.generateTransactionURL(currentHash, symbol)
 				)
 			}
 		}

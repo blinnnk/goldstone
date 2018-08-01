@@ -184,6 +184,7 @@ data class MyTokenTable(
 							}
 						}
 						
+						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}

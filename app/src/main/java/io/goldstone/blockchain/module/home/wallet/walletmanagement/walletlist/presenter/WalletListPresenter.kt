@@ -5,11 +5,15 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
@@ -31,7 +35,49 @@ class WalletListPresenter(
 	
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) {
-			fragment.activity?.jump<SplashActivity>()
+			WalletTable.getWalletByAddress(address) {
+				it?.apply {
+					WalletTable.getTargetWalletType(this) {
+						when (it) {
+							WalletType.BTCOnly -> {
+								if (Config.isTestEnvironment()) {
+									showConfirmationAlertView("Bitcoin Mainnet") {
+										NodeSelectionPresenter.setAllMainnet {
+											fragment.activity?.jump<SplashActivity>()
+										}
+									}
+								} else {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+							
+							WalletType.BTCTestOnly -> {
+								if (!Config.isTestEnvironment()) {
+									showConfirmationAlertView("Bitcoin Testnet") {
+										NodeSelectionPresenter.setAllTestnet {
+											fragment.activity?.jump<SplashActivity>()
+										}
+									}
+								} else {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+							
+							else -> fragment.activity?.jump<SplashActivity>()
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	fun showConfirmationAlertView(content: String, callback: () -> Unit) {
+		fragment.context?.showAlertView(
+			"Switch Chain Network",
+			WalletSettingsText.switchChainNetAlert(content),
+			false
+		) {
+			callback()
 		}
 	}
 	
