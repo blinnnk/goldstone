@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.presenter
 
-import android.util.Log
 import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
@@ -158,12 +157,11 @@ class WalletSettingsPresenter(
         // ToDo Get All addresses from database and show them here
         subtitle.text = "there are 5 addresses in this wallet"
       }
-      UnlimitedAvatar.width = avatarSize
-      UnlimitedAvatar.height = avatarSize
       avatarImage.glideImage(
         UnlimitedAvatar(
           Config.getCurrentID(),
-          context
+          context,
+          UnlimitedAvatar.Big
         ).generateImage())
     }
   }

@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.v
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -45,11 +44,10 @@ class WalletListCell(context: Context) : BaseValueCell(context) {
     }
 
     icon.apply {
-      UnlimitedAvatar.width = layoutParams.width
-      UnlimitedAvatar.height = layoutParams.height
       glideImage(UnlimitedAvatar(
         model.avatar,
-        context
+        context,
+        UnlimitedAvatar.Middle
       ).generateImage())
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import java.util.*
 
@@ -17,7 +18,8 @@ import java.util.*
  */
 class UnlimitedAvatar(
   randomNumber: Int,
-  private val context: Context
+  private val context: Context,
+  private val widthAndHeightSize: Int
 ) {
   private val absoluteRandomNumber = Math.abs(randomNumber)
   private val imageArrayList: ArrayList<Int> = getDrawableArrayList()
@@ -39,8 +41,8 @@ class UnlimitedAvatar(
     val frontBitmap = convertDrawable2BitmapByCanvas(iconDrawable!!)
 
     val backgroundBitmap = Bitmap.createBitmap(
-      width,
-      height,
+      widthAndHeightSize,
+      widthAndHeightSize,
       Bitmap.Config.ARGB_8888
     )
     backgroundBitmap.eraseColor(Color.parseColor(randomColor))
@@ -379,16 +381,16 @@ class UnlimitedAvatar(
   // 根据资源文件获取bitmap
   private fun convertDrawable2BitmapByCanvas(drawable: Drawable): Bitmap {
     val bitmap = Bitmap.createBitmap(
-      width,
-      height,
+      widthAndHeightSize,
+      widthAndHeightSize,
       if (drawable.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
     )
     val canvas = Canvas(bitmap)
     drawable.setBounds(
       0,
       0,
-      width,
-      height
+      widthAndHeightSize,
+      widthAndHeightSize
     )
     drawable.draw(canvas)
     return bitmap
@@ -404,7 +406,8 @@ class UnlimitedAvatar(
   }
 
   companion object {
-    var width = 0
-    var height = 0
+    val Small = 34.uiPX()
+    val Middle = 50.uiPX()
+    val Big = 75.uiPX()
   }
 }

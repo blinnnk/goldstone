@@ -4,7 +4,6 @@ import android.R
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.util.Log
 import android.view.Gravity
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -33,7 +32,11 @@ import org.jetbrains.anko.*
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-  private var avatarBitmap: Bitmap? = null
+  private var avatarBitmap = UnlimitedAvatar(
+    Config.getCurrentID(),
+    context,
+    UnlimitedAvatar.Small
+  ).generateImage()
 
   var model: WalletDetailHeaderModel? by observing(null) {
     model?.apply {
@@ -147,13 +150,6 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
       setAlignParentRight()
       setAlignParentBottom()
     }
-
-    UnlimitedAvatar.width = currentAccount.avatar.layoutParams.width
-    UnlimitedAvatar.height = currentAccount.avatar.layoutParams.height
-    avatarBitmap = UnlimitedAvatar(
-      Config.getCurrentID(),
-      context
-    ).generateImage()
   }
 
   fun showLoadingView(status: Boolean) {
