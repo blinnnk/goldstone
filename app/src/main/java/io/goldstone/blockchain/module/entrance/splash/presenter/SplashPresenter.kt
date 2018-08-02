@@ -7,6 +7,7 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 import org.jetbrains.anko.doAsync
@@ -28,19 +30,24 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun hasAccountThenLogin() {
 		WalletTable.getAll {
 			isNotEmpty() isTrue {
-				WalletTable.getCurrentWallet {
-					doAsync {
-						Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
-						Config.updateCurrentBTCAddress(currentBTCAddress)
-						Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
-						Config.updateCurrentETCAddress(currentETCAddress)
-						Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-						Config.updateCurrentID(id)
-						Config.updateCurrentBalance(balance.orElse(0.0))
-						Config.updateCurrentName(name)
-						uiThread {
-							activity.jump<MainActivity>()
+				WalletTable.getWalletType {
+					when (it) {
+						WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
+							cacheWalletData()
 						}
+						WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
+							cacheWalletData()
+						}
+						
+						WalletType.ETHERCAndETCOnly -> {
+							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+								cacheWalletData()
+							} else NodeSelectionPresenter.setAllMainnet {
+								cacheWalletData()
+							}
+						}
+						
+						WalletType.MultiChain -> cacheWalletData()
 					}
 				}
 			}
@@ -90,6 +97,24 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentRate(it)
 				// 更新数据库的值
 				SupportCurrencyTable.updateUsedRateValue(it)
+			}
+		}
+	}
+	
+	private fun cacheWalletData() {
+		WalletTable.getCurrentWallet {
+			doAsync {
+				Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
+				Config.updateCurrentBTCAddress(currentBTCAddress)
+				Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+				Config.updateCurrentETCAddress(currentETCAddress)
+				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
+				Config.updateCurrentID(id)
+				Config.updateCurrentBalance(balance.orElse(0.0))
+				Config.updateCurrentName(name)
+				uiThread {
+					activity.jump<MainActivity>()
+				}
 			}
 		}
 	}

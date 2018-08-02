@@ -51,7 +51,9 @@ enum class ChainID(val id: String) {
 				ChainID.Kovan.id,
 				ChainID.Rinkeby.id,
 				ChainID.ETCTest.id,
-				ChainID.ETCMain.id
+				ChainID.ETCMain.id,
+				ChainID.BTCMain.id,
+				ChainID.BTCTest.id
 			)
 		}
 		

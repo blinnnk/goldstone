@@ -1,13 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
-import android.content.Context
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -103,8 +101,7 @@ class TokenManagementListPresenter(
 		fun updateMyTokensInfoBy(
 			switch: HoneyBaseSwitch,
 			token: DefaultTokenTable,
-			chainID: String,
-			context: Context
+			chainID: String
 		) {
 			switch.isClickable = false
 			if (switch.isChecked) {
@@ -112,10 +109,8 @@ class TokenManagementListPresenter(
 				MyTokenTable.insertBySymbolAndContract(
 					token.symbol,
 					token.contract,
-					chainID,
-					{ error, reason ->
-						GoldStoneDialog.chainError(reason, error, context)
-					}) {
+					chainID
+				) {
 					switch.isClickable = true
 				}
 			} else {

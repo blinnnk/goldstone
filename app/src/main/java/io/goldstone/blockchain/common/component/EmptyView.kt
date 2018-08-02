@@ -39,7 +39,6 @@ class EmptyView(context: Context) : LinearLayout(context) {
 	private val emptyViewHeight = ScreenSize.Width
 	
 	init {
-		
 		id = ElementID.emptyView
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
@@ -73,13 +72,27 @@ class EmptyView(context: Context) : LinearLayout(context) {
 			}
 			
 			EmptyType.WalletDetail -> {
-				y = (context.getRealScreenHeight() - WalletDetailSize.height - emptyViewHeight) / 2 +
-					WalletDetailSize.height - 140.uiPX() * 1f
+				val viewSize = 300.uiPX()
+				val hasEnoughSpace =
+					WalletDetailSize.headerHeight + viewSize +
+					HomeSize.tabBarHeight <
+					context.getRealScreenHeight()
+				val topValue: (modulus: Float) -> Float = {
+					(context.getRealScreenHeight() - WalletDetailSize.headerHeight - viewSize * it) / 2f +
+					WalletDetailSize.headerHeight - (context.getRealScreenHeight() - viewSize * it) / 2f +
+					HomeSize.tabBarHeight
+				}
+				val centerY =
+					if (hasEnoughSpace) topValue(1f)
+					else {
+						val modulus = 0.8f
+						scaleX = modulus
+						scaleY = modulus
+						topValue(modulus)
+					}
+				y = centerY
 				layoutParams =
-					LinearLayout.LayoutParams(
-						300.uiPX(),
-						300.uiPX()
-					)
+					LinearLayout.LayoutParams(300.uiPX(), 300.uiPX())
 				icon.apply {
 					layoutParams = LinearLayout.LayoutParams(120.uiPX(), 120.uiPX())
 					addCorner(60.uiPX(), Spectrum.opacity3White)

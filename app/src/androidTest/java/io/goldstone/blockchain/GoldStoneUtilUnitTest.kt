@@ -83,6 +83,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
+			LogUtil.debug("getWatchOnlyAddress", "$it")
 		}
 	}
 	

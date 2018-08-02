@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Duration
@@ -70,7 +71,7 @@ class SplashActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 		savedInstanceState.isNull {
-			hideStatusBar()
+			transparentStatus()
 			container.apply {
 				gradientView.into(this)
 				initWaveView()
@@ -88,7 +89,7 @@ class SplashActivity : AppCompatActivity() {
 			findViewById<RelativeLayout>(ContainerID.splash)?.let {
 				supportFragmentManager.fragments.find {
 					it is StartingFragment
-				}.isNull() isTrue {
+				}.isNull {
 					addFragment<StartingFragment>(it.id)
 				}
 			}
@@ -102,10 +103,10 @@ class SplashActivity : AppCompatActivity() {
 							updateShareContentFromServer()
 							// 更新用户条款如果有必要
 							updateAgreement()
-							// insert support currency list from local json
+							// Insert support currency list from local json
 							updateCurrencyRateFromServer(this@config)
 						}
-						// check network to get default toke list
+						// Check network to get default toke list
 						initDefaultTokenByNetWork {
 							hasAccountThenLogin()
 							cleanMemoryDataLastAccount()

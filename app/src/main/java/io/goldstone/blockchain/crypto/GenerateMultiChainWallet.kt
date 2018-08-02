@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 
@@ -33,11 +34,13 @@ object GenerateMultiChainWallet {
 				BTCWalletUtils.getBitcoinWalletByMnemonic(
 					mnemonic,
 					path.btcPath
-				) { btcAddress, _ ->
+				) { btcAddress, secret ->
+					context.storeBase58PrivateKey(secret, btcAddress, password, false)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
-					) { btcTestAddress, _ ->
+					) { btcTestAddress, testSecret ->
+						context.storeBase58PrivateKey(testSecret, btcTestAddress, password, true)
 						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress), mnemonic)
 					}
 				}
@@ -49,17 +52,14 @@ object GenerateMultiChainWallet {
 		context: Context,
 		mnemonic: String,
 		password: String,
-		path: MultiChainPath = MultiChainPath(
-			DefaultPath.ethPath,
-			DefaultPath.etcPath,
-			DefaultPath.btcPath,
-			DefaultPath.btcTestPath
-		),
-		hold: (
-			multiChainAddresses: MultiChainAddresses
-		) -> Unit
+		path: MultiChainPath,
+		hold: (multiChainAddresses: MultiChainAddresses) -> Unit
 	) {
 		context.getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
+			if (ethAddress.equals(ImportWalletText.existAddress, true)) {
+				hold(MultiChainAddresses())
+				return@getEthereumWalletByMnemonic
+			}
 			context.getEthereumWalletByMnemonic(
 				mnemonic,
 				path.etcPath,
@@ -105,4 +105,12 @@ data class MultiChainAddresses(
 	val etcAddress: String,
 	val btcAddress: String,
 	val btcTestAddress: String
-)
+) {
+	
+	constructor() : this(
+		"",
+		"",
+		"",
+		""
+	)
+}

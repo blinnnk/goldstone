@@ -24,7 +24,6 @@ class TokenManagementListFragment :
 	
 	private var attentionView: AttentionTextView? = null
 	override val presenter = TokenManagementListPresenter(this)
-	private var hasInsertToken = false
 	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
@@ -32,7 +31,6 @@ class TokenManagementListFragment :
 	) {
 		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
 			switch.onClick {
-				hasInsertToken = true
 				model?.let { model ->
 					// 更新内存数据防止上下滑动导致的复用问题
 					asyncData?.find {
@@ -41,14 +39,11 @@ class TokenManagementListFragment :
 						isUsed = switch.isChecked
 					}
 					// 更新数据库
-					this@TokenManagementListFragment.context?.apply {
-						TokenManagementListPresenter.updateMyTokensInfoBy(
-							switch,
-							model,
-							ChainID.getChainIDBySymbol(model.symbol),
-							this
-						)
-					}
+					TokenManagementListPresenter.updateMyTokensInfoBy(
+						switch,
+						model,
+						ChainID.getChainIDBySymbol(model.symbol)
+					)
 				}
 			}
 		}
@@ -56,16 +51,12 @@ class TokenManagementListFragment :
 	
 	override fun onDestroy() {
 		super.onDestroy()
-		if (hasInsertToken) updateWalletDetailData()
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
-	}
-	
-	private fun updateWalletDetailData() {
-		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	fun showAttentionView() {

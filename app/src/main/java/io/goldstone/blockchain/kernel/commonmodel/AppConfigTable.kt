@@ -48,7 +48,8 @@ data class AppConfigTable(
 	var currentBTCTestChainName: String,
 	var currentETCChainName: String,
 	var currentBTCChainName: String,
-	var currentETHERC20AndETCChainName: String
+	var currentETHERC20AndETCChainName: String,
+	var defaultCoinListMD5: String
 ) {
 	
 	companion object {
@@ -88,6 +89,18 @@ data class AppConfigTable(
 					getAppConfig().let {
 						it.isNotEmpty() isTrue {
 							update(it[0].apply { this.pushToken = token })
+						}
+					}
+				}
+			}
+		}
+		
+		fun updateDefaultTokenMD5(md5: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it.isNotEmpty() isTrue {
+							update(it[0].apply { this.defaultCoinListMD5 = md5 })
 						}
 					}
 				}
@@ -284,7 +297,8 @@ data class AppConfigTable(
 							currentETHERC20AndETCChainName = ChainText.infuraMain,
 							currentBTCTestChainName = ChainText.btcTest,
 							currentETCTestChainName = ChainText.etcMorden,
-							currentETHERC20AndETCTestChainName = ChainText.infuraRopsten
+							currentETHERC20AndETCTestChainName = ChainText.infuraRopsten,
+							defaultCoinListMD5 = ""
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }

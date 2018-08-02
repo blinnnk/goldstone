@@ -25,8 +25,10 @@ class BitcoinTransactionListPresenter(
 	override val fragment: BitcoinTransactionListFragment
 ) : BaseRecyclerPresenter<BitcoinTransactionListFragment, TransactionListModel>() {
 	
-	private val address = if (Config.isTestEnvironment()) Config.getCurrentBTCTestAddress()
-	else Config.getCurrentBTCAddress()
+	private val address: () -> String = {
+		if (Config.isTestEnvironment()) Config.getCurrentBTCTestAddress()
+		else Config.getCurrentBTCAddress()
+	}
 	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
@@ -45,7 +47,7 @@ class BitcoinTransactionListPresenter(
 	
 	private var hasLoadServerData = false
 	private fun loadTransactionsFromDatabase() {
-		BitcoinSeriesTransactionTable.getTransactionsByAddress(address) { localData ->
+		BitcoinSeriesTransactionTable.getTransactionsByAddress(address()) { localData ->
 			localData.map {
 				TransactionListModel(it)
 			}.let {
@@ -83,10 +85,9 @@ class BitcoinTransactionListPresenter(
 		) {
 			val offset =
 				Math.floor(localData.size / pageSize.toDouble()).toInt() * pageSize
-			val address =
-				if (Config.isTestEnvironment())
-					Config.getCurrentBTCTestAddress()
-				else Config.getCurrentBTCAddress()
+			val address = if (Config.isTestEnvironment())
+				Config.getCurrentBTCTestAddress()
+			else Config.getCurrentBTCAddress()
 			BitcoinApi.getBTCTransactions(
 				address,
 				pageSize,

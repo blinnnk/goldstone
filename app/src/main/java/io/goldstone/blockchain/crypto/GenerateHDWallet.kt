@@ -9,6 +9,7 @@ import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
@@ -72,10 +73,13 @@ fun Context.getEthereumWalletByMnemonic(
 			keyString(masterKey.privateKey.toString(16)).hexToByteArray(),
 			password
 		)
+		hold(address)
 	} catch (error: Exception) {
+		if (error.toString().contains("account already exists")) {
+			hold(ImportWalletText.existAddress)
+		}
 		println("getEthereumWalletByMnemonic $error")
 	}
-	hold(address)
 }
 
 val keyString: (secret: String) -> String = {
@@ -105,10 +109,13 @@ fun Context.getWalletByPrivateKey(
 	/** Import Private Key to Keystore */
 	try {
 		keyStore.importECDSAKey(keyString(privateKey).hexToByteArray(), password)
+		hold(address)
 	} catch (error: Exception) {
+		if (error.toString().contains("account already exists")) {
+			hold(ImportWalletText.existAddress)
+		}
 		println(error)
 	}
-	hold(address)
 }
 
 fun Context.getKeystoreFile(

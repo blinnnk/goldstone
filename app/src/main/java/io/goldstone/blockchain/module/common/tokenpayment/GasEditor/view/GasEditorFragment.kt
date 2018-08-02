@@ -45,11 +45,8 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			val defaultPrice =
-				if (isBTC) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
 			gasPriceInput.apply {
 				setNumberInput()
-				setText(defaultPrice.toString())
 				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
 				title = if (isBTC) TransactionText.satoshiValue else TransactionText.gasPrice
 			}.into(this)
@@ -75,6 +72,14 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			}.into(this)
 			setProcessValue()
 		}
+	}
+	
+	override fun onStart() {
+		super.onStart()
+		val defaultPrice =
+			if (isBTC) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
+		gasPriceInput.setText(defaultPrice.toString())
+		gasPrice = defaultPrice
 	}
 	
 	private val currentValue: (
@@ -106,7 +111,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			gasLimitInput.let { limit ->
 				limit.afterTextChanged = Runnable {
 					limit.getContent {
-						dataSize = if (it.isEmpty()) 0L else it.toLong()
+						dataSize = if (it.isEmpty()) getGasSize() ?: 0L else it.toLong()
 					}
 				}
 			}

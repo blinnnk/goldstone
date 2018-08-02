@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.prese
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -151,6 +152,16 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	private fun RoundInput.setPasswordSafeLevel() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
+		}
+	}
+	
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
+			isNotNull {
+				getParentContainer()?.removeView(this)
+			} otherwise {
+				super.setBaseBackEvent(activity, parent)
+			}
 		}
 	}
 	

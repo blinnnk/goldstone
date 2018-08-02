@@ -31,6 +31,7 @@ object ElementID {
 	const val contentScrollview = 20016
 	const val mask = 20017
 	const val miniOverlay = 20018
+	const val dashboardOverlay = 20019
 }
 
 object ViewPagerID {

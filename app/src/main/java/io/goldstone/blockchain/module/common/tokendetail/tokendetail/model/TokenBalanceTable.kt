@@ -4,16 +4,11 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
-import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
-import java.util.*
 
 /**
  * @date 08/04/2018 5:10 PM
@@ -34,18 +29,23 @@ data class TokenBalanceTable(
 		
 		fun getBalanceByContract(
 			contract: String,
-			address: String = Config.getCurrentEthereumAddress(),
-			hold: (ArrayList<TokenBalanceTable>) -> Unit
+			address: String,
+			hold: (List<TokenBalanceTable>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.tokenBalanceDao()
 					.getTokenBalanceByContractAndAddress(address, contract)
 			} then {
-				hold(it.toArrayList())
+				hold(it)
 			}
 		}
 		
-		fun insertOrUpdate(contract: String, address: String, date: Long, balance: Double) {
+		fun insertOrUpdate(
+			contract: String,
+			address: String,
+			date: Long,
+			balance: Double
+		) {
 			val addTime = System.currentTimeMillis()
 			GoldStoneDataBase.database.tokenBalanceDao().apply {
 				getBalanceByDate(date, address, contract).let {

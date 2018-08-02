@@ -22,10 +22,8 @@ object APIPath {
 	}
 	
 	const val serverStatus = "https://gs.blinnnk.com/index/serverStatus"
-	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
-	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" } // 旧需要移除
 	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
 	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
@@ -37,6 +35,12 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
+	val defaultTokenList: (
+		header: String,
+		md5: String
+	) -> String = { header, md5 ->
+		"$header/index/defaultCoinList?md5=$md5"
+	}
 	val getTokenInfo: (
 		header: String,
 		condition: String,

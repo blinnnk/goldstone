@@ -25,6 +25,8 @@ import org.json.JSONObject
 data class DefaultTokenTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
+	@SerializedName("_id")
+	var serverTokenID: String,
 	@SerializedName("address")
 	var contract: String,
 	@SerializedName("url")
@@ -44,7 +46,6 @@ data class DefaultTokenTable(
 	var isDefault: Boolean = true,
 	@SerializedName("weight")
 	var weight: Int,
-	@SerializedName("chain_id")
 	var chain_id: String,
 	var description: String = "",
 	var exchange: String = "",
@@ -64,6 +65,7 @@ data class DefaultTokenTable(
 		"",
 		"",
 		"",
+		"",
 		0,
 		0.0,
 		"",
@@ -79,6 +81,7 @@ data class DefaultTokenTable(
 		isDefault: Boolean = false
 	) : this(
 		0,
+		"",
 		data.contract,
 		data.iconUrl,
 		data.symbol,
@@ -96,6 +99,7 @@ data class DefaultTokenTable(
 		localData: JSONObject
 	) : this(
 		0,
+		"",
 		localData.safeGet("address"),
 		localData.safeGet("url"),
 		localData.safeGet("symbol"),
@@ -118,6 +122,7 @@ data class DefaultTokenTable(
 	
 	constructor(data: CoinInfoModel) : this(
 		0,
+		"",
 		data.contract,
 		"",
 		data.symbol,
@@ -146,6 +151,7 @@ data class DefaultTokenTable(
 		decimals: Double
 	) : this(
 		0,
+		"",
 		contract,
 		"",
 		symbol,
@@ -297,7 +303,7 @@ data class DefaultTokenTable(
 								this.isDefault = isDefault
 								this.name = name
 							})
-							GoldStoneAPI.context.runOnUiThread { callback() }
+							callback()
 						}
 					}
 			}
@@ -351,6 +357,13 @@ interface DefaultTokenDao {
 		symbol: String,
 		contract: String
 	): List<DefaultTokenTable>
+	
+	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND chain_id LIKE :chainID AND  contract LIKE :contract")
+	fun getTokenBySymbolContractAndChainID(
+		symbol: String,
+		contract: String,
+		chainID: String
+	): DefaultTokenTable?
 	
 	@Insert
 	fun insert(token: DefaultTokenTable)

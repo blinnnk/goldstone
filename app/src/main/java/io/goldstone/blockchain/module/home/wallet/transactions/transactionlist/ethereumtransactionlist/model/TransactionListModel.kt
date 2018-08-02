@@ -78,9 +78,8 @@ data class TransactionListModel(
 	)
 	
 	constructor(data: BitcoinSeriesTransactionTable) : this(
-		if (!data.fromAddress.equals(data.recordAddress, true)) data.fromAddress else formatToAddress(
-			data.to
-		),
+		if (data.isReceive) data.fromAddress
+		else formatToAddress(data.to),
 		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
@@ -114,7 +113,7 @@ data class TransactionListModel(
 	companion object {
 		fun formatToAddress(toAddress: String): String {
 			var formatedAddresses = ""
-			// `ToAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
+			// `toAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
 			// `Start And End` 的值设定不同
 			val miroSetIndex = if (toAddress.contains("[")) 1 else 0
 			val addresses =

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ChainID
@@ -70,7 +69,10 @@ data class MyTokenTable(
 				doAsync {
 					var allTokens = listOf<MyTokenTable>()
 					addresses.forEachOrEnd { item, isEnd ->
-						allTokens += GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(item)
+						allTokens += GoldStoneDataBase
+							.database
+							.myTokenDao()
+							.getCurrentChainTokensBy(item)
 						if (isEnd) {
 							GoldStoneAPI.context.runOnUiThread {
 								callback(allTokens.toArrayList())
@@ -112,21 +114,6 @@ data class MyTokenTable(
 			}
 		}
 		
-		fun getCurrentChainTokenByContract(
-			contract: String,
-			hold: (MyTokenTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase
-					.database
-					.myTokenDao()
-					.getCurrentChainTokenByContractAndAddress(
-						contract,
-						WalletTable.getAddressByContract(contract)
-					)
-			} then (hold)
-		}
-		
 		fun getTokenBalance(
 			contract: String,
 			walletAddress: String,
@@ -153,7 +140,7 @@ data class MyTokenTable(
 		fun deleteByContract(
 			contract: String,
 			address: String,
-			callback: () -> Unit = {}
+			callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
@@ -170,9 +157,7 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao().apply {
 					val allTokens = getAllTokensBy(address)
 					if (allTokens.isEmpty()) {
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
+						callback()
 						return@doAsync
 					}
 					object : ConcurrentAsyncCombine() {
@@ -195,7 +180,6 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			chainID: String,
-			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: () -> Unit
 		) {
 			WalletTable.getCurrentWallet {
@@ -206,30 +190,20 @@ data class MyTokenTable(
 						myTokenDao().getCurrentChainTokensBy(currentAddress).find {
 							it.contract.equals(contract, true)
 						}.isNull() isTrue {
-							if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
-								getBalanceAndInsertWithSymbolAndContract(
-									symbol,
-									contract,
+							insert(
+								MyTokenTable(
+									0,
 									currentAddress,
-									errorCallback,
-									callback
-								)
-							} else {
-								insert(
-									MyTokenTable(
-										0,
-										currentAddress,
-										symbol,
-										0.0,
-										contract,
-										CryptoValue.chainID(contract)
-									),
-									chainID
-								)
-								// 没有网络不用检查间隔直接插入数据库
-								GoldStoneAPI.context.runOnUiThread {
-									callback()
-								}
+									symbol,
+									0.0,
+									contract,
+									CryptoValue.chainID(contract)
+								),
+								chainID
+							)
+							// 没有网络不用检查间隔直接插入数据库
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
 							}
 						}
 					}
@@ -384,9 +358,7 @@ interface MyTokenDao {
 	): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
-	fun getAllTokensBy(
-		walletAddress: String
-	): List<MyTokenTable>
+	fun getAllTokensBy(walletAddress: String): List<MyTokenTable>
 	
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>

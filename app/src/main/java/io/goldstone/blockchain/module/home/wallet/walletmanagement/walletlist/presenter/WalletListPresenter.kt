@@ -63,6 +63,17 @@ class WalletListPresenter(
 								}
 							}
 							
+							WalletType.MultiChain -> {
+								if (Config.isTestEnvironment()) {
+									NodeSelectionPresenter.setAllTestnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								} else {
+									NodeSelectionPresenter.setAllTestnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							}
 							else -> fragment.activity?.jump<SplashActivity>()
 						}
 					}

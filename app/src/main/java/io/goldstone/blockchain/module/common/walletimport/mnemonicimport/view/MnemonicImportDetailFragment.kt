@@ -19,6 +19,7 @@ import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.present
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -65,9 +66,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							bottomMargin = 10.uiPX()
 						}
 					}
-					.click {
-						showPatSettingsDashboard()
-					}
+					.click { showPatSettingsDashboard() }
 					.into(this)
 				
 				walletNameInput.apply {
@@ -194,6 +193,16 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	private fun RoundInput.setPasswordSafeLevel() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
+		}
+	}
+	
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
+			isNotNull {
+				getParentContainer()?.removeView(this)
+			} otherwise {
+				super.setBaseBackEvent(activity, parent)
+			}
 		}
 	}
 }

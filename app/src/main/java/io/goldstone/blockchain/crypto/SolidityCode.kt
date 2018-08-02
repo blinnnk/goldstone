@@ -103,9 +103,9 @@ object DefaultPath {
 	const val btcPath = "m/44'/0'/0'/0/0"
 	const val btcTestPath = "m/44'/1'/0'/0/0"
 	// Header Value
-	const val ethPathHeader = "m/44'/60'"
-	const val etcPathHeader = "m/44'/61'"
-	const val btcPathHeader = "m/44'/0'"
-	const val btcTestPathHeader = "m/44'/1'"
+	const val ethPathHeader = "m/44'/60'/"
+	const val etcPathHeader = "m/44'/61'/"
+	const val btcPathHeader = "m/44'/0'/"
+	const val btcTestPathHeader = "m/44'/1'/"
 	const val default = "0'/0/0"
 }

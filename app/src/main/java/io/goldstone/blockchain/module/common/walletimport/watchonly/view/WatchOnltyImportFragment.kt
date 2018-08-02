@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -109,6 +110,15 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					}
 				}
 			}.into(this)
+		}
+	}
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
+			isNotNull {
+				getParentContainer()?.removeView(this)
+			} otherwise {
+				super.setBaseBackEvent(activity, parent)
+			}
 		}
 	}
 }
