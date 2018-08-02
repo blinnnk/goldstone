@@ -48,12 +48,6 @@ object Config {
 	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 	
-	fun getCurrentAddress(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentAddress)
-	
-	fun updateCurrentAddress(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentAddress, address)
-	
 	fun getCurrentEthereumAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 	

@@ -154,7 +154,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				setTitle(PrepareTransferText.memo)
 				setSubtitle(CryptoUtils.scaleTo32(PrepareTransferText.addAMemo))
 				showArrow()
-				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
+				addTouchRippleAnimation(
+					GrayScale.whiteGray,
+					Spectrum.green,
+					RippleMode.Square,
+					CornerSize.cell.toFloat()
+				)
 			}.click {
 				getParentContainer()?.showMemoInputView {
 					if (it.isNotEmpty()) {

@@ -12,10 +12,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.QuotationText
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
@@ -48,7 +45,7 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		ImageView(context).apply {
 			imageResource = R.drawable.arrow_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
-			setColorFilter(GrayScale.midGray)
+			setColorFilter(GrayScale.gray)
 			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
 		}
 	}
@@ -58,7 +55,12 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		setMargins<RelativeLayout.LayoutParams> {
 			bottomMargin = 5.uiPX()
 		}
-		backgroundColor = GrayScale.whiteGray
+		addCorner(CornerSize.cell, GrayScale.whiteGray)
+		elevation = 3f
+		this.addView(View(context).apply {
+			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+			backgroundColor = GrayScale.midGray
+		})
 		this.addView(title)
 		this.addView(subtitle)
 	}

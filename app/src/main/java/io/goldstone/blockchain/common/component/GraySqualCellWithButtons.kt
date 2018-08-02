@@ -100,12 +100,8 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 		moreButton.setColorFilter(GrayScale.gray)
 		copyButton.setColorFilter(GrayScale.gray)
 		when (type) {
-			Normal -> lineView.visibility = View.GONE
-			
-			Default -> {
-				lineView.visibility = View.VISIBLE
-				lineView.backgroundColor = Spectrum.blue
-			}
+			Normal -> lineView.backgroundColor = GrayScale.midGray
+			Default -> lineView.backgroundColor = Spectrum.blue
 		}
 	}
 	

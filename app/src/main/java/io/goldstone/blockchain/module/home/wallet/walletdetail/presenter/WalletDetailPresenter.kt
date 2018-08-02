@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -271,24 +272,46 @@ class WalletDetailPresenter(
 	}
 	
 	private fun WalletDetailFragment.updateHeaderValue() {
-		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
-		// Once the calculation is finished then update `WalletTable`
-		Config.updateCurrentBalance(totalBalance.orElse(0.0))
 		try {
 			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
-				it?.model = WalletDetailHeaderModel(
-					null,
-					Config.getCurrentName(),
-					if (Config.getCurrentAddress().equals(WalletText.multiChainWallet, true)) {
-						Config.getCurrentAddress().scaleTo(18)
-					} else {
-						CryptoUtils.scaleMiddleAddress(Config.getCurrentAddress(), 5)
-					},
-					totalBalance.toString()
-				)
+				generateHeaderModel { model ->
+					it?.model = model
+				}
 			}
 		} catch (error: Exception) {
 			LogUtil.error("WalletDetail updateHeaderValue", error)
+		}
+	}
+	
+	private fun generateHeaderModel(
+		hold: (WalletDetailHeaderModel) -> Unit
+	) {
+		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
+		// Once the calculation is finished then update `WalletTable`
+		Config.updateCurrentBalance(totalBalance.orElse(0.0))
+		WalletTable.getWalletType { type ->
+			WalletTable.getCurrentWallet {
+				val subtitle = when (type) {
+					WalletType.ETHERCAndETCOnly -> currentETHAndERCAddress
+					WalletType.BTCOnly -> currentBTCAddress
+					WalletType.BTCTestOnly -> currentBTCTestAddress
+					WalletType.MultiChain -> WalletText.multiChainWallet
+				}
+				WalletDetailHeaderModel(
+					null,
+					Config.getCurrentName(),
+					if (subtitle.equals(WalletText.multiChainWallet, true)) {
+						object : FixTextLength() {
+							override var text = WalletText.multiChainWallet
+							override val maxWidth = 90.uiPX().toFloat()
+							override val textSize: Float = 12.uiPX().toFloat()
+						}.getFixString()
+					} else {
+						CryptoUtils.scaleMiddleAddress(subtitle, 5)
+					},
+					totalBalance.toString()
+				).let(hold)
+			}
 		}
 	}
 }
