@@ -2,13 +2,17 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechain
 
 import android.os.Bundle
 import android.view.View
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter.ChainAddressesPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -40,5 +44,12 @@ class ChainAddressesFragment
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.updateAddAddressEvent()
+	}
+	
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		getParentFragment<WalletSettingsFragment> {
+			headerTitle = WalletSettingsText.viewAddresses
+			presenter.popFragmentFrom<ChainAddressesFragment>()
+		}
 	}
 }

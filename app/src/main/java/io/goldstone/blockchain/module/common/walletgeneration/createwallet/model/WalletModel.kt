@@ -244,9 +244,10 @@ data class WalletTable(
 					currentETHAndERCAddress
 				).filter {
 					it.isNotEmpty()
-				}.distinctBy {
-					it
-				}.let(hold)
+				}.apply {
+					if (isEmpty()) hold(this)
+					else distinctBy { it }.let(hold)
+				}
 			}
 		}
 		
@@ -575,9 +576,7 @@ data class WalletTable(
 					}
 					getWalletByAddress(walletAddress)?.let { wallet ->
 						update(wallet.apply { wallet.isUsing = true })
-						GoldStoneAPI.context.runOnUiThread {
-							callback(wallet)
-						}
+						callback(wallet)
 					}
 				}
 			}

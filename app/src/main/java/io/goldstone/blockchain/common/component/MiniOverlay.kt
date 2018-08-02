@@ -37,7 +37,7 @@ class MiniOverlay(
 			model.forEachIndexed { index, pair ->
 				topPadding = 10.uiPX()
 				bottomPadding = 10.uiPX()
-				addCorner(5.uiPX(), Spectrum.white)
+				addCorner(CornerSize.small, Spectrum.white)
 				elevation = ShadowSize.Overlay
 				BaseCell(context).apply {
 					layoutParams.height = 40.uiPX()

@@ -107,7 +107,6 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						}.into(this)
 					}
 				}
-				
 				confirmButton.apply {
 					text = CommonText.confirm
 					setBlueStyle(50.uiPX())

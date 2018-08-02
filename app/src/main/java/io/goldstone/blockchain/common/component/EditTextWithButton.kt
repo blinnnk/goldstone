@@ -39,7 +39,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			textSize = fontSize(12)
 			textColor = GrayScale.black
 			hintTextColor = GrayScale.midGray
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 35.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
 			x += PaddingSize.device
 			singleLine = true
 			leftPadding = 20.uiPX()

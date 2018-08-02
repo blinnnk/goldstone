@@ -30,7 +30,7 @@ open class DashboardOverlay(
 	var confirmEvent: Runnable? = null
 	private val confirmButton = RoundButton(context)
 	private val container = scrollView {
-		addCorner(10.uiPX(), Spectrum.white)
+		addCorner(CornerSize.small, Spectrum.white)
 		elevation = ShadowSize.Overlay
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 		minimumHeight = 200.uiPX()
@@ -52,6 +52,7 @@ open class DashboardOverlay(
 	}
 	
 	init {
+		id = ElementID.dashboardOverlay
 		backgroundColor = GrayScale.Opacity5Black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		container.setCenterInParent()
@@ -61,7 +62,7 @@ open class DashboardOverlay(
 		}
 	}
 	
-	private fun removeSelf() {
+	fun removeSelf() {
 		(parent as? ViewGroup)?.removeView(this)
 	}
 }

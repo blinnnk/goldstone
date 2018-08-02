@@ -253,6 +253,9 @@ class WalletDetailPresenter(
 			} catch (error: Exception) {
 				LogUtil.error("updateUIByData", error)
 			}
+		} else {
+			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())
+			fragment.updateHeaderValue()
 		}
 	}
 	

@@ -73,7 +73,7 @@ class AddressesListView(
 						hold(moreButton, data.first, isDefault, data.second)
 						setTitle("${data.second}.")
 						
-						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 13))
+						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 12))
 					}.into(cellLayout)
 				}
 			}

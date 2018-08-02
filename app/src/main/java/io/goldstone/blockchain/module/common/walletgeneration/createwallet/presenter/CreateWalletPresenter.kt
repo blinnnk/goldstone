@@ -252,7 +252,7 @@ class CreateWalletPresenter(
 			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
-			failedCallback: () -> Unit = {},
+			failedCallback: () -> Unit,
 			callback: (password: String, walletName: String) -> Unit
 		) {
 			if (password.isEmpty()) {

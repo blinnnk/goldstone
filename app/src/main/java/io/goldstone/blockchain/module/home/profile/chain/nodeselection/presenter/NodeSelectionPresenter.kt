@@ -125,7 +125,7 @@ class NodeSelectionPresenter(
 				it?.apply {
 					AppConfigTable.updateChainStatus(true) {
 						Config.updateIsTestEnvironment(false)
-						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
+						Config.updateBTCCurrentChain(ChainID.BTCMain.id)
 						Config.updateETCCurrentChain(ChainID.ETCTest.id)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(currentETHERC20AndETCChainName)

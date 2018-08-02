@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequest
@@ -55,42 +56,54 @@ object GoldStoneAPI {
 	 */
 	@JvmStatic
 	fun getDefaultTokens(
-		errorCallback: (Exception) -> Unit = {},
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
-		requestData<String>(
-			APIPath.defaultTokenList(APIPath.currentUrl),
-			"data",
-			true,
-			errorCallback,
-			true
-		) {
-			val gson = Gson()
-			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
-			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount = ChainID.getAllChainID().size
-				override fun concurrentJobs() {
-					ChainID.getAllChainID().forEach { chainID ->
-						allDefaultTokens +=
-							gson.fromJson<List<DefaultTokenTable>>(
-								JSONObject(this@requestData[0]).safeGet(chainID),
-								collectionType
-							).map {
-								it.apply {
-									it.chain_id = chainID
-									it.isDefault = true
+		// 首先比对 `MD5` 值如果合法的就会返回列表.
+		AppConfigTable.getAppConfig {
+			requestData<String>(
+				APIPath.defaultTokenList(APIPath.currentUrl, ""),
+				"",
+				true,
+				errorCallback,
+				true
+			) {
+				val data = JSONObject(this[0])
+				val defaultTokens = data.safeGet("data")
+				// MD5 值存入数据库
+				val md5 = data.safeGet("md5")
+				AppConfigTable.updateDefaultTokenMD5(md5)
+				val gson = Gson()
+				val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
+				val allDefaultTokens = arrayListOf<DefaultTokenTable>()
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = ChainID.getAllChainID().size
+					override fun concurrentJobs() {
+						ChainID.getAllChainID().forEach { chainID ->
+							allDefaultTokens +=
+								try {
+									gson.fromJson<List<DefaultTokenTable>>(
+										JSONObject(defaultTokens).safeGet(chainID),
+										collectionType
+									)
+								} catch (error: Exception) {
+									listOf<DefaultTokenTable>()
+								}.map {
+									it.apply {
+										it.chain_id = chainID
+										it.isDefault = true
+									}
+								}.apply {
+									completeMark()
 								}
-							}.apply {
-								completeMark()
-							}
+						}
 					}
-				}
-				
-				override fun mergeCallBack() {
-					hold(allDefaultTokens)
-				}
-			}.start()
+					
+					override fun mergeCallBack() {
+						hold(allDefaultTokens)
+					}
+				}.start()
+			}
 		}
 	}
 	

@@ -103,9 +103,7 @@ class TokenSearchPresenter(
 				TokenManagementListPresenter.updateMyTokensInfoBy(
 					switch,
 					it,
-					ChainID.getChainIDBySymbol
-					(it.symbol),
-					this
+					ChainID.getChainIDBySymbol(it.symbol)
 				)
 			}
 		}
@@ -130,7 +128,7 @@ class TokenSearchPresenter(
 			}
 		) { result ->
 			MyTokenTable.getMyTokens { localTokens ->
-				if (result.isNullOrEmpty()) {
+				if (!result.isNullOrEmpty()) {
 					// 从服务器请求目标结果
 					result.map { serverToken ->
 						// 更新使用中的按钮状态
@@ -168,6 +166,7 @@ class TokenSearchPresenter(
 								arrayListOf(
 									DefaultTokenTable(
 										0,
+										"",
 										content,
 										"",
 										symbol,

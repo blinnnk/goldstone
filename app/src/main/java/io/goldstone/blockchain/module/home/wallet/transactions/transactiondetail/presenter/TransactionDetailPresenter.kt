@@ -187,10 +187,8 @@ class TransactionDetailPresenter(
 				arrayListOf(
 					receipt.minerFee,
 					receipt.memo,
-					if (receipt.isReceived) receipt.fromAddress
-					else fromAddress,
-					if (receipt.isReceived) fromAddress
-					else receipt.toAddress,
+					receipt.fromAddress,
+					receipt.toAddress,
 					receipt.transactionHash,
 					receipt.blockNumber,
 					receipt.date,
@@ -218,7 +216,7 @@ class TransactionDetailPresenter(
 					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
 					memo,
 					receipt.fromAddress,
-					receipt.to,
+					TransactionListModel.formatToAddress(receipt.to),
 					currentHash,
 					receipt.blockNumber,
 					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),

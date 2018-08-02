@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter
 
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -48,6 +49,8 @@ class KeystoreImportPresenter(
 					keystore,
 					password
 				) {
+					if (it.isNull()) callback(false)
+					
 					it?.let { privateKey ->
 						when {
 							currentType.equals(ETHERCAndETC.content, true) -> {
@@ -65,8 +68,7 @@ class KeystoreImportPresenter(
 									walletName,
 									password,
 									hintInput,
-									ECKey.fromPrivate(privateKey)
-										.getPrivateKeyAsWiF(TestNet3Params.get()),
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(TestNet3Params.get()),
 									true,
 									callback
 								)
@@ -77,8 +79,7 @@ class KeystoreImportPresenter(
 									walletName,
 									password,
 									hintInput,
-									ECKey.fromPrivate(privateKey)
-										.getPrivateKeyAsWiF(MainNetParams.get()),
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(MainNetParams.get()),
 									false,
 									callback
 								)
@@ -144,12 +145,10 @@ class KeystoreImportPresenter(
 			password.text.toString()
 		) {
 			fragment.context?.runOnUiThread {
-				fragment.context?.runOnUiThread {
-					fragment.context?.alert(AlertText.wrongKeyStorePassword)
-					callback(null)
-				}
-				LogUtil.error(this.javaClass.simpleName, it)
+				fragment.context?.alert(AlertText.wrongKeyStorePassword)
+				callback(null)
 			}
+			LogUtil.error(this.javaClass.simpleName, it)
 		}?.let {
 			callback(it.privateKey)
 		}

@@ -226,17 +226,21 @@ class TokenDetailPresenter(
 	
 	private fun getBTCData(
 		address: String,
-		callback: () -> Unit
+		withouDataCallback: () -> Unit
 	) {
 		BitcoinSeriesTransactionTable.getTransactionsByAddress(address) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updateChartBy(
-					transactions.map { TransactionListModel(it) }.sortedByDescending { it.timeStamp },
+					transactions.map {
+						TransactionListModel(it)
+					}.sortedByDescending {
+						it.timeStamp
+					},
 					address
 				)
 				fragment.removeLoadingView()
 			} otherwise {
-				callback()
+				withouDataCallback()
 				LogUtil.debug(this.javaClass.simpleName, "There isn't Bitcoin Local Data")
 			}
 		}
@@ -288,6 +292,7 @@ class TokenDetailPresenter(
 			}
 		) {
 			fragment.context?.runOnUiThread { fragment.removeLoadingView() }
+			// TODO 判断数据
 			loadDataFromDatabaseOrElse()
 		}
 	}
@@ -313,7 +318,7 @@ class TokenDetailPresenter(
 	private fun updateEmptyCharData(symbol: String) {
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
-		arrayListOf(
+		listOf(
 			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
 			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
@@ -324,7 +329,7 @@ class TokenDetailPresenter(
 		).updateChartAndHeaderData()
 	}
 	
-	private fun ArrayList<TokenBalanceTable>.updateChartAndHeaderData() {
+	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 6
 			val chartArray = arrayListOf<ChartPoint>()
@@ -346,26 +351,25 @@ class TokenDetailPresenter(
 	private fun List<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: String,
 		walletAddress: String,
-		callback: (ArrayList<TokenBalanceTable>) -> Unit
+		callback: (List<TokenBalanceTable>) -> Unit
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
 		MyTokenTable.getTokenBalance(contract, walletAddress) { todayBalance ->
 			if (todayBalance.isNull()) return@getTokenBalance
 			// 计算过去7天的所有余额
-			generateHistoryBalance(todayBalance!!) { history ->
+			generateHistoryBalance(todayBalance.orZero()) { history ->
 				load {
-					history.forEachIndexed { index, data ->
+					history.forEach { data ->
 						TokenBalanceTable.insertOrUpdate(
 							contract,
-							Config.getCurrentEthereumAddress(),
+							walletAddress,
 							data.date,
-							// 插入今日的余额数据
-							if (index == 0) todayBalance else data.balance
+							data.balance
 						)
 					}
 				} then {
 					// 更新数据完毕后在主线程从新从数据库获取数据
-					TokenBalanceTable.getBalanceByContract(contract) {
+					TokenBalanceTable.getBalanceByContract(contract, walletAddress) {
 						callback(it)
 					}
 				}
@@ -377,10 +381,10 @@ class TokenDetailPresenter(
 	
 	private fun List<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,
-		callback: (ArrayList<DateBalance>) -> Unit
+		callback: (List<DateBalance>) -> Unit
 	) {
 		val maxCount = 6
-		val balances = arrayListOf<DateBalance>()
+		var balances = listOf<DateBalance>()
 		var balance = todayBalance
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount: Int = maxCount
@@ -391,17 +395,23 @@ class TokenDetailPresenter(
 					(balance - filter {
 						it.timeStamp.toMillsecond() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {
-						if (it.isFee) it.minerFee.substringBefore(" ").toDouble() * -1
-						else it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
+						if (it.isFee) {
+							it.minerFee.substringBefore(" ").toDouble() * -1
+						} else {
+							it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
+						}
 					}).let {
-						balance = it
-						balances.add(DateBalance(index.daysAgoInMills(), balance))
+						balance = it.toBigDecimal().toDouble()
+						balances += DateBalance((index + 1).daysAgoInMills(), balance)
 						completeMark()
 					}
 				}
 			}
 			
-			override fun mergeCallBack() = callback(balances)
+			override fun mergeCallBack() {
+				balances += DateBalance(0.daysAgoInMills(), todayBalance)
+				callback(balances)
+			}
 		}.start()
 	}
 	

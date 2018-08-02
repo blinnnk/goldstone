@@ -148,7 +148,7 @@ object Count {
 
 object WalletDetailSize {
 	@JvmField
-	val height = 365.uiPX()
+	val headerHeight = 365.uiPX()
 }
 
 fun View.fontSize(defaultSize: Int): Float {

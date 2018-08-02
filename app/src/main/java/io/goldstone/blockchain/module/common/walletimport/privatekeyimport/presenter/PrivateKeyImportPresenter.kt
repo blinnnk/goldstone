@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllMainnet
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllTestnet
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -198,16 +199,23 @@ class PrivateKeyImportPresenter(
 			}
 			// 解析私钥并导入钱包
 			context?.getWalletByPrivateKey(currentPrivateKey, password) { address ->
-				address?.let {
-					WalletImportPresenter.insertWalletToDatabase(
-						context,
-						MultiChainAddresses(it, it, "", ""),
-						name,
-						"",
-						MultiChainPath("", "", "", ""),
-						hint,
-						callback
-					)
+				if (address.equals(ImportWalletText.existAddress, true)) {
+					context.runOnUiThread {
+						alert(ImportWalletText.existAddress)
+						callback(false)
+					}
+				} else {
+					address?.let {
+						WalletImportPresenter.insertWalletToDatabase(
+							context,
+							MultiChainAddresses(it, it, "", ""),
+							name,
+							"",
+							MultiChainPath("", "", "", ""),
+							hint,
+							callback
+						)
+					}
 				}
 			}
 		}

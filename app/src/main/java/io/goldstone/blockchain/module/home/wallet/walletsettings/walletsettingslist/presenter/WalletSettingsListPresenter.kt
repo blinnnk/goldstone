@@ -112,29 +112,34 @@ class WalletSettingsListPresenter(
 								
 								override fun concurrentJobs() {
 									AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
-										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename) {
+										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename, true) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
-										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename) {
+										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename, true) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
-										deleteRoutineWallet(it.first, password, it.first) {
+										deleteRoutineWallet(it.first, password, it.first, true) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
-										deleteRoutineWallet(it.first, password, it.first) {
+										deleteRoutineWallet(it.first, password, it.first, true) {
 											completeMark()
 										}
 									}
 								}
 								
 								override fun mergeCallBack() {
-									activity?.jump<SplashActivity>()
+									// delete wallet record in `walletTable`
+									WalletTable.deleteCurrentWallet {
+										// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+										XinGePushReceiver.registerAddressesForPush(true)
+										activity?.jump<SplashActivity>()
+									}
 								}
 							}.start()
 						}
@@ -155,7 +160,7 @@ class WalletSettingsListPresenter(
 							deleteRoutineWallet(
 								currentETHAndERCAddress,
 								password,
-								currentETHAndERCAddress
+								CryptoValue.keystoreFilename
 							) {
 								activity?.jump<SplashActivity>()
 							}
@@ -170,6 +175,7 @@ class WalletSettingsListPresenter(
 		address: String,
 		password: String,
 		filename: String,
+		justDeleteData: Boolean = false,
 		callback: () -> Unit
 	) {
 		// delete `keystore` file
@@ -183,11 +189,15 @@ class WalletSettingsListPresenter(
 			MyTokenTable.deleteByAddress(address) {
 				TransactionTable.deleteByAddress(address) {
 					TokenBalanceTable.deleteByAddress(address) {
-						// delete wallet record in `walletTable`
-						WalletTable.deleteCurrentWallet {
-							// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-							XinGePushReceiver.registerAddressesForPush(true)
+						if (justDeleteData) {
 							callback()
+						} else {
+							// delete wallet record in `walletTable`
+							WalletTable.deleteCurrentWallet {
+								// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+								XinGePushReceiver.registerAddressesForPush(true)
+								callback()
+							}
 						}
 					}
 				}

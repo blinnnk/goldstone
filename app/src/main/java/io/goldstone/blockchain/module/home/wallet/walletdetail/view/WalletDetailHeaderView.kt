@@ -63,10 +63,10 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	init {
 		setWillNotDraw(false)
 		
-		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.height)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight)
 		
 		waveView.apply {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.height - 50.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 30
 			waveColor = Color.parseColor("#FF265A80")

@@ -61,14 +61,15 @@ class MnemonicImportDetailPresenter(
 			callback(false)
 			return
 		}
-
+		
 		CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(),
 			isAgree,
 			fragment.context,
-			failedCallback = { callback(false) }) { passwordValue, walletName ->
+			failedCallback = { callback(false) }
+		) { passwordValue, walletName ->
 			val mnemonicContent =
 				mnemonicInput
 					.text.toString()
@@ -108,6 +109,12 @@ class MnemonicImportDetailPresenter(
 			password,
 			multiChainPath
 		) { multiChainAddresses ->
+			// 本地若存有当前多链钱包则直接跳出逻辑
+			if (multiChainAddresses.btcAddress.isEmpty() || multiChainAddresses.ethAddress.isEmpty()) {
+				fragment.context.alert(ImportWalletText.existAddress)
+				callback(false)
+				return@import
+			}
 			WalletImportPresenter.insertWalletToDatabase(
 				fragment.context,
 				multiChainAddresses,
