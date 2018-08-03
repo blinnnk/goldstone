@@ -3562,6 +3562,28 @@ object AlarmClockText {
   }
 
   @JvmField
+  val alarmRepeatingType = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Alarm Repeating"
+    HoneyLanguage.Chinese.code -> "报警重复"
+    HoneyLanguage.Japanese.code -> "アラームの繰り返し"
+    HoneyLanguage.Korean.code -> "반복되는 알람"
+    HoneyLanguage.Russian.code -> "Повторение тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警重複"
+    else -> ""
+  }
+
+  @JvmField
+  val alarmOnlyOneTimeType = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Only One Time"
+    HoneyLanguage.Chinese.code -> "只有一次"
+    HoneyLanguage.Japanese.code -> "1回のみ"
+    HoneyLanguage.Korean.code -> "한번만"
+    HoneyLanguage.Russian.code -> "Только раз"
+    HoneyLanguage.TraditionalChinese.code -> "只有一次"
+    else -> ""
+  }
+
+  @JvmField
   val priceTypeTitle = when (currentLanguage) {
     HoneyLanguage.English.code -> "Price Type"
     HoneyLanguage.Chinese.code -> "价格类型"

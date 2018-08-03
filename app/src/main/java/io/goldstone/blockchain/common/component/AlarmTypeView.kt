@@ -21,70 +21,63 @@ import org.jetbrains.anko.wrapContent
  * @author wcx
  */
 class AlarmTypeView(context: Context) : LinearLayout(context) {
-  val alarmTypeTitleTextView = TextView(context)
-  val repeatingRadioCell = BaseRadioCell(context)
-  val oneTimeRadioCell = BaseRadioCell(context)
-  var alarmType = 0
+  private val alarmTypeTitleCell = TopBottomLineCell(context)
+  private val repeatingCell = BaseRadioCell(context)
+  private val oneTimeCell = BaseRadioCell(context)
+  private var alarmType = 0
 
   init {
-    val layoutParamsAll = RelativeLayout.LayoutParams(
+    layoutParams = LinearLayout.LayoutParams(
       matchParent,
-      wrapContent)
-    layoutParamsAll.setMargins(
-      0,
-      20.uiPX(),
-      0,
-      20.uiPX())
-    layoutParams = layoutParamsAll
-    orientation = LinearLayout.VERTICAL
-
-    alarmTypeTitleTextView.apply {
-      text = AlarmClockText.alarmTypeTitle
-      val alarmTypeTitleLayoutParams = RelativeLayout.LayoutParams(
-        matchParent,
-        matchParent)
-      alarmTypeTitleLayoutParams.setMargins(
-        20.uiPX(),
+      wrapContent).apply {
+      setMargins(
         0,
         20.uiPX(),
-        0)
-      this.layoutParams = alarmTypeTitleLayoutParams
-    }.into(this)
-
-    View(context).apply {
-      val lineLayoutParams = RelativeLayout.LayoutParams(
-        matchParent,
-        1.uiPX())
-      lineLayoutParams.setMargins(
-        20.uiPX(),
-        20.uiPX(),
-        20.uiPX(),
+        0,
         20.uiPX())
-      this.layoutParams = lineLayoutParams
-      backgroundColor = Color.BLACK
+    }
+    orientation = LinearLayout.VERTICAL
+
+    alarmTypeTitleCell.apply {
+      layoutParams = LinearLayout.LayoutParams(
+        matchParent,
+        wrapContent).apply {
+        setMargins(
+          20.uiPX(),
+          0,
+          20.uiPX(),
+          20.uiPX()
+        )
+      }
+      setTitle(AlarmClockText.alarmTypeTitle)
     }.into(this)
 
     // 永久闹铃
-    repeatingRadioCell.apply {
-      setTitle("Alarm Repeating")
+    repeatingCell.apply {
+      setTitle(AlarmClockText.alarmRepeatingType)
       setSwitchStatusBy(true)
       onClick {
         alarmType = 1
-        repeatingRadioCell.setSwitchStatusBy(true)
-        oneTimeRadioCell.setSwitchStatusBy(false)
+        repeatingCell.setSwitchStatusBy(true)
+        oneTimeCell.setSwitchStatusBy(false)
       }
     }
-    repeatingRadioCell.into(this)
+    repeatingCell.into(this)
 
     // 一次闹铃
-    oneTimeRadioCell.apply {
-      setTitle("Only One Time")
+    oneTimeCell.apply {
+      setTitle(AlarmClockText.alarmOnlyOneTimeType)
       onClick {
         alarmType = 0
-        oneTimeRadioCell.setSwitchStatusBy(true)
-        repeatingRadioCell.setSwitchStatusBy(false)
+        oneTimeCell.setSwitchStatusBy(true)
+        repeatingCell.setSwitchStatusBy(false)
       }
     }
-    oneTimeRadioCell.into(this)
+    oneTimeCell.into(this)
+  }
+
+
+  fun getAlarmType(): Int {
+    return alarmType
   }
 }
