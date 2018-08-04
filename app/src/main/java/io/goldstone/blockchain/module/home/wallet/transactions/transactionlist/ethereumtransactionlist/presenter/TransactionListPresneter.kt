@@ -4,14 +4,12 @@ import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -26,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.support.v4.onUiThread
 
 /**
  * @date 24/03/2018 2:12 PM
@@ -65,6 +64,7 @@ class TransactionListPresenter(
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
 			checkAddressNameInContacts(it) {
+				it.insertToMyTokenTableIfHasValue()
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
 				// Save a copy into memory for imporving the speed of next time to view
 				memoryTransactionListData = it
@@ -75,9 +75,41 @@ class TransactionListPresenter(
 							hasUpdate = true
 							initData()
 						}
-						removeLoadingView()
+						onUiThread { removeLoadingView() }
 					}
 				}
+			}
+		}
+	}
+	
+	private fun ArrayList<TransactionListModel>.insertToMyTokenTableIfHasValue() {
+		MyTokenTable.getMyTokens { myTokens ->
+			distinctBy { it.contract }.filterNot {
+				myTokens.any { token ->
+					token.contract.equals(it.contract, true)
+				} || it.contract.isEmpty() || it.symbol.isEmpty()
+			}.apply {
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = size
+					override fun concurrentJobs() {
+						forEach {
+							MyTokenTable.insertBySymbolAndContract(
+								it.symbol,
+								it.contract,
+								Config.getCurrentChain()
+							) {
+								completeMark()
+							}
+						}
+					}
+					
+					override fun mergeCallBack() {
+						fragment.getMainActivity()
+							?.getWalletDetailFragment()
+							?.presenter
+							?.updateData()
+					}
+				}.start()
 			}
 		}
 	}
@@ -93,13 +125,14 @@ class TransactionListPresenter(
 			currentBlockNumber,
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
-				fragment.context
-					?.alert("${AlertText.getTransactionErrorPrefix} ${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}")
+				fragment.context.alert(
+					"${AlertText.getTransactionErrorPrefix} " +
+					"${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}"
+				)
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
-			}
-		) {
-			callback(it)
-		}
+			},
+			callback
+		)
 	}
 	
 	companion object {
@@ -327,10 +360,7 @@ class TransactionListPresenter(
 						override var asyncCount: Int = size
 						override fun concurrentJobs() {
 							forEach {
-								GoldStoneDataBase
-									.database
-									.transactionDao()
-									.insert(it)
+								GoldStoneDataBase.database.transactionDao().insert(it)
 								completeMark()
 							}
 						}

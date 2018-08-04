@@ -5,15 +5,14 @@ import android.content.Context
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
-import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.alert
@@ -86,23 +85,6 @@ data class WalletTable(
 				}
 				
 				symbol.equals(CryptoSymbol.etc, true) ->
-					Config.getCurrentETCAddress()
-				else ->
-					Config.getCurrentEthereumAddress()
-			}
-		}
-		
-		fun getAddressByContract(contract: String): String {
-			return when {
-				contract.equals(CryptoValue.btcContract, true) -> {
-					if (Config.isTestEnvironment()) {
-						Config.getCurrentBTCTestAddress()
-					} else {
-						Config.getCurrentBTCAddress()
-					}
-				}
-				
-				contract.equals(CryptoValue.etcContract, true) ->
 					Config.getCurrentETCAddress()
 				else ->
 					Config.getCurrentEthereumAddress()
@@ -209,32 +191,6 @@ data class WalletTable(
 			}
 		}
 		
-		fun getBTCPrivateKey(address: String, isTest: Boolean, hold: (String) -> Unit) {
-			WalletTable.getCurrentWallet {
-				val addresses = if (isTest) btcTestAddresses else btcAddresses
-				// 解析当前地址的 `Address Index`
-				val addressIndex = if (addresses.contains(",")) {
-					addresses.split(",").find {
-						it.contains(address)
-					}?.substringAfter("|")?.toInt()
-				} else {
-					addresses.substringAfter("|").toInt()
-				}
-				val path = if (isTest) btcTestPath else btcPath
-				// 生成对应的 `Path`
-				val targetPath = path.substringBeforeLast("/") + "/" + addressIndex
-				val mnemonicCode = JavaKeystoreUtil().decryptData(encryptMnemonic!!)
-				// 获取该 `Address` 的 `PrivateKey`
-				try {
-					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonicCode, targetPath) { _, secret ->
-						hold(secret)
-					}
-				} catch (error: Exception) {
-					LogUtil.error("getBTCPrivateKey", error)
-				}
-			}
-		}
-		
 		fun getCurrentAddresses(hold: (List<String>) -> Unit) {
 			WalletTable.getCurrentWallet {
 				listOf(
@@ -284,19 +240,6 @@ data class WalletTable(
 		fun getWalletType(hold: (WalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				getTargetWalletType(this, hold)
-			}
-		}
-		
-		fun getWalletSubtitleByType(hold: (subtitle: String) -> Unit) {
-			WalletTable.getCurrentWallet {
-				WalletTable.getWalletType { type ->
-					when (type) {
-						WalletType.ETHERCAndETCOnly -> hold(currentETHAndERCAddress)
-						WalletType.BTCOnly -> hold(currentBTCAddress)
-						WalletType.BTCTestOnly -> hold(currentBTCTestAddress)
-						WalletType.MultiChain -> hold(WalletText.multiChainWallet)
-					}
-				}
 			}
 		}
 		
@@ -372,16 +315,7 @@ data class WalletTable(
 			}
 		}
 		
-		fun getCurrentWalletETHAndERCAddress(hold: String.() -> Unit) {
-			WalletTable.getCurrentWallet {
-				hold(currentETHAndERCAddress)
-			}
-		}
-		
-		fun updateName(
-			newName: String,
-			callback: () -> Unit
-		) {
+		fun updateName(newName: String, callback: () -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {

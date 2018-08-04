@@ -181,7 +181,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				setTitle(PrepareTransferText.changeAddress)
 				setSubtitle(CryptoUtils.scaleTo16(changeAddress))
 				showArrow()
-				addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.green, RippleMode.Square)
+				addTouchRippleAnimation(
+					GrayScale.whiteGray,
+					Spectrum.green,
+					RippleMode.Square,
+					CornerSize.cell.toFloat()
+				)
 			}.click {
 				showCustomChangeAddressOverlay()
 			}.into(this)

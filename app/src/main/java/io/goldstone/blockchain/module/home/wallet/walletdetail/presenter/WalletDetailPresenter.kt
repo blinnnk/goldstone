@@ -116,7 +116,9 @@ class WalletDetailPresenter(
 	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
 	override fun onFragmentResume() {
-		updateData()
+		if (!fragment.asyncData.isNullOrEmpty()) {
+			updateData()
+		}
 		showPinCodeFragment()
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
@@ -236,22 +238,21 @@ class WalletDetailPresenter(
 	
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
 		if (data.isNotEmpty()) {
-			try {
-				load {
-					/** 先按照资产情况排序, 资产为零的按照权重排序 */
-					val currencyList = data.filter { it.currency > 0.0 }
-					val weightList = data.filter { it.currency == 0.0 }
-					currencyList.sortedByDescending {
-						it.currency
-					}.plus(weightList.sortedByDescending {
-						it.weight
-					}).toArrayList()
-				} then {
-					diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-					fragment.updateHeaderValue()
-				}
-			} catch (error: Exception) {
-				LogUtil.error("updateUIByData", error)
+			load {
+				/** 先按照资产情况排序, 资产为零的按照权重排序 */
+				val hasPrice =
+					data.filter { it.price * it.count != 0.0 }
+						.sortedByDescending { it.count * it.price }
+				val hasBalance =
+					data.filter { it.count != 0.0 && it.price == 0.0 }
+						.sortedByDescending { it.count }
+				val others =
+					data.filter { it.count == 0.0 }
+						.sortedByDescending { it.weight }
+				hasPrice.plus(hasBalance).plus(others).toArrayList()
+			} then {
+				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+				fragment.updateHeaderValue()
 			}
 		} else {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())

@@ -9,6 +9,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.value.AvatarSize
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
@@ -24,7 +25,6 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 	
 	val walletInfo = TwoLineTitles(context)
 	val avatarImage = ImageView(context)
-	private val avatarSize = 75.uiPX()
 	
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
@@ -33,11 +33,11 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 		gravity = Gravity.CENTER_VERTICAL
 		
 		verticalLayout {
-			addCorner(avatarSize, Spectrum.white)
+			addCorner(AvatarSize.big, Spectrum.white)
 			gravity = Gravity.START
 			lparams {
-				width = avatarSize
-				height = avatarSize
+				width = AvatarSize.big
+				height = AvatarSize.big
 				margin = 10.uiPX()
 				elevation = 10.uiPX().toFloat()
 			}

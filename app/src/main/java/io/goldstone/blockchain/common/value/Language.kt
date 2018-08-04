@@ -719,12 +719,72 @@ object WalletText {
 	}
 	@JvmField
 	val multiChainWallet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "this is multi-chain wallet"
-		HoneyLanguage.Chinese.code -> "this is multi-chain wallet"
-		HoneyLanguage.Japanese.code -> "this is multi-chain wallet"
-		HoneyLanguage.Korean.code -> "this is multi-chain wallet"
-		HoneyLanguage.Russian.code -> "this is multi-chain wallet"
-		HoneyLanguage.TraditionalChinese.code -> "this is multi-chain wallet"
+		HoneyLanguage.English.code -> "this is a multi-chain wallet"
+		HoneyLanguage.Chinese.code -> "this is a multi-chain wallet"
+		HoneyLanguage.Japanese.code -> "this is a multi-chain wallet"
+		HoneyLanguage.Korean.code -> "this is a multi-chain wallet"
+		HoneyLanguage.Russian.code -> "this is a multi-chain wallet"
+		HoneyLanguage.TraditionalChinese.code -> "this is a multi-chain wallet"
+		else -> ""
+	}
+	@JvmField
+	val multiChain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "MULTI-CHAIN"
+		HoneyLanguage.Chinese.code -> "MULTI-CHAIN"
+		HoneyLanguage.Japanese.code -> "MULTI-CHAIN"
+		HoneyLanguage.Korean.code -> "MULTI-CHAIN"
+		HoneyLanguage.Russian.code -> "MULTI-CHAIN"
+		HoneyLanguage.TraditionalChinese.code -> "MULTI-CHAIN"
+		else -> ""
+	}
+	@JvmField
+	val ethERCAndETC = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.Chinese.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.Japanese.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.Korean.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.Russian.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.TraditionalChinese.code -> "ETH/ERC20/ETC"
+		else -> ""
+	}
+	@JvmField
+	val btcMainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BITCOIN MAINNET"
+		HoneyLanguage.Chinese.code -> "BITCOIN MAINNET"
+		HoneyLanguage.Japanese.code -> "BITCOIN MAINNET"
+		HoneyLanguage.Korean.code -> "BITCOIN MAINNET"
+		HoneyLanguage.Russian.code -> "BITCOIN MAINNET"
+		HoneyLanguage.TraditionalChinese.code -> "BITCOIN MAINNET"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinTestnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Chinese.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Japanese.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Korean.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Russian.code -> "BITCOIN TESTNET"
+		HoneyLanguage.TraditionalChinese.code -> "BITCOIN TESTNET"
+		else -> ""
+	}
+	@JvmField
+	val watchOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WATCH ONLY"
+		HoneyLanguage.Chinese.code -> "WATCH ONLY"
+		HoneyLanguage.Japanese.code -> "WATCH ONLY"
+		HoneyLanguage.Korean.code -> "WATCH ONLY"
+		HoneyLanguage.Russian.code -> "WATCH ONLY"
+		HoneyLanguage.TraditionalChinese.code -> "WATCH ONLY"
+		else -> ""
+	}
+	@JvmField
+	val baseBip44 = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WALLET BASE BIP44"
+		HoneyLanguage.Chinese.code -> "WALLET BASE BIP44"
+		HoneyLanguage.Japanese.code -> "WALLET BASE BIP44"
+		HoneyLanguage.Korean.code -> "WALLET BASE BIP44"
+		HoneyLanguage.Russian.code -> "WALLET BASE BIP44"
+		HoneyLanguage.TraditionalChinese.code -> "WALLET BASE BIP44"
 		else -> ""
 	}
 	@JvmField

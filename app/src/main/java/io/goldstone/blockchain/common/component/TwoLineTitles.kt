@@ -135,6 +135,4 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		title.textSize = fontSize(18)
 		subtitle.textColor = Spectrum.opacity3White
 	}
-	
-	fun getSubtitleValue() = subtitle.text.toString()
 }

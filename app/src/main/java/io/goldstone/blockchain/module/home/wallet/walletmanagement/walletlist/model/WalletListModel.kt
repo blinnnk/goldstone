@@ -16,7 +16,6 @@ data class WalletListModel(
 	var address: String = "",
 	var subtitle: String = "",
 	var balance: Double = 0.0,
-	var avatar: Int = 0,
 	var isWatchOnly: Boolean = false,
 	var isUsing: Boolean = false
 ) {
@@ -27,8 +26,6 @@ data class WalletListModel(
 		showSubtitleByType(data, true),
 		showSubtitleByType(data, false),
 		balance,
-		//修改
-		data.id,
 		data.isWatchOnly,
 		data.isUsing
 	)

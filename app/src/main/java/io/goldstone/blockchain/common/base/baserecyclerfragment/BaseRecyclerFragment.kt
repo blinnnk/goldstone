@@ -131,6 +131,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		presenter.onFragmentAttach()
 	}
 	
+	override fun onStart() {
+		super.onStart()
+		presenter.onFragmentStart()
+	}
+	
 	override fun onDetach() {
 		super.onDetach()
 		presenter.onFragmentDetach()

@@ -180,7 +180,7 @@ data class MyTokenTable(
 			symbol: String,
 			contract: String,
 			chainID: String,
-			callback: () -> Unit
+			callback: () -> Unit = {}
 		) {
 			WalletTable.getCurrentWallet {
 				doAsync {
@@ -349,7 +349,7 @@ interface MyTokenDao {
 		btcChain: String = Config.getBTCCurrentChain()
 	): MyTokenTable?
 	
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
 		ercChain: String = Config.getCurrentChain(),

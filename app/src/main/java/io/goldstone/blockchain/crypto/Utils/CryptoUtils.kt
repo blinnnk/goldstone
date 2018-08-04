@@ -46,7 +46,7 @@ object CryptoUtils {
 	}
 	
 	fun formatDouble(value: Double): Double {
-		return DecimalFormat("0.000000").format(value).toDouble()
+		return DecimalFormat("0.000000000").format(value).toDouble()
 	}
 	
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
@@ -190,7 +190,7 @@ fun Double.formatCurrency(): String {
 	return prefix + formatEditor.format(this * rate)
 }
 
-fun Double.formatCount(count: Int = 6): String {
+fun Double.formatCount(count: Int = 9): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
 	val value = formatEditor.format(this).toDouble()
@@ -202,7 +202,6 @@ fun Int.daysAgoInMills(): Long =
 	CryptoUtils.getTargetDayInMills(-this)
 
 fun Double.toGwei() = (this / 1000000000.0).toLong()
-fun Double.toEtherFromGwei() = (this / 1000000000.0).toBigDecimal().toString()
 fun Long.scaleToGwei() = this * 1000000000
 
 /**

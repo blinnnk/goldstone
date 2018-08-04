@@ -275,10 +275,7 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun updateTokenName(
-			contract: String,
-			name: String
-		) {
+		fun updateTokenName(contract: String, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {

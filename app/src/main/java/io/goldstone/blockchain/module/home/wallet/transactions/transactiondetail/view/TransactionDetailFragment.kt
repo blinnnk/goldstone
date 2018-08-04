@@ -27,13 +27,12 @@ class TransactionDetailFragment :
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionDetailModel>?
 	) {
-		recyclerView.adapter =
-			TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
+		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
 				if (
 					model.description.equals(CommonText.from, true)
 					|| model.description.equals(CommonText.to, true)
 				) {
-					presenter.showAddContactsButton(this@cell)
+					presenter.showAddContactsButton(this)
 				}
 				
 				onClick {

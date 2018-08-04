@@ -47,7 +47,13 @@ class SplashPresenter(val activity: SplashActivity) {
 							}
 						}
 						
-						WalletType.MultiChain -> cacheWalletData()
+						WalletType.MultiChain -> {
+							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+								cacheWalletData()
+							} else NodeSelectionPresenter.setAllMainnet {
+								cacheWalletData()
+							}
+						}
 					}
 				}
 			}

@@ -19,7 +19,6 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.*
@@ -93,7 +92,8 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			if (headerModel.isReceive) TransactionText.transferResultReceived
 			else TransactionText.transferResultSent
 		info.title.text =
-			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
+			"$type ${headerModel.count.toBigDecimal().toPlainString()} " +
+			"${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address
 		

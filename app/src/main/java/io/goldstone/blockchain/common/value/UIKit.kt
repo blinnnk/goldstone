@@ -69,8 +69,16 @@ object Spectrum {
 	val opacity2White = Color.parseColor("#33FFFFFF")
 	@JvmField
 	val opacity5White = Color.parseColor("#80FFFFFF")
-	@JvmField
-	val opacity8White = Color.parseColor("#CCFFFFFF")
+}
+
+object WalletColor {
+	private val purple = Color.parseColor("#FF3F4E92")
+	private val blue = Color.parseColor("#FF2A7EDA")
+	private val cyan = Color.parseColor("#FF1BA2A9")
+	private val darkPuple = Color.parseColor("#FF603361")
+	private val grayYellow = Color.parseColor("#FF717335")
+	private val blueGray = Color.parseColor("#FF4B5C6E")
+	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPuple, grayYellow, blueGray)
 }
 
 object ShadowSize {
@@ -78,6 +86,8 @@ object ShadowSize {
 	val Header = 3.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
+	@JvmField
+	val default = 10.uiPX().toFloat()
 }
 
 object PaddingSize {
@@ -134,6 +144,13 @@ object HomeSize {
 	val sliderHeaderHeight = 65.uiPX()
 	@JvmField
 	val headerHeight = 65.uiPX()
+}
+
+object AvatarSize {
+	@JvmField
+	val big = 75.uiPX()
+	@JvmField
+	val middle = 60.uiPX()
 }
 
 object TokenDetailSize {
