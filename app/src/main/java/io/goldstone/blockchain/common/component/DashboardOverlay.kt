@@ -62,7 +62,7 @@ open class DashboardOverlay(
 		}
 	}
 	
-	fun removeSelf() {
+	private fun removeSelf() {
 		(parent as? ViewGroup)?.removeView(this)
 	}
 }

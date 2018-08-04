@@ -221,7 +221,7 @@ private fun TransactionDetailPresenter.getTransactionFromChain() {
 			fragment.asyncData?.clear()
 			val data = generateModels(it)
 			fragment.asyncData?.addAll(generateModels(it))
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, data.size)
+			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 		}
 		// 成功获取数据后在异步线程更新数据库记录
 		updateDataInDatabase(it.blockNumber)

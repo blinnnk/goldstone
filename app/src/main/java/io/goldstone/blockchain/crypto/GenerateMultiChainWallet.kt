@@ -35,12 +35,24 @@ object GenerateMultiChainWallet {
 					mnemonic,
 					path.btcPath
 				) { btcAddress, secret ->
-					context.storeBase58PrivateKey(secret, btcAddress, password, false)
+					context.storeBase58PrivateKey(
+						secret,
+						btcAddress,
+						password,
+						false,
+						false
+					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
 					) { btcTestAddress, testSecret ->
-						context.storeBase58PrivateKey(testSecret, btcTestAddress, password, true)
+						context.storeBase58PrivateKey(
+							testSecret,
+							btcTestAddress,
+							password,
+							true,
+							false
+						)
 						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress), mnemonic)
 					}
 				}
@@ -70,13 +82,25 @@ object GenerateMultiChainWallet {
 					path.btcPath
 				) { btcAddress, base58Privatekey ->
 					// 存入 `Btc PrivateKey` 到 `KeyStore`
-					context.storeBase58PrivateKey(base58Privatekey, btcAddress, password, false)
+					context.storeBase58PrivateKey(
+						base58Privatekey,
+						btcAddress,
+						password,
+						false,
+						false
+					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
 					) { btcTestAddress, btcTestBase58Privatekey ->
 						// 存入 `BtcTest PrivateKey` 到 `KeyStore`
-						context.storeBase58PrivateKey(btcTestBase58Privatekey, btcTestAddress, password, true)
+						context.storeBase58PrivateKey(
+							btcTestBase58Privatekey,
+							btcTestAddress,
+							password,
+							true,
+							false
+						)
 						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress))
 					}
 				}

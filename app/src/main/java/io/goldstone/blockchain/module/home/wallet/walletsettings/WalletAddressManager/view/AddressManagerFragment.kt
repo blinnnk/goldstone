@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
 
+import android.content.Context
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -17,7 +19,6 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -105,6 +106,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout parent@{
+				gravity = Gravity.CENTER_HORIZONTAL
 				lparams {
 					width = matchParent
 					height = matchParent
@@ -167,8 +169,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick {
-								AddressManagerFragment.verifyPassword(this@getParentFragment) {
-									createChildAddressByButtonTitle(title, it)
+								this@getParentFragment.context?.apply {
+									AddressManagerFragment.verifyMultiChainWalletPassword(this) {
+										createChildAddressByButtonTitle(title, it)
+									}
 								}
 								cell.preventDuplicateClicks()
 							}
@@ -184,27 +188,29 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	}
 	
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
-		when (title) {
-			WalletSettingsText.newETHAndERCAddress -> {
-				AddressManagerPresneter.createETHAndERCAddress(context, password) {
-					ethAndERCAddressesView.model = it
-				}
-			}
-			
-			WalletSettingsText.newETCAddress -> {
-				AddressManagerPresneter.createETCAddress(context, password) {
-					etcAddressesView.model = it
-				}
-			}
-			
-			WalletSettingsText.newBTCAddress -> {
-				if (Config.isTestEnvironment()) {
-					AddressManagerPresneter.createBTCTestAddress(context, password) {
-						btcAddressesView.model = it
+		context?.apply {
+			when (title) {
+				WalletSettingsText.newETHAndERCAddress -> {
+					AddressManagerPresneter.createETHAndERCAddress(this, password) {
+						ethAndERCAddressesView.model = it
 					}
-				} else {
-					AddressManagerPresneter.createBTCAddress(context, password) {
-						btcAddressesView.model = it
+				}
+				
+				WalletSettingsText.newETCAddress -> {
+					AddressManagerPresneter.createETCAddress(this, password) {
+						etcAddressesView.model = it
+					}
+				}
+				
+				WalletSettingsText.newBTCAddress -> {
+					if (Config.isTestEnvironment()) {
+						AddressManagerPresneter.createBTCTestAddress(this, password) {
+							btcAddressesView.model = it
+						}
+					} else {
+						AddressManagerPresneter.createBTCAddress(this, password) {
+							btcAddressesView.model = it
+						}
 					}
 				}
 			}
@@ -240,7 +246,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						}
 					}
 					toast(CommonText.succeed)
-					AddressManagerFragment.removeDashboard(this)
+					AddressManagerFragment.removeDashboard(context)
 				}
 			},
 			qrCellClickEvent = { presenter.showQRCodeFragment(address) },
@@ -266,30 +272,31 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	
 	override fun onDestroyView() {
 		super.onDestroyView()
-		removeDashboard(this)
+		removeDashboard(context)
 	}
 	
 	companion object {
-		fun verifyPassword(
-			fragment: Fragment,
+		fun verifyMultiChainWalletPassword(
+			context: Context,
 			callback: (password: String) -> Unit
 		) {
-			fragment.context?.showAlertView(
+			context.showAlertView(
 				WalletSettingsText.deleteInfoTitle,
 				WalletSettingsText.deleteInfoSubtitle,
 				!Config.getCurrentIsWatchOnlyOrNot()
 			) {
 				val password = it?.text.toString()
-				// 多链钱包所有地址的 `Keystore` 密码都一样, 创建子账号前验证密码.
-				fragment.context?.verifyKeystorePassword(password, CryptoValue.keystoreFilename) {
-					if (it) {
-						callback(password)
-					} else {
-						fragment.context.alert(CommonText.wrongPassword)
-					}
+				context.verifyKeystorePassword(
+					password,
+					Config.getCurrentBTCAddress(),
+					true,
+					false
+				) {
+					if (it) callback(password)
+					else context.alert(CommonText.wrongPassword)
 				}
 			}
-			AddressManagerFragment.removeDashboard(fragment)
+			AddressManagerFragment.removeDashboard(context)
 		}
 		
 		fun showMoreDashboard(
@@ -331,8 +338,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 		
-		fun removeDashboard(fragment: Fragment) {
-			fragment.getMainActivity()?.getMainContainer()?.apply {
+		fun removeDashboard(context: Context?) {
+			(context as? MainActivity)?.getMainContainer()?.apply {
 				findViewById<MiniOverlay>(ElementID.miniOverlay)?.removeSelf()
 			}
 		}

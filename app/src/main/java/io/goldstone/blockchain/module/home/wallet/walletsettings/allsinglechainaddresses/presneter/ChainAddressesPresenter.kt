@@ -58,7 +58,7 @@ class ChainAddressesPresenter(
 					// 更新钱包默认地址, 同时更新首页的数据
 					updateWalletDetail()
 					updateData()
-					AddressManagerFragment.removeDashboard(fragment)
+					AddressManagerFragment.removeDashboard(fragment.context)
 					updateDefaultStyle(coinType)
 					fragment.toast(CommonText.succeed)
 				}
@@ -79,27 +79,29 @@ class ChainAddressesPresenter(
 	fun updateAddAddressEvent() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
-				AddressManagerFragment.verifyPassword(this) {
-					when (fragment.coinType) {
-						ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(context, it) {
-							updateAddressManagerDataBy(ChainType.ETH.id, it)
-							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
-						}
-						ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(context, it) {
-							updateAddressManagerDataBy(ChainType.ETC.id, it)
-							diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
-						}
-						
-						ChainType.BTC.id -> {
-							if (Config.isTestEnvironment()) {
-								AddressManagerPresneter.createBTCTestAddress(context, it) {
-									updateAddressManagerDataBy(ChainType.BTCTest.id, it)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
-								}
-							} else {
-								AddressManagerPresneter.createBTCAddress(context, it) {
-									updateAddressManagerDataBy(ChainType.BTC.id, it)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+				context?.apply {
+					AddressManagerFragment.verifyMultiChainWalletPassword(this) {
+						when (fragment.coinType) {
+							ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(this, it) {
+								updateAddressManagerDataBy(ChainType.ETH.id, it)
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+							}
+							ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(this, it) {
+								updateAddressManagerDataBy(ChainType.ETC.id, it)
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+							}
+							
+							ChainType.BTC.id -> {
+								if (Config.isTestEnvironment()) {
+									AddressManagerPresneter.createBTCTestAddress(this, it) {
+										updateAddressManagerDataBy(ChainType.BTCTest.id, it)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+									}
+								} else {
+									AddressManagerPresneter.createBTCAddress(this, it) {
+										updateAddressManagerDataBy(ChainType.BTC.id, it)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+									}
 								}
 							}
 						}
@@ -149,7 +151,7 @@ class ChainAddressesPresenter(
 	}
 	
 	private fun showQRCode(address: String) {
-		AddressManagerFragment.removeDashboard(fragment)
+		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
 			presenter.showTargetFragment<QRCodeFragment>(
 				WalletText.showQRCode,
@@ -160,7 +162,7 @@ class ChainAddressesPresenter(
 	}
 	
 	private fun showPrivateKeyExportFragment(address: String, isBTC: Boolean) {
-		AddressManagerFragment.removeDashboard(fragment)
+		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
 			presenter.showTargetFragment<PrivateKeyExportFragment>(
 				WalletSettingsText.exportPrivateKey,
@@ -174,7 +176,7 @@ class ChainAddressesPresenter(
 	}
 	
 	private fun showKeystoreExportFragment(address: String) {
-		AddressManagerFragment.removeDashboard(fragment)
+		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
 			presenter.showTargetFragment<KeystoreExportFragment>(
 				WalletSettingsText.exportKeystore,

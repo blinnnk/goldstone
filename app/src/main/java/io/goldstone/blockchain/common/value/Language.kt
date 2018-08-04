@@ -1102,6 +1102,36 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val wrongChainID = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wrong Chain ID"
+		HoneyLanguage.Chinese.code -> "Wrong Chain ID"
+		HoneyLanguage.Japanese.code -> "Wrong Chain ID"
+		HoneyLanguage.Korean.code -> "Wrong Chain ID"
+		HoneyLanguage.Russian.code -> "Wrong Chain ID"
+		HoneyLanguage.TraditionalChinese.code -> "Wrong Chain ID"
+		else -> ""
+	}
+	@JvmField
+	val wrongCoin = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This QRCode is not same with current token"
+		HoneyLanguage.Chinese.code -> "This QRCode is not same with current token"
+		HoneyLanguage.Japanese.code -> "This QRCode is not same with current token"
+		HoneyLanguage.Korean.code -> "This QRCode is not same with current token"
+		HoneyLanguage.Russian.code -> "This QRCode is not same with current token"
+		HoneyLanguage.TraditionalChinese.code -> "This QRCode is not same with current token"
+		else -> ""
+	}
+	@JvmField
+	val wrongQRCode = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wrong QR Code Value"
+		HoneyLanguage.Chinese.code -> "Wrong QR Code Value"
+		HoneyLanguage.Japanese.code -> "Wrong QR Code Value"
+		HoneyLanguage.Korean.code -> "Wrong QR Code Value"
+		HoneyLanguage.Russian.code -> "Wrong QR Code Value"
+		HoneyLanguage.TraditionalChinese.code -> "Wrong QR Code Value"
+		else -> ""
+	}
+	@JvmField
 	val succeed = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Success"
 		HoneyLanguage.Chinese.code -> "成功"

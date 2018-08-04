@@ -174,7 +174,7 @@ class QuotationPresenter(
 			}
 		} then {
 			it?.let {
-				recyclerView.adapter.notifyDataSetChanged()
+				recyclerView.adapter?.notifyDataSetChanged()
 			}
 		}
 	}

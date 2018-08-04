@@ -85,13 +85,13 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 15.uiPX()
 				}
-			}.click {
-				it.showLoadingStatus()
-				presenter.getKeystoreByAddress(passwordInput) {
-					if (!isNullOrBlank()) {
-						privateKeyTextView.text = this
+			}.click { button ->
+				button.showLoadingStatus()
+				presenter.getKeystoreJson(passwordInput.text.toString()) {
+					if (!it.isNullOrBlank()) {
+						privateKeyTextView.text = it
 					}
-					it.showLoadingStatus(false)
+					button.showLoadingStatus(false)
 				}
 			}.into(this)
 		}

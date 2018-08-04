@@ -140,7 +140,7 @@ class ProfilePresenter(
 				}
 				fragment.asyncData?.apply {
 					last().info = version
-					fragment.recyclerView.adapter.notifyItemChanged(lastIndex)
+					fragment.recyclerView.adapter?.notifyItemChanged(lastIndex)
 				}
 			}
 		}

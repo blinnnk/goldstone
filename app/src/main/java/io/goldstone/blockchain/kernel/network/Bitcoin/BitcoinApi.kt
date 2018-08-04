@@ -60,6 +60,7 @@ object BitcoinApi {
 			"unspent_outputs",
 			false,
 			{
+				hold(listOf())
 				LogUtil.error("getRawtxByHash", it)
 			}
 		) {

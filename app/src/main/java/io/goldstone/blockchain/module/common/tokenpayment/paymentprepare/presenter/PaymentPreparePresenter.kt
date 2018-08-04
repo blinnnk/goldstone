@@ -45,12 +45,19 @@ class PaymentPreparePresenter(
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
-			fragment.context?.alert(AlertText.emptyTransferValue)
+			fragment.context.alert(AlertText.emptyTransferValue)
 			callback()
 		} else {
 			fragment.toast(LoadingText.calculateGas)
 			if (getToken()?.symbol.equals(CryptoSymbol.btc, true)) {
-				prepareBTCPaymentModel(count, fragment.getChangeAddress(), callback)
+				prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
+					if (!isSuccessful) {
+						fragment.context.alert(
+							"Something happened, Please check your balance is enough or else"
+						)
+					}
+					callback()
+				}
 			} else {
 				prepareETHERC20ETCPaymentModel(count, callback)
 			}

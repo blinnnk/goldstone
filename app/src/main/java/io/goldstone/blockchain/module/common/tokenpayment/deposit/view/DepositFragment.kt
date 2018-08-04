@@ -7,7 +7,9 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TokenDetailText
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -90,8 +92,21 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	}
 	
 	private fun setAddressText() {
-		WalletTable.getCurrentWalletETHAndERCAddress {
-			qrView.setAddressText(this)
+		WalletTable.getCurrentWallet {
+			getParentFragment<TokenDetailOverlayFragment> {
+				when {
+					token?.symbol.equals(CryptoSymbol.btc, true) -> {
+						if (Config.isTestEnvironment())
+							qrView.setAddressText(currentBTCTestAddress)
+						else
+							qrView.setAddressText(currentBTCAddress)
+					}
+					
+					token?.symbol.equals(CryptoSymbol.etc, true) ->
+						qrView.setAddressText(currentETCAddress)
+					else -> qrView.setAddressText(currentETHAndERCAddress)
+				}
+			}
 		}
 	}
 	

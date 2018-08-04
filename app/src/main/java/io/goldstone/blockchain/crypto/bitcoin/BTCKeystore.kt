@@ -2,16 +2,15 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.CryptoValue.singleChainFilename
 import io.goldstone.blockchain.crypto.getKeystoreFile
 import io.goldstone.blockchain.crypto.getPrivateKey
-import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
-import org.jetbrains.anko.runOnUiThread
 import java.io.File
 
 /**
@@ -26,10 +25,12 @@ fun Context.storeBase58PrivateKey(
 	base58PrivateKey: String,
 	fileName: String,
 	password: String,
-	isTestNet: Boolean
+	isTestNet: Boolean,
+	isSingleChainWallet: Boolean
 ) {
 	val net = if (isTestNet) TestNet3Params.get() else MainNetParams.get()
-	val keystoreFile by lazy { File(filesDir!!, fileName) }
+	val finalFilename = if (isSingleChainWallet) "$singleChainFilename$fileName" else fileName
+	val keystoreFile by lazy { File(filesDir!!, finalFilename) }
 	try {
 		/** Generate Keystore */
 		val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -42,81 +43,41 @@ fun Context.storeBase58PrivateKey(
 }
 
 fun Context.exportBase58PrivateKey(
-	fileName: String,
+	walletAddress: String,
 	password: String,
+	isSingleChainWallet: Boolean,
 	isTest: Boolean,
 	hold: (String?) -> Unit
 ) {
-	val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
-	val keystoreFile by lazy { File(filesDir!!, fileName) }
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	getPrivateKey(
-		keyStore.accounts[0].address.hex,
+		walletAddress,
 		password,
-		fileName,
+		true,
+		isSingleChainWallet,
 		{
 			hold(null)
 			LogUtil.error("exportBase58PrivateKey", it)
 		}
 	) {
+		val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
 		hold(ECKey.fromPrivate(it.toBigInteger(16)).getPrivateKeyAsWiF(net))
 	}
 }
 
 fun Context.exportBase58KeyStoreFile(
-	fileName: String,
+	walletAddress: String,
 	password: String,
+	isSingleChainWallet: Boolean,
 	hold: (String?) -> Unit
 ) {
-	val keystoreFile by lazy { File(filesDir!!, fileName) }
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	getKeystoreFile(
-		keyStore.accounts[0].address.hex,
+		walletAddress,
 		password,
-		fileName,
+		true,
+		isSingleChainWallet,
 		{
 			hold(null)
 		},
 		hold
 	)
-}
-
-fun Context.deleteBTCKeystoreAccount(
-	fileName: String,
-	password: String,
-	hold: (String?) -> Unit
-) {
-	val keystoreFile by lazy { File(filesDir!!, fileName) }
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	getKeystoreFile(
-		keyStore.accounts[0].address.hex,
-		password,
-		fileName,
-		{
-			hold(null)
-		},
-		hold
-	)
-}
-
-fun Context.getBase58PrivateKeyByKeystoreFile(
-	keystoreFile: String,
-	password: String,
-	isTest: Boolean,
-	errorCallback: (Throwable) -> Unit,
-	hold: (String) -> Unit
-) {
-	val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
-	WalletUtil.getKeyPairFromWalletFile(
-		keystoreFile,
-		password,
-		errorCallback
-	)?.let {
-		runOnUiThread {
-			hold(ECKey.fromPrivate(it.privateKey).getPrivateKeyAsWiF(net))
-		}
-	}
 }

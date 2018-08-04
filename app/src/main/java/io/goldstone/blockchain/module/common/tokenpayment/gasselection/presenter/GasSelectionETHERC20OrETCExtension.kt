@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -22,6 +23,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
@@ -132,23 +134,42 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易包括判断选择的交易燃气使用方式，以及生成签名并直接和链上交互.发起转账.
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
-private fun GasSelectionPresenter.getETHERC20OrETCAddress(): String {
-	return if (getToken()?.symbol.equals(CryptoSymbol.etc, true)) Config.getCurrentETCAddress()
-	else Config.getCurrentEthereumAddress()
+private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
+	if (getToken()?.symbol.equals(CryptoSymbol.etc, true))
+		Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress()
+
+private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
+	password: String,
+	hold: (String?) -> Unit
+) {
+	doAsync {
+		WalletTable.getWalletType {
+			val isSingleChainWallet = it != WalletType.MultiChain
+			// 获取当前账户的私钥
+			fragment.context?.getPrivateKey(
+				getETHERC20OrETCAddress(),
+				password,
+				false,
+				isSingleChainWallet,
+				{
+					hold(null)
+					fragment.showMaskView(false)
+				},
+				hold
+			)
+		}
+	}
 }
 
 fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 	doAsync {
-		// 获取当前账户的私钥
-		fragment.context?.getPrivateKey(
-			getETHERC20OrETCAddress(),
-			password,
-			CryptoValue.keystoreFilename,
-			{
+		getCurrentETHORETCPrivateKey(password) { privateKey ->
+			if (privateKey.isNullOrBlank()) {
+				// 当私钥为 `null` 的时候意味着获取私钥出错, 直接返回
 				callback()
-				fragment.showMaskView(false)
+				return@getCurrentETHORETCPrivateKey
 			}
-		) { privateKey ->
+			
 			prepareModel?.apply model@{
 				// 更新 `prepareModel`  的 `gasPrice` 的值
 				this.gasPrice = getSelectedGasPrice(currentMinerType)
@@ -165,7 +186,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 					else countWithDecimal
 					input = inputData.hexToByteArray().toList()
 				}
-				val signedHex = TransactionUtils.signTransaction(raw, privateKey)
+				val signedHex = TransactionUtils.signTransaction(raw, privateKey!!)
 				// 发起 `sendRawTransaction` 请求
 				GoldStoneEthCall.sendRawTransaction(
 					signedHex,

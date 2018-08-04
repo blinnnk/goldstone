@@ -80,6 +80,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			if (isBTC) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
 		gasPriceInput.setText(defaultPrice.toString())
 		gasPrice = defaultPrice
+		getGasSize()?.let { dataSize = it }
 	}
 	
 	private val currentValue: (
