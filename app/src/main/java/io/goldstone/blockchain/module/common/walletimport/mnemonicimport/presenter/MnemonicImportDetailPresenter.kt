@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
-import android.widget.EditText
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
@@ -24,55 +23,32 @@ class MnemonicImportDetailPresenter(
 	
 	fun importWalletByMnemonic(
 		multiChainPath: MultiChainPath,
-		mnemonicInput: EditText,
-		passwordInput: EditText,
-		repeatPasswordInput: EditText,
-		hintInput: EditText,
+		mnemonic: String,
+		password: String,
+		repeatPassword: String,
+		passwordHint: String,
 		isAgree: Boolean,
-		nameInput: EditText,
+		name: String,
 		callback: (Boolean) -> Unit
 	) {
-		if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback(false)
-			return
-		}
-		
-		if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback(false)
-			return
-		}
-		
-		if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback(false)
-			return
-		}
-		
-		if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback(false)
-			return
-		}
-		
-		mnemonicInput.text.isEmpty() isTrue {
+		mnemonic.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 			callback(false)
 			return
 		}
 		
+		if (!isValidPath(multiChainPath)) return
+		
 		CreateWalletPresenter.checkInputValue(
-			nameInput.text.toString(),
-			passwordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
+			name,
+			password,
+			repeatPassword,
 			isAgree,
 			fragment.context,
 			failedCallback = { callback(false) }
 		) { passwordValue, walletName ->
 			val mnemonicContent =
-				mnemonicInput
-					.text.toString()
+				mnemonic
 					.replaceWithPattern()
 					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
@@ -86,11 +62,27 @@ class MnemonicImportDetailPresenter(
 					multiChainPath,
 					passwordValue,
 					walletName,
-					hintInput.text?.toString(),
+					passwordHint,
 					callback
 				)
 			}
 		}
+	}
+	
+	private fun isValidPath(multiChainPath: MultiChainPath): Boolean {
+		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else true
 	}
 	
 	private fun importWallet(

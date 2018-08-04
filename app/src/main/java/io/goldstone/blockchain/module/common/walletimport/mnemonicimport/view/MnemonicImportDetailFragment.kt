@@ -121,12 +121,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[2],
 							defaultPath[3]
 						),
-						mnemonicInput,
-						passwordInput,
-						repeatPassword,
-						hintInput,
+						mnemonicInput.text.toString(),
+						passwordInput.text.toString(),
+						repeatPassword.text.toString(),
+						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
-						walletNameInput
+						walletNameInput.text.toString()
 					) { isScuccessful ->
 						it.showLoadingStatus(false)
 						if (isScuccessful) activity?.jump<SplashActivity>()
