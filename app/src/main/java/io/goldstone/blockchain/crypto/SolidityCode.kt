@@ -30,6 +30,7 @@ object CryptoValue {
 	// Bitcoin 转账前测算 `SignedSize` 需要用到私钥, 这里随便写一个紧用于提前预估 `SignedSize`
 	const val signedSecret = "cRKRm6mvfVrxDoStKhRETVZ91gcN13EBgCKhgCkVRw2DaWSByN94"
 	const val keystoreFilename = "keystore"
+	const val singleChainFilename = "singleChain"
 	// GoldStone 业务约定的值
 	const val ethContract = "0x60"
 	const val etcContract = "0x61"
@@ -37,6 +38,20 @@ object CryptoValue {
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
+	val singleChainFile: (btcAddress: String) -> String = {
+		singleChainFilename + it
+	}
+	val filename: (
+		walletAddress: String,
+		isBTCWallet: Boolean,
+		isSingleChainWallet: Boolean
+	) -> String = { walletAddress, isBTCWallet, isSingleChainWallet ->
+		when {
+			isBTCWallet && !isSingleChainWallet -> walletAddress
+			isSingleChainWallet -> CryptoValue.singleChainFile(walletAddress)
+			else -> CryptoValue.keystoreFilename
+		}
+	}
 	val chainID: (contract: String) -> String = {
 		when {
 			it.equals(CryptoValue.etcContract, true) -> Config.getETCCurrentChain()
@@ -85,6 +100,9 @@ object CryptoName {
 	const val eth = "Ethereum"
 	const val etc = "Ethereum Classic"
 	const val btc = "Bitcoin"
+	const val ltc = "Litecoin"
+	const val bch = "Bitcoin Cash"
+	val allChainName = listOf(etc.replace(" ", ""), eth, btc, ltc, bch.replace(" ", ""))
 }
 
 enum class ChainType(val id: Int) {

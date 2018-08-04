@@ -10,6 +10,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.CreateWalletText
@@ -67,13 +68,19 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 			}.click {
 				it.showLoadingStatus()
-				presenter.updatePassword(
-					oldPassword,
-					newPassword,
-					repeatPassword,
-					passwordHint
-				) {
-					it.showLoadingStatus(false)
+				presenter.verifyOldPassword(oldPassword.text.toString()) { isCorrectSecret ->
+					if (isCorrectSecret) presenter.updatePassword(
+						oldPassword.text.toString(),
+						newPassword.text.toString(),
+						repeatPassword.text.toString(),
+						passwordHint.text.toString()
+					) {
+						it.showLoadingStatus(false)
+					}
+					else {
+						context.alert(CommonText.wrongPassword)
+						it.showLoadingStatus(false)
+					}
 				}
 			}.into(this)
 		}

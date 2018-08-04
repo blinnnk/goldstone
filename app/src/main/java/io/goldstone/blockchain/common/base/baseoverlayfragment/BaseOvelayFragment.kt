@@ -194,7 +194,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 				is MainActivity -> {
 					supportFragmentManager.fragments.last()?.let { lastChild ->
 						if (lastChild is HomeFragment) {
-							lastChild.childFragmentManager.fragments?.last()?.let {
+							lastChild.childFragmentManager.fragments.last()?.let {
 								backEvent = if (it !is WalletDetailFragment) {
 									Runnable {
 										lastChild.presenter.showWalletDetailFragment()
@@ -214,9 +214,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 					}
 				}
 				
-				is SplashActivity -> {
-					backEvent = null
-				}
+				is SplashActivity -> backEvent = null
 			}
 		}
 	}

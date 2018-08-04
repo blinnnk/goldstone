@@ -51,16 +51,13 @@ class MnemonicConfirmationPresenter(
 		when (currentActivity) {
 			is MainActivity -> {
 				fragment.getParentFragment<WalletSettingsFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
-					}
+					presenter.removeSelfFromActivity()
+					currentActivity.showSucceedDialog()
 				}
 				
 				fragment.getParentFragment<WalletGenerationFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
-						fragment.activity?.jump<SplashActivity>()
-					}
+					presenter.removeSelfFromActivity()
+					fragment.activity?.jump<SplashActivity>()
 				}
 			}
 			
@@ -70,7 +67,7 @@ class MnemonicConfirmationPresenter(
 		}
 	}
 	
-	private fun Context.showSucceedDialog(callback: () -> Unit) {
+	private fun Context.showSucceedDialog() {
 		GoldStoneDialog.show(this) {
 			showOnlyConfirmButton {
 				GoldStoneDialog.remove(context)
@@ -78,7 +75,6 @@ class MnemonicConfirmationPresenter(
 			setImage(R.drawable.succeed_banner)
 			setContent(CommonText.succeed, DialogText.backUpMnemonicSucceed)
 		}
-		callback()
 	}
 	
 	override fun onFragmentShowFromHidden() {

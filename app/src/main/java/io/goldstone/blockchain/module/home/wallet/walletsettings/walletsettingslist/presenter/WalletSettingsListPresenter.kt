@@ -14,9 +14,9 @@ import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
+import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -90,7 +90,11 @@ class WalletSettingsListPresenter(
 			WalletSettingsText.deleteInfoSubtitle,
 			!Config.getCurrentIsWatchOnlyOrNot()
 		) {
-			fragment.deleteWalletData(it?.text.toString())
+			val password = it?.text.toString()
+			fragment.context?.verifyCurrentWalletKeyStorePassword(password) {
+				if (it) fragment.deleteWalletData(password)
+				else fragment.context.alert(CommonText.wrongPassword)
+			}
 		}
 	}
 	
@@ -112,22 +116,42 @@ class WalletSettingsListPresenter(
 								
 								override fun concurrentJobs() {
 									AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
-										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename, true) {
+										deleteRoutineWallet(
+											it.first,
+											password,
+											false,
+											true
+										) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
-										deleteRoutineWallet(it.first, password, CryptoValue.keystoreFilename, true) {
+										deleteRoutineWallet(
+											it.first,
+											password,
+											false,
+											true
+										) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
-										deleteRoutineWallet(it.first, password, it.first, true) {
+										deleteRoutineWallet(
+											it.first,
+											password,
+											true,
+											true
+										) {
 											completeMark()
 										}
 									}
 									AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
-										deleteRoutineWallet(it.first, password, it.first, true) {
+										deleteRoutineWallet(
+											it.first,
+											password,
+											true,
+											true
+										) {
 											completeMark()
 										}
 									}
@@ -145,13 +169,23 @@ class WalletSettingsListPresenter(
 						}
 					// 删除 `BTCTest` 包下的所有地址对应的数据
 						WalletType.BTCTestOnly -> WalletTable.getCurrentWallet {
-							deleteRoutineWallet(currentBTCTestAddress, password, currentBTCTestAddress) {
+							deleteRoutineWallet(
+								currentBTCTestAddress,
+								password,
+								true,
+								true
+							) {
 								activity?.jump<SplashActivity>()
 							}
 						}
 					// 删除 `BTCOnly` 包下的所有地址对应的数据
 						WalletType.BTCOnly -> WalletTable.getCurrentWallet {
-							deleteRoutineWallet(currentBTCAddress, password, currentBTCAddress) {
+							deleteRoutineWallet(
+								currentBTCAddress,
+								password,
+								true,
+								true
+							) {
 								activity?.jump<SplashActivity>()
 							}
 						}
@@ -160,7 +194,8 @@ class WalletSettingsListPresenter(
 							deleteRoutineWallet(
 								currentETHAndERCAddress,
 								password,
-								CryptoValue.keystoreFilename
+								false,
+								true
 							) {
 								activity?.jump<SplashActivity>()
 							}
@@ -174,12 +209,18 @@ class WalletSettingsListPresenter(
 	private fun Fragment.deleteRoutineWallet(
 		address: String,
 		password: String,
-		filename: String,
+		isBTCAccount: Boolean,
+		isSingleChainWallet: Boolean,
 		justDeleteData: Boolean = false,
 		callback: () -> Unit
 	) {
 		// delete `keystore` file
-		context?.deleteAccount(address, password, filename) {
+		context?.deleteAccount(
+			address,
+			password,
+			isBTCAccount,
+			isSingleChainWallet
+		) {
 			it isFalse {
 				fragment.context?.alert(CommonText.wrongPassword)
 				getMainActivity()?.removeLoadingView()

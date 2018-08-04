@@ -6,12 +6,15 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils.isValidMultiChainAddress
+import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
+import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -40,48 +43,42 @@ class AddressSelectionPresenter(
 	}
 	
 	fun showPaymentPrepareFragmentByQRCode(result: String) {
-		val content = result.orEmpty()
-		// 不符合标准的长度直接返回
-		if (content.length < CryptoValue.bip39AddressLength || content.substring(0, 2) != "0x") {
-			fragment.context?.alert(QRText.unvalidQRCodeAlert)
-			return
-		}
-		// 单纯的地址二维码
-		if (content.length == CryptoValue.bip39AddressLength) {
-			showPaymentPrepareFragment(content)
-			return
-		}
-		// 校验信息
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token?.let {
-			if (content.length > CryptoValue.bip39AddressLength) {
-				val amount = "amount"
-				val token = "token"
-				var transaferCount = 0.0
-				// 准备 `Count` 信息, 如果包含有 `amount` 关键字
-				if (content.contains(amount)) {
-					// 含有 `contract` 和不含有的解析 `amount` 的方式不同
-					transaferCount = if (content.contains(token)) {
-						content.substringAfter("amount=")
-							.substringBefore("?token=").toDoubleOrNull().orZero()
-					} else {
-						content.substring(50, content.length).toDoubleOrNull().orElse(0.0)
+		if (isValidQRCodeContent(result)) {
+			if (result.contains("transfer")) {
+				DepositPresenter.convertERC20QRCode(result).let {
+					isCorrectCoinOrChainID(it) {
+						showPaymentPrepareFragment(it.walletAddress, it.amount)
 					}
 				}
-				// 准备 `Contract` 信息, 如果包含有 `token` 关键字就是 `ERC20` 否则是 `ETH`
-				val contract = when {
-					content.contains(token) -> content.substringAfter("token=")
-					else -> CryptoValue.ethContract
+			} else {
+				when {
+					token?.symbol.equals(CryptoSymbol.btc, true) -> {
+						DepositPresenter.convertBitcoinQRCode(result).let {
+							isCorrectCoinOrChainID(it) {
+								showPaymentPrepareFragment(it.walletAddress, it.amount)
+							}
+						}
+					}
+					
+					token?.symbol.equals(CryptoSymbol.etc, true) -> {
+						DepositPresenter.convertETHOrETCQRCOde(result).let {
+							isCorrectCoinOrChainID(it) {
+								showPaymentPrepareFragment(it.walletAddress, it.amount)
+							}
+						}
+					}
+					
+					token?.symbol.equals(CryptoSymbol.eth, true) -> {
+						DepositPresenter.convertETHOrETCQRCOde(result).let {
+							isCorrectCoinOrChainID(it) {
+								showPaymentPrepareFragment(it.walletAddress, it.amount)
+							}
+						}
+					}
 				}
-				
-				if (contract.isNotEmpty() && it.contract != contract) {
-					fragment.context?.alert(QRText.unvalidContract)
-					return
-				}
-				
-				showPaymentPrepareFragment(
-					content.substring(0, CryptoValue.bip39AddressLength), transaferCount
-				)
 			}
+		} else {
+			fragment.context.alert(CommonText.wrongQRCode)
 		}
 	}
 	
@@ -162,14 +159,89 @@ class AddressSelectionPresenter(
 		}
 	}
 	
-	private fun alert(title: String, subtitle: String, callback: () -> Unit) {
-		fragment.alert(
-			title,
-			subtitle
-		) {
-			yesButton {
-				callback()
+	private fun isValidQRCodeContent(content: String): Boolean {
+		return when {
+			content.isEmpty() -> false
+			!content.contains(":") -> false
+			CryptoName.allChainName.none {
+				content.contains(it.toLowerCase())
+			} -> false
+			content.length < CryptoValue.bitcoinAddressLength -> false
+			else -> true
+		}
+	}
+	
+	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
+		when {
+			token?.symbol.equals(CryptoSymbol.eth, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.ethContract, true) -> {
+						fragment.context.alert(CommonText.wrongCoin)
+						return
+					}
+					
+					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+					
+					else -> callback()
+				}
 			}
+			
+			token?.symbol.equals(CryptoSymbol.etc, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.etcContract, true) -> {
+						fragment.context.alert(CommonText.wrongCoin)
+						return
+					}
+					
+					!qrModel.chainID.equals(Config.getETCCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+					
+					else -> callback()
+				}
+			}
+			
+			token?.symbol.equals(CryptoSymbol.btc, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.btcContract, true) -> {
+						fragment.context.alert(CommonText.wrongCoin)
+						return
+					}
+					
+					!qrModel.chainID.equals(Config.getBTCCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+					
+					else -> callback()
+				}
+			}
+			
+			else -> {
+				when {
+					!qrModel.contractAddress.equals(token?.contract, true) -> {
+						fragment.context.alert(CommonText.wrongCoin)
+						return
+					}
+					
+					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+					
+					else -> callback()
+				}
+			}
+		}
+	}
+	
+	private fun alert(title: String, subtitle: String, callback: () -> Unit) {
+		fragment.alert(title, subtitle) {
+			yesButton { callback() }
 			noButton { }
 		}.show()
 	}

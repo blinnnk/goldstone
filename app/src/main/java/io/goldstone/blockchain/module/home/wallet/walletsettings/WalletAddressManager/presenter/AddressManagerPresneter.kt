@@ -114,7 +114,7 @@ class AddressManagerPresneter(
 	
 	fun showPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment)
+			AddressManagerFragment.removeDashboard(fragment.context)
 			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportPrivateKey,
 				WalletSettingsText.viewAddresses,
@@ -125,7 +125,7 @@ class AddressManagerPresneter(
 	
 	fun showBTCPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment)
+			AddressManagerFragment.removeDashboard(fragment.context)
 			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportPrivateKey,
 				WalletSettingsText.viewAddresses,
@@ -141,7 +141,7 @@ class AddressManagerPresneter(
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment)
+			AddressManagerFragment.removeDashboard(fragment.context)
 			showTargetFragment<KeystoreExportFragment, WalletSettingsFragment>(
 				WalletSettingsText.exportKeystore,
 				WalletSettingsText.viewAddresses,
@@ -153,7 +153,7 @@ class AddressManagerPresneter(
 	fun showQRCodeFragment(address: String) {
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
-		AddressManagerFragment.removeDashboard(fragment)
+		AddressManagerFragment.removeDashboard(fragment.context)
 		showTargetFragment<QRCodeFragment, WalletSettingsFragment>(
 			WalletText.showQRCode,
 			WalletSettingsText.viewAddresses,
@@ -194,7 +194,7 @@ class AddressManagerPresneter(
 	companion object {
 		
 		fun createETHAndERCAddress(
-			context: Context?,
+			context: Context,
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
@@ -203,13 +203,16 @@ class AddressManagerPresneter(
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
-						insertNewAddressToMyToken(
-							CryptoSymbol.eth,
-							CryptoValue.etcContract,
-							address,
-							if (Config.isTestEnvironment()) Config.getCurrentChain() else ChainID.ETCMain.id
-						)
+					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
+						// 新创建的账号插入所有对应的链的默认 `Token`
+						ChainID.getAllEthereumChainID().forEach {
+							insertNewAddressToMyToken(
+								CryptoSymbol.eth,
+								CryptoValue.ethContract,
+								address,
+								it
+							)
+						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommitionModel(address, ChainType.ETH.id, 1)
@@ -223,7 +226,7 @@ class AddressManagerPresneter(
 		}
 		
 		fun createETCAddress(
-			context: Context?,
+			context: Context,
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
@@ -232,14 +235,17 @@ class AddressManagerPresneter(
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context?.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
+					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
+						// 新创建的账号插入所有对应的链的默认 `Token`
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-						insertNewAddressToMyToken(
-							CryptoSymbol.etc,
-							CryptoValue.etcContract,
-							address,
-							if (Config.isTestEnvironment()) ChainID.ETCTest.id else ChainID.ETCMain.id
-						)
+						ChainID.getAllETCChainID().forEach {
+							insertNewAddressToMyToken(
+								CryptoSymbol.etc,
+								CryptoValue.etcContract,
+								address,
+								it
+							)
+						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommitionModel(address, ChainType.ETC.id, 1)
@@ -253,11 +259,16 @@ class AddressManagerPresneter(
 		}
 		
 		fun createBTCAddress(
-			context: Context?,
+			context: Context,
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
-			context?.verifyKeystorePassword(password, Config.getCurrentBTCAddress()) {
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentBTCAddress(),
+				true,
+				false
+			) {
 				if (it) {
 					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
 						wallet.encryptMnemonic?.let {
@@ -269,7 +280,13 @@ class AddressManagerPresneter(
 								newChildPath
 							) { address, secret ->
 								// 存入 `KeyStore`
-								context.storeBase58PrivateKey(secret, address, password, false)
+								context.storeBase58PrivateKey(
+									secret,
+									address,
+									password,
+									false,
+									false
+								)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
 									CryptoSymbol.btc,
@@ -294,11 +311,16 @@ class AddressManagerPresneter(
 		}
 		
 		fun createBTCTestAddress(
-			context: Context?,
+			context: Context,
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
-			context?.verifyKeystorePassword(password, Config.getCurrentBTCTestAddress()) {
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentBTCTestAddress(),
+				true,
+				false
+			) {
 				if (!it) {
 					context.alert(CommonText.wrongPassword)
 					return@verifyKeystorePassword
@@ -310,7 +332,13 @@ class AddressManagerPresneter(
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
 						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, secret ->
-							context.storeBase58PrivateKey(secret, address, password, true)
+							context.storeBase58PrivateKey(
+								secret,
+								address,
+								password,
+								true,
+								false
+							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
 								CryptoSymbol.btc,
@@ -341,7 +369,7 @@ class AddressManagerPresneter(
 		
 		fun getCellDashboardMenu(
 			hasDefaultCell: Boolean = true
-		): ArrayList<Pair<Int, String>> {
+		): List<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
 				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
@@ -405,22 +433,18 @@ class AddressManagerPresneter(
 			symbol: String,
 			contract: String,
 			address: String,
-			chain: String
+			chainID: String
 		) {
-			DefaultTokenTable
-				.getTokenBySymbolAndContractFromAllChains(
-					symbol,
-					contract
-				) {
-					it?.let {
-						doAsync {
-							MyTokenTable.insert(
-								MyTokenTable(it.apply { chain_id = chain }, address),
-								chain
-							)
-						}
+			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) {
+				it?.let {
+					doAsync {
+						MyTokenTable.insert(
+							MyTokenTable(it.apply { chain_id = chainID }, address),
+							chainID
+						)
 					}
 				}
+			}
 		}
 	}
 }

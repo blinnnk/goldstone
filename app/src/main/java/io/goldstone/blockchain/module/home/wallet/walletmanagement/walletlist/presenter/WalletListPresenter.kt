@@ -69,7 +69,7 @@ class WalletListPresenter(
 										fragment.activity?.jump<SplashActivity>()
 									}
 								} else {
-									NodeSelectionPresenter.setAllTestnet {
+									NodeSelectionPresenter.setAllMainnet {
 										fragment.activity?.jump<SplashActivity>()
 									}
 								}

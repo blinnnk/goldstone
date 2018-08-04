@@ -1,15 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter
 
-import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.CreateWalletText
 import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.updatePassword
+import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -25,21 +26,33 @@ class PasswordSettingsPresenter(
 	override val fragment: PasswordSettingsFragment
 ) : BasePresenter<PasswordSettingsFragment>() {
 	
+	fun verifyOldPassword(oldPassword: String, callback: (Boolean) -> Unit) {
+		fragment.context?.apply {
+			if (oldPassword.isEmpty()) {
+				alert(CreateWalletText.emptyRepeatPasswordAlert)
+				callback(false)
+				return
+			} else {
+				verifyCurrentWalletKeyStorePassword(oldPassword, callback)
+			}
+		}
+	}
+	
 	fun updatePassword(
-		oldPasswordInput: EditText,
-		newPasswordInput: EditText,
-		repeatPasswordInput: EditText,
-		passwordHint: EditText,
+		oldPassword: String,
+		newPassword: String,
+		repeatPassword: String,
+		passwordHint: String,
 		callback: () -> Unit
 	) {
 		CreateWalletPresenter.checkInputValue(
 			"",
-			newPasswordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
+			newPassword,
+			repeatPassword,
 			true,
 			fragment.context,
 			callback // error callback
-		) { newPassword, _ ->
+		) { password, _ ->
 			WalletTable.getWalletType {
 				WalletTable.getCurrentWallet {
 					when (it) {
@@ -52,10 +65,11 @@ class PasswordSettingsPresenter(
 									AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
 										updateKeystorePassword(
 											it.first,
-											oldPasswordInput,
-											newPassword,
+											oldPassword,
+											password,
 											passwordHint,
-											CryptoValue.keystoreFilename
+											false,
+											false
 										) {
 											completeMark()
 										}
@@ -63,10 +77,11 @@ class PasswordSettingsPresenter(
 									AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
 										updateKeystorePassword(
 											it.first,
-											oldPasswordInput,
-											newPassword,
+											oldPassword,
+											password,
 											passwordHint,
-											CryptoValue.keystoreFilename
+											false,
+											false
 										) {
 											completeMark()
 										}
@@ -74,10 +89,11 @@ class PasswordSettingsPresenter(
 									AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
 										updateKeystorePassword(
 											it.first,
-											oldPasswordInput,
-											newPassword,
+											oldPassword,
+											password,
 											passwordHint,
-											it.first
+											true,
+											false
 										) {
 											completeMark()
 										}
@@ -85,10 +101,11 @@ class PasswordSettingsPresenter(
 									AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
 										updateKeystorePassword(
 											it.first,
-											oldPasswordInput,
-											newPassword,
+											oldPassword,
+											password,
 											passwordHint,
-											it.first
+											true,
+											false
 										) {
 											completeMark()
 										}
@@ -104,10 +121,11 @@ class PasswordSettingsPresenter(
 						WalletType.BTCTestOnly -> WalletTable.getCurrentWallet {
 							updateKeystorePassword(
 								currentBTCTestAddress,
-								oldPasswordInput,
-								newPassword,
+								oldPassword,
+								password,
 								passwordHint,
-								currentBTCTestAddress
+								true,
+								true
 							) {
 								autoBack()
 							}
@@ -116,10 +134,11 @@ class PasswordSettingsPresenter(
 						WalletType.BTCOnly -> WalletTable.getCurrentWallet {
 							updateKeystorePassword(
 								currentBTCAddress,
-								oldPasswordInput,
-								newPassword,
+								oldPassword,
+								password,
 								passwordHint,
-								currentBTCAddress
+								true,
+								true
 							) {
 								autoBack()
 							}
@@ -128,10 +147,11 @@ class PasswordSettingsPresenter(
 						WalletType.ETHERCAndETCOnly -> WalletTable.getCurrentWallet {
 							updateKeystorePassword(
 								currentETHAndERCAddress,
-								oldPasswordInput,
-								newPassword,
+								oldPassword,
+								password,
 								passwordHint,
-								CryptoValue.keystoreFilename
+								false,
+								true
 							) {
 								autoBack()
 							}
@@ -144,28 +164,28 @@ class PasswordSettingsPresenter(
 	
 	private fun updateKeystorePassword(
 		address: String,
-		oldPasswordInput: EditText,
+		oldPassword: String,
 		newPassword: String,
-		passwordHint: EditText,
-		filename: String,
+		passwordHint: String,
+		isBTCWallet: Boolean,
+		isSingleChainWallet: Boolean,
 		callback: () -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 		fragment.context?.updatePassword(
 			address,
-			oldPasswordInput.text.toString(),
+			oldPassword,
 			newPassword,
-			filename,
+			isBTCWallet,
+			isSingleChainWallet,
 			{
 				// error callback
 				callback()
 			}
 		) {
 			// Update User Password Hint
-			passwordHint.text.toString().apply {
-				isNotEmpty() isTrue {
-					WalletTable.updateHint(this)
-				}
+			passwordHint.isNotEmpty() isTrue {
+				WalletTable.updateHint(passwordHint)
 			}
 			
 			fragment.toast(CommonText.succeed)

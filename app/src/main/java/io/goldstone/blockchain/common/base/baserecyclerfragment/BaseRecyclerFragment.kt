@@ -51,7 +51,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			isNull() isTrue {
 				setRecyclerViewAdapter(recyclerView, asyncData)
 			} otherwise {
-				notifyDataSetChanged()
+				this?.notifyDataSetChanged()
 			}
 		}
 		
@@ -180,7 +180,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		// 监听 `RecyclerView` 滑动
 		recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 			override fun onScrollStateChanged(
-				recyclerView: RecyclerView?,
+				recyclerView: RecyclerView,
 				newState: Int
 			) {
 				/** [newState] `1` 开始滑动, `0` 停止滑动 `2` 加速滑动 */
@@ -189,18 +189,18 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			}
 			
 			override fun onScrolled(
-				recyclerView: RecyclerView?,
+				recyclerView: RecyclerView,
 				dx: Int,
 				dy: Int
 			) {
 				super.onScrolled(recyclerView, dx, dy)
 				observingRecyclerViewScrolled(dx, dy)
 				observingRecyclerViewVerticalOffset(
-					recyclerView?.computeVerticalScrollOffset().orZero(),
-					recyclerView?.computeVerticalScrollRange().orZero()
+					recyclerView.computeVerticalScrollOffset().orZero(),
+					recyclerView.computeVerticalScrollRange().orZero()
 				)
 				observingRecyclerViewHorizontalOffset(
-					recyclerView?.computeHorizontalScrollOffset().orZero()
+					recyclerView.computeHorizontalScrollOffset().orZero()
 				)
 			}
 		})

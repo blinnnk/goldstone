@@ -6,6 +6,7 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
@@ -58,10 +60,9 @@ fun GasSelectionPresenter.transferBTC(
 	password: String,
 	callback: () -> Unit
 ) {
-	fragment.context?.exportBase58PrivateKey(
+	getCurrentWalletBTCPrivateKey(
 		prepareBTCModel.fromAddress,
-		password,
-		Config.isTestEnvironment()
+		password
 	) { secret ->
 		if (secret.isNullOrBlank()) {
 			fragment.showMaskView(false)
@@ -100,6 +101,23 @@ fun GasSelectionPresenter.transferBTC(
 				}
 			}
 		}
+	}
+}
+
+private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
+	walletAddress: String,
+	password: String,
+	hold: (String?) -> Unit
+) {
+	WalletTable.getWalletType {
+		val isSingleChainWallet = it != WalletType.MultiChain
+		fragment.context?.exportBase58PrivateKey(
+			walletAddress,
+			password,
+			isSingleChainWallet,
+			Config.isTestEnvironment(),
+			hold
+		)
 	}
 }
 

@@ -15,6 +15,7 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
@@ -65,6 +66,7 @@ class PrivateKeyImportPresenter(
 						passwordValue,
 						walletName,
 						fragment.context,
+						true,
 						hintInput.text?.toString(),
 						callback
 					)
@@ -139,7 +141,13 @@ class PrivateKeyImportPresenter(
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
 				context?.apply {
 					// 存储私钥的 `KeyStore` 文件
-					storeBase58PrivateKey(privateKey, address, password, isTest)
+					storeBase58PrivateKey(
+						privateKey,
+						address,
+						password,
+						isTest,
+						true
+					)
 					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
 						this,
@@ -155,15 +163,13 @@ class PrivateKeyImportPresenter(
 						hint
 					) {
 						if (it) {
-							if (isTest) {
-								setAllTestnet {
-									callback(true)
-								}
-							} else {
+							if (isTest) setAllTestnet {
+								callback(true)
+							}
+							else
 								setAllMainnet {
 									callback(true)
 								}
-							}
 						} else {
 							callback(false)
 						}
@@ -180,6 +186,7 @@ class PrivateKeyImportPresenter(
 			password: String,
 			name: String,
 			context: Context?,
+			isSingleChainWallet: Boolean,
 			hint: String? = null,
 			callback: (Boolean) -> Unit
 		) {
@@ -197,8 +204,21 @@ class PrivateKeyImportPresenter(
 				callback(false)
 				return
 			}
+			/**
+			 * `Single Chain Wallet` 的地址可能存在于某个已经导入的 `Bip44 Mnemonic Wallet` 的名下
+			 * 所以所有单链钱包全部用额外的 `Keystore` 规则进行存储
+			 * [CryptoValue.singleChainFile] + `Wallet Address`
+			 */
+			val filname =
+				if (isSingleChainWallet)
+					CryptoValue.singleChainFile(CryptoUtils.getAddressFromPrivateKey(currentPrivateKey))
+				else CryptoValue.keystoreFilename
 			// 解析私钥并导入钱包
-			context?.getWalletByPrivateKey(currentPrivateKey, password) { address ->
+			context?.getWalletByPrivateKey(
+				currentPrivateKey,
+				password,
+				filname
+			) { address ->
 				if (address.equals(ImportWalletText.existAddress, true)) {
 					context.runOnUiThread {
 						alert(ImportWalletText.existAddress)

@@ -33,7 +33,9 @@ open class QRCodePresenter(
 	override val fragment: QRCodeFragment
 ) : BasePresenter<QRCodeFragment>() {
 	
-	private val address by lazy { fragment.arguments?.getString(ArgumentKey.address) }
+	private val address by lazy {
+		fragment.arguments?.getString(ArgumentKey.address)
+	}
 	
 	override fun onFragmentViewCreated() {
 		address?.let {

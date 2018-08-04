@@ -62,7 +62,7 @@ data class TransactionListModel(
 		data.symbol,
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
-		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
+		data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
 		data.hash,
 		data.memo,

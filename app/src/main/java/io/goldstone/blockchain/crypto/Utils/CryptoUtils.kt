@@ -5,9 +5,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -23,11 +21,6 @@ import java.util.*
 data class InputCodeData(val type: String, val address: String, val count: Double)
 
 object CryptoUtils {
-	
-	fun scaleAddress(address: String): String {
-		return if (address.isEmpty()) ""
-		else address.substring(0, 5) + " ... " + address.substring(address.length - 5, address.length)
-	}
 	
 	fun scaleTo16(address: String): String {
 		return if (address.length < 16) address
@@ -141,6 +134,15 @@ object CryptoUtils {
 	private fun isTransferInputCode(inputCode: String) = inputCode.length > 10 && inputCode.substring(
 		0, SolidityCode.contractTransfer.length
 	) == SolidityCode.contractTransfer
+	
+	fun getAddressFromPrivateKey(privateKey: String): String {
+		/** Convert PrivateKey To BigInteger */
+		val currentPrivateKey = privateKey.toBigInteger(16)
+		/** Get Public Key and Private Key*/
+		val publicKey =
+			ECKeyPair(currentPrivateKey, publicKeyFromPrivate(currentPrivateKey)).getAddress()
+		return publicKey.prepend0xPrefix()
+	}
 }
 
 fun Double.toUnitValue(symbol: String = CryptoSymbol.eth): String {

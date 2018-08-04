@@ -57,6 +57,22 @@ enum class ChainID(val id: String) {
 			)
 		}
 		
+		fun getAllETCChainID(): ArrayList<String> {
+			return arrayListOf(
+				ChainID.ETCTest.id,
+				ChainID.ETCMain.id
+			)
+		}
+		
+		fun getAllEthereumChainID(): ArrayList<String> {
+			return arrayListOf(
+				ChainID.Main.id,
+				ChainID.Ropsten.id,
+				ChainID.Kovan.id,
+				ChainID.Rinkeby.id
+			)
+		}
+		
 		fun getChainNameByID(chainID: String): String {
 			return when (chainID) {
 			// Third Pardy Nodes

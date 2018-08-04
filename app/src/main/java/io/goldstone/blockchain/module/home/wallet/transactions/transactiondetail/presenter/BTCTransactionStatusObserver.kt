@@ -192,7 +192,7 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 			fragment.asyncData?.clear()
 			val data = generateModels(it)
 			fragment.asyncData?.addAll(data)
-			fragment.recyclerView.adapter.notifyItemRangeChanged(1, data.size)
+			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 		}
 		// Update Database
 		it?.let {

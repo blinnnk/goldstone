@@ -22,7 +22,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 	init {
 		layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-		itemAnimator.changeDuration = 0
+		itemAnimator?.changeDuration = 0
 	}
 	
 	override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
@@ -40,10 +40,10 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		var toPosition: Int? = null
 		val itemMove = ItemTouchHelper(object : ItemTouchHelper.Callback() {
 			override fun getMovementFlags(
-				recyclerView: RecyclerView?,
-				viewHolder: ViewHolder?
+				recyclerView: RecyclerView,
+				viewHolder: ViewHolder
 			): Int {
-				fromPosition = viewHolder?.adapterPosition
+				fromPosition = viewHolder.adapterPosition
 				return makeFlag(
 					ItemTouchHelper.ACTION_STATE_DRAG,
 					ItemTouchHelper.DOWN or ItemTouchHelper.UP or ItemTouchHelper.START or ItemTouchHelper.END
@@ -51,22 +51,24 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 			}
 			
 			override fun onMove(
-				recyclerView: RecyclerView?,
-				viewHolder: ViewHolder?,
-				target: ViewHolder?
+				recyclerView: RecyclerView,
+				viewHolder: ViewHolder,
+				target: ViewHolder
 			): Boolean {
 				Collections.swap(
-					adapterDataSet, viewHolder?.adapterPosition.orZero(), target?.adapterPosition.orZero()
+					adapterDataSet,
+					viewHolder.adapterPosition.orZero(),
+					target.adapterPosition.orZero()
 				)
 				// and notify the adapter that its dataset has changed
-				recyclerView?.adapter?.notifyItemMoved(
-					viewHolder?.adapterPosition.orZero(), target?.adapterPosition.orZero()
+				recyclerView.adapter?.notifyItemMoved(
+					viewHolder.adapterPosition.orZero(), target.adapterPosition.orZero()
 				)
 				return true
 			}
 			
 			override fun onSwiped(
-				viewHolder: ViewHolder?,
+				viewHolder: ViewHolder,
 				direction: Int
 			) {
 			}
@@ -82,10 +84,10 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 			}
 			
 			override fun onMoved(
-				recyclerView: RecyclerView?,
-				viewHolder: ViewHolder?,
+				recyclerView: RecyclerView,
+				viewHolder: ViewHolder,
 				fromPos: Int,
-				target: ViewHolder?,
+				target: ViewHolder,
 				toPos: Int,
 				x: Int,
 				y: Int

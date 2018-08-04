@@ -45,10 +45,7 @@ class KeystoreImportPresenter(
 				if (nameInput.text.isEmpty()) UIUtils.generateDefaultName()
 				else nameInput.text.toString()
 			doAsync {
-				getPrivatekeyByKeystoreFile(
-					keystore,
-					password
-				) {
+				getPrivatekeyByKeystoreFile(keystore, password) {
 					if (it.isNull()) callback(false)
 					
 					it?.let { privateKey ->
@@ -111,6 +108,7 @@ class KeystoreImportPresenter(
 			password.text.toString(),
 			walletName,
 			fragment.context,
+			true,
 			hintInput.text?.toString(),
 			callback
 		)

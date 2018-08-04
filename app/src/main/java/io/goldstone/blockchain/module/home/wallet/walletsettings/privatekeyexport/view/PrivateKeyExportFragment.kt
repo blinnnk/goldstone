@@ -26,6 +26,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpor
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.support.v4.onUiThread
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
 
@@ -84,11 +85,11 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 			}.click {
 				it.showLoadingStatus()
-				presenter.getPrivateKeyByAddress(passwordInput) {
-					if (!isNullOrBlank()) {
-						privateKeyTextView.text = this
+				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) {
+					onUiThread {
+						this?.let { privateKeyTextView.text = it }
+						it.showLoadingStatus(false)
 					}
-					it.showLoadingStatus(false)
 				}
 			}.into(this)
 		}

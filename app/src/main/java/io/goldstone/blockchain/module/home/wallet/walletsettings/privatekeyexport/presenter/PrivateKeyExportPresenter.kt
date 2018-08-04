@@ -1,17 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter
 
-import android.widget.EditText
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.uiThread
 
@@ -31,63 +30,71 @@ class PrivateKeyExportPresenter(
 	}
 	
 	fun getPrivateKeyByAddress(
-		passwordInput: EditText,
+		password: String,
 		hold: String?.() -> Unit
 	) {
-		if (isBTCAddress == true) {
-			getBTCPrivateKeyByAddress(passwordInput, hold)
-		} else {
-			getETHERCorETCPrivateKeyByAddress(passwordInput, hold)
-		}
-	}
-	
-	private fun getETHERCorETCPrivateKeyByAddress(
-		passwordInput: EditText,
-		hold: String.() -> Unit
-	) {
-		if (passwordInput.text?.toString().isNullOrBlank()) {
+		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold("")
 			return
 		}
 		
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
+		
 		address?.let {
-			doAsync {
-				fragment.context?.getPrivateKey(
+			WalletTable.getWalletType { type ->
+				val isSingleChainWallet = type != WalletType.MultiChain
+				if (isBTCAddress == true) getBTCPrivateKeyByAddress(
 					it,
-					passwordInput.text.toString(),
-					CryptoValue.keystoreFilename,
-					{
-						uiThread { hold("") }
-					}
-				) {
-					fragment.context?.runOnUiThread { hold(it) }
-				}
+					password,
+					isSingleChainWallet,
+					hold
+				)
+				else getETHERCorETCPrivateKeyByAddress(
+					it,
+					password,
+					isSingleChainWallet,
+					hold
+				)
 			}
 		}
 	}
 	
+	private fun getETHERCorETCPrivateKeyByAddress(
+		address: String,
+		password: String,
+		isSingleChainWallet: Boolean,
+		hold: String.() -> Unit
+	) {
+		doAsync {
+			fragment.context?.getPrivateKey(
+				address,
+				password,
+				false,
+				isSingleChainWallet,
+				{
+					uiThread { hold("") }
+				},
+				hold
+			)
+		}
+	}
+	
 	private fun getBTCPrivateKeyByAddress(
-		passwordInput: EditText,
+		address: String,
+		password: String,
+		isSingleChainWallet: Boolean,
 		hold: String?.() -> Unit
 	) {
-		val password = passwordInput.text?.toString().orEmpty()
-		if (password.isEmpty()) {
-			fragment.toast(ImportWalletText.exportWrongPassword)
-			hold(null)
-			return
-		}
-		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		address?.let { address ->
-			doAsync {
-				val isTest = BTCUtils.isValidTestnetAddress(address)
-				fragment.context?.exportBase58PrivateKey(address, password, isTest) { secret ->
-					uiThread {
-						hold(secret)
-					}
-				}
-			}
+		doAsync {
+			val isTest = BTCUtils.isValidTestnetAddress(address)
+			fragment.context?.exportBase58PrivateKey(
+				address,
+				password,
+				isSingleChainWallet,
+				isTest,
+				hold
+			)
 		}
 	}
 }

@@ -42,14 +42,15 @@ import org.json.JSONObject
  * @date 31/03/2018 8:08 PM
  * @author KaySaith
  * @Important
- * 请求 `Parameters` 以及请求 `Response` 的加密规则是, GoldStone 自由 Server 业务以及 GoldStone
- * 自由节点进行双向加密解密. 第三方接口和节点不加密. 如 `EtherScan`, `Infura` 和 `GasTracker` 等。
+ * 请求 `Parameters` 以及请求 `Response` 的加密规则是, GoldStone 自有 Server 业务以及 GoldStone
+ * 自有节点进行双向加密解密. 第三方接口和节点不加密. 如 `EtherScan`, `Infura` 和 `GasTracker` 等。
  */
 object GoldStoneAPI {
 	
 	/** 网络请求很多是全台异步所以使用 `Application` 的 `Context` */
 	lateinit var context: Context
-	private val requestContentType = MediaType.parse("application/json; charset=utf-8")
+	private val requestContentType =
+		MediaType.parse("application/json; charset=utf-8")
 	
 	/**
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
@@ -62,7 +63,10 @@ object GoldStoneAPI {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
 		AppConfigTable.getAppConfig {
 			requestData<String>(
-				APIPath.defaultTokenList(APIPath.currentUrl, ""),
+				APIPath.defaultTokenList(
+					APIPath.currentUrl,
+					it?.defaultCoinListMD5.orEmpty()
+				),
 				"",
 				true,
 				errorCallback,
