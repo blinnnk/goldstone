@@ -4,7 +4,10 @@ package io.goldstone.blockchain.common.value
  * @date 2018/7/19 11:23 AM
  * @author KaySaith
  */
-enum class WalletType {
+enum class WalletType(val content: String) {
 	
-	BTCOnly, ETHERCAndETCOnly, BTCTestOnly, MultiChain
+	BTCOnly("btcOnly"),
+	ETHERCAndETCOnly("ethERCAndEtc"),
+	BTCTestOnly("btctestOnly"),
+	MultiChain("multiChain")
 }

@@ -56,20 +56,18 @@ data class WalletTable(
 		
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
-				WalletTable.getWalletType {
-					when (it) {
-						WalletType.MultiChain -> {
-							val ethAddressCount = ethAddresses.split(",").size
-							val etcAddressCount = etcAddresses.split(",").size
-							val btcAddressCount = btcAddresses.split(",").size
-							val btcTestAddressCount = btcTestAddresses.split(",").size
-							hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount)
-						}
-						
-						WalletType.ETHERCAndETCOnly -> hold(1)
-						WalletType.BTCTestOnly -> hold(1)
-						WalletType.BTCOnly -> hold(1)
+				when (Config.getCurrentWalletType()) {
+					WalletType.MultiChain.content -> {
+						val ethAddressCount = ethAddresses.split(",").size
+						val etcAddressCount = etcAddresses.split(",").size
+						val btcAddressCount = btcAddresses.split(",").size
+						val btcTestAddressCount = btcTestAddresses.split(",").size
+						hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount)
 					}
+					
+					WalletType.ETHERCAndETCOnly.content -> hold(1)
+					WalletType.BTCTestOnly.content -> hold(1)
+					WalletType.BTCOnly.content -> hold(1)
 				}
 			}
 		}
@@ -216,10 +214,7 @@ data class WalletTable(
 			).filter { it.isNotEmpty() }.distinctBy { it }
 		}
 		
-		fun getTargetWalletType(
-			walletTable: WalletTable,
-			hold: (WalletType) -> Unit
-		) {
+		fun getTargetWalletType(walletTable: WalletTable, hold: (WalletType) -> Unit) {
 			walletTable.apply {
 				if (currentETHAndERCAddress.isEmpty()) {
 					if (currentBTCTestAddress.isEmpty()) {
@@ -244,10 +239,7 @@ data class WalletTable(
 		}
 		
 		fun getETHAndERCWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				ethChildAddressIndex: Int
-			) -> Unit
+			hold: (wallet: WalletTable, ethChildAddressIndex: Int) -> Unit
 		) {
 			WalletTable.getCurrentWallet {
 				// 清理数据格式

@@ -113,25 +113,29 @@ class TransactionDetailPresenter(
 	}
 	
 	fun showAddContactsButton(cell: TransactionDetailCell) {
-		ContactTable.hasContacts(cell.model.info) {
-			cell.showAddContactButton {
-				onClick {
-					fragment.parentFragment?.apply {
-						when (this) {
-							is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-							is TransactionFragment -> presenter.removeSelfFromActivity()
+		TransactionListModel
+			.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
+				ContactTable.hasContacts(address) { exist ->
+					if (exist) return@hasContacts
+					cell.showAddContactButton(index) {
+						onClick {
+							fragment.parentFragment?.apply {
+								when (this) {
+									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+									is TransactionFragment -> presenter.removeSelfFromActivity()
+								}
+							}
+							fragment.getMainActivity()?.apply {
+								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+									putString(ArgumentKey.address, address)
+								}
+							}
+							preventDuplicateClicks()
 						}
 					}
-					fragment.getMainActivity()?.apply {
-						addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-							putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-							putString(ArgumentKey.address, cell.model.info)
-						}
-					}
-					preventDuplicateClicks()
 				}
 			}
-		}
 	}
 	
 	fun showTransactionWebFragment() {

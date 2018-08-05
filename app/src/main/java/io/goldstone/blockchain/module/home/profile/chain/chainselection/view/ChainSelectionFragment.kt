@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.presenter.ChainSelectionPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -38,12 +38,10 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 	}
 	
 	private fun checkIsSingleChainWalletOrElse(callback: () -> Unit) {
-		WalletTable.getWalletType {
-			when (it) {
-				WalletType.BTCTestOnly -> context.alert(AlertText.testnetOnly)
-				WalletType.BTCOnly -> context.alert(AlertText.mainnetOnly)
-				else -> callback()
-			}
+		when (Config.getCurrentWalletType()) {
+			WalletType.BTCTestOnly.content -> context.alert(AlertText.testnetOnly)
+			WalletType.BTCOnly.content -> context.alert(AlertText.mainnetOnly)
+			else -> callback()
 		}
 	}
 }

@@ -3,12 +3,12 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58KeyStoreFile
 import io.goldstone.blockchain.crypto.getKeystoreFile
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
@@ -47,16 +47,15 @@ class KeystoreExportPresenter(
 	) {
 		val isBTC = address.length == CryptoValue.bitcoinAddressLength
 		doAsync {
-			WalletTable.getWalletType { type ->
-				val isSingleChainWallet = type != WalletType.MultiChain
-				if (isBTC) {
-					getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
-						uiThread { hold(keystoreJSON) }
-					}
-				} else {
-					getETHERC20OrETCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
-						uiThread { hold(keystoreJSON) }
-					}
+			val isSingleChainWallet =
+				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+			if (isBTC) {
+				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
+					uiThread { hold(keystoreJSON) }
+				}
+			} else {
+				getETHERC20OrETCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
+					uiThread { hold(keystoreJSON) }
 				}
 			}
 		}

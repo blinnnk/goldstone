@@ -51,17 +51,20 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 	}
 	val switch by lazy { HoneyBaseSwitch(context) }
 	private val tokenInfo by lazy { TwoLineTitles(context) }
-	protected val icon by lazy { SquareIcon(context) }
+	protected val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 	
 	init {
 		hasArrow = false
 		
 		this.addView(icon.apply {
 			setGrayStyle()
-			y = 16.uiPX().toFloat()
+			y += 10.uiPX()
 		})
 		
-		this.addView(tokenInfo.apply { setBlackTitles() })
+		this.addView(tokenInfo.apply {
+			setBlackTitles()
+			x += 10.uiPX()
+		})
 		
 		this.addView(switch.apply {
 			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)

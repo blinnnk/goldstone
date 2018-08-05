@@ -8,8 +8,10 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter.TransactionPresenter
 import org.jetbrains.anko.matchParent
@@ -24,7 +26,6 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	
 	var isETCListShown: Runnable? = null
 	var isBTCListShown: Runnable? = null
-	
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
 	}
@@ -32,6 +33,14 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 		TransactionViewPager(this)
 	}
 	override val presenter = TransactionPresenter(this)
+	private val menuTitles = when (Config.getCurrentWalletType()) {
+		WalletType.BTCTestOnly.content, WalletType.BTCOnly.content ->
+			arrayListOf(CryptoSymbol.btc)
+		WalletType.ETHERCAndETCOnly.content ->
+			arrayListOf(CryptoSymbol.eth + "/" + CryptoSymbol.erc, CryptoSymbol.etc)
+		else ->
+			arrayListOf(CryptoSymbol.eth + "/" + CryptoSymbol.erc, CryptoSymbol.btc, CryptoSymbol.etc)
+	}
 	
 	override fun ViewGroup.initView() {
 		headerTitle = TransactionText.transaction
@@ -39,13 +48,7 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 		addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 		viewPager.apply {
 			// `MenuBar` 点击选中动画和内容更换
-			menuBar.setMemnuTitles(
-				arrayListOf(
-					CryptoSymbol.eth + "/" + CryptoSymbol.erc,
-					CryptoSymbol.btc,
-					CryptoSymbol.etc
-				)
-			) { button, id ->
+			menuBar.setMemnuTitles(menuTitles) { button, id ->
 				button.onClick {
 					currentItem = id
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)
@@ -74,6 +77,10 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	}
 	
 	companion object {
-		const val viewPagerSize = 3
+		val viewPagerSize = when (Config.getCurrentWalletType()) {
+			WalletType.BTCTestOnly.content, WalletType.BTCOnly.content -> 1
+			WalletType.ETHERCAndETCOnly.content -> 2
+			else -> 3
+		}
 	}
 }

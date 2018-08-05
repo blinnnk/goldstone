@@ -74,6 +74,7 @@ class WalletListPresenter(
 									}
 								}
 							}
+							
 							else -> fragment.activity?.jump<SplashActivity>()
 						}
 					}
@@ -82,7 +83,7 @@ class WalletListPresenter(
 		}
 	}
 	
-	fun showConfirmationAlertView(content: String, callback: () -> Unit) {
+	private fun showConfirmationAlertView(content: String, callback: () -> Unit) {
 		fragment.context?.showAlertView(
 			"Switch Chain Network",
 			WalletSettingsText.switchChainNetAlert(content),
@@ -113,35 +114,39 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(
-								WalletTable.getAddressesByWallet(wallet)
-							) {
-								if (it.isEmpty()) {
-									data.add(WalletListModel(wallet, 0.0))
-									completeMark()
-								} else {
-									// 计算当前钱包下的 `token` 对应的货币总资产
-									WalletListModel(wallet, it.sumByDouble { walletToken ->
-										val thisToken = allTokens.find {
-											it.contract.equals(walletToken.contract, true)
-										}!!
-										CryptoUtils.toCountByDecimal(
-											walletToken.balance,
-											thisToken.decimals
-										) * thisToken.price
-									}).let {
-										data.add(it)
+							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) {
+								WalletTable.getTargetWalletType(wallet) { walletType ->
+									if (it.isEmpty()) {
+										data.add(WalletListModel(wallet, 0.0, walletType.content))
 										completeMark()
+									} else {
+										val balance = it.sumByDouble { walletToken ->
+											val thisToken = allTokens.find {
+												it.contract.equals(walletToken.contract, true)
+											}!!
+											CryptoUtils.toCountByDecimal(
+												walletToken.balance,
+												thisToken.decimals
+											) * thisToken.price
+										}
+										// 计算当前钱包下的 `token` 对应的货币总资产
+										WalletListModel(
+											wallet,
+											balance,
+											walletType.content
+										).let {
+											data.add(it)
+											completeMark()
+										}
 									}
 								}
 							}
 						}
 					}
 					
-					override fun mergeCallBack() {
-						// 因为结果集是在异步状态下准备, 返回的数据按照 `id` 重新排序
+					// 因为结果集是在异步状态下准备, 返回的数据按照 `id` 重新排序
+					override fun mergeCallBack() =
 						hold(data.sortedByDescending { it.id }.toArrayList())
-					}
 				}.start()
 			}
 		}

@@ -306,6 +306,22 @@ data class DefaultTokenTable(
 			}
 		}
 		
+		fun updateDefaultStatusInCurrentChain(
+			contract: String,
+			symbol: String,
+			isDefault: Boolean
+		) {
+			GoldStoneDataBase.database.defaultTokenDao().apply {
+				getTokenBySymbolContractAndChainID(
+					symbol,
+					contract,
+					Config.getCurrentChain()
+				)?.let {
+					update(it.apply { this.isDefault = isDefault })
+				}
+			}
+		}
+		
 		fun insertToken(
 			token: DefaultTokenTable,
 			callback: () -> Unit
