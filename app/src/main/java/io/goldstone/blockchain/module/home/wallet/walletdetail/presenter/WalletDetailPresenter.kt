@@ -293,29 +293,27 @@ class WalletDetailPresenter(
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
 		Config.updateCurrentBalance(totalBalance.orElse(0.0))
-		WalletTable.getWalletType { type ->
-			WalletTable.getCurrentWallet {
-				val subtitle = when (type) {
-					WalletType.ETHERCAndETCOnly -> currentETHAndERCAddress
-					WalletType.BTCOnly -> currentBTCAddress
-					WalletType.BTCTestOnly -> currentBTCTestAddress
-					WalletType.MultiChain -> WalletText.multiChainWallet
-				}
-				WalletDetailHeaderModel(
-					null,
-					Config.getCurrentName(),
-					if (subtitle.equals(WalletText.multiChainWallet, true)) {
-						object : FixTextLength() {
-							override var text = WalletText.multiChainWallet
-							override val maxWidth = 90.uiPX().toFloat()
-							override val textSize: Float = 12.uiPX().toFloat()
-						}.getFixString()
-					} else {
-						CryptoUtils.scaleMiddleAddress(subtitle, 5)
-					},
-					totalBalance.toString()
-				).let(hold)
+		WalletTable.getCurrentWallet {
+			val subtitle = when (Config.getCurrentWalletType()) {
+				WalletType.ETHERCAndETCOnly.content -> currentETHAndERCAddress
+				WalletType.BTCOnly.content -> currentBTCAddress
+				WalletType.BTCTestOnly.content -> currentBTCTestAddress
+				else -> WalletText.multiChainWallet
 			}
+			WalletDetailHeaderModel(
+				null,
+				Config.getCurrentName(),
+				if (subtitle.equals(WalletText.multiChainWallet, true)) {
+					object : FixTextLength() {
+						override var text = WalletText.multiChainWallet
+						override val maxWidth = 90.uiPX().toFloat()
+						override val textSize: Float = 12.uiPX().toFloat()
+					}.getFixString()
+				} else {
+					CryptoUtils.scaleMiddleAddress(subtitle, 5)
+				},
+				totalBalance.toString()
+			).let(hold)
 		}
 	}
 }

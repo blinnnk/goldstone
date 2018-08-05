@@ -54,6 +54,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		balance.apply {
 			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
+			title.y += 3.uiPX()
 			subtitle.apply {
 				text = setBalanceInfo()
 				textSize = fontSize(12)

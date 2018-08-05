@@ -34,9 +34,11 @@ class SplashPresenter(val activity: SplashActivity) {
 					when (it) {
 						WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
 							cacheWalletData()
+							Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
 						}
 						WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
 							cacheWalletData()
+							Config.updateCurrentWalletType(WalletType.BTCOnly.content)
 						}
 						
 						WalletType.ETHERCAndETCOnly -> {
@@ -45,6 +47,7 @@ class SplashPresenter(val activity: SplashActivity) {
 							} else NodeSelectionPresenter.setAllMainnet {
 								cacheWalletData()
 							}
+							Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
 						}
 						
 						WalletType.MultiChain -> {
@@ -53,6 +56,7 @@ class SplashPresenter(val activity: SplashActivity) {
 							} else NodeSelectionPresenter.setAllMainnet {
 								cacheWalletData()
 							}
+							Config.updateCurrentWalletType(WalletType.MultiChain.content)
 						}
 					}
 				}

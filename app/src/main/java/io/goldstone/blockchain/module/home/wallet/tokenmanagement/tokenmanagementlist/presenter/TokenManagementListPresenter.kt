@@ -7,6 +7,7 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
@@ -44,16 +45,14 @@ class TokenManagementListPresenter(
 	}
 	
 	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
-		WalletTable.getWalletType {
-			when (it) {
-				WalletType.BTCTestOnly, WalletType.BTCOnly -> {
-					fragment.showAttentionView()
-					callback(false)
-				}
-				
-				WalletType.ETHERCAndETCOnly -> callback(true)
-				else -> callback(false)
+		when (Config.getCurrentWalletType()) {
+			WalletType.BTCTestOnly.content, WalletType.BTCOnly.content -> {
+				fragment.showAttentionView()
+				callback(false)
 			}
+			
+			WalletType.ETHERCAndETCOnly.content -> callback(true)
+			else -> callback(false)
 		}
 	}
 	

@@ -5,7 +5,9 @@ import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.updateHeightByText
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 
 /**
@@ -36,13 +38,12 @@ class TransactionDetailAdapter(
 			!model.description.equals(CommonText.from, true)
 			&& !model.description.equals(CommonText.to, true)
 		) {
-			updateHeightByText(data.info, fontSize(14), ScreenSize.widthWithPadding, 200.uiPX())
-			if (model.description.equals(TransactionText.url, true)) {
-				setContentColor(Spectrum.darkBlue)
-				// 会按照单词折行,
-				// 所以额外补贴
-				layoutParams.height += 20.uiPX()
-			}
+			updateHeightByText(
+				data.info,
+				fontSize(14),
+				ScreenSize.widthWithPadding,
+				200.uiPX()
+			)
 		}
 		hold(this)
 	}

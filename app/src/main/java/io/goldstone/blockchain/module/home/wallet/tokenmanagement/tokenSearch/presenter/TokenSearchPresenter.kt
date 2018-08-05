@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchCell
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
@@ -44,15 +43,16 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						WalletTable.getWalletType { type ->
-							canSearch = if (type == WalletType.BTCTestOnly || type == WalletType.BTCOnly) {
-								fragment.context.alert(
-									"This is a single bitcoin chain wallet so you canot add other crypot currency"
-								)
-								false
-							} else {
-								NetworkUtil.hasNetworkWithAlert(context)
-							}
+						canSearch = if (
+							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
+							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true)
+						) {
+							fragment.context.alert(
+								"This is a single bitcoin chain wallet so you canot add other crypot currency"
+							)
+							false
+						} else {
+							NetworkUtil.hasNetworkWithAlert(context)
 						}
 					}
 				}

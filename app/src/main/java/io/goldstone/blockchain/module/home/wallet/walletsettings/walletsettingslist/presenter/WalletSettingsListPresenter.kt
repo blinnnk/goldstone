@@ -106,99 +106,101 @@ class WalletSettingsListPresenter(
 				deleteWatchOnlyWallet(it.orEmpty())
 			}
 		} else {
-			WalletTable.getWalletType {
-				WalletTable.getCurrentWallet {
-					when (it) {
-					// 删除多链钱包下的所有地址对应的数据
-						WalletType.MultiChain -> {
-							object : ConcurrentAsyncCombine() {
-								override var asyncCount = 4
-								
-								override fun concurrentJobs() {
-									AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
-										deleteRoutineWallet(
-											it.first,
-											password,
-											false,
-											true
-										) {
-											completeMark()
-										}
-									}
-									AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
-										deleteRoutineWallet(
-											it.first,
-											password,
-											false,
-											true
-										) {
-											completeMark()
-										}
-									}
-									AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
-										deleteRoutineWallet(
-											it.first,
-											password,
-											true,
-											true
-										) {
-											completeMark()
-										}
-									}
-									AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
-										deleteRoutineWallet(
-											it.first,
-											password,
-											true,
-											true
-										) {
-											completeMark()
-										}
+			WalletTable.getCurrentWallet {
+				when (Config.getCurrentWalletType()) {
+				// 删除多链钱包下的所有地址对应的数据
+					WalletType.MultiChain.content -> {
+						object : ConcurrentAsyncCombine() {
+							override var asyncCount = 4
+							
+							override fun concurrentJobs() {
+								AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
+									deleteRoutineWallet(
+										it.first,
+										password,
+										false,
+										true,
+										true
+									) {
+										completeMark()
 									}
 								}
-								
-								override fun mergeCallBack() {
-									// delete wallet record in `walletTable`
-									WalletTable.deleteCurrentWallet {
-										// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-										XinGePushReceiver.registerAddressesForPush(true)
-										activity?.jump<SplashActivity>()
+								AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
+									deleteRoutineWallet(
+										it.first,
+										password,
+										false,
+										true,
+										true
+									) {
+										completeMark()
 									}
 								}
-							}.start()
-						}
-					// 删除 `BTCTest` 包下的所有地址对应的数据
-						WalletType.BTCTestOnly -> WalletTable.getCurrentWallet {
-							deleteRoutineWallet(
-								currentBTCTestAddress,
-								password,
-								true,
-								true
-							) {
-								activity?.jump<SplashActivity>()
+								AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
+									deleteRoutineWallet(
+										it.first,
+										password,
+										true,
+										true,
+										true
+									) {
+										completeMark()
+									}
+								}
+								AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
+									deleteRoutineWallet(
+										it.first,
+										password,
+										true,
+										true,
+										true
+									) {
+										completeMark()
+									}
+								}
 							}
-						}
-					// 删除 `BTCOnly` 包下的所有地址对应的数据
-						WalletType.BTCOnly -> WalletTable.getCurrentWallet {
-							deleteRoutineWallet(
-								currentBTCAddress,
-								password,
-								true,
-								true
-							) {
-								activity?.jump<SplashActivity>()
+							
+							override fun mergeCallBack() {
+								// delete wallet record in `walletTable`
+								WalletTable.deleteCurrentWallet {
+									// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+									XinGePushReceiver.registerAddressesForPush(true)
+									activity?.jump<SplashActivity>()
+								}
 							}
+						}.start()
+					}
+				// 删除 `BTCTest` 包下的所有地址对应的数据
+					WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
+						deleteRoutineWallet(
+							currentBTCTestAddress,
+							password,
+							true,
+							true
+						) {
+							activity?.jump<SplashActivity>()
 						}
-					// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
-						WalletType.ETHERCAndETCOnly -> WalletTable.getCurrentWallet {
-							deleteRoutineWallet(
-								currentETHAndERCAddress,
-								password,
-								false,
-								true
-							) {
-								activity?.jump<SplashActivity>()
-							}
+					}
+				// 删除 `BTCOnly` 包下的所有地址对应的数据
+					WalletType.BTCOnly.content -> WalletTable.getCurrentWallet {
+						deleteRoutineWallet(
+							currentBTCAddress,
+							password,
+							true,
+							true
+						) {
+							activity?.jump<SplashActivity>()
+						}
+					}
+				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
+					WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
+						deleteRoutineWallet(
+							currentETHAndERCAddress,
+							password,
+							false,
+							true
+						) {
+							activity?.jump<SplashActivity>()
 						}
 					}
 				}

@@ -54,6 +54,10 @@ object BTCUtils {
 		}
 	}
 	
+	fun isBTCAddress(address: String): Boolean {
+		return isValidTestnetAddress(address) || isValidMainnetAddress(address)
+	}
+	
 	fun isValidMultiChainAddress(address: String): AddressType? {
 		return when {
 			Address(address).isValid() -> AddressType.ETHERCOrETC

@@ -42,10 +42,8 @@ class AddressManagerPresneter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		WalletTable.getWalletType {
-			if (it == WalletType.MultiChain) {
-				fragment.showCreatorDashboard()
-			}
+		if (Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)) {
+			fragment.showCreatorDashboard()
 		}
 	}
 	

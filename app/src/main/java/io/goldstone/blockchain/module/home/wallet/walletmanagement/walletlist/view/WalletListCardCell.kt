@@ -17,8 +17,8 @@ import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.*
@@ -31,28 +31,26 @@ import java.util.*
 class WalletListCardCell(context: Context) : RelativeLayout(context) {
 	
 	var model: WalletListModel by observing(WalletListModel()) {
-		WalletTable.getWalletType {
-			val currentType = when (it) {
-				WalletType.MultiChain -> WalletText.multiChain
-				WalletType.ETHERCAndETCOnly -> WalletText.ethERCAndETC
-				WalletType.BTCOnly -> WalletText.btcMainnet
-				WalletType.BTCTestOnly -> WalletText.bitcoinTestnet
-			}
-			nameInfo.title.text = model.addressName
-			nameInfo.subtitle.text = model.subtitle
-			walletInfo.title.text =
-				if (Config.getCurrentIsWatchOnlyOrNot()) WalletText.watchOnly else currentType
-			walletInfo.subtitle.text = WalletText.baseBip44
-			balanceInfo.title.text = model.balance.formatCurrency()
-			balanceInfo.subtitle.text =
-				(WalletText.totalAssets + " (${Config.getCurrencyCode()})").toUpperCase()
-			avatar.glideImage(UnlimitedAvatar(model.id, context).generateImage())
-			container.addCorner(
-				CornerSize.default.toInt(),
-				WalletColor.getALl()[model.id % WalletColor.getALl().size]
-			)
-			container.elevation = 5.uiPX().toFloat()
+		val currentType = when {
+			model.isWatchOnly -> WalletText.watchOnly
+			model.type.equals(WalletType.ETHERCAndETCOnly.content, true) -> WalletText.ethERCAndETC
+			model.type.equals(WalletType.BTCOnly.content, true) -> WalletText.btcMainnet
+			model.type.equals(WalletType.BTCTestOnly.content, true) -> WalletText.bitcoinTestnet
+			else -> WalletText.multiChain
 		}
+		nameInfo.title.text = model.addressName
+		nameInfo.subtitle.text = CryptoUtils.scaleTo32(model.subtitle)
+		walletInfo.title.text = currentType
+		walletInfo.subtitle.text = WalletText.baseBip44
+		balanceInfo.title.text = model.balance.formatCurrency()
+		balanceInfo.subtitle.text =
+			(WalletText.totalAssets + " (${Config.getCurrencyCode()})").toUpperCase()
+		avatar.glideImage(UnlimitedAvatar(model.id, context).generateImage())
+		container.addCorner(
+			CornerSize.default.toInt(),
+			WalletColor.getALl()[model.id % WalletColor.getALl().size]
+		)
+		container.elevation = 5.uiPX().toFloat()
 	}
 	private val waveView by lazy { WaveLoadingView(context) }
 	private val subtitleSize = 12

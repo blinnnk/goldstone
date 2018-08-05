@@ -1152,6 +1152,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val waiting = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Waiting ..."
+		HoneyLanguage.Chinese.code -> "Waiting ..."
+		HoneyLanguage.Japanese.code -> "Waiting ..."
+		HoneyLanguage.Korean.code -> "Waiting ..."
+		HoneyLanguage.Russian.code -> "Waiting ..."
+		HoneyLanguage.TraditionalChinese.code -> "Waiting ..."
+		else -> ""
+	}
+	@JvmField
 	val wrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Password"
 		HoneyLanguage.Chinese.code -> "密码错误"

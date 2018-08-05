@@ -17,17 +17,19 @@ data class WalletListModel(
 	var subtitle: String = "",
 	var balance: Double = 0.0,
 	var isWatchOnly: Boolean = false,
-	var isUsing: Boolean = false
+	var isUsing: Boolean = false,
+	var type: String = ""
 ) {
 	
-	constructor(data: WalletTable, balance: Double) : this(
+	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
 		showSubtitleByType(data, true),
 		showSubtitleByType(data, false),
 		balance,
 		data.isWatchOnly,
-		data.isUsing
+		data.isUsing,
+		type
 	)
 	
 	companion object {

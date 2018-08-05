@@ -55,11 +55,11 @@ data class ContactTable(
 			}
 		}
 		
-		fun hasContacts(address: String, withoutContactOrElse: () -> Unit) {
+		fun hasContacts(address: String, hasContact: (Boolean) -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().getContactByAddress(address)
 			} then {
-				if (it.isNull()) withoutContactOrElse()
+				hasContact(!it.isNull())
 			}
 		}
 		

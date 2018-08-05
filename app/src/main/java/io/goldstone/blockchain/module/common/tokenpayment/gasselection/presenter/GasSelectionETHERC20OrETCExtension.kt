@@ -23,7 +23,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.doAsync
@@ -143,21 +142,20 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	hold: (String?) -> Unit
 ) {
 	doAsync {
-		WalletTable.getWalletType {
-			val isSingleChainWallet = it != WalletType.MultiChain
-			// 获取当前账户的私钥
-			fragment.context?.getPrivateKey(
-				getETHERC20OrETCAddress(),
-				password,
-				false,
-				isSingleChainWallet,
-				{
-					hold(null)
-					fragment.showMaskView(false)
-				},
-				hold
-			)
-		}
+		val isSingleChainWallet =
+			!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+		// 获取当前账户的私钥
+		fragment.context?.getPrivateKey(
+			getETHERC20OrETCAddress(),
+			password,
+			false,
+			isSingleChainWallet,
+			{
+				hold(null)
+				fragment.showMaskView(false)
+			},
+			hold
+		)
 	}
 }
 

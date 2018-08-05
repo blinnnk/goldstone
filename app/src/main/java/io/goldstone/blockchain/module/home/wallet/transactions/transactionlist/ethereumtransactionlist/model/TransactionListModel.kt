@@ -15,6 +15,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
+import org.json.JSONArray
 import java.io.Serializable
 
 /**
@@ -95,7 +96,7 @@ data class TransactionListModel(
 		CryptoSymbol.btc,
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
-		formatToAddress(data.to),
+		data.to,
 		data.blockNumber,
 		data.hash,
 		"",
@@ -122,6 +123,16 @@ data class TransactionListModel(
 				formatedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
 			}
 			return formatedAddresses
+		}
+		
+		fun convertMultiToOrFromAddresses(content: String): List<String> {
+			return if (content.contains("[")) {
+				(0 until JSONArray(content).length()).map {
+					JSONArray(content)[it].toString()
+				}
+			} else {
+				listOf(content)
+			}
 		}
 		
 		fun generateTransactionURL(taxHash: String, symbol: String?): String {

@@ -19,7 +19,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.bitcointransactionlistPresenter.BitcoinTransactionListPresenter
@@ -151,56 +150,54 @@ class TokenDetailPresenter(
 	private fun loadDataFromDatabaseOrElse(
 		withoutLocalDataCallback: () -> Unit = {}
 	) {
-		WalletTable.getWalletType {
-			when (it) {
-				WalletType.MultiChain -> {
-					when {
-						token?.symbol.equals(CryptoSymbol.etc, true) ->
-							getETHERC20OrETCData(
-								Config.getCurrentETCAddress(),
-								withoutLocalDataCallback
-							)
-						
-						token?.symbol.equals(CryptoSymbol.btc, true) -> {
-							if (Config.isTestEnvironment()) {
-								getBTCData(
-									Config.getCurrentBTCTestAddress(),
-									withoutLocalDataCallback
-								)
-							} else {
-								getBTCData(
-									Config.getCurrentBTCAddress(),
-									withoutLocalDataCallback
-								)
-							}
-						}
-						
-						else -> getETHERC20OrETCData(
-							Config.getCurrentEthereumAddress(),
+		when (Config.getCurrentWalletType()) {
+			WalletType.MultiChain.content -> {
+				when {
+					token?.symbol.equals(CryptoSymbol.etc, true) ->
+						getETHERC20OrETCData(
+							Config.getCurrentETCAddress(),
 							withoutLocalDataCallback
 						)
+					
+					token?.symbol.equals(CryptoSymbol.btc, true) -> {
+						if (Config.isTestEnvironment()) {
+							getBTCData(
+								Config.getCurrentBTCTestAddress(),
+								withoutLocalDataCallback
+							)
+						} else {
+							getBTCData(
+								Config.getCurrentBTCAddress(),
+								withoutLocalDataCallback
+							)
+						}
 					}
-				}
-				
-				WalletType.ETHERCAndETCOnly ->
-					getETHERC20OrETCData(
+					
+					else -> getETHERC20OrETCData(
 						Config.getCurrentEthereumAddress(),
 						withoutLocalDataCallback
 					)
-				
-				WalletType.BTCTestOnly -> {
-					getBTCData(
-						Config.getCurrentBTCTestAddress(),
-						withoutLocalDataCallback
-					)
 				}
-				
-				WalletType.BTCOnly -> {
-					getBTCData(
-						Config.getCurrentBTCAddress(),
-						withoutLocalDataCallback
-					)
-				}
+			}
+			
+			WalletType.ETHERCAndETCOnly.content ->
+				getETHERC20OrETCData(
+					Config.getCurrentEthereumAddress(),
+					withoutLocalDataCallback
+				)
+			
+			WalletType.BTCTestOnly.content -> {
+				getBTCData(
+					Config.getCurrentBTCTestAddress(),
+					withoutLocalDataCallback
+				)
+			}
+			
+			WalletType.BTCOnly.content -> {
+				getBTCData(
+					Config.getCurrentBTCAddress(),
+					withoutLocalDataCallback
+				)
 			}
 		}
 	}

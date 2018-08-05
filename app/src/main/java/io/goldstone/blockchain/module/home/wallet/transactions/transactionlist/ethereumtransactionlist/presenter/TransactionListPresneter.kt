@@ -49,7 +49,7 @@ class TransactionListPresenter(
 		} else {
 			fragment.asyncData = memoryTransactionListData
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				updateTransactionInAsync(memoryTransactionListData!!) { hasData ->
+				updateTransactionInAsync(memoryTransactionListData.orEmptyArray()) { hasData ->
 					hasData isTrue {
 						hasUpdate = true
 						fragment.initData()
@@ -89,6 +89,7 @@ class TransactionListPresenter(
 					token.contract.equals(it.contract, true)
 				} || it.contract.isEmpty() || it.symbol.isEmpty()
 			}.apply {
+				if (isEmpty()) return@getMyTokens
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount = size
 					override fun concurrentJobs() {
@@ -100,6 +101,12 @@ class TransactionListPresenter(
 							) {
 								completeMark()
 							}
+							// 更新默认显示到管理菜单的状态
+							DefaultTokenTable.updateDefaultStatusInCurrentChain(
+								it.contract,
+								it.symbol,
+								true
+							)
 						}
 					}
 					
@@ -152,7 +159,7 @@ class TransactionListPresenter(
 								it.ethERCAndETCAddress.equals(item.toAddress, true)
 								|| it.btcTestnetAddress.contains(item.toAddress, true)
 								|| it.btcMainnetAddress.contains(item.toAddress, true)
-							}?.name ?: item.toAddress
+							}?.name ?: item.addressName
 						if (isEnd) {
 							callback()
 						}

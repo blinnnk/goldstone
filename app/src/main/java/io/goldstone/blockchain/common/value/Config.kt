@@ -220,4 +220,10 @@ object Config {
 	
 	fun updateMaxWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)
+	
+	fun getCurrentWalletType(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.walletType)
+	
+	fun updateCurrentWalletType(type: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletType, type)
 }

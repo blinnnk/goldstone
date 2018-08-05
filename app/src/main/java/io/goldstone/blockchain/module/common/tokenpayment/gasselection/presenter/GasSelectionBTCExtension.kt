@@ -21,7 +21,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
@@ -109,16 +108,15 @@ private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 	password: String,
 	hold: (String?) -> Unit
 ) {
-	WalletTable.getWalletType {
-		val isSingleChainWallet = it != WalletType.MultiChain
-		fragment.context?.exportBase58PrivateKey(
-			walletAddress,
-			password,
-			isSingleChainWallet,
-			Config.isTestEnvironment(),
-			hold
-		)
-	}
+	val isSingleChainWallet =
+		!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+	fragment.context?.exportBase58PrivateKey(
+		walletAddress,
+		password,
+		isSingleChainWallet,
+		Config.isTestEnvironment(),
+		hold
+	)
 }
 
 private fun GasSelectionPresenter.prepareReceiptModelFromBTC(

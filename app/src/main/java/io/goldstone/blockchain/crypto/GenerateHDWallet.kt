@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.doAsync
@@ -220,46 +219,44 @@ fun Context.deleteAccount(
 }
 
 fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean) -> Unit) {
-	WalletTable.getWalletType {
-		when (it) {
-			WalletType.BTCTestOnly -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentBTCTestAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-			
-			WalletType.BTCOnly -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentBTCAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-			
-			WalletType.ETHERCAndETCOnly -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentEthereumAddress(),
-					false,
-					true,
-					hold
-				)
-			}
-		// 多链钱包随便找一个名下钱包地址进行验证即可
-			WalletType.MultiChain -> verifyKeystorePassword(
+	when (Config.getCurrentWalletType()) {
+		WalletType.BTCTestOnly.content -> {
+			verifyKeystorePassword(
 				password,
-				Config.getCurrentEthereumAddress(),
-				false,
-				false,
+				Config.getCurrentBTCTestAddress(),
+				true,
+				true,
 				hold
 			)
 		}
+		
+		WalletType.BTCOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentBTCAddress(),
+				true,
+				true,
+				hold
+			)
+		}
+		
+		WalletType.ETHERCAndETCOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentEthereumAddress(),
+				false,
+				true,
+				hold
+			)
+		}
+	// 多链钱包随便找一个名下钱包地址进行验证即可
+		WalletType.MultiChain.content -> verifyKeystorePassword(
+			password,
+			Config.getCurrentEthereumAddress(),
+			false,
+			false,
+			hold
+		)
 	}
 }
 
