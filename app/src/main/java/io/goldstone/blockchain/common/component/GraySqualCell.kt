@@ -47,7 +47,6 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
 		}
 	}
-	
 	private var container: RelativeLayout
 	
 	init {
@@ -72,7 +71,7 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun showArrow() {
-		arrow.into(this)
+		arrow.into(container)
 		arrow.setAlignParentRight()
 		subtitle.x -= 20.uiPX()
 	}

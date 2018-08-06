@@ -9,7 +9,9 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ButtonMenu
 import io.goldstone.blockchain.common.component.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
@@ -108,9 +110,8 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					tokenSocialMedia
 				)
 			}.lparams {
-				width = ScreenSize.widthWithPadding
+				width = matchParent
 				height = matchParent
-				leftMargin = PaddingSize.device
 			}
 		}
 	}
