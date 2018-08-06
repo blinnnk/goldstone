@@ -50,7 +50,7 @@ class UnlimitedAvatar(
 		R.drawable.avatar_elephant,
 		R.drawable.avatar_elk,
 		R.drawable.avatar_fox,
-		R.drawable.avatar_frogrita,
+		R.drawable.avatar_frogita,
 		R.drawable.avatar_giraffe,
 		R.drawable.avatar_hippo,
 		R.drawable.avatar_jaguar,
