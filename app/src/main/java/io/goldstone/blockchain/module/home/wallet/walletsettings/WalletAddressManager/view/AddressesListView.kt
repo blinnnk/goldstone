@@ -47,7 +47,7 @@ class AddressesListView(
 			if (this[0].second.toIntOrNull().isNull()) {
 				hideButton()
 			} else {
-				updateButtonTitle("${CommonText.checkAll} (${model?.size})")
+				updateButtonTitle("Check All (${model?.size})")
 			}
 			// 最多只显示 `4` 个链下地址
 			val limitCount =
@@ -88,7 +88,7 @@ class AddressesListView(
 		cellLayout.gravity = Gravity.CENTER_HORIZONTAL
 		showTopLine = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, 0)
-		showButton(CommonText.checkAll, PaddingSize.device) {
+		showButton("Check All Address", PaddingSize.device) {
 			checkAllEvent?.run()
 		}
 		cellLayout.setAlignParentBottom()

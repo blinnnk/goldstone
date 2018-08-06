@@ -11,6 +11,7 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -62,24 +63,27 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
-	private var lineView: View
+	private lateinit var lineView: View
+	private var container: RelativeLayout
 	
 	init {
-		val param = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
-		param.setMargins(5.uiPX(), 3.uiPX(), 5.uiPX(), 3.uiPX())
-		layoutParams = param
-		addCorner(CornerSize.cell, GrayScale.whiteGray)
-		lineView = View(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+		container = relativeLayout {
+			lparams(ScreenSize.widthWithPadding, cellHeight)
+			setCenterInParent()
+			addCorner(CornerSize.cell, GrayScale.whiteGray)
+			lineView = View(context).apply {
+				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+			}
+			addView(lineView)
+			addView(title)
+			addView(subtitle)
+			addView(copyButton)
+			copyButton.setAlignParentRight()
+			copyButton.x -= 30.uiPX()
+			addView(moreButton)
+			moreButton.setAlignParentRight()
 		}
-		this.addView(lineView)
-		this.addView(title)
-		this.addView(subtitle)
-		this.addView(copyButton)
-		copyButton.setAlignParentRight()
-		copyButton.x -= 30.uiPX()
-		this.addView(moreButton)
-		moreButton.setAlignParentRight()
+		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight + 7.uiPX())
 	}
 	
 	fun <T : CharSequence> setTitle(text: T) {
@@ -93,7 +97,7 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 	}
 	
 	fun updateStyle(type: CellType = Normal) {
-		elevation = 3f
+		container.elevation = 3f
 		title.textColor = GrayScale.Opacity8Black
 		moreButton.setColorFilter(GrayScale.gray)
 		copyButton.setColorFilter(GrayScale.gray)

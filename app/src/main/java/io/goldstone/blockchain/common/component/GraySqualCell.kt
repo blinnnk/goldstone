@@ -13,10 +13,8 @@ import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
+import io.goldstone.blockchain.common.value.ScreenSize
+import org.jetbrains.anko.*
 
 /**
  * @date 25/04/2018 8:56 AM
@@ -50,19 +48,23 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		}
 	}
 	
+	private var container: RelativeLayout
+	
 	init {
-		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 45.uiPX())
-		setMargins<RelativeLayout.LayoutParams> {
-			bottomMargin = 5.uiPX()
+		// 低端机型导致的 SetMargin 不识别, 顾此采用夹层方式实现 `Margin` 的阴影
+		container = relativeLayout {
+			lparams(ScreenSize.widthWithPadding, 45.uiPX())
+			setCenterInParent()
+			addCorner(CornerSize.cell, GrayScale.whiteGray)
+			elevation = 3f
+			addView(View(context).apply {
+				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+				backgroundColor = GrayScale.midGray
+			})
+			addView(title)
+			addView(subtitle)
 		}
-		addCorner(CornerSize.cell, GrayScale.whiteGray)
-		elevation = 3f
-		this.addView(View(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
-			backgroundColor = GrayScale.midGray
-		})
-		this.addView(title)
-		this.addView(subtitle)
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 51.uiPX())
 	}
 	
 	fun <T : CharSequence> setTitle(text: T) {
