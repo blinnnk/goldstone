@@ -34,7 +34,7 @@ class AddressesListView(
 		title: String
 	) -> Unit
 ) : TopBottomLineCell(context) {
-	
+
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
 	}
@@ -47,7 +47,7 @@ class AddressesListView(
 			if (this[0].second.toIntOrNull().isNull()) {
 				hideButton()
 			} else {
-				updateButtonTitle("Check All (${model?.size})")
+				updateButtonTitle("${CommonText.checkAll} (${model?.size})")
 			}
 			// 最多只显示 `4` 个链下地址
 			val limitCount =
@@ -68,27 +68,27 @@ class AddressesListView(
 						} else {
 							updateStyle(Companion.CellType.Normal)
 						}
-						
+
 						copyButton.onClick {
 							context.clickToCopy(data.first)
 							copyButton.preventDuplicateClicks()
 						}
 						hold(moreButton, data.first, isDefault, data.second)
 						setTitle("${data.second}.")
-						
+
 						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 12))
 					}.into(cellLayout)
 				}
 			}
 		}
 	}
-	
+
 	init {
 		setHorizontalPadding(PaddingSize.device.toFloat())
 		cellLayout.gravity = Gravity.CENTER_HORIZONTAL
 		showTopLine = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, 0)
-		showButton("Check All Address", PaddingSize.device) {
+		showButton(CommonText.checkAll, PaddingSize.device) {
 			checkAllEvent?.run()
 		}
 		cellLayout.setAlignParentBottom()

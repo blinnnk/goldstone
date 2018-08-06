@@ -15,7 +15,7 @@ class UnlimitedAvatar(
 	randomNumber: Int,
 	val context: Context
 ) {
-	
+
 	private val absoluteRandomNumber = Math.abs(randomNumber)
 	private var nameMark = 0
 	private var bitmap: Bitmap? = null
@@ -31,7 +31,7 @@ class UnlimitedAvatar(
 					intrinsicHeight,
 					Bitmap.Config.RGB_565
 				)
-				
+
 				backgroundBitmap.eraseColor(Color.parseColor(randomColor))
 				bitmap = combineBitmap(
 					backgroundBitmap,
@@ -43,14 +43,14 @@ class UnlimitedAvatar(
 			null
 		}
 	}
-	
+
 	private val avatarList = listOf(
 		R.drawable.avatar_brown_bear,
 		R.drawable.avatar_cattle,
 		R.drawable.avatar_elephant,
 		R.drawable.avatar_elk,
 		R.drawable.avatar_fox,
-		R.drawable.avatar_frogita,
+		R.drawable.avatar_frog,
 		R.drawable.avatar_giraffe,
 		R.drawable.avatar_hippo,
 		R.drawable.avatar_jaguar,
@@ -63,7 +63,7 @@ class UnlimitedAvatar(
 		R.drawable.avatar_rhinoceros,
 		R.drawable.avatar_wolf
 	)
-	
+
 	// 根据随机数字获得颜色
 	private fun getRandomColor(absoluteRandomNumber: Int): String {
 		val colorMax = 220
@@ -77,33 +77,33 @@ class UnlimitedAvatar(
 		var blueNextInt = colorMin
 		val colorArea = modulusNumber / colorDifference
 		val colorChangeAmount = modulusNumber % colorDifference
-		
+
 		when (colorArea) {
 			0 -> greedNextInt += colorChangeAmount
-			
+
 			1 -> {
 				redNextInt -= colorChangeAmount
 				greedNextInt = colorMax
 			}
-			
+
 			2 -> {
 				redNextInt = colorMin
 				greedNextInt = colorMax
 				blueNextInt += colorChangeAmount
 			}
-			
+
 			3 -> {
 				redNextInt = colorMin
 				greedNextInt = colorMax - colorChangeAmount
 				blueNextInt = colorMax
 			}
-			
+
 			4 -> {
 				redNextInt = colorMin + colorChangeAmount
 				greedNextInt = colorMin
 				blueNextInt = colorMax
 			}
-			
+
 			5 -> {
 				redNextInt = colorMax
 				greedNextInt = colorMin
@@ -124,7 +124,7 @@ class UnlimitedAvatar(
 		}
 		return "#$redToHexString$greedToHexString$blueToHexString"
 	}
-	
+
 	// 合成图片
 	private fun combineBitmap(
 		background: Bitmap?,
@@ -181,24 +181,24 @@ class UnlimitedAvatar(
 		if (firstArea == 0 || firstArea == 2) {
 			// 三角坐标
 			firstTriangleFirstY = backgroundHeight / 2 - sinHeight - sinMobile
-			
+
 			firstTriangleSecondX = backgroundWidth / 2 + cosWidth
 			firstTriangleSecondY = backgroundHeight / 2 + sinHeight - sinMobile
-			
+
 			firstTriangleEndX = backgroundWidth / 2 - cosWidth
 			firstTriangleEndY = backgroundHeight / 2 + sinHeight - sinMobile
-			
+
 			firstTriangleFirstY -= absoluteRandomNumber % 50 * speedMultiple / 2
 			// 四边形坐标
 			rectangleFirstX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
 			rectangleFirstY = backgroundHeight / 2 - cosWidth
-			
+
 			rectangleSecondX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
 			rectangleSecondY = backgroundHeight / 2 - cosWidth
-			
+
 			rectangleThirdX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
 			rectangleThirdY = backgroundHeight / 2 + cosWidth
-			
+
 			rectangleEndX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
 			rectangleEndY = backgroundHeight / 2 + cosWidth
 			var factor = 1
@@ -206,14 +206,14 @@ class UnlimitedAvatar(
 				0 -> {
 					factor = -1
 					firstTriangleEndY += absoluteRandomNumber % 50 * speedMultiple
-					
+
 					rectangleThirdX += absoluteRandomNumber % 50 * speedMultiple * 2
 					rectangleEndX -= absoluteRandomNumber % 50 * speedMultiple * 2
 				}
-				
+
 				2 -> {
 					firstTriangleSecondY += absoluteRandomNumber % 50 * speedMultiple
-					
+
 					rectangleFirstX -= absoluteRandomNumber % 50 * speedMultiple * 2
 					rectangleSecondX += absoluteRandomNumber % 50 * speedMultiple * 2
 				}
@@ -223,13 +223,13 @@ class UnlimitedAvatar(
 			// 四边形坐标
 			rectangleFirstX = backgroundWidth / 2 - cosWidth
 			rectangleFirstY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-			
+
 			rectangleSecondX = backgroundWidth / 2 + cosWidth
 			rectangleSecondY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-			
+
 			rectangleThirdX = backgroundWidth / 2 + cosWidth
 			rectangleThirdY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
-			
+
 			rectangleEndX = backgroundWidth / 2 - cosWidth
 			rectangleEndY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
 			var factor = 1
@@ -239,7 +239,7 @@ class UnlimitedAvatar(
 					rectangleSecondY -= absoluteRandomNumber % 50 * speedMultiple * 2
 					rectangleThirdY += absoluteRandomNumber % 50 * speedMultiple * 2
 				}
-				
+
 				3 -> {
 					rectangleFirstY -= absoluteRandomNumber % 50 * speedMultiple * 2
 					rectangleEndY += absoluteRandomNumber % 50 * speedMultiple * 2
@@ -248,13 +248,13 @@ class UnlimitedAvatar(
 			// 三角坐标
 			firstTriangleFirstX = backgroundWidth / 2 + (sinHeight - sinMobile) * factor
 			firstTriangleFirstY = backgroundHeight / 2 + cosWidth * factor
-			
+
 			firstTriangleSecondX = backgroundWidth / 2 + (sinHeight + sinMobile) * -factor
 			firstTriangleSecondY = backgroundHeight / 2 + cosWidth * -factor
-			
+
 			firstTriangleEndX = backgroundWidth / 2 + (sinHeight - sinMobile) * factor
 			firstTriangleEndY = backgroundHeight / 2 + cosWidth * -factor
-			
+
 			firstTriangleSecondX += absoluteRandomNumber % 50 * speedMultiple / 2 * -factor
 			firstTriangleEndX += absoluteRandomNumber % 50 * speedMultiple * factor
 		}
@@ -294,7 +294,7 @@ class UnlimitedAvatar(
 			)
 			close()
 		}
-		
+
 		Canvas(newmap).apply {
 			// 第一个三角形
 			drawBitmap(
@@ -332,7 +332,7 @@ class UnlimitedAvatar(
 				rectanglePath,
 				paint
 			)
-			
+
 			rotate(
 				(absoluteRandomNumber % 50).toFloat(),
 				backgroundWidth / 2,
@@ -349,7 +349,7 @@ class UnlimitedAvatar(
 		}
 		return newmap
 	}
-	
+
 	// 根据资源文件获取bitmap
 	private fun convertDrawable2BitmapByCanvas(drawable: Drawable): Bitmap {
 		val bitmap = Bitmap.createBitmap(
@@ -368,7 +368,7 @@ class UnlimitedAvatar(
 		drawable.draw(canvas)
 		return bitmap
 	}
-	
+
 	fun getBitmap(): Bitmap? {
 		return bitmap ?: generateImage()
 	}

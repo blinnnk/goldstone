@@ -1166,6 +1166,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val checkAll = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Check All"
+		HoneyLanguage.Chinese.code -> "Check All"
+		HoneyLanguage.Japanese.code -> "Check All"
+		HoneyLanguage.Korean.code -> "Check All"
+		HoneyLanguage.Russian.code -> "Check All"
+		HoneyLanguage.TraditionalChinese.code -> "Check All"
+		else -> ""
+	}
+	@JvmField
 	val wrongCoin = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The QR code you scanned does not match the current currency"
 		HoneyLanguage.Chinese.code -> "您扫描的二维码与当前币种不一致"
@@ -1954,6 +1964,26 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "귀하의 지갑을 삭제하기전, 귀하의 지갑정보를 백업하십시오. 당사는 귀하의 데이터를 저장하지 않기 때문에 이번 조작을 복구할 수 없습니다"
 		HoneyLanguage.Russian.code -> "Перед удалением кошелька, создайте резервную копию его информации, мы не будем сохранять Ваши данные, поэтому мы не сможем их восстановить."
 		HoneyLanguage.TraditionalChinese.code -> "在刪除您的錢包之前，請備份您的錢包信息，我們絕不會保存您的數據，因此我們無法恢復此操作"
+		else -> ""
+	}
+	@JvmField
+	val  createSubAccount= when (currentLanguage) {
+		HoneyLanguage.English.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.Chinese.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.Japanese.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.Korean.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.Russian.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.TraditionalChinese.code -> "Create a sub-account for the Bip44 rule"
+		else -> ""
+	}
+	@JvmField
+	val  createSubAccountIntro= when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Chinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Japanese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Korean.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Russian.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.TraditionalChinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
 		else -> ""
 	}
 	@JvmField
