@@ -14,7 +14,13 @@ data class ServerConfigModel(
 	val switch: String,
 	@SerializedName("value")
 	val value: String
-) : Serializable
+) : Serializable {
+	constructor() : this(
+		"",
+		"",
+		""
+	)
+}
 
 data class QRCodeModel(
 	val amount: Double,

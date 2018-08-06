@@ -31,7 +31,7 @@ data class WalletDetailCellModel(
 	var contract: String = "",
 	var weight: Int = 0
 ) : Serializable {
-	
+
 	constructor(data: DefaultTokenTable, balance: Double, countHasDecimal: Boolean = false) : this(
 		data.iconUrl,
 		data.symbol,
@@ -45,9 +45,9 @@ data class WalletDetailCellModel(
 		data.contract,
 		data.weight
 	)
-	
+
 	companion object {
-		
+
 		fun Boolean.convertBalance(balance: Double, decimal: Double): Double {
 			return if (this) {
 				balance.formatCount(9).toDoubleOrNull().orElse(0.0)
@@ -55,7 +55,7 @@ data class WalletDetailCellModel(
 				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
 			}
 		}
-		
+
 		fun getLocalModels(
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
@@ -94,7 +94,7 @@ data class WalletDetailCellModel(
 								}
 							}
 						}
-						
+
 						override fun mergeCallBack() {
 							hold(tokenList)
 						}
@@ -102,7 +102,7 @@ data class WalletDetailCellModel(
 				}
 			}
 		}
-		
+
 		fun getChainModels(
 			fragment: WalletDetailFragment,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
@@ -156,14 +156,14 @@ data class WalletDetailCellModel(
 									}
 								}
 							}
-							
+
 							override fun mergeCallBack() = hold(tokenList)
 						}.start()
 					}
 				}
 			}
 		}
-		
+
 		private fun DefaultTokenTable.updateTokenNameFromChain(
 			errorCallback: (Throwable?) -> Unit,
 			callback: (DefaultTokenTable) -> Unit
@@ -181,7 +181,7 @@ data class WalletDetailCellModel(
 				callback(this.apply { this.name = name })
 			}
 		}
-		
+
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
@@ -203,7 +203,7 @@ data class WalletDetailCellModel(
 								completeMark()
 							}
 						}
-						
+
 						override fun mergeCallBack() = callback()
 					}.start()
 				}

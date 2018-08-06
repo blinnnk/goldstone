@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  * @author KaySaith
  */
 object RequisitionUtil {
-	
+
 	inline fun <reified T> postRequestGetJsonObject(
 		body: RequestBody,
 		keyName: String,
@@ -40,7 +40,7 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		
+
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -49,7 +49,7 @@ object RequisitionUtil {
 					}
 					LogUtil.error(path, error)
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -76,7 +76,7 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	fun postRequest(
 		body: RequestBody,
 		path: String,
@@ -90,7 +90,7 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		
+
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -99,7 +99,7 @@ object RequisitionUtil {
 						netWorkError(error)
 					}
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -116,7 +116,7 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	@JvmStatic
 	inline fun <reified T> requestData(
 		api: String,
@@ -133,7 +133,7 @@ object RequisitionUtil {
 				.connectTimeout(maxConnectTime, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		
+
 		getcryptGetRequest(api, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -142,7 +142,7 @@ object RequisitionUtil {
 					}
 					LogUtil.error(keyName + "requestData", error)
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -154,7 +154,7 @@ object RequisitionUtil {
 						GoldStoneCode.showErrorCodeReason(data)
 						return
 					}
-					
+
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
@@ -177,7 +177,7 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	/** 请求 ehterScan, blockchain.info 的数据是明文请求不需要加密 */
 	@JvmStatic
 	inline fun <reified T> requestUncryptoData(
@@ -200,7 +200,7 @@ object RequisitionUtil {
 				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 				LogUtil.error("$api $keyName", error)
 			}
-			
+
 			override fun onResponse(call: Call, response: Response) {
 				val data = response.body()?.string()
 				try {
@@ -221,7 +221,7 @@ object RequisitionUtil {
 			}
 		})
 	}
-	
+
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
 	fun getcryptoRequest(
 		body: RequestBody,
@@ -261,7 +261,7 @@ object RequisitionUtil {
 			callback(request)
 		}
 	}
-	
+
 	fun getcryptGetRequest(
 		api: String,
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
@@ -297,7 +297,7 @@ object RequisitionUtil {
 			}
 		}
 	}
-	
+
 	fun callChainBy(
 		body: RequestBody,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
@@ -321,7 +321,7 @@ object RequisitionUtil {
 						errorCallback(error, "Call Ethereum Failured")
 					}
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -346,7 +346,7 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	private fun checkChainErrorCode(data: String?): String {
 		val hasError = data?.contains("error")
 		val errorData: String
@@ -362,7 +362,7 @@ object RequisitionUtil {
 		}
 		return when {
 			data.isNullOrBlank() -> return ""
-			
+
 			errorData.isNotEmpty() -> {
 				try {
 					if (errorData.equals("null", true)) ""
@@ -371,7 +371,7 @@ object RequisitionUtil {
 					"$error"
 				}
 			}
-			
+
 			else -> ""
 		}
 	}
@@ -388,7 +388,7 @@ object GoldStoneCode {
 			LogUtil.error("function: GoldStoneCode, wrongCode: $code")
 		}
 	}
-	
+
 	fun showErrorCodeReason(data: String?, errorCallback: () -> Unit = {}) {
 		data?.apply {
 			val code = try {
@@ -404,7 +404,7 @@ object GoldStoneCode {
 						}
 						LogUtil.error("Server Error GoldStone")
 					}
-					
+
 					-4 -> {
 						GoldStoneAPI.context.runOnUiThread {
 							errorCallback()

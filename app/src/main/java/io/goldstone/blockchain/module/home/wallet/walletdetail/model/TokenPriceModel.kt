@@ -12,4 +12,10 @@ data class TokenPriceModel(
 	val contract: String,
 	@SerializedName("price")
 	val price: Double
-)
+) {
+	// 这个没设定构造函数会导致 Gson 解析失败
+	constructor() : this(
+		"",
+		0.0
+	)
+}

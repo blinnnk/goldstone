@@ -19,11 +19,11 @@ import java.util.*
  */
 class WalletDetailFragment :
 	BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
-	
+
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
 	private var headerView: WalletDetailHeaderView? = null
 	override val presenter = WalletDetailPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<WalletDetailCellModel>?
@@ -47,15 +47,15 @@ class WalletDetailFragment :
 			}
 		}
 	}
-	
+
 	fun showMiniLoadingView() {
 		headerView?.showLoadingView(true)
 	}
-	
+
 	fun removeMiniLoadingView() {
 		headerView?.showLoadingView(false)
 	}
-	
+
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
@@ -68,18 +68,18 @@ class WalletDetailFragment :
 			notifyButton.onClick { presenter.showNotificationListFragment() }
 		}
 	}
-	
+
 	private var isShow = false
 	private val headerHeight by lazy { slideHeader.layoutParams.height }
 	private var totalRange = 0
-	
+
 	override fun observingRecyclerViewVerticalOffset(
 		offset: Int,
 		range: Int
 	) {
 		if (offset == 0) totalRange = 0
 		if (totalRange == 0) totalRange = range
-		
+
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
@@ -89,15 +89,15 @@ class WalletDetailFragment :
 			isShow = false
 		}
 	}
-	
+
 	fun setNotificationUnreadCount(count: String) {
 		slideHeader.notifyButton.setRedotStyle(count)
 	}
-	
+
 	fun recoveryNotifyButtonStyle() {
 		slideHeader.notifyButton.removeRedot()
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		val overlay = mainActivity
 			?.getMainContainer()

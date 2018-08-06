@@ -34,4 +34,21 @@ data class ETCTransactionModel(
 	@SerializedName("transactionIndex")
 	var transactionIndex: String,
 	var isFee: Boolean = false
-)
+) {
+	constructor() : this(
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		false
+	)
+}
