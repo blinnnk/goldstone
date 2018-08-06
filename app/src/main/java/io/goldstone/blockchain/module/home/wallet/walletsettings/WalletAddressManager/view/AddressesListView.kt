@@ -49,7 +49,9 @@ class AddressesListView(
 				updateButtonTitle("Check All (${model?.size})")
 			}
 			// 最多只显示 `4` 个链下地址
-			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
+			val limitCount =
+				if (model?.size.orZero() > maxCount) maxCount
+				else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 60.uiPX()
 			requestLayout()
 			WalletTable.getCurrentAddresses { currentAddresses ->

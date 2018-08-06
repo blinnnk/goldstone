@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.entrance.splash.view
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.app.AppCompatDelegate
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -69,6 +70,7 @@ class SplashActivity : AppCompatActivity() {
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 		// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 		savedInstanceState.isNull {
 			transparentStatus()

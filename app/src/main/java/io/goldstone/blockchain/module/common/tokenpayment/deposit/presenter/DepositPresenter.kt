@@ -132,14 +132,18 @@ class DepositPresenter(
 			val chainID = if (content.contains("chain_id"))
 				content.substringAfter("chain_id=").substringBefore("e18")
 			else ""
+			val contract = if (
+				chainID.equals(ChainID.ETCMain.id, true) ||
+				chainID.equals(ChainID.ETCTest.id, true)
+			) CryptoValue.etcContract else CryptoValue.ethContract
 			return if (content.contains("?")) {
 				val address = content.substringBefore("?").substringAfter(":")
 				val value = content.substringAfter("value=").substringBefore("e18")
 				val amount = value.toDoubleOrNull().orZero()
-				QRCodeModel(amount, address, CryptoValue.ethContract, chainID)
+				QRCodeModel(amount, address, contract, chainID)
 			} else {
 				val address = content.substringAfter(":")
-				QRCodeModel(0.0, address, CryptoValue.ethContract, chainID)
+				QRCodeModel(0.0, address, contract, chainID)
 			}
 		}
 		

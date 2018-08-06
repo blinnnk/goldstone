@@ -31,10 +31,7 @@ import org.jetbrains.anko.*
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
-	private val avatarBitmap = UnlimitedAvatar(
-		Config.getCurrentID(),
-		context
-	).generateImage()
+	private val avatarBitmap = UnlimitedAvatar(Config.getCurrentID(), context).getBitmap()
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull())
@@ -66,7 +63,8 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight)
 		
 		waveView.apply {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
+			layoutParams =
+				RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 30
 			waveColor = Color.parseColor("#FF265A80")

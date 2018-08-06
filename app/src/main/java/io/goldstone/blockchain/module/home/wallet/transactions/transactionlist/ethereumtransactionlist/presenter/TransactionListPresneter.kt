@@ -24,7 +24,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.view.TransactionListFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.support.v4.onUiThread
 
 /**
  * @date 24/03/2018 2:12 PM
@@ -75,7 +74,14 @@ class TransactionListPresenter(
 							hasUpdate = true
 							initData()
 						}
-						onUiThread { removeLoadingView() }
+						
+						try {
+							// ViewPager 跨 Fragment 的时候 数据现成存在但是 View 已经被
+							// ViewPager 清楚
+							GoldStoneAPI.context.runOnUiThread { removeLoadingView() }
+						} catch (error: Exception) {
+							LogUtil.error("removeLoadingView", error)
+						}
 					}
 				}
 			}
@@ -143,7 +149,6 @@ class TransactionListPresenter(
 	}
 	
 	companion object {
-		
 		fun checkAddressNameInContacts(
 			transactions: List<TransactionListModel>,
 			callback: () -> Unit

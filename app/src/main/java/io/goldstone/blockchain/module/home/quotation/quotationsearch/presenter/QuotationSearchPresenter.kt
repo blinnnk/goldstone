@@ -27,7 +27,7 @@ class QuotationSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 	
-	var hasNetWork = true
+	private var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
