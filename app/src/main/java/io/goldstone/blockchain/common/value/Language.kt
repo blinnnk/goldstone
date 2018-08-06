@@ -1153,16 +1153,6 @@ object CommonText {
 	}
 	
 	@JvmField
-	val checkAll = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check All"
-		HoneyLanguage.Chinese.code -> "Check All"
-		HoneyLanguage.Japanese.code -> "Check All"
-		HoneyLanguage.Korean.code -> "Check All"
-		HoneyLanguage.Russian.code -> "Check All"
-		HoneyLanguage.TraditionalChinese.code -> "Check All"
-		else -> ""
-	}
-	@JvmField
 	val waiting = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Waiting ..."
 		HoneyLanguage.Chinese.code -> "Waiting ..."
