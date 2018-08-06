@@ -73,7 +73,7 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 		}
 		findViewById<View>(index)?.apply {
 			addCorner(codeSize, Spectrum.white)
-			scale()
+			scale(0)
 		}
 	}
 

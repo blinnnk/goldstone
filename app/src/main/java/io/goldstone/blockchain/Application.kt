@@ -16,10 +16,10 @@ import java.io.File
  * @author KaySaith
  */
 class GoldStoneApp : Application() {
-	
+
 	private var sAnalytics: GoogleAnalytics? = null
 	private var tracker: Tracker? = null
-	
+
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
@@ -33,8 +33,9 @@ class GoldStoneApp : Application() {
 		GoldStoneAPI.context = this
 		// 检查是否需要清理本地的 `KeyStore File`
 		cleanKeyStoreFileWhenUpdateDatabase()
+
 	}
-	
+
 	/**
 	 * Gets the default [Tracker] for this [Application].
 	 */
@@ -45,7 +46,7 @@ class GoldStoneApp : Application() {
 		}
 		return tracker
 	}
-	
+
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
 	private fun cleanKeyStoreFileWhenUpdateDatabase() {
@@ -55,7 +56,7 @@ class GoldStoneApp : Application() {
 			}
 		}
 	}
-	
+
 	private fun cleanKeyStoreFile(dir: File): Boolean {
 		if (dir.isDirectory) {
 			val children = dir.list()

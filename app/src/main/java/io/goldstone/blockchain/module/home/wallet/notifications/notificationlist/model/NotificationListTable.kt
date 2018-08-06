@@ -162,4 +162,9 @@ data class ExtraTransactionModel(
 	val value: String,
 	@SerializedName("address")
 	val address: String
-)
+) {
+	constructor() : this(
+		"",
+		""
+	)
+}

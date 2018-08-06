@@ -21,4 +21,14 @@ data class UnspentModel(
 	val txid: String,
 	@SerializedName("confirmations")
 	val confirmations: Int
-)
+) {
+	constructor() : this(
+		0,
+		"",
+		0L,
+		"",
+		"",
+		"",
+		0
+	)
+}

@@ -24,4 +24,15 @@ data class TokenSearchModel(
 	var type: Int = 0,
 	@SerializedName("weight")
 	var weight: Int = 0
-)
+) {
+	constructor() : this(
+		"",
+		"",
+		"",
+		"",
+		"",
+		0,
+		0,
+		0
+	)
+}

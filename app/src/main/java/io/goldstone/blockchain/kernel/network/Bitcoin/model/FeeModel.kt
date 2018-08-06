@@ -11,4 +11,9 @@ data class FeeModel(
 	val fee: Double,
 	@SerializedName("blocks")
 	val blocks: Int
-)
+) {
+	constructor() : this(
+		0.0,
+		0
+	)
+}
