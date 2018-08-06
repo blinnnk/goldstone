@@ -726,6 +726,66 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
+	val multiChain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "MULTI-CHAIN"
+		HoneyLanguage.Chinese.code -> "支持多链"
+		HoneyLanguage.Japanese.code -> "マルチチェーン"
+		HoneyLanguage.Korean.code -> "다중 체인"
+		HoneyLanguage.Russian.code -> "Multi-цепи"
+		HoneyLanguage.TraditionalChinese.code -> "支持多鏈"
+		else -> ""
+	}
+	@JvmField
+	val ethERCAndETC = when (currentLanguage) {
+		HoneyLanguage.English.code -> "ETH/ERC20 Token/ETC"
+		HoneyLanguage.Chinese.code -> "ETH/ERC20代币/ETC"
+		HoneyLanguage.Japanese.code -> "ETH/ERC20トークン/ETC"
+		HoneyLanguage.Korean.code -> "ETH/ERC20 토큰/ETC"
+		HoneyLanguage.Russian.code -> "ETH/ERC20 Token/ETC"
+		HoneyLanguage.TraditionalChinese.code -> "ETH/ERC20代幣/ETC"
+		else -> ""
+	}
+	@JvmField
+	val btcMainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BITCOIN MAINNET"
+		HoneyLanguage.Chinese.code -> "BITCOIN 主网"
+		HoneyLanguage.Japanese.code -> "BITCOIN メインネット"
+		HoneyLanguage.Korean.code -> "BITCOIN  메인 넷"
+		HoneyLanguage.Russian.code -> "BITCOIN МАЙНЕТ"
+		HoneyLanguage.TraditionalChinese.code -> "BITCOIN MAINNET"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinTestnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Chinese.code -> "BITCOIN 测试网络"
+		HoneyLanguage.Japanese.code -> "BITCOIN テストネット"
+		HoneyLanguage.Korean.code -> "BITCOIN 테스트 넷"
+		HoneyLanguage.Russian.code -> "BITCOIN TESTNET"
+		HoneyLanguage.TraditionalChinese.code -> "BITCOIN 測試網絡"
+		else -> ""
+	}
+	@JvmField
+	val watchOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WATCH ONLY"
+		HoneyLanguage.Chinese.code -> "观察钱包"
+		HoneyLanguage.Japanese.code -> "観測ウォレット"
+		HoneyLanguage.Korean.code -> "관측 지갑"
+		HoneyLanguage.Russian.code -> "Наблюдательный кошелек"
+		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"
+		else -> ""
+	}
+	@JvmField
+	val baseBip44 = when (currentLanguage) {
+		HoneyLanguage.English.code -> "WALLET BASED ON BIP44"
+		HoneyLanguage.Chinese.code -> "钱包基于 BIP44标准"
+		HoneyLanguage.Japanese.code -> "BIP44規格に基づくウォレット"
+		HoneyLanguage.Korean.code -> "BIP44 표준 기반 월렛"
+		HoneyLanguage.Russian.code -> "Кошелек на основе стандарта BIP44"
+		HoneyLanguage.TraditionalChinese.code -> "錢包基於 BIP44標準"
+		else -> ""
+	}
+	@JvmField
 	val showQRCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR Code"
 		HoneyLanguage.Chinese.code -> "二维码"
@@ -1084,6 +1144,37 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "確認"
 		else -> ""
 	}
+
+	@JvmField
+	val waiting = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Waiting ..."
+		HoneyLanguage.Chinese.code -> "请稍候 ..."
+		HoneyLanguage.Japanese.code -> "お待ちください ..."
+		HoneyLanguage.Korean.code -> "기다려주십시오 ..."
+		HoneyLanguage.Russian.code -> "Пожалуйста, подождите ..."
+		HoneyLanguage.TraditionalChinese.code -> "請稍後 ..."
+		else -> ""
+	}
+	@JvmField
+	val wrongChainID = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wrong Chain ID"
+		HoneyLanguage.Chinese.code -> "错误的链 ID"
+		HoneyLanguage.Japanese.code -> "間違ったチェーンID"
+		HoneyLanguage.Korean.code -> "잘못된 체인 ID"
+		HoneyLanguage.Russian.code -> "Неверный идентификатор цепи"
+		HoneyLanguage.TraditionalChinese.code -> "錯誤的鏈ID"
+		else -> ""
+	}
+	@JvmField
+	val wrongCoin = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The QR code you scanned does not match the current currency"
+		HoneyLanguage.Chinese.code -> "您扫描的二维码与当前币种不一致"
+		HoneyLanguage.Japanese.code -> "スキャンしたQRコードが現在の通貨と一致しません"
+		HoneyLanguage.Korean.code -> "스캔 한 QR 코드가 현재 통화와 일치하지 않습니다."
+		HoneyLanguage.Russian.code -> "Сканированный QR-код не соответствует текущей валюте"
+		HoneyLanguage.TraditionalChinese.code -> "您掃描的二維碼與當前幣種不一致"
+		else -> ""
+	}
 	@JvmField
 	val wrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Password"
@@ -1102,6 +1193,16 @@ object CommonText {
 		HoneyLanguage.Korean.code -> "성공"
 		HoneyLanguage.Russian.code -> "Завершено"
 		HoneyLanguage.TraditionalChinese.code -> "成功"
+		else -> ""
+	}
+	@JvmField
+	val wrongQRCode = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Incorrect QR Code Format"
+		HoneyLanguage.Chinese.code -> "二维码格式不正确"
+		HoneyLanguage.Japanese.code -> "QRコード形式が正しくありませ"
+		HoneyLanguage.Korean.code -> "QR 코드 형식이 잘못되었습니다"
+		HoneyLanguage.Russian.code -> "Формат QR-кода неверен"
+		HoneyLanguage.TraditionalChinese.code -> "二維碼格式不正確"
 		else -> ""
 	}
 	@JvmField
