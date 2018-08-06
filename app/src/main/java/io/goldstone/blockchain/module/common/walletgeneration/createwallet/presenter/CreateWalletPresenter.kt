@@ -23,7 +23,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
-import io.goldstone.blockchain.crypto.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
