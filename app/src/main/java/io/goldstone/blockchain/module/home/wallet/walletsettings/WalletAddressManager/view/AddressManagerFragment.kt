@@ -33,7 +33,7 @@ import org.jetbrains.anko.support.v4.toast
  * @author KaySaith
  */
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
-	
+
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!) { moreButton, address, isDefault, title ->
 			val chainTYpe = when (title) {
@@ -100,7 +100,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	override val presenter = AddressManagerPresneter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		showCreatorDashboard()
 		scrollView {
@@ -137,31 +137,31 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	
+
 	private fun hideAddButton() {
 		getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 	}
-	
+
 	fun setMultiChainAddresses(model: List<Pair<String, String>>) {
 		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
 		currentMultiChainAddressesView.model = model
 	}
-	
+
 	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
 		ethAndERCAddressesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethAndERCAddressesView.model = model
 	}
-	
+
 	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.model = model
 	}
-	
+
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
 		btcAddressesView.setTitle(WalletSettingsText.bitcoinAddress)
 		btcAddressesView.model = model
 	}
-	
+
 	fun showCreatorDashboard() {
 		getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
@@ -186,7 +186,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	
+
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
 		context?.apply {
 			when (title) {
@@ -195,13 +195,13 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						ethAndERCAddressesView.model = it
 					}
 				}
-				
+
 				WalletSettingsText.newETCAddress -> {
 					AddressManagerPresneter.createETCAddress(this, password) {
 						etcAddressesView.model = it
 					}
 				}
-				
+
 				WalletSettingsText.newBTCAddress -> {
 					if (Config.isTestEnvironment()) {
 						AddressManagerPresneter.createBTCTestAddress(this, password) {
@@ -216,7 +216,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	
+
 	private fun showCellMoreDashboard(
 		top: Float,
 		address: String,
@@ -236,7 +236,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-						
+
 						ChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								presenter.getBitcoinTestAddresses()
@@ -259,30 +259,30 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) }
 		)
 	}
-	
+
 	private fun updateWalletDetail() {
 		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
-	
+
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
 			presenter.showWalletSettingListFragment()
 		}
 	}
-	
+
 	override fun onDestroyView() {
 		super.onDestroyView()
 		removeDashboard(context)
 	}
-	
+
 	companion object {
 		fun verifyMultiChainWalletPassword(
 			context: Context,
 			callback: (password: String) -> Unit
 		) {
 			context.showAlertView(
-				WalletSettingsText.deleteInfoTitle,
-				WalletSettingsText.deleteInfoSubtitle,
+				WalletSettingsText.createSubAccount,
+				WalletSettingsText.createSubAccountIntro,
 				!Config.getCurrentIsWatchOnlyOrNot()
 			) {
 				val password = it?.text.toString()
@@ -298,7 +298,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 			AddressManagerFragment.removeDashboard(context)
 		}
-		
+
 		fun showMoreDashboard(
 			container: ViewGroup?,
 			top: Float,
@@ -317,12 +317,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 							when (title) {
 								WalletText.setDefaultAddress -> setDefaultAddressEvent()
 								WalletText.showQRCode -> qrCellClickEvent()
-								
+
 								WalletSettingsText.exportPrivateKey -> {
 									if (isBTC) exportBTCPrivateKey()
 									else exportPrivateKey()
 								}
-								
+
 								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
 							}
 							cell.preventDuplicateClicks()
@@ -337,7 +337,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				}
 			}
 		}
-		
+
 		fun removeDashboard(context: Context?) {
 			(context as? MainActivity)?.getMainContainer()?.apply {
 				findViewById<MiniOverlay>(ElementID.miniOverlay)?.removeSelf()
