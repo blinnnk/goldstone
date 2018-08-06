@@ -11,7 +11,6 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -66,10 +65,9 @@ open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) 
 	private var lineView: View
 	
 	init {
-		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
-		setMargins<RelativeLayout.LayoutParams> {
-			setMargins(5.uiPX(), 3.uiPX(), 5.uiPX(), 3.uiPX())
-		}
+		val param = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
+		param.setMargins(5.uiPX(), 3.uiPX(), 5.uiPX(), 3.uiPX())
+		layoutParams = param
 		addCorner(CornerSize.cell, GrayScale.whiteGray)
 		lineView = View(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)

@@ -45,7 +45,8 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 		balanceInfo.title.text = model.balance.formatCurrency()
 		balanceInfo.subtitle.text =
 			(WalletText.totalAssets + " (${Config.getCurrencyCode()})").toUpperCase()
-		avatar.glideImage(UnlimitedAvatar(model.id, context).generateImage())
+		avatar.glideImage("")
+		avatar.glideImage(UnlimitedAvatar(model.id, context).getBitmap())
 		container.addCorner(
 			CornerSize.default.toInt(),
 			WalletColor.getALl()[model.id % WalletColor.getALl().size]

@@ -119,7 +119,7 @@ class WalletSettingsListPresenter(
 										it.first,
 										password,
 										false,
-										true,
+										false,
 										true
 									) {
 										completeMark()
@@ -130,7 +130,7 @@ class WalletSettingsListPresenter(
 										it.first,
 										password,
 										false,
-										true,
+										false,
 										true
 									) {
 										completeMark()
@@ -141,7 +141,7 @@ class WalletSettingsListPresenter(
 										it.first,
 										password,
 										true,
-										true,
+										false,
 										true
 									) {
 										completeMark()
@@ -152,7 +152,7 @@ class WalletSettingsListPresenter(
 										it.first,
 										password,
 										true,
-										true,
+										false,
 										true
 									) {
 										completeMark()

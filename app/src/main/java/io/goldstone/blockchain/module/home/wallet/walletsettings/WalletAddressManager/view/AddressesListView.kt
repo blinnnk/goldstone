@@ -12,6 +12,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion
 import io.goldstone.blockchain.common.component.TopBottomLineCell
+import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -46,10 +47,12 @@ class AddressesListView(
 			if (this[0].second.toIntOrNull().isNull()) {
 				hideButton()
 			} else {
-				updateButtonTitle("Check All (${model?.size})")
+				updateButtonTitle("${CommonText.checkAll} (${model?.size})")
 			}
 			// 最多只显示 `4` 个链下地址
-			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
+			val limitCount =
+				if (model?.size.orZero() > maxCount) maxCount
+				else model?.size.orZero()
 			layoutParams.height = limitCount * 50.uiPX() + 60.uiPX()
 			requestLayout()
 			WalletTable.getCurrentAddresses { currentAddresses ->
@@ -85,7 +88,7 @@ class AddressesListView(
 		cellLayout.gravity = Gravity.CENTER_HORIZONTAL
 		showTopLine = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, 0)
-		showButton("Check All Addresses", PaddingSize.device) {
+		showButton(CommonText.checkAll, PaddingSize.device) {
 			checkAllEvent?.run()
 		}
 		cellLayout.setAlignParentBottom()
