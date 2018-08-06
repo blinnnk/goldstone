@@ -74,15 +74,17 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	private val percent by lazy { TextView(context) }
 	
 	init {
+		setHorizontalPadding(PaddingSize.device.toFloat())
 		orientation = VERTICAL
 		setTitle(QuotationText.currentPrice)
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 		showTopLine = true
 		priceTitles.apply {
+			x += PaddingSize.device
 			textColor = GrayScale.black
 			textSize = fontSize(24)
 			typeface = GoldStoneFont.black(context)
-			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 			gravity = Gravity.START or Gravity.BOTTOM
 			y -= 5.uiPX()
 		}.into(this)
@@ -90,9 +92,10 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 			textColor = Spectrum.green
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
-			layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX())
 			gravity = Gravity.END or Gravity.BOTTOM
 			y -= 31.uiPX()
+			x += 15.uiPX()
 		}.into(this)
 	}
 }
