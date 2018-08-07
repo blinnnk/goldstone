@@ -24,7 +24,9 @@ class BlinnnkXValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValu
       || this.chart.data.getDataSetByIndex(0) == null) {
       return ""
     }
-    var values = (this.chart.data.getDataSetByIndex(0) as DataSet<Entry>).values
+		
+		
+    var values = (this.chart.data.getDataSetByIndex(0) as DataSet<*>).values
     if (position >= values.size) return ""
     val entry = values[position]
     if ((entry.data as Long) == 0.toLong()) return ""

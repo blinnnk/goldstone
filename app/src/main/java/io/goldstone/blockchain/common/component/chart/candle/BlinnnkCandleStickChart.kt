@@ -78,25 +78,7 @@ class BlinnnkCandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider
     }
   }
   
-  override fun getLowestVisibleX(): Float {
-    if (isGetLeftZero) {
-      return mXAxis.mAxisMinimum
-    }else{
-      return super.getLowestVisibleX()
-      
-    }
-    postDelayed(getLeftRunnable, delayTime.toLong())
-    
-  }
-  
-  override fun getHighestVisibleX(): Float {
-    if (isGetLeftZero) {
-      return mXAxis.mAxisMaximum
-    }else{
-      return super.getHighestVisibleX()
-    }
-  }
-  
+	
   fun notifyData(dataRows: List<CandleEntry>) {
     setEmptyData()
     postDelayed(object : Runnable{

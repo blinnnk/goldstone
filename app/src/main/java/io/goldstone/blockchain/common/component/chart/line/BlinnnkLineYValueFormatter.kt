@@ -16,6 +16,6 @@ class BlinnnkLineYValueFormatter : IValueFormatter {
     viewPortHandler: ViewPortHandler
   ): String {
     val bean = entry.data as Entry
-    return if (bean != null) bean!!.y.toString() else value.toString()
+    return bean.y.toString()
   }
 }
