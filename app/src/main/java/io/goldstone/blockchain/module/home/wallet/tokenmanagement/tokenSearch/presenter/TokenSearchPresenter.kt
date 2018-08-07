@@ -30,11 +30,11 @@ import org.jetbrains.anko.runOnUiThread
 class TokenSearchPresenter(
 	override val fragment: TokenSearchFragment
 ) : BaseRecyclerPresenter<TokenSearchFragment, DefaultTokenTable>() {
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-	
+
 	private var canSearch = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -56,9 +56,9 @@ class TokenSearchPresenter(
 						}
 					}
 				}
-			) {
+			) { defaultTokens ->
 				canSearch isTrue {
-					searchTokenByContractOrSymbol(it) {
+					searchTokenByContractOrSymbol(defaultTokens) {
 						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
 							fragment.removeLoadingView()
@@ -68,7 +68,7 @@ class TokenSearchPresenter(
 			}
 		}
 	}
-	
+
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
 			model?.let { searchToken ->
@@ -96,7 +96,7 @@ class TokenSearchPresenter(
 			switch.preventDuplicateClicks()
 		}
 	}
-	
+
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
@@ -108,17 +108,17 @@ class TokenSearchPresenter(
 			}
 		}
 	}
-	
+
 	private fun searchTokenByContractOrSymbol(
 		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-		
+
 		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
 			content,
-			{
+			{ it ->
 				// Usually this kinds of Exception will be connect to the service Timeout
 				fragment.context?.alert(
 					it.toString().trimStart {
@@ -130,7 +130,7 @@ class TokenSearchPresenter(
 			MyTokenTable.getMyTokens { localTokens ->
 				if (!result.isNullOrEmpty()) {
 					// 从服务器请求目标结果
-					result.map { serverToken ->
+					hold(result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							val status = localTokens.any {
@@ -139,9 +139,7 @@ class TokenSearchPresenter(
 							isDefault = status
 							isUsed = status
 						}
-					}.let {
-						hold(it.toArrayList())
-					}
+					}.toArrayList())
 				} else {
 					if (isSearchingSymbol) {
 						hold(arrayListOf())

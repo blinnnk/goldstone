@@ -28794,9 +28794,8 @@ io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.prese
     kotlin.jvm.functions.Function0 $callback -> a
     void invoke(java.lang.Throwable) -> super
 io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter$updateKeystorePassword$2 -> c.a.a.d.c.d.g.d.a.b:
-    io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter this$0 -> a
-    java.lang.String $passwordHint -> b
-    kotlin.jvm.functions.Function0 $callback -> c
+    java.lang.String $passwordHint -> a
+    kotlin.jvm.functions.Function0 $callback -> b
 io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter$updatePassword$1 -> c.a.a.d.c.d.g.d.a.o:
     io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter this$0 -> a
     java.lang.String $oldPassword -> b
@@ -37696,25 +37695,25 @@ org.spongycastle.x509.extension.X509ExtensionUtil -> org.spongycastle.x509.exten
 org.spongycastle.x509.util.LDAPStoreHelper -> org.spongycastle.x509.util.LDAPStoreHelper:
 org.spongycastle.x509.util.StreamParser -> org.spongycastle.x509.util.StreamParser:
 org.spongycastle.x509.util.StreamParsingException -> org.spongycastle.x509.util.StreamParsingException:
-android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
-android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
-android.support.v4.content.Loader -> a.b.c.b.b:
-android.support.v7.appcompat.R -> a.b.d.b.a:
 com.blinnnk.honey.R -> b.a.e.a:
-android.support.compat.R -> a.b.a.a:
-com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
+org.bitcoinj.net.discovery.HttpDiscovery -> i.b.c.a.a:
 android.support.v7.recyclerview.R -> a.b.d.e.a:
+android.support.v4.util.Pools -> a.b.c.i.l:
 com.google.android.gms.common.R -> b.e.a.a.d.n:
 me.itangqi.library.R -> f.a.a.a:
-com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
-com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
-android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
 com.google.android.gms.common.api.internal.ListenerHolder -> b.e.a.a.d.a.a.c:
+android.support.compat.R -> a.b.a.a:
+com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
+com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
+android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
+com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
+com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
 com.google.android.gms.common.internal.GmsClientEventManager -> b.e.a.a.d.c.e:
+android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
+android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
+android.support.v4.content.Loader -> a.b.c.b.b:
+android.support.v7.appcompat.R -> a.b.d.b.a:
+com.db.williamchart.R -> b.c.b.a:
 com.google.android.gms.base.R -> b.e.a.a.c.a:
 com.google.zxing.client.android.R -> b.e.c.b.a.k:
-org.bitcoinj.net.discovery.HttpDiscovery -> i.b.c.a.a:
-com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
-com.db.williamchart.R -> b.c.b.a:
-android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
-android.support.v4.util.Pools -> a.b.c.i.l:
+android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:

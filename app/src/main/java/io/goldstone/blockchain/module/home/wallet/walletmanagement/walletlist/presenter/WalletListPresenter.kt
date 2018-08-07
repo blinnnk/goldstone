@@ -26,16 +26,16 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 class WalletListPresenter(
 	override val fragment: WalletListFragment
 ) : BaseRecyclerPresenter<WalletListFragment, WalletListModel>() {
-	
+
 	override fun updateData() {
 		updateAllWalletBalance {
 			fragment.asyncData = this
 		}
 	}
-	
+
 	fun switchWallet(address: String) {
-		WalletTable.switchCurrentWallet(address) {
-			WalletTable.getWalletByAddress(address) {
+		WalletTable.switchCurrentWallet(address) { _ ->
+			WalletTable.getWalletByAddress(address) { it ->
 				it?.apply {
 					WalletTable.getTargetWalletType(this) {
 						when (it) {
@@ -50,7 +50,7 @@ class WalletListPresenter(
 									fragment.activity?.jump<SplashActivity>()
 								}
 							}
-							
+
 							WalletType.BTCTestOnly -> {
 								if (!Config.isTestEnvironment()) {
 									showConfirmationAlertView("Bitcoin Testnet") {
@@ -62,7 +62,7 @@ class WalletListPresenter(
 									fragment.activity?.jump<SplashActivity>()
 								}
 							}
-							
+
 							WalletType.MultiChain -> {
 								if (Config.isTestEnvironment()) {
 									NodeSelectionPresenter.setAllTestnet {
@@ -74,7 +74,7 @@ class WalletListPresenter(
 									}
 								}
 							}
-							
+
 							else -> fragment.activity?.jump<SplashActivity>()
 						}
 					}
@@ -82,7 +82,7 @@ class WalletListPresenter(
 			}
 		}
 	}
-	
+
 	private fun showConfirmationAlertView(content: String, callback: () -> Unit) {
 		fragment.context?.showAlertView(
 			"Switch Chain Network",
@@ -92,7 +92,7 @@ class WalletListPresenter(
 			callback()
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			overlayView.header.showCloseButton(false)
@@ -102,7 +102,7 @@ class WalletListPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateAllWalletBalance(hold: ArrayList<WalletListModel>.() -> Unit) {
 		val data = ArrayList<WalletListModel>()
 		// 获取全部本机钱包
@@ -114,7 +114,7 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) {
+							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { it ->
 								WalletTable.getTargetWalletType(wallet) { walletType ->
 									if (it.isEmpty()) {
 										data.add(WalletListModel(wallet, 0.0, walletType.content))
@@ -129,6 +129,7 @@ class WalletListPresenter(
 												thisToken.decimals
 											) * thisToken.price
 										}
+
 										// 计算当前钱包下的 `token` 对应的货币总资产
 										WalletListModel(
 											wallet,
@@ -143,7 +144,7 @@ class WalletListPresenter(
 							}
 						}
 					}
-					
+
 					// 因为结果集是在异步状态下准备, 返回的数据按照 `id` 重新排序
 					override fun mergeCallBack() =
 						hold(data.sortedByDescending { it.id }.toArrayList())

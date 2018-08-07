@@ -29,7 +29,7 @@ import org.jetbrains.anko.support.v4.toast
 class ChainAddressesPresenter(
 	override val fragment: ChainAddressesFragment
 ) : BaseRecyclerPresenter<ChainAddressesFragment, Pair<String, String>>() {
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<WalletSettingsFragment> {
@@ -40,7 +40,7 @@ class ChainAddressesPresenter(
 			}
 		}
 	}
-	
+
 	fun showMoreDashboard(
 		cell: GraySqualCellWithButtons,
 		address: String,
@@ -75,30 +75,30 @@ class ChainAddressesPresenter(
 			}
 		)
 	}
-	
+
 	fun updateAddAddressEvent() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
 				context?.apply {
-					AddressManagerFragment.verifyMultiChainWalletPassword(this) {
+					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password ->
 						when (fragment.coinType) {
-							ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(this, it) {
+							ChainType.ETH.id -> AddressManagerPresneter.createETHAndERCAddress(this, password) {
 								updateAddressManagerDataBy(ChainType.ETH.id, it)
 								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 							}
-							ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(this, it) {
+							ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(this, password) {
 								updateAddressManagerDataBy(ChainType.ETC.id, it)
 								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 							}
-							
+
 							ChainType.BTC.id -> {
 								if (Config.isTestEnvironment()) {
-									AddressManagerPresneter.createBTCTestAddress(this, it) {
+									AddressManagerPresneter.createBTCTestAddress(this, password) {
 										updateAddressManagerDataBy(ChainType.BTCTest.id, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
 								} else {
-									AddressManagerPresneter.createBTCAddress(this, it) {
+									AddressManagerPresneter.createBTCAddress(this, password) {
 										updateAddressManagerDataBy(ChainType.BTC.id, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
@@ -110,11 +110,11 @@ class ChainAddressesPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateWalletDetail() {
 		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
-	
+
 	private fun updateAddressManagerDataBy(coinType: Int, data: ArrayList<Pair<String, String>>) {
 		fragment.parentFragment?.childFragmentManager?.fragments?.find {
 			it is AddressManagerFragment
@@ -128,7 +128,7 @@ class ChainAddressesPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateDefaultStyle(coinType: Int) {
 		fragment.parentFragment?.childFragmentManager?.fragments?.find {
 			it is AddressManagerFragment
@@ -137,7 +137,7 @@ class ChainAddressesPresenter(
 				when (coinType) {
 					ChainType.ETH.id -> it.presenter.getEthereumAddresses()
 					ChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
-					
+
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							it.presenter.getBitcoinTestAddresses()
@@ -149,7 +149,7 @@ class ChainAddressesPresenter(
 			}
 		}
 	}
-	
+
 	private fun showQRCode(address: String) {
 		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
@@ -160,7 +160,7 @@ class ChainAddressesPresenter(
 			)
 		}
 	}
-	
+
 	private fun showPrivateKeyExportFragment(address: String, isBTC: Boolean) {
 		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
@@ -174,7 +174,7 @@ class ChainAddressesPresenter(
 			)
 		}
 	}
-	
+
 	private fun showKeystoreExportFragment(address: String) {
 		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
@@ -187,7 +187,7 @@ class ChainAddressesPresenter(
 			)
 		}
 	}
-	
+
 	private fun getFragmentTitleBy(coinType: Int): String {
 		return when (coinType) {
 			ChainType.ETH.id -> WalletSettingsText.allETHAndERCAddresses
@@ -197,7 +197,7 @@ class ChainAddressesPresenter(
 				WalletSettingsText.allBtCTestAddresses
 		}
 	}
-	
+
 	override fun updateData() {
 		WalletTable.getCurrentWallet {
 			when (fragment.coinType) {
@@ -209,7 +209,7 @@ class ChainAddressesPresenter(
 						Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 					}
 				}
-				
+
 				ChainType.ETC.id -> {
 					fragment.asyncData =
 						AddressManagerPresneter.convertToChildAddresses(etcAddresses).toArrayList()
@@ -218,7 +218,7 @@ class ChainAddressesPresenter(
 						Config.updateCurrentETCAddress(currentETCAddress)
 					}
 				}
-				
+
 				ChainType.BTC.id -> {
 					val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
 					val currentAddress =
@@ -235,7 +235,7 @@ class ChainAddressesPresenter(
 			}
 		}
 	}
-	
+
 	private fun setDefaultAddress(index: String, address: String, chainType: Int) {
 		fragment.recyclerView.getItemAtAdapterPosition<ChainAddressesHeaderView>(0) {
 			it?.setDefaultAddress(index, address, chainType) {

@@ -83,7 +83,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 15.uiPX()
 				}
-			}.click {
+			}.click { it ->
 				it.showLoadingStatus()
 				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) {
 					onUiThread {

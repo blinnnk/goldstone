@@ -35,7 +35,7 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 fun TransactionDetailPresenter.showConformationInterval(
 	intervalCount: Int
 ) {
-	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
+	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) { it ->
 		it?.apply {
 			headerModel?.let {
 				updateHeaderValue(it)

@@ -33,12 +33,12 @@ import org.jetbrains.anko.doAsync
 class AddressManagerPresneter(
 	override val fragment: AddressManagerFragment
 ) : BasePresenter<AddressManagerFragment>() {
-	
+
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		getMultiChainAddresses()
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
@@ -46,7 +46,7 @@ class AddressManagerPresneter(
 			fragment.showCreatorDashboard()
 		}
 	}
-	
+
 	fun setBackEvent() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			overlayView.header.apply {
@@ -57,7 +57,7 @@ class AddressManagerPresneter(
 			}
 		}
 	}
-	
+
 	private fun getMultiChainAddresses() {
 		WalletTable.getCurrentWallet {
 			val addresses =
@@ -77,31 +77,31 @@ class AddressManagerPresneter(
 			fragment.setMultiChainAddresses(addresses)
 		}
 	}
-	
+
 	fun getEthereumAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
 		}
 	}
-	
+
 	fun getEthereumClassicAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
 		}
 	}
-	
+
 	fun getBitcoinAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
 		}
 	}
-	
+
 	fun getBitcoinTestAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
 		}
 	}
-	
+
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
 		return listOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
@@ -109,7 +109,7 @@ class AddressManagerPresneter(
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress)
 		)
 	}
-	
+
 	fun showPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
 			AddressManagerFragment.removeDashboard(fragment.context)
@@ -120,7 +120,7 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	fun showBTCPrivateKeyExportFragment(address: String) {
 		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
 			AddressManagerFragment.removeDashboard(fragment.context)
@@ -134,7 +134,7 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	fun showKeystoreExportFragment(address: String) {
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
@@ -147,7 +147,7 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	fun showQRCodeFragment(address: String) {
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
@@ -158,7 +158,7 @@ class AddressManagerPresneter(
 			Bundle().apply { putString(ArgumentKey.address, address) }
 		)
 	}
-	
+
 	fun showAllETHAndERCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
@@ -168,7 +168,7 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	fun showAllETCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
@@ -178,7 +178,7 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
@@ -188,9 +188,9 @@ class AddressManagerPresneter(
 			)
 		}
 	}
-	
+
 	companion object {
-		
+
 		fun createETHAndERCAddress(
 			context: Context,
 			password: String,
@@ -222,7 +222,7 @@ class AddressManagerPresneter(
 				}
 			}
 		}
-		
+
 		fun createETCAddress(
 			context: Context,
 			password: String,
@@ -255,7 +255,7 @@ class AddressManagerPresneter(
 				}
 			}
 		}
-		
+
 		fun createBTCAddress(
 			context: Context,
 			password: String,
@@ -266,11 +266,11 @@ class AddressManagerPresneter(
 				Config.getCurrentBTCAddress(),
 				true,
 				false
-			) {
-				if (it) {
+			) { isCorrect ->
+				if (isCorrect) {
 					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-						wallet.encryptMnemonic?.let {
-							val mnemonic = JavaKeystoreUtil().decryptData(it)
+						wallet.encryptMnemonic?.let { encryptoMnemonic ->
+							val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
 							BTCWalletUtils.getBitcoinWalletByMnemonic(
@@ -307,7 +307,7 @@ class AddressManagerPresneter(
 				}
 			}
 		}
-		
+
 		fun createBTCTestAddress(
 			context: Context,
 			password: String,
@@ -318,15 +318,15 @@ class AddressManagerPresneter(
 				Config.getCurrentBTCTestAddress(),
 				true,
 				false
-			) {
-				if (!it) {
+			) { isCorrect ->
+				if (!isCorrect) {
 					context.alert(CommonText.wrongPassword)
 					return@verifyKeystorePassword
 				}
-				
+
 				WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let {
-						val mnemonic = JavaKeystoreUtil().decryptData(it)
+					wallet.encryptMnemonic?.let { encryptoMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
 						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, secret ->
@@ -356,7 +356,7 @@ class AddressManagerPresneter(
 				}
 			}
 		}
-		
+
 		fun setDefaultAddress(
 			chainType: Int,
 			defaultAddress: String,
@@ -364,7 +364,7 @@ class AddressManagerPresneter(
 		) {
 			WalletTable.updateCurrentAddressByChainType(chainType, defaultAddress, callback)
 		}
-		
+
 		fun getCellDashboardMenu(
 			hasDefaultCell: Boolean = true
 		): List<Pair<Int, String>> {
@@ -377,7 +377,7 @@ class AddressManagerPresneter(
 				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
 			}
 		}
-		
+
 		fun convertToChildAddresses(seriesAddress: String): List<Pair<String, String>> {
 			return if (seriesAddress.contains(",")) {
 				seriesAddress.split(",").map {
@@ -395,7 +395,7 @@ class AddressManagerPresneter(
 				)
 			}
 		}
-		
+
 		fun getCurrentAddressIndexByChainType(chainType: Int, hold: (String) -> Unit) {
 			fun getTargetAddressIndex(address: String, targetAddress: String): String {
 				return if (address.contains(",")) {
@@ -410,7 +410,7 @@ class AddressManagerPresneter(
 				when (chainType) {
 					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					
+
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							hold(
@@ -426,14 +426,14 @@ class AddressManagerPresneter(
 				}
 			}
 		}
-		
+
 		private fun insertNewAddressToMyToken(
 			symbol: String,
 			contract: String,
 			address: String,
 			chainID: String
 		) {
-			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) {
+			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
 						MyTokenTable.insert(

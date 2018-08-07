@@ -43,16 +43,16 @@ import org.jetbrains.anko.uiThread
 class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
-	
+
 	var isGettingDataInAsyncThreadNow = false
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
 	}
-	
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -79,7 +79,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun setQuickTransferEvent(isShowAddress: Boolean) {
 		// Check current wallet is watch only or not
 		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
@@ -111,7 +111,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	/**
 	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
@@ -123,7 +123,7 @@ class WalletDetailPresenter(
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
 	}
-	
+
 	fun showTransactionsFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.transaction) isFalse {
@@ -131,7 +131,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun showNotificationListFragment() {
 		XinGePushReceiver.clearAppIconRedot()
 		fragment.activity?.apply {
@@ -140,7 +140,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun showTokenManagementFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenManagement) isFalse {
@@ -148,7 +148,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun showWalletSettingsFragment() {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.walletSettings) isFalse {
@@ -162,7 +162,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
@@ -177,7 +177,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun updateUnreadCount() {
 		doAsync {
 			AppConfigTable.getAppConfig { config ->
@@ -205,7 +205,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun WalletDetailFragment.showSelectionListOverlayView(
 		myTokens: ArrayList<MyTokenTable>,
 		defaultTokens: ArrayList<DefaultTokenTable>,
@@ -222,7 +222,7 @@ class WalletDetailPresenter(
 						topPadding = 10.uiPX()
 						defaultTokens.filter { default ->
 							myTokens.any { it.contract.equals(default.contract, true) }
-						}.let {
+						}.let { it ->
 							val data = it.sortedByDescending { it.weight }.toArrayList()
 							val tokenList = TokenSelectionRecyclerView(context)
 							tokenList.into(this)
@@ -235,7 +235,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
 		if (data.isNotEmpty()) {
 			load {
@@ -259,7 +259,7 @@ class WalletDetailPresenter(
 			fragment.updateHeaderValue()
 		}
 	}
-	
+
 	private fun showPinCodeFragment() {
 		fragment.activity?.supportFragmentManager?.findFragmentByTag(
 			FragmentTag.pinCode
@@ -274,7 +274,7 @@ class WalletDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun WalletDetailFragment.updateHeaderValue() {
 		try {
 			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
@@ -286,7 +286,7 @@ class WalletDetailPresenter(
 			LogUtil.error("WalletDetail updateHeaderValue", error)
 		}
 	}
-	
+
 	private fun generateHeaderModel(
 		hold: (WalletDetailHeaderModel) -> Unit
 	) {

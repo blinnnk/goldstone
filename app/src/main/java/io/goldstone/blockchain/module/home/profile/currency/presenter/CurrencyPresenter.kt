@@ -20,17 +20,17 @@ import org.jetbrains.anko.yesButton
 class CurrencyPresenter(
 	override val fragment: CurrencyFragment
 ) : BaseRecyclerPresenter<CurrencyFragment, SupportCurrencyTable>() {
-	
+
 	override fun updateData() {
-		SupportCurrencyTable.getSupportCurrencies {
+		SupportCurrencyTable.getSupportCurrencies { currencies ->
 			fragment.asyncData.isNull() isTrue {
-				fragment.asyncData = it.distinctBy { it.currencySymbol }.toArrayList()
+				fragment.asyncData = currencies.distinctBy { it.currencySymbol }.toArrayList()
 			} otherwise {
-				diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(it)
+				diffAndUpdateSingleCellAdapterData<CurrencyAdapter>(currencies)
 			}
 		}
 	}
-	
+
 	fun setCurrencyAlert(
 		code: String,
 		hold: Boolean.() -> Unit
@@ -47,7 +47,7 @@ class CurrencyPresenter(
 			}.show()
 		}
 	}
-	
+
 	private fun updateCurrencyValue(code: String) {
 		SupportCurrencyTable.updateUsedStatus(code) {
 			AppConfigTable.updateCurrency(code) {

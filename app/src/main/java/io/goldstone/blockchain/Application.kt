@@ -23,17 +23,16 @@ class GoldStoneApp : Application() {
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
-		// init google analytics
+		// Init google analyticsd
 		sAnalytics = GoogleAnalytics.getInstance(this)
-		// create and init database
-		GoldStoneDataBase.initDatabase(applicationContext)
-		// init ethereum utils `Context`
-		GoldStoneEthCall.context = this
-		// init `Api` context
-		GoldStoneAPI.context = this
 		// 检查是否需要清理本地的 `KeyStore File`
 		cleanKeyStoreFileWhenUpdateDatabase()
-
+		// Create and init database
+		GoldStoneDataBase.initDatabase(applicationContext)
+		// Init ethereum utils `Context`
+		GoldStoneEthCall.context = this
+		// Init `Api` context
+		GoldStoneAPI.context = this
 	}
 
 	/**
@@ -51,9 +50,7 @@ class GoldStoneApp : Application() {
 	// 需要也同时清理本地的 `Keystore File`
 	private fun cleanKeyStoreFileWhenUpdateDatabase() {
 		WalletTable.getAll {
-			if (isEmpty()) {
-				cleanKeyStoreFile(filesDir)
-			}
+			if (isEmpty()) cleanKeyStoreFile(filesDir)
 		}
 	}
 
@@ -62,9 +59,7 @@ class GoldStoneApp : Application() {
 			val children = dir.list()
 			for (index in children.indices) {
 				val success = cleanKeyStoreFile(File(dir, children[index]))
-				if (!success) {
-					return false
-				}
+				if (!success) return false
 			}
 		}
 		// The directory is now empty so delete it

@@ -29,7 +29,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
-		
+
 		when {
 			symbol.equals(CryptoSymbol.btc, true) -> {
 				dataFromList?.let {
@@ -39,12 +39,12 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 					if (isPending) observerBTCTransaction()
 				}
 			}
-			
+
 			symbol.equals(CryptoSymbol.etc, true) -> {
 				getETHERC20OrETCMemo(headerData)
 				if (isPending) observerTransaction()
 			}
-			
+
 			else -> {
 				//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取
 				// 未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
@@ -78,8 +78,8 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 }
 
 private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
-	DefaultTokenTable.getCurrentChainToken(contract) {
-		it?.apply {
+	DefaultTokenTable.getCurrentChainToken(contract) { defaultToken ->
+		defaultToken?.apply {
 			if (name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
 					contract,

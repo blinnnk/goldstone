@@ -13,7 +13,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 
 /**
  * @date 26/03/2018 9:13 PM
@@ -22,7 +22,7 @@ import org.jetbrains.anko.support.v4.toast
 class PasswordSettingsPresenter(
 	override val fragment: PasswordSettingsFragment
 ) : BasePresenter<PasswordSettingsFragment>() {
-	
+
 	fun verifyOldPassword(oldPassword: String, callback: (Boolean) -> Unit) {
 		fragment.context?.apply {
 			if (oldPassword.isEmpty()) {
@@ -34,7 +34,7 @@ class PasswordSettingsPresenter(
 			}
 		}
 	}
-	
+
 	fun updatePassword(
 		oldPassword: String,
 		newPassword: String,
@@ -52,11 +52,11 @@ class PasswordSettingsPresenter(
 		) { password, _ ->
 			WalletTable.getCurrentWallet {
 				when (Config.getCurrentWalletType()) {
-				// 删除多链钱包下的所有地址对应的数据
+					// 删除多链钱包下的所有地址对应的数据
 					WalletType.MultiChain.content -> {
 						object : ConcurrentAsyncCombine() {
 							override var asyncCount = 4
-							
+
 							override fun concurrentJobs() {
 								AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
 									updateKeystorePassword(
@@ -107,13 +107,13 @@ class PasswordSettingsPresenter(
 									}
 								}
 							}
-							
+
 							override fun mergeCallBack() {
 								autoBack()
 							}
 						}.start()
 					}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
+					// 删除 `BTCTest` 包下的所有地址对应的数据
 					WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
 						updateKeystorePassword(
 							currentBTCTestAddress,
@@ -126,7 +126,7 @@ class PasswordSettingsPresenter(
 							autoBack()
 						}
 					}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
+					// 删除 `BTCOnly` 包下的所有地址对应的数据
 					WalletType.BTCOnly.content -> WalletTable.getCurrentWallet {
 						updateKeystorePassword(
 							currentBTCAddress,
@@ -139,7 +139,7 @@ class PasswordSettingsPresenter(
 							autoBack()
 						}
 					}
-				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
+					// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
 					WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
 						updateKeystorePassword(
 							currentETHAndERCAddress,
@@ -156,7 +156,7 @@ class PasswordSettingsPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateKeystorePassword(
 		address: String,
 		oldPassword: String,
@@ -182,15 +182,14 @@ class PasswordSettingsPresenter(
 			passwordHint.isNotEmpty() isTrue {
 				WalletTable.updateHint(passwordHint)
 			}
-			
-			fragment.toast(CommonText.succeed)
 			callback()
 		}
 	}
-	
+
 	private fun autoBack() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			presenter.showTargetFragmentByTitle(WalletSettingsText.walletSettings)
+			fragment.activity?.toast(CommonText.succeed)
 		}
 	}
 }

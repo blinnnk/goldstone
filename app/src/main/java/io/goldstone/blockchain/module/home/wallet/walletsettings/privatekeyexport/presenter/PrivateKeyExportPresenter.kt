@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpo
 
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ImportWalletText
@@ -21,14 +22,14 @@ import org.jetbrains.anko.uiThread
 class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {
-	
+
 	private val address by lazy {
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
 	private val isBTCAddress by lazy {
 		fragment.arguments?.getBoolean(ArgumentKey.isBTCAddress)
 	}
-	
+
 	fun getPrivateKeyByAddress(
 		password: String,
 		hold: String?.() -> Unit
@@ -38,9 +39,9 @@ class PrivateKeyExportPresenter(
 			hold("")
 			return
 		}
-		
+
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		
+
 		address?.let {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
@@ -58,7 +59,7 @@ class PrivateKeyExportPresenter(
 			)
 		}
 	}
-	
+
 	private fun getETHERCorETCPrivateKeyByAddress(
 		address: String,
 		password: String,
@@ -71,14 +72,15 @@ class PrivateKeyExportPresenter(
 				password,
 				false,
 				isSingleChainWallet,
-				{
+				{ error ->
 					uiThread { hold("") }
+					LogUtil.error("getPrivateKey", error)
 				},
 				hold
 			)
 		}
 	}
-	
+
 	private fun getBTCPrivateKeyByAddress(
 		address: String,
 		password: String,
