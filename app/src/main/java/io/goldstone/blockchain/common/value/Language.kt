@@ -1690,11 +1690,11 @@ object WalletSettingsText {
 	@JvmField
 	val containsBTCTest = when (currentLanguage) {
 		HoneyLanguage.English.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.Chinese.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.Japanese.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.Korean.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.Chinese.code -> "(包含 BTC 测试链地址)"
+		HoneyLanguage.Japanese.code -> "(BTCテストチェーンアドレスが含まれています)"
+		HoneyLanguage.Korean.code -> "(BTC 테스트 체인 주소가 들어 있습니다)"
 		HoneyLanguage.Russian.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.TraditionalChinese.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.TraditionalChinese.code -> "(包含 BTC 測試鏈地址)"
 		else -> ""
 	}
 
@@ -1702,17 +1702,26 @@ object WalletSettingsText {
 		count: Int,
 		description: String
 	) -> String = { count, description ->
-		val unit = if (count > 1) "addresses" else "address"
+
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "there are $count $unit in this wallet $description"
-			HoneyLanguage.Chinese.code -> "there are $count $unit in this wallet $description"
-			HoneyLanguage.Japanese.code -> "there are $count $unit in this wallet $description"
-			HoneyLanguage.Korean.code -> "there are $count $unit in this wallet $description"
-			HoneyLanguage.Russian.code -> "there are $count $unit in this wallet $description"
-			HoneyLanguage.TraditionalChinese.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.English.code -> if (count > 1) {
+				"there are $count addresses in this wallet $description"
+			} else {
+				"there is $count address in this wallet $description"
+			}
+			HoneyLanguage.Russian.code -> if (count > 1) {
+				"В текущем кошельке есть $count адреса $description"
+			} else {
+				"В текущем кошельке всего $count адрес $description"
+			}
+			HoneyLanguage.Chinese.code -> "当前钱包中一共有$count 个地址 $description"
+			HoneyLanguage.Japanese.code -> "$count のアドレスがあります $description"
+			HoneyLanguage.Korean.code -> "현재 지갑에는 $count 개의 주소가 있습니다 $description"
+			HoneyLanguage.TraditionalChinese.code -> "當前錢包中一共有$count 個地址 $description"
 			else -> ""
 		}
 	}
+
 	@JvmField
 	val newETHAndERCAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "New ETH & ERC20 Token Address"
@@ -2053,6 +2062,7 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "還沒有填寫錢包名稱"
 		else -> ""
 	}
+
 	@JvmField
 	val switchChainNetAlert: (customContent: String) -> String = {
 		when (currentLanguage) {
@@ -2353,10 +2363,10 @@ object EmptyText {
 	}
 	@JvmField
 	val currency = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
+		HoneyLanguage.English.code -> "Currency"
 		HoneyLanguage.Chinese.code -> "货币设置"
 		HoneyLanguage.Japanese.code -> "貨幣設定"
-		HoneyLanguage.Korean.code -> "좌측 상단 플러스 부호를 클릭하면 상용 연락처 주소를 추가할 수 있습니다"
+		HoneyLanguage.Korean.code -> "통화 설정"
 		HoneyLanguage.Russian.code -> "Настройки валюты"
 		HoneyLanguage.TraditionalChinese.code -> "貨幣設置"
 		else -> ""
