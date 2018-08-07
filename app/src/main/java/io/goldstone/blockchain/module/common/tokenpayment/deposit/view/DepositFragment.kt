@@ -48,7 +48,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			inputView.inputTextListener {
 				inputView.updateCurrencyValue(symbolPrice)
 				if (it.toDoubleOrNull().isNull()) {
-					context.alert(AlertText.transferUnvalidInputFromat)
+					context.alert(AlertText.transferUnvalidInputFormat)
 				} else {
 					presenter.generateQRCode(if (it.isEmpty()) 0.0 else it.toDouble())
 				}

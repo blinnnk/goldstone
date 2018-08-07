@@ -18466,7 +18466,7 @@ io.goldstone.blockchain.common.value.AlertText -> c.a.a.a.d.b:
     java.lang.String switchLanguage -> l
     java.lang.String switchLanguageConfirmText -> m
     java.lang.String testnetOnly -> a
-    java.lang.String transferUnvalidInputFromat -> k
+    java.lang.String transferUnvalidInputFormat -> k
     java.lang.String transferWrongDecimal -> g
     java.lang.String watchOnly -> d
     java.lang.String wrongKeyStorePassword -> n

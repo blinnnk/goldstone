@@ -1519,7 +1519,7 @@ object AlertText {
 		else -> ""
 	}
 	@JvmField
-	val transferUnvalidInputFromat = when (currentLanguage) {
+	val transferUnvalidInputFormat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect value format, please check again"
 		HoneyLanguage.Chinese.code -> "请输入正确的金额"
 		HoneyLanguage.Japanese.code -> "正確な金額を入力して下さい"
@@ -1968,22 +1968,22 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val  createSubAccount= when (currentLanguage) {
-		HoneyLanguage.English.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Chinese.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Japanese.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Korean.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Russian.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.TraditionalChinese.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.English.code -> "Create a new subaddress"
+		HoneyLanguage.Chinese.code -> "创建一个新的子地址"
+		HoneyLanguage.Japanese.code -> "新しいサブアドレスを作成する"
+		HoneyLanguage.Korean.code -> "새 하위 주소 만들기"
+		HoneyLanguage.Russian.code -> "Создание нового субадресса"
+		HoneyLanguage.TraditionalChinese.code -> "創建一個新的子地址"
 		else -> ""
 	}
 	@JvmField
 	val  createSubAccountIntro= when (currentLanguage) {
-		HoneyLanguage.English.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Chinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.English.code -> "Subaddresses are created following the BIP44 standard. You can restore this subaddress in any wallet software that supports BIP44 at any time via mnemonic and subaddress path."
+		HoneyLanguage.Chinese.code -> "サブアドレスはBIP44規格に従って作成されます。 このサブアドレスは、任意のBIP44対応ウォレットソフトウェアで、ニーモニックとサブアドレスのパス(Path)を使用していつでも復元できます。"
 		HoneyLanguage.Japanese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Korean.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Russian.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.TraditionalChinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Korean.code -> "하위 주소는 BIP44 표준에 따라 작성됩니다. 니모닉 및 하위 주소 경로(Path) 를 통해 언제든지 BIP44를 지원하는 모든 지갑 소프트웨어에서이 하위 주소를 복원 할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Субадресы создаются по стандарту BIP44. Вы можете восстановить этот субадресс в любом программном обеспечении кошелька с поддержкой BIP44 в любое время через путь(Path) мнемоники и субадресса."
+		HoneyLanguage.TraditionalChinese.code -> "子地址遵循BIP44標準創建。你可以隨時通過助記詞與子地址路徑在任意支持BIP44的錢包軟件中恢復這個子地址"
 		else -> ""
 	}
 	@JvmField
