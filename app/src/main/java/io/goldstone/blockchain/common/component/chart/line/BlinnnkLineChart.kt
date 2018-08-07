@@ -21,7 +21,7 @@ import java.util.*
  * @author: yanglihai
  * @description: 线性表
  */
-class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
+abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
   
   
   private lateinit var blinnnkMarkerView: BlinnnkLineMarkerView
@@ -32,24 +32,22 @@ class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
   private var pointColor: Int = Color.BLACK
   
   private val gridlineColor = Color.rgb(236,236,236)
-  
   private val labelColor = Color.rgb(152, 152, 152)
   
   
-  private var isDrawPoints: Boolean = false
-  private var isPerformBezier = false
-  private var chartColor: Int = Color.RED
+//  private var isDrawPoints: Boolean = false
+//  private var isPerformBezier = false
+//  private var chartColor: Int = Color.RED
   private val chartWidth = 3f
-  private val pointRadius = arrayListOf<Float>(5f,2f)
-  private var chartShadowResource: Int = R.drawable.fade_red
+  private val pointRadius = arrayListOf(5f, 2f)
+//  private var chartShadowResource: Int = R.drawable.fade_red
+	
+	abstract fun isDrawPoints() : Boolean
+	abstract fun isPerformBezier() : Boolean
+	abstract fun getChartShadowResource() : Int
+	abstract fun getChartColor() : Int
   
-  constructor(context: Context, isDrawPoints: Boolean,isPerformBezier: Boolean, chartColor: Int, chartShadowResource: Int) : super(context) {
-    this@BlinnnkLineChart.isDrawPoints = isDrawPoints
-    this@BlinnnkLineChart.isPerformBezier = isPerformBezier
-    this@BlinnnkLineChart.chartColor = chartColor
-    this@BlinnnkLineChart.chartShadowResource = chartShadowResource
-    this@BlinnnkLineChart.pointColor = chartColor
-  }
+  constructor(context: Context) : super(context)
   
   constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
   
@@ -130,7 +128,7 @@ class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
         valueFormatter = lineYValueFormatter
 
         //平划的曲线
-        if (isPerformBezier){
+        if (isPerformBezier()){
           mode = LineDataSet.Mode.CUBIC_BEZIER
           cubicIntensity = 0.2f
         }
@@ -138,9 +136,9 @@ class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
         setDrawIcons(false)//显示图标
         setDrawValues(false)//展示每个点的值
         
-        color = chartColor
+        color = getChartColor()
         lineWidth = chartWidth
-        if (isDrawPoints) {
+        if (isDrawPoints()) {
           //峰值点
           setDrawCircles(true)
           setCircleColor(pointColor)
@@ -155,7 +153,7 @@ class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
   
         if (Utils.getSDKInt() >= 18) {
           // fill drawable only supported on api level 18 and above
-          fillDrawable= ContextCompat.getDrawable(context, chartShadowResource)
+          fillDrawable= ContextCompat.getDrawable(context, getChartShadowResource())
         } else {
           fillColor = Color.TRANSPARENT
         }

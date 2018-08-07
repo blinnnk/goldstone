@@ -17,8 +17,7 @@ import example.cat.com.candlechartdemo.ktd.BlinnnkXValueFormatter
  * @description: 蜡烛统计图view
  */
 class BlinnnkCandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
-  
-  
+	
   private val labelColor = Color.rgb(152, 152, 152)
   private val shadowColor = Color.DKGRAY//蜡烛柄颜色
   private val decreasingColor = Color.rgb(219, 74, 76)
