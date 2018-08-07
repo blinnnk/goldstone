@@ -37,7 +37,7 @@ import org.jetbrains.anko.support.v4.UI
  */
 abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D>
 	: Fragment() {
-	
+
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
 	private lateinit var loadingView: RecyclerLoadingView
@@ -54,7 +54,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				this?.notifyDataSetChanged()
 			}
 		}
-		
+
 		presenter.afterUpdateAdapterDataset(recyclerView)
 		/** 如果数据返回空的显示占位图 */
 		asyncData?.let { setEmptyViewBy(it) }
@@ -66,7 +66,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * 有固定的约定实现协议, 来更方便安全和便捷的使用.
 	 */
 	abstract val presenter: T
-	
+
 	/**
 	 * `RecyclerFragment` 的默认 `LayoutManager` 是 `LinearLayoutManager`. 提供了下面这个
 	 * 可被修改的方法来更改 内嵌的 `RecyclerView` 的 `LayoutManager`
@@ -74,32 +74,32 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	open fun setRecyclerViewLayoutManager(recyclerView: BaseRecyclerView) {
 		// Do Something
 	}
-	
+
 	open fun observingRecyclerViewScrollState(state: Int) {
 		// Do Something
 		if (state == 1) {
 			activity?.apply { SoftKeyboard.hide(this) }
 		}
 	}
-	
+
 	open fun observingRecyclerViewScrolled(
 		dx: Int,
 		dy: Int
 	) {
 		// Do Something
 	}
-	
+
 	open fun observingRecyclerViewVerticalOffset(
 		offset: Int,
 		range: Int
 	) {
 		// Do Something
 	}
-	
+
 	open fun observingRecyclerViewHorizontalOffset(offset: Int) {
 		// Do Something
 	}
-	
+
 	/**
 	 * @description
 	 * `RecyclerFragment` 把 `RecyclerView` 内置在 `Fragment` 中所以协议提供了一个强制实现的
@@ -114,7 +114,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<D>?
 	)
-	
+
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
@@ -125,32 +125,32 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		RelativeLayout.LayoutParams(
 			width, height
 		)
-	
+
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
 		presenter.onFragmentAttach()
 	}
-	
+
 	override fun onStart() {
 		super.onStart()
 		presenter.onFragmentStart()
 	}
-	
+
 	override fun onDetach() {
 		super.onDetach()
 		presenter.onFragmentDetach()
 	}
-	
+
 	override fun onDestroyView() {
 		super.onDestroyView()
 		presenter.onFragmentDestroy()
 	}
-	
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		presenter.onFragmentCreate()
 	}
-	
+
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -175,7 +175,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			}
 		}.view
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -192,7 +192,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				super.onScrollStateChanged(recyclerView, newState)
 				observingRecyclerViewScrollState(newState)
 			}
-			
+
 			override fun onScrolled(
 				recyclerView: RecyclerView,
 				dx: Int,
@@ -213,7 +213,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			setBackEvent(getMainActivity())
 		}
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		presenter.onFragmentHiddenChanged(hidden)
@@ -227,28 +227,28 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			presenter.onFragmentShowFromHidden()
 		}
 	}
-	
+
 	open fun updateBackEvent() {
 		// 重置回退栈事件
 		getMainActivity()?.backEvent = Runnable {
 			setBackEvent(getMainActivity())
 		}
 	}
-	
+
 	override fun onDestroy() {
 		super.onDestroy()
 		// 如果键盘在显示那么销毁键盘
 		activity?.apply { SoftKeyboard.hide(this) }
 	}
-	
+
 	override fun onResume() {
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 		presenter.onFragmentResume()
 	}
-	
+
 	private var emptyLayout: EmptyView? = null
-	
+
 	/**
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
@@ -257,12 +257,12 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		loadingView.visibility = View.VISIBLE
 		recyclerView.y = loadingView.layoutParams.height.toFloat()
 	}
-	
+
 	open fun removeLoadingView() {
 		loadingView.visibility = View.GONE
 		recyclerView.y = 0f
 	}
-	
+
 	open fun showEmptyView() {
 		// 如果已经存在 `emptyLayout` 跳出
 		emptyLayout.isNotNull { return }
@@ -287,14 +287,14 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			emptyClickEvent()
 		}
 		if (this@BaseRecyclerFragment !is TokenDetailFragment
-		    && this@BaseRecyclerFragment !is QuotationFragment
+			&& this@BaseRecyclerFragment !is QuotationFragment
 		) emptyLayout?.setCenterInParent()
 	}
-	
+
 	open fun emptyClickEvent() {
 		// Do Something
 	}
-	
+
 	open fun removeEmptyView() {
 		emptyLayout?.apply {
 			wrapper.removeView(this)
@@ -303,7 +303,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			emptyLayout = null
 		}
 	}
-	
+
 	private fun setEmptyViewBy(data: ArrayList<D>) {
 		if (data.isEmpty()) {
 			showEmptyView()
@@ -311,7 +311,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			removeEmptyView()
 		}
 	}
-	
+
 	open fun recoveryBackEvent() {
 		getMainActivity()?.apply {
 			backEvent = Runnable {
@@ -319,7 +319,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			}
 		}
 	}
-	
+
 	open fun setBackEvent(mainActivity: MainActivity?) {
 		val parent = parentFragment
 		if (parent is BaseOverlayFragment<*>) {

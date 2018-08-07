@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
@@ -110,24 +109,21 @@ class BitcoinTransactionListPresenter(
 						localData.find { it.hash.equals(chainData.hash, true) }
 					// 本地的数据更新网络数据, 因为本地可能有  `Pending` 拼接的数据, 所以重复的都首先更新网络
 					!localTransaction?.apply {
-						BitcoinSeriesTransactionTable
-							.updateLocalDataByHash(
-								hash,
-								this,
-								false,
-								false
-							)
+						BitcoinSeriesTransactionTable.updateLocalDataByHash(
+							hash,
+							this,
+							false,
+							false
+						)
 					}.isNull()
 				}.map {
 					// 插入转账数据到数据库
-					GoldStoneDataBase.database
-						.bitcoinTransactionDao()
-						.insert(it)
+					BitcoinSeriesTransactionTable
+						.preventRepeatedInsert(it.hash, false, it)
 					// 同样的账单插入一份燃气费的数据
 					if (!it.isReceive) {
-						GoldStoneDataBase.database
-							.bitcoinTransactionDao()
-							.insert(it.apply { isFee = true })
+						BitcoinSeriesTransactionTable
+							.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
 					}
 					TransactionListModel(it)
 				}.isNotEmpty())

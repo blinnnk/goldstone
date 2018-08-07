@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter
 
 import android.support.v4.app.Fragment
-import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument

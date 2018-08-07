@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -31,7 +32,7 @@ data class BitcoinSeriesTransactionTable(
 	var isFee: Boolean,
 	var isPending: Boolean
 ) {
-	
+
 	constructor(
 		data: JSONObject,
 		symbol: String,
@@ -54,7 +55,7 @@ data class BitcoinSeriesTransactionTable(
 		isFee,
 		false
 	)
-	
+
 	companion object {
 		private fun getFromAddress(data: JSONObject): String {
 			val inputs = JSONArray(data.safeGet("inputs"))
@@ -62,7 +63,7 @@ data class BitcoinSeriesTransactionTable(
 				JSONObject(inputs[0].toString()).safeGet("prev_out")
 			).safeGet("addr")
 		}
-		
+
 		private fun getToAddresses(
 			data: JSONObject
 		): List<String> {
@@ -74,14 +75,14 @@ data class BitcoinSeriesTransactionTable(
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
 			return toAddresses.filterNot { it.equals(getFromAddress(data), true) }
 		}
-		
+
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
 			return (getTotalValue(data) - getFeeSatoshi(data).toLong() - getChangeValue(
 				myAddress,
 				data
 			).toLong()).toString()
 		}
-		
+
 		/**
 		 * 理论上, 比特币的转账地址都可以定义为找零地址, 而若当用户更改不为人所知的自己可以控制的 `ChangeAddress`
 		 * 我们是无从得知的。这里我们假定输出地址就是发起转账的地址为找零地址。并把对应的 `Value` 定义为 `ChangeValue`、
@@ -105,7 +106,7 @@ data class BitcoinSeriesTransactionTable(
 			}
 			return changeValue.toString()
 		}
-		
+
 		fun getTransactionsByAddress(
 			address: String,
 			hold: (List<BitcoinSeriesTransactionTable>) -> Unit
@@ -117,7 +118,7 @@ data class BitcoinSeriesTransactionTable(
 					.getDataByAddress(address)
 			} then (hold)
 		}
-		
+
 		fun getTransactionsByHash(
 			hash: String,
 			isReceive: Boolean,
@@ -130,7 +131,7 @@ data class BitcoinSeriesTransactionTable(
 					.getDataByHash(hash, isReceive)
 			} then (hold)
 		}
-		
+
 		fun updateLocalDataByHash(
 			hash: String,
 			newData: BitcoinSeriesTransactionTable,
@@ -153,7 +154,19 @@ data class BitcoinSeriesTransactionTable(
 						}
 				}
 		}
-		
+
+		fun preventRepeatedInsert(
+			hash: String,
+			isFee: Boolean,
+			transaction: BitcoinSeriesTransactionTable
+		) {
+			GoldStoneDataBase.database.bitcoinTransactionDao().apply {
+				if(getTransactionByHash(hash, isFee).isNull()) {
+					insert(transaction)
+				}
+			}
+		}
+
 		private fun getTotalValue(data: JSONObject): Long {
 			val inputs = JSONArray(data.safeGet("inputs"))
 			var totalValue = 0L
@@ -164,7 +177,7 @@ data class BitcoinSeriesTransactionTable(
 			}
 			return totalValue
 		}
-		
+
 		private fun getTotalOutValue(data: JSONObject): Long {
 			val out = JSONArray(data.safeGet("out"))
 			var totalValue = 0L
@@ -173,7 +186,7 @@ data class BitcoinSeriesTransactionTable(
 			}
 			return totalValue
 		}
-		
+
 		private fun getFeeSatoshi(data: JSONObject): String {
 			return (getTotalValue(data) - getTotalOutValue(data)).toString()
 		}
@@ -182,25 +195,25 @@ data class BitcoinSeriesTransactionTable(
 
 @Dao
 interface BitcoinTransactionDao {
-	
+
 	@Query("SELECT * FROM bitcoinTransactionList")
 	fun getAll(): List<BitcoinSeriesTransactionTable>
-	
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address  ORDER BY timeStamp DESC")
 	fun getDataByAddress(address: String): List<BitcoinSeriesTransactionTable>
-	
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
 	fun getDataByHash(hash: String, isReceive: Boolean): BitcoinSeriesTransactionTable?
-	
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isFee LIKE :isFee")
 	fun getTransactionByHash(hash: String, isFee: Boolean): BitcoinSeriesTransactionTable?
-	
+
 	@Insert
 	fun insert(table: BitcoinSeriesTransactionTable)
-	
+
 	@Update
 	fun update(table: BitcoinSeriesTransactionTable)
-	
+
 	@Delete
 	fun delete(table: BitcoinSeriesTransactionTable)
 }

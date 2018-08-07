@@ -13,8 +13,10 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 private const val fadeDuration = 200
 
 fun <T> ImageView.glideImage(imagePath: T?) {
+	// 这里的 `Context` 应该用 `Application` 的 `Context`, 不然在多线程下的 Context
+	// 可能会丢失 `Context`
 	Glide
-		.with(context)
+		.with(GoldStoneAPI.context.applicationContext)
 		.load(imagePath)
 		.transition(DrawableTransitionOptions().crossFade(fadeDuration))
 		.into(this)

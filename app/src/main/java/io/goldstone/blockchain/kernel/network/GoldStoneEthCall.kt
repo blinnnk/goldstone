@@ -28,11 +28,11 @@ import java.math.BigInteger
  * @author KaySaith
  */
 object GoldStoneEthCall {
-	
+
 	lateinit var context: Context
 	@JvmStatic
 	val contentType = MediaType.parse("application/json; charset=utf-8")
-	
+
 	/**
 	 * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
 	 */
@@ -55,7 +55,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
@@ -72,7 +72,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
@@ -103,7 +103,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getUsableNonce(
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
@@ -134,7 +134,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getBlockNumber(
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
@@ -164,7 +164,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
@@ -199,7 +199,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTransactionByHash(
 		hash: String,
@@ -244,7 +244,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getReceiptByHash(
 		hash: String,
@@ -277,7 +277,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTransactionExecutedValue(
 		to: String,
@@ -317,7 +317,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun sendRawTransaction(
 		signTransactions: String,
@@ -341,7 +341,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTokenBalanceWithContract(
 		contractAddress: String,
@@ -371,7 +371,7 @@ object GoldStoneEthCall {
 			) { holdValue(it.hexToDecimal()) }
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTokenSymbolByContract(
 		contractAddress: String,
@@ -402,7 +402,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTokenDecimal(
 		contractAddress: String,
@@ -433,7 +433,7 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	fun getTokenName(
 		contractAddress: String,
@@ -464,37 +464,35 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	fun getEthBalance(
 		address: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
 		holdValue: (Double) -> Unit
 	) {
-		RequestBody.create(
-			contentType,
-			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
-				EthereumMethod.GetBalance.method,
-				1,
-				true,
-				true,
-				address
-			)
-		).let {
-			callChainBy(
-				it,
-				{ error, reason ->
-					errorCallback(error, reason)
-					LogUtil.error(EthereumMethod.GetBalance.display, error)
-				},
-				chainName
-			) {
-				holdValue(it.hexToDecimal())
-			}
+		callChainBy(
+			RequestBody.create(
+				contentType,
+				ParameterUtil.prepareJsonRPC(
+					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					EthereumMethod.GetBalance.method,
+					1,
+					true,
+					true,
+					address
+				)
+			),
+			{ error, reason ->
+				errorCallback(error, reason)
+				LogUtil.error(EthereumMethod.GetBalance.display, error)
+			},
+			chainName
+		) {
+			holdValue(it.hexToDecimal())
 		}
 	}
-	
+
 	fun getTokenTotalSupply(
 		contractAddress: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
@@ -524,15 +522,15 @@ object GoldStoneEthCall {
 			}
 		}
 	}
-	
+
 	@JvmStatic
 	private infix fun String.withAddress(address: String) =
 		this + address.checkAddressInRules()
-	
+
 	@JvmStatic
 	private fun String.checkAddressInRules() =
 		if (substring(0, 2) == "0x") substring(2 until length) else this
-	
+
 	@JvmStatic
 	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
 		return when (type) {

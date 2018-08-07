@@ -10,10 +10,11 @@ import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.uiThread
 
 /**
  * @date 06/04/2018 1:02 AM
@@ -73,7 +74,7 @@ class PrivateKeyExportPresenter(
 				false,
 				isSingleChainWallet,
 				{ error ->
-					uiThread { hold("") }
+					GoldStoneAPI.context.runOnUiThread { hold("") }
 					LogUtil.error("getPrivateKey", error)
 				},
 				hold
