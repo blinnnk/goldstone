@@ -15,7 +15,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpor
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.uiThread
 
 /**
  * @date 06/04/2018 1:02 AM
