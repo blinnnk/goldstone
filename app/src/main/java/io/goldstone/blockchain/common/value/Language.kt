@@ -2540,30 +2540,30 @@ object QuotationText {
 	@JvmField
 	val totalSupply = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Supply"
-		HoneyLanguage.Chinese.code -> "总供应量"
-		HoneyLanguage.Japanese.code -> "総提供量"
-		HoneyLanguage.Korean.code -> "총 공급"
-		HoneyLanguage.Russian.code -> "Совокупное предложение"
-		HoneyLanguage.TraditionalChinese.code -> "總供應量"
+		HoneyLanguage.Chinese.code -> "总供给量"
+		HoneyLanguage.Japanese.code -> "総合サプライ"
+		HoneyLanguage.Korean.code -> "총 공급량"
+		HoneyLanguage.Russian.code -> "Общее предложение"
+		HoneyLanguage.TraditionalChinese.code -> "總供給量"
 		else -> ""
 	}
 	@JvmField
 	val marketCap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Cap"
-		HoneyLanguage.Chinese.code -> "流通市值"
-		HoneyLanguage.Japanese.code -> "流通市場価値"
+		HoneyLanguage.Chinese.code -> "市值"
+		HoneyLanguage.Japanese.code -> "時価総額"
 		HoneyLanguage.Korean.code -> "시가 총액"
-		HoneyLanguage.Russian.code -> "Ликвидная рыночная капитализация"
-		HoneyLanguage.TraditionalChinese.code -> "流通市值"
+		HoneyLanguage.Russian.code -> "Рыночная капитализация"
+		HoneyLanguage.TraditionalChinese.code -> "市值"
 		else -> ""
 	}
 	@JvmField
 	val addQuotationChartPlaceholderTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ADD QUOTATION CHART"
 		HoneyLanguage.Chinese.code -> "添加你感兴趣的Token行情"
-		HoneyLanguage.Japanese.code -> "お客様の注目しているTokenの市況を追加する"
+		HoneyLanguage.Japanese.code -> "カスタム見積もりを追加する"
 		HoneyLanguage.Korean.code -> "관심있는 Token 따옴표 추가"
-		HoneyLanguage.Russian.code -> "Добавьте интересующую Вас конъюнктуру токена"
+		HoneyLanguage.Russian.code -> "Добавить пользовательскую цитату"
 		HoneyLanguage.TraditionalChinese.code -> "添加你感興趣的Token行情"
 		else -> ""
 	}
@@ -2676,11 +2676,11 @@ object PrepareTransferText {
 	@JvmField
 	val sendAmountSuffix = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Amount"
-		HoneyLanguage.Chinese.code -> "转出数量"
-		HoneyLanguage.Japanese.code -> "転送数量"
-		HoneyLanguage.Korean.code -> "수량 전송"
+		HoneyLanguage.Chinese.code -> "数量"
+		HoneyLanguage.Japanese.code -> "数量"
+		HoneyLanguage.Korean.code -> "수량"
 		HoneyLanguage.Russian.code -> "сумму"
-		HoneyLanguage.TraditionalChinese.code -> "轉出數量"
+		HoneyLanguage.TraditionalChinese.code -> "數量"
 		else -> ""
 	}
 	@JvmField
