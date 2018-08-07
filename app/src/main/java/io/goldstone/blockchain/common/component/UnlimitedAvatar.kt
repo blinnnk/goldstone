@@ -298,7 +298,7 @@ class UnlimitedAvatar(
 		Canvas(newmap).apply {
 			// 第一个三角形
 			drawBitmap(
-				background,
+				background ?:newmap,
 				0f,
 				0f,
 				null
