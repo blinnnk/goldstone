@@ -2063,6 +2063,7 @@ val emptyNameAleryt = when (currentLanguage) {
 	HoneyLanguage.TraditionalChinese.code -> "還沒有填寫錢包名稱"
 	else -> ""
 }
+
 @JvmField
 val switchChainNetAlert: (customContent: String) -> String = {
 	when (currentLanguage) {
@@ -2075,7 +2076,7 @@ val switchChainNetAlert: (customContent: String) -> String = {
 		else -> ""
 	}
 }
-}
+
 
 object ProfileText {
 	@JvmField
