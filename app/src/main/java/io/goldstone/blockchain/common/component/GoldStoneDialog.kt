@@ -32,7 +32,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class GoldStoneDialog(context: Context) : RelativeLayout(context) {
-	
+
 	private val image by lazy { ImageView(context) }
 	private val content by lazy { TwoLineTitles(context) }
 	private val cancelButton by lazy {
@@ -44,7 +44,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		DialogButton(context, CommonText.confirm)
 	}
 	private lateinit var buttonLayout: LinearLayout
-	
+
 	init {
 		id = ElementID.dialog
 		isClickable = true
@@ -72,11 +72,11 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}.setCenterInParent()
 	}
-	
+
 	fun <T> setImage(src: T) {
 		image.glideImage(src)
 	}
-	
+
 	fun setContent(
 		title: String,
 		subtitle: String
@@ -84,7 +84,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		content.title.text = title
 		content.subtitle.text = subtitle
 	}
-	
+
 	fun showOnlyConfirmButton(
 		buttonTitle: String = CommonText.confirm,
 		clickEvent: () -> Unit
@@ -95,7 +95,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			clickEvent()
 		}.into(buttonLayout)
 	}
-	
+
 	fun showButtons(confirmTitle: String = CommonText.confirm, confirmEvent: () -> Unit) {
 		buttonLayout.x = 140.uiPX().toFloat()
 		cancelButton.into(buttonLayout)
@@ -104,12 +104,12 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			confirmEvent()
 		}.into(buttonLayout)
 	}
-	
+
 	inner class DialogButton(
 		context: Context,
 		title: String
 	) : TextView(context) {
-		
+
 		init {
 			gravity = Gravity.END or Gravity.CENTER_VERTICAL
 			text = title
@@ -120,7 +120,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
 		}
 	}
-	
+
 	companion object {
 		fun show(
 			context: Context,
@@ -140,7 +140,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 							}
 						}
 					}
-					
+
 					else -> {
 						it.findViewById<RelativeLayout>(ContainerID.main)?.apply {
 							// 防止重复添加
@@ -155,7 +155,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 			}
 		}
-		
+
 		fun remove(context: Context) {
 			(context as? Activity)?.let { activity ->
 				when (activity) {
@@ -166,7 +166,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 							}
 						}
 					}
-					
+
 					else -> {
 						activity.findViewById<RelativeLayout>(ContainerID.main)?.apply {
 							findViewById<GoldStoneDialog>(ElementID.dialog)?.let {
@@ -177,10 +177,10 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 			}
 		}
-		
+
 		private fun showChainErrorDialog(context: Context) {
 			GoldStoneDialog.show(context) {
-				showOnlyConfirmButton("Got It") {
+				showOnlyConfirmButton(CommonText.gotIt) {
 					GoldStoneDialog.remove(context)
 				}
 				setImage(R.drawable.node_error_banner)
@@ -190,7 +190,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				)
 			}
 		}
-		
+
 		fun chainError(reason: String?, error: Throwable?, context: Context) {
 			if (reason.equals(ErrorTag.chain, true)) {
 				GoldStoneDialog.showChainErrorDialog(context)
