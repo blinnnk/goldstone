@@ -229,7 +229,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 				hold
 			)
 		}
-		
+
 		WalletType.BTCOnly.content -> {
 			verifyKeystorePassword(
 				password,
@@ -239,7 +239,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 				hold
 			)
 		}
-		
+
 		WalletType.ETHERCAndETCOnly.content -> {
 			verifyKeystorePassword(
 				password,
@@ -249,14 +249,16 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 				hold
 			)
 		}
-	// 多链钱包随便找一个名下钱包地址进行验证即可
-		WalletType.MultiChain.content -> verifyKeystorePassword(
-			password,
-			Config.getCurrentEthereumAddress(),
-			false,
-			false,
-			hold
-		)
+		// 多链钱包随便找一个名下钱包地址进行验证即可
+		WalletType.MultiChain.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentEthereumAddress(),
+				false,
+				false,
+				hold
+			)
+		}
 	}
 }
 

@@ -156,7 +156,7 @@ private fun isTargetDevice(name: String): Boolean? {
 private fun Activity.detectnochScreenInAndroidP(): Boolean? {
 	return if (Build.VERSION.SDK_INT >= 28) {
 		try {
-			View(this).rootWindowInsets.displayCutout.safeInsetTop > 30.uiPX()
+			View(this).rootWindowInsets.displayCutout?.safeInsetTop ?: 0 > 30.uiPX()
 		} catch (error: Exception) {
 			LogUtil.error("detectnochScreenInAndroidP", error)
 			null

@@ -26,13 +26,13 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 abstract class BTCTransactionStatusObserver {
-	
+
 	abstract val hash: String
 	private val handler = Handler(Looper.getMainLooper())
 	private val targetIntervla = 6
 	private val retryTime = 20000L
 	private var currentBlockNumber: Int? = null
-	
+
 	open fun checkStatusByTransaction() {
 		doAsync {
 			if (currentBlockNumber.isNull()) {
@@ -54,7 +54,7 @@ abstract class BTCTransactionStatusObserver {
 						removeObserver()
 						// TODO ERROR Alert
 					}
-				) {
+				) { it ->
 					it?.let {
 						val blockInterval = it - currentBlockNumber!!
 						val hasConfirmed = blockInterval > targetIntervla
@@ -71,17 +71,17 @@ abstract class BTCTransactionStatusObserver {
 			}
 		}
 	}
-	
+
 	abstract fun getStatus(confirmed: Boolean, blockInterval: Int)
-	
+
 	private fun removeObserver() {
 		handler.removeCallbacks(reDo)
 	}
-	
+
 	fun start() {
 		checkStatusByTransaction()
 	}
-	
+
 	private val reDo: Runnable = Runnable {
 		checkStatusByTransaction()
 	}
@@ -159,7 +159,7 @@ private fun TransactionDetailPresenter.onBTCTransactionSucceed() {
 		)
 		getBTCTransactionFromChain(false)
 	}
-	
+
 	dataFromList?.apply {
 		updateHeaderValue(
 			TransactionHeaderModel(
@@ -187,15 +187,15 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 		{
 			fragment.context?.alert(it.toString())
 		}
-	) {
+	) { transaction ->
 		GoldStoneAPI.context.runOnUiThread {
 			fragment.asyncData?.clear()
-			val data = generateModels(it)
+			val data = generateModels(transaction)
 			fragment.asyncData?.addAll(data)
 			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 		}
 		// Update Database
-		it?.let {
+		transaction?.let {
 			// 更新本地的燃气费记录以及转账记录的相关信息
 			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, false, isPending)
 			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, true, isPending)

@@ -58,7 +58,7 @@ class WalletSettingsPresenter(
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
 		}
 	}
-	
+
 	fun showWalletSettingListFragment() {
 		setCustomHeader()
 		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)

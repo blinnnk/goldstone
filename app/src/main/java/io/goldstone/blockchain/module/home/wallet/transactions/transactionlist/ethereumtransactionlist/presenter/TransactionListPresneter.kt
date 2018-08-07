@@ -34,7 +34,7 @@ var memoryTransactionListData: ArrayList<TransactionListModel>? = null
 class TransactionListPresenter(
 	override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
-	
+
 	override fun updateData() {
 		fragment.showLoadingView(LoadingText.transactionData)
 		if (memoryTransactionListData.isNull()) {
@@ -58,23 +58,23 @@ class TransactionListPresenter(
 			}
 		}
 	}
-	
+
 	private var hasUpdate = false
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
-			checkAddressNameInContacts(it) {
-				it.insertToMyTokenTableIfHasValue()
-				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
+			checkAddressNameInContacts(transactions) {
+				transactions.insertToMyTokenTableIfHasValue()
+				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(transactions)
 				// Save a copy into memory for imporving the speed of next time to view
-				memoryTransactionListData = it
+				memoryTransactionListData = transactions
 				// Check and update the new data from chain in async thread
 				if (!hasUpdate) {
-					updateTransactionInAsync(it) {
+					updateTransactionInAsync(transactions) {
 						it isTrue {
 							hasUpdate = true
 							initData()
 						}
-						
+
 						try {
 							// ViewPager 跨 Fragment 的时候 数据现成存在但是 View 已经被
 							// ViewPager 清楚
@@ -87,7 +87,7 @@ class TransactionListPresenter(
 			}
 		}
 	}
-	
+
 	private fun ArrayList<TransactionListModel>.insertToMyTokenTableIfHasValue() {
 		MyTokenTable.getMyTokens { myTokens ->
 			distinctBy { it.contract }.filterNot {
@@ -115,7 +115,7 @@ class TransactionListPresenter(
 							)
 						}
 					}
-					
+
 					override fun mergeCallBack() {
 						fragment.getMainActivity()
 							?.getWalletDetailFragment()
@@ -126,7 +126,7 @@ class TransactionListPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateTransactionInAsync(
 		localData: ArrayList<TransactionListModel>,
 		callback: (hasData: Boolean) -> Unit
@@ -140,14 +140,14 @@ class TransactionListPresenter(
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
 				fragment.context.alert(
 					"${AlertText.getTransactionErrorPrefix} " +
-					"${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}"
+						"${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}"
 				)
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
 			},
 			callback
 		)
 	}
-	
+
 	companion object {
 		fun checkAddressNameInContacts(
 			transactions: List<TransactionListModel>,
@@ -162,8 +162,8 @@ class TransactionListPresenter(
 							contacts.find {
 								// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
 								it.ethERCAndETCAddress.equals(item.toAddress, true)
-								|| it.btcTestnetAddress.contains(item.toAddress, true)
-								|| it.btcMainnetAddress.contains(item.toAddress, true)
+									|| it.btcTestnetAddress.contains(item.toAddress, true)
+									|| it.btcMainnetAddress.contains(item.toAddress, true)
 							}?.name ?: item.addressName
 						if (isEnd) {
 							callback()
@@ -172,7 +172,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-		
+
 		fun showTransactionDetail(
 			fragment: TransactionFragment?,
 			model: TransactionListModel?,
@@ -189,23 +189,25 @@ class TransactionListPresenter(
 				)
 			}
 		}
-		
+
 		fun getTokenTransactions(
 			startBlock: String,
 			errorCallback: (Throwable) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			getTransactionsFromEtherScan(startBlock, errorCallback) {
-				it isTrue {
-					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
-						checkAddressNameInContacts(it) { hold(it) }
+			getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
+				hasData isTrue {
+					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
+						checkAddressNameInContacts(transactions) {
+							hold(transactions)
+						}
 					}
 				} otherwise {
 					hold(arrayListOf())
 				}
 			}
 		}
-		
+
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun getTransactionsFromEtherScan(
 			startBlock: String,
@@ -221,7 +223,7 @@ class TransactionListPresenter(
 				}
 			}.start()
 		}
-		
+
 		private fun mergeETHAndERC20Incoming(
 			startBlock: String,
 			errorCallback: (Throwable) -> Unit,
@@ -249,7 +251,7 @@ class TransactionListPresenter(
 							chainData = this
 							completeMark()
 						}
-						
+
 						GoldStoneAPI.getERC20TokenIncomingTransaction(
 							startBlock,
 							{
@@ -261,7 +263,7 @@ class TransactionListPresenter(
 								}
 								completeMark()
 							}
-						) {
+						) { it ->
 							// 把请求回来的数据转换成 `TransactionTable` 格式
 							logData = it.map {
 								TransactionTable(ERC20TransactionModel(it))
@@ -270,23 +272,21 @@ class TransactionListPresenter(
 						}
 					}
 				}
-				
+
 				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
-					chainData.plus(logData).apply {
-					}.filter {
-						it.to.isNotEmpty()
-					}.distinctBy {
-						it.hash
-					}.sortedByDescending {
-						it.timeStamp
-					}.let {
-						diffNewDataAndUpdateLocalData(it, hold)
-					}
+					diffNewDataAndUpdateLocalData(chainData.plus(logData)
+						.filter {
+							it.to.isNotEmpty()
+						}.distinctBy {
+							it.hash
+						}.sortedByDescending {
+							it.timeStamp
+						}, hold)
 				}
 			}
 		}
-		
+
 		private fun diffNewDataAndUpdateLocalData(
 			newData: List<TransactionTable>,
 			hold: List<TransactionTable>.() -> Unit
@@ -316,7 +316,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-		
+
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			DefaultTokenTable.getCurrentChainTokens { localTokens ->
 				filter {
@@ -352,14 +352,14 @@ class TransactionListPresenter(
 								}
 							}
 						}
-						
+
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}
 			}
 		}
-		
+
 		private fun filterCompletedData(
 			data: List<TransactionTable>,
 			hold: (hasData: Boolean) -> Unit
@@ -376,10 +376,10 @@ class TransactionListPresenter(
 								completeMark()
 							}
 						}
-						
+
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() {
-							this@list.insertMinerFeeToDatabase {
+							this@list.insertMinerFeeToDatabase { _ ->
 								hold(distinctBy { new ->
 									data.any {
 										it.hash.equals(new.hash, true)
@@ -391,7 +391,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-		
+
 		private fun List<TransactionTable>.insertMinerFeeToDatabase(
 			hold: (List<TransactionTable>) -> Unit
 		) {
@@ -411,12 +411,12 @@ class TransactionListPresenter(
 							completeMark()
 						}
 					}
-					
+
 					override fun mergeCallBack() = hold(this@list)
 				}.start()
 			}
 		}
-		
+
 		/**
 		 * 补全从 `EtherScan` 拉下来的账单中各种 `token` 的信息, 需要很多种线程情况, 这里使用异步并发观察结果
 		 * 在汇总到主线程.
@@ -456,7 +456,7 @@ class TransactionListPresenter(
 										)
 										receiveAddress = transactionInfo?.address
 									}
-									
+
 									TransactionTable.updateModelInfo(
 										transaction,
 										true,
@@ -479,7 +479,7 @@ class TransactionListPresenter(
 							}
 						}
 					}
-					
+
 					override fun getResultInMainThread() = false
 					override fun mergeCallBack() = hold(data)
 				}.start()

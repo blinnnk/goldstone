@@ -231,7 +231,7 @@ private fun TransactionDetailPresenter.getTransactionFromChain() {
 // 自动监听交易完成后, 将转账信息插入数据库
 private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String) {
 	GoldStoneDataBase.database.transactionDao().apply {
-		getTransactionByTaxHash(currentHash).let {
+		getTransactionByTaxHash(currentHash).let { it ->
 			it.forEach {
 				update(it.apply {
 					this.blockNumber = blockNumber
@@ -245,7 +245,7 @@ private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String)
 }
 
 fun TransactionDetailPresenter.updateDataWhenHasError() {
-	TransactionTable.getTransactionByHash(currentHash) {
+	TransactionTable.getTransactionByHash(currentHash) { it ->
 		it.find {
 			it.hash == currentHash
 		}?.let {
@@ -264,7 +264,7 @@ fun TransactionDetailPresenter.updateDataWhenHasError() {
 }
 
 private fun TransactionDetailPresenter.updateDataWhenFailed() {
-	TransactionTable.getTransactionByHash(currentHash) {
+	TransactionTable.getTransactionByHash(currentHash) { it ->
 		it.find {
 			it.hash == currentHash
 		}?.let {

@@ -15,19 +15,19 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
-	
+
 	override fun updateData() {
 		updateSelectionsData()
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 	}
-	
+
 	private fun updateSelectionsData(callback: () -> Unit = {}) {
-		QuotationSelectionTable.getMySelections {
-			it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
+		QuotationSelectionTable.getMySelections { selections ->
+			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
 				fragment.apply {
 					asyncData.isNull() isTrue {
 						asyncData = orderedData
@@ -39,14 +39,14 @@ class QuotationManagementPresenter(
 			callback()
 		}
 	}
-	
+
 	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
 		fragment.updateSelectionOrderID()
 	}
-	
+
 	private fun getCurrentAsyncData() =
 		fragment.asyncData.orEmptyArray()
-	
+
 	private fun QuotationManagementFragment.updateSelectionOrderID() {
 		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { fromPosition, toPosition ->
 			val data = getCurrentAsyncData()
@@ -68,7 +68,7 @@ class QuotationManagementPresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		// 更新数据
 		updateSelectionsData()

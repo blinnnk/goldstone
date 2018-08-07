@@ -9,13 +9,14 @@ import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.view.BitcoinTransactionListAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.view.BitcoinTransactionListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/7/26 11:57 PM
@@ -24,16 +25,16 @@ import org.jetbrains.anko.uiThread
 class BitcoinTransactionListPresenter(
 	override val fragment: BitcoinTransactionListFragment
 ) : BaseRecyclerPresenter<BitcoinTransactionListFragment, TransactionListModel>() {
-	
+
 	private val address: () -> String = {
 		if (Config.isTestEnvironment()) Config.getCurrentBTCTestAddress()
 		else Config.getCurrentBTCAddress()
 	}
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-	
+
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TransactionFragment>()?.apply {
@@ -44,15 +45,13 @@ class BitcoinTransactionListPresenter(
 			}
 		}
 	}
-	
+
 	private var hasLoadServerData = false
 	private fun loadTransactionsFromDatabase() {
 		BitcoinSeriesTransactionTable.getTransactionsByAddress(address()) { localData ->
-			localData.map {
+			diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(localData.map {
 				TransactionListModel(it)
-			}.let {
-				diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(it.toArrayList())
-			}
+			}.toArrayList())
 			// 如果已经更新了网络数据就不再继续执行
 			if (!hasLoadServerData) {
 				doAsync {
@@ -63,9 +62,11 @@ class BitcoinTransactionListPresenter(
 							fragment.removeLoadingView()
 							// TODO ERROR Alert
 						}
-					) {
-						uiThread { fragment.removeLoadingView() }
-						if (it) {
+					) { hasData ->
+						GoldStoneAPI.context.runOnUiThread {
+							fragment.removeLoadingView()
+						}
+						if (hasData) {
 							loadTransactionsFromDatabase()
 							hasLoadServerData = true
 						}
@@ -74,7 +75,7 @@ class BitcoinTransactionListPresenter(
 			}
 		}
 	}
-	
+
 	companion object {
 		const val pageSize = 40
 		fun loadTransactionsFromChain(
@@ -93,9 +94,9 @@ class BitcoinTransactionListPresenter(
 				pageSize,
 				offset,
 				errorCallback
-			) {
+			) { transactions ->
 				// Calculate All Inputs to get transfer value
-				it.map {
+				successCallback(transactions.map {
 					// 转换数据格式
 					BitcoinSeriesTransactionTable(
 						it,
@@ -129,10 +130,7 @@ class BitcoinTransactionListPresenter(
 							.insert(it.apply { isFee = true })
 					}
 					TransactionListModel(it)
-				}.let {
-					// 更新 `UI` 界面
-					successCallback(it.isNotEmpty())
-				}
+				}.isNotEmpty())
 			}
 		}
 	}

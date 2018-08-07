@@ -21,12 +21,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class BitcoinUnitTest {
-	
+
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	
+
 	@Test
 	fun getBitcoinBalance() {
 		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
@@ -34,23 +34,20 @@ class BitcoinUnitTest {
 			LogUtil.debug("$positon getBitcoinBalance", "$it")
 		}
 	}
-	
+
 	@Test
 	fun getBitcoinAddress() {
 		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
-		
+
 		BTCWalletUtils.getBitcoinWalletByMnemonic(seedCode, DefaultPath.btcPath) { address, secret ->
 			LogUtil.debug("getBitcoinAddress", "$address and $secret")
-			
+
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(secret, false) {
-				LogUtil.debug(
-					"getBitcoinAddress",
-					it
-				)
+				LogUtil.debug("getBitcoinAddress", it)
 			}
 		}
 	}
-	
+
 	@Test
 	fun encryptPrivateKey() {
 	}
