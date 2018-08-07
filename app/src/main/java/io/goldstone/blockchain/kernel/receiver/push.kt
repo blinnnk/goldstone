@@ -3,7 +3,6 @@
 package io.goldstone.blockchain.kernel.receiver
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
@@ -192,7 +191,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
 					WalletType.BTCOnly.content -> {
 						val btcSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
+							AddressManagerPresneter.convertToChildAddresses(currentBTCAddress)
 								.map {
 									Pair(it.first, ChainType.BTC.id)
 								}.map {
@@ -216,7 +215,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
 					WalletType.BTCTestOnly.content -> {
 						val btcTestSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses)
+							AddressManagerPresneter.convertToChildAddresses(currentBTCTestAddress)
 								.map {
 									Pair(it.first, ChainType.BTCTest.id)
 								}.map {
@@ -240,7 +239,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
 					WalletType.ETHERCAndETCOnly.content -> {
 						val ethSeries =
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses)
+							AddressManagerPresneter.convertToChildAddresses(currentETHAndERCAddress)
 								.map {
 									Pair(it.first, ChainType.ETH.id)
 								}.map {

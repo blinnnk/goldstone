@@ -20028,6 +20028,7 @@ io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable$Compani
     long getTotalValue(org.json.JSONObject) -> for
     void getTransactionsByAddress(java.lang.String,kotlin.jvm.functions.Function1) -> else
     void getTransactionsByHash(java.lang.String,boolean,kotlin.jvm.functions.Function1) -> for
+    void preventRepeatedInsert(java.lang.String,boolean,io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable) -> do
     void updateLocalDataByHash(java.lang.String,io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable,boolean,boolean) -> do
 io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable$Companion$getTransactionsByAddress$1 -> c.a.a.c.a.I:
     java.lang.String $address -> a
@@ -21259,15 +21260,11 @@ io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getBlockNumber$$inlined$
     java.lang.String $chainName$inlined -> b
     kotlin.jvm.functions.Function1 $holdValue$inlined -> c
     kotlin.jvm.functions.Function2 $errorCallback$inlined -> a
-io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getEthBalance$$inlined$let$lambda$1 -> c.a.a.c.c._b:
-    java.lang.String $chainName$inlined -> b
-    kotlin.jvm.functions.Function1 $holdValue$inlined -> c
-    kotlin.jvm.functions.Function2 $errorCallback$inlined -> a
+io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getEthBalance$1 -> c.a.a.c.c._b:
+    kotlin.jvm.functions.Function2 $errorCallback -> a
     void invoke(java.lang.Throwable,java.lang.String) -> for
-io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getEthBalance$$inlined$let$lambda$2 -> c.a.a.c.c.ac:
-    java.lang.String $chainName$inlined -> b
-    kotlin.jvm.functions.Function1 $holdValue$inlined -> c
-    kotlin.jvm.functions.Function2 $errorCallback$inlined -> a
+io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getEthBalance$2 -> c.a.a.c.c.ac:
+    kotlin.jvm.functions.Function1 $holdValue -> a
 io.goldstone.blockchain.kernel.network.GoldStoneEthCall$getInputCodeByHash$$inlined$let$lambda$1 -> c.a.a.c.c.bc:
     java.lang.String $chainName$inlined -> b
     kotlin.jvm.functions.Function1 $holdValue$inlined -> c
@@ -28955,11 +28952,10 @@ io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.prese
     void invoke(org.jetbrains.anko.AnkoAsyncContext) -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter$getETHERCorETCPrivateKeyByAddress$1$1 -> c.a.a.d.c.d.g.e.a.d:
     io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter$getETHERCorETCPrivateKeyByAddress$1 this$0 -> a
-    org.jetbrains.anko.AnkoAsyncContext receiver$0 -> b
     void invoke(java.lang.Throwable) -> throw
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter$getETHERCorETCPrivateKeyByAddress$1$1$1 -> c.a.a.d.c.d.g.e.a.c:
     io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter$getETHERCorETCPrivateKeyByAddress$1$1 this$0 -> a
-    void invoke(io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter) -> do
+    void invoke(android.content.Context) -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter$isBTCAddress$2 -> c.a.a.d.c.d.g.e.a.f:
     io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter this$0 -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment -> c.a.a.d.c.d.g.e.b.i:
@@ -28998,8 +28994,9 @@ io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.
     io.goldstone.blockchain.common.component.RoundButton $it -> b
     io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$initView$$inlined$verticalLayout$lambda$2 this$0 -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$initView$$inlined$verticalLayout$lambda$2$1$1 -> c.a.a.d.c.d.g.e.b.d:
-    io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$initView$$inlined$verticalLayout$lambda$2$1 this$0 -> b
-    java.lang.String receiver$0$inlined -> a
+    io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$initView$$inlined$verticalLayout$lambda$2$1 this$0 -> a
+    java.lang.String receiver$0 -> b
+    void invoke(android.content.Context) -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$passwordInput$2 -> c.a.a.d.c.d.g.e.b.g:
     io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment this$0 -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment$privateKeyTextView$2 -> c.a.a.d.c.d.g.e.b.h:
@@ -37741,25 +37738,25 @@ org.spongycastle.x509.extension.X509ExtensionUtil -> org.spongycastle.x509.exten
 org.spongycastle.x509.util.LDAPStoreHelper -> org.spongycastle.x509.util.LDAPStoreHelper:
 org.spongycastle.x509.util.StreamParser -> org.spongycastle.x509.util.StreamParser:
 org.spongycastle.x509.util.StreamParsingException -> org.spongycastle.x509.util.StreamParsingException:
-android.support.compat.R -> a.b.a.a:
-com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
-android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
-com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
-android.support.v7.appcompat.R -> a.b.d.b.a:
-android.support.v4.util.Pools -> a.b.c.i.l:
-com.blinnnk.honey.R -> b.a.e.a:
 org.bitcoinj.net.discovery.HttpDiscovery -> i.b.c.a.a:
-com.google.android.gms.common.R -> b.e.a.a.d.n:
-com.google.zxing.client.android.R -> b.e.c.b.a.k:
-com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
-android.support.v4.content.Loader -> a.b.c.b.b:
-android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
-com.google.android.gms.common.internal.GmsClientEventManager -> b.e.a.a.d.c.e:
-com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
-com.google.android.gms.common.api.internal.ListenerHolder -> b.e.a.a.d.a.a.c:
-com.db.williamchart.R -> b.c.b.a:
-android.support.v7.recyclerview.R -> a.b.d.e.a:
+com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
 android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
-me.itangqi.library.R -> f.a.a.a:
+android.support.compat.R -> a.b.a.a:
+com.blinnnk.honey.R -> b.a.e.a:
 com.google.android.gms.base.R -> b.e.a.a.c.a:
+com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
+android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
+com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
+com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
+android.support.v7.appcompat.R -> a.b.d.b.a:
+com.google.android.gms.common.api.internal.ListenerHolder -> b.e.a.a.d.a.a.c:
+android.support.v4.util.Pools -> a.b.c.i.l:
 android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
+android.support.v4.content.Loader -> a.b.c.b.b:
+me.itangqi.library.R -> f.a.a.a:
+com.google.zxing.client.android.R -> b.e.c.b.a.k:
+com.google.android.gms.common.R -> b.e.a.a.d.n:
+android.support.v7.recyclerview.R -> a.b.d.e.a:
+android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
+com.google.android.gms.common.internal.GmsClientEventManager -> b.e.a.a.d.c.e:
+com.db.williamchart.R -> b.c.b.a:

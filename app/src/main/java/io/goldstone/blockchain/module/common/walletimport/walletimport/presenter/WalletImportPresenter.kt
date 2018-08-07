@@ -65,7 +65,7 @@ class WalletImportPresenter(
 					multiChainAddresses.btcTestAddress
 				).find { it.isNotEmpty() }.orEmpty()
 			
-			WalletTable.getWalletByAddress(currentAddress) {
+			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
 					WalletTable.insert(

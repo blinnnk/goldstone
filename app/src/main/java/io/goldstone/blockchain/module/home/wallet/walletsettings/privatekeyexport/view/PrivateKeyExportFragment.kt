@@ -21,27 +21,24 @@ import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.support.v4.onUiThread
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 06/04/2018 1:02 AM
  * @author KaySaith
  */
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
-	
+
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val privateKeyTextView by lazy { TextView(context) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyExportPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -68,7 +65,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)
-			
+
 			passwordInput.apply {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
@@ -76,7 +73,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 				title = CreateWalletText.password
 			}.into(this)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				setBlueStyle()
@@ -85,16 +82,18 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) {
-					onUiThread {
-						this?.let { privateKeyTextView.text = it }
+				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) privateKey@{
+					GoldStoneAPI.context.runOnUiThread {
+						this@privateKey?.let {
+							privateKeyTextView.text = it
+						}
 						it.showLoadingStatus(false)
 					}
 				}
 			}.into(this)
 		}
 	}
-	
+
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		parentFragment?.let {
@@ -103,7 +102,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?
