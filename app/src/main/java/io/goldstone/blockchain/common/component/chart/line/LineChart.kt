@@ -1,9 +1,10 @@
-package example.cat.com.candlechartdemo.ktd.line
+package io.goldstone.blockchain.common.component.chart.line
 
 import android.content.Context
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.view.MotionEvent
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -11,9 +12,9 @@ import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.renderer.LineChartRenderer
 import com.github.mikephil.charting.utils.Utils
-import example.cat.com.candlechartdemo.ktd.BlinnnkXAxisRenderer
-import example.cat.com.candlechartdemo.ktd.BlinnnkXValueFormatter
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.chart.XAxisRenderer
+import io.goldstone.blockchain.common.component.chart.XValueFormatter
 import java.util.*
 
 /**
@@ -21,31 +22,26 @@ import java.util.*
  * @author: yanglihai
  * @description: 线性表
  */
-abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
+abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
   
   
-  private lateinit var blinnnkMarkerView: BlinnnkLineMarkerView
-  private lateinit var blinnnkXValueFormatter: BlinnnkXValueFormatter
-  private val xRangeVisibleNum = 5f
-  private val lineYValueFormatter = BlinnnkLineYValueFormatter()
+  private lateinit var blinnnkMarkerView: LineMarkerView
+  private lateinit var blinnnkXValueFormatter: XValueFormatter
+  private val xRangeVisibleNum = 8f
+  private val lineYValueFormatter = LineYValueFormatter()
   
   private var pointColor: Int = Color.BLACK
   
   private val gridlineColor = Color.rgb(236,236,236)
   private val labelColor = Color.rgb(152, 152, 152)
-  
-  
-//  private var isDrawPoints: Boolean = false
-//  private var isPerformBezier = false
-//  private var chartColor: Int = Color.RED
+	
+  private var chartColor: Int = Color.RED
   private val chartWidth = 3f
   private val pointRadius = arrayListOf(5f, 2f)
-//  private var chartShadowResource: Int = R.drawable.fade_red
+  private var chartShadowResource: Int = R.drawable.fade_red
 	
 	abstract fun isDrawPoints() : Boolean
 	abstract fun isPerformBezier() : Boolean
-	abstract fun getChartShadowResource() : Int
-	abstract fun getChartColor() : Int
   
   constructor(context: Context) : super(context)
   
@@ -57,17 +53,14 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
   override fun init() {
     super.init()
     mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
-    mXAxisRenderer = BlinnnkXAxisRenderer(mViewPortHandler,
-      mXAxis,
-      mLeftAxisTransformer)
+    mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
     
-    blinnnkMarkerView = BlinnnkLineMarkerView(context)
+    blinnnkMarkerView = LineMarkerView(context)
     blinnnkMarkerView.setChartView(this)
-    blinnnkXValueFormatter = BlinnnkXValueFormatter(this@BlinnnkLineChart)
+    blinnnkXValueFormatter = XValueFormatter(this)
     
     post {
       initAxisStyle()
-      setEmptyData()
     }
   }
   
@@ -76,10 +69,10 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
     isScaleYEnabled = false
     mPinchZoomEnabled = true
     isDragEnabled = true
-    legend.isEnabled = false//标签是否显示
-    description.isEnabled = false//描述信息展示
+    legend.isEnabled = false // 标签是否显示
+    description.isEnabled = false // 描述信息展示
   
-    marker = this@BlinnnkLineChart.blinnnkMarkerView
+    marker = blinnnkMarkerView
   
     xAxis.apply {
       valueFormatter = blinnnkXValueFormatter
@@ -88,13 +81,17 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
       setDrawLabels(true)
       gridColor = gridlineColor
       textColor = labelColor
+			mAxisMinimum = 10f
     }
     mAxisLeft.apply {
+			axisLineColor = gridlineColor
       gridColor = gridlineColor
       textColor = labelColor
+			setLabelCount(4,true)
     }
   
     axisRight.apply {
+			axisLineColor = gridlineColor
       isEnabled = true
       setDrawLabels(false)
       setDrawGridLines(false)
@@ -112,7 +109,7 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
     },500)
   }
   
-  private fun resetData(dataRows: List<Entry>) {
+	fun resetData(dataRows: List<Entry>) {
     
     val dataSet: LineDataSet
     
@@ -123,23 +120,23 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
       notifyDataSetChanged()
     } else {
       // create a dataset and give it a type
-      dataSet = LineDataSet(dataRows, "DataSet 1")
+      dataSet = LineDataSet(dataRows, "lineData ")
       dataSet.apply {
         valueFormatter = lineYValueFormatter
 
-        //平划的曲线
+        // 平划的曲线
         if (isPerformBezier()){
           mode = LineDataSet.Mode.CUBIC_BEZIER
           cubicIntensity = 0.2f
         }
         
-        setDrawIcons(false)//显示图标
-        setDrawValues(false)//展示每个点的值
+        setDrawIcons(false) // 显示图标
+        setDrawValues(false) // 展示每个点的值
         
-        color = getChartColor()
+        color = chartColor
         lineWidth = chartWidth
         if (isDrawPoints()) {
-          //峰值点
+          // 峰值点
           setDrawCircles(true)
           setCircleColor(pointColor)
           circleRadius = pointRadius[0]
@@ -153,7 +150,7 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
   
         if (Utils.getSDKInt() >= 18) {
           // fill drawable only supported on api level 18 and above
-          fillDrawable= ContextCompat.getDrawable(context, getChartShadowResource())
+          fillDrawable= ContextCompat.getDrawable(context, chartShadowResource)
         } else {
           fillColor = Color.TRANSPARENT
         }
@@ -168,10 +165,34 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
       
       // set data
       setData(data)
-      setVisibleXRangeMaximum(this@BlinnnkLineChart.xRangeVisibleNum)
-      setVisibleXRangeMinimum(this@BlinnnkLineChart.xRangeVisibleNum)
+			// set visible num xRange
+      setVisibleXRangeMaximum(xRangeVisibleNum)
+      setVisibleXRangeMinimum(xRangeVisibleNum)
     }
   }
+	
+	fun setChartColor(color: Int) {
+		chartColor = color
+		if (mData != null) {
+			(mData.getDataSetByIndex(0) as LineDataSet).color = chartColor
+			mData.notifyDataChanged()
+			notifyDataSetChanged()
+			invalidate()
+		}
+		
+		
+	}
+	
+	fun setShadowResource(resource: Int) {
+		chartShadowResource = resource
+		if (mData != null) {
+			(mData.getDataSetByIndex(0) as LineDataSet).fillDrawable = ContextCompat.getDrawable(context, chartShadowResource)
+			mData.notifyDataChanged()
+			notifyDataSetChanged()
+			invalidate()
+		}
+		
+	}
   
   override fun getLineData(): LineData {
     return mData
@@ -193,4 +214,8 @@ abstract class BlinnnkLineChart : BarLineChartBase<LineData> ,LineDataProvider {
     }
     resetData(candleEntrySet)
   }
+	
+	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+		return false
+	}
 }

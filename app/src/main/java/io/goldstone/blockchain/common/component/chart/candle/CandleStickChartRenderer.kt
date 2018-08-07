@@ -1,4 +1,4 @@
-package example.cat.com.candlechartdemo.ktd.candle
+package io.goldstone.blockchain.common.component.chart.candle
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -15,18 +15,18 @@ import com.github.mikephil.charting.utils.*
  * @description: 蜡烛绘制的逻辑
  */
 
-class BlinnnkCandleStickChartRenderer(
-  protected var mChart: CandleDataProvider,
+class CandleStickChartRenderer(
+  protected var candleDataProvider: CandleDataProvider,
   animator: ChartAnimator,
   viewPortHandler: ViewPortHandler) : LineScatterCandleRadarRenderer(animator, viewPortHandler) {
   
-  private val radius = 3f
+  private val candleRectRadius = 3f // 蜡烛矩形的圆角
   
-  private val mShadowBuffers = FloatArray(8)
-  private val mBodyBuffers = FloatArray(4)
-  private val mRangeBuffers = FloatArray(4)
-  private val mOpenBuffers = FloatArray(4)
-  private val mCloseBuffers = FloatArray(4)
+  private val shadowBuffers = FloatArray(8)
+  private val bodyBuffers = FloatArray(4)
+  private val rangeBuffers = FloatArray(4)
+  private val openBuffers = FloatArray(4)
+  private val closeBuffers = FloatArray(4)
   
   override fun initBuffers() {
   
@@ -34,7 +34,7 @@ class BlinnnkCandleStickChartRenderer(
   
   override fun drawData(c: Canvas) {
     
-    val candleData = mChart.candleData
+    val candleData = candleDataProvider.candleData
     
     for (set in candleData.dataSets) {
       
@@ -47,74 +47,74 @@ class BlinnnkCandleStickChartRenderer(
     dataSet: ICandleDataSet
   ) {
     
-    val trans = mChart.getTransformer(dataSet.axisDependency)
+    val trans = candleDataProvider.getTransformer(dataSet.axisDependency)
     
     val phaseY = mAnimator.phaseY
     val barSpace = dataSet.barSpace
     val showCandleBar = dataSet.showCandleBar
     
-    mXBounds.set(mChart, dataSet)
+    mXBounds.set(candleDataProvider, dataSet)
     
     mRenderPaint.strokeWidth = dataSet.shadowWidth
     
     // draw the body
-    for (j in mXBounds.min..mXBounds.range + mXBounds.min) {
+    for (entryPosition in mXBounds.min .. mXBounds.range + mXBounds.min) {
       
       // get the entry
-      val e = dataSet.getEntryForIndex(j)
+      val candleEntry = dataSet.getEntryForIndex(entryPosition)
         ?: continue
       
-      val xPos = e.x
+      val xPosition = candleEntry.x
       
-      val open = e.open
-      val close = e.close
-      val high = e.high
-      val low = e.low
+      val open = candleEntry.open
+      val close = candleEntry.close
+      val high = candleEntry.high
+      val low = candleEntry.low
       
       if (showCandleBar) {
         // calculate the shadow
         
-        mShadowBuffers[0] = xPos
-        mShadowBuffers[2] = xPos
-        mShadowBuffers[4] = xPos
-        mShadowBuffers[6] = xPos
+        shadowBuffers[0] = xPosition
+        shadowBuffers[2] = xPosition
+        shadowBuffers[4] = xPosition
+        shadowBuffers[6] = xPosition
         
         if (open > close) {
-          mShadowBuffers[1] = high * phaseY
-          mShadowBuffers[3] = open * phaseY
-          mShadowBuffers[5] = low * phaseY
-          mShadowBuffers[7] = close * phaseY
+          shadowBuffers[1] = high * phaseY
+          shadowBuffers[3] = open * phaseY
+          shadowBuffers[5] = low * phaseY
+          shadowBuffers[7] = close * phaseY
         } else if (open < close) {
-          mShadowBuffers[1] = high * phaseY
-          mShadowBuffers[3] = close * phaseY
-          mShadowBuffers[5] = low * phaseY
-          mShadowBuffers[7] = open * phaseY
+          shadowBuffers[1] = high * phaseY
+          shadowBuffers[3] = close * phaseY
+          shadowBuffers[5] = low * phaseY
+          shadowBuffers[7] = open * phaseY
         } else {
-          mShadowBuffers[1] = high * phaseY
-          mShadowBuffers[3] = open * phaseY
-          mShadowBuffers[5] = low * phaseY
-          mShadowBuffers[7] = mShadowBuffers[3]
+          shadowBuffers[1] = high * phaseY
+          shadowBuffers[3] = open * phaseY
+          shadowBuffers[5] = low * phaseY
+          shadowBuffers[7] = shadowBuffers[3]
         }
         
-        trans.pointValuesToPixel(mShadowBuffers)
+        trans.pointValuesToPixel(shadowBuffers)
         
         // draw the shadows
         
         if (dataSet.shadowColorSameAsCandle) {
           
           if (open > close) mRenderPaint.color = if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-            j)
+            entryPosition)
           else dataSet.decreasingColor
           else if (open < close) mRenderPaint.color = if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-            j)
+            entryPosition)
           else dataSet.increasingColor
           else mRenderPaint.color = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-            j)
+            entryPosition)
           else dataSet.neutralColor
           
         } else {
           mRenderPaint.color = if (dataSet.shadowColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-            j)
+            entryPosition)
           else dataSet.shadowColor
         }
         
@@ -122,22 +122,22 @@ class BlinnnkCandleStickChartRenderer(
         
         mRenderPaint.strokeCap = Paint.Cap.ROUND
         
-        c.drawLines(mShadowBuffers, mRenderPaint)
+        c.drawLines(shadowBuffers, mRenderPaint)
         
         // calculate the body
         
-        mBodyBuffers[0] = xPos - 0.5f + barSpace
-        mBodyBuffers[1] = close * phaseY
-        mBodyBuffers[2] = xPos + 0.5f - barSpace
-        mBodyBuffers[3] = open * phaseY
+        bodyBuffers[0] = xPosition - 0.5f + barSpace
+        bodyBuffers[1] = close * phaseY
+        bodyBuffers[2] = xPosition + 0.5f - barSpace
+        bodyBuffers[3] = open * phaseY
         
-        trans.pointValuesToPixel(mBodyBuffers)
+        trans.pointValuesToPixel(bodyBuffers)
         
         // draw body differently for increasing and decreasing entry
         if (open > close) { // decreasing
           
           if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) {
-            mRenderPaint.color = dataSet.getColor(j)
+            mRenderPaint.color = dataSet.getColor(entryPosition)
           } else {
             mRenderPaint.color = dataSet.decreasingColor
           }
@@ -146,18 +146,18 @@ class BlinnnkCandleStickChartRenderer(
           
           mRenderPaint.strokeCap = Paint.Cap.SQUARE
           
-          c.drawRoundRect(mBodyBuffers[0],
-            mBodyBuffers[1],
-            mBodyBuffers[2],
-            mBodyBuffers[3],
-            radius,
-            radius,
+          c.drawRoundRect(bodyBuffers[0],
+            bodyBuffers[1],
+            bodyBuffers[2],
+            bodyBuffers[3],
+            candleRectRadius,
+            candleRectRadius,
             mRenderPaint)
           
         } else if (open < close) {
           
           if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) {
-            mRenderPaint.color = dataSet.getColor(j)
+            mRenderPaint.color = dataSet.getColor(entryPosition)
           } else {
             mRenderPaint.color = dataSet.increasingColor
           }
@@ -166,71 +166,72 @@ class BlinnnkCandleStickChartRenderer(
           
           mRenderPaint.strokeCap = Paint.Cap.SQUARE
           
-          c.drawRoundRect(mBodyBuffers[0],
-            mBodyBuffers[1],
-            mBodyBuffers[2],
-            mBodyBuffers[3],
-            radius,
-            radius,
+          c.drawRoundRect(bodyBuffers[0],
+            bodyBuffers[1],
+            bodyBuffers[2],
+            bodyBuffers[3],
+            candleRectRadius,
+            candleRectRadius,
             mRenderPaint)
         } else { // equal values
           
           if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) {
-            mRenderPaint.color = dataSet.getColor(j)
+            mRenderPaint.color = dataSet.getColor(entryPosition)
           } else {
             mRenderPaint.color = dataSet.neutralColor
           }
           
-          c.drawLine(mBodyBuffers[0],
-            mBodyBuffers[1],
-            mBodyBuffers[2],
-            mBodyBuffers[3],
+          c.drawLine(bodyBuffers[0],
+            bodyBuffers[1],
+            bodyBuffers[2],
+            bodyBuffers[3],
             mRenderPaint)
         }
       } else {
         
-        mRangeBuffers[0] = xPos
-        mRangeBuffers[1] = high * phaseY
-        mRangeBuffers[2] = xPos
-        mRangeBuffers[3] = low * phaseY
+        rangeBuffers[0] = xPosition
+        rangeBuffers[1] = high * phaseY
+        rangeBuffers[2] = xPosition
+        rangeBuffers[3] = low * phaseY
         
-        mOpenBuffers[0] = xPos - 0.5f + barSpace
-        mOpenBuffers[1] = open * phaseY
-        mOpenBuffers[2] = xPos
-        mOpenBuffers[3] = open * phaseY
+        openBuffers[0] = xPosition - 0.5f + barSpace
+        openBuffers[1] = open * phaseY
+        openBuffers[2] = xPosition
+        openBuffers[3] = open * phaseY
         
-        mCloseBuffers[0] = xPos + 0.5f - barSpace
-        mCloseBuffers[1] = close * phaseY
-        mCloseBuffers[2] = xPos
-        mCloseBuffers[3] = close * phaseY
+        closeBuffers[0] = xPosition + 0.5f - barSpace
+        closeBuffers[1] = close * phaseY
+        closeBuffers[2] = xPosition
+        closeBuffers[3] = close * phaseY
         
-        trans.pointValuesToPixel(mRangeBuffers)
-        trans.pointValuesToPixel(mOpenBuffers)
-        trans.pointValuesToPixel(mCloseBuffers)
+        trans.pointValuesToPixel(rangeBuffers)
+        trans.pointValuesToPixel(openBuffers)
+        trans.pointValuesToPixel(closeBuffers)
         
         // draw the ranges
         val barColor: Int
         
-        if (open > close) barColor = if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-          j)
-        else dataSet.decreasingColor
-        else if (open < close) barColor = if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(
-          j)
-        else dataSet.increasingColor
-        else barColor = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(j)
-        else dataSet.neutralColor
+        if (open > close) barColor =
+					if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.decreasingColor
+        else if (open < close) barColor =
+					if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.increasingColor
+        else barColor = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.neutralColor
         
         mRenderPaint.color = barColor
-        c.drawLine(mRangeBuffers[0],
-          mRangeBuffers[1],
-          mRangeBuffers[2],
-          mRangeBuffers[3],
+        c.drawLine(rangeBuffers[0],
+          rangeBuffers[1],
+          rangeBuffers[2],
+          rangeBuffers[3],
           mRenderPaint)
-        c.drawLine(mOpenBuffers[0], mOpenBuffers[1], mOpenBuffers[2], mOpenBuffers[3], mRenderPaint)
-        c.drawLine(mCloseBuffers[0],
-          mCloseBuffers[1],
-          mCloseBuffers[2],
-          mCloseBuffers[3],
+        c.drawLine(openBuffers[0],
+					openBuffers[1],
+					openBuffers[2],
+					openBuffers[3],
+					mRenderPaint)
+        c.drawLine(closeBuffers[0],
+          closeBuffers[1],
+          closeBuffers[2],
+          closeBuffers[3],
           mRenderPaint)
       }
     }
@@ -239,22 +240,22 @@ class BlinnnkCandleStickChartRenderer(
   override fun drawValues(c: Canvas) {
     
     // if values are drawn
-    if (isDrawingValuesAllowed(mChart)) {
+    if (isDrawingValuesAllowed(candleDataProvider)) {
       
-      val dataSets = mChart.candleData.dataSets
+      val dataSets = candleDataProvider.candleData.dataSets
       
-      for (i in dataSets.indices) {
+      for (dataSetPosition in dataSets.indices) {
         
-        val dataSet = dataSets[i]
+        val dataSet = dataSets[dataSetPosition]
         
         if (!shouldDrawValues(dataSet)) continue
         
         // apply the text-styling defined by the DataSet
         applyValueTextStyle(dataSet)
         
-        val trans = mChart.getTransformer(dataSet.axisDependency)
+        val trans = candleDataProvider.getTransformer(dataSet.axisDependency)
         
-        mXBounds.set(mChart, dataSet)
+        mXBounds.set(candleDataProvider, dataSet)
         
         val positions = trans.generateTransformedValuesCandle(dataSet,
           mAnimator.phaseX,
@@ -288,7 +289,7 @@ class BlinnnkCandleStickChartRenderer(
               dataSet.valueFormatter,
               entry.high,
               entry,
-              i,
+              dataSetPosition,
               x,
               y - yOffset,
               dataSet.getValueTextColor(j / 2))
@@ -296,7 +297,7 @@ class BlinnnkCandleStickChartRenderer(
               dataSet.valueFormatter,
               entry.low,
               entry,
-              i,
+              dataSetPosition,
               x,
               y - yOffset,
               dataSet.getValueTextColor(j / 2))
@@ -328,28 +329,28 @@ class BlinnnkCandleStickChartRenderer(
     indices: Array<Highlight>
   ) {
     
-    val candleData = mChart.candleData
+    val candleData = candleDataProvider.candleData
     
     for (high in indices) {
       
-      val set = candleData.getDataSetByIndex(high.dataSetIndex)
+      val dataSet = candleData.getDataSetByIndex(high.dataSetIndex)
       
-      if (set == null || !set.isHighlightEnabled) continue
+      if (dataSet == null || !dataSet.isHighlightEnabled) continue
       
-      val e = set.getEntryForXValue(high.x, high.y)
+      val candleEntry = dataSet.getEntryForXValue(high.x, high.y)
       
-      if (!isInBoundsX(e, set)) continue
+      if (!isInBoundsX(candleEntry, dataSet)) continue
       
-      val lowValue = e.low * mAnimator.phaseY
-      val highValue = e.high * mAnimator.phaseY
+      val lowValue = candleEntry.low * mAnimator.phaseY
+      val highValue = candleEntry.high * mAnimator.phaseY
       val y = (lowValue + highValue) / 2f
       
-      val pix = mChart.getTransformer(set.axisDependency).getPixelForValues(e.x, y)
+      val pix = candleDataProvider.getTransformer(dataSet.axisDependency).getPixelForValues(candleEntry.x, y)
       
       high.setDraw(pix.x.toFloat(), pix.y.toFloat())
       
       // draw the lines
-      drawHighlightLines(c, pix.x.toFloat(), pix.y.toFloat(), set)
+      drawHighlightLines(c, pix.x.toFloat(), pix.y.toFloat(), dataSet)
     }
   }
   

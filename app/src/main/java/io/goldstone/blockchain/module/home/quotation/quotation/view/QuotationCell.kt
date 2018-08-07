@@ -2,26 +2,21 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.numberDate
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import com.db.chart.model.LineSet
-import io.goldstone.blockchain.common.component.LineChart
+import com.github.mikephil.charting.data.Entry
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.chart.line.LineChart
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.margin
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.textColor
+import org.jetbrains.anko.*
 
 @SuppressLint("SetTextI18n")
 /**
@@ -49,25 +44,27 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		when {
 			model.isDisconnected -> {
 				tokenPrice.setColorStyle(GrayScale.midGray)
-				chartView.setDisconnectedStyle()
 			}
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				chartView.setRedColor()
+				blinnnkLineChart.setChartColor(Spectrum.red)
+				blinnnkLineChart.setShadowResource(R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				chartView.setGreenColor()
+				blinnnkLineChart.setChartColor(Spectrum.green)
+				blinnnkLineChart.setShadowResource(R.drawable.fade_green)
 			}
 		}
 		
-		chartView.updateData(
-			model.chartData.map {
-				ChartPoint(numberDate(it.label.toLong()), it.value)
-			}.toArrayList()
-		)
+		var entrySet = arrayListOf<Entry>()
+		model.chartData.forEachIndexed {
+			index, point -> entrySet.add(Entry(index.toFloat(), point.value, point.label))
+		}
+		blinnnkLineChart.resetData(entrySet)
+		
 		exchangeName.text = model.exchangeName
 	}
 	private val tokenInfo by lazy {
@@ -98,37 +95,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			y += 52.uiPX()
 		}
 	}
-	private val chartView = object : LineChart(context) {
-		override fun setChartValueType() = LineChart.Companion.ChartType.Quotation
-		override fun canClickPoint() = false
-		override fun setChartStyle() = LineChart.Companion.Style.LineStyle
-		override fun hasAnimation() = false
-		override fun setEvnetWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
-			return if (model.price != ValueTag.emptyPrice) {
-				chartData.addAll(
-					arrayListOf(
-						ChartPoint(1.daysAgoInMills().toString(), 0f),
-						ChartPoint(0.daysAgoInMills().toString(), model.price.toFloat())
-					)
-				)
-				true
-			} else {
-				false
-			}
-		}
-		
-		override fun modifyLineDataSet(chartData: ArrayList<ChartPoint>, dataSet: LineSet) {
-			// 比对如果最后一个不是今天那么把当前长连接的价格插入表格
-			if (
-				chartData.last().label != numberDate(0.daysAgoInMills())
-				&& chartData.size < 8
-			) {
-				dataSet.addPoint(
-					numberDate(0.daysAgoInMills()),
-					model.price.toFloatOrNull() ?: chartData.last().value
-				)
-			}
-		}
+	
+	private val blinnnkLineChart = object : LineChart(context) {
+		override fun isDrawPoints(): Boolean = false
+
+		override fun isPerformBezier(): Boolean = true
+
 	}
 	
 	init {
@@ -147,12 +119,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			tokenPrice.setAlignParentRight()
 			
-			chartView.apply {
+			blinnnkLineChart.apply {
 				id = ElementID.chartView
-				layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
-				setClickablePointRadius(30.uiPX().toFloat())
-				setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
-				y = 60.uiPX().toFloat()
+				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
+				setMargins<RelativeLayout.LayoutParams> {
+					margin = 10.uiPX()
+				}
+				y = 45.uiPX().toFloat()
 			}.into(this)
 		}
 	}

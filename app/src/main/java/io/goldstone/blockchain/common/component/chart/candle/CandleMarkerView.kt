@@ -1,11 +1,11 @@
-package example.cat.com.candlechartdemo.ktd.candle
+package io.goldstone.blockchain.common.component.chart.candle
 
 import android.content.Context
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
-import example.cat.com.candlechartdemo.ktd.BlinnnkBaseMarkerView
+import io.goldstone.blockchain.common.component.chart.BaseMarkerView
 
 
 /**
@@ -14,13 +14,13 @@ import example.cat.com.candlechartdemo.ktd.BlinnnkBaseMarkerView
  * @description: 点击candleChartView的item的时候展示的具体详情
  */
 
-class BlinnnkMarkerView(context: Context) : BlinnnkBaseMarkerView(context) {
+class CandleMarkerView(context: Context) : BaseMarkerView(context) {
   
-  override fun refreshContent(e: Entry, highlight: Highlight) {
-    val entry = e as CandleEntry
+  override fun refreshContent(entry: Entry, highlight: Highlight) {
+    val candleEntry = entry as CandleEntry
     textViewContent.text = "最高：" + entry.high + "\n" + "最低：" + entry.low + "\n" + "开盘：" + entry.open + "\n" + "收盘：" + entry.close
     
-    super.refreshContent(e, highlight)
+    super.refreshContent(candleEntry, highlight)
   }
   
   override fun getOffset(): MPPointF {

@@ -1,6 +1,6 @@
-package example.cat.com.candlechartdemo.ktd
+package io.goldstone.blockchain.common.component.chart
 
-
+import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.*
@@ -14,14 +14,14 @@ import java.util.*
  * @description: x轴的坐标展示的时间字符串转换器
  */
 
-class BlinnnkXValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormatter {
+class XValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormatter {
   
-  private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
-  
+  private val simpleDateFormat = SimpleDateFormat("M/d")
+	
   override fun getFormattedValue(value: Float, axis: AxisBase): String {
     val position = value.toInt()
-    if (this.chart.data == null
-      || this.chart.data.getDataSetByIndex(0) == null) {
+    if (chart.data.isNull()
+      || chart.data.getDataSetByIndex(0).isNull()) {
       return ""
     }
 		
@@ -29,8 +29,17 @@ class BlinnnkXValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValu
     var values = (this.chart.data.getDataSetByIndex(0) as DataSet<*>).values
     if (position >= values.size) return ""
     val entry = values[position]
-    if ((entry.data as Long) == 0.toLong()) return ""
-    return simpleDateFormat.format(Date(entry.data as Long))
+		if ((entry.data is Long)) {
+			if (entry.data == 0) return ""
+			return simpleDateFormat.format(Date(entry.data as Long))
+		}
+		if (entry.data is String) {
+			if ((entry.data as String).isEmpty()) return ""
+			return simpleDateFormat.format(Date((entry.data as String).toLong()))
+		}
+		
+		return ""
+  
     
     
   }
