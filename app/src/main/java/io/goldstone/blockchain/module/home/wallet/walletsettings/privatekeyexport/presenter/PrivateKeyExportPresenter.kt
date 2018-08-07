@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey

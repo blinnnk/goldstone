@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.model
 
-import io.goldstone.blockchain.common.value.DateAndTimeText
+import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**

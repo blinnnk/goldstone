@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase

@@ -6,8 +6,16 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.*
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.cell.RoundCell
+import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click

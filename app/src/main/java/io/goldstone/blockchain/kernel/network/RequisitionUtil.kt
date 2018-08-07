@@ -223,6 +223,7 @@ object RequisitionUtil {
 		})
 	}
 
+	// `GoldStone` 加密规则的 `Header Request`
 	private val generateRequest: (
 		path: String,
 		goldStoneID: String,

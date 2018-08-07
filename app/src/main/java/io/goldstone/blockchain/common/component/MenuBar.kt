@@ -16,7 +16,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.ImportMenubar
+import io.goldstone.blockchain.common.language.ImportMenubar
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent

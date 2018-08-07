@@ -4,8 +4,11 @@ import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.*

@@ -9,12 +9,12 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -107,10 +107,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateRegisterAddressesStatus(
-			isRegistered: Boolean,
-			callback: () -> Unit = {}
-		) {
+		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {

@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.home.profile.lanaguage.view
 
 import android.content.Context
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseRadioCell
+import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.HoneyLanguage
+import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 
 /**

@@ -12,7 +12,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView

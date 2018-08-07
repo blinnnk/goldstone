@@ -4,6 +4,9 @@ import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
@@ -252,7 +255,7 @@ class TokenDetailPresenter(
 					// ToDo 等自定义的 `Alert` 完成后应当友好提示
 					LogUtil.error("error in getTransactionDataFromEtherScan $it")
 				}
-			) {
+			) { it ->
 				// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 				it.find {
 					it.contract.equals(token?.contract, true)

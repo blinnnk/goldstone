@@ -13,10 +13,14 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click

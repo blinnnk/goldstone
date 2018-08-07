@@ -7,8 +7,12 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.MiniOverlay
+import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment

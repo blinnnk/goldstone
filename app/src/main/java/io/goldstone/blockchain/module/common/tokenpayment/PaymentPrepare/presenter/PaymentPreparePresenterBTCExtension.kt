@@ -5,6 +5,9 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoValue

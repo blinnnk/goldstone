@@ -7,7 +7,7 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver

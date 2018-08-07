@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.profile.currency.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.Alert
+import io.goldstone.blockchain.common.language.Alert
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity

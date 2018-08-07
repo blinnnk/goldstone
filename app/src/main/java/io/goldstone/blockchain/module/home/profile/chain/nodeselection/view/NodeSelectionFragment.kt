@@ -6,8 +6,10 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orTrue
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType

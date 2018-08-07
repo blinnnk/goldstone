@@ -7,9 +7,9 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.CryptoUtils

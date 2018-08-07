@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationmanagement.view
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
-import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment

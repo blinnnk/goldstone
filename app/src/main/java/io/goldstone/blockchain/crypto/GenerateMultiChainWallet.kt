@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath

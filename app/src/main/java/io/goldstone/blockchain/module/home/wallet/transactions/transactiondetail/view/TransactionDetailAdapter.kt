@@ -5,7 +5,7 @@ import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.updateHeightByText
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel

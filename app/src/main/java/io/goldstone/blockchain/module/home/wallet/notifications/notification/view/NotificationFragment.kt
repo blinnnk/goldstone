@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.NotificationText
+import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.presenter.NotificationPresenter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 

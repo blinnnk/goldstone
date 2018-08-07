@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.*
 

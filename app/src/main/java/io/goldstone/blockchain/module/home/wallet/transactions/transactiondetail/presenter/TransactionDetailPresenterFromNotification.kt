@@ -7,9 +7,9 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toBTCCount

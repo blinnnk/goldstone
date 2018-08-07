@@ -18,6 +18,8 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*

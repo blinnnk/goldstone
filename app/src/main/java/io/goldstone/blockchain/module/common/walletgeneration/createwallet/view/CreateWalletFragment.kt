@@ -8,10 +8,11 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.AttentionView
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName

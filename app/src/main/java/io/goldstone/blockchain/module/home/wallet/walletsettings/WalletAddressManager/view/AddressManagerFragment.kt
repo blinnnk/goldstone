@@ -8,9 +8,13 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.MiniOverlay
+import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
@@ -170,7 +174,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick {
 								this@getParentFragment.context?.apply {
-									AddressManagerFragment.verifyMultiChainWalletPassword(this) {
+									verifyMultiChainWalletPassword(this) {
 										createChildAddressByButtonTitle(title, it)
 									}
 								}

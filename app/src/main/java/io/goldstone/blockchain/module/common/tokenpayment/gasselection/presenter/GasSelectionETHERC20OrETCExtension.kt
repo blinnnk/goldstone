@@ -2,12 +2,12 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.utils.*

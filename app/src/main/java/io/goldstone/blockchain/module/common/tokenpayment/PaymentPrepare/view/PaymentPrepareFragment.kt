@@ -12,8 +12,14 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*

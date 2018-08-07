@@ -18,6 +18,9 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*

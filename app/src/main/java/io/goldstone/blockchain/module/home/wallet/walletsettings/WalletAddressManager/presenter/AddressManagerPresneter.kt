@@ -6,6 +6,9 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.*
@@ -379,20 +382,20 @@ class AddressManagerPresneter(
 		}
 
 		fun convertToChildAddresses(seriesAddress: String): List<Pair<String, String>> {
-			return if (seriesAddress.contains(",")) {
-				seriesAddress.split(",").map {
+			return when {
+				seriesAddress.contains(",") -> seriesAddress.split(",").map {
 					Pair(
 						it.substringBeforeLast("|"),
 						it.substringAfterLast("|")
 					)
 				}
-			} else {
-				listOf(
+				seriesAddress.contains("|") -> listOf(
 					Pair(
 						seriesAddress.substringBeforeLast("|"),
 						seriesAddress.substringAfterLast("|")
 					)
 				)
+				else -> listOf(Pair(seriesAddress, ""))
 			}
 		}
 

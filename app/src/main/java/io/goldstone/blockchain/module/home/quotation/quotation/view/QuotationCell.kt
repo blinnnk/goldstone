@@ -103,7 +103,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override fun canClickPoint() = false
 		override fun setChartStyle() = LineChart.Companion.Style.LineStyle
 		override fun hasAnimation() = false
-		override fun setEvnetWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
+		override fun setEventWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
 			return if (model.price != ValueTag.emptyPrice) {
 				chartData.addAll(
 					arrayListOf(

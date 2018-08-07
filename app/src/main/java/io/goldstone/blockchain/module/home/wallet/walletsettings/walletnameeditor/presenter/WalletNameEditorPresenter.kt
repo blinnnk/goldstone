@@ -5,7 +5,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment

@@ -7,8 +7,12 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*

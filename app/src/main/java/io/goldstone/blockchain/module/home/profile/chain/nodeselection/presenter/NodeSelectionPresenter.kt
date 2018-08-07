@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presente
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable

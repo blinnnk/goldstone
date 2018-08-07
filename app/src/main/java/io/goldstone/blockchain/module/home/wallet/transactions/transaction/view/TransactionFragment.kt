@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter.TransactionPresenter

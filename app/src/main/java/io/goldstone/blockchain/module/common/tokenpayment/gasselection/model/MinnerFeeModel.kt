@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
-import io.goldstone.blockchain.common.value.PrepareTransferText
+import io.goldstone.blockchain.common.language.PrepareTransferText
 
 /**
  * @date 2018/5/25 2:05 AM

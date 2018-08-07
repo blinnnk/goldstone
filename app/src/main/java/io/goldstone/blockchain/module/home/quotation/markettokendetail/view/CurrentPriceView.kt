@@ -10,7 +10,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.orElse
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.TopBottomLineCell
+import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency

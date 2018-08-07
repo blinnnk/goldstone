@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.toMillsecond
-import io.goldstone.blockchain.common.value.DateAndTimeText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.DateAndTimeText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode

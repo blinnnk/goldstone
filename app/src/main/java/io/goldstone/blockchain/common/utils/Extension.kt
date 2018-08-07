@@ -12,7 +12,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity

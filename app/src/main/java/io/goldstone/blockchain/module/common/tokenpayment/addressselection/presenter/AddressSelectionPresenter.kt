@@ -4,8 +4,14 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.QRText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -31,17 +37,17 @@ import org.jetbrains.anko.yesButton
 class AddressSelectionPresenter(
 	override val fragment: AddressSelectionFragment
 ) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
-	
+
 	val token by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 	}
-	
+
 	override fun updateData() {
 		updateAddressList {
 			fragment.updateHeaderViewStatus()
 		}
 	}
-	
+
 	fun showPaymentPrepareFragmentByQRCode(result: String) {
 		if (isValidQRCodeContent(result)) {
 			if (result.contains("transfer")) {
@@ -59,7 +65,7 @@ class AddressSelectionPresenter(
 							}
 						}
 					}
-					
+
 					token?.symbol.equals(CryptoSymbol.etc, true) -> {
 						DepositPresenter.convertETHOrETCQRCOde(result).let {
 							isCorrectCoinOrChainID(it) {
@@ -67,7 +73,7 @@ class AddressSelectionPresenter(
 							}
 						}
 					}
-					
+
 					token?.symbol.equals(CryptoSymbol.eth, true) -> {
 						DepositPresenter.convertETHOrETCQRCOde(result).let {
 							isCorrectCoinOrChainID(it) {
@@ -78,10 +84,10 @@ class AddressSelectionPresenter(
 				}
 			}
 		} else {
-			fragment.context.alert(CommonText.wrongQRCode)
+			fragment.context.alert(QRText.invalidQRCodeAlert)
 		}
 	}
-	
+
 	fun showPaymentPrepareFragment(
 		toAddress: String,
 		count: Double = 0.0
@@ -105,7 +111,7 @@ class AddressSelectionPresenter(
 				fragment.context?.alert(ImportWalletText.addressFromatAlert)
 				return
 			}
-			
+
 			AddressType.ETHERCOrETC -> {
 				if (token?.symbol.equals(CryptoSymbol.btc, true)) {
 					fragment.context.alert(
@@ -113,17 +119,17 @@ class AddressSelectionPresenter(
 					)
 					return
 				}
-				
+
 				WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
 			}
-			
+
 			AddressType.BTC -> {
 				if (Config.isTestEnvironment()) {
 					fragment.context.alert(
 						"this is a mainnet address, please switch your local net " +
-						"setting in settings first"
+							"setting in settings first"
 					)
 					return
 				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
@@ -137,12 +143,12 @@ class AddressSelectionPresenter(
 					}
 				}
 			}
-			
+
 			AddressType.BTCTest -> {
 				if (!Config.isTestEnvironment()) {
 					fragment.context.alert(
 						"this is a testnet address, please switch your local net " +
-						"setting in settings first"
+							"setting in settings first"
 					)
 					return
 				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
@@ -158,7 +164,7 @@ class AddressSelectionPresenter(
 			}
 		}
 	}
-	
+
 	private fun isValidQRCodeContent(content: String): Boolean {
 		return when {
 			content.isEmpty() -> false
@@ -170,82 +176,82 @@ class AddressSelectionPresenter(
 			else -> true
 		}
 	}
-	
+
 	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
 		when {
 			token?.symbol.equals(CryptoSymbol.eth, true) -> {
 				when {
 					!qrModel.contractAddress.equals(CryptoValue.ethContract, true) -> {
-						fragment.context.alert(CommonText.wrongCoin)
+						fragment.context.alert(QRText.invalidContract)
 						return
 					}
-					
+
 					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
 						fragment.context.alert(CommonText.wrongChainID)
 						return
 					}
-					
+
 					else -> callback()
 				}
 			}
-			
+
 			token?.symbol.equals(CryptoSymbol.etc, true) -> {
 				when {
 					!qrModel.contractAddress.equals(CryptoValue.etcContract, true) -> {
-						fragment.context.alert(CommonText.wrongCoin)
+						fragment.context.alert(QRText.invalidContract)
 						return
 					}
-					
+
 					!qrModel.chainID.equals(Config.getETCCurrentChain(), true) -> {
 						fragment.context.alert(CommonText.wrongChainID)
 						return
 					}
-					
+
 					else -> callback()
 				}
 			}
-			
+
 			token?.symbol.equals(CryptoSymbol.btc, true) -> {
 				when {
 					!qrModel.contractAddress.equals(CryptoValue.btcContract, true) -> {
-						fragment.context.alert(CommonText.wrongCoin)
+						fragment.context.alert(QRText.invalidContract)
 						return
 					}
-					
+
 					!qrModel.chainID.equals(Config.getBTCCurrentChain(), true) -> {
 						fragment.context.alert(CommonText.wrongChainID)
 						return
 					}
-					
+
 					else -> callback()
 				}
 			}
-			
+
 			else -> {
 				when {
 					!qrModel.contractAddress.equals(token?.contract, true) -> {
-						fragment.context.alert(CommonText.wrongCoin)
+						fragment.context.alert(QRText.invalidContract)
 						return
 					}
-					
+
 					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
 						fragment.context.alert(CommonText.wrongChainID)
 						return
 					}
-					
+
 					else -> callback()
 				}
 			}
 		}
 	}
-	
+
 	private fun alert(title: String, subtitle: String, callback: () -> Unit) {
 		fragment.alert(title, subtitle) {
 			yesButton { callback() }
 			noButton { }
 		}.show()
 	}
-	
+
 	private fun goToPaymentPrepareFragment(
 		address: String,
 		count: Double = 0.0
@@ -267,7 +273,7 @@ class AddressSelectionPresenter(
 			headerTitle = TokenDetailText.transferDetail
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
@@ -280,16 +286,16 @@ class AddressSelectionPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateAddressList(callback: () -> Unit) {
-		ContactTable.getAllContacts {
-			it.isEmpty() isTrue {
+		ContactTable.getAllContacts { contacts ->
+			contacts.isEmpty() isTrue {
 				fragment.asyncData = arrayListOf()
 			} otherwise {
 				if (fragment.asyncData.isNullOrEmpty()) {
 					// 根据当前的 `Coin Type` 来选择展示地址的哪一项
 					fragment.asyncData = if (token?.symbol.equals(CryptoSymbol.btc, true)) {
-						it.map {
+						contacts.map {
 							it.apply {
 								defaultAddress =
 									if (Config.isTestEnvironment()) it.btcTestnetAddress
@@ -297,14 +303,14 @@ class AddressSelectionPresenter(
 							}
 						}.toArrayList()
 					} else {
-						it.map {
+						contacts.map {
 							it.apply {
 								defaultAddress = ethERCAndETCAddress
 							}
 						}.toArrayList()
 					}
 				} else {
-					diffAndUpdateSingleCellAdapterData<ContactsAdapter>(it)
+					diffAndUpdateSingleCellAdapterData<ContactsAdapter>(contacts)
 				}
 			}
 			callback()
