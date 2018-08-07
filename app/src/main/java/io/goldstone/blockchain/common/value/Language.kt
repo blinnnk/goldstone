@@ -1688,6 +1688,32 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val containsBTCTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.Chinese.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.Japanese.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.Korean.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.Russian.code -> "(Contains BTC Test Address)"
+		HoneyLanguage.TraditionalChinese.code -> "(Contains BTC Test Address)"
+		else -> ""
+	}
+
+	val addressCountSubtitle: (
+		count: Int,
+		description: String
+	) -> String = { count, description ->
+		val unit = if (count > 1) "addresses" else "address"
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.Chinese.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.Japanese.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.Korean.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.Russian.code -> "there are $count $unit in this wallet $description"
+			HoneyLanguage.TraditionalChinese.code -> "there are $count $unit in this wallet $description"
+			else -> ""
+		}
+	}
+	@JvmField
 	val newETHAndERCAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "New ETH & ERC20 Token Address"
 		HoneyLanguage.Chinese.code -> "新的ETH和ERC20代币地址"
@@ -1978,7 +2004,7 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val  createSubAccount= when (currentLanguage) {
+	val createSubAccount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Create a new subaddress"
 		HoneyLanguage.Chinese.code -> "创建一个新的子地址"
 		HoneyLanguage.Japanese.code -> "新しいサブアドレスを作成する"
@@ -1988,7 +2014,7 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val  createSubAccountIntro= when (currentLanguage) {
+	val createSubAccountIntro = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Subaddresses are created following the BIP44 standard. You can restore this subaddress in any wallet software that supports BIP44 at any time via mnemonic and subaddress path."
 		HoneyLanguage.Chinese.code -> "子地址遵循BIP44标准创建。你可以随时通过助记词与子地址路径在任意支持BIP44的钱包软件中恢复这个子地址"
 		HoneyLanguage.Japanese.code -> "サブアドレスはBIP44規格に従って作成されます。 このサブアドレスは、任意のBIP44対応ウォレットソフトウェアで、ニーモニックとサブアドレスのパス(Path)を使用していつでも復元できます。"
