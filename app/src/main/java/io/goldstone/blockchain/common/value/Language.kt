@@ -1979,8 +1979,8 @@ object WalletSettingsText {
 	@JvmField
 	val  createSubAccountIntro= when (currentLanguage) {
 		HoneyLanguage.English.code -> "Subaddresses are created following the BIP44 standard. You can restore this subaddress in any wallet software that supports BIP44 at any time via mnemonic and subaddress path."
-		HoneyLanguage.Chinese.code -> "サブアドレスはBIP44規格に従って作成されます。 このサブアドレスは、任意のBIP44対応ウォレットソフトウェアで、ニーモニックとサブアドレスのパス(Path)を使用していつでも復元できます。"
-		HoneyLanguage.Japanese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.Chinese.code -> "子地址遵循BIP44标准创建。你可以随时通过助记词与子地址路径在任意支持BIP44的钱包软件中恢复这个子地址"
+		HoneyLanguage.Japanese.code -> "サブアドレスはBIP44規格に従って作成されます。 このサブアドレスは、任意のBIP44対応ウォレットソフトウェアで、ニーモニックとサブアドレスのパス(Path)を使用していつでも復元できます。"
 		HoneyLanguage.Korean.code -> "하위 주소는 BIP44 표준에 따라 작성됩니다. 니모닉 및 하위 주소 경로(Path) 를 통해 언제든지 BIP44를 지원하는 모든 지갑 소프트웨어에서이 하위 주소를 복원 할 수 있습니다."
 		HoneyLanguage.Russian.code -> "Субадресы создаются по стандарту BIP44. Вы можете восстановить этот субадресс в любом программном обеспечении кошелька с поддержкой BIP44 в любое время через путь(Path) мнемоники и субадресса."
 		HoneyLanguage.TraditionalChinese.code -> "子地址遵循BIP44標準創建。你可以隨時通過助記詞與子地址路徑在任意支持BIP44的錢包軟件中恢復這個子地址"
