@@ -10,11 +10,15 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.QAText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.ExplanationTitle
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click

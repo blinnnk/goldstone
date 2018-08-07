@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presen
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath

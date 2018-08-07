@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.component.GoldStoneDialog.Companion.chainError
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog.Companion.chainError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil

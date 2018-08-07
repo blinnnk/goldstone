@@ -10,6 +10,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.EmptyText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.imageView

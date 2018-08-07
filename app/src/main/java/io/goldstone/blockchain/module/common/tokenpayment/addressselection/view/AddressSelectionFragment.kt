@@ -11,7 +11,9 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.google.zxing.integration.android.IntentIntegrator
-import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
@@ -110,7 +112,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	}
 	
 	fun updateHeaderViewStatus() {
-		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) {
+		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) { it ->
 			it?.setFocusStatus()
 			it?.getInputStatus { _, address ->
 				if (!address.isNullOrBlank()) {

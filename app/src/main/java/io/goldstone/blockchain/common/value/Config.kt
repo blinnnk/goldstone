@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.value
 
 import com.blinnnk.util.*
+import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**

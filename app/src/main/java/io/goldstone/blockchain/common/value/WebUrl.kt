@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.value
 
+import io.goldstone.blockchain.common.language.HoneyLanguage
+
 /**
  * @date 2018/5/15 4:44 PM
  * @author KaySaith

@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.v
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment

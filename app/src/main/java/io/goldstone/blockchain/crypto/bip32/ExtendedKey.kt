@@ -24,7 +24,7 @@ data class ExtendedKey(
 	private val parentFingerprint: Int,
 	private val sequence: Int
 ) {
-	
+
 	fun generateChildKey(element: Int): ExtendedKey {
 		try {
 			if (isHardened(element) && keyPair.privateKey == BigInteger.ZERO) {
@@ -60,7 +60,7 @@ data class ExtendedKey(
 			if (m >= CURVE.n) {
 				throw KeyException("Child key derivation resulted in a key with higher modulus. Suggest deriving the next increment.")
 			}
-			
+
 			return if (keyPair.privateKey != BigInteger.ZERO) {
 				val k = m.add(keyPair.privateKey).mod(CURVE.n)
 				if (k == BigInteger.ZERO) {
@@ -79,7 +79,7 @@ data class ExtendedKey(
 					throw KeyException("Child key derivation resulted in zeros. Suggest deriving the next increment.")
 				}
 				val point = CURVE.curve.createPoint(q.xCoord.toBigInteger(), q.yCoord.toBigInteger())
-				
+
 				ExtendedKey(
 					ECKeyPair(BigInteger.ZERO, point.toPublicKey()),
 					r,
@@ -88,30 +88,30 @@ data class ExtendedKey(
 					element
 				)
 			}
-		} catch (e: NoSuchAlgorithmException) {
-			throw KeyException(e)
-		} catch (e: NoSuchProviderException) {
-			throw KeyException(e)
-		} catch (e: InvalidKeyException) {
-			throw KeyException(e)
+		} catch (error: NoSuchAlgorithmException) {
+			throw KeyException(error)
+		} catch (error: NoSuchProviderException) {
+			throw KeyException(error)
+		} catch (error: InvalidKeyException) {
+			throw KeyException(error)
 		}
 	}
-	
+
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (javaClass != other?.javaClass) return false
-		
+
 		other as ExtendedKey
-		
+
 		if (keyPair != other.keyPair) return false
 		if (!Arrays.equals(chainCode, other.chainCode)) return false
 		if (depth != other.depth) return false
 		if (parentFingerprint != other.parentFingerprint) return false
 		if (sequence != other.sequence) return false
-		
+
 		return true
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = keyPair.hashCode()
 		result = 31 * result + Arrays.hashCode(chainCode)
@@ -120,7 +120,7 @@ data class ExtendedKey(
 		result = 31 * result + sequence
 		return result
 	}
-	
+
 	fun serialize(publicKeyOnly: Boolean = false): String {
 		val out = ByteBuffer.allocate(Companion.EXTENDED_KEY_SIZE)
 		try {
@@ -141,19 +141,19 @@ data class ExtendedKey(
 			}
 		} catch (e: IOException) {
 		}
-		
+
 		return out.array().encodeToBase58WithChecksum()
 	}
-	
+
 	companion object {
-		
+
 		private val BITCOIN_SEED = "Bitcoin seed".toByteArray()
 		private const val CHAINCODE_SIZE = PRIVATE_KEY_SIZE
 		private const val COMPRESSED_PUBLIC_KEY_SIZE = PRIVATE_KEY_SIZE + 1
 		private const val EXTENDED_KEY_SIZE: Int = 78
 		internal val xprv = byteArrayOf(0x04, 0x88.toByte(), 0xAD.toByte(), 0xE4.toByte())
 		internal val xpub = byteArrayOf(0x04, 0x88.toByte(), 0xB2.toByte(), 0x1E.toByte())
-		
+
 		fun createFromSeed(seed: ByteArray, publicKeyOnly: Boolean = false): ExtendedKey {
 			try {
 				val mac = Mac.getInstance("HmacSHA512")
@@ -181,7 +181,7 @@ data class ExtendedKey(
 				throw KeyException(e)
 			}
 		}
-		
+
 		/**
 		 * Gets an [Int] representation of public key hash
 		 * @return an Int built from the first 4 bytes of the result of hash160 over the compressed public key
@@ -191,13 +191,13 @@ data class ExtendedKey(
 				.sha256()
 				.ripemd160()
 			var fingerprint = 0
-			for (i in 0 .. 3) {
+			for (i in 0..3) {
 				fingerprint = fingerprint shl 8
 				fingerprint = fingerprint or (pubKeyHash[i].toInt() and 0xff)
 			}
 			return fingerprint
 		}
-		
+
 		fun parse(serialized: String): ExtendedKey {
 			val data = serialized.decodeBase58WithChecksum()
 			if (data.size != EXTENDED_KEY_SIZE) {
@@ -207,7 +207,7 @@ data class ExtendedKey(
 				.wrap(data)
 				.order(ByteOrder.BIG_ENDIAN)
 			val type = ByteArray(4)
-			
+
 			buff.get(type)
 			val hasPrivate = when {
 				Arrays.equals(type, xprv) -> true

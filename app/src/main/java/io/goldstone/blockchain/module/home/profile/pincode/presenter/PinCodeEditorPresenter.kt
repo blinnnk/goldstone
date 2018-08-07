@@ -6,10 +6,10 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Count
-import io.goldstone.blockchain.common.value.PincodeText
+import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment

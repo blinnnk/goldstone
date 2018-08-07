@@ -8,8 +8,8 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
-import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID

@@ -3,6 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*

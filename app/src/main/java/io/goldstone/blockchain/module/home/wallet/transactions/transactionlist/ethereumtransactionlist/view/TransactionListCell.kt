@@ -6,7 +6,7 @@ import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum

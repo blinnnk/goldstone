@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.profile.lanaguage.view
 
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.presenter.LanguagePresenter

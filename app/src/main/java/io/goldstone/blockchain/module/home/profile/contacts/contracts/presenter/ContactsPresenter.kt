@@ -5,7 +5,7 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.ProfileText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter

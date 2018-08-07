@@ -5,7 +5,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI

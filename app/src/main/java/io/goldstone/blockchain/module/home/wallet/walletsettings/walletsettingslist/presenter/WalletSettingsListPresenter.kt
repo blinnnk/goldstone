@@ -10,9 +10,9 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency

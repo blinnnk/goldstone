@@ -9,10 +9,10 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable

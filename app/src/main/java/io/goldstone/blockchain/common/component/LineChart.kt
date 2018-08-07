@@ -40,7 +40,7 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 		// override something
 	}
 	
-	open fun setEvnetWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
+	open fun setEventWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
 		return false
 	}
 	
@@ -77,7 +77,7 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 	private var hasPoint = false
 	private var chartData: ArrayList<ChartPoint> by observing(arrayListOf()) {
 		if (chartData.isEmpty()) {
-			setEvnetWhenDataIsEmpty(chartData).let {
+			setEventWhenDataIsEmpty(chartData).let {
 				if (!it) return@observing
 			}
 		}

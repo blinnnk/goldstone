@@ -7,7 +7,9 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DateAndTimeText
+import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.value.*

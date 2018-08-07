@@ -6,6 +6,10 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
@@ -101,7 +105,7 @@ class GasSelectionPresenter(
 					/** 更新默认的燃气花销的 `ETH`, `ETC` 用于用户余额判断 */
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
-			}.click {
+			}.click { it ->
 				currentMinerType = it.model.type
 				if (isBTC()) updateBTCGasSettings(parent)
 				else updateGasSettings(parent)

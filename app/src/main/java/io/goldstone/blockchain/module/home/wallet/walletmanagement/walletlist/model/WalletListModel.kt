@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**

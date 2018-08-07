@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable

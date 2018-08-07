@@ -8,8 +8,8 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -24,61 +24,63 @@ import org.jetbrains.anko.textView
 
 class NumberKeyboard(context: Context) : RelativeLayout(context) {
 
-  var checkCode: Runnable? = null
+	var checkCode: Runnable? = null
 
-  private val buttonSize = 60.uiPX()
-  private val itemSpace = 35.uiPX()
-  private val lineSpace = 20.uiPX()
-  private val rowCount = 3
-  private val totalCount = 11
-  private val deleteButtonIndex = 10
+	private val buttonSize = 60.uiPX()
+	private val itemSpace = 35.uiPX()
+	private val lineSpace = 20.uiPX()
+	private val rowCount = 3
+	private val totalCount = 11
+	private val deleteButtonIndex = 10
 
-  private var currentCode: String by observing("") {
-    if (currentCode.length <= Count.pinCode) checkCode?.run()
-  }
+	private var currentCode: String by observing("") {
+		if (currentCode.length <= Count.pinCode) checkCode?.run()
+	}
 
-  init {
-    val keyboardWidth = (buttonSize + itemSpace) * rowCount - itemSpace
-    val keyboardHeight =
-      ((buttonSize + lineSpace) * (Math.ceil(totalCount / rowCount.toDouble())) - lineSpace).toInt()
-    layoutParams = LinearLayout.LayoutParams(keyboardWidth, keyboardHeight)
-    (0 until totalCount).forEach {
-      textView {
-        text = if (it == 9) "0" else if (it == 10) CommonText.cancel else (it + 1).toString()
-        textSize = if (it == 10) fontSize(12) else fontSize(30)
-        typeface = GoldStoneFont.heavy(context)
-        textColor = Spectrum.white
-        gravity = Gravity.CENTER
-        layoutParams = LinearLayout.LayoutParams(buttonSize, buttonSize)
-        x = (it % rowCount * (buttonSize + itemSpace)).toFloat() +
-          if (it >= 9) buttonSize + itemSpace else 0
-        y = (Math.floor(it / rowCount.toDouble()) * (buttonSize + lineSpace)).toFloat()
-        addTouchRippleAnimation(
-          Spectrum.opacity1White, Spectrum.yellow, RippleMode.Square, buttonSize.toFloat()
-        )
-        // 输入密码
-        // 第 `10` 位是 `cancel` 键
-        if (it < deleteButtonIndex) {
-          onClick {
-            // 超过 `4` 位就不在记录新输入的密码
-            if (currentCode.length < Count.pinCode) {
-              currentCode += text
-            }
-          }
-        }
-        // 删除已经输入的部分
-        if (it == deleteButtonIndex) {
-          onClick {
-            currentCode.apply {
-              if (isNotEmpty()) currentCode = substring(0, lastIndex)
-            }
-          }
-        }
-      }
-    }
-  }
+	init {
+		val keyboardWidth = (buttonSize + itemSpace) * rowCount - itemSpace
+		val keyboardHeight =
+			((buttonSize + lineSpace) * (Math.ceil(totalCount / rowCount.toDouble())) - lineSpace).toInt()
+		layoutParams = LinearLayout.LayoutParams(keyboardWidth, keyboardHeight)
+		(0 until totalCount).forEach { index ->
+			textView {
+				text = if (index == 9) "0" else if (index == 10) CommonText.cancel else (index + 1).toString()
+				textSize = if (index == 10) fontSize(12) else fontSize(30)
+				typeface = GoldStoneFont.heavy(context)
+				textColor = Spectrum.white
+				gravity = Gravity.CENTER
+				layoutParams = LinearLayout.LayoutParams(buttonSize, buttonSize)
+				x = (index % rowCount * (buttonSize + itemSpace)).toFloat() +
+					if (index >= 9) buttonSize + itemSpace else 0
+				y = (Math.floor(index / rowCount.toDouble()) * (buttonSize + lineSpace)).toFloat()
+				addTouchRippleAnimation(
+					Spectrum.opacity1White, Spectrum.yellow, RippleMode.Square, buttonSize.toFloat()
+				)
+				// 输入密码
+				// 第 `10` 位是 `cancel` 键
+				if (index < deleteButtonIndex) {
+					onClick {
+						// 超过 `4` 位就不在记录新输入的密码
+						if (currentCode.length < Count.pinCode) {
+							currentCode += text
+						}
+					}
+				}
+				// 删除已经输入的部分
+				if (index == deleteButtonIndex) {
+					onClick {
+						currentCode.apply {
+							if (isNotEmpty()) currentCode = substring(0, lastIndex)
+						}
+					}
+				}
+			}
+		}
+	}
 
-  fun getEnteredCode() = currentCode
-  fun resetCode() { currentCode = "" }
+	fun getEnteredCode() = currentCode
+	fun resetCode() {
+		currentCode = ""
+	}
 
 }

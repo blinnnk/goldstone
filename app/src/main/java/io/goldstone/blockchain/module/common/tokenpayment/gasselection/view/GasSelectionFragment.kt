@@ -10,9 +10,13 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
+import io.goldstone.blockchain.common.language.QAText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ExplanationTitle
-import io.goldstone.blockchain.common.component.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment

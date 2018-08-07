@@ -269,7 +269,7 @@ data class TransactionTable(
 					.database
 					.transactionDao()
 					.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
-			} then {
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -288,7 +288,7 @@ data class TransactionTable(
 					.database
 					.transactionDao()
 					.getETCTransactionsByAddress(address)
-			} then {
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -409,9 +409,7 @@ data class TransactionTable(
 			hold: (List<TransactionTable>) -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash).let {
-					hold(it)
-				}
+				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
 		

@@ -8,8 +8,8 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.BaseCell
-import io.goldstone.blockchain.common.component.SquareIcon
+import io.goldstone.blockchain.common.base.basecell.BaseCell
+import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config

@@ -4,12 +4,12 @@ import android.arch.persistence.room.*
 import android.content.Context
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol

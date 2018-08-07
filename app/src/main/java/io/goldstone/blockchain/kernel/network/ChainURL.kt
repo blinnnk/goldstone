@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
-import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -13,7 +13,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
  * @author KaySaith
  */
 object ChainURL {
-	
+
 	val currentChain: (currentChainName: String) -> String = {
 		when (it) {
 			ChainText.goldStoneMain -> ChainURL.main
@@ -38,13 +38,7 @@ object ChainURL {
 			else -> ChainURL.etcMain
 		}
 	}
-	val currentBTCChain: (currentChainName: String) -> String = {
-		when (it) {
-			ChainText.btcMain -> ChainURL.btcMain
-			ChainText.btcTest -> ChainURL.btcTest
-			else -> ChainURL.btcMain
-		}
-	}
+
 	val uncryptChainName = listOf(
 		ChainText.etcMorden,
 		ChainText.etcMainGasTracker,
@@ -60,7 +54,7 @@ object ChainURL {
 			ChainText.goldStoneEtcMain,
 			ChainText.goldStoneEtcMorderTest
 		)
-	
+
 	fun getChainNameByChainType(type: ChainType): String {
 		return when (type) {
 			ChainType.ETH -> Config.getCurrentChainName()
@@ -69,7 +63,7 @@ object ChainURL {
 			else -> Config.getCurrentChainName()
 		}
 	}
-	
+
 	fun getChainNameBySymbol(symbol: String): String {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
@@ -78,7 +72,7 @@ object ChainURL {
 			else -> Config.getCurrentChainName()
 		}
 	}
-	
+
 	fun getChainTypeBySymbol(symbol: String): ChainType {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
@@ -87,7 +81,7 @@ object ChainURL {
 			else -> ChainType.ETH
 		}
 	}
-	
+
 	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
 		return when {
 			transaction.isERC20Token -> transaction.to
@@ -97,7 +91,7 @@ object ChainURL {
 			else -> CryptoValue.ethContract
 		}
 	}
-	
+
 	private val infuraKey: () -> String = {
 		infuraKeys.getRandom()
 	}
@@ -119,7 +113,7 @@ object ChainURL {
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
-	
+
 	@JvmStatic
 	fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
 		return !ChainURL.uncryptChainName.any { it.equals(name, true) }

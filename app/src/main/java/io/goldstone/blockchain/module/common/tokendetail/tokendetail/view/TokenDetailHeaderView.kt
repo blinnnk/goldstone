@@ -8,9 +8,9 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.ButtonMenu
+import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.common.component.LineChart
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.TokenDetailSize
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import org.jetbrains.anko.margin

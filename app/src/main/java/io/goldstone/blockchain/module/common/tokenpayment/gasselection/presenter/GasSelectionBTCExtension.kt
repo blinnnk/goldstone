@@ -4,7 +4,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
