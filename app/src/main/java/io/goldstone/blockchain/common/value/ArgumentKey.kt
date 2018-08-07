@@ -52,6 +52,8 @@ object SharesPreference {
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"
 	const val walletType = "walletType"
+	const val goldStoneID = "goldStoneID"
+	const val unregisterGoldStoneID = "unregisterGoldStoneID"
 	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
 	const val currentETCAddress = "currentETCAddress"

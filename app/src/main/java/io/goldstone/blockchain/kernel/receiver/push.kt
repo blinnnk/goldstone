@@ -41,7 +41,7 @@ import org.json.JSONObject
  * @author KaySaith
  */
 class XinGePushReceiver : XGPushBaseReceiver() {
-	
+
 	@SuppressLint("InvalidWakeLockTag", "WrongConstant")
 	private fun showNotificationOnLockScreen(
 		context: Context,
@@ -67,14 +67,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		builder.setContentTitle("GoldStone").setContentText(content).setSmallIcon(R.mipmap.ic_launcher)
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 	}
-	
+
 	override fun onSetTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-	
+
 	override fun onNotifactionShowedResult(
 		context: Context?,
 		notifiShowedRlt: XGPushShowedResult?
@@ -82,7 +82,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null || notifiShowedRlt == null) return
 		// Normal Notification
 	}
-	
+
 	override fun onUnregisterResult(
 		context: Context?,
 		p1: Int
@@ -91,21 +91,21 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			return
 		}
 	}
-	
+
 	override fun onDeleteTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-	
+
 	override fun onRegisterResult(
 		p0: Context?,
 		p1: Int,
 		p2: XGPushRegisterResult?
 	) {
 	}
-	
+
 	@SuppressLint("PrivateResource")
 	override fun onTextMessage(
 		context: Context?,
@@ -114,7 +114,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null) return
 		showNotificationOnLockScreen(context, message.toString())
 	}
-	
+
 	override fun onNotifactionClickedResult(
 		context: Context?,
 		result: XGPushClickedResult?
@@ -128,7 +128,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		}
 		clearAppIconRedot()
 	}
-	
+
 	private fun handlTransactionNotification(
 		context: Context?,
 		content: String?
@@ -138,7 +138,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		intent.putExtra(IntentKey.hashFromNotify, content)
 		context?.startActivity(intent)
 	}
-	
+
 	companion object {
 		fun clearAppIconRedot() {
 			// 清楚所有 `App Icon` 上的小红点
@@ -148,7 +148,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				) as NotificationManager
 			notificationManager.cancelAll()
 		}
-		
+
 		fun registerAddressesForPush(isRemove: Boolean = false) {
 			val option = if (isRemove) 0 else 1
 			WalletTable.getCurrentWallet {
@@ -189,7 +189,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							updateRegisterAddressesStatus(it)
 						}
 					}
-					
+
 					WalletType.BTCOnly.content -> {
 						val btcSeries =
 							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
@@ -213,7 +213,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							updateRegisterAddressesStatus(it)
 						}
 					}
-					
+
 					WalletType.BTCTestOnly.content -> {
 						val btcTestSeries =
 							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses)
@@ -237,7 +237,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							updateRegisterAddressesStatus(it)
 						}
 					}
-					
+
 					WalletType.ETHERCAndETCOnly.content -> {
 						val ethSeries =
 							AddressManagerPresneter.convertToChildAddresses(ethAddresses)
@@ -264,7 +264,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				}
 			}
 		}
-		
+
 		fun registerSingleAddress(model: AddressCommitionModel) {
 			listOf(model).map {
 				generateJSONObject(
@@ -272,7 +272,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					Pair("chain_type", it.chainType),
 					Pair("option", it.option)
 				)
-			}.let {
+			}.let { it ->
 				GoldStoneAPI.registerWalletAddresses(
 					AesCrypto.encrypt("$it").orEmpty(),
 					{
@@ -291,7 +291,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				}
 			}
 		}
-		
+
 		private fun <T> generateJSONObject(vararg pairs: Pair<String, T>): String {
 			var content = ""
 			pairs.forEach {
@@ -302,7 +302,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			}
 			return "{${content.substringBeforeLast(",")}}"
 		}
-		
+
 		private fun updateRegisterAddressesStatus(code: String) {
 			GoldStoneCode.isSuccess(code.toJsonObject()["code"]) { isSucceed ->
 				isSucceed isTrue {
@@ -318,7 +318,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 }
 
 @SuppressLint("HardwareIds")
-fun Application.registerDeviceForPush() {
+fun Context.registerDeviceForPush() {
 	// 为测试方便设置，发布上线时设置为 `false`
 	XGPushConfig.enableDebug(this, false)
 	XGPushManager.registerPush(this, object : XGIOperateCallback {
@@ -334,7 +334,7 @@ fun Application.registerDeviceForPush() {
 				XinGePushReceiver.registerAddressesForPush()
 			}
 		}
-		
+
 		override fun onFail(
 			data: Any?, errCode: Int, message: String?
 		) {
@@ -369,11 +369,13 @@ fun Context.registerDevice(
 						LogUtil.error("registerDevice")
 						callback()
 					}
-				) {
+				) { it ->
 					// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-						saveDataToSharedPreferences(SharesPreference.registerPush, token)
-						uiThread { callback() }
+					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSuccessful ->
+						if (isSuccessful) {
+							saveDataToSharedPreferences(SharesPreference.registerPush, token)
+							uiThread { callback() }
+						}
 					}
 				}
 			}
