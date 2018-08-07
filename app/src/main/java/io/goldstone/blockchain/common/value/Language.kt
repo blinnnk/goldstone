@@ -619,9 +619,9 @@ object WalletText {
 	val totalAssets = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Assets"
 		HoneyLanguage.Chinese.code -> "钱包所有财产"
-		HoneyLanguage.Japanese.code -> "ウォレット内の全ての財産"
+		HoneyLanguage.Japanese.code -> "総資産"
 		HoneyLanguage.Korean.code -> "지갑내 모든 재산"
-		HoneyLanguage.Russian.code -> "Все средства Кошелька"
+		HoneyLanguage.Russian.code -> "Итого активы"
 		HoneyLanguage.TraditionalChinese.code -> "總資產"
 		else -> ""
 	}
@@ -777,11 +777,11 @@ object WalletText {
 	}
 	@JvmField
 	val baseBip44 = when (currentLanguage) {
-		HoneyLanguage.English.code -> "WALLET BASED ON BIP44"
+		HoneyLanguage.English.code -> "BASED ON BIP44"
 		HoneyLanguage.Chinese.code -> "钱包基于 BIP44标准"
-		HoneyLanguage.Japanese.code -> "BIP44規格に基づくウォレット"
+		HoneyLanguage.Japanese.code -> "BIP44規格に基づく"
 		HoneyLanguage.Korean.code -> "BIP44 표준 기반 월렛"
-		HoneyLanguage.Russian.code -> "Кошелек на основе стандарта BIP44"
+		HoneyLanguage.Russian.code -> "Основано на bip44"
 		HoneyLanguage.TraditionalChinese.code -> "錢包基於 BIP44標準"
 		else -> ""
 	}
@@ -1478,6 +1478,17 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
 		else -> ""
 	}
+
+	@JvmField
+	val btcBalanceNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Insufficient funds for transfer and fee"
+		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与矿工费"
+		HoneyLanguage.Japanese.code -> "お客様のアカウントの残高は、振込額と鉱山者の手数料をカバーするには不十分です"
+		HoneyLanguage.Korean.code -> "귀하의 계정 잔액으로 이체 금액과 광부 수수료를 충당 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "Баланса вашего счета недостаточно для покрытия суммы перевода и гонорара шахтера"
+		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與礦工費"
+		else -> ""
+	}
 	@JvmField
 	val transferWrongDecimal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."
@@ -1519,7 +1530,7 @@ object AlertText {
 		else -> ""
 	}
 	@JvmField
-	val transferUnvalidInputFromat = when (currentLanguage) {
+	val transferUnvalidInputFormat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect value format, please check again"
 		HoneyLanguage.Chinese.code -> "请输入正确的金额"
 		HoneyLanguage.Japanese.code -> "正確な金額を入力して下さい"
@@ -1968,22 +1979,22 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val  createSubAccount= when (currentLanguage) {
-		HoneyLanguage.English.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Chinese.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Japanese.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Korean.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.Russian.code -> "Create a sub-account for the Bip44 rule"
-		HoneyLanguage.TraditionalChinese.code -> "Create a sub-account for the Bip44 rule"
+		HoneyLanguage.English.code -> "Create a new subaddress"
+		HoneyLanguage.Chinese.code -> "创建一个新的子地址"
+		HoneyLanguage.Japanese.code -> "新しいサブアドレスを作成する"
+		HoneyLanguage.Korean.code -> "새 하위 주소 만들기"
+		HoneyLanguage.Russian.code -> "Создание нового субадресса"
+		HoneyLanguage.TraditionalChinese.code -> "創建一個新的子地址"
 		else -> ""
 	}
 	@JvmField
 	val  createSubAccountIntro= when (currentLanguage) {
-		HoneyLanguage.English.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Chinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Japanese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Korean.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.Russian.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
-		HoneyLanguage.TraditionalChinese.code -> "Sub-accounts created in full compliance with the Bip44 rules can be easily managed and restored with your mnemonics whenever you want."
+		HoneyLanguage.English.code -> "Subaddresses are created following the BIP44 standard. You can restore this subaddress in any wallet software that supports BIP44 at any time via mnemonic and subaddress path."
+		HoneyLanguage.Chinese.code -> "子地址遵循BIP44标准创建。你可以随时通过助记词与子地址路径在任意支持BIP44的钱包软件中恢复这个子地址"
+		HoneyLanguage.Japanese.code -> "サブアドレスはBIP44規格に従って作成されます。 このサブアドレスは、任意のBIP44対応ウォレットソフトウェアで、ニーモニックとサブアドレスのパス(Path)を使用していつでも復元できます。"
+		HoneyLanguage.Korean.code -> "하위 주소는 BIP44 표준에 따라 작성됩니다. 니모닉 및 하위 주소 경로(Path) 를 통해 언제든지 BIP44를 지원하는 모든 지갑 소프트웨어에서이 하위 주소를 복원 할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Субадресы создаются по стандарту BIP44. Вы можете восстановить этот субадресс в любом программном обеспечении кошелька с поддержкой BIP44 в любое время через путь(Path) мнемоники и субадресса."
+		HoneyLanguage.TraditionalChinese.code -> "子地址遵循BIP44標準創建。你可以隨時通過助記詞與子地址路徑在任意支持BIP44的錢包軟件中恢復這個子地址"
 		else -> ""
 	}
 	@JvmField
@@ -2307,7 +2318,7 @@ object EmptyText {
 	@JvmField
 	val contractSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
-		HoneyLanguage.Chinese.code -> "點擊左上角加號，可以添加常用聯繫人的地址"
+		HoneyLanguage.Chinese.code -> "点击左上角加号，可以添加常用联系人的地址"
 		HoneyLanguage.Japanese.code -> "左上隅の「+」記号をクリックして、普段使われる連絡先のアドレスを追加することが出来ます"
 		HoneyLanguage.Korean.code -> "좌측 상단 플러스 부호를 클릭하면 상용 연락처 주소를 추가할 수 있습니다"
 		HoneyLanguage.Russian.code -> "Нажмите на плюс в левом верхнем углу, чтобы добавить адреса часто используемых контактов"
@@ -2540,30 +2551,30 @@ object QuotationText {
 	@JvmField
 	val totalSupply = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Supply"
-		HoneyLanguage.Chinese.code -> "总供应量"
-		HoneyLanguage.Japanese.code -> "総提供量"
-		HoneyLanguage.Korean.code -> "총 공급"
-		HoneyLanguage.Russian.code -> "Совокупное предложение"
-		HoneyLanguage.TraditionalChinese.code -> "總供應量"
+		HoneyLanguage.Chinese.code -> "总供给量"
+		HoneyLanguage.Japanese.code -> "総合サプライ"
+		HoneyLanguage.Korean.code -> "총 공급량"
+		HoneyLanguage.Russian.code -> "Общее предложение"
+		HoneyLanguage.TraditionalChinese.code -> "總供給量"
 		else -> ""
 	}
 	@JvmField
 	val marketCap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Cap"
-		HoneyLanguage.Chinese.code -> "流通市值"
-		HoneyLanguage.Japanese.code -> "流通市場価値"
+		HoneyLanguage.Chinese.code -> "市值"
+		HoneyLanguage.Japanese.code -> "時価総額"
 		HoneyLanguage.Korean.code -> "시가 총액"
-		HoneyLanguage.Russian.code -> "Ликвидная рыночная капитализация"
-		HoneyLanguage.TraditionalChinese.code -> "流通市值"
+		HoneyLanguage.Russian.code -> "Рыночная капитализация"
+		HoneyLanguage.TraditionalChinese.code -> "市值"
 		else -> ""
 	}
 	@JvmField
 	val addQuotationChartPlaceholderTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ADD QUOTATION CHART"
 		HoneyLanguage.Chinese.code -> "添加你感兴趣的Token行情"
-		HoneyLanguage.Japanese.code -> "お客様の注目しているTokenの市況を追加する"
+		HoneyLanguage.Japanese.code -> "カスタム見積もりを追加する"
 		HoneyLanguage.Korean.code -> "관심있는 Token 따옴표 추가"
-		HoneyLanguage.Russian.code -> "Добавьте интересующую Вас конъюнктуру токена"
+		HoneyLanguage.Russian.code -> "Добавить пользовательскую цитату"
 		HoneyLanguage.TraditionalChinese.code -> "添加你感興趣的Token行情"
 		else -> ""
 	}
@@ -2676,11 +2687,11 @@ object PrepareTransferText {
 	@JvmField
 	val sendAmountSuffix = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Amount"
-		HoneyLanguage.Chinese.code -> "转出数量"
-		HoneyLanguage.Japanese.code -> "転送数量"
-		HoneyLanguage.Korean.code -> "수량 전송"
+		HoneyLanguage.Chinese.code -> "数量"
+		HoneyLanguage.Japanese.code -> "数量"
+		HoneyLanguage.Korean.code -> "수량"
 		HoneyLanguage.Russian.code -> "сумму"
-		HoneyLanguage.TraditionalChinese.code -> "轉出數量"
+		HoneyLanguage.TraditionalChinese.code -> "數量"
 		else -> ""
 	}
 	@JvmField

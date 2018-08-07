@@ -53,7 +53,7 @@ class PaymentPreparePresenter(
 				prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
 					if (!isSuccessful) {
 						fragment.context.alert(
-							"Something happened, Please check your balance is enough or else"
+							AlertText.btcBalanceNotEnough
 						)
 					}
 					callback()

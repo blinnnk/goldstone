@@ -87,7 +87,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	
 	fun updateCurrencyValue(value: Double) {
 		if (valueInput.text?.toString()?.toDoubleOrNull().isNull() && valueInput.text.isNotEmpty()) {
-			context?.alert(AlertText.transferUnvalidInputFromat)
+			context?.alert(AlertText.transferUnvalidInputFormat)
 			valueInput.text.clear()
 			return
 		}
