@@ -25,12 +25,12 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class StartingFragment : BaseFragment<StartingPresenter>() {
-	
+
 	override val presenter = StartingPresenter(this)
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
 	private val logoSize = 220.uiPX()
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
@@ -51,7 +51,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					typeface = GoldStoneFont.black(context)
 					gravity = Gravity.CENTER_HORIZONTAL
 				}
-				
+
 				textView(SplashText.slogan) {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
@@ -61,7 +61,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				centerHorizontally()
 				topMargin = (ScreenSize.Height * 0.2).toInt() + logoSize
 			}
-			
+
 			WalletTable.getAll {
 				// 本地没有钱包的情况下显示登录和导入按钮
 				if (isEmpty()) {
@@ -74,7 +74,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						}.click {
 							presenter.showCreateWalletFragment()
 						}.into(this)
-						
+
 						importButton.apply {
 							text = ImportWalletText.importWallet.toUpperCase()
 							marginTop = PaddingSize.content

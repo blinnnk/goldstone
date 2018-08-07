@@ -14,7 +14,7 @@ private const val fadeDuration = 200
 
 fun <T> ImageView.glideImage(imagePath: T?) {
 	Glide
-		.with(GoldStoneAPI.context.applicationContext)
+		.with(context)
 		.load(imagePath)
 		.transition(DrawableTransitionOptions().crossFade(fadeDuration))
 		.into(this)

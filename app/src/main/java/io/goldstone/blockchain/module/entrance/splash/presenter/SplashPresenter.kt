@@ -20,13 +20,14 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.io.File
 
 /**
  * @date 30/03/2018 2:21 AM
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-	
+
 	fun hasAccountThenLogin() {
 		WalletTable.getAll {
 			isNotEmpty() isTrue {
@@ -40,7 +41,7 @@ class SplashPresenter(val activity: SplashActivity) {
 							cacheWalletData()
 							Config.updateCurrentWalletType(WalletType.BTCOnly.content)
 						}
-						
+
 						WalletType.ETHERCAndETCOnly -> {
 							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 								cacheWalletData()
@@ -49,7 +50,7 @@ class SplashPresenter(val activity: SplashActivity) {
 							}
 							Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
 						}
-						
+
 						WalletType.MultiChain -> {
 							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 								cacheWalletData()
@@ -63,11 +64,11 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
 	fun cleanMemoryDataLastAccount() {
 		memoryTransactionListData = null
 	}
-	
+
 	fun initDefaultTokenByNetWork(callback: () -> Unit) {
 		// if there isn't network init local token list
 		DefaultTokenTable.getAllTokens {
@@ -83,7 +84,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
 	fun initSupportCurrencyList(callback: () -> Unit) {
 		SupportCurrencyTable.getSupportCurrencies {
 			it.isEmpty() isTrue {
@@ -93,7 +94,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
 	// 获取当前的汇率
 	fun updateCurrencyRateFromServer(
 		config: AppConfigTable
@@ -110,7 +111,57 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
+	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
+	// 需要也同时清理本地的 `Keystore File`
+	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
+		WalletTable.getAll {
+			if (isEmpty()) {
+				cleanKeyStoreFile(activity.filesDir)
+				unregisterGoldStoneID(Config.getGoldStoneID())
+			} else {
+				val needUnregister =
+					!Config.getneedUnregisterGoldStoneID().equals("Default", true)
+				if (needUnregister) {
+					unregisterGoldStoneID(Config.getneedUnregisterGoldStoneID())
+				}
+			}
+			callback()
+		}
+	}
+
+	private fun unregisterGoldStoneID(targetGoldStoneID: String) {
+		if (NetworkUtil.hasNetwork(activity)) {
+			GoldStoneAPI.unregisterDevice(
+				targetGoldStoneID,
+				{
+					// 出现请求错误标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
+					Config.updateUnregisterGoldStoneID(targetGoldStoneID)
+					LogUtil.error("unregisterDevice", it)
+				}
+			) { isSuccessful ->
+				// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
+				val newID = if (isSuccessful) "Default" else targetGoldStoneID
+				Config.updateUnregisterGoldStoneID(newID)
+			}
+		} else {
+			// 没有网络的情况下标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
+			Config.updateUnregisterGoldStoneID(targetGoldStoneID)
+		}
+	}
+
+	private fun cleanKeyStoreFile(dir: File): Boolean {
+		if (dir.isDirectory) {
+			val children = dir.list()
+			for (index in children.indices) {
+				val success = cleanKeyStoreFile(File(dir, children[index]))
+				if (!success) return false
+			}
+		}
+		// The directory is now empty so delete it
+		return dir.delete()
+	}
+
 	private fun cacheWalletData() {
 		WalletTable.getCurrentWallet {
 			doAsync {
@@ -128,7 +179,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
 	private fun updateLocalTokensByNetWork() {
 		// 每次有网络的时候都插入或更新网络数据
 		NetworkUtil.hasNetwork(activity) isTrue {

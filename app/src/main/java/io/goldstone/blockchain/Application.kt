@@ -8,8 +8,6 @@ import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import java.io.File
 
 /**
  * @date 22/03/2018 3:02 PM
@@ -23,10 +21,8 @@ class GoldStoneApp : Application() {
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
-		// Init google analyticsd
+		// Init google analytics
 		sAnalytics = GoogleAnalytics.getInstance(this)
-		// 检查是否需要清理本地的 `KeyStore File`
-		cleanKeyStoreFileWhenUpdateDatabase()
 		// Create and init database
 		GoldStoneDataBase.initDatabase(applicationContext)
 		// Init ethereum utils `Context`
@@ -44,25 +40,5 @@ class GoldStoneApp : Application() {
 			tracker = sAnalytics?.newTracker(R.xml.global_tracker)
 		}
 		return tracker
-	}
-
-	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
-	// 需要也同时清理本地的 `Keystore File`
-	private fun cleanKeyStoreFileWhenUpdateDatabase() {
-		WalletTable.getAll {
-			if (isEmpty()) cleanKeyStoreFile(filesDir)
-		}
-	}
-
-	private fun cleanKeyStoreFile(dir: File): Boolean {
-		if (dir.isDirectory) {
-			val children = dir.list()
-			for (index in children.indices) {
-				val success = cleanKeyStoreFile(File(dir, children[index]))
-				if (!success) return false
-			}
-		}
-		// The directory is now empty so delete it
-		return dir.delete()
 	}
 }
