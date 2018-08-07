@@ -619,9 +619,9 @@ object WalletText {
 	val totalAssets = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Assets"
 		HoneyLanguage.Chinese.code -> "钱包所有财产"
-		HoneyLanguage.Japanese.code -> "ウォレット内の全ての財産"
+		HoneyLanguage.Japanese.code -> "総資産"
 		HoneyLanguage.Korean.code -> "지갑내 모든 재산"
-		HoneyLanguage.Russian.code -> "Все средства Кошелька"
+		HoneyLanguage.Russian.code -> "Итого активы"
 		HoneyLanguage.TraditionalChinese.code -> "總資產"
 		else -> ""
 	}
@@ -777,11 +777,11 @@ object WalletText {
 	}
 	@JvmField
 	val baseBip44 = when (currentLanguage) {
-		HoneyLanguage.English.code -> "WALLET BASED ON BIP44"
+		HoneyLanguage.English.code -> "BASED ON BIP44"
 		HoneyLanguage.Chinese.code -> "钱包基于 BIP44标准"
-		HoneyLanguage.Japanese.code -> "BIP44規格に基づくウォレット"
+		HoneyLanguage.Japanese.code -> "BIP44規格に基づく"
 		HoneyLanguage.Korean.code -> "BIP44 표준 기반 월렛"
-		HoneyLanguage.Russian.code -> "Кошелек на основе стандарта BIP44"
+		HoneyLanguage.Russian.code -> "Основано на bip44"
 		HoneyLanguage.TraditionalChinese.code -> "錢包基於 BIP44標準"
 		else -> ""
 	}
@@ -1476,6 +1476,17 @@ object AlertText {
 		HoneyLanguage.Korean.code -> "귀하의 계정 잔고 부족으로 이체 금액과 채굴수수료를 지불할 수 없습니다"
 		HoneyLanguage.Russian.code -> "Баланса вашего счета недостаточно для оплаты суммы перевода и платы за газ."
 		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
+		else -> ""
+	}
+
+	@JvmField
+	val btcBalanceNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Insufficient funds for transfer and fee"
+		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与矿工费"
+		HoneyLanguage.Japanese.code -> "お客様のアカウントの残高は、振込額と鉱山者の手数料をカバーするには不十分です"
+		HoneyLanguage.Korean.code -> "귀하의 계정 잔액으로 이체 금액과 광부 수수료를 충당 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "Баланса вашего счета недостаточно для покрытия суммы перевода и гонорара шахтера"
+		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與礦工費"
 		else -> ""
 	}
 	@JvmField
@@ -2307,7 +2318,7 @@ object EmptyText {
 	@JvmField
 	val contractSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Click the plus sign in the upper-left corner to add a contact address"
-		HoneyLanguage.Chinese.code -> "點擊左上角加號，可以添加常用聯繫人的地址"
+		HoneyLanguage.Chinese.code -> "点击左上角加号，可以添加常用联系人的地址"
 		HoneyLanguage.Japanese.code -> "左上隅の「+」記号をクリックして、普段使われる連絡先のアドレスを追加することが出来ます"
 		HoneyLanguage.Korean.code -> "좌측 상단 플러스 부호를 클릭하면 상용 연락처 주소를 추가할 수 있습니다"
 		HoneyLanguage.Russian.code -> "Нажмите на плюс в левом верхнем углу, чтобы добавить адреса часто используемых контактов"

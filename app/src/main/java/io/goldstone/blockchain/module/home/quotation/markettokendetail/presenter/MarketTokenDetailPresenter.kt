@@ -111,7 +111,7 @@ class MarketTokenDetailPresenter(
 			val overlay = ContentScrollOverlayView(parent.context)
 			overlay.into(parent)
 			overlay.apply {
-				setTitle("DESCRIPTION")
+				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
 					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
