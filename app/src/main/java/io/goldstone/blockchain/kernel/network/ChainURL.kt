@@ -68,7 +68,7 @@ object ChainURL {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
-			symbol.equals(CryptoSymbol.btc, true) -> Config.getBTCCurrentChainName()
+			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -77,7 +77,7 @@ object ChainURL {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
 			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
-			symbol.equals(CryptoSymbol.btc, true) -> ChainType.BTC
+			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
 			else -> ChainType.ETH
 		}
 	}

@@ -9,12 +9,11 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.SplashContainer
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.transparentStatus
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.Duration
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.transparentStatus
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -26,7 +25,6 @@ import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresen
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.matchParent
 
 /**
 ─────────────────────────────────────────────────────────────
@@ -87,6 +85,37 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
+	private fun prepareYingYongBaoInReviewStatus(callback: () -> Unit) {
+		// 如果不是 `YingYongBao` 渠道跳过
+		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
+			Config.updateYingYongBaoInReviewStatus(false)
+			callback()
+			return
+		}
+		// 没有网络直接返回
+		if (!NetworkUtil.hasNetwork(this)) {
+			callback()
+			return
+		}
+		// 从服务器获取配置状态
+		GoldStoneAPI.getConfigList(
+			{
+				callback()
+				LogUtil.error("prepareStatusForYingYongBao", it)
+			}
+		) { serverConfigs ->
+			val isInReview = serverConfigs.find {
+				it.name.equals("inReview", true)
+			}?.switch?.toIntOrNull() == 1
+			if (isInReview) {
+				Config.updateYingYongBaoInReviewStatus(true)
+			} else {
+				Config.updateYingYongBaoInReviewStatus(false)
+			}
+			callback()
+		}
+	}
+
 	private fun prepareData() {
 		prepareAppConfig config@{
 			// 如果本地的钱包数量不为空那么才开始注册设备
@@ -120,7 +149,9 @@ class SplashActivity : AppCompatActivity() {
 						}
 						// Check network to get default toke list
 						initDefaultTokenByNetWork {
-							hasAccountThenLogin()
+							prepareYingYongBaoInReviewStatus {
+								hasAccountThenLogin()
+							}
 							cleanMemoryDataLastAccount()
 						}
 					}
@@ -186,7 +217,6 @@ class SplashActivity : AppCompatActivity() {
 
 	private fun ViewGroup.initWaveView() {
 		waveView.apply {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 35
 			waveColor = Color.parseColor("#FF19769D")

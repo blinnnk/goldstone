@@ -13,8 +13,8 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -78,7 +78,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	private fun ContactTable.generateSubtitleIntro(): String {
 		val addresses = listOf(
 			Pair("${CryptoSymbol.etc}/${CryptoSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
-			Pair(CryptoSymbol.btc, btcMainnetAddress.isNotEmpty()),
+			Pair(CryptoSymbol.btc(), btcMainnetAddress.isNotEmpty()),
 			Pair("BTCTest", btcTestnetAddress.isNotEmpty())
 		)
 		val count = addresses.filter { it.second }.size

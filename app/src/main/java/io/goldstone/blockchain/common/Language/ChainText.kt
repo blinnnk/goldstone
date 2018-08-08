@@ -199,7 +199,7 @@ object ChainText {
 	@JvmField
 	val btcTest = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BTC Testnet (GoldStone)"
-		HoneyLanguage.Chinese.code -> "BTC测试网（GoldStone）"
+		HoneyLanguage.Chinese.code -> "BTC 测试网（GoldStone）"
 		HoneyLanguage.Japanese.code -> "BTCテストネットワーク（GoldStone）"
 		HoneyLanguage.Korean.code -> "BTC 테스트 네트워크 (GoldStone)"
 		HoneyLanguage.Russian.code -> "Сеть тестирования BTC (GoldStone)"

@@ -8,9 +8,9 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter.TransactionPresenter
@@ -23,7 +23,7 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  * @author KaySaith
  */
 class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
-	
+
 	var isETCListShown: Runnable? = null
 	var isBTCListShown: Runnable? = null
 	private val menuBar by lazy {
@@ -35,13 +35,13 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 	override val presenter = TransactionPresenter(this)
 	private val menuTitles = when (Config.getCurrentWalletType()) {
 		WalletType.BTCTestOnly.content, WalletType.BTCOnly.content ->
-			arrayListOf(CryptoSymbol.btc)
+			arrayListOf(CryptoSymbol.btc())
 		WalletType.ETHERCAndETCOnly.content ->
 			arrayListOf(CryptoSymbol.eth + "/" + CryptoSymbol.erc, CryptoSymbol.etc)
 		else ->
-			arrayListOf(CryptoSymbol.eth + "/" + CryptoSymbol.erc, CryptoSymbol.btc, CryptoSymbol.etc)
+			arrayListOf(CryptoSymbol.eth + "/" + CryptoSymbol.erc, CryptoSymbol.btc(), CryptoSymbol.etc)
 	}
-	
+
 	override fun ViewGroup.initView() {
 		headerTitle = TransactionText.transaction
 		menuBar.into(this)
@@ -58,12 +58,13 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 			setMargins<RelativeLayout.LayoutParams> {
 				topMargin = menuBar.layoutParams.height
 			}
+
 			// `MenuBar` 滑动选中动画
 			onPageChangeListener {
 				onPageScrolled { position, percent, _ ->
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 				}
-				
+
 				onPageSelected {
 					if (it == 1) isBTCListShown?.run()
 					if (it == 2) isETCListShown?.run()
@@ -71,11 +72,11 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 			}
 		}
 	}
-	
+
 	fun showMenuBar(isShow: Boolean) {
 		menuBar.visibility = if (isShow) View.VISIBLE else View.GONE
 	}
-	
+
 	companion object {
 		val viewPagerSize = when (Config.getCurrentWalletType()) {
 			WalletType.BTCTestOnly.content, WalletType.BTCOnly.content -> 1

@@ -1,25 +1,19 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter
 
-import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
-import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -41,6 +35,7 @@ class ChainAddressesPresenter(
 				headerTitle = WalletSettingsText.viewAddresses
 				presenter.popFragmentFrom<ChainAddressesFragment>()
 			}
+			updateAddAddressEvent()
 		}
 	}
 
@@ -154,54 +149,26 @@ class ChainAddressesPresenter(
 	}
 
 	private fun showQRCode(address: String) {
-		AddressManagerFragment.removeDashboard(fragment.context)
+		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment> {
-			presenter.showTargetFragment<QRCodeFragment>(
-				WalletText.showQRCode,
-				getFragmentTitleBy(fragment.coinType.orZero()),
-				Bundle().apply { putString(ArgumentKey.address, address) }
-			)
+			AddressManagerPresneter.showQRCodeFragment(address, this)
 		}
 	}
 
 	private fun showPrivateKeyExportFragment(address: String, isBTC: Boolean) {
-		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
-			presenter.showTargetFragment<PrivateKeyExportFragment>(
-				WalletSettingsText.exportPrivateKey,
-				getFragmentTitleBy(fragment.coinType.orZero()),
-				Bundle().apply {
-					putString(ArgumentKey.address, address)
-					if (isBTC) putBoolean(ArgumentKey.isBTCAddress, isBTC)
-				}
-			)
+			AddressManagerPresneter.showPrivateKeyExportFragment(address, isBTC, this)
 		}
 	}
 
 	private fun showKeystoreExportFragment(address: String) {
-		AddressManagerFragment.removeDashboard(fragment.context)
 		fragment.getParentFragment<WalletSettingsFragment> {
-			presenter.showTargetFragment<KeystoreExportFragment>(
-				WalletSettingsText.exportKeystore,
-				getFragmentTitleBy(fragment.coinType.orZero()),
-				Bundle().apply {
-					putString(ArgumentKey.address, address)
-				}
-			)
-		}
-	}
-
-	private fun getFragmentTitleBy(coinType: Int): String {
-		return when (coinType) {
-			ChainType.ETH.id -> WalletSettingsText.allETHAndERCAddresses
-			ChainType.ETC.id -> WalletSettingsText.allETCAddresses
-			ChainType.BTC.id -> WalletSettingsText.allBtCAddresses
-			else ->
-				WalletSettingsText.allBtCTestAddresses
+			AddressManagerPresneter.showKeystoreExportFragment(address, this)
 		}
 	}
 
 	override fun updateData() {
+		// 用户在这个界面更新 默认地址的时候会再次调用这个方法，所以方法内包含更新当前地址的方法.
 		WalletTable.getCurrentWallet {
 			when (fragment.coinType) {
 				ChainType.ETH.id -> {
@@ -231,8 +198,8 @@ class ChainAddressesPresenter(
 					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
 						setDefaultAddress(it, currentAddress, ChainType.BTC.id)
 						if (Config.isTestEnvironment())
-							Config.updateCurrentBTCTestAddress(btcTestAddresses)
-						else Config.updateCurrentBTCAddress(btcAddresses)
+							Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+						else Config.updateCurrentBTCAddress(currentBTCAddress)
 					}
 				}
 			}

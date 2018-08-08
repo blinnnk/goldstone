@@ -2,8 +2,9 @@ package io.goldstone.blockchain.module.home.quotation.quotationmanagement.view
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -15,7 +16,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class QuotationManagementFragment :
 	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
-	
+
 	private var willDeletePair = listOf<String>()
 	override val presenter = QuotationManagementPresenter(this)
 	override fun setRecyclerViewAdapter(
@@ -23,11 +24,11 @@ class QuotationManagementFragment :
 		asyncData: ArrayList<QuotationSelectionTable>?
 	) {
 		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.switch.onClick {
+			cell.switch.onClick { _ ->
 				cell.searchModel?.apply {
 					// 更新内存里面的数据防止复用的时候出错
-					asyncData?.find {
-						it.pair.equals(pair, true)
+					asyncData?.find { selection ->
+						selection.pair.equals(pair, true)
 					}?.isSelecting = cell.switch.isChecked
 					// 更新标记, 来在页面销毁的时候决定是否集中处理逻辑
 					if (cell.switch.isChecked) {
@@ -39,16 +40,20 @@ class QuotationManagementFragment :
 			}
 		}
 	}
-	
+
 	override fun onDetach() {
 		super.onDetach()
 		asyncData?.filter {
 			!it.isSelecting
-		}?.forEach { pair ->
-			QuotationSelectionTable.removeSelectionBy(pair.pair)
+		}?.apply {
+			forEach { pair ->
+				QuotationSelectionTable.removeSelectionBy(pair.pair)
+			}
+			if (isNotEmpty())
+				getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 		}
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		// 从下一个界面返回的时候更新这个界面的 `UI` 数据

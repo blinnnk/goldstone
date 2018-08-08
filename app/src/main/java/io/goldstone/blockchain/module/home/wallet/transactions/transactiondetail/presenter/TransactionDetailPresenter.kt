@@ -9,7 +9,8 @@ import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillsecond
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
@@ -108,7 +109,7 @@ class TransactionDetailPresenter(
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
 		return when {
 			symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-			symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+			symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
 			else -> CryptoSymbol.eth
 		}
 	}
@@ -151,7 +152,7 @@ class TransactionDetailPresenter(
 			val webTitle =
 				when {
 					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
-					symbol.equals(CryptoSymbol.btc, true) -> TransactionText.blockChainInfo
+					symbol.equals(CryptoSymbol.btc(), true) -> TransactionText.blockChainInfo
 					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
@@ -169,14 +170,14 @@ class TransactionDetailPresenter(
 	}
 
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
-	fun TransactionDetailPresenter.generateModels(
+	fun generateModels(
 		receipt: Any? = null
 	): ArrayList<TransactionDetailModel> {
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
 		val timstamp =
 			data?.timestamp
 				?: dataFromList?.timeStamp?.toLongOrNull()
-				?: dataFromList?.timeStamp?.toLongOrNull().orElse(0L)
+				?: notificationData?.timeStamp.orElse(0L)
 		val date = TimeUtils.formatDate(timstamp.toMillsecond())
 		val memo =
 			if (data?.memo.isNull()) TransactionText.noMemo
@@ -218,14 +219,14 @@ class TransactionDetailPresenter(
 
 			is BitcoinSeriesTransactionTable -> {
 				arrayListOf(
-					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
 					memo,
 					receipt.fromAddress,
 					TransactionListModel.formatToAddress(receipt.to),
 					currentHash,
 					receipt.blockNumber,
 					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),
-					TransactionListModel.generateTransactionURL(currentHash, CryptoSymbol.btc)
+					TransactionListModel.generateTransactionURL(currentHash, CryptoSymbol.btc())
 				)
 			}
 
@@ -255,9 +256,9 @@ class TransactionDetailPresenter(
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let { models ->
 			return if (
-				data?.token?.symbol.equals(CryptoSymbol.btc, true)
-				|| dataFromList?.symbol.equals(CryptoSymbol.btc, true)
-				|| notificationData?.symbol.equals(CryptoSymbol.btc, true)
+				data?.token?.symbol.equals(CryptoSymbol.btc(), true)
+				|| dataFromList?.symbol.equals(CryptoSymbol.btc(), true)
+				|| notificationData?.symbol.equals(CryptoSymbol.btc(), true)
 			) {
 				// 如果是 `比特币` 账单不显示 `Memo`
 				models.filterNot {
@@ -271,7 +272,7 @@ class TransactionDetailPresenter(
 
 	private fun formatedMinnerFee(): String? {
 		val dataMinerFee =
-			if (data?.token?.symbol.equals(CryptoSymbol.btc, true))
+			if (data?.token?.symbol.equals(CryptoSymbol.btc(), true))
 				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
 			else data?.minnerFee
 		return if (data.isNull()) dataFromList?.minerFee

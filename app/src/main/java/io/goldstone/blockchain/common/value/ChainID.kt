@@ -23,7 +23,7 @@ enum class ChainID(val id: String) {
 
 		fun getChainIDBySymbol(symbol: String): String {
 			return when {
-				symbol.equals(CryptoSymbol.btc, true) -> {
+				symbol.equals(CryptoSymbol.btc(), true) -> {
 					if (Config.isTestEnvironment()) ChainID.BTCTest.id
 					else ChainID.BTCMain.id
 				}
@@ -116,6 +116,65 @@ enum class ChainID(val id: String) {
 				ChainText.btcMain -> BTCMain.id
 				ChainText.btcTest -> BTCTest.id
 				else -> Main.id
+			}
+		}
+	}
+}
+
+// `ChainName ID` 这个值是用来通过国际化的 `Name` 找回对应的 `ID` 的值
+
+enum class ChainNameID(val id: Int) {
+	GoldStoneETHMain(0),
+	GoldStoneRopsten(1),
+	GoldStoneRinkeby(2),
+	GoldStoneKovan(3),
+	InfuraETHMain(4),
+	InfuraRopsten(5),
+	InfuraRinkeby(6),
+	InfuraKovan(7),
+	GoldStoneETCMain(8),
+	GoldStoneETCMorden(9),
+	GasTrackerETCMain(10),
+	GasTrackerETCMorden(11),
+	GoldStoneBTCMain(12),
+	GoldStoneBTCTest(13);
+
+	companion object {
+		fun getChainNameByID(chainNameID: Int): String {
+			return when (chainNameID) {
+				0 -> ChainText.mainnet
+				1 -> ChainText.ropsten
+				2 -> ChainText.rinkeby
+				3 -> ChainText.kovan
+				4 -> ChainText.infuraMain
+				5 -> ChainText.infuraRopsten
+				6 -> ChainText.infuraRinkeby
+				7 -> ChainText.infuraKovan
+				8 -> ChainText.goldStoneEtcMain
+				9 -> ChainText.goldStoneEtcMorderTest
+				10 -> ChainText.etcMainGasTracker
+				11 -> ChainText.etcMorden
+				12 -> ChainText.btcMain
+				else -> ChainText.btcTest
+			}
+		}
+
+		fun getChainNameIDByName(chainName: String): Int {
+			return when (chainName) {
+				ChainText.mainnet -> 0
+				ChainText.ropsten -> 1
+				ChainText.rinkeby -> 2
+				ChainText.kovan -> 3
+				ChainText.infuraMain -> 4
+				ChainText.infuraRopsten -> 5
+				ChainText.infuraRinkeby -> 6
+				ChainText.infuraKovan -> 7
+				ChainText.goldStoneEtcMain -> 8
+				ChainText.goldStoneEtcMorderTest -> 9
+				ChainText.etcMainGasTracker -> 10
+				ChainText.etcMorden -> 11
+				ChainText.btcMain -> 12
+				else -> 13
 			}
 		}
 	}

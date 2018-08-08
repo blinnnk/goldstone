@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
-import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -354,7 +354,7 @@ class MarketTokenDetailPresenter(
 		val chainID = when {
 			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
 			info.contract.isNotEmpty() -> ChainID.Main.id
-			info.symbol.equals(CryptoSymbol.btc, true) -> ChainID.BTCMain.id
+			info.symbol.equals(CryptoSymbol.btc(), true) -> ChainID.BTCMain.id
 			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.BTCMain.id
 			else -> ""
 		}

@@ -54,7 +54,7 @@ object WalletUtil {
 	
 	fun getAddressBySymbol(symbol: String): String {
 		return when (symbol) {
-			CryptoSymbol.btc -> {
+			CryptoSymbol.btc() -> {
 				if (Config.isTestEnvironment()) {
 					Config.getCurrentBTCTestAddress()
 				} else {

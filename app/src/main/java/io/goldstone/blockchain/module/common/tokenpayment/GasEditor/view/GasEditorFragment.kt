@@ -8,13 +8,13 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
-import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasEditorPresenter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType

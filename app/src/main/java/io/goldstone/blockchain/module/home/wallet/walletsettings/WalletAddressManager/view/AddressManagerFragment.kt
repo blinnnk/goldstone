@@ -8,18 +8,19 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -162,7 +163,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	}
 
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
-		btcAddressesView.setTitle(WalletSettingsText.bitcoinAddress)
+		btcAddressesView.setTitle(WalletSettingsText.bitcoinAddress(Config.getYingYongBaoInReviewStatus()))
 		btcAddressesView.model = model
 	}
 
@@ -172,7 +173,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				getMainActivity()?.getMainContainer()?.apply {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
-							cell.onClick {
+							cell.onClick { _ ->
 								this@getParentFragment.context?.apply {
 									verifyMultiChainWalletPassword(this) {
 										createChildAddressByButtonTitle(title, it)
@@ -253,14 +254,26 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					AddressManagerFragment.removeDashboard(context)
 				}
 			},
-			qrCellClickEvent = { presenter.showQRCodeFragment(address) },
+			qrCellClickEvent = {
+				getParentFragment<WalletSettingsFragment> {
+					AddressManagerPresneter.showQRCodeFragment(address, this)
+				}
+			},
 			exportPrivateKey = {
-				presenter.showPrivateKeyExportFragment(address)
+				getParentFragment<WalletSettingsFragment> {
+					AddressManagerPresneter.showPrivateKeyExportFragment(address, false, this)
+				}
 			},
 			exportBTCPrivateKey = {
-				presenter.showBTCPrivateKeyExportFragment(address)
+				getParentFragment<WalletSettingsFragment> {
+					AddressManagerPresneter.showPrivateKeyExportFragment(address, true, this)
+				}
 			},
-			keystoreCellClickEvent = { presenter.showKeystoreExportFragment(address) }
+			keystoreCellClickEvent = {
+				getParentFragment<WalletSettingsFragment> {
+					AddressManagerPresneter.showKeystoreExportFragment(address, this)
+				}
+			}
 		)
 	}
 
@@ -288,8 +301,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
 				!Config.getCurrentIsWatchOnlyOrNot()
-			) {
-				val password = it?.text.toString()
+			) { passwordInput ->
+				val password = passwordInput?.text.toString()
 				context.verifyKeystorePassword(
 					password,
 					Config.getCurrentBTCAddress(),

@@ -17,9 +17,9 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**

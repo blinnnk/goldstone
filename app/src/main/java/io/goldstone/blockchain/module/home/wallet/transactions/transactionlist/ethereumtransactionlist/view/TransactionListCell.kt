@@ -68,7 +68,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 				subtitle.text = if (it.isFee) {
 					when {
 						it.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-						it.symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+						it.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
 						else -> CryptoSymbol.eth
 					}
 				} else it.symbol

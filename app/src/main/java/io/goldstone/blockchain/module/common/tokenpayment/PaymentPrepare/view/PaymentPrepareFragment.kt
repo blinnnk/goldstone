@@ -6,20 +6,19 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.common.component.cell.GraySqualCell
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.ValueInputView
+import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -39,7 +38,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
-	
+
 	val address by lazy {
 		arguments?.getString(ArgumentKey.paymentAddress)
 	}
@@ -58,7 +57,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
-	private var changeAddress: String = WalletTable.getAddressBySymbol(CryptoSymbol.btc)
+	private var changeAddress: String = WalletTable.getAddressBySymbol(CryptoSymbol.btc())
 	override val presenter = PaymentPreparePresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -69,19 +68,19 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				verticalLayout {
 					gravity = Gravity.CENTER_HORIZONTAL
 					lparams(matchParent, matchParent)
-					
+
 					inputView.into(this)
-					
+
 					showAccountInfo()
 					// `BTC` 于 ETH, ERC20, ETC 显示不同的配置信息
-					if (rootFragment?.token?.symbol.equals(CryptoSymbol.btc, true)) {
+					if (rootFragment?.token?.symbol.equals(CryptoSymbol.btc(), true)) {
 						showCustomChangeAddressCell()
 					} else {
 						showMemoCell()
 					}
-					
+
 					showUnitPrice()
-					
+
 					confirmButton.apply {
 						setGrayStyle(20.uiPX())
 						text = CommonText.next.toUpperCase()
@@ -103,7 +102,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -112,33 +111,33 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		updateValueTotalPrice()
 		resetBackButtonEvent()
 	}
-	
+
 	override fun onResume() {
 		super.onResume()
 		inputView.setFoucs()
 	}
-	
+
 	fun getMemoContent(): String {
 		return memoData
 	}
-	
+
 	fun getTransferCount(): Double {
 		return if (inputView.getValue().isEmpty()) 0.0 else inputView.getValue().toDouble()
 	}
-	
+
 	fun setSymbolAndPrice(symbol: String, price: String) {
 		this.inputView.setHeaderSymbol(symbol)
 		this.price.setSubtitle(price)
 	}
-	
+
 	fun updateChangeAddress(address: String) {
 		customChangeAddressCell.setSubtitle(address)
 	}
-	
+
 	fun getChangeAddress(): String {
 		return changeAddress
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?
@@ -151,26 +150,21 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			removeMemoInputView()
 		}
 	}
-	
+
 	private fun LinearLayout.showMemoCell() {
 		TopBottomLineCell(context).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.memoInformation)
 			memo.apply {
 				setTitle(PrepareTransferText.memo)
 				setSubtitle(CryptoUtils.scaleTo32(PrepareTransferText.addAMemo))
 				showArrow()
-				addTouchRippleAnimation(
-					GrayScale.whiteGray,
-					Spectrum.green,
-					RippleMode.Square,
-					CornerSize.cell.toFloat()
-				)
 			}.click {
-				getParentContainer()?.showMemoInputView {
-					if (it.isNotEmpty()) {
-						memoData = it
-						memo.setSubtitle(it)
+				getParentContainer()?.showMemoInputView { content ->
+					if (content.isNotEmpty()) {
+						memoData = content
+						memo.setSubtitle(content)
 					} else {
 						memo.setSubtitle(PrepareTransferText.addAMemo)
 					}
@@ -178,27 +172,22 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}.into(this)
 		}.into(this)
 	}
-	
+
 	private fun LinearLayout.showCustomChangeAddressCell() {
 		TopBottomLineCell(context).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.customChangeAddress)
 			customChangeAddressCell.apply {
 				setTitle(PrepareTransferText.changeAddress)
 				setSubtitle(CryptoUtils.scaleTo16(changeAddress))
 				showArrow()
-				addTouchRippleAnimation(
-					GrayScale.whiteGray,
-					Spectrum.green,
-					RippleMode.Square,
-					CornerSize.cell.toFloat()
-				)
 			}.click {
 				showCustomChangeAddressOverlay()
 			}.into(this)
 		}.into(this)
 	}
-	
+
 	private fun showCustomChangeAddressOverlay() {
 		getParentContainer()?.apply {
 			val addressInput = WalletEditText(context)
@@ -229,38 +218,40 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}.into(this)
 		}
 	}
-	
+
 	private fun LinearLayout.showAccountInfo() {
 		TopBottomLineCell(context).apply {
 			layoutParams =
-				LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 150.uiPX()).apply {
+				LinearLayout.LayoutParams(matchParent, 150.uiPX()).apply {
 					topMargin = 10.uiPX()
 				}
+			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.accountInfo)
-			
+
 			sendInfo.apply {
 				setTitle(PrepareTransferText.send)
 				setSubtitle(CryptoUtils.scaleMiddleAddress(address.orEmpty()))
 			}.into(this)
-			
+
 			from.apply {
 				setTitle(PrepareTransferText.from)
 			}.into(this)
-			
+
 			setFromAddress()
 		}.into(this)
 	}
-	
+
 	private fun LinearLayout.showUnitPrice() {
 		TopBottomLineCell(context).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 100.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.currentPrice)
 			price.apply {
 				setTitle(PrepareTransferText.price)
 			}.into(this)
 		}.into(this)
 	}
-	
+
 	private fun setFromAddress() {
 		from.setSubtitle(
 			CryptoUtils.scaleMiddleAddress(
@@ -268,7 +259,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			)
 		)
 	}
-	
+
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
@@ -284,14 +275,14 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			memoInputView?.into(this)
 		}
 	}
-	
+
 	private fun removeMemoInputView() {
 		memoInputView?.updateAlphaAnimation(0f) {
 			getParentContainer()?.removeView(memoInputView)
 			memoInputView = null
 		}
 	}
-	
+
 	private fun updateValueTotalPrice() {
 		val price = rootFragment?.token?.price ?: 0.0
 		inputView.inputTextListener {
@@ -306,7 +297,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}
 		}
 	}
-	
+
 	private fun resetBackButtonEvent() {
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {

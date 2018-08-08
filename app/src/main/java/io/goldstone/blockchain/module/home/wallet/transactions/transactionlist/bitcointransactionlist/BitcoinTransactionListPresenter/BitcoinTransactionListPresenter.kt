@@ -4,16 +4,19 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.view.BitcoinTransactionListAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.view.BitcoinTransactionListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -36,11 +39,18 @@ class BitcoinTransactionListPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		fragment.getParentFragment<TransactionFragment>()?.apply {
-			isBTCListShown = Runnable {
+		WalletTable.getWalletType {
+			if (it == WalletType.BTCOnly || it == WalletType.BTCTestOnly) {
 				fragment.showLoadingView(LoadingText.transactionData)
-				// TODO 触底翻页的逻辑
 				loadTransactionsFromDatabase()
+			} else {
+				fragment.getParentFragment<TransactionFragment>()?.apply {
+					isBTCListShown = Runnable {
+						fragment.showLoadingView(LoadingText.transactionData)
+						// TODO 触底翻页的逻辑
+						loadTransactionsFromDatabase()
+					}
+				}
 			}
 		}
 	}
@@ -48,9 +58,13 @@ class BitcoinTransactionListPresenter(
 	private var hasLoadServerData = false
 	private fun loadTransactionsFromDatabase() {
 		BitcoinSeriesTransactionTable.getTransactionsByAddress(address()) { localData ->
-			diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(localData.map {
-				TransactionListModel(it)
-			}.toArrayList())
+			localData.map { transactions ->
+				TransactionListModel(transactions)
+			}.toArrayList().let {
+				TransactionListPresenter.checkAddressNameInContacts(it) {
+					diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(it)
+				}
+			}
 			// 如果已经更新了网络数据就不再继续执行
 			if (!hasLoadServerData) {
 				doAsync {
@@ -99,7 +113,7 @@ class BitcoinTransactionListPresenter(
 					// 转换数据格式
 					BitcoinSeriesTransactionTable(
 						it,
-						CryptoSymbol.btc,
+						CryptoSymbol.btc(),
 						address,
 						false
 					)

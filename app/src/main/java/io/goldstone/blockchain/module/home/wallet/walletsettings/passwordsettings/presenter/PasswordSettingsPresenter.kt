@@ -2,13 +2,14 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettin
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.Language.CreateWalletText
-import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.updatePassword
 import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable

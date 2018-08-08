@@ -15,9 +15,9 @@ import com.blinnnk.uikit.FloatAnimationObject
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.Count
-import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent

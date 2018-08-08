@@ -4,7 +4,6 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
@@ -64,36 +63,34 @@ fun GasSelectionPresenter.transferBTC(
 		password
 	) { secret ->
 		if (secret.isNullOrBlank()) {
-			fragment.showMaskView(false)
-			fragment.context.alert(CommonText.wrongPassword)
 			callback()
-		} else {
-			prepareBTCModel.apply model@{
-				val fee = gasUsedGasFee?.toSatoshi()!!
-				BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
-					BTCTransactionUtils.generateSignedRawTransaction(
-						value,
-						fee,
-						toAddress,
-						changeAddress,
-						unspents,
-						secret!!,
-						Config.isTestEnvironment()
-					).let { signedModel ->
-						BTCJsonRPC.sendRawTransaction(
-							Config.isTestEnvironment(),
-							signedModel.signedMessage
-						) { hash ->
-							hash?.let {
-								// 插入 `Pending` 数据到本地数据库
-								insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
-								// 跳转到章党详情界面
-								GoldStoneAPI.context.runOnUiThread {
-									goToTransactionDetailFragment(
-										prepareReceiptModelFromBTC(this@model, fee, it)
-									)
-									callback()
-								}
+			return@getCurrentWalletBTCPrivateKey
+		}
+		prepareBTCModel.apply model@{
+			val fee = gasUsedGasFee?.toSatoshi()!!
+			BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
+				BTCTransactionUtils.generateSignedRawTransaction(
+					value,
+					fee,
+					toAddress,
+					changeAddress,
+					unspents,
+					secret!!,
+					Config.isTestEnvironment()
+				).let { signedModel ->
+					BTCJsonRPC.sendRawTransaction(
+						Config.isTestEnvironment(),
+						signedModel.signedMessage
+					) { hash ->
+						hash?.let {
+							// 插入 `Pending` 数据到本地数据库
+							insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
+							// 跳转到章党详情界面
+							GoldStoneAPI.context.runOnUiThread {
+								goToTransactionDetailFragment(
+									prepareReceiptModelFromBTC(this@model, fee, it)
+								)
+								callback()
 							}
 						}
 					}

@@ -4,12 +4,15 @@ import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -38,21 +41,21 @@ import org.jetbrains.anko.runOnUiThread
 class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
-	
+
 	private var allData: List<TransactionListModel>? = null
 	private val token by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 	}
-	
+
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
 		loadDataFromDatabaseOrElse()
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.recoveryValueHeader()
 	}
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		updateEmptyCharData(fragment.token?.symbol.orEmpty())
@@ -61,7 +64,7 @@ class TokenDetailPresenter(
 			prepareTokenDetailData()
 		}
 	}
-	
+
 	fun showOnlyReceiveData() {
 		allData?.filter {
 			it.isReceived
@@ -69,7 +72,7 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
 	}
-	
+
 	fun showOnlyFailedData() {
 		allData?.filter {
 			it.isFailed || it.hasError
@@ -77,7 +80,7 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
 	}
-	
+
 	fun showOnlySendData() {
 		allData?.filter {
 			!it.isReceived && !it.isFee
@@ -85,25 +88,25 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
 	}
-	
+
 	fun showAllData() {
 		allData?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 		}
 	}
-	
+
 	fun showAddressSelectionFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			presenter.showAddressSelectionFragment()
 		}
 	}
-	
+
 	fun showDepositFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			presenter.showDepositFragment()
 		}
 	}
-	
+
 	fun showTransactionDetailFragment(model: TransactionListModel) {
 		val argument = Bundle().apply {
 			putSerializable(ArgumentKey.transactionFromList, model)
@@ -117,7 +120,7 @@ class TokenDetailPresenter(
 				recoverHeader()
 			}
 	}
-	
+
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse {
@@ -126,30 +129,30 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private var hasUpdateETCData = false
 	private var hasUpdateBTCData = false
 	private var hasUpdateERCData = false
-	
+
 	private fun TokenDetailFragment.loadDataFromChain() {
 		when {
 			token?.symbol.equals(CryptoSymbol.etc, true) -> {
 				if (!hasUpdateETCData) loadETCChainData()
 				hasUpdateETCData = true
 			}
-			
-			token?.symbol.equals(CryptoSymbol.btc, true) -> {
+
+			token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
 				if (!hasUpdateBTCData) loadBTCChainData()
 				hasUpdateBTCData = true
 			}
-			
+
 			else -> {
 				if (!hasUpdateERCData) loadERCChainData()
 				hasUpdateERCData = true
 			}
 		}
 	}
-	
+
 	private fun loadDataFromDatabaseOrElse(
 		withoutLocalDataCallback: () -> Unit = {}
 	) {
@@ -161,8 +164,8 @@ class TokenDetailPresenter(
 							Config.getCurrentETCAddress(),
 							withoutLocalDataCallback
 						)
-					
-					token?.symbol.equals(CryptoSymbol.btc, true) -> {
+
+					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
 						if (Config.isTestEnvironment()) {
 							getBTCData(
 								Config.getCurrentBTCTestAddress(),
@@ -175,27 +178,27 @@ class TokenDetailPresenter(
 							)
 						}
 					}
-					
+
 					else -> getETHERC20OrETCData(
 						Config.getCurrentEthereumAddress(),
 						withoutLocalDataCallback
 					)
 				}
 			}
-			
+
 			WalletType.ETHERCAndETCOnly.content ->
 				getETHERC20OrETCData(
 					Config.getCurrentEthereumAddress(),
 					withoutLocalDataCallback
 				)
-			
+
 			WalletType.BTCTestOnly.content -> {
 				getBTCData(
 					Config.getCurrentBTCTestAddress(),
 					withoutLocalDataCallback
 				)
 			}
-			
+
 			WalletType.BTCOnly.content -> {
 				getBTCData(
 					Config.getCurrentBTCAddress(),
@@ -204,7 +207,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun getETHERC20OrETCData(
 		address: String,
 		callback: () -> Unit
@@ -223,7 +226,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun getBTCData(
 		address: String,
 		withouDataCallback: () -> Unit
@@ -245,7 +248,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun TokenDetailFragment.loadERCChainData() {
 		doAsync {
 			// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
@@ -272,7 +275,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun TokenDetailFragment.loadETCChainData() {
 		showLoadingView(LoadingText.transactionData)
 		ClassicTransactionListPresenter.getETCTransactionsFromChain(arrayListOf()) {
@@ -280,7 +283,7 @@ class TokenDetailPresenter(
 			loadDataFromDatabaseOrElse()
 		}
 	}
-	
+
 	private fun TokenDetailFragment.loadBTCChainData() {
 		showLoadingView(LoadingText.transactionData)
 		BitcoinTransactionListPresenter.loadTransactionsFromChain(
@@ -296,7 +299,7 @@ class TokenDetailPresenter(
 			loadDataFromDatabaseOrElse()
 		}
 	}
-	
+
 	private fun TokenDetailFragment.updateChartBy(
 		data: List<TransactionListModel>,
 		walletAddress: String
@@ -314,7 +317,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateEmptyCharData(symbol: String) {
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
@@ -328,7 +331,7 @@ class TokenDetailPresenter(
 			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
 		).updateChartAndHeaderData()
 	}
-	
+
 	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 6
@@ -347,7 +350,7 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun List<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: String,
 		walletAddress: String,
@@ -376,9 +379,9 @@ class TokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	data class DateBalance(val date: Long, val balance: Double)
-	
+
 	private fun List<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,
 		callback: (List<DateBalance>) -> Unit
@@ -393,7 +396,7 @@ class TokenDetailPresenter(
 					val currentMills =
 						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
-						it.timeStamp.toMillsecond() in index.daysAgoInMills() .. currentMills
+						it.timeStamp.toMillsecond() in index.daysAgoInMills()..currentMills
 					}.sumByDouble {
 						if (it.isFee) {
 							it.minerFee.substringBefore(" ").toDouble() * -1
@@ -407,13 +410,13 @@ class TokenDetailPresenter(
 					}
 				}
 			}
-			
+
 			override fun mergeCallBack() {
 				balances += DateBalance(0.daysAgoInMills(), todayBalance)
 				callback(balances)
 			}
 		}.start()
 	}
-	
+
 	private fun modulusByReceiveStatus(isReceived: Boolean) = if (isReceived) 1 else -1
 }

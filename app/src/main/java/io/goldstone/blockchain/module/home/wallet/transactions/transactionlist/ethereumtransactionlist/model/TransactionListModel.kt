@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
 import com.blinnnk.util.HoneyDateUtil
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.toMillsecond
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
@@ -44,7 +44,7 @@ data class TransactionListModel(
 	var isFailed: Boolean,
 	var isFee: Boolean = false
 ) : Serializable {
-	
+
 	constructor(data: TransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else data.tokenReceiveAddress.orEmpty(),
@@ -77,7 +77,7 @@ data class TransactionListModel(
 		data.isFailed,
 		data.isFee
 	)
-	
+
 	constructor(data: BitcoinSeriesTransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else formatToAddress(data.to),
@@ -93,15 +93,15 @@ data class TransactionListModel(
 			)
 		), // 副标题的生成
 		data.value.toDouble().toBTCCount(),
-		CryptoSymbol.btc,
+		CryptoSymbol.btc(),
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
 		data.to,
 		data.blockNumber,
 		data.hash,
 		"",
-		"${data.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
-		generateTransactionURL(data.hash, CryptoSymbol.btc),
+		"${data.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
+		generateTransactionURL(data.hash, CryptoSymbol.btc()),
 		data.isPending,
 		data.timeStamp,
 		data.value.toDouble().toBTCCount().toString(),
@@ -110,7 +110,7 @@ data class TransactionListModel(
 		false,
 		data.isFee
 	)
-	
+
 	companion object {
 		fun formatToAddress(toAddress: String): String {
 			var formatedAddresses = ""
@@ -124,7 +124,7 @@ data class TransactionListModel(
 			}
 			return formatedAddresses
 		}
-		
+
 		fun convertMultiToOrFromAddresses(content: String): List<String> {
 			return if (content.contains("[")) {
 				(0 until JSONArray(content).length()).map {
@@ -134,17 +134,17 @@ data class TransactionListModel(
 				listOf(content)
 			}
 		}
-		
+
 		fun generateTransactionURL(taxHash: String, symbol: String?): String {
 			return when {
 				symbol.equals(CryptoSymbol.etc, true) ->
 					EtherScanApi.gasTrackerHeader(taxHash)
-				symbol.equals(CryptoSymbol.btc, true) ->
+				symbol.equals(CryptoSymbol.btc(), true) ->
 					bitcoinTransactionDetail(taxHash)
 				else -> EtherScanApi.transactionDetail(taxHash)
 			}
 		}
-		
+
 		private fun getUnitSymbol(symbol: String): String {
 			return " " + if (symbol.equals(CryptoSymbol.etc, true))
 				CryptoSymbol.etc

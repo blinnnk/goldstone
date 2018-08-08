@@ -2,8 +2,8 @@ package io.goldstone.blockchain.module.home.quotation.quotationoverlay.view
 
 import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter.QuotationOverlayPresenter
 

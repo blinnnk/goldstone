@@ -6,12 +6,15 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orTrue
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainNameID
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -26,7 +29,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
-	
+
 	private val fromMainnetSetting by lazy {
 		arguments?.getBoolean(ArgumentKey.isMainnet)
 	}
@@ -58,7 +61,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private lateinit var container: LinearLayout
 	private val selectedNode = arrayListOf<Pair<String, String>>()
 	override val presenter = NodeSelectionPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -97,7 +100,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							pair.first.equals(CryptoName.btc, true) -> 20
 							else -> 0
 						}
-						NodeSelectionCell(context).setData(pair.second, isSelected, id).click {
+						NodeSelectionCell(context).setData(pair.second, isSelected, id).click { it ->
 							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
 							selectedNode.find {
@@ -112,8 +115,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				confirmButton.apply {
 					text = CommonText.confirm
 					setBlueStyle(50.uiPX())
-				}.click {
-					fromMainnetSetting?.let {
+				}.click { _ ->
+					fromMainnetSetting?.let { it ->
 						// 更新是否是测试环境的参数
 						Config.updateIsTestEnvironment(!it)
 						selectedNode.forEach { pair ->
@@ -127,9 +130,21 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						}
 						AppConfigTable.updateChainInfo(
 							it,
-							selectedNode.find { it.first.equals(CryptoName.etc, true) }?.second!!,
-							selectedNode.find { it.first.equals(CryptoName.eth, true) }?.second!!,
-							selectedNode.find { it.first.equals(CryptoName.btc, true) }?.second!!
+							ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.etc, true)
+								}?.second.orEmpty()
+							),
+							ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.eth, true)
+								}?.second.orEmpty()
+							),
+							ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.btc, true)
+								}?.second.orEmpty()
+							)
 						) {
 							activity?.jump<SplashActivity>()
 						}
@@ -138,7 +153,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			}
 		}
 	}
-	
+
 	private fun getChainTypeByName(name: String): ChainType {
 		return when (name) {
 			CryptoName.eth -> ChainType.ETH
@@ -146,7 +161,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			else -> ChainType.ETC
 		}
 	}
-	
+
 	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
 		val start = when (type) {
 			ChainType.ETC -> 10

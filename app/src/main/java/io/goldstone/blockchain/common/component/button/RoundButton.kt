@@ -17,7 +17,10 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 
 /**
  * @date 21/03/2018 11:00 PM
