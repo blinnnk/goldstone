@@ -17,7 +17,7 @@ class XAxisRenderer(
   trans: Transformer
 ) : XAxisRenderer(viewPortHandler, xAxis, trans) {
 	
-	private val gridlineColor = Color.rgb(236,236,236)
+	private val gridlineColor = Color.rgb(236, 236, 236)
 	private val topLinePaint = Paint()
 	init {
 	  topLinePaint.color = gridlineColor

@@ -34,7 +34,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	}
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
-	private val chartView by lazy { MarketTokenChart(context!!) }
+	private val chartView by lazy { MarketTokenCandleChart(context!!) }
 	private val priceHistroy by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }

@@ -146,10 +146,11 @@ class CandleStickChartRenderer(
           
           mRenderPaint.strokeCap = Paint.Cap.SQUARE
           
+					// 柱状图，如果是此种情况（开盘价低于收盘价），那么举行的顶部应该用bodyBuffers[3]，底部用 bodyBuffers[1]
           c.drawRoundRect(bodyBuffers[0],
-            bodyBuffers[1],
-            bodyBuffers[2],
             bodyBuffers[3],
+            bodyBuffers[2],
+            bodyBuffers[1],
             candleRectRadius,
             candleRectRadius,
             mRenderPaint)

@@ -200,7 +200,9 @@ class QuotationPresenter(
 			val timeStamp = jsonarray.getJSONObject(it).safeGet("time").toLong()
 			ChartPoint(
 				timeStamp.toString(),
-				jsonarray.getJSONObject(it).safeGet("price").toFloat()
+				if (jsonarray.getJSONObject(it).safeGet("close").isEmpty())
+					jsonarray.getJSONObject(it).safeGet("price").toFloat()
+				else jsonarray.getJSONObject(it).safeGet("close").toFloat() // close值是当天的收盘值
 			)
 		}.reversed().let {
 			return it.toArrayList()
