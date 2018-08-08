@@ -27048,6 +27048,7 @@ io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.Transac
     kotlin.reflect.KProperty[] $$delegatedProperties -> a
     int access$getViewPagerSize$cp() -> oa
     io.goldstone.blockchain.common.component.ViewPagerMenu access$getMenuBar$p(io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment) -> do
+    java.util.ArrayList access$getMenuTitles$p(io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment) -> if
     io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter getPresenter() -> ca
     io.goldstone.blockchain.common.component.ViewPagerMenu getMenuBar() -> sa
     io.goldstone.blockchain.module.home.wallet.transactions.transaction.presenter.TransactionPresenter getPresenter() -> ra
@@ -37737,25 +37738,25 @@ org.spongycastle.x509.extension.X509ExtensionUtil -> org.spongycastle.x509.exten
 org.spongycastle.x509.util.LDAPStoreHelper -> org.spongycastle.x509.util.LDAPStoreHelper:
 org.spongycastle.x509.util.StreamParser -> org.spongycastle.x509.util.StreamParser:
 org.spongycastle.x509.util.StreamParsingException -> org.spongycastle.x509.util.StreamParsingException:
-android.support.v4.content.Loader -> a.b.c.b.b:
-com.google.android.gms.common.internal.GmsClientEventManager -> b.e.a.a.d.c.e:
-org.bitcoinj.net.discovery.HttpDiscovery -> i.b.c.a.a:
-com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
-com.db.williamchart.R -> b.c.b.a:
 com.google.android.gms.common.api.internal.ListenerHolder -> b.e.a.a.d.a.a.c:
-android.support.v7.appcompat.R -> a.b.d.b.a:
-com.google.android.gms.base.R -> b.e.a.a.c.a:
-android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
-android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
-android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
-me.itangqi.library.R -> f.a.a.a:
-com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
-com.google.android.gms.common.R -> b.e.a.a.d.n:
-com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
-com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
-android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
-com.google.zxing.client.android.R -> b.e.c.b.a.k:
 android.support.v4.util.Pools -> a.b.c.i.l:
-android.support.compat.R -> a.b.a.a:
+com.google.android.gms.common.internal.GmsClientEventManager -> b.e.a.a.d.c.e:
+com.google.android.gms.common.api.GoogleApiClient -> b.e.a.a.d.a.e:
+android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
+com.github.mmin18.realtimeblurview.R -> b.d.a.a.a:
+android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
+com.google.android.gms.common.R -> b.e.a.a.d.n:
 com.blinnnk.honey.R -> b.a.e.a:
+com.google.zxing.client.android.R -> b.e.c.b.a.k:
+me.itangqi.library.R -> f.a.a.a:
+android.support.compat.R -> a.b.a.a:
+com.google.android.gms.base.R -> b.e.a.a.c.a:
+android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
+android.support.v7.appcompat.R -> a.b.d.b.a:
 android.support.v7.recyclerview.R -> a.b.d.e.a:
+org.bitcoinj.net.discovery.HttpDiscovery -> i.b.c.a.a:
+android.support.v4.content.Loader -> a.b.c.b.b:
+com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
+com.db.williamchart.R -> b.c.b.a:
+com.google.android.gms.analytics.HitBuilders -> b.e.a.a.b.e:
+android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:

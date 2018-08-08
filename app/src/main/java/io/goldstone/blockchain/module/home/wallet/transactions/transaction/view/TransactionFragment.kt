@@ -65,9 +65,11 @@ class TransactionFragment : BaseOverlayFragment<TransactionPresenter>() {
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 				}
 
-				onPageSelected {
-					if (it == 1) isBTCListShown?.run()
-					if (it == 2) isETCListShown?.run()
+				if (menuTitles.size > 1) {
+					onPageSelected {
+						if (it == menuTitles.lastIndex - 1) isBTCListShown?.run()
+						if (it == menuTitles.lastIndex) isETCListShown?.run()
+					}
 				}
 			}
 		}
