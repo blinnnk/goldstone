@@ -14,13 +14,16 @@ import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.button.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.TransactionSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.*
 

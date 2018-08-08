@@ -3,13 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -34,7 +34,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
-		if (transaction.symbol.equals(CryptoSymbol.btc, true)) {
+		if (transaction.symbol.equals(CryptoSymbol.btc(), true)) {
 			getBitcoinSeriesTransaction(transaction)
 		} else {
 			/**

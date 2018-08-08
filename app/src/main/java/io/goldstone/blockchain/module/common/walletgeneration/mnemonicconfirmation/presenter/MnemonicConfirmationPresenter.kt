@@ -6,14 +6,14 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment

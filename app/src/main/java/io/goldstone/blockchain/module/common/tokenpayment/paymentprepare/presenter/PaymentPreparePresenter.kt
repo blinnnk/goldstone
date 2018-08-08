@@ -2,11 +2,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -49,7 +49,7 @@ class PaymentPreparePresenter(
 			callback()
 		} else {
 			fragment.toast(LoadingText.calculateGas)
-			if (getToken()?.symbol.equals(CryptoSymbol.btc, true)) {
+			if (getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
 				prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
 					if (!isSuccessful) {
 						fragment.context.alert(

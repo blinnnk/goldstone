@@ -87,7 +87,7 @@ object BitcoinApi {
 				if (isNotEmpty()) {
 					BitcoinSeriesTransactionTable(
 						JSONObject(this[0]),
-						CryptoSymbol.btc,
+						CryptoSymbol.btc(),
 						address,
 						false
 					)

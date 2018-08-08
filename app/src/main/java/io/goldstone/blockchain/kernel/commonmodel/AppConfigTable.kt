@@ -9,11 +9,11 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
-import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -43,12 +43,12 @@ data class AppConfigTable(
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
 	var terms: String = "",
-	var currentETCTestChainName: String,
-	var currentETHERC20AndETCTestChainName: String,
-	var currentBTCTestChainName: String,
-	var currentETCChainName: String,
-	var currentBTCChainName: String,
-	var currentETHERC20AndETCChainName: String,
+	var currentETCTestChainNameID: Int,
+	var currentETHERC20AndETCTestChainNameID: Int,
+	var currentBTCTestChainNameID: Int,
+	var currentETCChainNameID: Int,
+	var currentBTCChainNameID: Int,
+	var currentETHERC20AndETCChainNameID: Int,
 	var defaultCoinListMD5: String
 ) {
 
@@ -209,9 +209,9 @@ data class AppConfigTable(
 
 		fun updateChainInfo(
 			isMainnet: Boolean,
-			etcChainName: String,
-			ethERC20AndETCChainName: String,
-			btcChainName: String,
+			etcChainNameID: Int,
+			ethERC20AndETCChainNameID: Int,
+			btcChainNameID: Int,
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -220,13 +220,13 @@ data class AppConfigTable(
 						update(it[0].apply {
 							this.isMainnet = isMainnet
 							if (isMainnet) {
-								currentBTCChainName = btcChainName
-								currentETCChainName = etcChainName
-								currentETHERC20AndETCChainName = ethERC20AndETCChainName
+								currentBTCChainNameID = btcChainNameID
+								currentETCChainNameID = etcChainNameID
+								currentETHERC20AndETCChainNameID = ethERC20AndETCChainNameID
 							} else {
-								currentBTCTestChainName = btcChainName
-								currentETCTestChainName = etcChainName
-								currentETHERC20AndETCTestChainName = ethERC20AndETCChainName
+								currentBTCTestChainNameID = btcChainNameID
+								currentETCTestChainNameID = etcChainNameID
+								currentETHERC20AndETCTestChainNameID = ethERC20AndETCChainNameID
 							}
 						})
 						GoldStoneAPI.context.runOnUiThread {
@@ -285,12 +285,12 @@ data class AppConfigTable(
 							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 							terms = getLocalTerms(),
 							isMainnet = true,
-							currentBTCChainName = ChainText.btcMain,
-							currentETCChainName = ChainText.etcMainGasTracker,
-							currentETHERC20AndETCChainName = ChainText.infuraMain,
-							currentBTCTestChainName = ChainText.btcTest,
-							currentETCTestChainName = ChainText.etcMorden,
-							currentETHERC20AndETCTestChainName = ChainText.infuraRopsten,
+							currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
+							currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
+							currentETHERC20AndETCChainNameID = ChainNameID.InfuraETHMain.id,
+							currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
+							currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
+							currentETHERC20AndETCTestChainNameID = ChainNameID.InfuraRopsten.id,
 							defaultCoinListMD5 = ""
 						)
 					)

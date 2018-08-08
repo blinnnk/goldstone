@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.value.Config
  * @author KaySaith
  */
 object SolidityCode {
-	
+
 	const val contractTransfer = "0xa9059cbb"
 	const val ethTransfer = "0x"
 	const val ethCall = "0x95d89b41000000000000000000000000"
@@ -61,7 +61,7 @@ object CryptoValue {
 	}
 	val isToken: (contract: String) -> Boolean = {
 		(!it.equals(ethContract, true)
-		 && !it.equals(etcContract, true))
+			&& !it.equals(etcContract, true))
 	}
 	val pathCointType: (path: String) -> Int = {
 		it.replace("'", "").split("/")[2].toInt()
@@ -70,12 +70,12 @@ object CryptoValue {
 	val isBTCTest: (pathCointType: Int) -> Boolean = {
 		it == 1
 	}
-	
+
 	enum class PrivateKeyType(val content: String) {
 		ETHERCAndETC("ETH, ERC20 And ETC"),
 		BTC("BTC"),
 		BTCTest("BTC Test");
-		
+
 		companion object {
 			fun getTypeByContent(content: String): PrivateKeyType {
 				return when (content) {
@@ -91,9 +91,28 @@ object CryptoValue {
 object CryptoSymbol {
 	const val eth = "ETH"
 	const val etc = "ETC"
-	const val btc = "BTC"
+	val btc: () -> String = {
+		if (Config.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
+	}
+	const val pureBTCSymbol = "BTC"
 	const val ltc = "LTC"
 	const val erc = "ERC"
+
+	fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
+		return if (
+			symbol.contains("BTC", true) &&
+			Config.getYingYongBaoInReviewStatus()
+		) "B.C." + if (isTest) " Test" else ""
+		else symbol
+	}
+
+	fun updateNameIfInReview(name: String): String {
+		return if (
+			name.contains("Bitcoin", true) &&
+			Config.getYingYongBaoInReviewStatus()
+		) "Bitc."
+		else name
+	}
 }
 
 object CryptoName {

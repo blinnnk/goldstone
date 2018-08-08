@@ -11,9 +11,9 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -67,6 +67,7 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 			typeface = GoldStoneFont.medium(context)
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 			x = PaddingSize.device.toFloat()
+			y -= 3.uiPX()
 		}
 	}
 	

@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.*
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -19,7 +19,9 @@ import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
@@ -71,7 +73,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						}
 						setTitles(ImportWalletText.walletType, currentType)
 					}
-					.click {
+					.click { _ ->
 						PrivateKeyImportFragment.showWalletTypeDashboard(
 							this@KeystoreImportFragment,
 							currentType

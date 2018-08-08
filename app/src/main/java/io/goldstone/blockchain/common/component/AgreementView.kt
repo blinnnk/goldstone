@@ -12,9 +12,9 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize

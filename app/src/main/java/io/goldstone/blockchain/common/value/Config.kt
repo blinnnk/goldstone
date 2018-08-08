@@ -234,9 +234,16 @@ object Config {
 	fun updateGoldStoneID(goldStoneID: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.goldStoneID, goldStoneID)
 
+	// Configs For Review Or UpdateDatabase ETC.
 	fun getneedUnregisterGoldStoneID(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.unregisterGoldStoneID)
 
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.unregisterGoldStoneID, goldStoneID)
+
+	fun getYingYongBaoInReviewStatus(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.yingYongBaoInReview)
+
+	fun updateYingYongBaoInReviewStatus(status: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
 }

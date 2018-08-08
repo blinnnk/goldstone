@@ -11,11 +11,11 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.component.button.RoundButtonWithIcon
 import io.goldstone.blockchain.common.component.button.StoneButton
-import io.goldstone.blockchain.common.component.UnlimitedAvatar
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*

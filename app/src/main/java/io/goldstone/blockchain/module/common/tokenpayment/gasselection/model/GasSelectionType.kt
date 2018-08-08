@@ -17,7 +17,7 @@ data class GasSelectionModel(
 	var currentType: String = "",
 	val unitSymbol: String = CryptoSymbol.eth
 ) {
-	
+
 	constructor(
 		id: Int,
 		gWei: Double,
@@ -32,7 +32,7 @@ data class GasSelectionModel(
 		currentType,
 		unitSymbol
 	)
-	
+
 	constructor(
 		id: Int,
 		price: Long, // Satoshi
@@ -40,13 +40,13 @@ data class GasSelectionModel(
 		currentType: String
 	) : this(
 		id,
-		"${(price * bytes).toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		"${(price * bytes).toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
 		"≈ $price Satoshi  * $bytes bytes",
 		calculateBTCType(id, price),
 		currentType,
-		CryptoSymbol.btc
+		CryptoSymbol.btc()
 	)
-	
+
 	companion object {
 		fun calculateType(id: Int, gWei: Double): String {
 			return if (id == 3) MinerFeeType.Custom.content
@@ -59,7 +59,7 @@ data class GasSelectionModel(
 				}
 			}
 		}
-		
+
 		fun calculateBTCType(id: Int, satoshi: Long): String {
 			return if (id == 3) MinerFeeType.Custom.content
 			else {

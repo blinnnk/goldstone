@@ -4,10 +4,10 @@ import android.support.v4.app.Fragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment

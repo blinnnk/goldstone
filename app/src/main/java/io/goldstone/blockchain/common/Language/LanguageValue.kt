@@ -11,26 +11,26 @@ enum class HoneyLanguage(
 	val language: String,
 	val symbol: String
 ) {
-	
+
 	English(0, "English", "EN"),
 	Chinese(1, "简体中文", "ZH"),
 	Japanese(2, "日本語", "JA"),
 	Russian(3, "Русский язык", "RU"),
 	Korean(4, "한국어", "KO"),
 	TraditionalChinese(5, "繁體中文", "TC");
-	
+
 	companion object {
-		
+
 		fun currentLanguageIsSupported(): Boolean {
-			return Config.getCurrentLanguageCode() in 0 .. 5
+			return Config.getCurrentLanguageCode() in 0..5
 		}
-		
+
 		fun getPluralLanguageCode(): ArrayList<Int> {
 			return arrayListOf(
 				English.code
 			)
 		}
-		
+
 		fun getLanguageCode(language: String): Int {
 			return when (language) {
 				English.language -> English.code
@@ -42,7 +42,7 @@ enum class HoneyLanguage(
 				else -> 100
 			}
 		}
-		
+
 		fun getLanguageByCode(code: Int): String {
 			return when (code) {
 				English.code -> English.language
@@ -54,7 +54,7 @@ enum class HoneyLanguage(
 				else -> ""
 			}
 		}
-		
+
 		fun getLanguageSymbol(code: Int): String {
 			return when (code) {
 				English.code -> English.symbol
@@ -66,7 +66,7 @@ enum class HoneyLanguage(
 				else -> ""
 			}
 		}
-		
+
 		fun getCodeBySymbol(symbol: String): Int {
 			return when (symbol.toUpperCase()) {
 				English.symbol -> English.code
@@ -76,6 +76,14 @@ enum class HoneyLanguage(
 				Korean.symbol -> Korean.code
 				TraditionalChinese.symbol -> TraditionalChinese.code
 				else -> 100
+			}
+		}
+
+		val bitcoinPrefix: (isYingYongBao: Boolean) -> String = {
+			when (currentLanguage) {
+				HoneyLanguage.English.code -> if (it) "Bitc." else "Bitcoin"
+				HoneyLanguage.Chinese.code -> if (it) "B.C." else "比特币"
+				else -> "Bitcoin"
 			}
 		}
 	}

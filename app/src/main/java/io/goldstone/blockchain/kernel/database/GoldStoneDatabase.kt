@@ -45,7 +45,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun bitcoinTransactionDao(): BitcoinTransactionDao
 	
 	companion object {
-		const val databaseVersion = 4
+		const val databaseVersion = 5
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 		

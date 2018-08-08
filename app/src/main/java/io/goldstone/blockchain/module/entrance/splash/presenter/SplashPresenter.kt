@@ -96,15 +96,16 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	// 获取当前的汇率
-	fun updateCurrencyRateFromServer(
-		config: AppConfigTable
-	) {
+	fun updateCurrencyRateFromServer(config: AppConfigTable) {
 		doAsync {
 			Config.updateCurrencyCode(config.currencyCode)
-			GoldStoneAPI.getCurrencyRate(config.currencyCode, {
-				LogUtil.error("Request of get currency rate has error")
-			}) {
-				// 更新内存中的值
+			GoldStoneAPI.getCurrencyRate(
+				config.currencyCode,
+				{
+					LogUtil.error("Request of get currency rate has error")
+				}
+			) {
+				// 更新 `SharePreference` 中的值
 				Config.updateCurrentRate(it)
 				// 更新数据库的值
 				SupportCurrencyTable.updateUsedRateValue(it)

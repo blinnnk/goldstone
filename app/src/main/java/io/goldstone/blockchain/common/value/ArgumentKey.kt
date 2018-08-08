@@ -67,4 +67,5 @@ object SharesPreference {
 	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
+	const val yingYongBaoInReview = "yingYongBaoInReview"
 }

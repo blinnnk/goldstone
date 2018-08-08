@@ -6,8 +6,8 @@ import android.graphics.Paint
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.component.button.RoundBorderButton
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent

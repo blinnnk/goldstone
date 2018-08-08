@@ -3,13 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable

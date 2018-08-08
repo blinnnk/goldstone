@@ -23,7 +23,7 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 		)
 		updateHeaderValue(headerData)
 		headerModel = headerData
-		if (token.symbol.equals(CryptoSymbol.btc, true)) {
+		if (token.symbol.equals(CryptoSymbol.btc(), true)) {
 			observerBTCTransaction()
 		} else {
 			// 监听 `ETH, ERC20 or ETC` 的转账状态

@@ -3,11 +3,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.utils.*
@@ -278,7 +278,7 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 fun GasSelectionPresenter.getUnitSymbol(): String {
 	return when {
 		getToken()?.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-		getToken()?.symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+		getToken()?.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
 		else -> CryptoSymbol.eth
 	}
 }

@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -33,7 +33,7 @@ class NotificationListFragment :
 					} else {
 						val fromAddress: String
 						val toAddress: String
-						if (NotificationTable.getSymbol(extra.orEmpty()).equals(CryptoSymbol.btc, true)) {
+						if (NotificationTable.getSymbol(extra.orEmpty()).equals(CryptoSymbol.btc(), true)) {
 							// TODO Bitcoin Transaction FromAddress 需要处理多 FromAddress 地址的情况
 							fromAddress =
 								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address

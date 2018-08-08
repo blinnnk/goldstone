@@ -10,9 +10,9 @@ import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize

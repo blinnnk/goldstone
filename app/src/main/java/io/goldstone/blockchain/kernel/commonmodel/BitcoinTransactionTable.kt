@@ -161,7 +161,7 @@ data class BitcoinSeriesTransactionTable(
 			transaction: BitcoinSeriesTransactionTable
 		) {
 			GoldStoneDataBase.database.bitcoinTransactionDao().apply {
-				if(getTransactionByHash(hash, isFee).isNull()) {
+				if (getTransactionByHash(hash, isFee).isNull()) {
 					insert(transaction)
 				}
 			}

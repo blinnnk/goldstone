@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.language
 
+import io.goldstone.blockchain.crypto.CryptoSymbol
+
 /**
  * @date 2018/8/8 2:16 AM
  * @author KaySaith
@@ -18,8 +20,8 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val containsBTCTest = when (currentLanguage) {
-		HoneyLanguage.English.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.Chinese.code -> "(包含 BTC 测试链地址)"
+		HoneyLanguage.English.code -> "(Contains ${CryptoSymbol.btc()} Test Address)"
+		HoneyLanguage.Chinese.code -> "(包含  ${CryptoSymbol.btc()} 测试链地址)"
 		HoneyLanguage.Japanese.code -> "(BTCテストチェーンアドレスが含まれています)"
 		HoneyLanguage.Korean.code -> "(BTC 테스트 체인 주소가 들어 있습니다)"
 		HoneyLanguage.Russian.code -> "(Contains BTC Test Address)"
@@ -73,12 +75,12 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val newBTCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New BTC Address"
-		HoneyLanguage.Chinese.code -> "新的BTC地址"
-		HoneyLanguage.Japanese.code -> "新しいBTCアドレス"
-		HoneyLanguage.Korean.code -> "새로운 BTC 주소"
+		HoneyLanguage.English.code -> "New ${CryptoSymbol.btc()} Address"
+		HoneyLanguage.Chinese.code -> "新的${CryptoSymbol.btc()}地址"
+		HoneyLanguage.Japanese.code -> "新しい${CryptoSymbol.btc()}アドレス"
+		HoneyLanguage.Korean.code -> "새로운 ${CryptoSymbol.btc()} 주소"
 		HoneyLanguage.Russian.code -> "Новый адрес BTC"
-		HoneyLanguage.TraditionalChinese.code -> "新的BTC地址"
+		HoneyLanguage.TraditionalChinese.code -> "新的${CryptoSymbol.btc()}地址"
 		else -> ""
 	}
 	@JvmField
@@ -272,14 +274,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Bitcoin Address"
-		HoneyLanguage.Chinese.code -> "比特币地址"
-		HoneyLanguage.Japanese.code -> "Bitcoinアドレス"
-		HoneyLanguage.Korean.code -> "비트 코인 주소"
-		HoneyLanguage.Russian.code -> "Адрес биткойна"
-		HoneyLanguage.TraditionalChinese.code -> "比特幣地址"
-		else -> ""
+	val bitcoinAddress: (isYingYongBao: Boolean) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix(it)} Address"
+			HoneyLanguage.Chinese.code -> "${HoneyLanguage.bitcoinPrefix(it)} 地址"
+			HoneyLanguage.Japanese.code -> "${HoneyLanguage.bitcoinPrefix(it)} アドレス"
+			HoneyLanguage.Korean.code -> "비트 코인 주소"
+			HoneyLanguage.Russian.code -> "Адрес биткойна"
+			HoneyLanguage.TraditionalChinese.code -> "比特幣地址"
+			else -> ""
+		}
 	}
 
 	@JvmField

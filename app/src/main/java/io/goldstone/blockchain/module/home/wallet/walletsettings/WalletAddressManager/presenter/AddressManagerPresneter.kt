@@ -4,14 +4,16 @@ import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
@@ -67,9 +69,9 @@ class AddressManagerPresneter(
 				arrayListOf<Pair<String, String>>().apply {
 					// 如果是测试环境展示 `BTCTest Address`
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBTCAddress, CryptoSymbol.btc))
+						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
 					} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCTestAddress, CryptoSymbol.btc))
+						add(Pair(currentBTCTestAddress, CryptoSymbol.btc()))
 					}
 					if (currentETHAndERCAddress.isNotEmpty()) {
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
@@ -113,55 +115,6 @@ class AddressManagerPresneter(
 		)
 	}
 
-	fun showPrivateKeyExportFragment(address: String) {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment.context)
-			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
-				WalletSettingsText.exportPrivateKey,
-				WalletSettingsText.viewAddresses,
-				Bundle().apply { putString(ArgumentKey.address, address) }
-			)
-		}
-	}
-
-	fun showBTCPrivateKeyExportFragment(address: String) {
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment.context)
-			showTargetFragment<PrivateKeyExportFragment, WalletSettingsFragment>(
-				WalletSettingsText.exportPrivateKey,
-				WalletSettingsText.viewAddresses,
-				Bundle().apply {
-					putString(ArgumentKey.address, address)
-					putBoolean(ArgumentKey.isBTCAddress, true)
-				}
-			)
-		}
-	}
-
-	fun showKeystoreExportFragment(address: String) {
-		// 这个页面不限时 `Header` 上的加号按钮
-		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
-		WalletTable.isWatchOnlyWalletShowAlertOrElse(fragment.context!!) {
-			AddressManagerFragment.removeDashboard(fragment.context)
-			showTargetFragment<KeystoreExportFragment, WalletSettingsFragment>(
-				WalletSettingsText.exportKeystore,
-				WalletSettingsText.viewAddresses,
-				Bundle().apply { putString(ArgumentKey.address, address) }
-			)
-		}
-	}
-
-	fun showQRCodeFragment(address: String) {
-		// 这个页面不限时 `Header` 上的加号按钮
-		fragment.getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
-		AddressManagerFragment.removeDashboard(fragment.context)
-		showTargetFragment<QRCodeFragment, WalletSettingsFragment>(
-			WalletText.showQRCode,
-			WalletSettingsText.viewAddresses,
-			Bundle().apply { putString(ArgumentKey.address, address) }
-		)
-	}
-
 	fun showAllETHAndERCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
@@ -193,6 +146,55 @@ class AddressManagerPresneter(
 	}
 
 	companion object {
+
+		fun showPrivateKeyExportFragment(
+			address: String,
+			isBTC: Boolean,
+			walletSettingsFragment: WalletSettingsFragment
+		) {
+			walletSettingsFragment.apply {
+				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+					AddressManagerFragment.removeDashboard(context)
+					presenter.showTargetFragment<PrivateKeyExportFragment>(
+						WalletSettingsText.exportPrivateKey,
+						WalletSettingsText.viewAddresses,
+						Bundle().apply {
+							putString(ArgumentKey.address, address)
+							if (isBTC) putBoolean(ArgumentKey.isBTCAddress, true)
+						}
+					)
+				}
+			}
+
+		}
+
+		fun showQRCodeFragment(address: String, walltSettingsFragment: WalletSettingsFragment) {
+			walltSettingsFragment.apply {
+				// 这个页面不限时 `Header` 上的加号按钮
+				showAddButton(false)
+				AddressManagerFragment.removeDashboard(context)
+				presenter.showTargetFragment<QRCodeFragment>(
+					WalletText.showQRCode,
+					WalletSettingsText.viewAddresses,
+					Bundle().apply { putString(ArgumentKey.address, address) }
+				)
+			}
+		}
+
+		fun showKeystoreExportFragment(address: String, walltSettingsFragment: WalletSettingsFragment) {
+			walltSettingsFragment.apply {
+				// 这个页面不限时 `Header` 上的加号按钮
+				showAddButton(false)
+				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+					AddressManagerFragment.removeDashboard(context)
+					presenter.showTargetFragment<KeystoreExportFragment>(
+						WalletSettingsText.exportKeystore,
+						WalletSettingsText.viewAddresses,
+						Bundle().apply { putString(ArgumentKey.address, address) }
+					)
+				}
+			}
+		}
 
 		fun createETHAndERCAddress(
 			context: Context,
@@ -290,7 +292,7 @@ class AddressManagerPresneter(
 								)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
-									CryptoSymbol.btc,
+									CryptoSymbol.btc(),
 									CryptoValue.btcContract,
 									address,
 									ChainID.BTCMain.id
@@ -342,7 +344,7 @@ class AddressManagerPresneter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.btc,
+								CryptoSymbol.btc(),
 								CryptoValue.btcContract,
 								address,
 								ChainID.BTCTest.id

@@ -13,8 +13,10 @@ import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**

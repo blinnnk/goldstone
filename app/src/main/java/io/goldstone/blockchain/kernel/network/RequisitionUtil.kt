@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
@@ -10,6 +11,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
+import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -123,8 +125,8 @@ object RequisitionUtil {
 		keyName: String,
 		justGetData: Boolean = false,
 		crossinline errorCallback: (Exception) -> Unit,
-		targetGoldStoneID: String = "",
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		targetGoldStoneID: String? = null,
+		isEncrypt: Boolean,
 		maxConnectTime: Long = 20,
 		crossinline hold: List<T>.() -> Unit
 	) {
@@ -244,6 +246,7 @@ object RequisitionUtil {
 			.addHeader("os", "0")
 			.addHeader("version", version)
 			.addHeader("sign", sign)
+			.addHeader("channel", currentChannel.value)
 			.build()
 	}
 
@@ -276,15 +279,15 @@ object RequisitionUtil {
 
 	fun getcryptGetRequest(
 		api: String,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
-		targetGoldStoneID: String = "",
+		isEncrypt: Boolean,
+		targetGoldStoneID: String? = null,
 		hold: (Request) -> Unit
 	) {
 		when {
-			isEncrypt && targetGoldStoneID.isEmpty() -> AppConfigTable.getAppConfig {
+			isEncrypt && targetGoldStoneID.isNullOrBlank() -> AppConfigTable.getAppConfig {
 				it?.apply { hold(generateRequest(api, goldStoneID, null)) }
 			}
-			targetGoldStoneID.isNotEmpty() -> {
+			targetGoldStoneID?.count().orZero() > 0 -> {
 				hold(generateRequest(api, Config.getGoldStoneID(), null))
 			}
 			else -> {
@@ -348,9 +351,13 @@ object RequisitionUtil {
 
 	private fun checkChainErrorCode(data: String?): String {
 		val hasError = data?.contains("error")
-		val errorData: String
-		if (hasError == true) {
-			errorData = JSONObject(data).safeGet("error")
+		val errorData = if (hasError == true) {
+			try {
+				JSONObject(data).safeGet("error")
+			} catch (error: Exception) {
+				LogUtil.error("checkChainErrorCode", error)
+				""
+			}
 		} else {
 			val code =
 				if (data?.contains("code") == true)

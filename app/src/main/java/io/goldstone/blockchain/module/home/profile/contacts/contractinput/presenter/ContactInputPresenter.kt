@@ -11,8 +11,8 @@ import com.blinnnk.util.getParentFragment
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.language.ContactText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.bitcoin.AddressType

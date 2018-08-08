@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.home.view.MainActivity

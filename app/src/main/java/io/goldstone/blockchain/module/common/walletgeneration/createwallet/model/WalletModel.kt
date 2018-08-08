@@ -5,11 +5,11 @@ import android.content.Context
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -74,7 +74,7 @@ data class WalletTable(
 
 		fun getAddressBySymbol(symbol: String?): String {
 			return when {
-				symbol.equals(CryptoSymbol.btc, true) -> {
+				symbol.equals(CryptoSymbol.btc(), true) -> {
 					if (Config.isTestEnvironment()) {
 						Config.getCurrentBTCTestAddress()
 					} else {

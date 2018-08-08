@@ -69,7 +69,8 @@ object GoldStoneAPI {
 				),
 				"",
 				true,
-				errorCallback
+				errorCallback,
+				isEncrypt = true
 			) {
 				val data = JSONObject(this[0])
 				val defaultTokens = data.safeGet("data")
@@ -164,7 +165,8 @@ object GoldStoneAPI {
 			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			isEncrypt = true
 		) {
 			val data = JSONObject(this[0])
 			val hasNewVersion =
@@ -191,7 +193,8 @@ object GoldStoneAPI {
 			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
 			"rate",
 			true,
-			errorCallback
+			errorCallback,
+			isEncrypt = true
 		) {
 			this[0].isNotNull { hold(this[0].toDouble()) }
 		}
@@ -207,7 +210,8 @@ object GoldStoneAPI {
 			APIPath.terms(APIPath.currentUrl) + md5,
 			"",
 			true,
-			errorCallback
+			errorCallback,
+			isEncrypt = true
 		) {
 			hold(JSONObject(this[0]).safeGet("result"))
 		}
@@ -240,7 +244,8 @@ object GoldStoneAPI {
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			true,
-			errorCallback
+			errorCallback,
+			isEncrypt = true
 		) {
 			this[0].isNotNull {
 				hold(ShareContentModel(JSONObject(this[0])))

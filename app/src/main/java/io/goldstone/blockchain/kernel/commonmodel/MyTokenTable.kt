@@ -116,6 +116,7 @@ data class MyTokenTable(
 		fun getTokenBalance(
 			contract: String,
 			walletAddress: String,
+			convertByDecimal: Boolean = true,
 			callback: (Double?) -> Unit
 		) {
 			load {
@@ -129,8 +130,14 @@ data class MyTokenTable(
 			} then { token ->
 				if (token.isNull()) callback(null)
 				else {
-					DefaultTokenTable.getCurrentChainToken(contract) {
-						callback(CryptoUtils.toCountByDecimal(token!!.balance, it!!.decimals))
+					if (!convertByDecimal) {
+						callback(token!!.balance)
+					} else {
+						DefaultTokenTable.getCurrentChainToken(contract) {
+							it?.apply {
+								callback(CryptoUtils.toCountByDecimal(token!!.balance, it.decimals))
+							}
+						}
 					}
 				}
 			}

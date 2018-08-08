@@ -79,7 +79,7 @@ class TokenManagementListPresenter(
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) {
 							sortedList.filterNot {
-								it.symbol.equals(CryptoSymbol.btc, true)
+								it.symbol.equals(CryptoSymbol.btc(), true)
 							}.let {
 								memoryTokenData = it.toArrayList()
 							}

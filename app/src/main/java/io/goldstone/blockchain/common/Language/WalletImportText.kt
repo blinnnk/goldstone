@@ -27,14 +27,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val customBitcoinPath = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Custom Bitcoin Path"
-		HoneyLanguage.Chinese.code -> "自定义BTC路径"
-		HoneyLanguage.Japanese.code -> "カスタムBTCパス"
-		HoneyLanguage.Korean.code -> "사용자 정의 BTC 경로"
-		HoneyLanguage.Russian.code -> "Пользовательский путь BTC"
-		HoneyLanguage.TraditionalChinese.code -> "自定義BTC路徑"
-		else -> ""
+	val customBitcoinPath: (isYingYongBao: Boolean) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix(it)} Path"
+			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix(it)} 路径"
+			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix(it)} パス"
+			HoneyLanguage.Korean.code -> "사용자 정의 ${HoneyLanguage.bitcoinPrefix(it)} 경로"
+			HoneyLanguage.Russian.code -> "Пользовательский путь ${HoneyLanguage.bitcoinPrefix(it)}"
+			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix(it)} 路徑"
+			else -> ""
+		}
 	}
 	@JvmField
 	val customEthereumPath = when (currentLanguage) {
@@ -47,14 +49,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val customBTCTestPath = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Custom Bitcoin Test Path"
-		HoneyLanguage.Chinese.code -> "自定义BTC测试路径"
-		HoneyLanguage.Japanese.code -> "カスタムBTCテストパス"
-		HoneyLanguage.Korean.code -> "사용자 지정 BTC 테스트 경로"
-		HoneyLanguage.Russian.code -> "Пользовательский тестовый путь BTC"
-		HoneyLanguage.TraditionalChinese.code -> "自定義BTC測試路徑"
-		else -> ""
+	val customBTCTestPath: (isYingYongBao: Boolean) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix(it)} Test Path"
+			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix(it)} 测试路径"
+			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix(it)} テストパス"
+			HoneyLanguage.Korean.code -> "사용자 지정 ${HoneyLanguage.bitcoinPrefix(it)} 테스트 경로"
+			HoneyLanguage.Russian.code -> "Пользовательский тестовый путь ${HoneyLanguage.bitcoinPrefix(it)}"
+			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix(it)} 測試路徑"
+			else -> ""
+		}
 	}
 	@JvmField
 	val customEthereumClassicPath = when (currentLanguage) {

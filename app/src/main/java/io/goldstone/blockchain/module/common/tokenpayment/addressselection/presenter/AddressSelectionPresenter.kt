@@ -58,7 +58,7 @@ class AddressSelectionPresenter(
 				}
 			} else {
 				when {
-					token?.symbol.equals(CryptoSymbol.btc, true) -> {
+					token?.symbol.equals(CryptoSymbol.btc(), true) -> {
 						DepositPresenter.convertBitcoinQRCode(result).let {
 							isCorrectCoinOrChainID(it) {
 								showPaymentPrepareFragment(it.walletAddress, it.amount)
@@ -113,7 +113,7 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.ETHERCOrETC -> {
-				if (token?.symbol.equals(CryptoSymbol.btc, true)) {
+				if (token?.symbol.equals(CryptoSymbol.btc(), true)) {
 					fragment.context.alert(
 						"this is not a valid bitcoin address"
 					)
@@ -132,7 +132,7 @@ class AddressSelectionPresenter(
 							"setting in settings first"
 					)
 					return
-				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
+				} else if (!token?.symbol.equals(CryptoSymbol.btc(), true)) {
 					fragment.context.alert(
 						"This is a invalid address type, Please check it agin"
 					)
@@ -151,7 +151,7 @@ class AddressSelectionPresenter(
 							"setting in settings first"
 					)
 					return
-				} else if (!token?.symbol.equals(CryptoSymbol.btc, true)) {
+				} else if (!token?.symbol.equals(CryptoSymbol.btc(), true)) {
 					fragment.context.alert(
 						"This is a invalid address type, Please check it agin"
 					)
@@ -179,22 +179,6 @@ class AddressSelectionPresenter(
 
 	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
 		when {
-			token?.symbol.equals(CryptoSymbol.eth, true) -> {
-				when {
-					!qrModel.contractAddress.equals(CryptoValue.ethContract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
-
-					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
-			}
-
 			token?.symbol.equals(CryptoSymbol.etc, true) -> {
 				when {
 					!qrModel.contractAddress.equals(CryptoValue.etcContract, true) -> {
@@ -211,7 +195,7 @@ class AddressSelectionPresenter(
 				}
 			}
 
-			token?.symbol.equals(CryptoSymbol.btc, true) -> {
+			token?.symbol.equals(CryptoSymbol.btc(), true) -> {
 				when {
 					!qrModel.contractAddress.equals(CryptoValue.btcContract, true) -> {
 						fragment.context.alert(QRText.invalidContract)
@@ -294,7 +278,7 @@ class AddressSelectionPresenter(
 			} otherwise {
 				if (fragment.asyncData.isNullOrEmpty()) {
 					// 根据当前的 `Coin Type` 来选择展示地址的哪一项
-					fragment.asyncData = if (token?.symbol.equals(CryptoSymbol.btc, true)) {
+					fragment.asyncData = if (token?.symbol.equals(CryptoSymbol.btc(), true)) {
 						contacts.map {
 							it.apply {
 								defaultAddress =

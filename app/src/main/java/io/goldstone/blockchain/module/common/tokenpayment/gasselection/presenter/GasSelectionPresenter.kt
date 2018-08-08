@@ -6,13 +6,15 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -161,7 +163,7 @@ class GasSelectionPresenter(
 	}
 	
 	private fun isBTC(): Boolean {
-		return getToken()?.symbol.equals(CryptoSymbol.btc, true)
+		return getToken()?.symbol.equals(CryptoSymbol.btc(), true)
 	}
 	
 	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {

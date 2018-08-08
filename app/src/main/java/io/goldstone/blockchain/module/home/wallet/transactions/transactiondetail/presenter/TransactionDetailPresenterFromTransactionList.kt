@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -31,7 +31,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 
 		when {
-			symbol.equals(CryptoSymbol.btc, true) -> {
+			symbol.equals(CryptoSymbol.btc(), true) -> {
 				dataFromList?.let {
 					fragment.asyncData = generateModels(it)
 					updateHeaderValue(headerData)
