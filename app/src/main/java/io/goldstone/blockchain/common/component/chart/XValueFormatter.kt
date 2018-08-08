@@ -5,6 +5,7 @@ import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import io.goldstone.blockchain.common.utils.TimeUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,8 +16,6 @@ import java.util.*
  */
 
 class XValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormatter {
-  
-  private val simpleDateFormat = SimpleDateFormat("M/d")
 	
   override fun getFormattedValue(value: Float, axis: AxisBase): String {
     val position = value.toInt()
@@ -31,11 +30,11 @@ class XValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormat
     val entry = values[position]
 		if ((entry.data is Long)) {
 			if (entry.data == 0) return ""
-			return simpleDateFormat.format(Date(entry.data as Long))
+			return TimeUtils.formatMdDate(entry.data as Long)
 		}
 		if (entry.data is String) {
 			if ((entry.data as String).isEmpty()) return ""
-			return simpleDateFormat.format(Date((entry.data as String).toLong()))
+			return TimeUtils.formatMdDate((entry.data as String).toLong())
 		}
 		
 		return ""

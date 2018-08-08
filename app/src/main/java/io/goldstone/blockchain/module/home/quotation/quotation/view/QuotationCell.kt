@@ -97,6 +97,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 	
 	private val blinnnkLineChart = object : LineChart(context) {
+		override fun dragEnable(): Boolean = false
+		
+		override fun touchEnable(): Boolean = false
+		
 		override fun isDrawPoints(): Boolean = false
 
 		override fun isPerformBezier(): Boolean = true

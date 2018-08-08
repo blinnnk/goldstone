@@ -18,20 +18,20 @@ import io.goldstone.blockchain.common.component.chart.XValueFormatter
  */
 class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 	
-  private val labelColor = Color.rgb(152, 152, 152)
-  private val shadowColor = Color.DKGRAY // 蜡烛柄颜色
-  private val decreasingColor = Color.rgb(219, 74, 76)
-  private val increasingColor = Color.rgb(67, 200, 135)
-  private val labelCount = 9
-  private val labelRotationAngle = 320f
+  private var labelColor = Color.rgb(152, 152, 152)
+  private var shadowColor = Color.DKGRAY // 蜡烛柄颜色
+  private var decreasingColor = Color.rgb(219, 74, 76)
+  private var increasingColor = Color.rgb(67, 200, 135)
+  private var labelCount = 9
+  private var labelRotationAngle = 320f
   
-  private val neutralColor = Color.BLUE
-  private val barSpace = 0.2f
-  private val shadowWidth = 2f // 蜡烛柄宽度
+  private var neutralColor = Color.BLUE
+  private var barSpace = 0.2f
+  private var shadowWidth = 2f // 蜡烛柄宽度
   
-  private val xRangeVisibleNum = 20f
+  private var xRangeVisibleNum = 20f
   
-  private val xAxisSpace = 0.5f
+  private var xAxisSpace = 0.5f
   
   private lateinit var blinnnkXValueFormatter: XValueFormatter
   
@@ -57,32 +57,15 @@ class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
     blinnnkMarkerView.setChartView(this)
   
     blinnnkXValueFormatter = XValueFormatter(this@CandleStickChart)
-    mXAxisRenderer = XAxisRenderer(mViewPortHandler,
-      mXAxis,
-      mLeftAxisTransformer)
+    mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
     mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
     
-    post {
-      resetAxisStyle()
-      setEmptyData()
-    }
+		resetAxisStyle()
+		post {
+			setEmptyData()
+		}
+  
     
-  }
-  
-  private val getLeftRunnable = object: Runnable {
-    override fun run() {
-      isGetLeftZero = false
-    }
-  }
-  
-	
-  fun notifyData(dataRows: List<CandleEntry>) {
-    setEmptyData()
-    postDelayed(object : Runnable{
-      override fun run() {
-        resetData(dataRows)
-      }
-    },500)
   }
   
   private fun resetData(dataRows: List<CandleEntry>) {
@@ -113,13 +96,26 @@ class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
     val data = CandleData(dataSet)
     
     setData(data)
-    setVisibleXRangeMaximum(this@CandleStickChart.xRangeVisibleNum)
-    setVisibleXRangeMinimum(this@CandleStickChart.xRangeVisibleNum)
+    setVisibleXRangeMaximum(xRangeVisibleNum)
+    setVisibleXRangeMinimum(xRangeVisibleNum)
     invalidate()
   }
   
   private fun resetAxisStyle() {
-    
+	
+		// 初始化一些属性
+		labelColor = Color.rgb(152, 152, 152)
+		shadowColor = Color.DKGRAY // 蜡烛柄颜色
+		decreasingColor = Color.rgb(219, 74, 76)
+		increasingColor = Color.rgb(67, 200, 135)
+		labelCount = 9
+		labelRotationAngle = 320f
+		neutralColor = Color.BLUE
+		barSpace = 0.2f
+		shadowWidth = 2f // 蜡烛柄宽度
+		xRangeVisibleNum = 20f
+		xAxisSpace = 0.5f
+		
     setScaleEnabled(false)
     setPinchZoom(true)
     isDragEnabled = true
