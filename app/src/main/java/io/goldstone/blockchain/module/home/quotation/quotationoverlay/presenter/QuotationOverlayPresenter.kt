@@ -5,6 +5,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
@@ -22,7 +23,13 @@ class QuotationOverlayPresenter(
 	fun showQutationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
 	}
-	
+
+	fun showMarketTokenCenter(model: QuotationModel?) {
+		fragment.addFragmentAndSetArgument<MarketTokenCenterFragment>(ContainerID.content) {
+			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
+		}
+	}
+
 	fun showMarketTokenDetailFragment(model: QuotationModel?) {
 		fragment.addFragmentAndSetArgument<MarketTokenDetailFragment>(ContainerID.content) {
 			putSerializable(ArgumentKey.quotationCurrencyDetail, model)

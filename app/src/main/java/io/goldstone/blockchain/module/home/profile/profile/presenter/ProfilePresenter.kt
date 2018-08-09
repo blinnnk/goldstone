@@ -7,10 +7,7 @@ import android.net.Uri
 import android.os.Environment
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.CheckPermission
-import com.blinnnk.util.FixTextLength
-import com.blinnnk.util.PermissionCategory
-import com.blinnnk.util.SystemUtils
+import com.blinnnk.util.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
@@ -38,9 +35,9 @@ import org.jetbrains.anko.runOnUiThread
 class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
-	
+
 	private var version = ""
-	
+
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
 			val data = arrayListOf(
@@ -94,7 +91,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-	
+
 	fun showTargetFragment(title: String) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.profileOverlay) isFalse {
@@ -111,11 +108,11 @@ class ProfilePresenter(
 			}
 		}
 	}
-	
+
 	private var newVersionDescription = ""
 	private var newVersionName = ""
 	private var newVersionUrl = ""
-	
+
 	fun showUpgradeDialog() {
 		fragment.context?.let {
 			GoldStoneDialog.show(it) {
@@ -130,7 +127,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-	
+
 	private fun checkVersion() {
 		fragment.context?.let { context ->
 			GoldStoneAPI.getNewVersionOrElse { versionModel ->
@@ -149,7 +146,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-	
+
 	private fun downloadNewVersion(callback: () -> Unit) {
 		object : CheckPermission(fragment.activity) {
 			override var permissionType = PermissionCategory.Write
@@ -160,7 +157,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-	
+
 	private fun download(url: String, title: String, description: String) {
 		val request = DownloadManager.Request(Uri.parse(url)).apply {
 			setDescription(description)
@@ -173,7 +170,7 @@ class ProfilePresenter(
 		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 		manager.enqueue(request)
 	}
-	
+
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
 		fun getShareContentThenShowView(content: String) {
@@ -184,14 +181,14 @@ class ProfilePresenter(
 			intent.type = "text/plain"
 			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 		}
-		
+
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				getShareContentThenShowView(shareContent)
 			}
 		}
 	}
-	
+
 	// 这个方法是为了内部使用的隐藏方法
 	private var clickTimes = 10
 	private var hasShownGoldStoneID = false
@@ -202,11 +199,12 @@ class ProfilePresenter(
 			AppConfigTable.getAppConfig {
 				it?.apply {
 					fragment.context.alert(it.goldStoneID)
+					fragment.context?.clickToCopy(it.goldStoneID)
 				}
 			}
 		}
 	}
-	
+
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguageCode())
 }
