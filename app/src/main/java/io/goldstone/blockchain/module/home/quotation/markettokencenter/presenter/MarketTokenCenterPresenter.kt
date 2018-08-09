@@ -16,7 +16,7 @@ class MarketTokenCenterPresenter(
 
 	fun showAddButtonOrElse(isShown: Boolean, callback: () -> Unit) {
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.showAddButton(isShown, false, callback)
+			overlayView.header.showAddButton(isShown, true, callback)
 		}
 	}
 }

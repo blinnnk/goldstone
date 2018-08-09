@@ -33,4 +33,5 @@ class MarketTokeCenterViewPager(val fragment: Fragment) : ViewPager(fragment.con
 		}
 		adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
 	}
+
 }
