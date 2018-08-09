@@ -53,8 +53,8 @@ class TransactionListPresenter(
 		} else {
 			fragment.asyncData = memoryTransactionListData
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				updateTransactionInAsync(memoryTransactionListData.orEmptyArray()) { hasData ->
-					hasData isTrue {
+				updateTransactionInAsync(memoryTransactionListData.orEmptyArray()) { newData ->
+					newData.isNotEmpty() isTrue {
 						hasUpdate = true
 						fragment.initData()
 					}
@@ -68,21 +68,20 @@ class TransactionListPresenter(
 	private fun TransactionListFragment.initData() {
 		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
 			checkAddressNameInContacts(transactions) {
-				transactions.insertToMyTokenTableIfHasValue()
 				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(transactions)
 				// Save a copy into memory for imporving the speed of next time to view
 				memoryTransactionListData = transactions
 				// Check and update the new data from chain in async thread
 				if (!hasUpdate) {
 					updateTransactionInAsync(transactions) {
-						it isTrue {
+						it.insertToMyTokenTableIfHasValue()
+						it.isNotEmpty() isTrue {
 							hasUpdate = true
 							initData()
 						}
 
 						try {
-							// ViewPager 跨 Fragment 的时候 数据现成存在但是 View 已经被
-							// ViewPager 清楚
+							// `ViewPager` 跨 `Fragment` 的时候 数据现成存在但是 `View` 已经被 `ViewPager` 清除
 							GoldStoneAPI.context.runOnUiThread { removeLoadingView() }
 						} catch (error: Exception) {
 							LogUtil.error("removeLoadingView", error)
@@ -93,7 +92,7 @@ class TransactionListPresenter(
 		}
 	}
 
-	private fun ArrayList<TransactionListModel>.insertToMyTokenTableIfHasValue() {
+	private fun List<TransactionListModel>.insertToMyTokenTableIfHasValue() {
 		MyTokenTable.getMyTokens { myTokens ->
 			distinctBy { it.contract }.filterNot {
 				myTokens.any { token ->
@@ -134,7 +133,7 @@ class TransactionListPresenter(
 
 	private fun updateTransactionInAsync(
 		localData: ArrayList<TransactionListModel>,
-		callback: (hasData: Boolean) -> Unit
+		hold: (newData: List<TransactionListModel>) -> Unit
 	) {
 		val currentBlockNumber =
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber ?: "0"
@@ -149,7 +148,7 @@ class TransactionListPresenter(
 				)
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
 			},
-			callback
+			hold
 		)
 	}
 
@@ -201,7 +200,7 @@ class TransactionListPresenter(
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
-				hasData isTrue {
+				hasData.isNotEmpty() isTrue {
 					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
 						checkAddressNameInContacts(transactions) {
 							hold(transactions)
@@ -217,14 +216,14 @@ class TransactionListPresenter(
 		private fun getTransactionsFromEtherScan(
 			startBlock: String,
 			errorCallback: (Throwable) -> Unit,
-			hold: (hasNewData: Boolean) -> Unit
+			hold: (newData: List<TransactionListModel>) -> Unit
 		) {
 			// 请求所有链上的数据
 			mergeETHAndERC20Incoming(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					filterCompletedData(it, hold)
 				} otherwise {
-					hold(false)
+					hold(listOf())
 				}
 			}.start()
 		}
@@ -367,7 +366,7 @@ class TransactionListPresenter(
 
 		private fun filterCompletedData(
 			data: List<TransactionTable>,
-			hold: (hasData: Boolean) -> Unit
+			hold: (newData: List<TransactionListModel>) -> Unit
 		) {
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
 			data.getUnkonwTokenInfo {
@@ -384,12 +383,8 @@ class TransactionListPresenter(
 
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() {
-							this@list.insertMinerFeeToDatabase { _ ->
-								hold(distinctBy { new ->
-									data.any {
-										it.hash.equals(new.hash, true)
-									}
-								}.isNotEmpty())
+							this@list.afterInsertingMinerFeeToDatabase {
+								hold(this@list.map { TransactionListModel(it) })
 							}
 						}
 					}.start()
@@ -397,9 +392,7 @@ class TransactionListPresenter(
 			}
 		}
 
-		private fun List<TransactionTable>.insertMinerFeeToDatabase(
-			hold: (List<TransactionTable>) -> Unit
-		) {
+		private fun List<TransactionTable>.afterInsertingMinerFeeToDatabase(callback: () -> Unit) {
 			// 抽出燃气费的部分单独插入
 			filter {
 				if (!it.isReceive) it.isFee = true
@@ -417,7 +410,7 @@ class TransactionListPresenter(
 						}
 					}
 
-					override fun mergeCallBack() = hold(this@list)
+					override fun mergeCallBack() = callback()
 				}.start()
 			}
 		}
