@@ -68,6 +68,28 @@ object QuotationText {
 	}
 
 	@JvmField
+	val quotationInfo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Quotation Info"
+		HoneyLanguage.Chinese.code -> "Quotation Info"
+		HoneyLanguage.Japanese.code -> "Quotation Info"
+		HoneyLanguage.Korean.code -> "Quotation Info"
+		HoneyLanguage.Russian.code -> "Quotation Info"
+		HoneyLanguage.TraditionalChinese.code -> "Quotation Info"
+		else -> ""
+	}
+
+	@JvmField
+	val alarm = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Alarm"
+		HoneyLanguage.Chinese.code -> "Alarm"
+		HoneyLanguage.Japanese.code -> "Alarm"
+		HoneyLanguage.Korean.code -> "Alarm"
+		HoneyLanguage.Russian.code -> "Alarm"
+		HoneyLanguage.TraditionalChinese.code -> "Alarm"
+		else -> ""
+	}
+
+	@JvmField
 	val currentPrice = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current Price"
 		HoneyLanguage.Chinese.code -> "当前价格"

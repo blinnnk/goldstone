@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.QuotationText
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -42,6 +44,10 @@ import java.util.*
 class MarketTokenDetailPresenter(
 	override val fragment: MarketTokenDetailFragment
 ) : BasePresenter<MarketTokenDetailFragment>() {
+
+	private val marketCenter by lazy {
+		fragment.getParentFragment<MarketTokenCenterFragment>()
+	}
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -139,13 +145,18 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebfragumentWithLink(link: String, title: String, previousTitle: String) {
-		showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-			title,
-			previousTitle,
-			Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
-			true
-		)
+	fun showWebfragumentWithLink(
+		link: String,
+		title: String,
+		previousTitle: String
+	) {
+		marketCenter?.presenter
+			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
+				title,
+				previousTitle,
+				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				true
+			)
 	}
 
 	fun openSystemBrowser(url: String) {
