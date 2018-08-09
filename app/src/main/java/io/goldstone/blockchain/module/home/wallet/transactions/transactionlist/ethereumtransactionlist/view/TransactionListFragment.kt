@@ -15,14 +15,14 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class TransactionListFragment :
 	BaseRecyclerFragment<TransactionListPresenter, TransactionListModel>() {
-	
+
 	override val presenter = TransactionListPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionListModel>?
 	) {
-		asyncData?.let {
+		asyncData?.let { it ->
 			recyclerView.adapter = TransactionListAdapter(it) {
 				onClick {
 					TransactionListPresenter.showTransactionDetail(
@@ -35,7 +35,7 @@ class TransactionListFragment :
 			}
 		}
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		getParentFragment<TransactionFragment> {
