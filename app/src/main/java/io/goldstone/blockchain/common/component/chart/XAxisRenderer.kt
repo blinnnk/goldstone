@@ -24,9 +24,9 @@ class XAxisRenderer(
 	}
 	
   
-  override fun renderAxisLine(c: Canvas) {
-    super.renderAxisLine(c)
-    c.drawLine(mViewPortHandler.contentLeft(),
+  override fun renderAxisLine(canvas: Canvas) {
+    super.renderAxisLine(canvas)
+    canvas.drawLine(mViewPortHandler.contentLeft(),
       mViewPortHandler.contentTop(),
       mViewPortHandler.contentRight(),
       mViewPortHandler.contentTop(),

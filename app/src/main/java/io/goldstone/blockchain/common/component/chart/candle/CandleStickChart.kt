@@ -54,7 +54,7 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
     blinnnkMarkerView = CandleMarkerView(context)
     blinnnkMarkerView.setChartView(this)
   
-    blinnnkXValueFormatter = XValueFormatter(this@CandleStickChart)
+    blinnnkXValueFormatter = XValueFormatter(this)
     mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
     mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
     
@@ -87,7 +87,6 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
     dataSet.apply {
       setDrawIcons(false)
       axisDependency = YAxis.AxisDependency.LEFT
-//      shadowColor = this@CandleStickChart.shadowColor
       shadowWidth = this@CandleStickChart.shadowWidth
       decreasingColor = this@CandleStickChart.decreasingColor
       decreasingPaintStyle = Paint.Style.FILL

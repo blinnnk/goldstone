@@ -89,8 +89,8 @@ open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
     
     val chart = getChartView()
     
-    val width = getWidth().toFloat()
-    val height = getHeight().toFloat()
+    val width = width.toFloat()
+    val height = height.toFloat()
     
     if (positionX + drawingOffsetMPPointF.x < 0) {
       drawingOffsetMPPointF.x = -positionX
@@ -114,7 +114,7 @@ open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
     
     measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
       View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
-    layout(0, 0, getMeasuredWidth(), getMeasuredHeight())
+    layout(0, 0, measuredWidth, measuredHeight)
     
   }
   

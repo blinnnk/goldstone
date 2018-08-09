@@ -32,18 +32,18 @@ class CandleStickChartRenderer(
   
   }
   
-  override fun drawData(c: Canvas) {
+  override fun drawData(canvas: Canvas) {
     
     val candleData = candleDataProvider.candleData
     
     for (set in candleData.dataSets) {
       
-      if (set.isVisible) drawDataSet(c, set)
+      if (set.isVisible) drawDataSet(canvas, set)
     }
   }
   
   protected fun drawDataSet(
-    c: Canvas,
+    canvas: Canvas,
     dataSet: ICandleDataSet
   ) {
     
@@ -122,7 +122,7 @@ class CandleStickChartRenderer(
         
         mRenderPaint.strokeCap = Paint.Cap.ROUND
         
-        c.drawLines(shadowBuffers, mRenderPaint)
+        canvas.drawLines(shadowBuffers, mRenderPaint)
         
         // calculate the body
         
@@ -147,7 +147,7 @@ class CandleStickChartRenderer(
           mRenderPaint.strokeCap = Paint.Cap.SQUARE
           
 					// 柱状图，如果是此种情况（开盘价低于收盘价），那么举行的顶部应该用bodyBuffers[3]，底部用 bodyBuffers[1]
-          c.drawRoundRect(bodyBuffers[0],
+          canvas.drawRoundRect(bodyBuffers[0],
             bodyBuffers[3],
             bodyBuffers[2],
             bodyBuffers[1],
@@ -167,7 +167,7 @@ class CandleStickChartRenderer(
           
           mRenderPaint.strokeCap = Paint.Cap.SQUARE
           
-          c.drawRoundRect(bodyBuffers[0],
+          canvas.drawRoundRect(bodyBuffers[0],
             bodyBuffers[1],
             bodyBuffers[2],
             bodyBuffers[3],
@@ -182,7 +182,7 @@ class CandleStickChartRenderer(
             mRenderPaint.color = dataSet.neutralColor
           }
           
-          c.drawLine(bodyBuffers[0],
+          canvas.drawLine(bodyBuffers[0],
             bodyBuffers[1],
             bodyBuffers[2],
             bodyBuffers[3],
@@ -219,17 +219,17 @@ class CandleStickChartRenderer(
         else barColor = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.neutralColor
         
         mRenderPaint.color = barColor
-        c.drawLine(rangeBuffers[0],
+        canvas.drawLine(rangeBuffers[0],
           rangeBuffers[1],
           rangeBuffers[2],
           rangeBuffers[3],
           mRenderPaint)
-        c.drawLine(openBuffers[0],
+        canvas.drawLine(openBuffers[0],
 					openBuffers[1],
 					openBuffers[2],
 					openBuffers[3],
 					mRenderPaint)
-        c.drawLine(closeBuffers[0],
+        canvas.drawLine(closeBuffers[0],
           closeBuffers[1],
           closeBuffers[2],
           closeBuffers[3],
@@ -238,7 +238,7 @@ class CandleStickChartRenderer(
     }
   }
   
-  override fun drawValues(c: Canvas) {
+  override fun drawValues(canvas: Canvas) {
     
     // if values are drawn
     if (isDrawingValuesAllowed(candleDataProvider)) {
@@ -270,52 +270,52 @@ class CandleStickChartRenderer(
         iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
         iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
         
-        var j = 0
-        while (j < positions.size) {
+        var index = 0
+        while (index < positions.size) {
           
-          val x = positions[j]
-          val y = positions[j + 1]
+          val x = positions[index]
+          val y = positions[index + 1]
           
           if (!mViewPortHandler.isInBoundsRight(x)) break
           
           if (!mViewPortHandler.isInBoundsLeft(x) || !mViewPortHandler.isInBoundsY(y)) {
-            j += 2
+            index += 2
             continue
           }
           
-          val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)
+          val entry = dataSet.getEntryForIndex(index / 2 + mXBounds.min)
           
           if (dataSet.isDrawValuesEnabled) {
-            drawValue(c,
+            drawValue(canvas,
               dataSet.valueFormatter,
               entry.high,
               entry,
               dataSetPosition,
               x,
               y - yOffset,
-              dataSet.getValueTextColor(j / 2))
-            drawValue(c,
+              dataSet.getValueTextColor(index / 2))
+            drawValue(canvas,
               dataSet.valueFormatter,
               entry.low,
               entry,
               dataSetPosition,
               x,
               y - yOffset,
-              dataSet.getValueTextColor(j / 2))
+              dataSet.getValueTextColor(index / 2))
           }
           
           if (entry.icon != null && dataSet.isDrawIconsEnabled) {
             
             val icon = entry.icon
             
-            Utils.drawImage(c,
+            Utils.drawImage(canvas,
               icon,
               (x + iconsOffset.x).toInt(),
               (y + iconsOffset.y).toInt(),
               icon.intrinsicWidth,
               icon.intrinsicHeight)
           }
-          j += 2
+          index += 2
         }
         
         MPPointF.recycleInstance(iconsOffset)
@@ -326,7 +326,7 @@ class CandleStickChartRenderer(
   override fun drawExtras(c: Canvas) {}
   
   override fun drawHighlighted(
-    c: Canvas,
+    canvas: Canvas,
     indices: Array<Highlight>
   ) {
     
@@ -351,7 +351,7 @@ class CandleStickChartRenderer(
       high.setDraw(pix.x.toFloat(), pix.y.toFloat())
       
       // draw the lines
-      drawHighlightLines(c, pix.x.toFloat(), pix.y.toFloat(), dataSet)
+      drawHighlightLines(canvas, pix.x.toFloat(), pix.y.toFloat(), dataSet)
     }
   }
   
