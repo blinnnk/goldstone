@@ -64,6 +64,7 @@ fun GasSelectionPresenter.transferBTC(
 	) { secret ->
 		if (secret.isNullOrBlank()) {
 			callback()
+			fragment.showMaskView(false)
 			return@getCurrentWalletBTCPrivateKey
 		}
 		prepareBTCModel.apply model@{

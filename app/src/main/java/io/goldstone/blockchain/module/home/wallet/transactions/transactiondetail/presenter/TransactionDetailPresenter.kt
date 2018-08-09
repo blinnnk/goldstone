@@ -73,7 +73,7 @@ class TransactionDetailPresenter(
 	// 更新头部数字的工具
 	fun updateHeaderValue(headerModel: TransactionHeaderModel) {
 		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			it?.setIconStyle(headerModel)
+			it.setIconStyle(headerModel)
 		}
 	}
 

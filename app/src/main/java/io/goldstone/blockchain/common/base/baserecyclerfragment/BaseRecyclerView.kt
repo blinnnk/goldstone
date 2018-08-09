@@ -7,6 +7,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import org.jetbrains.anko.matchParent
@@ -18,20 +19,20 @@ import java.util.*
  */
 @Suppress("UNCHECKED_CAST")
 open class BaseRecyclerView(context: Context) : RecyclerView(context) {
-	
+
 	init {
 		layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		itemAnimator?.changeDuration = 0
 	}
-	
+
 	override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
 		if (event.action == MotionEvent.ACTION_DOWN && this.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
 			this.stopScroll()
 		}
 		return super.onInterceptTouchEvent(event)
 	}
-	
+
 	inline fun <T> addDragEventAndReordering(
 		adapterDataSet: ArrayList<T>,
 		crossinline hold: (fromPosition: Int?, toPosition: Int?) -> Unit
@@ -49,7 +50,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 					ItemTouchHelper.DOWN or ItemTouchHelper.UP or ItemTouchHelper.START or ItemTouchHelper.END
 				)
 			}
-			
+
 			override fun onMove(
 				recyclerView: RecyclerView,
 				viewHolder: ViewHolder,
@@ -66,13 +67,13 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				)
 				return true
 			}
-			
+
 			override fun onSwiped(
 				viewHolder: ViewHolder,
 				direction: Int
 			) {
 			}
-			
+
 			override fun onSelectedChanged(
 				viewHolder: ViewHolder?,
 				actionState: Int
@@ -82,7 +83,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 					hold(fromPosition, toPosition)
 				}
 			}
-			
+
 			override fun onMoved(
 				recyclerView: RecyclerView,
 				viewHolder: ViewHolder,
@@ -98,15 +99,19 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		})
 		itemMove.attachToRecyclerView(this)
 	}
-	
+
 	inline fun <reified T> getItemAtAdapterPosition(
 		position: Int,
-		crossinline block: (T?) -> Unit
+		crossinline block: (T) -> Unit
 	) {
 		load {
 			findViewHolderForAdapterPosition(position)?.itemView
 		} then {
-			block(it as? T)
+			try {
+				(it as? T)?.let(block)
+			} catch (error: Exception) {
+				LogUtil.error("getItemAtAdapterPosition", error)
+			}
 		}
 	}
 }

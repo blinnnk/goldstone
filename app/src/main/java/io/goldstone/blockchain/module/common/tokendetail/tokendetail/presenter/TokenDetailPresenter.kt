@@ -345,7 +345,7 @@ class TokenDetailPresenter(
 					)
 				)
 				if (chartArray.size == charCount) {
-					header?.setCharData(chartArray.reversed().toArrayList())
+					header.setCharData(chartArray.reversed().toArrayList())
 				}
 			}
 		}

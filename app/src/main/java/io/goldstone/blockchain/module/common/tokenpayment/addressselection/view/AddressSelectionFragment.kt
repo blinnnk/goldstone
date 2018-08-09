@@ -34,7 +34,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
-	
+
 	private val buttonHeight = 50.uiPX()
 	private var viewHeight = 0
 	private var keyboardHeight = 0
@@ -51,7 +51,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		}
 	}
 	override val presenter = AddressSelectionPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
@@ -62,7 +62,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -72,7 +72,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		setScanButtonStatus {
 			QRCodePresenter.scanQRCode(this)
 		}
-		
+
 		wrapper.keyboardHeightListener {
 			if (keyboardHeight != it) {
 				viewHeight = ScreenSize.heightWithOutHeader - it
@@ -81,12 +81,12 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-	
+
 	override fun onDestroyView() {
 		super.onDestroyView()
 		setScanButtonStatus(false)
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (hidden) {
@@ -97,7 +97,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-	
+
 	/**
 	 * 扫描二维码后接受信息用的函数
 	 */
@@ -113,11 +113,10 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			presenter.showPaymentPrepareFragmentByQRCode(it.contents)
 		}
 	}
-	
+
 	fun updateHeaderViewStatus() {
 		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) { it ->
-			it?.setFocusStatus()
-			it?.getInputStatus { _, address ->
+			it.getInputStatus { _, address ->
 				if (!address.isNullOrBlank()) {
 					confirmButton.apply {
 						textColor = Spectrum.white
@@ -134,9 +133,11 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 					}
 				}
 			}
+			it.setFocusStatus()
+			recyclerView.scrollToPosition(0)
 		}
 	}
-	
+
 	private fun setScanButtonStatus(
 		isShow: Boolean = true,
 		callback: () -> Unit = {}
@@ -147,7 +148,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			if (isFromQuickTransfer) {
