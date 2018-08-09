@@ -36,7 +36,7 @@ fun TransactionDetailPresenter.showConformationInterval(
 	intervalCount: Int
 ) {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) { it ->
-		it?.apply {
+		it.apply {
 			headerModel?.let {
 				updateHeaderValue(it)
 			}
@@ -47,7 +47,7 @@ fun TransactionDetailPresenter.showConformationInterval(
 
 fun TransactionDetailPresenter.updateConformationBarFinished() {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-		it?.apply {
+		it.apply {
 			updateConformationBar(CryptoValue.confirmBlockNumber)
 		}
 	}

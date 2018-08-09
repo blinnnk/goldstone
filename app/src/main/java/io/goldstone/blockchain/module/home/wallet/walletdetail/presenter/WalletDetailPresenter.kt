@@ -282,7 +282,7 @@ class WalletDetailPresenter(
 		try {
 			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
 				generateHeaderModel { model ->
-					it?.model = model
+					it.model = model
 				}
 			}
 		} catch (error: Exception) {

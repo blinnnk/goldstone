@@ -208,7 +208,7 @@ class ChainAddressesPresenter(
 
 	private fun setDefaultAddress(index: String, address: String, chainType: Int) {
 		fragment.recyclerView.getItemAtAdapterPosition<ChainAddressesHeaderView>(0) {
-			it?.setDefaultAddress(index, address, chainType) {
+			it.setDefaultAddress(index, address, chainType) {
 				showMoreDashboard(this, address, chainType, false)
 			}
 		}
