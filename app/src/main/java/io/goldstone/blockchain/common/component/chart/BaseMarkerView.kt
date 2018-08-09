@@ -79,8 +79,8 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
     positionY: Float
   ): MPPointF {
     
-    drawingOffsetMPPointF.x = offsetMPPOintF!!.x
-    drawingOffsetMPPointF.y = offsetMPPOintF!!.y
+    drawingOffsetMPPointF.x = offsetMPPOintF.x
+    drawingOffsetMPPointF.y = offsetMPPOintF.y
     
 
 		val chartWidht = getChartWidth()

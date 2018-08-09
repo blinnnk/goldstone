@@ -57,11 +57,11 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			}
 		}
 		
-		var entrySet = arrayListOf<Entry>()
-		model.chartData.forEachIndexed {
-			index, point -> entrySet.add(Entry(index.toFloat(), point.value, point.label))
-		}
-		blinnnkLineChart.resetData(entrySet)
+		blinnnkLineChart.resetData(
+			model.chartData.mapIndexed { index, chartPoint ->
+				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
+			}.toArrayList()
+		)
 		
 		exchangeName.text = model.exchangeName
 	}

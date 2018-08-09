@@ -61,6 +61,9 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	}
 	
 	fun initAxisStyle() {
+		
+		chartColor = Color.RED
+		
 		val gridlineColor = Color.rgb(236, 236, 236)
 		val labelColor = Color.rgb(152, 152, 152)
 		
@@ -132,7 +135,6 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	fun resetData(dataRows: List<Entry>) {
 		
 		val pointColor = Color.BLACK
-		chartColor = Color.RED
 		val chartWidth = 3f
 		
 		val dataSet: LineDataSet
@@ -140,6 +142,8 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		if (mData != null && mData.dataSetCount > 0) {
 			dataSet = mData.getDataSetByIndex(0) as LineDataSet
 			dataSet.values = dataRows
+			dataSet.color = chartColor
+			dataSet.fillDrawable = ContextCompat.getDrawable(context, chartShadowResource)
 			mData.notifyDataChanged()
 			notifyDataSetChanged()
 		} else {
@@ -204,14 +208,6 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	fun setChartColorAndShadowResource(color: Int, resource: Int) {
 		chartColor = color
 		chartShadowResource = resource
-		if (mData != null) {
-			(mData.getDataSetByIndex(0) as LineDataSet).color = chartColor
-			(mData.getDataSetByIndex(0) as LineDataSet).fillDrawable =
-				ContextCompat.getDrawable(context, chartShadowResource)
-			mData.notifyDataChanged()
-			notifyDataSetChanged()
-		}
-		
 	}
 	
 	override fun getLineData(): LineData {
