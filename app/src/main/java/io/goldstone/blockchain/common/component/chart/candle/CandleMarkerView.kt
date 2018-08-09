@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.component.chart.BaseMarkerView
  * @description: 点击candleChartView的item的时候展示的具体详情
  */
 
-class CandleMarkerView(context: Context) : BaseMarkerView(context) {
+abstract class CandleMarkerView(context: Context) : BaseMarkerView(context) {
   
   override fun refreshContent(entry: Entry, highlight: Highlight) {
     val candleEntry = entry as CandleEntry

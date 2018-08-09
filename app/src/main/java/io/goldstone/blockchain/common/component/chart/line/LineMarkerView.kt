@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.component.chart.BaseMarkerView
  * @author: yanglihai
  * @description: 线性表详情这是marker
  */
-class LineMarkerView(context: Context) : BaseMarkerView(context) {
+abstract class LineMarkerView(context: Context) : BaseMarkerView(context) {
   
   override fun refreshContent(entry: Entry, highlight: Highlight) {
     

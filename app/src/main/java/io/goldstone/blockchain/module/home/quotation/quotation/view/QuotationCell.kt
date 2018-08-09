@@ -48,14 +48,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				blinnnkLineChart.setChartColor(Spectrum.red)
-				blinnnkLineChart.setShadowResource(R.drawable.fade_red)
+				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				blinnnkLineChart.setChartColor(Spectrum.green)
-				blinnnkLineChart.setShadowResource(R.drawable.fade_green)
+				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
 		

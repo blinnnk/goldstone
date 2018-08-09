@@ -5,9 +5,14 @@ import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.renderer.LineChartRenderer
@@ -15,6 +20,7 @@ import com.github.mikephil.charting.utils.Utils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.component.chart.XValueFormatter
+import io.goldstone.blockchain.common.utils.TimeUtils
 import java.util.*
 
 /**
@@ -24,19 +30,7 @@ import java.util.*
  */
 abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	
-	private lateinit var blinnnkMarkerView: LineMarkerView
-	private lateinit var blinnnkXValueFormatter: XValueFormatter
-	private val xRangeVisibleNum = 8f
-	private val lineYValueFormatter = LineYValueFormatter()
-	
-	private var pointColor: Int = Color.BLACK
-	
-	private var gridlineColor: Int = Color.rgb(236, 236, 236)
-	private var labelColor: Int = Color.rgb(152, 152, 152)
-	
 	private var chartColor: Int = Color.RED
-	private val chartWidth = 3f
-	private val pointRadius = arrayListOf(5f, 2f)
 	private var chartShadowResource: Int = R.drawable.fade_red
 	
 	abstract fun isDrawPoints(): Boolean
@@ -63,18 +57,12 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
 		mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
 		
-		blinnnkMarkerView = LineMarkerView(context)
-		blinnnkMarkerView.setChartView(this)
-		blinnnkXValueFormatter = XValueFormatter(this)
-		
 		initAxisStyle()
 	}
 	
 	fun initAxisStyle() {
-		pointColor = Color.BLACK
-		gridlineColor = Color.rgb(236, 236, 236)
-		labelColor = Color.rgb(152, 152, 152)
-		chartColor = Color.RED
+		val gridlineColor = Color.rgb(236, 236, 236)
+		val labelColor = Color.rgb(152, 152, 152)
 		
 		isScaleXEnabled = false
 		isScaleYEnabled = false
@@ -83,10 +71,39 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		legend.isEnabled = false // 标签是否显示
 		description.isEnabled = false // 描述信息展示
 		
-		marker = blinnnkMarkerView
+		
+		marker = object : LineMarkerView(context) {
+			override fun getChartWidth(): Int {
+				return this@LineChart.width
+			}
+			
+			override fun getChartHeight(): Int {
+				return this@LineChart.height
+			}
+		}
 		
 		xAxis.apply {
-			valueFormatter = blinnnkXValueFormatter
+			valueFormatter = IAxisValueFormatter { value, _ ->
+				var result = ""
+				if (!this@LineChart.data.isNull() ||
+					!this@LineChart.data.getDataSetByIndex(0).isNull()){
+					val position = value.toInt()
+					var values = (this@LineChart.data.getDataSetByIndex(0) as LineDataSet).values
+					if (position < values.size) {
+						val entry = values[position]
+						if ((entry.data is Long)) {
+							result = if (entry.data == 0) "" else  TimeUtils.formatMdDate(entry.data as Long)
+						}
+						if (entry.data is String) {
+							result = if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+						}
+					}else {
+						result = ""
+					}
+				}
+				
+				result
+			}
 			position = XAxis.XAxisPosition.BOTTOM
 			setDrawAxisLine(false)
 			setDrawLabels(true)
@@ -109,10 +126,14 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			setDrawGridLines(false)
 		}
 		
-		animateY(1000)
+//		animateY(1000)
 	}
 	
 	fun resetData(dataRows: List<Entry>) {
+		
+		val pointColor = Color.BLACK
+		chartColor = Color.RED
+		val chartWidth = 3f
 		
 		val dataSet: LineDataSet
 		
@@ -125,7 +146,10 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			// create a dataset and give it a type
 			dataSet = LineDataSet(dataRows, "lineData ")
 			dataSet.apply {
-				valueFormatter = lineYValueFormatter
+				valueFormatter = IValueFormatter { _, entry, _, _ ->
+					val entryBean = entry.data as Entry
+					entryBean.y.toString()
+				}
 				
 				// 平划的曲线
 				if (isPerformBezier()) {
@@ -139,6 +163,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				color = chartColor
 				lineWidth = chartWidth
 				if (isDrawPoints()) {
+					val pointRadius = arrayListOf(5f, 2f)
 					// 峰值点
 					setDrawCircles(true)
 					setCircleColor(pointColor)
@@ -168,6 +193,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			// set data
 			setData(data)
 			if (dragEnable()){
+				val xRangeVisibleNum = 8f
 				// set visible num xRange
 				setVisibleXRangeMaximum(xRangeVisibleNum)
 				setVisibleXRangeMinimum(xRangeVisibleNum)
@@ -175,25 +201,15 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		}
 	}
 	
-	fun setChartColor(color: Int) {
+	fun setChartColorAndShadowResource(color: Int, resource: Int) {
 		chartColor = color
-		if (mData != null) {
-			(mData.getDataSetByIndex(0) as LineDataSet).color = chartColor
-			mData.notifyDataChanged()
-			notifyDataSetChanged()
-			invalidate()
-		}
-		
-	}
-	
-	fun setShadowResource(resource: Int) {
 		chartShadowResource = resource
 		if (mData != null) {
-			(mData.getDataSetByIndex(0) as LineDataSet).fillDrawable = ContextCompat.getDrawable(context,
-				chartShadowResource)
+			(mData.getDataSetByIndex(0) as LineDataSet).color = chartColor
+			(mData.getDataSetByIndex(0) as LineDataSet).fillDrawable =
+				ContextCompat.getDrawable(context, chartShadowResource)
 			mData.notifyDataChanged()
 			notifyDataSetChanged()
-			invalidate()
 		}
 		
 	}
@@ -211,10 +227,9 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	}
 	
 	fun setEmptyData() {
-		val candleEntrySet = mutableListOf<Entry>()
-		for (i in 0 until 19) {
-			candleEntrySet.add(Entry(i.toFloat(), 0f, java.lang.Long.valueOf(0)))
-			
+		val candleEntrySet = arrayListOf<Entry>()
+		(0 until 19).forEach {
+			index -> 	candleEntrySet.add(Entry(index.toFloat(), 0f, System.currentTimeMillis()))
 		}
 		resetData(candleEntrySet)
 	}

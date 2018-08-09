@@ -39,8 +39,8 @@ class XValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormat
 		
 		return ""
   
-    
-    
+  
+  
   }
   
   

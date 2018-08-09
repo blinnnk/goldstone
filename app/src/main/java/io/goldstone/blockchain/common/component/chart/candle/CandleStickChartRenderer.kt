@@ -16,12 +16,10 @@ import com.github.mikephil.charting.utils.*
  */
 
 class CandleStickChartRenderer(
-  protected var candleDataProvider: CandleDataProvider,
+	private var candleDataProvider: CandleDataProvider,
   animator: ChartAnimator,
   viewPortHandler: ViewPortHandler) : LineScatterCandleRadarRenderer(animator, viewPortHandler) {
-  
-  private val candleRectRadius = 3f // 蜡烛矩形的圆角
-  
+	
   private val shadowBuffers = FloatArray(8)
   private val bodyBuffers = FloatArray(4)
   private val rangeBuffers = FloatArray(4)
@@ -46,8 +44,10 @@ class CandleStickChartRenderer(
     canvas: Canvas,
     dataSet: ICandleDataSet
   ) {
-    
-    val trans = candleDataProvider.getTransformer(dataSet.axisDependency)
+	
+		val candleRectRadius = 3f // 蜡烛矩形的圆角
+		
+		val transformer = candleDataProvider.getTransformer(dataSet.axisDependency)
     
     val phaseY = mAnimator.phaseY
     val barSpace = dataSet.barSpace
@@ -96,7 +96,7 @@ class CandleStickChartRenderer(
           shadowBuffers[7] = shadowBuffers[3]
         }
         
-        trans.pointValuesToPixel(shadowBuffers)
+        transformer.pointValuesToPixel(shadowBuffers)
         
         // draw the shadows
         
@@ -131,7 +131,7 @@ class CandleStickChartRenderer(
         bodyBuffers[2] = xPosition + 0.5f - barSpace
         bodyBuffers[3] = open * phaseY
         
-        trans.pointValuesToPixel(bodyBuffers)
+        transformer.pointValuesToPixel(bodyBuffers)
         
         // draw body differently for increasing and decreasing entry
         if (open > close) { // decreasing
@@ -205,18 +205,23 @@ class CandleStickChartRenderer(
         closeBuffers[2] = xPosition
         closeBuffers[3] = close * phaseY
         
-        trans.pointValuesToPixel(rangeBuffers)
-        trans.pointValuesToPixel(openBuffers)
-        trans.pointValuesToPixel(closeBuffers)
+        transformer.pointValuesToPixel(rangeBuffers)
+        transformer.pointValuesToPixel(openBuffers)
+        transformer.pointValuesToPixel(closeBuffers)
         
         // draw the ranges
         val barColor: Int
         
-        if (open > close) barColor =
-					if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.decreasingColor
-        else if (open < close) barColor =
-					if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.increasingColor
-        else barColor = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition) else dataSet.neutralColor
+        if (open > close) {
+					barColor = if (dataSet.decreasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition)
+					else dataSet.decreasingColor
+				} else if (open < close) {
+					barColor = if (dataSet.increasingColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition)
+					else dataSet.increasingColor
+				} else {
+					barColor = if (dataSet.neutralColor == ColorTemplate.COLOR_NONE) dataSet.getColor(entryPosition)
+					else dataSet.neutralColor
+				}
         
         mRenderPaint.color = barColor
         canvas.drawLine(rangeBuffers[0],
@@ -323,7 +328,7 @@ class CandleStickChartRenderer(
     }
   }
   
-  override fun drawExtras(c: Canvas) {}
+  override fun drawExtras(canvas: Canvas) {}
   
   override fun drawHighlighted(
     canvas: Canvas,

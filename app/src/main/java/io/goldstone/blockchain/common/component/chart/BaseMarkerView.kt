@@ -20,10 +20,9 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
-  private var offsetMPPOintF: MPPointF? = MPPointF()
+abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
+  private var offsetMPPOintF: MPPointF = MPPointF()
   private val drawingOffsetMPPointF = MPPointF()
-  private var chartView: Chart<*>? = null
   
   lateinit var textViewContent: TextView
   
@@ -51,7 +50,7 @@ open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
     
   }
   
-  fun setOffset(offset: MPPointF?) {
+  fun setOffset(offset: MPPointF) {
     offsetMPPOintF = offset
     
     if (offsetMPPOintF.isNull()) {
@@ -63,20 +62,16 @@ open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
     offsetX: Float,
     offsetY: Float
   ) {
-    offsetMPPOintF!!.x = offsetX
-    offsetMPPOintF!!.y = offsetY
+    offsetMPPOintF.x = offsetX
+    offsetMPPOintF.y = offsetY
   }
+	
+	abstract fun getChartWidth() : Int
+	
+	abstract fun getChartHeight() : Int
   
   override fun getOffset(): MPPointF? {
     return offsetMPPOintF
-  }
-  
-  fun setChartView(chart: Chart<*>) {
-    chartView = chart
-  }
-  
-  fun getChartView(): Chart<*>? {
-    return chartView
   }
   
   override fun getOffsetForDrawingAtPoint(
@@ -87,21 +82,23 @@ open class BaseMarkerView(context: Context) : RelativeLayout(context), IMarker {
     drawingOffsetMPPointF.x = offsetMPPOintF!!.x
     drawingOffsetMPPointF.y = offsetMPPOintF!!.y
     
-    val chart = getChartView()
-    
+
+		val chartWidht = getChartWidth()
+		val chartHeight = getChartHeight()
+		
     val width = width.toFloat()
     val height = height.toFloat()
     
     if (positionX + drawingOffsetMPPointF.x < 0) {
       drawingOffsetMPPointF.x = -positionX
-    } else if (chart != null && positionX + width + drawingOffsetMPPointF.x > chart.width) {
-      drawingOffsetMPPointF.x = chart.width.toFloat() - positionX - width
+    } else if (positionX + width + drawingOffsetMPPointF.x > chartWidht) {
+      drawingOffsetMPPointF.x = chartWidht.toFloat() - positionX - width
     }
     
     if (positionY + drawingOffsetMPPointF.y < 0) {
       drawingOffsetMPPointF.y = -positionY
-    } else if (chart != null && positionY + height + drawingOffsetMPPointF.y > chart.height) {
-      drawingOffsetMPPointF.y = chart.height.toFloat() - positionY - height
+    } else if (positionY + height + drawingOffsetMPPointF.y > chartHeight) {
+      drawingOffsetMPPointF.y = chartHeight.toFloat() - positionY - height
     }
     
     return drawingOffsetMPPointF
