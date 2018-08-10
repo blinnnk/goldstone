@@ -4,14 +4,17 @@ import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -36,7 +39,7 @@ var memoryTransactionListData: ArrayList<TransactionListModel>? = null
 class TransactionListPresenter(
 	override val fragment: TransactionListFragment
 ) : BaseRecyclerPresenter<TransactionListFragment, TransactionListModel>() {
-	
+
 	override fun updateData() {
 		fragment.showLoadingView(LoadingText.transactionData)
 		if (memoryTransactionListData.isNull()) {
@@ -50,8 +53,8 @@ class TransactionListPresenter(
 		} else {
 			fragment.asyncData = memoryTransactionListData
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				updateTransactionInAsync(memoryTransactionListData!!) { hasData ->
-					hasData isTrue {
+				updateTransactionInAsync(memoryTransactionListData.orEmptyArray()) { newData ->
+					newData.isNotEmpty() isTrue {
 						hasUpdate = true
 						fragment.initData()
 					}
@@ -60,31 +63,77 @@ class TransactionListPresenter(
 			}
 		}
 	}
-	
+
 	private var hasUpdate = false
 	private fun TransactionListFragment.initData() {
-		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
-			checkAddressNameInContacts(it) {
-				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(it)
+		TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
+			checkAddressNameInContacts(transactions) {
+				presenter.diffAndUpdateSingleCellAdapterData<TransactionListAdapter>(transactions)
 				// Save a copy into memory for imporving the speed of next time to view
-				memoryTransactionListData = it
+				memoryTransactionListData = transactions
 				// Check and update the new data from chain in async thread
 				if (!hasUpdate) {
-					updateTransactionInAsync(it) {
-						it isTrue {
+					updateTransactionInAsync(transactions) {
+						it.insertToMyTokenTableIfHasValue()
+						it.isNotEmpty() isTrue {
 							hasUpdate = true
 							initData()
 						}
-						removeLoadingView()
+
+						try {
+							// `ViewPager` 跨 `Fragment` 的时候 数据现成存在但是 `View` 已经被 `ViewPager` 清除
+							GoldStoneAPI.context.runOnUiThread { removeLoadingView() }
+						} catch (error: Exception) {
+							LogUtil.error("removeLoadingView", error)
+						}
 					}
 				}
 			}
 		}
 	}
-	
+
+	private fun List<TransactionListModel>.insertToMyTokenTableIfHasValue() {
+		MyTokenTable.getMyTokens { myTokens ->
+			distinctBy { it.contract }.filterNot {
+				myTokens.any { token ->
+					token.contract.equals(it.contract, true)
+				} || it.contract.isEmpty() || it.symbol.isEmpty()
+			}.apply {
+				if (isEmpty()) return@getMyTokens
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = size
+					override fun concurrentJobs() {
+						forEach {
+							MyTokenTable.insertBySymbolAndContract(
+								it.symbol,
+								it.contract,
+								Config.getCurrentChain()
+							) {
+								completeMark()
+							}
+							// 更新默认显示到管理菜单的状态
+							DefaultTokenTable.updateDefaultStatusInCurrentChain(
+								it.contract,
+								it.symbol,
+								true
+							)
+						}
+					}
+
+					override fun mergeCallBack() {
+						fragment.getMainActivity()
+							?.getWalletDetailFragment()
+							?.presenter
+							?.updateData()
+					}
+				}.start()
+			}
+		}
+	}
+
 	private fun updateTransactionInAsync(
 		localData: ArrayList<TransactionListModel>,
-		callback: (hasData: Boolean) -> Unit
+		hold: (newData: List<TransactionListModel>) -> Unit
 	) {
 		val currentBlockNumber =
 			localData.firstOrNull { it.blockNumber.isNotEmpty() }?.blockNumber ?: "0"
@@ -93,19 +142,19 @@ class TransactionListPresenter(
 			currentBlockNumber,
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示
-				fragment.context
-					?.alert("${AlertText.getTransactionErrorPrefix} ${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}")
+				fragment.context.alert(
+					"${AlertText.getTransactionErrorPrefix} " +
+						"${ChainID.getChainNameByID(Config.getCurrentChain())} ${AlertText.getTransactionErrorSuffix}"
+				)
 				LogUtil.error("error in GetTransactionDataFromEtherScan $it")
-			}
-		) {
-			callback(it)
-		}
+			},
+			hold
+		)
 	}
-	
+
 	companion object {
-		
 		fun checkAddressNameInContacts(
-			transactions: ArrayList<TransactionListModel>,
+			transactions: List<TransactionListModel>,
 			callback: () -> Unit
 		) {
 			ContactTable.getAllContacts { contacts ->
@@ -115,8 +164,11 @@ class TransactionListPresenter(
 					transactions.forEachOrEnd { item, isEnd ->
 						item.addressName =
 							contacts.find {
-								it.ethERCAndETCAddress.equals(item.targetAddress, true)
-							}?.name ?: item.targetAddress
+								// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
+								it.ethERCAndETCAddress.equals(item.addressName, true)
+									|| it.btcTestnetAddress.contains(item.addressName, true)
+									|| it.btcMainnetAddress.contains(item.addressName, true)
+							}?.name ?: item.addressName
 						if (isEnd) {
 							callback()
 						}
@@ -124,7 +176,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-		
+
 		fun showTransactionDetail(
 			fragment: TransactionFragment?,
 			model: TransactionListModel?,
@@ -141,42 +193,44 @@ class TransactionListPresenter(
 				)
 			}
 		}
-		
+
 		fun getTokenTransactions(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			getTransactionsFromEtherScan(startBlock, errorCallback) {
-				it isTrue {
-					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) {
-						checkAddressNameInContacts(it) { hold(it) }
+			getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
+				hasData.isNotEmpty() isTrue {
+					TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
+						checkAddressNameInContacts(transactions) {
+							hold(transactions)
+						}
 					}
 				} otherwise {
 					hold(arrayListOf())
 				}
 			}
 		}
-		
+
 		// 默认拉取全部的 `EtherScan` 的交易数据
 		private fun getTransactionsFromEtherScan(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
-			hold: (hasNewData: Boolean) -> Unit
+			errorCallback: (Throwable) -> Unit,
+			hold: (newData: List<TransactionListModel>) -> Unit
 		) {
 			// 请求所有链上的数据
 			mergeETHAndERC20Incoming(startBlock, errorCallback) {
 				it.isNotEmpty() isTrue {
 					filterCompletedData(it, hold)
 				} otherwise {
-					hold(false)
+					hold(listOf())
 				}
 			}.start()
 		}
-		
+
 		private fun mergeETHAndERC20Incoming(
 			startBlock: String,
-			errorCallback: (Exception) -> Unit,
+			errorCallback: (Throwable) -> Unit,
 			hold: (List<TransactionTable>) -> Unit
 		): ConcurrentAsyncCombine {
 			return object : ConcurrentAsyncCombine() {
@@ -201,7 +255,7 @@ class TransactionListPresenter(
 							chainData = this
 							completeMark()
 						}
-						
+
 						GoldStoneAPI.getERC20TokenIncomingTransaction(
 							startBlock,
 							{
@@ -213,7 +267,7 @@ class TransactionListPresenter(
 								}
 								completeMark()
 							}
-						) {
+						) { it ->
 							// 把请求回来的数据转换成 `TransactionTable` 格式
 							logData = it.map {
 								TransactionTable(ERC20TransactionModel(it))
@@ -222,23 +276,21 @@ class TransactionListPresenter(
 						}
 					}
 				}
-				
+
 				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
-					chainData.plus(logData).apply {
-					}.filter {
-						it.to.isNotEmpty()
-					}.distinctBy {
-						it.hash
-					}.sortedByDescending {
-						it.timeStamp
-					}.let {
-						diffNewDataAndUpdateLocalData(it, hold)
-					}
+					diffNewDataAndUpdateLocalData(chainData.plus(logData)
+						.filter {
+							it.to.isNotEmpty()
+						}.distinctBy {
+							it.hash
+						}.sortedByDescending {
+							it.timeStamp
+						}, hold)
 				}
 			}
 		}
-		
+
 		private fun diffNewDataAndUpdateLocalData(
 			newData: List<TransactionTable>,
 			hold: List<TransactionTable>.() -> Unit
@@ -268,7 +320,7 @@ class TransactionListPresenter(
 				}
 			}
 		}
-		
+
 		private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
 			DefaultTokenTable.getCurrentChainTokens { localTokens ->
 				filter {
@@ -304,17 +356,17 @@ class TransactionListPresenter(
 								}
 							}
 						}
-						
+
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}
 			}
 		}
-		
+
 		private fun filterCompletedData(
 			data: List<TransactionTable>,
-			hold: (hasData: Boolean) -> Unit
+			hold: (newData: List<TransactionListModel>) -> Unit
 		) {
 			// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
 			data.getUnkonwTokenInfo {
@@ -324,32 +376,23 @@ class TransactionListPresenter(
 						override var asyncCount: Int = size
 						override fun concurrentJobs() {
 							forEach {
-								GoldStoneDataBase
-									.database
-									.transactionDao()
-									.insert(it)
+								GoldStoneDataBase.database.transactionDao().insert(it)
 								completeMark()
 							}
 						}
-						
+
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() {
-							this@list.insertMinerFeeToDatabase {
-								hold(distinctBy { new ->
-									data.any {
-										it.hash.equals(new.hash, true)
-									}
-								}.isNotEmpty())
+							this@list.afterInsertingMinerFeeToDatabase {
+								hold(this@list.map { TransactionListModel(it) })
 							}
 						}
 					}.start()
 				}
 			}
 		}
-		
-		private fun List<TransactionTable>.insertMinerFeeToDatabase(
-			hold: (List<TransactionTable>) -> Unit
-		) {
+
+		private fun List<TransactionTable>.afterInsertingMinerFeeToDatabase(callback: () -> Unit) {
 			// 抽出燃气费的部分单独插入
 			filter {
 				if (!it.isReceive) it.isFee = true
@@ -366,12 +409,12 @@ class TransactionListPresenter(
 							completeMark()
 						}
 					}
-					
-					override fun mergeCallBack() = hold(this@list)
+
+					override fun mergeCallBack() = callback()
 				}.start()
 			}
 		}
-		
+
 		/**
 		 * 补全从 `EtherScan` 拉下来的账单中各种 `token` 的信息, 需要很多种线程情况, 这里使用异步并发观察结果
 		 * 在汇总到主线程.
@@ -411,7 +454,7 @@ class TransactionListPresenter(
 										)
 										receiveAddress = transactionInfo?.address
 									}
-									
+
 									TransactionTable.updateModelInfo(
 										transaction,
 										true,
@@ -434,7 +477,7 @@ class TransactionListPresenter(
 							}
 						}
 					}
-					
+
 					override fun getResultInMainThread() = false
 					override fun mergeCallBack() = hold(data)
 				}.start()

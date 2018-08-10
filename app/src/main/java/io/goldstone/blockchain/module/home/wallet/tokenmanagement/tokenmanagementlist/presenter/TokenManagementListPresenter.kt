@@ -1,20 +1,18 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
-import android.content.Context
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
@@ -36,7 +34,7 @@ class TokenManagementListPresenter(
 			if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
 			// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 			fragment.getParentFragment<TokenManagementFragment> {
-				afterSetHeightAnimation = Runnable { prepareMyDefaultTokens(it) }
+				prepareMyDefaultTokens(it)
 			}
 		}
 	}
@@ -47,20 +45,14 @@ class TokenManagementListPresenter(
 	}
 	
 	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
-		WalletTable.getWalletType {
-			when (it) {
-				WalletType.BTCTestOnly, WalletType.BTCOnly -> {
-					fragment.showAttentionView()
-				}
-				
-				WalletType.ETHERCAndETCOnly -> {
-					callback(true)
-				}
-				
-				else -> {
-					callback(false)
-				}
+		when (Config.getCurrentWalletType()) {
+			WalletType.BTCTestOnly.content, WalletType.BTCOnly.content -> {
+				fragment.showAttentionView()
+				callback(false)
 			}
+			
+			WalletType.ETHERCAndETCOnly.content -> callback(true)
+			else -> callback(false)
 		}
 	}
 	
@@ -72,7 +64,7 @@ class TokenManagementListPresenter(
 				
 				override fun concurrentJobs() {
 					defaultTokens.forEach { default ->
-						MyTokenTable.getMyTokensWithAddresses { myTokens ->
+						MyTokenTable.getMyTokens { myTokens ->
 							default.isUsed = !myTokens.find {
 								default.contract.equals(it.contract, true)
 							}.isNull()
@@ -82,16 +74,18 @@ class TokenManagementListPresenter(
 				}
 				
 				override fun mergeCallBack() {
-					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
+					val sortedList =
+						defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) {
-							sortedList.filterNot { it.symbol.equals(CryptoSymbol.btc, true) }.let {
+							sortedList.filterNot {
+								it.symbol.equals(CryptoSymbol.btc(), true)
+							}.let {
 								memoryTokenData = it.toArrayList()
 							}
 						} else {
 							memoryTokenData = sortedList
 						}
-						
 						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
 					} else {
 						return
@@ -106,7 +100,7 @@ class TokenManagementListPresenter(
 		fun updateMyTokensInfoBy(
 			switch: HoneyBaseSwitch,
 			token: DefaultTokenTable,
-			context: Context
+			chainID: String
 		) {
 			switch.isClickable = false
 			if (switch.isChecked) {
@@ -114,23 +108,19 @@ class TokenManagementListPresenter(
 				MyTokenTable.insertBySymbolAndContract(
 					token.symbol,
 					token.contract,
-					{ error, reason ->
-						GoldStoneDialog.chainError(reason, error, context)
-					}) {
+					chainID
+				) {
 					switch.isClickable = true
-					updateWalletDetailData(context)
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteByContract(token.contract) {
+				MyTokenTable.deleteByContract(
+					token.contract,
+					WalletTable.getAddressBySymbol(token.symbol)
+				) {
 					switch.isClickable = true
-					updateWalletDetailData(context)
 				}
 			}
-		}
-		
-		private fun updateWalletDetailData(context: Context) {
-			(context as? MainActivity)?.getWalletDetailFragment()?.presenter?.updateData()
 		}
 	}
 }

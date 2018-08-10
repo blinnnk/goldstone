@@ -14,8 +14,10 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
@@ -34,10 +36,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	var model: ContactTable by observing(ContactTable()) {
 		info.apply {
 			title.text = model.name
-			subtitle.text = CryptoUtils.scaleMiddleAddress(
-				if (model.defaultAddress.isEmpty()) model.ethERCAndETCAddress
-				else model.defaultAddress
-			)
+			subtitle.text = model.generateSubtitleIntro()
 		}
 		model.name.isNotEmpty() isTrue {
 			fontIcon.text = model.name.substring(0, 1).toUpperCase()
@@ -76,6 +75,19 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 		}
 	}
 	
+	private fun ContactTable.generateSubtitleIntro(): String {
+		val addresses = listOf(
+			Pair("${CryptoSymbol.etc}/${CryptoSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
+			Pair(CryptoSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair("BTCTest", btcTestnetAddress.isNotEmpty())
+		)
+		val count = addresses.filter { it.second }.size
+		val allTypes = addresses.filter { it.second }.map { it.first }.toString()
+		val type = "(${allTypes.substring(1, allTypes.lastIndex)})"
+		val unit = if (count > 1) "Addresses" else "Address"
+		return "$count $unit $type"
+	}
+	
 	private val fontIcon by lazy {
 		TextView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(50.uiPX(), 50.uiPX())
@@ -89,7 +101,9 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	private val deleteButton by lazy {
 		Button(context).apply {
 			text = CommonText.delete
-			textSize = fontSize(12)
+			textSize = fontSize(14)
+			typeface = GoldStoneFont.black(context)
+			textColor = Spectrum.white
 			layoutParams = RelativeLayout.LayoutParams(deleteButtonWidth, cellHeight)
 			x = ScreenSize.widthWithPadding.toFloat() + 3f
 			backgroundColor = Spectrum.red

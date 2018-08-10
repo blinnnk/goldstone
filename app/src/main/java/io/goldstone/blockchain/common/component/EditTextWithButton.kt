@@ -18,6 +18,8 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -39,7 +41,7 @@ class EditTextWithButton(context: Context) : RelativeLayout(context) {
 			textSize = fontSize(12)
 			textColor = GrayScale.black
 			hintTextColor = GrayScale.midGray
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 35.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
 			x += PaddingSize.device
 			singleLine = true
 			leftPadding = 20.uiPX()

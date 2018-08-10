@@ -8,6 +8,7 @@ import java.math.BigInteger
  * @author KaySaith
  */
 data class PaymentPrepareModel(
+	val fromAddress: String,
 	val nonce: BigInteger,
 	val gasLimit: BigInteger,
 	val toAddress: String,
@@ -22,6 +23,8 @@ data class PaymentPrepareModel(
 data class PaymentPrepareBTCModel(
 	val toAddress: String,
 	val fromAddress: String,
+	val changeAddress: String,
 	val value: Long,
-	val estimateFeePerByte: Long
+	val estimateFeePerByte: Long,
+	val signedMessageSize: Long
 ) : Serializable

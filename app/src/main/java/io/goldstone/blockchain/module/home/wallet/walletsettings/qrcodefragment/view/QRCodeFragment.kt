@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.value.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment

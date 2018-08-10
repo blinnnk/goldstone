@@ -31,6 +31,6 @@ class AttentionTextView(context: Context) : TextView(context) {
 	}
 	
 	fun isCenter() {
-		gravity = Gravity.CENTER
+		gravity = Gravity.CENTER_HORIZONTAL
 	}
 }

@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -43,7 +43,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 	
 	private fun showAddButton(status: Boolean = true) {
 		getParentFragment<ProfileOverlayFragment> {
-			overlayView.header.showAddButton(status) {
+			showAddButton(status) {
 				presenter.showContactInputFragment()
 			}
 		}

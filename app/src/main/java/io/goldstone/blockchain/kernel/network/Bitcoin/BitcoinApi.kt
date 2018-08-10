@@ -2,6 +2,8 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONArray
@@ -15,7 +17,7 @@ object BitcoinApi {
 	
 	fun getBalanceByAddress(address: String, hold: (Long) -> Unit) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getBalance(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getBalance(BitcoinUrl.currentUrl(), address),
 			address,
 			true,
 			{
@@ -29,11 +31,13 @@ object BitcoinApi {
 	
 	fun getBTCTransactions(
 		address: String,
-		errorCallback: (Exception) -> Unit,
+		pageSize: Int,
+		offset: Int,
+		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl(), address, pageSize, offset),
 			"txs",
 			true,
 			{
@@ -52,14 +56,66 @@ object BitcoinApi {
 	
 	fun getUnspentListByAddress(address: String, hold: (List<UnspentModel>) -> Unit) {
 		RequisitionUtil.requestUncryptoData<UnspentModel>(
-			BitcoinUrl.getUnspentInfo(BitcoinUrl.currentUrl, address),
+			BitcoinUrl.getUnspentInfo(BitcoinUrl.currentUrl(), address),
 			"unspent_outputs",
 			false,
 			{
+				hold(listOf())
 				LogUtil.error("getRawtxByHash", it)
 			}
 		) {
 			hold(if (isNotEmpty()) this else listOf())
+		}
+	}
+	
+	fun getTransactionByHash(
+		hash: String,
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (BitcoinSeriesTransactionTable?) -> Unit
+	) {
+		RequisitionUtil.requestUncryptoData<String>(
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
+			"",
+			true,
+			{
+				errorCallback(it)
+				LogUtil.error("Bitcoin getTransactionByHash", it)
+			}
+		) {
+			hold(
+				if (isNotEmpty()) {
+					BitcoinSeriesTransactionTable(
+						JSONObject(this[0]),
+						CryptoSymbol.btc(),
+						address,
+						false
+					)
+				} else null
+			)
+		}
+	}
+	
+	fun getBlockNumberByTransactionHash(
+		hash: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (Int?) -> Unit
+	) {
+		RequisitionUtil.requestUncryptoData<String>(
+			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
+			"",
+			true,
+			{
+				hold(null)
+				errorCallback(it)
+				LogUtil.error("getBlockNumberByTransactionHash", it)
+			}
+		) {
+			hold(
+				if (isNotEmpty()) {
+					JSONObject(this[0]).safeGet("block_height").toIntOrNull()
+				} else null
+			)
 		}
 	}
 }

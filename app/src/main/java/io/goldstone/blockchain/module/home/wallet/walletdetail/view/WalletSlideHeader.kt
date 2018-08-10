@@ -9,11 +9,15 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.CircleButton
 import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.button.CircleButton
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 
 /**
@@ -54,6 +58,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		balance.apply {
 			title.textSize = fontSize(18)
 			title.typeface = GoldStoneFont.black(context)
+			title.y += 3.uiPX()
 			subtitle.apply {
 				text = setBalanceInfo()
 				textSize = fontSize(12)

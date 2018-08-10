@@ -1,15 +1,17 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.component.GoldStoneDialog.Companion.chainError
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog.Companion.chainError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import java.io.Serializable
@@ -29,13 +31,13 @@ data class WalletDetailCellModel(
 	var contract: String = "",
 	var weight: Int = 0
 ) : Serializable {
-	
+
 	constructor(data: DefaultTokenTable, balance: Double, countHasDecimal: Boolean = false) : this(
 		data.iconUrl,
 		data.symbol,
 		data.name,
 		data.decimals,
-		countHasDecimal.convertBalance(balance, data.decimals),
+		CryptoUtils.toCountByDecimal(balance, data.decimals),
 		data.price,
 		CryptoUtils.formatDouble(
 			countHasDecimal.convertBalance(balance, data.decimals) * data.price
@@ -43,25 +45,25 @@ data class WalletDetailCellModel(
 		data.contract,
 		data.weight
 	)
-	
+
 	companion object {
-		
+
 		fun Boolean.convertBalance(balance: Double, decimal: Double): Double {
 			return if (this) {
-				balance.formatCount(5).toDoubleOrNull().orElse(0.0)
+				balance.formatCount(9).toDoubleOrNull().orElse(0.0)
 			} else {
 				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
 			}
 		}
-		
+
 		fun getLocalModels(
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
 		) {
-			MyTokenTable.getMyTokensWithAddresses { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getMyTokensWithAddresses
+					return@getMyTokens
 				}
 				DefaultTokenTable.getCurrentChainTokens { localTokens ->
 					object : ConcurrentAsyncCombine() {
@@ -72,12 +74,27 @@ data class WalletDetailCellModel(
 								localTokens.find {
 									it.contract.equals(token.contract, true)
 								}?.let { targetToken ->
-									tokenList.add(WalletDetailCellModel(targetToken, token.balance))
+									// 需求会在账单拉取后把当前账号地址下的 `Token` 也显示出来, 拉取账单的地方因为数量和第三方的
+									// 原因, 尽量提速的时候并没有拉取 `TokenName` 所以, 所以在这里显示以上原因插入的 `Token` 如
+									// 过 `TokenName` 为空会额外拉取一次.
+									if (targetToken.name.isEmpty()) {
+										targetToken.updateTokenNameFromChain(
+											{
+												LogUtil.error("updateTokenNameFromChain", it)
+												completeMark()
+											}
+										) {
+											tokenList.add(WalletDetailCellModel(it, token.balance))
+											completeMark()
+										}
+									} else {
+										tokenList.add(WalletDetailCellModel(targetToken, token.balance))
+										completeMark()
+									}
 								}
-								completeMark()
 							}
 						}
-						
+
 						override fun mergeCallBack() {
 							hold(tokenList)
 						}
@@ -85,7 +102,7 @@ data class WalletDetailCellModel(
 				}
 			}
 		}
-		
+
 		fun getChainModels(
 			fragment: WalletDetailFragment,
 			hold: (ArrayList<WalletDetailCellModel>) -> Unit
@@ -95,11 +112,11 @@ data class WalletDetailCellModel(
 			/** 没有网络直接返回 */
 			if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) return
 			// 获取我的钱包的 `Token` 列表
-			MyTokenTable.getMyTokensWithAddresses { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) {
 					hold(arrayListOf())
-					return@getMyTokensWithAddresses
+					return@getMyTokens
 				}
 				// 首先更新 `MyToken` 的 `Price`
 				myTokens.updateMyTokensPrices(
@@ -139,14 +156,32 @@ data class WalletDetailCellModel(
 									}
 								}
 							}
-							
+
 							override fun mergeCallBack() = hold(tokenList)
 						}.start()
 					}
 				}
 			}
 		}
-		
+
+		private fun DefaultTokenTable.updateTokenNameFromChain(
+			errorCallback: (Throwable?) -> Unit,
+			callback: (DefaultTokenTable) -> Unit
+		) {
+			GoldStoneEthCall.getTokenName(
+				contract,
+				{ error, reason ->
+					LogUtil.error("getTokenName $reason", error)
+					errorCallback(error)
+				},
+				Config.getCurrentChainName()
+			) {
+				val name = if (it.isEmpty()) symbol else it
+				DefaultTokenTable.updateTokenName(contract, name)
+				callback(this.apply { this.name = name })
+			}
+		}
+
 		private fun ArrayList<MyTokenTable>.updateMyTokensPrices(
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
@@ -168,7 +203,7 @@ data class WalletDetailCellModel(
 								completeMark()
 							}
 						}
-						
+
 						override fun mergeCallBack() = callback()
 					}.start()
 				}

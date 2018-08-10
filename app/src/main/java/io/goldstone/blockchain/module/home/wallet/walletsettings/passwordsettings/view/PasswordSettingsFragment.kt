@@ -7,13 +7,14 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -67,13 +68,19 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 			}.click {
 				it.showLoadingStatus()
-				presenter.updatePassword(
-					oldPassword,
-					newPassword,
-					repeatPassword,
-					passwordHint
-				) {
-					it.showLoadingStatus(false)
+				presenter.verifyOldPassword(oldPassword.text.toString()) { isCorrectSecret ->
+					if (isCorrectSecret) presenter.updatePassword(
+						oldPassword.text.toString(),
+						newPassword.text.toString(),
+						repeatPassword.text.toString(),
+						passwordHint.text.toString()
+					) {
+						it.showLoadingStatus(false)
+					}
+					else {
+						context.alert(CommonText.wrongPassword)
+						it.showLoadingStatus(false)
+					}
 				}
 			}.into(this)
 		}

@@ -2,9 +2,8 @@ package io.goldstone.blockchain.common.utils
 
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.UI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -75,4 +74,15 @@ abstract class ConcurrentAsyncCombine {
 	}
 	
 	abstract fun mergeCallBack()
+}
+
+/**
+ * 封装的配套协程工具
+ */
+fun <T> load(doThings: () -> T): Deferred<T> {
+	return async(CommonPool, CoroutineStart.LAZY) { doThings() }
+}
+
+infix fun <T> Deferred<T>.then(block: (T) -> Unit): Job {
+	return launch(UI) { block(await()) }
 }

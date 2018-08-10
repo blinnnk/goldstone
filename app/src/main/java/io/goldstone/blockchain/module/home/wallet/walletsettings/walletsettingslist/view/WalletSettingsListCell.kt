@@ -5,11 +5,11 @@ import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseCell
+import io.goldstone.blockchain.common.base.basecell.BaseCell
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import org.jetbrains.anko.textColor

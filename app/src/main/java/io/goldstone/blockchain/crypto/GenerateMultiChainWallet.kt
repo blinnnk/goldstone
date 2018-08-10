@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
-import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 
 /**
  * @date 2018/7/14 12:20 PM
@@ -14,17 +16,17 @@ object GenerateMultiChainWallet {
 	fun create(
 		context: Context,
 		password: String,
-		path: MultiChainPath = MultiChainPath(
-			DefaultPath.ethPath,
-			DefaultPath.etcPath,
-			DefaultPath.btcPath,
-			DefaultPath.btcTestPath
-		),
 		hold: (
 			multiChainAddresses: MultiChainAddresses,
 			mnemonic: String
 		) -> Unit
 	) {
+		val path = MultiChainPath(
+			DefaultPath.ethPath,
+			DefaultPath.etcPath,
+			DefaultPath.btcPath,
+			DefaultPath.btcTestPath
+		)
 		context.generateWallet(password, path.ethPath) { mnemonic, ethAddress ->
 			context.getEthereumWalletByMnemonic(
 				mnemonic,
@@ -34,11 +36,25 @@ object GenerateMultiChainWallet {
 				BTCWalletUtils.getBitcoinWalletByMnemonic(
 					mnemonic,
 					path.btcPath
-				) { btcAddress, _ ->
+				) { btcAddress, secret ->
+					context.storeBase58PrivateKey(
+						secret,
+						btcAddress,
+						password,
+						false,
+						false
+					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
-					) { btcTestAddress, _ ->
+					) { btcTestAddress, testSecret ->
+						context.storeBase58PrivateKey(
+							testSecret,
+							btcTestAddress,
+							password,
+							true,
+							false
+						)
 						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress), mnemonic)
 					}
 				}
@@ -50,17 +66,14 @@ object GenerateMultiChainWallet {
 		context: Context,
 		mnemonic: String,
 		password: String,
-		path: MultiChainPath = MultiChainPath(
-			DefaultPath.ethPath,
-			DefaultPath.etcPath,
-			DefaultPath.btcPath,
-			DefaultPath.btcTestPath
-		),
-		hold: (
-			multiChainAddresses: MultiChainAddresses
-		) -> Unit
+		path: MultiChainPath,
+		hold: (multiChainAddresses: MultiChainAddresses) -> Unit
 	) {
 		context.getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
+			if (ethAddress.equals(ImportWalletText.existAddress, true)) {
+				hold(MultiChainAddresses())
+				return@getEthereumWalletByMnemonic
+			}
 			context.getEthereumWalletByMnemonic(
 				mnemonic,
 				path.etcPath,
@@ -69,41 +82,31 @@ object GenerateMultiChainWallet {
 				BTCWalletUtils.getBitcoinWalletByMnemonic(
 					mnemonic,
 					path.btcPath
-				) { btcAddress, _ ->
+				) { btcAddress, base58Privatekey ->
+					// 存入 `Btc PrivateKey` 到 `KeyStore`
+					context.storeBase58PrivateKey(
+						base58Privatekey,
+						btcAddress,
+						password,
+						false,
+						false
+					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.btcTestPath
-					) { btcTestAddress, _ ->
+					) { btcTestAddress, btcTestBase58Privatekey ->
+						// 存入 `BtcTest PrivateKey` 到 `KeyStore`
+						context.storeBase58PrivateKey(
+							btcTestBase58Privatekey,
+							btcTestAddress,
+							password,
+							true,
+							false
+						)
 						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress))
 					}
 				}
 			}
-		}
-	}
-}
-
-data class MultiChainPath(
-	val ethPath: String,
-	val etcPath: String,
-	val btcPath: String,
-	val btcTestPath: String
-)
-
-data class MultiChainAddresses(
-	val ethAddress: String,
-	val etcAddress: String,
-	val btcAddress: String,
-	val btcTestAddress: String
-) {
-	
-	companion object {
-		fun getNotEmptyAddresses(addresses: MultiChainAddresses): ArrayList<String> {
-			return arrayListOf(
-				addresses.ethAddress,
-				addresses.etcAddress,
-				addresses.btcAddress,
-				addresses.btcTestAddress
-			).filter { it.isNotEmpty() }.toArrayList()
 		}
 	}
 }

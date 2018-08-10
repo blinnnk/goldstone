@@ -8,11 +8,13 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
-import com.blinnnk.util.coroutinesTask
 import io.goldstone.blockchain.R.raw.terms
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.HoneyLanguage
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -40,15 +42,21 @@ data class AppConfigTable(
 	var pushToken: String = "",
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
-	var terms: String = ""
+	var terms: String = "",
+	var currentETCTestChainNameID: Int,
+	var currentETHERC20AndETCTestChainNameID: Int,
+	var currentBTCTestChainNameID: Int,
+	var currentETCChainNameID: Int,
+	var currentBTCChainNameID: Int,
+	var currentETHERC20AndETCChainNameID: Int,
+	var defaultCoinListMD5: String
 ) {
-	
+
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.appConfigDao().getAppConfig()
-				}) {
+			load {
+				GoldStoneDataBase.database.appConfigDao().getAppConfig()
+			} then {
 				it.isNotEmpty() isTrue {
 					hold(it[0])
 				} otherwise {
@@ -56,7 +64,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun updatePinCode(
 			newPinCode: Int,
 			callback: () -> Unit
@@ -74,7 +82,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun updatePushToken(token: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -86,11 +94,20 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
-		fun updateRegisterAddressesStatus(
-			isRegistered: Boolean,
-			callback: () -> Unit = {}
-		) {
+
+		fun updateDefaultTokenMD5(md5: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it.isNotEmpty() isTrue {
+							update(it[0].apply { this.defaultCoinListMD5 = md5 })
+						}
+					}
+				}
+			}
+		}
+
+		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -104,7 +121,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun updateRetryTimes(
 			times: Int
 		) {
@@ -118,7 +135,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun setFrozenTime(
 			frozenTime: Long?,
 			callback: () -> Unit = {}
@@ -134,12 +151,12 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun setShowPinCodeStatus(
 			status: Boolean,
 			callback: () -> Unit
 		) {
-			AppConfigTable.getAppConfig {
+			AppConfigTable.getAppConfig { it ->
 				it?.let {
 					doAsync {
 						GoldStoneDataBase.database.appConfigDao().update(it.apply {
@@ -155,7 +172,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun updateLanguage(
 			code: Int,
 			callback: () -> Unit
@@ -171,7 +188,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		fun updateChainStatus(
 			isMainnet: Boolean,
 			callback: () -> Unit
@@ -179,7 +196,9 @@ data class AppConfigTable(
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
-						update(it[0].apply { this.isMainnet = isMainnet })
+						update(it[0].apply {
+							this.isMainnet = isMainnet
+						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -187,27 +206,53 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
+		fun updateChainInfo(
+			isMainnet: Boolean,
+			etcChainNameID: Int,
+			ethERC20AndETCChainNameID: Int,
+			btcChainNameID: Int,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						update(it[0].apply {
+							this.isMainnet = isMainnet
+							if (isMainnet) {
+								currentBTCChainNameID = btcChainNameID
+								currentETCChainNameID = etcChainNameID
+								currentETHERC20AndETCChainNameID = ethERC20AndETCChainNameID
+							} else {
+								currentBTCTestChainNameID = btcChainNameID
+								currentETCTestChainNameID = etcChainNameID
+								currentETHERC20AndETCTestChainNameID = ethERC20AndETCChainNameID
+							}
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
 		fun updateTerms(terms: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { this.terms = terms })
-					}
+					update(getAppConfig()[0].apply { this.terms = terms })
 				}
 			}
 		}
-		
+
 		fun updateShareContent(shareContent: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { this.shareContent = shareContent })
-					}
+					update(getAppConfig()[0].apply { this.shareContent = shareContent })
 				}
 			}
 		}
-		
+
 		fun updateCurrency(
 			code: String,
 			callback: () -> Unit
@@ -221,7 +266,7 @@ data class AppConfigTable(
 				}
 			}
 		}
-		
+
 		@SuppressLint("HardwareIds")
 		fun insertAppConfig(callback: () -> Unit) {
 			doAsync {
@@ -239,18 +284,25 @@ data class AppConfigTable(
 							goldStoneID = goldStoneID,
 							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 							terms = getLocalTerms(),
-							isMainnet = true
+							isMainnet = true,
+							currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
+							currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
+							currentETHERC20AndETCChainNameID = ChainNameID.InfuraETHMain.id,
+							currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
+							currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
+							currentETHERC20AndETCTestChainNameID = ChainNameID.InfuraRopsten.id,
+							defaultCoinListMD5 = ""
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
-		
+
 		private fun getLocalTerms(): String {
 			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {
 					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
-				}.let {
+				}.let { it ->
 					return if (it.isNull()) {
 						localTerms.find {
 							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
@@ -266,16 +318,16 @@ data class AppConfigTable(
 
 @Dao
 interface AppConfigDao {
-	
+
 	@Query("SELECT * FROM appConfig")
 	fun getAppConfig(): List<AppConfigTable>
-	
+
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)
-	
+
 	@Update
 	fun update(appConfigTable: AppConfigTable)
-	
+
 	@Delete
 	fun delete(appConfigTable: AppConfigTable)
 }

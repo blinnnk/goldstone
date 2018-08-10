@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainText
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -36,7 +36,7 @@ object BTCJsonRPC {
 				false,
 				blocks
 			)
-		).let {
+		).let { it ->
 			RequisitionUtil.callChainBy(
 				it,
 				{ error, reason ->
@@ -53,6 +53,7 @@ object BTCJsonRPC {
 	
 	fun getCurrentBlockHeight(
 		isTest: Boolean,
+		errorCallback: (Throwable?) -> Unit,
 		hold: (Int?) -> Unit
 	) {
 		RequestBody.create(
@@ -65,10 +66,11 @@ object BTCJsonRPC {
 				false,
 				null
 			)
-		).let {
+		).let { it ->
 			RequisitionUtil.callChainBy(
 				it,
 				{ error, reason ->
+					errorCallback(error)
 					LogUtil.error("getblockHeight $reason", error)
 				},
 				if (isTest) ChainText.btcTest else ChainText.btcMain
@@ -94,7 +96,7 @@ object BTCJsonRPC {
 				signedMessage,
 				true // anyone can pay by this signed message
 			)
-		).let {
+		).let { it ->
 			RequisitionUtil.callChainBy(
 				it,
 				{ error, reason ->

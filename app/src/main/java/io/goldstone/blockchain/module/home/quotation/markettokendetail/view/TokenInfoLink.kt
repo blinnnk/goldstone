@@ -10,9 +10,10 @@ import com.blinnnk.extension.scaleTo
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.GraySqualCell
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -51,6 +52,7 @@ class TokenInfoLink(
 	private val whitePaper = GraySqualCell(context).apply { showArrow() }
 	
 	init {
+		setHorizontalPadding(PaddingSize.device.toFloat())
 		setTitle(QuotationText.tokenInfoLink)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		verticalLayout {

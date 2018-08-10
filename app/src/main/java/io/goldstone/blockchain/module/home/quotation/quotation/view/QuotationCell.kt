@@ -51,10 +51,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				tokenPrice.setColorStyle(GrayScale.midGray)
 				chartView.setDisconnectedStyle()
 			}
+			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
 				chartView.setRedColor()
 			}
+			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
 				chartView.setGreenColor()
@@ -101,7 +103,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override fun canClickPoint() = false
 		override fun setChartStyle() = LineChart.Companion.Style.LineStyle
 		override fun hasAnimation() = false
-		override fun setEvnetWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
+		override fun setEventWhenDataIsEmpty(chartData: ArrayList<ChartPoint>): Boolean {
 			return if (model.price != ValueTag.emptyPrice) {
 				chartData.addAll(
 					arrayListOf(

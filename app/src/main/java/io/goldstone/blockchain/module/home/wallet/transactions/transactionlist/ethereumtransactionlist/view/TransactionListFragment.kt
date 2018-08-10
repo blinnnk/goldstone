@@ -2,8 +2,8 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
@@ -15,14 +15,14 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class TransactionListFragment :
 	BaseRecyclerFragment<TransactionListPresenter, TransactionListModel>() {
-	
+
 	override val presenter = TransactionListPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionListModel>?
 	) {
-		asyncData?.let {
+		asyncData?.let { it ->
 			recyclerView.adapter = TransactionListAdapter(it) {
 				onClick {
 					TransactionListPresenter.showTransactionDetail(
@@ -35,7 +35,7 @@ class TransactionListFragment :
 			}
 		}
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		getParentFragment<TransactionFragment> {

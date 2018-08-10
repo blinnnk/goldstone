@@ -6,14 +6,15 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.common.value.DialogText
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -33,7 +34,9 @@ class MnemonicConfirmationPresenter(
 		current: String
 	) {
 		compareMnemonicCode(correct, current) isTrue {
-			validAndContinue()
+			WalletTable.updateHasBackupMnemonic {
+				validAndContinue()
+			}
 		} otherwise {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}
@@ -48,16 +51,13 @@ class MnemonicConfirmationPresenter(
 		when (currentActivity) {
 			is MainActivity -> {
 				fragment.getParentFragment<WalletSettingsFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
-					}
+					presenter.removeSelfFromActivity()
+					currentActivity.showSucceedDialog()
 				}
 				
 				fragment.getParentFragment<WalletGenerationFragment> {
-					context?.showSucceedDialog {
-						presenter.removeSelfFromActivity()
-						fragment.activity?.jump<SplashActivity>()
-					}
+					presenter.removeSelfFromActivity()
+					fragment.activity?.jump<SplashActivity>()
 				}
 			}
 			
@@ -67,7 +67,7 @@ class MnemonicConfirmationPresenter(
 		}
 	}
 	
-	private fun Context.showSucceedDialog(callback: () -> Unit) {
+	private fun Context.showSucceedDialog() {
 		GoldStoneDialog.show(this) {
 			showOnlyConfirmButton {
 				GoldStoneDialog.remove(context)
@@ -75,13 +75,12 @@ class MnemonicConfirmationPresenter(
 			setImage(R.drawable.succeed_banner)
 			setContent(CommonText.succeed, DialogText.backUpMnemonicSucceed)
 		}
-		callback()
 	}
 	
 	override fun onFragmentShowFromHidden() {
 		fragment.parentFragment.apply {
 			fun BaseOverlayFragment<*>.resetEvent() {
-				headerTitle = CreateWalletText.mnemonicBackUp
+				headerTitle = CreateWalletText.mnemonicConfirmation
 				overlayView.header.showCloseButton(false)
 				overlayView.header.showBackButton(true) {
 					presenter.popFragmentFrom<MnemonicConfirmationFragment>()

@@ -30,7 +30,7 @@ class PasscodePresenter(
 	private val handler = Handler()
 	
 	fun unlockOrAlert(passcode: String, action: () -> Unit) {
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig { it ->
 			var retryTimes = it?.retryTimes.orZero()
 			checkPasscode(passcode) {
 				it isTrue {

@@ -4,10 +4,11 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.ConcurrentCombine
-import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -133,7 +134,7 @@ data class TransactionTable(
 		data.fromAddress != Config.getCurrentEthereumAddress(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
-		Config.getCurrentAddress()
+		Config.getCurrentEthereumAddress()
 	)
 	
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -194,10 +195,13 @@ data class TransactionTable(
 		"",
 		"",
 		"",
-		data.safeGet("from") != Config.getCurrentAddress(),
+		!data.safeGet("from").equals(
+			if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+			true
+		),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		Config.getCurrentAddress(),
+		if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
 		chainID = chainID
 	)
@@ -225,7 +229,7 @@ data class TransactionTable(
 		"",
 		"0",
 		"",
-		data.from != Config.getCurrentETCAddress(),
+		!data.from.equals(Config.getCurrentETCAddress(), true),
 		false,
 		CryptoSymbol.etc,
 		Config.getCurrentETCAddress(),
@@ -260,13 +264,12 @@ data class TransactionTable(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -280,13 +283,12 @@ data class TransactionTable(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getETCTransactionsByAddress(address)
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.transactionDao()
+					.getETCTransactionsByAddress(address)
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -345,10 +347,10 @@ data class TransactionTable(
 				GoldStoneDataBase.database.transactionDao().apply {
 					val data = getAllTransactionsByAddress(address)
 					if (data.isEmpty()) {
-						GoldStoneAPI.context.runOnUiThread { callback() }
+						callback()
 						return@doAsync
 					}
-					object : ConcurrentCombine() {
+					object : ConcurrentAsyncCombine() {
 						override var asyncCount: Int = data.size
 						override fun concurrentJobs() {
 							data.forEach {
@@ -357,6 +359,7 @@ data class TransactionTable(
 							}
 						}
 						
+						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}
@@ -377,6 +380,7 @@ data class TransactionTable(
 						getInputCodeByHash(
 							hash,
 							{ error, reason ->
+								callback("")
 								LogUtil.error("getMemoByHashAndReceiveStatus $reason", error)
 							},
 							chainName
@@ -405,9 +409,7 @@ data class TransactionTable(
 			hold: (List<TransactionTable>) -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash).let {
-					hold(it)
-				}
+				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
 		
@@ -416,13 +418,10 @@ data class TransactionTable(
 			isReceived: Boolean,
 			hold: (TransactionTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.transactionDao()
-						.getByTaxHashAndReceivedStatus(hash, isReceived)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase.database.transactionDao()
+					.getByTaxHashAndReceivedStatus(hash, isReceived)
+			} then (hold)
 		}
 	}
 }

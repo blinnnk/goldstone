@@ -4,11 +4,16 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONObject
+import java.io.Serializable
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -56,10 +61,9 @@ data class NotificationTable(
 	
 	companion object {
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.notificationDao().getAllNotifications()
-				}) {
+			load {
+				GoldStoneDataBase.database.notificationDao().getAllNotifications()
+			} then {
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}
@@ -74,6 +78,16 @@ data class NotificationTable(
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("from")
 			} else ""
+		}
+		
+		fun getBTCTransactionData(extra: String, isFrom: Boolean): List<ExtraTransactionModel> {
+			val option = if (isFrom) "from" else "to"
+			return if (extra.isNotEmpty()) {
+				val gson = Gson()
+				val collectionType = object : TypeToken<Collection<ExtraTransactionModel>>() {}.type
+				val jsonData = JSONObject(extra).safeGet(option)
+				gson.fromJson(jsonData, collectionType)
+			} else listOf()
 		}
 		
 		fun getToAddress(extra: String): String {
@@ -130,4 +144,27 @@ interface NotificationDao {
 	
 	@Update
 	fun update(notification: NotificationTable)
+}
+
+data class NotificationTransactionInfo(
+	val hash: String,
+	val chainID: String,
+	val isReceived: Boolean,
+	val symbol: String,
+	val value: Double,
+	val timeStamp: Long,
+	val toAddress: String,
+	val fromAddress: String
+) : Serializable
+
+data class ExtraTransactionModel(
+	@SerializedName("value")
+	val value: String,
+	@SerializedName("address")
+	val address: String
+) {
+	constructor() : this(
+		"",
+		""
+	)
 }

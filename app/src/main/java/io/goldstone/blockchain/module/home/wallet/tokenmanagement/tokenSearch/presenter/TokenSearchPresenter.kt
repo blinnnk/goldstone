@@ -3,13 +3,14 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -29,17 +30,35 @@ import org.jetbrains.anko.runOnUiThread
 class TokenSearchPresenter(
 	override val fragment: TokenSearchFragment
 ) : BaseRecyclerPresenter<TokenSearchFragment, DefaultTokenTable>() {
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-	
+
+	private var canSearch = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
-			overlayView.header.searchInputLinstener {
-				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					searchTokenByContractOrSymbol(it) {
+			overlayView.header.searchInputLinstener(
+				{
+					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+					if (it) {
+						canSearch = if (
+							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
+							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true)
+						) {
+							fragment.context.alert(
+								"This is a single bitcoin chain wallet so you canot add other crypot currency"
+							)
+							false
+						} else {
+							NetworkUtil.hasNetworkWithAlert(context)
+						}
+					}
+				}
+			) { defaultTokens ->
+				canSearch isTrue {
+					searchTokenByContractOrSymbol(defaultTokens) {
 						context?.runOnUiThread {
 							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
 							fragment.removeLoadingView()
@@ -49,7 +68,7 @@ class TokenSearchPresenter(
 			}
 		}
 	}
-	
+
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
 			model?.let { searchToken ->
@@ -77,25 +96,29 @@ class TokenSearchPresenter(
 			switch.preventDuplicateClicks()
 		}
 	}
-	
+
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it, this)
+				TokenManagementListPresenter.updateMyTokensInfoBy(
+					switch,
+					it,
+					ChainID.getChainIDBySymbol(it.symbol)
+				)
 			}
 		}
 	}
-	
+
 	private fun searchTokenByContractOrSymbol(
 		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-		
+
 		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
 			content,
-			{
+			{ it ->
 				// Usually this kinds of Exception will be connect to the service Timeout
 				fragment.context?.alert(
 					it.toString().trimStart {
@@ -104,58 +127,61 @@ class TokenSearchPresenter(
 				)
 			}
 		) { result ->
-			result.isNullOrEmpty() isFalse {
-				// 从服务器请求目标结果
-				MyTokenTable.getMyTokensWithAddresses { localTokens ->
-					result.map { serverToken ->
+			MyTokenTable.getMyTokens { localTokens ->
+				if (!result.isNullOrEmpty()) {
+					// 从服务器请求目标结果
+					hold(result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
-							isDefault = localTokens.any {
+							val status = localTokens.any {
 								it.contract.equals(serverToken.contract, true)
 							}
+							isDefault = status
+							isUsed = status
 						}
-					}.let {
-						hold(it.toArrayList())
+					}.toArrayList())
+				} else {
+					if (isSearchingSymbol) {
+						hold(arrayListOf())
+						return@getMyTokens
 					}
-				}
-			} otherwise {
-				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
-				isSearchingSymbol isFalse {
+					// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
-					MyTokenTable.getCurrentChainTokenByContract(content) {
-						GoldStoneEthCall.getTokenInfoByContractAddress(
-							content,
-							{ error, reason ->
-								fragment.context?.alert(reason ?: error.toString())
-							},
-							Config.getCurrentChainName()
-						) { symbol, name, decimal ->
-							if (symbol.isEmpty() || name.isEmpty()) {
-								hold(arrayListOf())
-							} else {
-								hold(
-									arrayListOf(
-										DefaultTokenTable(
-											0,
-											content,
-											"",
-											symbol,
-											TinyNumber.False.value,
-											0.0,
-											name,
-											decimal,
-											null,
-											false,
-											0,
-											ChainID.getChainIDBySymbol(symbol)
-										)
+					GoldStoneEthCall.getTokenInfoByContractAddress(
+						content,
+						{ error, reason ->
+							fragment.context?.alert(reason ?: error.toString())
+						},
+						Config.getCurrentChainName()
+					) { symbol, name, decimal ->
+						if (symbol.isEmpty() || name.isEmpty()) {
+							hold(arrayListOf())
+						} else {
+							val status = localTokens.any {
+								it.contract.equals(content, true)
+							}
+							hold(
+								arrayListOf(
+									DefaultTokenTable(
+										0,
+										"",
+										content,
+										"",
+										symbol,
+										TinyNumber.False.value,
+										0.0,
+										name,
+										decimal,
+										null,
+										status,
+										0,
+										ChainID.getChainIDBySymbol(symbol),
+										isUsed = status
 									)
 								)
-							}
+							)
 						}
 					}
-				} otherwise {
-					hold(arrayListOf())
 				}
 			}
 		}

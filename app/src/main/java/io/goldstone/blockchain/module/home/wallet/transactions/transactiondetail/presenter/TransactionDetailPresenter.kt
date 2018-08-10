@@ -2,22 +2,26 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.utils.toBTCCount
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -32,13 +36,13 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date 27/03/2018 3:27 AM
  * @author KaySaith
  * @description
- * 这个界面由三个入场景公用, 分别是账单列表，转账完成或通知中心进入, `fragment` 承担了多重身份
+ * 这个界面由三个入场景公用, 分别是账单列表，转账完成和通知中心进入, `fragment` 承担了多重身份
  * 固再次需要注意.
  */
 class TransactionDetailPresenter(
 	override val fragment: TransactionDetailFragment
 ) : BaseRecyclerPresenter<TransactionDetailFragment, TransactionDetailModel>() {
-	
+
 	internal val data by lazy {
 		fragment.arguments?.get(ArgumentKey.transactionDetail) as? ReceiptModel
 	}
@@ -51,7 +55,7 @@ class TransactionDetailPresenter(
 	internal var count = 0.0
 	internal var currentHash = ""
 	internal var headerModel: TransactionHeaderModel? = null
-	
+
 	override fun updateData() {
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
 		updateDataFromTransactionList()
@@ -60,19 +64,19 @@ class TransactionDetailPresenter(
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 		updateDataFromNotification()
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.setBackEventByParentFragment()
 	}
-	
+
 	// 更新头部数字的工具
 	fun updateHeaderValue(headerModel: TransactionHeaderModel) {
 		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			it?.setIconStyle(headerModel)
+			it.setIconStyle(headerModel)
 		}
 	}
-	
+
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
 			is TransactionFragment -> {
@@ -80,80 +84,76 @@ class TransactionDetailPresenter(
 				parent.presenter
 					.popFragmentFrom<TransactionDetailFragment>(TransactionFragment.viewPagerSize)
 			}
-			
+
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 			}
-			
+
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 			}
 		}
 	}
-	
+
 	fun getCurrentChainName(): String {
 		return ChainURL.getChainNameBySymbol(
 			data?.token?.symbol
-			?: dataFromList?.symbol
-			?: notificationData?.symbol.orEmpty()
+				?: dataFromList?.symbol
+				?: notificationData?.symbol.orEmpty()
 		)
 	}
-	
-	fun getUnitSymbol(): String {
+
+	private fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return if (symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
-		else CryptoSymbol.eth
+		return when {
+			symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
+			symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
+			else -> CryptoSymbol.eth
+		}
 	}
-	
+
 	fun showAddContactsButton(cell: TransactionDetailCell) {
-		ContactTable.getAllContacts {
-			if (it.find { contact ->
-					contact.ethERCAndETCAddress.equals(cell.model.info, true)
-				}.isNull()) {
-				cell.showAddContactButton {
-					onClick {
-						fragment.parentFragment?.apply {
-							when (this) {
-								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-								is TransactionFragment -> presenter.removeSelfFromActivity()
+		TransactionListModel
+			.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
+				ContactTable.hasContacts(address) { exist ->
+					if (exist) return@hasContacts
+					cell.showAddContactButton(index) {
+						onClick {
+							fragment.parentFragment?.apply {
+								when (this) {
+									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+									is TransactionFragment -> presenter.removeSelfFromActivity()
+								}
 							}
-						}
-						fragment.getMainActivity()?.apply {
-							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-								putString(ArgumentKey.address, cell.model.info)
+							fragment.getMainActivity()?.apply {
+								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+									putString(ArgumentKey.address, address)
+								}
 							}
+							preventDuplicateClicks()
 						}
-						preventDuplicateClicks()
 					}
 				}
 			}
-		}
 	}
-	
-	fun showEtherScanTransactionFragment() {
+
+	fun showTransactionWebFragment() {
+		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
 		val argument = Bundle().apply {
 			putString(
 				ArgumentKey.webViewUrl,
-				TransactionListModel.generateTransactionURL(
-					currentHash,
-					dataFromList?.symbol ?: data?.token?.contract ?: notificationData?.symbol
-				)
+				TransactionListModel.generateTransactionURL(currentHash, symbol)
 			)
 		}
 		fragment.parentFragment.apply {
 			val webTitle =
-				if (
-					dataFromList?.symbol
-					?: data?.token?.contract
-					?: notificationData?.symbol ==
-					CryptoSymbol.etc
-				) {
-					TransactionText.gasTracker
-				} else {
-					TransactionText.etherScanTransaction
+				when {
+					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
+					symbol.equals(CryptoSymbol.btc(), true) -> TransactionText.blockChainInfo
+					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
 				is TransactionFragment -> presenter.showTargetFragment<WebViewFragment>(
@@ -168,10 +168,121 @@ class TransactionDetailPresenter(
 			}
 		}
 	}
-	
+
+	// 根据传入转账信息类型, 来生成对应的更新界面的数据
+	fun generateModels(
+		receipt: Any? = null
+	): ArrayList<TransactionDetailModel> {
+		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
+		val timstamp =
+			data?.timestamp
+				?: dataFromList?.timeStamp?.toLongOrNull()
+				?: notificationData?.timeStamp.orElse(0L)
+		val date = TimeUtils.formatDate(timstamp.toMillsecond())
+		val memo =
+			if (data?.memo.isNull()) TransactionText.noMemo
+			else data?.memo
+		val fromAddress = data?.fromAddress
+			?: dataFromList?.fromAddress
+			?: notificationData?.fromAddress
+		val symbol = data?.token?.symbol
+			?: dataFromList?.symbol
+			?: notificationData?.symbol.orEmpty()
+		val receiptData = when (receipt) {
+			is TransactionListModel -> {
+				arrayListOf(
+					receipt.minerFee,
+					receipt.memo,
+					receipt.fromAddress,
+					receipt.toAddress,
+					receipt.transactionHash,
+					receipt.blockNumber,
+					receipt.date,
+					receipt.url
+				)
+			}
+
+			is TransactionTable -> {
+				arrayListOf(
+					formatedMinnerFee(),
+					memo,
+					if (receipt.isReceive) receipt.to
+					else fromAddress,
+					if (receipt.isReceive) fromAddress
+					else receipt.to,
+					currentHash,
+					receipt.blockNumber,
+					date,
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+				)
+			}
+
+			is BitcoinSeriesTransactionTable -> {
+				arrayListOf(
+					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
+					memo,
+					receipt.fromAddress,
+					TransactionListModel.formatToAddress(receipt.to),
+					currentHash,
+					receipt.blockNumber,
+					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),
+					TransactionListModel.generateTransactionURL(currentHash, CryptoSymbol.btc())
+				)
+			}
+
+			else -> {
+				arrayListOf(
+					formatedMinnerFee(),
+					memo,
+					fromAddress,
+					data?.toAddress.orEmpty(),
+					currentHash,
+					"Waiting...",
+					date,
+					TransactionListModel.generateTransactionURL(currentHash, symbol)
+				)
+			}
+		}
+		arrayListOf(
+			TransactionText.minerFee,
+			TransactionText.memo,
+			CommonText.from,
+			CommonText.to,
+			TransactionText.transactionHash,
+			TransactionText.blockNumber,
+			TransactionText.transactionDate,
+			TransactionText.url
+		).mapIndexed { index, it ->
+			TransactionDetailModel(receiptData[index].toString(), it)
+		}.let { models ->
+			return if (
+				data?.token?.symbol.equals(CryptoSymbol.btc(), true)
+				|| dataFromList?.symbol.equals(CryptoSymbol.btc(), true)
+				|| notificationData?.symbol.equals(CryptoSymbol.btc(), true)
+			) {
+				// 如果是 `比特币` 账单不显示 `Memo`
+				models.filterNot {
+					it.description.equals(TransactionText.memo, true)
+				}.toArrayList()
+			} else {
+				models.toArrayList()
+			}
+		}
+	}
+
+	private fun formatedMinnerFee(): String? {
+		val dataMinerFee =
+			if (data?.token?.symbol.equals(CryptoSymbol.btc(), true))
+				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
+			else data?.minnerFee
+		return if (data.isNull()) dataFromList?.minerFee
+		else "$dataMinerFee ${getUnitSymbol()}"
+	}
+
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
 		parentFragment?.let { parent ->
 			if (parent is BaseOverlayFragment<*>) {
+				parent.headerTitle = TransactionText.detail
 				parent.overlayView.header.backButton.onClick {
 					runBackEventBy(parent)
 				}

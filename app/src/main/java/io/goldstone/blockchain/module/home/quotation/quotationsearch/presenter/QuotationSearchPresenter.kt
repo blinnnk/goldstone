@@ -3,11 +3,11 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
-import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -27,13 +27,19 @@ class QuotationSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 	
+	private var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.searchInputLinstener {
-				NetworkUtil.hasNetworkWithAlert(context) isTrue {
-					searchTokenBy(it)
+			overlayView.header.searchInputLinstener(
+				{
+					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+					if (it) {
+						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+					}
 				}
+			) {
+				hasNetWork isTrue { searchTokenBy(it) }
 			}
 		}
 	}

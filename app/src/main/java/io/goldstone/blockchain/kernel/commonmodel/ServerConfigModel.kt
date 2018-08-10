@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 /**
  * @date 2018/6/12 3:42 PM
@@ -13,4 +14,17 @@ data class ServerConfigModel(
 	val switch: String,
 	@SerializedName("value")
 	val value: String
-)
+) : Serializable {
+	constructor() : this(
+		"",
+		"",
+		""
+	)
+}
+
+data class QRCodeModel(
+	val amount: Double,
+	val walletAddress: String,
+	val contractAddress: String,
+	val chainID: String
+) : Serializable

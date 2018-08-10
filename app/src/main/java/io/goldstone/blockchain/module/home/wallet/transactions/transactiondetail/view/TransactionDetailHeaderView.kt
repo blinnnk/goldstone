@@ -16,15 +16,16 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.RoundIcon
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.TransactionSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 27/03/2018 3:33 AM
@@ -46,9 +47,9 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		
 		verticalLayout {
 			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), 140.uiPX()).apply {
+				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), wrapContent).apply {
 					leftMargin = (ScreenSize.Width * 0.1).toInt()
-					addRule(CENTER_VERTICAL)
+					topMargin = 50.uiPX()
 				}
 			
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -95,9 +96,10 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			if (headerModel.isReceive) TransactionText.transferResultReceived
 			else TransactionText.transferResultSent
 		info.title.text =
-			"$type ${headerModel.count} ${headerModel.symbol} ${if (headerModel.isReceive)
+			"$type ${headerModel.count.toBigDecimal().toPlainString()} " +
+			"${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
-		info.subtitle.text = headerModel.address.toUpperCase()
+		info.subtitle.text = headerModel.address
 		
 		if (headerModel.isError) {
 			icon.iconColor = Spectrum.lightRed
@@ -112,7 +114,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		} else {
 			showPendingIcon(false)
 			if (!headerModel.isReceive) {
-				icon.iconColor = Spectrum.yellow
+				icon.iconColor = Spectrum.DarkYellow
 				icon.src = R.drawable.send_icon
 				icon.setColorFilter(GrayScale.Opacity5Black)
 			} else {
@@ -123,17 +125,18 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	}
 	
 	private fun showPendingIcon(status: Boolean = true) {
-		pendingIcon.isNotNull {
+		pendingIcon isNotNull {
 			if (!status) removeView(pendingIcon)
 		} otherwise {
 			if (status) {
 				pendingIcon =
 					ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
 						indeterminateDrawable.setColorFilter(
-							HoneyColor.HoneyWhite, android.graphics.PorterDuff.Mode.MULTIPLY
+							HoneyColor.HoneyWhite,
+							android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 51.uiPX()
+						y += 60.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

@@ -1,21 +1,19 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 
-import android.support.v4.app.Fragment
+import android.content.Context
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
-import io.goldstone.blockchain.crypto.MultiChainAddresses
-import io.goldstone.blockchain.crypto.MultiChainPath
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 
 /**
  * @date 23/03/2018 12:55 AM
@@ -50,13 +48,13 @@ class WalletImportPresenter(
 		}
 		
 		fun insertWalletToDatabase(
-			fragment: Fragment,
+			context: Context?,
 			multiChainAddresses: MultiChainAddresses,
 			name: String,
 			encryptMnemonic: String,
 			multiChainPath: MultiChainPath,
 			hint: String?,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			// 不为空的地址进行
 			val currentAddress =
@@ -67,7 +65,7 @@ class WalletImportPresenter(
 					multiChainAddresses.btcTestAddress
 				).find { it.isNotEmpty() }.orEmpty()
 			
-			WalletTable.getWalletByAddress(currentAddress) {
+			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
 					WalletTable.insert(
@@ -111,17 +109,16 @@ class WalletImportPresenter(
 							multiChainAddresses,
 							{
 								LogUtil.error("insertWalletToDatabase")
-								callback()
-							}
-						) {
-							fragment.activity?.jump<SplashActivity>()
-						}
+								callback(false)
+							},
+							callback
+						)
 						// 注册钱包地址用于发送 `Push`
-						XinGePushReceiver.registerWalletAddressForPush()
+						XinGePushReceiver.registerAddressesForPush()
 					}
 				} otherwise {
-					fragment.context?.alert(ImportWalletText.existAddress)
-					callback()
+					context?.alert(ImportWalletText.existAddress)
+					callback(false)
 				}
 			}
 		}

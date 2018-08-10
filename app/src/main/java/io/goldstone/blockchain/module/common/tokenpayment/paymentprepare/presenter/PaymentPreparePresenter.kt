@@ -2,16 +2,15 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -31,6 +30,12 @@ class PaymentPreparePresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		setSymbol()
+		// 根据入口不同决定是否显示关闭按钮
+		rootFragment?.apply {
+			if (isFromQuickTransfer) {
+				overlayView.header.showCloseButton(false)
+			}
+		}
 	}
 	
 	fun getToken(): WalletDetailCellModel? {
@@ -40,12 +45,19 @@ class PaymentPreparePresenter(
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
-			fragment.context?.alert(AlertText.emptyTransferValue)
+			fragment.context.alert(AlertText.emptyTransferValue)
 			callback()
 		} else {
 			fragment.toast(LoadingText.calculateGas)
-			if (getToken()?.symbol.equals(CryptoSymbol.btc, true)) {
-				prepareBTCPaymentModel(count, callback)
+			if (getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
+				prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
+					if (!isSuccessful) {
+						fragment.context.alert(
+							AlertText.btcBalanceNotEnough
+						)
+					}
+					callback()
+				}
 			} else {
 				prepareETHERC20ETCPaymentModel(count, callback)
 			}
@@ -56,41 +68,6 @@ class PaymentPreparePresenter(
 		fragment.apply {
 			headerTitle = TokenDetailText.address
 			presenter.popFragmentFrom<PaymentPrepareFragment>()
-		}
-	}
-	
-	fun getFromAddress(hold: (String) -> Unit) {
-		WalletTable.getCurrentWallet {
-			it?.apply {
-				hold(
-					when (rootFragment?.token?.symbol) {
-						CryptoSymbol.btc -> {
-							if (Config.isTestEnvironment()) currentBTCTestAddress
-							else currentBTCAddress
-						}
-						
-						CryptoSymbol.etc -> currentETCAddress
-						else -> currentETHAndERCAddress
-					}
-				)
-			}
-		}
-	}
-	
-	fun getCurrentChainTypeAddress(): String {
-		return when {
-			getToken()?.symbol.equals(CryptoSymbol.btc, true) -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCTestAddress()
-				} else {
-					Config.getCurrentBTCAddress()
-				}
-			}
-			
-			getToken()?.symbol.equals(CryptoSymbol.etc, true) ->
-				Config.getCurrentETCAddress()
-			else ->
-				Config.getCurrentEthereumAddress()
 		}
 	}
 	

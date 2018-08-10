@@ -1,12 +1,15 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter
 
 import android.support.v4.app.Fragment
-import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -32,13 +35,6 @@ class TokenDetailOverlayPresenter(
 		}
 	}
 	
-	fun recoverHeader() {
-		fragment.apply {
-			overlayView.header.title.visibility = View.VISIBLE
-			valueHeader?.visibility = View.GONE
-		}
-	}
-	
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
 		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
 			fragment.context!!,
@@ -50,7 +46,7 @@ class TokenDetailOverlayPresenter(
 			if (isFromQuickTransfer) {
 				fragment.apply {
 					fragment.setValueHeader(token)
-					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content) {}
+					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.address
 				}
 			} else {

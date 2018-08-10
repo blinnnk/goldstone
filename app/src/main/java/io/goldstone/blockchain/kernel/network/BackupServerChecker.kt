@@ -13,7 +13,7 @@ import org.json.JSONObject
  * @author KaySaith
  */
 object BackupServerChecker {
-	
+
 	/**
 	 * 有一些原因会导致， 我们的核心 `Server` 不可用, 当出现这种情况的时候客户端需要
 	 * 有策略检测并切换到备份网络。
@@ -37,7 +37,7 @@ object BackupServerChecker {
 			}
 		}
 	}
-	
+
 	/**
 	 * 业务中会在入口的常贵接口请求中判断超时， 如果超时后就会执行这个函数来检查
 	 * 是否需要把业务切换到备份网络。
@@ -50,7 +50,8 @@ object BackupServerChecker {
 			APIPath.serverStatus,
 			"",
 			true,
-			errorCallback = errorCallback
+			errorCallback,
+			isEncrypt = true
 		) {
 			hold(TinyNumberUtils.isTrue(JSONObject(this[0]).safeGet("inuse")))
 		}

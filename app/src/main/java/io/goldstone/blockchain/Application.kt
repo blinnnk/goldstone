@@ -14,23 +14,23 @@ import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
  * @author KaySaith
  */
 class GoldStoneApp : Application() {
-	
+
 	private var sAnalytics: GoogleAnalytics? = null
 	private var tracker: Tracker? = null
-	
+
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
-		// init google analytics
+		// Init google analytics
 		sAnalytics = GoogleAnalytics.getInstance(this)
-		// create and init database
+		// Create and init database
 		GoldStoneDataBase.initDatabase(applicationContext)
-		// init ethereum utils `Context`
+		// Init ethereum utils `Context`
 		GoldStoneEthCall.context = this
-		// init `Api` context
+		// Init `Api` context
 		GoldStoneAPI.context = this
 	}
-	
+
 	/**
 	 * Gets the default [Tracker] for this [Application].
 	 */

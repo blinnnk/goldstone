@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.TransactionDetailPresenter
@@ -25,18 +27,21 @@ class TransactionDetailFragment :
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionDetailModel>?
 	) {
-		recyclerView.adapter =
-			TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
+		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
 				if (
 					model.description.equals(CommonText.from, true)
 					|| model.description.equals(CommonText.to, true)
 				) {
-					presenter.showAddContactsButton(this@cell)
+					presenter.showAddContactsButton(this)
 				}
 				
 				onClick {
 					if (model.description.equals(TransactionText.url, true)) {
-						presenter.showEtherScanTransactionFragment()
+						presenter.showTransactionWebFragment()
+						// 还原 `Header` 样式
+						getParentFragment<TokenDetailOverlayFragment> {
+							recoverHeader()
+						}
 					} else {
 						this@cell.context?.clickToCopy(model.info)
 					}

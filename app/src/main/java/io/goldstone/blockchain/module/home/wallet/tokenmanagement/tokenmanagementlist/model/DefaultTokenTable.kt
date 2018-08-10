@@ -1,19 +1,17 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -27,6 +25,8 @@ import org.json.JSONObject
 data class DefaultTokenTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
+	@SerializedName("_id")
+	var serverTokenID: String,
 	@SerializedName("address")
 	var contract: String,
 	@SerializedName("url")
@@ -46,7 +46,6 @@ data class DefaultTokenTable(
 	var isDefault: Boolean = true,
 	@SerializedName("weight")
 	var weight: Int,
-	@SerializedName("chain_id")
 	var chain_id: String,
 	var description: String = "",
 	var exchange: String = "",
@@ -66,6 +65,7 @@ data class DefaultTokenTable(
 		"",
 		"",
 		"",
+		"",
 		0,
 		0.0,
 		"",
@@ -81,6 +81,7 @@ data class DefaultTokenTable(
 		isDefault: Boolean = false
 	) : this(
 		0,
+		"",
 		data.contract,
 		data.iconUrl,
 		data.symbol,
@@ -98,6 +99,7 @@ data class DefaultTokenTable(
 		localData: JSONObject
 	) : this(
 		0,
+		"",
 		localData.safeGet("address"),
 		localData.safeGet("url"),
 		localData.safeGet("symbol"),
@@ -120,6 +122,7 @@ data class DefaultTokenTable(
 	
 	constructor(data: CoinInfoModel) : this(
 		0,
+		"",
 		data.contract,
 		"",
 		data.symbol,
@@ -148,6 +151,7 @@ data class DefaultTokenTable(
 		decimals: Double
 	) : this(
 		0,
+		"",
 		contract,
 		"",
 		symbol,
@@ -164,60 +168,26 @@ data class DefaultTokenTable(
 	companion object {
 		
 		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
 		
 		fun getCurrentChainTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
 		
 		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
-				}) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
+			} then {
 				hold(it.toArrayList())
-			}
-		}
-		
-		fun getDecimalByContract(
-			contract: String,
-			chainName: String,
-			hold: (decimal: Double?) -> Unit
-		) {
-			// 首先从本地数据库查询数据
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract)
-				}) {
-				if (it.isNull()) {
-					// 如果本地没有数据就从网络获取
-					GoldStoneEthCall.getTokenDecimal(
-						contract,
-						{ error, reason ->
-							hold(null)
-							LogUtil.error("getDecimalByContract $reason", error)
-						},
-						chainName
-					) {
-						hold(it)
-					}
-				} else {
-					hold(it?.decimals)
-				}
 			}
 		}
 		
@@ -226,13 +196,12 @@ data class DefaultTokenTable(
 			contract: String,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getTokenBySymbolAndContractFromAllChains(symbol, contract)
-				}) {
+			load {
+				GoldStoneDataBase
+					.database
+					.defaultTokenDao()
+					.getTokenBySymbolAndContractFromAllChains(symbol, contract)
+			} then {
 				if (it.isNotEmpty()) {
 					hold(it[0])
 				} else {
@@ -247,15 +216,12 @@ data class DefaultTokenTable(
 			etcChain: String = Config.getETCCurrentChain(),
 			hold: (DefaultTokenTable?) -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase
-						.database
-						.defaultTokenDao()
-						.getCurrentChainTokenByContract(contract, ercChain, etcChain)
-				}) {
-				hold(it)
-			}
+			load {
+				GoldStoneDataBase
+					.database
+					.defaultTokenDao()
+					.getCurrentChainTokenByContract(contract, ercChain, etcChain)
+			} then (hold)
 		}
 		
 		fun updateOrInsertCoinInfo(
@@ -309,10 +275,7 @@ data class DefaultTokenTable(
 			}
 		}
 		
-		fun updateTokenName(
-			contract: String,
-			name: String
-		) {
+		fun updateTokenName(contract: String, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
@@ -337,9 +300,25 @@ data class DefaultTokenTable(
 								this.isDefault = isDefault
 								this.name = name
 							})
-							GoldStoneAPI.context.runOnUiThread { callback() }
+							callback()
 						}
 					}
+			}
+		}
+		
+		fun updateDefaultStatusInCurrentChain(
+			contract: String,
+			symbol: String,
+			isDefault: Boolean
+		) {
+			GoldStoneDataBase.database.defaultTokenDao().apply {
+				getTokenBySymbolContractAndChainID(
+					symbol,
+					contract,
+					Config.getCurrentChain()
+				)?.let {
+					update(it.apply { this.isDefault = isDefault })
+				}
 			}
 		}
 		
@@ -391,6 +370,13 @@ interface DefaultTokenDao {
 		symbol: String,
 		contract: String
 	): List<DefaultTokenTable>
+	
+	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND chain_id LIKE :chainID AND  contract LIKE :contract")
+	fun getTokenBySymbolContractAndChainID(
+		symbol: String,
+		contract: String,
+		chainID: String
+	): DefaultTokenTable?
 	
 	@Insert
 	fun insert(token: DefaultTokenTable)

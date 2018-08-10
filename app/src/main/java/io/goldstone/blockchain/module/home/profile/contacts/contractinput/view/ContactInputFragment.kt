@@ -10,14 +10,14 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.WalletEditText
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ContactText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ContactText
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -98,8 +98,13 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		parent: Fragment?
 	) {
 		getParentFragment<ProfileOverlayFragment> {
-			headerTitle = ProfileText.contacts
-			presenter.popFragmentFrom<ContactInputFragment>()
+			if (childFragmentManager.fragments.size <= 1) {
+				// 从账单详情添加快捷通讯录跳转过来, 是没有上级入口的. 这里直接销毁。
+				presenter.removeSelfFromActivity()
+			} else {
+				headerTitle = ProfileText.contacts
+				presenter.popFragmentFrom<ContactInputFragment>()
+			}
 		}
 	}
 }

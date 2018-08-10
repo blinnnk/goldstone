@@ -23,8 +23,6 @@ object GrayScale {
 	@JvmField
 	val gray = Color.parseColor("#FFAAAAAA")
 	@JvmField
-	val darkGray = Color.parseColor("#FFA1A1A1")
-	@JvmField
 	val midGray = Color.parseColor("#FFCCCCCC")
 	@JvmField
 	val Opacity1Black = Color.parseColor("#1A000000")
@@ -35,8 +33,6 @@ object GrayScale {
 	@JvmField
 	val Opacity5Black = Color.parseColor("#80000000")
 	@JvmField
-	val Opacity7Black = Color.parseColor("#B3000000")
-	@JvmField
 	val Opacity8Black = Color.parseColor("#CC000000")
 }
 
@@ -45,6 +41,10 @@ object Spectrum {
 	val white = Color.parseColor("#FFFFFFFF")
 	@JvmField
 	val blue = Color.parseColor("#FF235682")
+	@JvmField
+	val deepBlue = Color.parseColor("#FF17446B")
+	@JvmField
+	val lightBlue = Color.parseColor("#FF2882D2")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
@@ -60,6 +60,8 @@ object Spectrum {
 	@JvmField
 	val yellow = Color.parseColor("#FFFFF988")
 	@JvmField
+	val DarkYellow = Color.parseColor("#FFF3EA3C")
+	@JvmField
 	val opacity1White = Color.parseColor("#1AFFFFFF")
 	@JvmField
 	val opacity3White = Color.parseColor("#4DFFFFFF")
@@ -69,13 +71,23 @@ object Spectrum {
 	val opacity5White = Color.parseColor("#80FFFFFF")
 }
 
+object WalletColor {
+	private val purple = Color.parseColor("#FF3F4E92")
+	private val blue = Color.parseColor("#FF2A7EDA")
+	private val cyan = Color.parseColor("#FF1BA2A9")
+	private val darkPuple = Color.parseColor("#FF603361")
+	private val grayYellow = Color.parseColor("#FF717335")
+	private val blueGray = Color.parseColor("#FF4B5C6E")
+	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPuple, grayYellow, blueGray)
+}
+
 object ShadowSize {
-	@JvmField
-	val Button = 10.uiPX().toFloat()
 	@JvmField
 	val Header = 3.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
+	@JvmField
+	val default = 10.uiPX().toFloat()
 }
 
 object PaddingSize {
@@ -83,19 +95,17 @@ object PaddingSize {
 	val device = 20.uiPX()
 	@JvmField
 	val content = 10.uiPX()
-	@JvmField
-	val lineSpace = 2.uiPX()
 }
 
 object CornerSize {
+	@JvmField
+	val cell = 3.uiPX()
 	@JvmField
 	val small = 5.uiPX()
 	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField
 	val middle = 15.uiPX().toFloat()
-	@JvmField
-	val big = 25.uiPX().toFloat()
 }
 
 object BorderSize {
@@ -120,16 +130,9 @@ object CommonCellSize {
 	val iconPadding = 40.uiPX()
 }
 
-object BasicSize {
-	@JvmField
-	val overlayMinHeight = 250.uiPX()
-}
-
 object TransactionSize {
 	@JvmField
 	val headerView = 220.uiPX()
-	@JvmField
-	val cellHeight = 65.uiPX()
 }
 
 object HomeSize {
@@ -139,6 +142,13 @@ object HomeSize {
 	val sliderHeaderHeight = 65.uiPX()
 	@JvmField
 	val headerHeight = 65.uiPX()
+}
+
+object AvatarSize {
+	@JvmField
+	val big = 75.uiPX()
+	@JvmField
+	val middle = 60.uiPX()
 }
 
 object TokenDetailSize {
@@ -153,7 +163,7 @@ object Count {
 
 object WalletDetailSize {
 	@JvmField
-	val height = 365.uiPX()
+	val headerHeight = 365.uiPX()
 }
 
 fun View.fontSize(defaultSize: Int): Float {

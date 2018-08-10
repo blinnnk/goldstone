@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
@@ -15,24 +15,23 @@ data class WalletListModel(
 	var addressName: String = "",
 	var address: String = "",
 	var subtitle: String = "",
-	var count: Double = 0.0,
-	var avatar: Int = 0,
+	var balance: Double = 0.0,
 	var isWatchOnly: Boolean = false,
-	var isUsing: Boolean = false
+	var isUsing: Boolean = false,
+	var type: String = ""
 ) {
-
-	constructor(data: WalletTable, balance: Double) : this(
+	
+	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
 		showSubtitleByType(data, true),
 		showSubtitleByType(data, false),
 		balance,
-		//修改
-		data.id,
 		data.isWatchOnly,
-		data.isUsing
+		data.isUsing,
+		type
 	)
-
+	
 	companion object {
 		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
 			return if (wallet.currentETHAndERCAddress.isEmpty()) {

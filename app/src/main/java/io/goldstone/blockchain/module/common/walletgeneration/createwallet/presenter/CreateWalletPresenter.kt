@@ -12,18 +12,22 @@ import com.blinnnk.util.ReasonText
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import com.blinnnk.util.replaceFragmentAndSetArgument
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
-import io.goldstone.blockchain.crypto.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -174,7 +178,7 @@ class CreateWalletPresenter(
 						}
 					}
 					
-					XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		}
@@ -230,16 +234,16 @@ class CreateWalletPresenter(
 		fun generateMyTokenInfo(
 			addresses: MultiChainAddresses,
 			errorCallback: (Exception) -> Unit,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			// 首先从本地查找数据
 			DefaultTokenTable.getAllTokens { localTokens ->
 				localTokens.isEmpty() isTrue {
 					errorCallback(Exception())
 					// 本地没有数据从服务器获取数据
-					//					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-					//						serverTokens.completeAddressInfo(addresses, callback)
-					//					}
+					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+						serverTokens.completeAddressInfo(addresses, callback)
+					}
 				} otherwise {
 					localTokens.completeAddressInfo(addresses, callback)
 				}
@@ -252,7 +256,7 @@ class CreateWalletPresenter(
 			repeatPassword: String,
 			isAgree: Boolean,
 			context: Context?,
-			failedCallback: () -> Unit = {},
+			failedCallback: () -> Unit,
 			callback: (password: String, walletName: String) -> Unit
 		) {
 			if (password.isEmpty()) {
@@ -302,7 +306,7 @@ class CreateWalletPresenter(
 		
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			currentAddresses: MultiChainAddresses,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			filter {
 				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
@@ -311,7 +315,9 @@ class CreateWalletPresenter(
 				/**
 				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 				 **/
-				insertNewAccount(currentAddresses, callback)
+				insertNewAccount(currentAddresses) {
+					callback(true)
+				}
 			}
 		}
 		

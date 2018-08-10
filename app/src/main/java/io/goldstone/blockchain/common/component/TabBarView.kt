@@ -14,6 +14,9 @@ import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*

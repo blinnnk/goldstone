@@ -51,8 +51,10 @@ object SharesPreference {
 	const val currentLanguage = "currentLanguage"
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"
+	const val walletType = "walletType"
+	const val goldStoneID = "goldStoneID"
+	const val unregisterGoldStoneID = "unregisterGoldStoneID"
 	const val activityIsResult = "activityIsResult"
-	const val currentAddress = "currentAddress"
 	const val currentEthereumAddress = "currentEthereumAddress"
 	const val currentETCAddress = "currentETCAddress"
 	const val currentBTCAddress = "currentBTCAddress"
@@ -65,4 +67,5 @@ object SharesPreference {
 	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
+	const val yingYongBaoInReview = "yingYongBaoInReview"
 }

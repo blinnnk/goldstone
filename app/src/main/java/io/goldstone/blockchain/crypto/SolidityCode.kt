@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.value.Config
  * @author KaySaith
  */
 object SolidityCode {
-	
+
 	const val contractTransfer = "0xa9059cbb"
 	const val ethTransfer = "0x"
 	const val ethCall = "0x95d89b41000000000000000000000000"
@@ -27,6 +27,10 @@ object CryptoValue {
 	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
+	// Bitcoin 转账前测算 `SignedSize` 需要用到私钥, 这里随便写一个紧用于提前预估 `SignedSize`
+	const val signedSecret = "cRKRm6mvfVrxDoStKhRETVZ91gcN13EBgCKhgCkVRw2DaWSByN94"
+	const val keystoreFilename = "keystore"
+	const val singleChainFilename = "singleChain"
 	// GoldStone 业务约定的值
 	const val ethContract = "0x60"
 	const val etcContract = "0x61"
@@ -34,6 +38,20 @@ object CryptoValue {
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
+	val singleChainFile: (btcAddress: String) -> String = {
+		singleChainFilename + it
+	}
+	val filename: (
+		walletAddress: String,
+		isBTCWallet: Boolean,
+		isSingleChainWallet: Boolean
+	) -> String = { walletAddress, isBTCWallet, isSingleChainWallet ->
+		when {
+			isBTCWallet && !isSingleChainWallet -> walletAddress
+			isSingleChainWallet -> CryptoValue.singleChainFile(walletAddress)
+			else -> CryptoValue.keystoreFilename
+		}
+	}
 	val chainID: (contract: String) -> String = {
 		when {
 			it.equals(CryptoValue.etcContract, true) -> Config.getETCCurrentChain()
@@ -43,7 +61,7 @@ object CryptoValue {
 	}
 	val isToken: (contract: String) -> Boolean = {
 		(!it.equals(ethContract, true)
-		 && !it.equals(etcContract, true))
+			&& !it.equals(etcContract, true))
 	}
 	val pathCointType: (path: String) -> Int = {
 		it.replace("'", "").split("/")[2].toInt()
@@ -52,12 +70,12 @@ object CryptoValue {
 	val isBTCTest: (pathCointType: Int) -> Boolean = {
 		it == 1
 	}
-	
+
 	enum class PrivateKeyType(val content: String) {
 		ETHERCAndETC("ETH, ERC20 And ETC"),
 		BTC("BTC"),
 		BTCTest("BTC Test");
-		
+
 		companion object {
 			fun getTypeByContent(content: String): PrivateKeyType {
 				return when (content) {
@@ -68,26 +86,47 @@ object CryptoValue {
 			}
 		}
 	}
-	
-	const val basicLockKey = "1111111111111111111111111111111111111111111111111111111111111111"
 }
 
 object CryptoSymbol {
 	const val eth = "ETH"
 	const val etc = "ETC"
-	const val btc = "BTC"
+	val btc: () -> String = {
+		if (Config.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
+	}
+	const val pureBTCSymbol = "BTC"
 	const val ltc = "LTC"
 	const val erc = "ERC"
+
+	fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
+		return if (
+			symbol.contains("BTC", true) &&
+			Config.getYingYongBaoInReviewStatus()
+		) "B.C." + if (isTest) " Test" else ""
+		else symbol
+	}
+
+	fun updateNameIfInReview(name: String): String {
+		return if (
+			name.contains("Bitcoin", true) &&
+			Config.getYingYongBaoInReviewStatus()
+		) "Bitc."
+		else name
+	}
 }
 
 object CryptoName {
 	const val eth = "Ethereum"
 	const val etc = "Ethereum Classic"
 	const val btc = "Bitcoin"
+	const val ltc = "Litecoin"
+	const val bch = "Bitcoin Cash"
+	val allChainName = listOf(etc.replace(" ", ""), eth, btc, ltc, bch.replace(" ", ""))
 }
 
 enum class ChainType(val id: Int) {
 	BTC(0),
+	BTCTest(1),
 	LTC(2),
 	ETH(60),
 	ETC(61),
@@ -101,9 +140,9 @@ object DefaultPath {
 	const val btcPath = "m/44'/0'/0'/0/0"
 	const val btcTestPath = "m/44'/1'/0'/0/0"
 	// Header Value
-	const val ethPathHeader = "m/44'/60'"
-	const val etcPathHeader = "m/44'/61'"
-	const val btcPathHeader = "m/44'/0'"
-	const val btcTestPathHeader = "m/44'/1'"
+	const val ethPathHeader = "m/44'/60'/"
+	const val etcPathHeader = "m/44'/61'/"
+	const val btcPathHeader = "m/44'/0'/"
+	const val btcTestPathHeader = "m/44'/1'/"
 	const val default = "0'/0/0"
 }

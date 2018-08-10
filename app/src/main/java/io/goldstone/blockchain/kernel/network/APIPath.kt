@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 31/03/2018 8:09 PM
@@ -21,10 +22,9 @@ object APIPath {
 	}
 	
 	const val serverStatus = "https://gs.blinnnk.com/index/serverStatus"
-	val defaultTokenList: (header: String) -> String = { "$it/index/defaultCoinList" }
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
-	val updateAddress: (header: String) -> String = { "$it/account/updateAddress" }
+	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
 	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
@@ -35,6 +35,13 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
+	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
+	val defaultTokenList: (
+		header: String,
+		md5: String
+	) -> String = { header, md5 ->
+		"$header/index/defaultCoinList?md5=$md5"
+	}
 	val getTokenInfo: (
 		header: String,
 		condition: String,
@@ -103,6 +110,9 @@ object EtherScanApi {
 	}
 	val gasTrackerHeader: (taxHash: String) -> String = {
 		"https://gastracker.io/tx/$it"
+	}
+	val bitcoinTransactionDetail: (taxHash: String) -> String = {
+		"${BitcoinUrl.currentUrl()}/tx/$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"

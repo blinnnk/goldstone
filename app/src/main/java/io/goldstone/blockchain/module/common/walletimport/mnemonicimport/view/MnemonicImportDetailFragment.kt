@@ -4,21 +4,31 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.cell.RoundCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.MultiChainPath
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -29,7 +39,7 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
-	
+
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val pathSettings by lazy { RoundCell(context!!) }
@@ -46,7 +56,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.btcPath,
 		DefaultPath.btcTestPath
 	)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -56,7 +66,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					hint = ImportWalletText.mnemonicHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				}.into(this)
-				
+
 				pathSettings
 					.apply {
 						setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
@@ -65,36 +75,34 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							bottomMargin = 10.uiPX()
 						}
 					}
-					.click {
-						showPatSettingsDashboard()
-					}
+					.click { showPatSettingsDashboard() }
 					.into(this)
-				
+
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
-				
+
 				passwordInput.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
 				}.into(this)
-				
+
 				repeatPassword.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.repeatPassword
 				}.into(this)
-				
+
 				hintInput.apply {
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
-				
+
 				agreementView
 					.click {
 						getParentFragment<WalletImportFragment> {
@@ -108,7 +116,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						}
 					}
 					.into(this)
-				
+
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle()
@@ -122,18 +130,19 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[2],
 							defaultPath[3]
 						),
-						mnemonicInput,
-						passwordInput,
-						repeatPassword,
-						hintInput,
+						mnemonicInput.text.toString(),
+						passwordInput.text.toString(),
+						repeatPassword.text.toString(),
+						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
-						walletNameInput
-					) {
+						walletNameInput.text.toString()
+					) { isScuccessful ->
 						it.showLoadingStatus(false)
+						if (isScuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
-				
-				
+
+
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsMnemonic.setUnderline()
 				}.click {
@@ -152,14 +161,20 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}
 		}
 	}
-	
+
 	private val pathInfo = listOf(
 		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
 		Pair(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader),
-		Pair(ImportWalletText.customBitcoinPath, DefaultPath.btcPathHeader),
-		Pair(ImportWalletText.customBTCTestPath, DefaultPath.btcTestPathHeader)
+		Pair(
+			ImportWalletText.customBitcoinPath(Config.getYingYongBaoInReviewStatus()),
+			DefaultPath.btcPathHeader
+		),
+		Pair(
+			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
+			DefaultPath.btcTestPathHeader
+		)
 	)
-	
+
 	private fun showPatSettingsDashboard() {
 		getParentContainer()?.apply {
 			DashboardOverlay(context) {
@@ -189,10 +204,20 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}.into(this)
 		}
 	}
-	
+
 	private fun RoundInput.setPasswordSafeLevel() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
+		}
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
+			isNotNull {
+				getParentContainer()?.removeView(this)
+			} otherwise {
+				super.setBaseBackEvent(activity, parent)
+			}
 		}
 	}
 }

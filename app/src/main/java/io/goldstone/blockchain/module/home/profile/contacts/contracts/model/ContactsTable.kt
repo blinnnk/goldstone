@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
@@ -18,8 +20,8 @@ data class ContactTable(
 	var name: String = "",
 	var defaultAddress: String,
 	var ethERCAndETCAddress: String,
-	var bitMainnetCoinAddress: String,
-	var bitTestnetCoinAddress: String
+	var btcMainnetAddress: String,
+	var btcTestnetAddress: String
 ) : Serializable {
 	
 	@Ignore constructor() : this(
@@ -38,20 +40,26 @@ data class ContactTable(
 			contact: ContactTable,
 			callback: () -> Unit = {}
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().insert(contact)
-				}) {
+			load {
+				GoldStoneDataBase.database.contactDao().insert(contact)
+			} then {
 				callback()
 			}
 		}
 		
-		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit = {}) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().getAllContacts()
-				}) {
+		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
+			load {
+				GoldStoneDataBase.database.contactDao().getAllContacts()
+			} then {
 				callback(it.toArrayList())
+			}
+		}
+		
+		fun hasContacts(address: String, hasContact: (Boolean) -> Unit) {
+			load {
+				GoldStoneDataBase.database.contactDao().getContactByAddress(address)
+			} then {
+				hasContact(!it.isNull())
 			}
 		}
 		
@@ -59,12 +67,11 @@ data class ContactTable(
 			id: Int,
 			callback: () -> Unit
 		) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.contactDao().apply {
-						getContacts(id)?.let { delete(it) }
-					}
-				}) {
+			load {
+				GoldStoneDataBase.database.contactDao().apply {
+					getContacts(id)?.let { delete(it) }
+				}
+			} then {
 				callback()
 			}
 		}
@@ -79,6 +86,9 @@ interface ContractDao {
 	
 	@Query("SELECT * FROM contact WHERE id LIKE :id")
 	fun getContacts(id: Int): ContactTable?
+	
+	@Query("SELECT * FROM contact WHERE (ethERCAndETCAddress LIKE :address OR btcMainnetAddress LIKE :address OR btcTestnetAddress LIKE :address)")
+	fun getContactByAddress(address: String): ContactTable?
 	
 	@Insert
 	fun insert(contact: ContactTable)

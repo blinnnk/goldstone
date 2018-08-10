@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
@@ -11,33 +13,39 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 06/04/2018 1:02 AM
  * @author KaySaith
  */
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
-	
+
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val privateKeyTextView by lazy { TextView(context) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyExportPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -64,7 +72,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)
-			
+
 			passwordInput.apply {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
@@ -72,25 +80,36 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				}
 				title = CreateWalletText.password
 			}.into(this)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				setBlueStyle()
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 15.uiPX()
 				}
-			}.click {
+			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKeyByAddress(passwordInput) {
-					if (isNotEmpty()) {
-						privateKeyTextView.text = this
+				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) privateKey@{
+					GoldStoneAPI.context.runOnUiThread {
+						this@privateKey?.let {
+							privateKeyTextView.text = it
+						}
+						it.showLoadingStatus(false)
 					}
-					it.showLoadingStatus(false)
 				}
 			}.into(this)
 		}
 	}
-	
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		parentFragment?.let {
+			if (it is BaseOverlayFragment<*>) {
+				it.showAddButton(false)
+			}
+		}
+	}
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

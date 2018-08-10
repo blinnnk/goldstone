@@ -2,10 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.v
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.value.TokenManagementText
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.TokenManagementText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment

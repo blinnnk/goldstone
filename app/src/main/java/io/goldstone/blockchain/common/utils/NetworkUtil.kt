@@ -11,8 +11,8 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.value.DialogText
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 
@@ -51,7 +51,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 		NetworkUtil.hasNetwork(context) isTrue {
 			AppConfigTable.getAppConfig {
 				it?.isRegisteredAddresses?.isFalse {
-					XinGePushReceiver.registerWalletAddressForPush()
+					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		} otherwise {

@@ -1,13 +1,12 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
-import android.widget.EditText
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
-import io.goldstone.blockchain.crypto.MultiChainPath
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
@@ -24,72 +23,66 @@ class MnemonicImportDetailPresenter(
 	
 	fun importWalletByMnemonic(
 		multiChainPath: MultiChainPath,
-		mnemonicInput: EditText,
-		passwordInput: EditText,
-		repeatPasswordInput: EditText,
-		hintInput: EditText,
+		mnemonic: String,
+		password: String,
+		repeatPassword: String,
+		passwordHint: String,
 		isAgree: Boolean,
-		nameInput: EditText,
-		callback: () -> Unit
+		name: String,
+		callback: (Boolean) -> Unit
 	) {
-		if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
-			return
-		}
-		
-		if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
-			return
-		}
-		
-		if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
-			return
-		}
-		
-		if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			callback()
-			return
-		}
-		
-		mnemonicInput.text.isEmpty() isTrue {
+		mnemonic.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
-			callback()
+			callback(false)
 			return
 		}
-
+		
+		if (!isValidPath(multiChainPath)) return
+		
 		CreateWalletPresenter.checkInputValue(
-			nameInput.text.toString(),
-			passwordInput.text.toString(),
-			repeatPasswordInput.text.toString(),
+			name,
+			password,
+			repeatPassword,
 			isAgree,
 			fragment.context,
-			failedCallback = { callback() }) { passwordValue, walletName ->
+			failedCallback = { callback(false) }
+		) { passwordValue, walletName ->
 			val mnemonicContent =
-				mnemonicInput
-					.text.toString()
+				mnemonic
 					.replaceWithPattern()
 					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
 			
 			Mnemonic.validateMnemonic(mnemonicContent) isFalse {
 				fragment.context?.alert(ImportWalletText.mnemonicAlert)
-				callback()
+				callback(false)
 			} otherwise {
 				importWallet(
 					mnemonicContent,
 					multiChainPath,
 					passwordValue,
 					walletName,
-					hintInput.text?.toString(),
+					passwordHint,
 					callback
 				)
 			}
 		}
+	}
+	
+	private fun isValidPath(multiChainPath: MultiChainPath): Boolean {
+		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else true
 	}
 	
 	private fun importWallet(
@@ -98,7 +91,7 @@ class MnemonicImportDetailPresenter(
 		password: String,
 		name: String,
 		hint: String? = null,
-		callback: () -> Unit
+		callback: (Boolean) -> Unit
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
@@ -108,8 +101,14 @@ class MnemonicImportDetailPresenter(
 			password,
 			multiChainPath
 		) { multiChainAddresses ->
+			// 本地若存有当前多链钱包则直接跳出逻辑
+			if (multiChainAddresses.btcAddress.isEmpty() || multiChainAddresses.ethAddress.isEmpty()) {
+				fragment.context.alert(ImportWalletText.existAddress)
+				callback(false)
+				return@import
+			}
 			WalletImportPresenter.insertWalletToDatabase(
-				fragment,
+				fragment.context,
 				multiChainAddresses,
 				name,
 				encryptMnemonic,

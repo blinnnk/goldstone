@@ -9,8 +9,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -19,6 +21,7 @@ import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -41,14 +44,18 @@ import java.util.*
 class MarketTokenDetailPresenter(
 	override val fragment: MarketTokenDetailFragment
 ) : BasePresenter<MarketTokenDetailFragment>() {
-	
+
+	private val marketCenter by lazy {
+		fragment.getParentFragment<MarketTokenCenterFragment>()
+	}
+
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.currencyInfo?.apply {
 			updateCurrencyPriceInfo()
 		}
 	}
-	
+
 	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
@@ -64,11 +71,10 @@ class MarketTokenDetailPresenter(
 			MarketTokenDetailChartType.Hour.info -> DateUtils.FORMAT_SHOW_TIME
 			else -> 1000
 		}
-		
+
 		fragment.currencyInfo?.apply {
-			fragment.getMainActivity()?.showLoadingView()
-			QuotationSelectionTable.getSelectionByPair(pair) {
-				it?.apply {
+			QuotationSelectionTable.getSelectionByPair(pair) { selectionTable ->
+				selectionTable?.apply {
 					val data: String? = when (period) {
 						MarketTokenDetailChartType.WEEK.info -> lineChartWeek
 						MarketTokenDetailChartType.DAY.info -> lineChartDay
@@ -86,11 +92,11 @@ class MarketTokenDetailPresenter(
 						// 把数据转换成需要的格式
 						(0 until jsonArray.length()).map {
 							ChartModel(JSONObject(jsonArray[it]?.toString()))
-						}.toArrayList().let {
+						}.toArrayList().let { it ->
 							val databaseTime = it.maxBy {
 								it.timestamp
 							}?.timestamp?.toLongOrNull().orElse(0)
-							/** 校验数据库的数据时间是否有效，是否需要更新 */
+							// 校验数据库的数据时间是否有效，是否需要更新
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
 								isTrue {
 									// 合规就更新本地数据库的数据
@@ -106,13 +112,13 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	fun showAllDescription(parent: ViewGroup) {
 		if (parent.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
 			val overlay = ContentScrollOverlayView(parent.context)
 			overlay.into(parent)
 			overlay.apply {
-				setTitle("DESCRIPTION")
+				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
 					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
@@ -138,21 +144,26 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
-	fun showWebfragumentWithLink(link: String, title: String, previousTitle: String) {
-		showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-			title,
-			previousTitle,
-			Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
-			true
-		)
+
+	fun showWebfragumentWithLink(
+		link: String,
+		title: String,
+		previousTitle: String
+	) {
+		marketCenter?.presenter
+			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
+				title,
+				previousTitle,
+				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				true
+			)
 	}
-	
+
 	fun openSystemBrowser(url: String) {
 		val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
 		startActivity(fragment.context!!, browserIntent, null)
 	}
-	
+
 	fun setCurrencyInfo(
 		currencyInfo: QuotationModel?,
 		tokenInformation: TokenInformation,
@@ -203,12 +214,13 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun MarketTokenChart.updateChartDataBy(
 		pair: String,
 		period: String,
 		dateType: Int
 	) {
+		fragment.getMainActivity()?.showLoadingView()
 		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8, {
 			// Show the error exception to user
 			fragment.context.alert(it.toString().showAfterColonContent())
@@ -219,7 +231,7 @@ class MarketTokenDetailPresenter(
 			updateChartUI(it, dateType)
 		}
 	}
-	
+
 	private fun checkDatabaseTimeIsValidBy(
 		period: String,
 		databaseTime: Long,
@@ -230,24 +242,24 @@ class MarketTokenDetailPresenter(
 				// 如果本地数据库的时间周的最大时间小当前于自然周一的时间
 				callback(databaseTime > TimeUtils.getNatureSundayTimeInMill() - TimeUtils.ondDayInMills)
 			}
-			
+
 			MarketTokenDetailChartType.DAY.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > 0.daysAgoInMills() - TimeUtils.oneHourInMills)
 			}
-			
+
 			MarketTokenDetailChartType.MONTH.info -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > TimeUtils.getNatureMonthFirstTimeInMill() - TimeUtils.ondDayInMills)
 			}
-			
+
 			else -> {
 				// 如果本地数据库的时间是1小时之前的那么更新网络数据
 				callback(databaseTime > System.currentTimeMillis() - TimeUtils.oneHourInMills)
 			}
 		}
 	}
-	
+
 	private fun MarketTokenChart.updateChartUI(
 		data: ArrayList<ChartModel>,
 		dateType: Int
@@ -273,7 +285,7 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun ArrayList<ChartModel>.updateChartDataInDatabaseBy(
 		period: String,
 		pair: String
@@ -283,22 +295,22 @@ class MarketTokenDetailPresenter(
 				MarketTokenDetailChartType.WEEK.info -> {
 					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
 				}
-				
+
 				MarketTokenDetailChartType.DAY.info -> {
 					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
 				}
-				
+
 				MarketTokenDetailChartType.MONTH.info -> {
 					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
 				}
-				
+
 				MarketTokenDetailChartType.Hour.info -> {
 					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
 				}
 			}
 		}
 	}
-	
+
 	private fun getCurrencyInfoFromServer(
 		info: QuotationModel,
 		hold: (PriceHistoryModel) -> Unit
@@ -316,7 +328,7 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun getCurrencyInfoFromDatabase(
 		info: QuotationModel,
 		hold: (
@@ -344,7 +356,7 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	// Async Function
 	private fun loadCoinInfoFromServer(
 		info: QuotationModel,
@@ -353,7 +365,7 @@ class MarketTokenDetailPresenter(
 		val chainID = when {
 			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
 			info.contract.isNotEmpty() -> ChainID.Main.id
-			info.symbol.equals(CryptoSymbol.btc, true) -> ChainID.BTCMain.id
+			info.symbol.equals(CryptoSymbol.btc(), true) -> ChainID.BTCMain.id
 			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.BTCMain.id
 			else -> ""
 		}
@@ -363,8 +375,8 @@ class MarketTokenDetailPresenter(
 			{
 				LogUtil.error("loadCoinInformationFromServer", it)
 			}
-		) {
-			DefaultTokenTable.updateOrInsertCoinInfo(it) {
+		) { coinInfo ->
+			DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
 				DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
 					info.symbol,
 					info.contract
@@ -372,9 +384,9 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	private var currentSocket: GoldStoneWebSocket? = null
-	
+
 	private fun QuotationModel.updateCurrencyPriceInfo() {
 		// 长连接获取数据
 		QuotationPresenter.getPriceInfoBySocket(
@@ -389,11 +401,20 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-		
+
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
+	}
+
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
+		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
+		fragment.getParentFragment<QuotationOverlayFragment> {
+			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
+		}
 	}
 }

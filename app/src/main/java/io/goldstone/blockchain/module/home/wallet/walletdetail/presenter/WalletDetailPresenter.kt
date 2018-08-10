@@ -2,11 +2,16 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.coroutinesTask
+import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -114,7 +119,9 @@ class WalletDetailPresenter(
 	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
 	 */
 	override fun onFragmentResume() {
-		updateData()
+		if (!fragment.asyncData.isNullOrEmpty()) {
+			updateData()
+		}
 		showPinCodeFragment()
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
@@ -218,7 +225,7 @@ class WalletDetailPresenter(
 						topPadding = 10.uiPX()
 						defaultTokens.filter { default ->
 							myTokens.any { it.contract.equals(default.contract, true) }
-						}.let {
+						}.let { it ->
 							val data = it.sortedByDescending { it.weight }.toArrayList()
 							val tokenList = TokenSelectionRecyclerView(context)
 							tokenList.into(this)
@@ -233,29 +240,26 @@ class WalletDetailPresenter(
 	}
 
 	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
-		if (data.isEmpty()) {
-			diffAndUpdateAdapterData<WalletDetailAdapter>(data)
-			fragment.updateHeaderValue()
-		} else {
-			try {
-				coroutinesTask(
-					{
-						/** 先按照资产情况排序, 资产为零的按照权重排序 */
-						val currencyList = data.filter { it.currency > 0.0 }
-						val weightList = data.filter { it.currency == 0.0 }
-						currencyList.sortedByDescending {
-							it.currency
-						}.plus(weightList.sortedByDescending {
-							it.weight
-						}).toArrayList()
-					}
-				) {
-					diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-					fragment.updateHeaderValue()
-				}
-			} catch (error: Exception) {
-				LogUtil.error("updateUIByData", error)
+		if (data.isNotEmpty()) {
+			load {
+				/** 先按照资产情况排序, 资产为零的按照权重排序 */
+				val hasPrice =
+					data.filter { it.price * it.count != 0.0 }
+						.sortedByDescending { it.count * it.price }
+				val hasBalance =
+					data.filter { it.count != 0.0 && it.price == 0.0 }
+						.sortedByDescending { it.count }
+				val others =
+					data.filter { it.count == 0.0 }
+						.sortedByDescending { it.weight }
+				hasPrice.plus(hasBalance).plus(others).toArrayList()
+			} then {
+				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+				fragment.updateHeaderValue()
 			}
+		} else {
+			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())
+			fragment.updateHeaderValue()
 		}
 	}
 
@@ -275,24 +279,44 @@ class WalletDetailPresenter(
 	}
 
 	private fun WalletDetailFragment.updateHeaderValue() {
-		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
-		// Once the calculation is finished then update `WalletTable`
-		Config.updateCurrentBalance(totalBalance.orElse(0.0))
 		try {
 			recyclerView.getItemAtAdapterPosition<WalletDetailHeaderView>(0) {
-				it?.model = WalletDetailHeaderModel(
-					null,
-					Config.getCurrentName(),
-					if (Config.getCurrentAddress().equals(WalletText.multiChainWallet, true)) {
-						Config.getCurrentAddress().scaleTo(18)
-					} else {
-						CryptoUtils.scaleMiddleAddress(Config.getCurrentAddress(), 5)
-					},
-					totalBalance.toString()
-				)
+				generateHeaderModel { model ->
+					it.model = model
+				}
 			}
 		} catch (error: Exception) {
 			LogUtil.error("WalletDetail updateHeaderValue", error)
+		}
+	}
+
+	private fun generateHeaderModel(
+		hold: (WalletDetailHeaderModel) -> Unit
+	) {
+		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
+		// Once the calculation is finished then update `WalletTable`
+		Config.updateCurrentBalance(totalBalance.orElse(0.0))
+		WalletTable.getCurrentWallet {
+			val subtitle = when (Config.getCurrentWalletType()) {
+				WalletType.ETHERCAndETCOnly.content -> currentETHAndERCAddress
+				WalletType.BTCOnly.content -> currentBTCAddress
+				WalletType.BTCTestOnly.content -> currentBTCTestAddress
+				else -> WalletText.multiChainWallet
+			}
+			WalletDetailHeaderModel(
+				null,
+				Config.getCurrentName(),
+				if (subtitle.equals(WalletText.multiChainWallet, true)) {
+					object : FixTextLength() {
+						override var text = WalletText.multiChainWallet
+						override val maxWidth = 90.uiPX().toFloat()
+						override val textSize: Float = 12.uiPX().toFloat()
+					}.getFixString()
+				} else {
+					CryptoUtils.scaleMiddleAddress(subtitle, 5)
+				},
+				totalBalance.toString()
+			).let(hold)
 		}
 	}
 }

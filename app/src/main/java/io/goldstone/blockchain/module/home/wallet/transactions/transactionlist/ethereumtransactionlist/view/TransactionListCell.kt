@@ -6,7 +6,7 @@ import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -66,8 +66,11 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 					(if (it.isReceived) "+" else "-") +
 					if (it.isFee) it.minerFee.substringBefore(" ") else it.count.formatCount()
 				subtitle.text = if (it.isFee) {
-					if (it.symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
-					else CryptoSymbol.eth
+					when {
+						it.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
+						it.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
+						else -> CryptoSymbol.eth
+					}
 				} else it.symbol
 			}
 		}

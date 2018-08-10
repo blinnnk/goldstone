@@ -8,11 +8,11 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -135,27 +135,38 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		private fun ArrayList<DefaultTokenTable>.updateLocalTokenIcon(
 			localTokens: ArrayList<DefaultTokenTable>
 		) {
-			filter { server ->
-				localTokens.any { local ->
-					local.chain_id.equals(server.chain_id, true)
-					&& local.contract.equals(server.contract, true)
-					&& local.iconUrl != server.iconUrl
-				}
-			}.apply {
-				if (isEmpty()) return
-				forEach { server ->
-					doAsync {
+			doAsync {
+				val unmanuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+				filter { server ->
+					unmanuallyData.find {
+						it.serverTokenID.equals(server.serverTokenID, true)
+					}?.let {
+						// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
+						GoldStoneDataBase.database
+							.defaultTokenDao().update(it.apply { isDefault = false })
+					}
+					
+					localTokens.any { local ->
+						local.chain_id.equals(server.chain_id, true)
+						&& local.contract.equals(server.contract, true)
+					}
+				}.apply {
+					if (isEmpty()) return@doAsync
+					forEach { server ->
 						GoldStoneDataBase
 							.database
 							.defaultTokenDao()
 							.apply {
-								getTokenBySymbolAndContractFromAllChains(
+								getTokenBySymbolContractAndChainID(
 									server.symbol,
-									server.contract
-								).let {
-									if (it.isNotEmpty()) {
-										update(it[0].apply { iconUrl = server.iconUrl })
-									}
+									server.contract,
+									server.chain_id
+								)?.let {
+									update(it.apply {
+										iconUrl = server.iconUrl
+										isDefault = server.isDefault
+										forceShow = server.forceShow
+									})
 								}
 							}
 					}

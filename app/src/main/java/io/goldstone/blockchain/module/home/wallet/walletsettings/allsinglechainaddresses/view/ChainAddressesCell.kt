@@ -5,7 +5,8 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -27,5 +28,6 @@ class ChainAddressesCell(context: Context) : LinearLayout(context) {
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		cell.into(this)
+		cell.updateStyle(Companion.CellType.Normal)
 	}
 }

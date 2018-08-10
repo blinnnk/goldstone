@@ -14,6 +14,7 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
@@ -23,7 +24,7 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class NodeSelectionCell(context: Context) : RelativeLayout(context) {
-	
+
 	private val radio = HoneyRadioButton(context).apply {
 		layoutParams = LinearLayout.LayoutParams(50.uiPX(), 50.uiPX())
 		setColorStyle(GrayScale.midGray, Spectrum.green)
@@ -39,7 +40,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		style = Paint.Style.FILL
 		color = GrayScale.midGray
 	}
-	
+
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
 		setWillNotDraw(false)
@@ -50,11 +51,11 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		radio.setAlignParentRight()
 		radio.isClickable = false
 	}
-	
+
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		
+
 		canvas?.drawLine(
 			70.uiPX().toFloat(),
 			height - BorderSize.default,
@@ -63,17 +64,20 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 			paint
 		)
 	}
-	
+
 	fun selectRadio() {
 		radio.isChecked = true
 	}
-	
+
 	fun clearRadio() {
 		radio.isChecked = false
 	}
-	
+
 	fun setData(name: String, isSelected: Boolean, id: Int? = null): NodeSelectionCell {
-		title.text = name
+		title.text =
+			if (Config.getYingYongBaoInReviewStatus() && name.contains("BTC", true))
+				CryptoSymbol.btc() + " " + name.substringAfter(" ")
+			else name
 		radio.isChecked = isSelected
 		id?.let { this.id = it }
 		return this

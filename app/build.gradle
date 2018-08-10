@@ -22,15 +22,15 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 7
-    versionName "1.1.2"
+    versionCode 11
+    versionName "1.2.1"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
     vectorDrawables.useSupportLibrary = true
     manifestPlaceholders = [
-      XG_ACCESS_ID : "2100282353",
-      XG_ACCESS_KEY: xinGePushAccessKey
+            XG_ACCESS_ID : "2100282353",
+            XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
       abiFilters "armeabi", "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
@@ -62,8 +62,8 @@ android {
 
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
-  // noinspection GradleCompatible
-  implementation 'com.android.support:appcompat-v7:27.1.1'
+  //noinspection GradleCompatible
+  implementation 'com.android.support:appcompat-v7:28.0.0-beta01'
   implementation 'com.android.support.constraint:constraint-layout:1.1.2'
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -73,16 +73,15 @@ dependencies {
   implementation 'com.github.bumptech.glide:glide:4.7.1'
   annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
   // Recycler View
-  // noinspection GradleCompatible
-  implementation 'com.android.support:recyclerview-v7:27.1.1'
+  implementation 'com.android.support:recyclerview-v7:28.0.0-beta01'
   // Kotlin
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
   // Anko
   implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.1.6'
+  implementation 'com.blinnnk:honeyui:0.3.1.7'
   // Crypto Ethereum
-  implementation 'org.ethereum:geth:1.8.8'
+  implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
   implementation 'org.bitcoinj:bitcoinj-core:0.14.7'
   // Support PBKDF2withHmacSHA512 Below Api 26
@@ -91,15 +90,15 @@ dependencies {
   // Crypt slf4j
   implementation "org.slf4j:slf4j-api:1.7.25"
   // BlurView
-  implementation 'com.github.mmin18:realtimeblurview:1.1.0'
+  implementation 'com.github.mmin18:realtimeblurview:1.1.2'
   // Chart
   implementation 'com.diogobernardino:williamchart:2.5.0'
   // Room Database
   implementation 'android.arch.persistence.room:runtime:1.1.1'
   kapt 'android.arch.persistence.room:compiler:1.1.1'
   // OkHttp
-  implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-  implementation 'com.google.code.gson:gson:2.8.2'
+  implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+  implementation 'com.google.code.gson:gson:2.8.5'
   // ZXing QR Code
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.2'

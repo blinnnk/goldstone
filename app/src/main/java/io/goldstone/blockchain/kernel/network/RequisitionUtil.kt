@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit
  * @author KaySaith
  */
 object RequisitionUtil {
-	
+
 	inline fun <reified T> postRequestGetJsonObject(
 		body: RequestBody,
 		keyName: String,
@@ -40,7 +42,7 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		
+
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -49,7 +51,7 @@ object RequisitionUtil {
 					}
 					LogUtil.error(path, error)
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -76,7 +78,7 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	fun postRequest(
 		body: RequestBody,
 		path: String,
@@ -90,7 +92,7 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		
+
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -99,7 +101,7 @@ object RequisitionUtil {
 						netWorkError(error)
 					}
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -116,14 +118,15 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	@JvmStatic
 	inline fun <reified T> requestData(
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
 		crossinline errorCallback: (Exception) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		targetGoldStoneID: String? = null,
+		isEncrypt: Boolean,
 		maxConnectTime: Long = 20,
 		crossinline hold: List<T>.() -> Unit
 	) {
@@ -131,10 +134,10 @@ object RequisitionUtil {
 			OkHttpClient
 				.Builder()
 				.connectTimeout(maxConnectTime, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
+				.readTimeout(maxConnectTime, TimeUnit.SECONDS)
 				.build()
-		
-		getcryptGetRequest(api, isEncrypt) {
+
+		getcryptGetRequest(api, isEncrypt, targetGoldStoneID) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
@@ -142,7 +145,7 @@ object RequisitionUtil {
 					}
 					LogUtil.error(keyName + "requestData", error)
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -154,7 +157,7 @@ object RequisitionUtil {
 						GoldStoneCode.showErrorCodeReason(data)
 						return
 					}
-					
+
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
@@ -177,14 +180,14 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	/** 请求 ehterScan, blockchain.info 的数据是明文请求不需要加密 */
 	@JvmStatic
 	inline fun <reified T> requestUncryptoData(
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: (Exception) -> Unit,
+		crossinline errorCallback: (Throwable) -> Unit,
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
@@ -198,9 +201,9 @@ object RequisitionUtil {
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
 				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
-				LogUtil.error(keyName, error)
+				LogUtil.error("$api $keyName", error)
 			}
-			
+
 			override fun onResponse(call: Call, response: Response) {
 				val data = response.body()?.string()
 				try {
@@ -221,86 +224,85 @@ object RequisitionUtil {
 			}
 		})
 	}
-	
+
+	// `GoldStone` 加密规则的 `Header Request`
+	private val generateRequest: (
+		path: String,
+		goldStoneID: String,
+		bold: RequestBody?
+	) -> Request = { path, goldStoneID, body ->
+		val timeStamp = System.currentTimeMillis().toString()
+		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
+		val sign =
+			(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
+		Request.Builder()
+			.url(path)
+			.apply {
+				if (!body.isNull()) method("POST", body)
+			}
+			.header("Content-type", "application/json")
+			.addHeader("device", goldStoneID)
+			.addHeader("timestamp", timeStamp)
+			.addHeader("os", "0")
+			.addHeader("version", version)
+			.addHeader("sign", sign)
+			.addHeader("channel", currentChannel.value)
+			.build()
+	}
+
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
 	fun getcryptoRequest(
 		body: RequestBody,
 		path: String,
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
-		callback: (Request) -> Unit
+		targetGoldStoneID: String = "",
+		hold: (Request) -> Unit
 	) {
-		if (isEncrypt) {
-			AppConfigTable.getAppConfig {
+		when {
+			isEncrypt && targetGoldStoneID.isEmpty() -> AppConfigTable.getAppConfig {
 				it?.apply {
-					val timeStamp = System.currentTimeMillis().toString()
-					val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
-					val sign =
-						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
-							.getObjectMD5HexString()
-					val request =
-						Request.Builder()
-							.url(path)
-							.method("POST", body)
-							.header("Content-type", "application/json")
-							.addHeader("device", goldStoneID)
-							.addHeader("timestamp", timeStamp)
-							.addHeader("os", "0")
-							.addHeader("version", version)
-							.addHeader("sign", sign)
-							.build()
-					callback(request)
+					hold(generateRequest(path, goldStoneID, body))
 				}
 			}
-		} else {
-			val request =
+			targetGoldStoneID.isNotEmpty() ->
+				hold(generateRequest(path, Config.getGoldStoneID(), body))
+			else -> hold(
 				Request.Builder()
 					.url(path)
 					.method("POST", body)
 					.header("Content-type", "application/json")
 					.build()
-			callback(request)
+			)
+
 		}
 	}
-	
+
 	fun getcryptGetRequest(
 		api: String,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
-		callback: (Request) -> Unit
+		isEncrypt: Boolean,
+		targetGoldStoneID: String? = null,
+		hold: (Request) -> Unit
 	) {
-		val timeStamp = System.currentTimeMillis().toString()
-		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
-		AppConfigTable.getAppConfig {
-			it?.apply {
-				if (isEncrypt) {
-					val sign =
-						(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version)
-							.getObjectMD5HexString()
-					val request =
-						Request.Builder()
-							.url(api)
-							.header("Content-type", "application/json")
-							.addHeader("device", goldStoneID)
-							.addHeader("timestamp", timeStamp)
-							.addHeader("os", "0")
-							.addHeader("version", version)
-							.addHeader("sign", sign)
-							.addHeader("channel", currentChannel.value)
-							.build()
-					callback(request)
-				} else {
-					val uncryptRequest = Request.Builder()
-						.url(api)
-						.header("Content-type", "application/json")
-						.build()
-					callback(uncryptRequest)
-				}
+		when {
+			isEncrypt && targetGoldStoneID.isNullOrBlank() -> AppConfigTable.getAppConfig {
+				it?.apply { hold(generateRequest(api, goldStoneID, null)) }
+			}
+			targetGoldStoneID?.count().orZero() > 0 -> {
+				hold(generateRequest(api, Config.getGoldStoneID(), null))
+			}
+			else -> {
+				val uncryptRequest = Request.Builder()
+					.url(api)
+					.header("Content-type", "application/json")
+					.build()
+				hold(uncryptRequest)
 			}
 		}
 	}
-	
+
 	fun callChainBy(
 		body: RequestBody,
-		errorCallback: (error: Exception?, reason: String?) -> Unit,
+		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String = Config.getCurrentChainName(),
 		hold: (String) -> Unit
 	) {
@@ -314,14 +316,14 @@ object RequisitionUtil {
 			if (ChainURL.etcChainName.any { it.equals(chainName, true) })
 				ChainURL.currentETCChain(chainName)
 			else ChainURL.currentChain(chainName)
-		getcryptoRequest(body, chainUrl, isEncrypt) {
+		getcryptoRequest(body, chainUrl, isEncrypt) { it ->
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
 						errorCallback(error, "Call Ethereum Failured")
 					}
 				}
-				
+
 				override fun onResponse(call: Call, response: Response) {
 					val data =
 						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
@@ -346,12 +348,16 @@ object RequisitionUtil {
 			})
 		}
 	}
-	
+
 	private fun checkChainErrorCode(data: String?): String {
 		val hasError = data?.contains("error")
-		val errorData: String
-		if (hasError == true) {
-			errorData = JSONObject(data).safeGet("error")
+		val errorData = if (hasError == true) {
+			try {
+				JSONObject(data).safeGet("error")
+			} catch (error: Exception) {
+				LogUtil.error("checkChainErrorCode", error)
+				""
+			}
 		} else {
 			val code =
 				if (data?.contains("code") == true)
@@ -362,7 +368,7 @@ object RequisitionUtil {
 		}
 		return when {
 			data.isNullOrBlank() -> return ""
-			
+
 			errorData.isNotEmpty() -> {
 				try {
 					if (errorData.equals("null", true)) ""
@@ -371,7 +377,7 @@ object RequisitionUtil {
 					"$error"
 				}
 			}
-			
+
 			else -> ""
 		}
 	}
@@ -388,7 +394,7 @@ object GoldStoneCode {
 			LogUtil.error("function: GoldStoneCode, wrongCode: $code")
 		}
 	}
-	
+
 	fun showErrorCodeReason(data: String?, errorCallback: () -> Unit = {}) {
 		data?.apply {
 			val code = try {
@@ -404,7 +410,7 @@ object GoldStoneCode {
 						}
 						LogUtil.error("Server Error GoldStone")
 					}
-					
+
 					-4 -> {
 						GoldStoneAPI.context.runOnUiThread {
 							errorCallback()

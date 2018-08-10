@@ -1,17 +1,10 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
-import android.graphics.Color
-import android.util.Log
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.BaseRadioCell
 import io.goldstone.blockchain.common.value.AlarmClockText
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.wrapContent

@@ -3,7 +3,8 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -73,10 +74,9 @@ data class SupportCurrencyTable(
 		}
 		
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
-				}) {
+			load {
+				GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
+			} then {
 				hold(it.toArrayList())
 			}
 		}

@@ -14,6 +14,7 @@ import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
@@ -42,7 +43,9 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 	private var keyboardHeight = 0
 	
 	init {
-		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		isClickable = true
+		y = HomeSize.headerHeight.toFloat()
+		layoutParams = RelativeLayout.LayoutParams(matchParent, ScreenSize.heightWithOutHeader)
 		backgroundColor = Spectrum.white
 		inputView.apply {
 			textSize = fontSize(18)

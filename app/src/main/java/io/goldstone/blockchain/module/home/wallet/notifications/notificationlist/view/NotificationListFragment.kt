@@ -3,12 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationListPresenter
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationTransactionInfo
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -30,6 +31,20 @@ class NotificationListFragment :
 					if (type == 1) {
 						presenter.showWebFragment(title, actionContent)
 					} else {
+						val fromAddress: String
+						val toAddress: String
+						if (NotificationTable.getSymbol(extra.orEmpty()).equals(CryptoSymbol.btc(), true)) {
+							// TODO Bitcoin Transaction FromAddress 需要处理多 FromAddress 地址的情况
+							fromAddress =
+								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address
+							toAddress =
+								NotificationTable.getBTCTransactionData(extra.orEmpty(), false)
+									.map { it.address }
+									.toString()
+						} else {
+							fromAddress = NotificationTable.getFromAddress(extra.orEmpty())
+							toAddress = NotificationTable.getToAddress(extra.orEmpty())
+						}
 						presenter.showTransactionListDetailFragment(
 							NotificationTransactionInfo(
 								actionContent,
@@ -38,8 +53,8 @@ class NotificationListFragment :
 								NotificationTable.getSymbol(extra.orEmpty()),
 								NotificationTable.getValue(extra.orEmpty()),
 								createTime,
-								NotificationTable.getToAddress(extra.orEmpty()),
-								NotificationTable.getFromAddress(extra.orEmpty())
+								toAddress,
+								fromAddress
 							)
 						)
 					}

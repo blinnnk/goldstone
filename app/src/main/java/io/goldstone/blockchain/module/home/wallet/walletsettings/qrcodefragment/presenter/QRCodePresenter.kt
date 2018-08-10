@@ -16,8 +16,8 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.QRText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import org.jetbrains.anko.support.v4.toast
@@ -33,7 +33,9 @@ open class QRCodePresenter(
 	override val fragment: QRCodeFragment
 ) : BasePresenter<QRCodeFragment>() {
 	
-	private val address by lazy { fragment.arguments?.getString(ArgumentKey.address) }
+	private val address by lazy {
+		fragment.arguments?.getString(ArgumentKey.address)
+	}
 	
 	override fun onFragmentViewCreated() {
 		address?.let {

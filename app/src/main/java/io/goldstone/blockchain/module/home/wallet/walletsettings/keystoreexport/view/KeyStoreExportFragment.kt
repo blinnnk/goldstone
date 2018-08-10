@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
@@ -12,13 +14,21 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter.KeystoreExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -82,15 +92,24 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 15.uiPX()
 				}
-			}.click {
-				it.showLoadingStatus()
-				presenter.getKeystoreByAddress(passwordInput) {
-					if (isNotEmpty()) {
-						privateKeyTextView.text = this
+			}.click { button ->
+				button.showLoadingStatus()
+				presenter.getKeystoreJson(passwordInput.text.toString()) {
+					if (!it.isNullOrBlank()) {
+						privateKeyTextView.text = it
 					}
-					it.showLoadingStatus(false)
+					button.showLoadingStatus(false)
 				}
 			}.into(this)
+		}
+	}
+	
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		parentFragment?.let {
+			if (it is BaseOverlayFragment<*>) {
+				it.showAddButton(false)
+			}
 		}
 	}
 	

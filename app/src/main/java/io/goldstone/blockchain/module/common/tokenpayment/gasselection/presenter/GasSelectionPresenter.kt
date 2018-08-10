@@ -3,10 +3,18 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.os.Bundle
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
+import com.blinnnk.util.SoftKeyboard
+import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -23,6 +31,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -78,7 +88,7 @@ class GasSelectionPresenter(
 					GasSelectionModel(
 						index,
 						minner.toString().toLong(),
-						226,
+						prepareBTCModel?.signedMessageSize ?: 226,
 						currentMinerType
 					)
 				else
@@ -97,7 +107,7 @@ class GasSelectionPresenter(
 					/** 更新默认的燃气花销的 `ETH`, `ETC` 用于用户余额判断 */
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
-			}.click {
+			}.click { it ->
 				currentMinerType = it.model.type
 				if (isBTC()) updateBTCGasSettings(parent)
 				else updateGasSettings(parent)
@@ -118,7 +128,9 @@ class GasSelectionPresenter(
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
-						if (isBTC()) 226 else prepareModel?.gasLimit?.toLong().orElse(0L)
+						if (isBTC()) {
+							prepareBTCModel?.signedMessageSize ?: 226L
+						} else prepareModel?.gasLimit?.toLong().orElse(0L)
 					)
 					putBoolean(
 						ArgumentKey.isBTC,
@@ -150,11 +162,11 @@ class GasSelectionPresenter(
 		return prepareModel?.count?.toBigDecimal() ?: BigDecimal.ZERO
 	}
 	
-	fun isBTC(): Boolean {
-		return getToken()?.symbol.equals(CryptoSymbol.btc, true)
+	private fun isBTC(): Boolean {
+		return getToken()?.symbol.equals(CryptoSymbol.btc(), true)
 	}
 	
-	fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
+	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
 		return when {
 			getDecimalCount().isNull() -> return true
 			
@@ -182,8 +194,32 @@ class GasSelectionPresenter(
 				}
 				fragment.showMaskView(false)
 			}) {
-			if (isBTC()) transferBTC(it?.text.toString(), callback)
-			else transfer(it?.text.toString(), callback)
+			if (isBTC()) {
+				prepareBTCModel?.apply {
+					transferBTC(this, it?.text.toString(), callback)
+				}
+			} else transfer(it?.text.toString(), callback)
+		}
+	}
+	
+	/**
+	 * 转账开始后跳转到转账监听界面
+	 */
+	fun goToTransactionDetailFragment(receiptModel: ReceiptModel) {
+		// 准备跳转到下一个界面
+		fragment.getParentFragment<TokenDetailOverlayFragment> {
+			// 如果有键盘收起键盘
+			activity?.apply { SoftKeyboard.hide(this) }
+			removeChildFragment(fragment)
+			
+			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+				putSerializable(ArgumentKey.transactionDetail, receiptModel)
+			}
+			overlayView.header.apply {
+				showBackButton(false)
+				showCloseButton(true)
+			}
+			headerTitle = TokenDetailText.transferDetail
 		}
 	}
 	

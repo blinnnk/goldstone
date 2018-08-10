@@ -1,19 +1,21 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
 import com.blinnnk.util.HoneyDateUtil
+import io.goldstone.blockchain.common.language.DateAndTimeText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.toMillsecond
-import io.goldstone.blockchain.common.value.DateAndTimeText
-import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
+import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
+import org.json.JSONArray
 import java.io.Serializable
 
 /**
@@ -22,12 +24,13 @@ import java.io.Serializable
  */
 data class TransactionListModel(
 	var addressName: String,
+	var fromAddress: String,
 	val addressInfo: String,
 	var count: Double,
 	val symbol: String,
 	val isReceived: Boolean,
 	val date: String,
-	val targetAddress: String,
+	val toAddress: String,
 	val blockNumber: String,
 	val transactionHash: String,
 	var memo: String,
@@ -41,10 +44,11 @@ data class TransactionListModel(
 	var isFailed: Boolean,
 	var isFee: Boolean = false
 ) : Serializable {
-	
+
 	constructor(data: TransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else data.tokenReceiveAddress.orEmpty(),
+		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
@@ -59,7 +63,7 @@ data class TransactionListModel(
 		data.symbol,
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
-		if (data.isReceive) data.fromAddress else data.tokenReceiveAddress.orEmpty(),
+		data.tokenReceiveAddress.orEmpty(),
 		data.blockNumber,
 		data.hash,
 		data.memo,
@@ -73,47 +77,74 @@ data class TransactionListModel(
 		data.isFailed,
 		data.isFee
 	)
-	
-	constructor(data: BitcoinTransactionTable) : this(
-		if (data.to.equals(data.recordAddress, true)) data.fromAddress else data.to,
+
+	constructor(data: BitcoinSeriesTransactionTable) : this(
+		if (data.isReceive) data.fromAddress
+		else formatToAddress(data.to),
+		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillsecond(),
 				DateAndTimeText.getDateText()
 			) + descriptionText(
-				data.to.equals(data.recordAddress, true),
-				data.to,
+				data.to.contains(data.recordAddress, true),
+				formatToAddress(data.to),
 				data.fromAddress
 			)
 		), // 副标题的生成
 		data.value.toDouble().toBTCCount(),
-		CryptoSymbol.btc,
-		data.to.equals(data.recordAddress, true),
+		CryptoSymbol.btc(),
+		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
 		data.to,
 		data.blockNumber,
 		data.hash,
 		"",
-		data.fee,
-		"",
-		false,
+		"${data.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
+		generateTransactionURL(data.hash, CryptoSymbol.btc()),
+		data.isPending,
 		data.timeStamp,
-		data.value,
+		data.value.toDouble().toBTCCount().toString(),
 		false,
 		CryptoValue.btcContract,
 		false,
-		false
+		data.isFee
 	)
-	
+
 	companion object {
-		fun generateTransactionURL(taxHash: String, symbol: String?): String {
-			return if (symbol.equals(CryptoSymbol.etc, true)) {
-				EtherScanApi.gasTrackerHeader(taxHash)
+		fun formatToAddress(toAddress: String): String {
+			var formatedAddresses = ""
+			// `toAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
+			// `Start And End` 的值设定不同
+			val miroSetIndex = if (toAddress.contains("[")) 1 else 0
+			val addresses =
+				toAddress.substring(miroSetIndex, toAddress.count() - miroSetIndex).split(",")
+			addresses.forEachIndexed { index, item ->
+				formatedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
+			}
+			return formatedAddresses
+		}
+
+		fun convertMultiToOrFromAddresses(content: String): List<String> {
+			return if (content.contains("[")) {
+				(0 until JSONArray(content).length()).map {
+					JSONArray(content)[it].toString()
+				}
 			} else {
-				EtherScanApi.transactionDetail(taxHash)
+				listOf(content)
 			}
 		}
-		
+
+		fun generateTransactionURL(taxHash: String, symbol: String?): String {
+			return when {
+				symbol.equals(CryptoSymbol.etc, true) ->
+					EtherScanApi.gasTrackerHeader(taxHash)
+				symbol.equals(CryptoSymbol.btc(), true) ->
+					bitcoinTransactionDetail(taxHash)
+				else -> EtherScanApi.transactionDetail(taxHash)
+			}
+		}
+
 		private fun getUnitSymbol(symbol: String): String {
 			return " " + if (symbol.equals(CryptoSymbol.etc, true))
 				CryptoSymbol.etc

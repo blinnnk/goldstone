@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -12,8 +11,9 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.BaseRadioCell
-import io.goldstone.blockchain.common.value.AlarmClockText
+import io.goldstone.blockchain.common.Language.AlarmClockText
+import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.wrapContent

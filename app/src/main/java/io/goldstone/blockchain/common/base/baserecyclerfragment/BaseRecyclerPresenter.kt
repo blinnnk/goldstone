@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.isFalse
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 
 /**
@@ -48,8 +47,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 	
 	open fun onFragmentViewCreated() {
-		// 当 `ViewCreated`后执行更新数据函数
 		updateData()
+	}
+	
+	open fun onFragmentStart() {
+		// 当 `ViewCreated`后执行更新数据函数
 	}
 	
 	open fun onFragmentShowFromHidden() {

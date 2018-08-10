@@ -15,12 +15,23 @@ import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.common.language.SplashText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
+import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
 
 @Suppress("DEPRECATION")
@@ -46,6 +57,42 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				showWebView()
 			} otherwise {
 				showLocalContent()
+			}
+		}
+	}
+	
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		super.setBaseBackEvent(activity, parent)
+		// 这里高度复用导致了一些耦合, 暂时额外判断. 之后重构再优化. By KaySaith
+		parentFragment.apply {
+			when (this) {
+				is TokenDetailOverlayFragment -> {
+					headerTitle = TransactionText.detail
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is NotificationFragment -> {
+					headerTitle = NotificationText.notification
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is WalletGenerationFragment -> {
+					headerTitle = CreateWalletText.create
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is QuotationOverlayFragment -> {
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is TransactionFragment -> {
+					headerTitle = TransactionText.detail
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
+				
+				is WalletSettingsFragment -> {
+					presenter.popFragmentFrom<WebViewFragment>()
+				}
 			}
 		}
 	}

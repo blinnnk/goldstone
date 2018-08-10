@@ -1,25 +1,25 @@
 package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter
 
-import android.support.v4.app.Fragment
+import android.content.Context
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.removeStartAndEndValue
 import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.MultiChainAddresses
-import io.goldstone.blockchain.crypto.MultiChainPath
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
+import io.goldstone.blockchain.crypto.bitcoin.*
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllMainnet
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter.Companion.setAllTestnet
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -37,11 +37,11 @@ class PrivateKeyImportPresenter(
 		isAgree: Boolean,
 		nameInput: EditText,
 		hintInput: EditText,
-		callback: () -> Unit
+		callback: (Boolean) -> Unit
 	) {
 		privateKeyInput.text.isEmpty() isTrue {
 			fragment.context?.alert(ImportWalletText.privateKeyAlert)
-			callback()
+			callback(false)
 			return
 		}
 		CreateWalletPresenter.checkInputValue(
@@ -52,7 +52,7 @@ class PrivateKeyImportPresenter(
 			fragment.context,
 			{
 				// Failed callback
-				callback()
+				callback(false)
 			}
 		) { passwordValue, walletName ->
 			when (type) {
@@ -61,32 +61,39 @@ class PrivateKeyImportPresenter(
 						privateKeyInput.text.toString(),
 						passwordValue,
 						walletName,
-						fragment,
+						fragment.context,
+						true,
 						hintInput.text?.toString(),
-						callback
-					)
-				CryptoValue.PrivateKeyType.BTC ->
-					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
-						privateKeyInput.text.toString(),
-						passwordValue,
-						walletName,
-						fragment,
-						hintInput.text?.toString(),
-						false,
 						callback
 					)
 				
+				CryptoValue.PrivateKeyType.BTC -> {
+					setAllMainnet {
+						PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+							privateKeyInput.text.toString(),
+							passwordValue,
+							walletName,
+							fragment.context,
+							hintInput.text?.toString(),
+							false,
+							callback
+						)
+					}
+				}
+				
 				CryptoValue.PrivateKeyType.BTCTest -> {
-					Config.updateIsTestEnvironment(true)
-					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
-						privateKeyInput.text.toString(),
-						passwordValue,
-						walletName,
-						fragment,
-						hintInput.text?.toString(),
-						true,
-						callback
-					)
+					// 跟随导入的测试网私钥切换全局测试网络状态
+					setAllTestnet {
+						PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+							privateKeyInput.text.toString(),
+							passwordValue,
+							walletName,
+							fragment.context,
+							hintInput.text?.toString(),
+							true,
+							callback
+						)
+					}
 				}
 			}
 		}
@@ -102,36 +109,44 @@ class PrivateKeyImportPresenter(
 			privateKey: String,
 			password: String,
 			name: String,
-			fragment: Fragment,
+			context: Context?,
 			hint: String?,
 			isTest: Boolean,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			if (privateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
-				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
-				callback()
+				context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback(false)
 				return
 			}
 			// 检查比特币私钥地址格式是否是对应的网络
 			if (isTest) {
 				if (!BTCUtils.isValidTestnetPrivateKey(privateKey)) {
-					fragment.context?.alert(ImportWalletText.unvalidTestnetBTCPrivateKey)
-					callback()
+					context?.alert(ImportWalletText.unvalidTestnetBTCPrivateKey)
+					callback(false)
 					return
 				}
 			} else {
 				if (!BTCUtils.isValidMainnetPrivateKey(privateKey)) {
-					fragment.context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
-					callback()
+					context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
+					callback(false)
 					return
 				}
 			}
-			fragment.context?.getWalletByPrivateKey(CryptoValue.basicLockKey, password) { _ ->
-				// use ethereum geth keystore to verify btc user password, this value is unuseful
-				// just ignore the value
-				BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
+			
+			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
+				context?.apply {
+					// 存储私钥的 `KeyStore` 文件
+					storeBase58PrivateKey(
+						privateKey,
+						address,
+						password,
+						isTest,
+						true
+					)
+					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
-						fragment,
+						this,
 						MultiChainAddresses(
 							"",
 							"",
@@ -140,10 +155,21 @@ class PrivateKeyImportPresenter(
 						),
 						name,
 						"",
-						MultiChainPath("", "", "", ""),
-						hint,
-						callback
-					)
+						MultiChainPath(),
+						hint
+					) {
+						if (it) {
+							if (isTest) setAllTestnet {
+								callback(true)
+							}
+							else
+								setAllMainnet {
+									callback(true)
+								}
+						} else {
+							callback(false)
+						}
+					}
 				}
 			}
 		}
@@ -155,9 +181,10 @@ class PrivateKeyImportPresenter(
 			privateKey: String,
 			password: String,
 			name: String,
-			fragment: Fragment,
+			context: Context?,
+			isSingleChainWallet: Boolean,
 			hint: String? = null,
-			callback: () -> Unit
+			callback: (Boolean) -> Unit
 		) {
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
 			val formatPrivateKey = privateKey.removePrefix("0x")
@@ -169,22 +196,42 @@ class PrivateKeyImportPresenter(
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtil.isValidPrivateKey(currentPrivateKey)) {
-				fragment.context?.alert(ImportWalletText.unvalidPrivateKey)
-				callback()
+				context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback(false)
 				return
 			}
+			/**
+			 * `Single Chain Wallet` 的地址可能存在于某个已经导入的 `Bip44 Mnemonic Wallet` 的名下
+			 * 所以所有单链钱包全部用额外的 `Keystore` 规则进行存储
+			 * [CryptoValue.singleChainFile] + `Wallet Address`
+			 */
+			val filname =
+				if (isSingleChainWallet)
+					CryptoValue.singleChainFile(CryptoUtils.getAddressFromPrivateKey(currentPrivateKey))
+				else CryptoValue.keystoreFilename
 			// 解析私钥并导入钱包
-			fragment.context?.getWalletByPrivateKey(currentPrivateKey, password) { address ->
-				address?.let {
-					WalletImportPresenter.insertWalletToDatabase(
-						fragment,
-						MultiChainAddresses(it, it, "", ""),
-						name,
-						"",
-						MultiChainPath("", "", "", ""),
-						hint,
-						callback
-					)
+			context?.getWalletByPrivateKey(
+				currentPrivateKey,
+				password,
+				filname
+			) { address ->
+				if (address.equals(ImportWalletText.existAddress, true)) {
+					context.runOnUiThread {
+						alert(ImportWalletText.existAddress)
+						callback(false)
+					}
+				} else {
+					address?.let {
+						WalletImportPresenter.insertWalletToDatabase(
+							context,
+							MultiChainAddresses(it, it, "", ""),
+							name,
+							"",
+							MultiChainPath("", "", "", ""),
+							hint,
+							callback
+						)
+					}
 				}
 			}
 		}

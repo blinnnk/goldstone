@@ -8,8 +8,8 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
-import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
@@ -31,13 +31,13 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
-	
-	
+
+
 	init {
 		backgroundColor = Color.RED
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 	}
-	
+
 	fun setAdapter(data: ArrayList<DefaultTokenTable>, isShowAddressList: Boolean = true) {
 		adapter = TokenSelectionAdapter(data) {
 			model?.let { token ->
@@ -52,9 +52,9 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 			}
 		}
 	}
-	
+
 	companion object {
-		
+
 		fun showTransferAddressFragment(
 			context: Context?,
 			token: DefaultTokenTable
@@ -63,21 +63,29 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 				putBoolean(ArgumentKey.fromQuickTransfer, true)
 			}
 		}
-		
+
 		fun showDepositFragment(context: Context?, token: DefaultTokenTable) {
 			prepareContentOverlay(context, token) {
 				putBoolean(ArgumentKey.fromQuickDeposit, true)
 			}
 		}
-		
+
 		private fun prepareContentOverlay(
 			context: Context?,
 			token: DefaultTokenTable,
 			putArgument: Bundle.() -> Unit
 		) {
-			MyTokenTable.getTokenBalance(token.contract, getAddressBySymbol(token.symbol)) {
+			MyTokenTable.getTokenBalance(
+				token.contract,
+				getAddressBySymbol(token.symbol),
+				false
+			) { balance ->
 				// 准备数据
-				val model = WalletDetailCellModel(token, it.orElse(0.0), true)
+				val model = WalletDetailCellModel(
+					token,
+					balance.orElse(0.0),
+					true
+				)
 				// 显示 `ContentOverlay`
 				(context as? MainActivity)?.apply {
 					getMainContainer()?.apply {

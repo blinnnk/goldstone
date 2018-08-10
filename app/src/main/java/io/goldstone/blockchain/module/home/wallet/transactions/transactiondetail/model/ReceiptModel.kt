@@ -8,11 +8,10 @@ import java.math.BigInteger
  * @date 12/04/2018 10:41 PM
  * @author KaySaith
  */
-
 data class ReceiptModel(
-	val address: String,
-	val gasLimit: BigInteger,
-	val gasPrice: BigInteger,
+	val fromAddress: String,
+	val toAddress: String,
+	val minnerFee: String,
 	val value: BigInteger,
 	val token: WalletDetailCellModel,
 	val taxHash: String,

@@ -2,15 +2,14 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.view.View
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.setCenterInHorizontal
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.value.AlertText
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
@@ -23,7 +22,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TokenManagementListFragment :
 	BaseRecyclerFragment<TokenManagementListPresenter, DefaultTokenTable>() {
 	
-	private val attentionView by lazy { AttentionTextView(context!!) }
+	private var attentionView: AttentionTextView? = null
 	override val presenter = TokenManagementListPresenter(this)
 	
 	override fun setRecyclerViewAdapter(
@@ -43,11 +42,16 @@ class TokenManagementListFragment :
 					TokenManagementListPresenter.updateMyTokensInfoBy(
 						switch,
 						model,
-						this@TokenManagementListFragment.context!!
+						ChainID.getChainIDBySymbol(model.symbol)
 					)
 				}
 			}
 		}
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
@@ -57,11 +61,14 @@ class TokenManagementListFragment :
 	
 	fun showAttentionView() {
 		recyclerView.visibility = View.GONE
-		attentionView.apply {
-			isCenter()
-			setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
-			text = AlertText.btcWalletOnly
-		}.into(wrapper)
-		attentionView.setCenterInHorizontal()
+		if (attentionView.isNull()) {
+			attentionView = AttentionTextView(context!!)
+			attentionView?.apply {
+				isCenter()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+				text = AlertText.btcWalletOnly
+			}?.into(wrapper)
+			attentionView?.setCenterInHorizontal()
+		}
 	}
 }

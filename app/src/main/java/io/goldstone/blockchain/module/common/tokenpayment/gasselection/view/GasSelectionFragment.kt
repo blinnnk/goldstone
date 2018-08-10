@@ -12,14 +12,19 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ExplanationTitle
-import io.goldstone.blockchain.common.component.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
+import io.goldstone.blockchain.common.language.QAText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.transferBTC
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
@@ -89,7 +94,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 								putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas)
 							}
 						)
-						presenter.recoverHeader()
+						recoverHeader()
 					}
 				}.into(this)
 			}

@@ -11,9 +11,10 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.IconWithTitle
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.QuotationText
+import io.goldstone.blockchain.common.component.button.IconWithTitle
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.gridLayout
@@ -54,13 +55,15 @@ class TokenSocialMedia(
 	private var container: GridLayout
 	
 	init {
+		setHorizontalPadding(PaddingSize.device.toFloat())
 		setTitle(QuotationText.socimalMedia)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 140.uiPX())
 		container = gridLayout {
-			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 			rowCount = 1
 			columnCount = 3
 			y -= 10.uiPX()
+			x += PaddingSize.device
 		}
 		container.setAlignParentBottom()
 	}

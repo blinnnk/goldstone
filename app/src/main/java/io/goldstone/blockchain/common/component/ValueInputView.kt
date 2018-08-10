@@ -18,9 +18,14 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.matchParent
@@ -87,7 +92,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	
 	fun updateCurrencyValue(value: Double) {
 		if (valueInput.text?.toString()?.toDoubleOrNull().isNull() && valueInput.text.isNotEmpty()) {
-			context?.alert(AlertText.transferUnvalidInputFromat)
+			context?.alert(AlertText.transferUnvalidInputFormat)
 			valueInput.text.clear()
 			return
 		}
