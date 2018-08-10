@@ -1,13 +1,9 @@
-package io.goldstone.blockchain.common.Language
-
-import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.language.currentLanguage
+package io.goldstone.blockchain.common.language
 
 /**
  * @date 10/08/2018 14:19 PM
  * @author wcx
  */
-
 object AlarmClockText {
   @JvmField
   val priceAlarmClockList = when (currentLanguage) {
@@ -105,6 +101,40 @@ object AlarmClockText {
     HoneyLanguage.Korean.code -> "알람 수정"
     HoneyLanguage.Russian.code -> "Изменить сигнал тревоги"
     HoneyLanguage.TraditionalChinese.code -> "修改警報"
+    else -> ""
+  }
+
+  @JvmField
+  val alarmPriceValue = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Alarm Price Value"
+    HoneyLanguage.Chinese.code -> "报警价格"
+    HoneyLanguage.Japanese.code -> "アラーム価格値"
+    HoneyLanguage.Korean.code -> "알람 가격 값"
+    HoneyLanguage.Russian.code -> "Ценовая стоимость сигнала тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警價格"
+    else -> ""
+  }
+
+  @JvmField
+  val priceThreshold = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "价格门槛"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val modifyDescription = when (currentLanguage) {
+    HoneyLanguage.English.code -> "when the price corresponding to the currency reaches the threshold you set," +
+            "we will send you an alarm to inform you."
+    HoneyLanguage.Chinese.code -> "当货币对应的价格达到您设定的门槛时，我们会向您发送警报通知您。"
+    HoneyLanguage.Japanese.code -> "通貨に対応する価格があなたが設定したしきい値に達すると、私たちはあなたに通知するために警報を送信します。"
+    HoneyLanguage.Korean.code -> "통화에 해당하는 가격이 귀하가 설정 한 기준 액에 도달하면, 우리는 귀하에게 통보하기 위해 경보를 보내드립니다."
+    HoneyLanguage.Russian.code -> "когда цена, соответствующая валюте, достигает установленного вами порога, мы отправим вам сигнал тревоги, чтобы сообщить вам."
+    HoneyLanguage.TraditionalChinese.code -> "當貨幣對應的價格達到您設定的門檻時，我們會向您發送警報通知您。"
     else -> ""
   }
 }

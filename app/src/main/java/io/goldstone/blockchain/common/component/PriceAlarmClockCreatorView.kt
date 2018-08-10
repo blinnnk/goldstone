@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -11,11 +12,10 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.AlarmClockText
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.AlarmClockText
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.wrapContent
 
 /**
@@ -31,6 +31,7 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
   private val priceTypeTitleCell = TopBottomLineCell(context)
   private var priceType = 0
   private var alarmTypeView = AlarmTypeView(context)
+  private var automaticChoosePriceTypeFlag = false
   private var moreThanCell = object : BaseRadioCell(context) {
   }
   private var lessThanCell = object : BaseRadioCell(context) {
@@ -43,7 +44,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
     titleCell.apply {
       layoutParams = LinearLayout.LayoutParams(
         matchParent,
-        wrapContent).apply {
+        wrapContent
+      ).apply {
         leftMargin = 20.uiPX()
         rightMargin = 20.uiPX()
       }
@@ -53,7 +55,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
     RelativeLayout(context).apply {
       layoutParams = RelativeLayout.LayoutParams(
         matchParent,
-        matchParent).apply {
+        matchParent
+      ).apply {
         leftMargin = 20.uiPX()
         rightMargin = 20.uiPX()
         bottomMargin = 20.uiPX()
@@ -62,7 +65,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
       targetPriceEditText.apply {
         layoutParams = ViewGroup.LayoutParams(
           matchParent,
-          wrapContent)
+          wrapContent
+        )
         hint = AlarmClockText.targetPrice
         maxLines = 1
         inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -71,7 +75,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
           setText(
             editTextString.toCharArray(),
             0,
-            editTextString.length)
+            editTextString.length
+          )
         }
       }
       addView(targetPriceEditText)
@@ -79,7 +84,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
       currencyTextView.apply {
         layoutParams = ViewGroup.LayoutParams(
           wrapContent,
-          wrapContent)
+          wrapContent
+        )
         if (text.isNullOrBlank()) {
           text = "USDT"
         }
@@ -92,7 +98,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
     priceTypeTitleCell.apply {
       layoutParams = LinearLayout.LayoutParams(
         matchParent,
-        wrapContent).apply {
+        wrapContent
+      ).apply {
         leftMargin = 20.uiPX()
         rightMargin = 20.uiPX()
         bottomMargin = 20.uiPX()
@@ -106,11 +113,6 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
         setTitle("1 BTC > 5800 USDT")
       }
       setSwitchStatusBy(true)
-      onClick {
-        moreThanCell.setSwitchStatusBy(true)
-        lessThanCell.setSwitchStatusBy(false)
-        priceType = 0
-      }
     }
     moreThanCell.into(this)
 
@@ -118,11 +120,6 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
     lessThanCell.apply {
       if (getTitle().isEmpty()) {
         setTitle("1 BTC < 5800 USDT")
-      }
-      onClick {
-        moreThanCell.setSwitchStatusBy(false)
-        lessThanCell.setSwitchStatusBy(true)
-        priceType = 1
       }
     }
     lessThanCell.into(this)
@@ -141,12 +138,16 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
 
   fun setTargetPriceEditTextListener(
     price: Double?,
-    currencyName: String?) {
+    marketPrice: Double?,
+    currencyName: String?
+  ) {
     val editTextString = "" + price
     targetPriceEditText.setText(
       editTextString.toCharArray(),
       0,
-      editTextString.length)
+      editTextString.length
+    )
+
     targetPriceEditText.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(editable: Editable?) {
       }
@@ -155,20 +156,21 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
         p0: CharSequence?,
         p1: Int,
         p2: Int,
-        p3: Int) {
+        p3: Int
+      ) {
       }
 
       override fun onTextChanged(
         charSequence: CharSequence?,
         p1: Int,
         p2: Int,
-        p3: Int) {
+        p3: Int
+      ) {
         if (("" + charSequence).isEmpty()) {
           moreThanCell.setTitle("1 BTC > 0 $currencyName")
           lessThanCell.setTitle("1 BTC < 0 $currencyName")
 
-          moreThanCell.setSwitchStatusBy(true)
-          lessThanCell.setSwitchStatusBy(false)
+          changePriceType(true)
         } else {
           val inputPrice = ("" + charSequence).toDouble()
           if (inputPrice > 100000000) {
@@ -176,7 +178,8 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
             targetPriceEditText.setText(
               maxPrice.toCharArray(),
               0,
-              maxPrice.length)
+              maxPrice.length
+            )
             Toast.makeText(
               context,
               "已达到价格上限100000000",
@@ -184,23 +187,19 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
             moreThanCell.setTitle("1 BTC > 100000000 $currencyName")
             lessThanCell.setTitle("1 BTC < 100000000 $currencyName")
 
-            moreThanCell.setSwitchStatusBy(false)
-            lessThanCell.setSwitchStatusBy(true)
+            changePriceType(false)
           } else if (inputPrice < 0) {
             moreThanCell.setTitle("1 BTC > 0 $currencyName")
             lessThanCell.setTitle("1 BTC < 0 $currencyName")
 
-            moreThanCell.setSwitchStatusBy(true)
-            lessThanCell.setSwitchStatusBy(false)
+            changePriceType(true)
           } else {
             moreThanCell.setTitle("1 BTC > $inputPrice $currencyName")
             lessThanCell.setTitle("1 BTC < $inputPrice $currencyName")
-            if (inputPrice < price!!) {
-              moreThanCell.setSwitchStatusBy(false)
-              lessThanCell.setSwitchStatusBy(true)
+            if (inputPrice < marketPrice!!) {
+              changePriceType(false)
             } else {
-              moreThanCell.setSwitchStatusBy(true)
-              lessThanCell.setSwitchStatusBy(false)
+              changePriceType(true)
             }
           }
         }
@@ -210,9 +209,22 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
 
   fun setPriceChooseContent(
     price: Double?,
-    currencyName: String?) {
+    currencyName: String?
+  ) {
     moreThanCell.setTitle("1 BTC > $price $currencyName")
     lessThanCell.setTitle("1 BTC < $price $currencyName")
+
+    if (priceType == 0) {
+      moreThanCell.setSwitchStatusBy(true)
+      lessThanCell.setSwitchStatusBy(false)
+    } else {
+      moreThanCell.setSwitchStatusBy(false)
+      lessThanCell.setSwitchStatusBy(true)
+    }
+  }
+
+  fun setAlarmChooseContent(alarmType: Int?) {
+    alarmTypeView.setAlarmType(alarmType)
   }
 
   fun setCurrencyName(currencyName: String?) {
@@ -223,11 +235,34 @@ class PriceAlarmClockCreatorView(context: Context) : LinearLayout(context) {
     return targetPriceEditText
   }
 
+  fun setPriceType(priceType: Int?) {
+    this.priceType = priceType!!
+  }
+
   fun getPriceType(): Int {
     return priceType
   }
 
   fun getAlarmTypeView(): AlarmTypeView {
     return alarmTypeView
+  }
+
+  fun setAutomaticChoosePriceType(automaticChoosePriceTypeFlag: Boolean) {
+    this.automaticChoosePriceTypeFlag = automaticChoosePriceTypeFlag
+  }
+
+  fun getMoreThanCell(): BaseRadioCell {
+    return moreThanCell
+  }
+
+  fun getLessThanCell(): BaseRadioCell {
+    return lessThanCell
+  }
+
+  fun changePriceType(priceType: Boolean) {
+    if (!automaticChoosePriceTypeFlag) {
+      moreThanCell.setSwitchStatusBy(priceType)
+      lessThanCell.setSwitchStatusBy(!priceType)
+    }
   }
 }

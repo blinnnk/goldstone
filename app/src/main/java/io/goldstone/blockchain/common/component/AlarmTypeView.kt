@@ -4,7 +4,9 @@ import android.content.Context
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.AlarmClockText
+import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.AlarmClockText
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.wrapContent
@@ -48,9 +50,11 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
     // 永久闹铃
     repeatingCell.apply {
       setTitle(AlarmClockText.alarmRepeatingType)
-      setSwitchStatusBy(true)
+      if (alarmType == 0) {
+        setSwitchStatusBy(true)
+      }
       onClick {
-        alarmType = 1
+        alarmType = 0
         repeatingCell.setSwitchStatusBy(true)
         oneTimeCell.setSwitchStatusBy(false)
       }
@@ -60,8 +64,11 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
     // 一次闹铃
     oneTimeCell.apply {
       setTitle(AlarmClockText.alarmOnlyOneTimeType)
+      if (alarmType == 1) {
+        setSwitchStatusBy(true)
+      }
       onClick {
-        alarmType = 0
+        alarmType = 1
         oneTimeCell.setSwitchStatusBy(true)
         repeatingCell.setSwitchStatusBy(false)
       }
@@ -72,5 +79,17 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 
   fun getAlarmType(): Int {
     return alarmType
+  }
+
+  fun setAlarmType(alarmType: Int?) {
+    this.alarmType = alarmType!!
+  }
+
+  fun getRepeatingCell(): BaseRadioCell {
+    return repeatingCell
+  }
+
+  fun getOneTimeCell(): BaseRadioCell {
+    return oneTimeCell
   }
 }
