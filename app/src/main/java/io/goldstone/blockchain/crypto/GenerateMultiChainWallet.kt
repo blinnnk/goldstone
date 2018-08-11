@@ -12,7 +12,7 @@ import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
  * @author KaySaith
  */
 object GenerateMultiChainWallet {
-	
+
 	fun create(
 		context: Context,
 		password: String,
@@ -25,7 +25,7 @@ object GenerateMultiChainWallet {
 			DefaultPath.ethPath,
 			DefaultPath.etcPath,
 			DefaultPath.btcPath,
-			DefaultPath.btcTestPath
+			DefaultPath.testPath
 		)
 		context.generateWallet(password, path.ethPath) { mnemonic, ethAddress ->
 			context.getEthereumWalletByMnemonic(
@@ -61,7 +61,7 @@ object GenerateMultiChainWallet {
 			}
 		}
 	}
-	
+
 	fun import(
 		context: Context,
 		mnemonic: String,

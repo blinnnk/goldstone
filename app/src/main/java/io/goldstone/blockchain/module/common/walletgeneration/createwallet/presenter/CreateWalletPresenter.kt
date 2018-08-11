@@ -49,11 +49,11 @@ import org.jetbrains.anko.runOnUiThread
 class CreateWalletPresenter(
 	override val fragment: CreateWalletFragment
 ) : BasePresenter<CreateWalletFragment>() {
-	
+
 	private var nameText = ""
 	private var passwordText = ""
 	private var repeatPasswordText = ""
-	
+
 	fun showAgreementFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
@@ -64,7 +64,7 @@ class CreateWalletPresenter(
 			argument
 		)
 	}
-	
+
 	fun generateWalletWith(
 		isAgree: Boolean,
 		hintInput: EditText,
@@ -86,7 +86,7 @@ class CreateWalletPresenter(
 			)
 		}
 	}
-	
+
 	fun updateConfirmButtonStyle(
 		nameInput: RoundInput,
 		passwordInput: RoundInput,
@@ -107,7 +107,7 @@ class CreateWalletPresenter(
 			setConfirmButtonStyle(confirmButton)
 		}
 	}
-	
+
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
 		if (passwordText.count() * repeatPasswordText.count() != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
@@ -115,7 +115,7 @@ class CreateWalletPresenter(
 			confirmButton.setGrayStyle(20.uiPX())
 		}
 	}
-	
+
 	private fun Context.generateWalletWith(
 		password: String,
 		name: String,
@@ -155,7 +155,7 @@ class CreateWalletPresenter(
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
-						btcTestPath = DefaultPath.btcTestPath,
+						btcTestPath = DefaultPath.testPath,
 						hint = hint,
 						isUsing = true
 					)
@@ -177,13 +177,13 @@ class CreateWalletPresenter(
 							}
 						}
 					}
-					
+
 					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		}
 	}
-	
+
 	private fun saveEncryptMnemonic(
 		mnemonic: String?,
 		address: String,
@@ -198,7 +198,7 @@ class CreateWalletPresenter(
 			}
 		}
 	}
-	
+
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
 		// 创建钱包一旦成功跳转到 `备份助记词` 界面就不准许再回到创建的界面防止重复创建账号
 		// 所以这里使用了覆盖 `Fragment` 的方法
@@ -209,14 +209,14 @@ class CreateWalletPresenter(
 			headerTitle = CreateWalletText.mnemonicBackUp
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletGenerationFragment>(fragment)
 	}
-	
+
 	companion object {
-		
+
 		fun showPasswordSafeLevel(passwordInput: RoundInput) {
 			passwordInput.apply {
 				val password = text.toString()
@@ -227,7 +227,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
@@ -249,7 +249,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		fun checkInputValue(
 			name: String,
 			password: String,
@@ -269,7 +269,7 @@ class CreateWalletPresenter(
 				failedCallback()
 				return
 			}
-			
+
 			if (password != repeatPassword) {
 				context?.alert(CreateWalletText.passwordRepeatAlert)
 				failedCallback()
@@ -289,7 +289,7 @@ class CreateWalletPresenter(
 				normal = CreateWalletText.safetyLevelNoraml
 				high = CreateWalletText.safetyLevelHigh
 			}
-			
+
 			doAsync {
 				password.checkPasswordInRules(reason) { _, reasons ->
 					GoldStoneAPI.context.runOnUiThread {
@@ -303,7 +303,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			currentAddresses: MultiChainAddresses,
 			callback: (Boolean) -> Unit
@@ -320,7 +320,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		private fun List<DefaultTokenTable>.insertNewAccount(
 			currentAddresses: MultiChainAddresses,
 			callback: () -> Unit
@@ -341,7 +341,7 @@ class CreateWalletPresenter(
 									)
 								}
 							}
-							
+
 							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
 									MyTokenTable.insert(
@@ -350,7 +350,7 @@ class CreateWalletPresenter(
 									)
 								}
 							}
-							
+
 							ChainID.BTCMain.id -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
 									MyTokenTable.insert(
@@ -359,7 +359,7 @@ class CreateWalletPresenter(
 									)
 								}
 							}
-							
+
 							ChainID.BTCTest.id -> {
 								if (currentAddresses.btcTestAddress.isNotEmpty()) {
 									MyTokenTable.insert(
@@ -372,7 +372,7 @@ class CreateWalletPresenter(
 						completeMark()
 					}
 				}
-				
+
 				override fun mergeCallBack() = callback()
 			}.start()
 		}
