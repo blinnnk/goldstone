@@ -10,7 +10,7 @@ import org.bitcoinj.core.*
  * @author KaySaith
  */
 object BTCWalletUtils {
-	
+
 	fun getBitcoinWalletByMnemonic(
 		mnemonicCode: String,
 		path: String,
@@ -27,7 +27,7 @@ object BTCWalletUtils {
 		val secret = keyPair.getPrivateKeyEncoded(currentID).toString()
 		hold(address, secret)
 	}
-	
+
 	private fun getKeyPairFromBase58PrivateKey(
 		privateKey: String,
 		isTest: Boolean,
@@ -40,12 +40,13 @@ object BTCWalletUtils {
 			DumpedPrivateKey.fromBase58(currentID, privateKey).key
 		)
 	}
-	
+
 	fun getPublicKeyFromBase58PrivateKey(
 		privateKey: String,
 		isTest: Boolean,
 		hold: (publicKey: String) -> Unit
 	) {
+		
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val chainID = if (isTest) testNetID else mainNetID

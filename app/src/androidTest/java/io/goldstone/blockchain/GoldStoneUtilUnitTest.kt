@@ -121,7 +121,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
-			CryptoSymbol.btc,
+			CryptoSymbol.btc(),
 			ChainID.BTCMain.id,
 			{
 				LogUtil.error("getCoinInfo", it)

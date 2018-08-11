@@ -54,7 +54,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.ethPath,
 		DefaultPath.etcPath,
 		DefaultPath.btcPath,
-		DefaultPath.btcTestPath
+		DefaultPath.testPath
 	)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -171,7 +171,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		),
 		Pair(
 			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
-			DefaultPath.btcTestPathHeader
+			DefaultPath.testPathHeader
 		)
 	)
 
