@@ -31,9 +31,6 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			item.apply {
 				// 增加查询 GoldStoneID 的快捷方法
 				when {
-					model.title.equals(ProfileText.version, true) -> onClick {
-						presenter.showGoldStoneID()
-					}
 					position == asyncData?.size -> upgradeEvent = Runnable {
 						presenter.showUpgradeDialog()
 					}

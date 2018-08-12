@@ -3,8 +3,9 @@ package io.goldstone.blockchain.module.home.profile.profile.presenter
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
-import android.os.Environment
+import android.os.*
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
@@ -14,7 +15,8 @@ import com.blinnnk.util.SystemUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.component.chart.ProgressLoadingDialog
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -24,8 +26,9 @@ import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.*
+import java.io.File
+import java.util.concurrent.Executors
 
 /**
  * @date 25/03/2018 10:52 PM
@@ -36,6 +39,55 @@ class ProfilePresenter(
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
 	
 	private var version = ""
+	private val progressLoadingDialog: ProgressLoadingDialog by lazy {
+		ProgressLoadingDialog(fragment.context)
+	}
+	
+	private val downloadHandler: Handler
+	private var downloadId = 0L
+	
+	private fun resetDownloadId () {
+		downloadId = 0L
+	}
+	init {
+	  downloadHandler = object : Handler() {
+			override fun handleMessage(msg: Message) {
+					when (msg.arg1) {
+						DownloadManager.STATUS_SUCCESSFUL -> {
+							resetDownloadId()
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(0, 100)
+								progressLoadingDialog.dismiss()
+							}
+							val path = msg.obj as String
+							path.isNotNull {
+								ApkUtil.installApk(File(path))
+							}
+							
+						}
+						
+						DownloadManager.STATUS_FAILED -> {
+							resetDownloadId()
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(0, 100)
+								progressLoadingDialog.dismiss()
+							}
+						}
+						
+						else -> {
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(msg.arg2, 100)
+							}
+							
+							getBytesAndStatus()
+							
+						}
+						
+					}
+				
+			}
+		}
+	}
 	
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
@@ -113,18 +165,73 @@ class ProfilePresenter(
 	private var newVersionUrl = ""
 	
 	fun showUpgradeDialog() {
+		if (downloadId != 0L) {
+			progressLoadingDialog.show()
+			return
+		}
 		fragment.context?.let {
 			GoldStoneDialog.show(it) {
 				showButtons(CommonText.upgrade) {
 					downloadNewVersion {
 						GoldStoneDialog.remove(it)
-						fragment.context?.alert("Application is downloading now")
+						showDownloadProgress()
 					}
 				}
 				setContent(newVersionName, newVersionDescription)
 				setImage(R.drawable.version_banner)
 			}
 		}
+	}
+	
+	
+	private fun showDownloadProgress() {
+		fragment.context?.apply {
+			if (downloadId != 0L) {
+				progressLoadingDialog.show()
+				getBytesAndStatus()
+				
+			}
+		}
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		downloadHandler.removeCallbacksAndMessages(null)
+	}
+	
+	private fun getBytesAndStatus() {
+		Executors.newSingleThreadExecutor().execute {
+			val bytesAndStatus = arrayOf(-1, -1, 0)
+			val query = DownloadManager.Query().setFilterById(downloadId)
+			var cursor: Cursor? = null
+			var filePath: String? = null
+			try {
+				cursor = (fragment.context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).query(query)
+				if (cursor != null && cursor.moveToFirst()) {
+					//已经下载文件大小
+					bytesAndStatus[0] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+					//下载文件的总大小
+					bytesAndStatus[1] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+					//下载状态
+					bytesAndStatus[2] = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+					
+					filePath = cursor.getString(cursor.getColumnIndex("local_filename"))
+				}
+			} finally {
+				cursor!!.close()
+				
+			}
+			
+			val progress = (bytesAndStatus[0].toFloat()) / (bytesAndStatus[1].toFloat() ) * 100
+			val message = downloadHandler.obtainMessage()
+			message.arg1 = bytesAndStatus[2]
+			message.arg2 = progress.toInt()
+			message.obj = filePath
+			downloadHandler.sendMessageDelayed(message, 500)
+			
+		}
+		
+		
 	}
 	
 	private fun checkVersion() {
@@ -151,23 +258,25 @@ class ProfilePresenter(
 			override var permissionType = PermissionCategory.Write
 		}.start {
 			doAsync {
-				download(newVersionUrl, newVersionName, newVersionDescription)
+				downloadId = download(newVersionUrl, newVersionName, newVersionDescription)
 				fragment.context?.runOnUiThread { callback() }
 			}
 		}
 	}
 	
-	private fun download(url: String, title: String, description: String) {
+	private fun download(url: String, title: String, description: String) : Long {
 		val request = DownloadManager.Request(Uri.parse(url)).apply {
 			setDescription(description)
 			setTitle(title)
 			allowScanningByMediaScanner()
 			setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title.apk")
+			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GoldStone$title.apk")
 		}
+		
 		// get download service and enqueue file
 		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-		manager.enqueue(request)
+		return manager.enqueue(request)
+		
 	}
 	
 	private fun showShareChooser() {
