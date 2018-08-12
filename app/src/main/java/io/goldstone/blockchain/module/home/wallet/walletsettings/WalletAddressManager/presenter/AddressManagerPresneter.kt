@@ -17,6 +17,9 @@ import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -73,6 +76,9 @@ class AddressManagerPresneter(
 					} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
 						add(Pair(currentBTCTestAddress, CryptoSymbol.btc()))
 					}
+					if (currentLTCAddress.isNotEmpty()) {
+						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
+					}
 					if (currentETHAndERCAddress.isNotEmpty()) {
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
@@ -107,11 +113,18 @@ class AddressManagerPresneter(
 		}
 	}
 
+	fun getLitecoinAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setLitecoinAddressesModel(convertToChildAddresses(ltcAddresses))
+		}
+	}
+
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
 		return listOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
-			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress)
+			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
+			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newLTCAddress)
 		)
 	}
 
@@ -145,11 +158,21 @@ class AddressManagerPresneter(
 		}
 	}
 
+	fun showAllLTCAddresses(): Runnable {
+		return Runnable {
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
+				WalletSettingsText.allLTCAddresses,
+				WalletSettingsText.viewAddresses,
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
+			)
+		}
+	}
+
 	companion object {
 
 		fun showPrivateKeyExportFragment(
 			address: String,
-			isBTC: Boolean,
+			chainType: Int,
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
@@ -160,7 +183,7 @@ class AddressManagerPresneter(
 						WalletSettingsText.viewAddresses,
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
-							if (isBTC) putBoolean(ArgumentKey.isBTCAddress, true)
+							putInt(ArgumentKey.chainType, chainType)
 						}
 					)
 				}
@@ -362,6 +385,54 @@ class AddressManagerPresneter(
 			}
 		}
 
+		fun createLTCAddress(
+			context: Context,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentLTCAddress(),
+				true,
+				false
+			) { isCorrect ->
+				if (!isCorrect) {
+					context.alert(CommonText.wrongPassword)
+					return@verifyKeystorePassword
+				}
+
+				WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let { encryptoMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
+						LTCWalletUtils.generateBase58Keypair(mnemonic, newChildPath, ChainPrefix.Litecoin, true).let { ltcKeyPair ->
+							context.storeLTCBase58PrivateKey(
+								ltcKeyPair.privateKey,
+								ltcKeyPair.address,
+								password,
+								false
+							)
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							insertNewAddressToMyToken(
+								CryptoSymbol.ltc,
+								CryptoValue.ltcContract,
+								ltcKeyPair.address,
+								ChainID.LTCMain.id
+							)
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommitionModel(ltcKeyPair.address, ChainType.LTC.id, 1)
+							)
+							WalletTable.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
+							}
+						}
+					}
+				}
+			}
+		}
+
 		fun setDefaultAddress(
 			chainType: Int,
 			defaultAddress: String,
@@ -415,7 +486,7 @@ class AddressManagerPresneter(
 				when (chainType) {
 					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-
+					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							hold(

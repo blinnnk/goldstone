@@ -31,6 +31,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 		val currentType = when {
 			model.isWatchOnly -> WalletText.watchOnly
 			model.type.equals(WalletType.ETHERCAndETCOnly.content, true) -> WalletText.ethERCAndETC
+			model.type.equals(WalletType.LTCOnly.content, true) -> WalletText.ltcMainnet
 			model.type.equals(WalletType.BTCOnly.content, true) -> WalletText.btcMainnet
 			model.type.equals(WalletType.BTCTestOnly.content, true) -> WalletText.bitcoinTestnet
 			else -> WalletText.multiChain

@@ -22,7 +22,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 class WalletImportPresenter(
 	override val fragment: WalletImportFragment
 ) : BaseOverlayPresenter<WalletImportFragment>() {
-	
+
 	fun onClickMenuBarItem() {
 		fragment.apply {
 			menuBar.clickEvent = Runnable {
@@ -33,20 +33,20 @@ class WalletImportPresenter(
 			}
 		}
 	}
-	
+
 	companion object {
-		
+
 		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
 			return if (index == -1) ""
 			else "$address|$index"
 		}
-		
+
 		fun getAddressIndexFromPath(path: String): Int {
 			return if (path.isEmpty()) -1
 			else path.substringAfterLast("/").toInt()
 		}
-		
+
 		fun insertWalletToDatabase(
 			context: Context?,
 			multiChainAddresses: MultiChainAddresses,
@@ -62,9 +62,10 @@ class WalletImportPresenter(
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcTestAddress
+					multiChainAddresses.btcTestAddress,
+					multiChainAddresses.ltcAddress
 				).find { it.isNotEmpty() }.orEmpty()
-			
+
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
@@ -76,6 +77,7 @@ class WalletImportPresenter(
 							currentETCAddress = multiChainAddresses.etcAddress,
 							currentBTCAddress = multiChainAddresses.btcAddress,
 							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
+							currentLTCAddress = multiChainAddresses.ltcAddress,
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -96,12 +98,17 @@ class WalletImportPresenter(
 							),
 							btcTestAddresses = childAddressValue(
 								multiChainAddresses.btcTestAddress,
-								getAddressIndexFromPath(multiChainPath.btcTestPath)
+								getAddressIndexFromPath(multiChainPath.testPath)
+							),
+							ltcAddresses = childAddressValue(
+								multiChainAddresses.ltcAddress,
+								getAddressIndexFromPath(multiChainPath.ltcPath)
 							),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,
-							btcTestPath = multiChainPath.btcTestPath
+							btcTestPath = multiChainPath.testPath,
+							ltcPath = multiChainPath.ltcPath
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息

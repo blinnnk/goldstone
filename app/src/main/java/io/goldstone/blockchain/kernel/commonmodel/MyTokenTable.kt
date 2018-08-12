@@ -248,6 +248,11 @@ data class MyTokenTable(
 					}
 				}
 
+				contract.equals(CryptoValue.ltcContract, true) -> {
+					// TODO Litecoin GetBalance
+					callback(0.0)
+				}
+
 				contract.equals(CryptoValue.btcContract, true) -> {
 					BitcoinApi.getBalanceByAddress(ownerAddress) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
@@ -301,12 +306,13 @@ interface MyTokenDao {
 		btcChain: String = Config.getBTCCurrentChain()
 	): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :ltcChain  OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
 		ercChain: String = Config.getCurrentChain(),
 		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain()
+		btcChain: String = Config.getBTCCurrentChain(),
+		ltcChain: String = Config.getLTCCurrentChain()
 	): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

@@ -26,6 +26,8 @@ object ChainURL {
 			ChainText.infuraMain -> ChainURL.infuraMain
 			ChainText.btcTest -> ChainURL.btcTest
 			ChainText.btcMain -> ChainURL.btcMain
+			ChainText.ltcMain -> ChainURL.ltcMain
+			ChainText.ltcTest -> ChainURL.ltcTest
 			else -> ChainURL.main
 		}
 	}
@@ -59,7 +61,8 @@ object ChainURL {
 		return when (type) {
 			ChainType.ETH -> Config.getCurrentChainName()
 			ChainType.ETC -> Config.getETCCurrentChainName()
-			ChainType.BTC -> Config.getBTCCurrentChain()
+			ChainType.BTC -> Config.getBTCCurrentChainName()
+			ChainType.LTC -> Config.getLTCCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -69,6 +72,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
 			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
+			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -78,6 +82,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
 			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
 			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
+			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
 			else -> ChainType.ETH
 		}
 	}
@@ -103,6 +108,12 @@ object ChainURL {
 	/** BTC Chain Address */
 	private const val btcMain = "https://btc-node-mainnet.goldstone.io/btc"
 	private const val btcTest = "https://btc-node-testnet.goldstone.io/btc"
+	/** LTC Chain Address */
+	private const val ltcMain = "https://btc-node-mainnet.goldstone.io/ltc"
+	private const val ltcTest = "https://btc-node-testnet.goldstone.io/ltc"
+	/** BCH Chain Address */
+	private const val bchMain = "https://btc-node-mainnet.goldstone.io/bch"
+	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMorderTest = "https://web3.gastracker.io/morden"

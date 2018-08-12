@@ -35,6 +35,7 @@ object CryptoValue {
 	const val ethContract = "0x60"
 	const val etcContract = "0x61"
 	const val btcContract = "0x0"
+	const val ltcContract = "0x2"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
@@ -43,11 +44,11 @@ object CryptoValue {
 	}
 	val filename: (
 		walletAddress: String,
-		isBTCWallet: Boolean,
+		isBTCSeriesWallet: Boolean,
 		isSingleChainWallet: Boolean
-	) -> String = { walletAddress, isBTCWallet, isSingleChainWallet ->
+	) -> String = { walletAddress, isBTCSeriesWallet, isSingleChainWallet ->
 		when {
-			isBTCWallet && !isSingleChainWallet -> walletAddress
+			isBTCSeriesWallet && !isSingleChainWallet -> walletAddress
 			isSingleChainWallet -> CryptoValue.singleChainFile(walletAddress)
 			else -> CryptoValue.keystoreFilename
 		}
@@ -56,6 +57,8 @@ object CryptoValue {
 		when {
 			it.equals(CryptoValue.etcContract, true) -> Config.getETCCurrentChain()
 			it.equals(CryptoValue.ethContract, true) -> Config.getCurrentChain()
+			it.equals(CryptoValue.ltcContract, true) -> Config.getLTCCurrentChain()
+			it.equals(CryptoValue.btcContract, true) -> Config.getBTCCurrentChain()
 			else -> Config.getCurrentChain()
 		}
 	}
@@ -74,12 +77,14 @@ object CryptoValue {
 	enum class PrivateKeyType(val content: String) {
 		ETHERCAndETC("ETH, ERC20 And ETC"),
 		BTC("BTC"),
-		BTCTest("BTC Test");
+		BTCTest("BTC Test"),
+		LTC("LTC"),;
 
 		companion object {
 			fun getTypeByContent(content: String): PrivateKeyType {
 				return when (content) {
 					ETHERCAndETC.content -> ETHERCAndETC
+					LTC.content -> LTC
 					BTC.content -> BTC
 					else -> BTCTest
 				}
@@ -130,7 +135,12 @@ enum class ChainType(val id: Int) {
 	LTC(2),
 	ETH(60),
 	ETC(61),
-	ERC(100) // 需要调大不然可能会和自然 `Type` 冲突
+	ERC(100); // 需要调大不然可能会和自然 `Type` 冲突
+	companion object {
+	  fun getAllBTCSeriesType(): List<Int> {
+			return listOf(LTC.id, BTCTest.id, BTC.id)
+		}
+	}
 }
 
 object DefaultPath {

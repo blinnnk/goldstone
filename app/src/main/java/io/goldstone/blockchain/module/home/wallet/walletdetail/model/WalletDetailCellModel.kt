@@ -95,9 +95,7 @@ data class WalletDetailCellModel(
 							}
 						}
 
-						override fun mergeCallBack() {
-							hold(tokenList)
-						}
+						override fun mergeCallBack() = hold(tokenList)
 					}.start()
 				}
 			}
@@ -186,7 +184,7 @@ data class WalletDetailCellModel(
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
 		) {
-			map { it.contract }.toJsonArray {
+			map { it.contract }.toJsonArray { it ->
 				GoldStoneAPI.getPriceByContractAddress(
 					it,
 					{

@@ -71,6 +71,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val customLitecoinPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Litecoin Path"
+		HoneyLanguage.Chinese.code -> "Custom Litecoin Path"
+		HoneyLanguage.Japanese.code -> "Custom Litecoin Path"
+		HoneyLanguage.Korean.code -> "Custom Litecoin Path"
+		HoneyLanguage.Russian.code -> "Custom Litecoin Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Litecoin Path"
+		else -> ""
+	}
+	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
 		HoneyLanguage.Chinese.code -> "默认路径"
@@ -158,6 +168,16 @@ object ImportWalletText {
 		HoneyLanguage.Korean.code -> "올바른 비트 코인 테스트 네트워크 개인 키 또는 주소 형식이 아닙니다."
 		HoneyLanguage.Russian.code -> "Не правильный личный ключ или формат адреса биткойн-теста"
 		HoneyLanguage.TraditionalChinese.code -> "不是正確的比特幣測試網私鑰或地址格式"
+		else -> ""
+	}
+	@JvmField
+	val invalidLTCPrivateKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.Chinese.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.Japanese.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.Korean.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.Russian.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.TraditionalChinese.code -> "Incorrect Litecoin private key address format"
 		else -> ""
 	}
 	@JvmField

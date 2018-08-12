@@ -118,16 +118,16 @@ fun Context.getWalletByPrivateKey(
 fun Context.getKeystoreFile(
 	walletAddress: String,
 	password: String,
-	isBTCWallet: Boolean,
+	isBTCSeriesWallet: Boolean,
 	isSingleChainWallet: Boolean,
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
 ) {
-	val isBTCOrSingChainWallet = TinyNumberUtils.hasTrue(isBTCWallet, isSingleChainWallet)
-	val filename = CryptoValue.filename(walletAddress, isBTCWallet, isSingleChainWallet)
+	val isBTCSeriesOrSingChainWallet = TinyNumberUtils.hasTrue(isBTCSeriesWallet, isSingleChainWallet)
+	val filename = CryptoValue.filename(walletAddress, isBTCSeriesWallet, isSingleChainWallet)
 	val keystoreFile by lazy { File(filesDir!!, filename) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	if (isBTCOrSingChainWallet) {
+	if (isBTCSeriesOrSingChainWallet) {
 		try {
 			hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)))
 		} catch (error: Exception) {
@@ -159,7 +159,7 @@ fun Context.getKeystoreFile(
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
-	isBTCWallet: Boolean,
+	isBTCSeriesWallet: Boolean,
 	isSingleChainWallet: Boolean,
 	errorCallback: (Throwable) -> Unit,
 	hold: (String) -> Unit
@@ -167,7 +167,7 @@ fun Context.getPrivateKey(
 	getKeystoreFile(
 		walletAddress,
 		password,
-		isBTCWallet,
+		isBTCSeriesWallet,
 		isSingleChainWallet,
 		errorCallback
 	) { it ->
@@ -265,17 +265,17 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 fun Context.verifyKeystorePassword(
 	password: String,
 	address: String,
-	isBTCWallet: Boolean,
+	isBTCSeriesWallet: Boolean,
 	isSingleChainWallet: Boolean,
 	hold: (Boolean) -> Unit
 ) {
-	val isBTCOrSingChainWallet = TinyNumberUtils.hasTrue(isBTCWallet, isSingleChainWallet)
-	val filename = CryptoValue.filename(address, isBTCWallet, isSingleChainWallet)
+	val isBTCSeriesOrSingChainWallet = TinyNumberUtils.hasTrue(isBTCSeriesWallet, isSingleChainWallet)
+	val filename = CryptoValue.filename(address, isBTCSeriesWallet, isSingleChainWallet)
 	val keystoreFile by lazy { File(filesDir!!, filename) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
 	// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
 	var accountIndex = 0L
-	if (isBTCOrSingChainWallet) {
+	if (isBTCSeriesOrSingChainWallet) {
 		try {
 			keyStore.unlock(keyStore.accounts.get(0), password)
 		} catch (error: Exception) {

@@ -54,7 +54,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.ethPath,
 		DefaultPath.etcPath,
 		DefaultPath.btcPath,
-		DefaultPath.testPath
+		DefaultPath.testPath,
+		DefaultPath.ltcPath
 	)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -128,7 +129,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[0],
 							defaultPath[1],
 							defaultPath[2],
-							defaultPath[3]
+							defaultPath[3],
+							defaultPath[4]
 						),
 						mnemonicInput.text.toString(),
 						passwordInput.text.toString(),
@@ -172,7 +174,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		Pair(
 			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
 			DefaultPath.testPathHeader
-		)
+		),
+		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader)
 	)
 
 	private fun showPatSettingsDashboard() {
@@ -182,10 +185,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					TopBottomLineCell(context).apply {
 						layoutParams = LinearLayout.LayoutParams(
 							ScreenSize.widthWithPadding - 40.uiPX(),
-							100.uiPX()
+							85.uiPX()
 						)
 						setTitle(it.first, fontSize(14))
 						TitleEditText(context).apply {
+							y -= 10.uiPX()
 							tag = "pathEdit$index"
 							setTitle(it.second)
 							getEditText().setText(DefaultPath.default)

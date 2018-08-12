@@ -36,14 +36,17 @@ data class WalletTable(
 	var currentETCAddress: String,
 	var currentBTCAddress: String,
 	var currentBTCTestAddress: String,
+	var currentLTCAddress: String,
 	var ethAddresses: String, // format - "address|index,0x288832ds23...|0"
 	var btcAddresses: String,
 	var btcTestAddresses: String,
 	var etcAddresses: String,
+	var ltcAddresses: String,
 	var ethPath: String,
 	var etcPath: String,
 	var btcPath: String,
 	var btcTestPath: String,
+	var ltcPath: String,
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
@@ -62,7 +65,8 @@ data class WalletTable(
 						val etcAddressCount = etcAddresses.split(",").size
 						val btcAddressCount = btcAddresses.split(",").size
 						val btcTestAddressCount = btcTestAddresses.split(",").size
-						hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount)
+						val ltcAddressCount = ltcAddresses.split(",").size
+						hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount + ltcAddressCount)
 					}
 
 					WalletType.ETHERCAndETCOnly.content -> hold(1)
@@ -81,7 +85,8 @@ data class WalletTable(
 						Config.getCurrentBTCAddress()
 					}
 				}
-
+				symbol.equals(CryptoSymbol.ltc, true) ->
+					Config.getCurrentLTCAddress()
 				symbol.equals(CryptoSymbol.etc, true) ->
 					Config.getCurrentETCAddress()
 				else ->
@@ -132,7 +137,7 @@ data class WalletTable(
 		fun getAllETHAndERCAddresses(callback: ArrayList<String>.() -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then {
+			} then { it ->
 				callback(
 					it.map {
 						it.currentETHAndERCAddress
@@ -144,7 +149,7 @@ data class WalletTable(
 		fun getAllBTCMainnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then {
+			} then { it ->
 				callback(
 					it.map {
 						it.currentBTCAddress
@@ -156,7 +161,7 @@ data class WalletTable(
 		fun getAllBTCTestnetAddresses(callback: ArrayList<String>.() -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then {
+			} then { it ->
 				callback(
 					it.map {
 						it.currentBTCTestAddress
@@ -195,7 +200,8 @@ data class WalletTable(
 					currentBTCAddress,
 					currentBTCTestAddress,
 					currentETCAddress,
-					currentETHAndERCAddress
+					currentETHAndERCAddress,
+					currentLTCAddress
 				).filter {
 					it.isNotEmpty()
 				}.apply {
@@ -210,31 +216,29 @@ data class WalletTable(
 				wallet.currentBTCAddress,
 				wallet.currentBTCTestAddress,
 				wallet.currentETCAddress,
-				wallet.currentETHAndERCAddress
+				wallet.currentETHAndERCAddress,
+				wallet.currentLTCAddress
 			).filter { it.isNotEmpty() }.distinctBy { it }
 		}
 
-		fun getTargetWalletType(walletTable: WalletTable, hold: (WalletType) -> Unit) {
-			walletTable.apply {
-				if (currentETHAndERCAddress.isEmpty()) {
-					if (currentBTCTestAddress.isEmpty()) {
-						hold(WalletType.BTCOnly)
-						return@apply
-					}
-					if (currentBTCAddress.isEmpty()) {
-						hold(WalletType.BTCTestOnly)
-					}
-				} else if (currentBTCAddress.isEmpty()) {
-					hold(WalletType.ETHERCAndETCOnly)
-				} else {
-					hold(WalletType.MultiChain)
-				}
+		fun getTargetWalletType(walletTable: WalletTable): WalletType {
+			val types = listOf(
+				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
+				Pair(WalletType.BTCTestOnly, walletTable.currentBTCAddress),
+				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentBTCAddress),
+				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress)
+			).filter {
+				it.second.isNotEmpty()
+			}
+			return when (types.size) {
+				4 -> WalletType.MultiChain
+				else -> types[0].first
 			}
 		}
 
 		fun getWalletType(hold: (WalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
-				getTargetWalletType(this, hold)
+				hold(getTargetWalletType(this))
 			}
 		}
 
@@ -301,6 +305,24 @@ data class WalletTable(
 					btcTestAddresses.replace(",", "")
 				} else {
 					btcTestAddresses
+				}
+				// 获取最近的 `Address Index` 数值
+				hold(this, pureAddresses.substringAfterLast("|").toInt())
+			}
+		}
+
+		fun getLTCWalletLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				ltcChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				// 清理数据格式
+				val pureAddresses = if (ltcAddresses.contains(",")) {
+					ltcAddresses.replace(",", "")
+				} else {
+					ltcAddresses
 				}
 				// 获取最近的 `Address Index` 数值
 				hold(this, pureAddresses.substringAfterLast("|").toInt())
@@ -434,6 +456,28 @@ data class WalletTable(
 			}
 		}
 
+		fun updateLTCAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (litecoinAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.ltcAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								ltcAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+
 		fun updateCurrentAddressByChainType(
 			chainType: Int,
 			newAddress: String,
@@ -459,6 +503,18 @@ data class WalletTable(
 								this@wallet.apply {
 									currentETCAddress = newAddress
 									Config.updateCurrentETCAddress(newAddress)
+								}
+							)
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
+						}
+
+						ChainType.LTC.id -> {
+							GoldStoneDataBase.database.walletDao().update(
+								this@wallet.apply {
+									currentLTCAddress = newAddress
+									Config.updateCurrentLTCAddress(newAddress)
 								}
 							)
 							GoldStoneAPI.context.runOnUiThread {
@@ -585,7 +641,7 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 
-	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCTestAddress LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCTestAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
 
 	@Query("SELECT * FROM wallet")

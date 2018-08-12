@@ -46,9 +46,11 @@ data class AppConfigTable(
 	var currentETCTestChainNameID: Int,
 	var currentETHERC20AndETCTestChainNameID: Int,
 	var currentBTCTestChainNameID: Int,
+	var currentLTCTestChainNameID: Int,
 	var currentETCChainNameID: Int,
 	var currentBTCChainNameID: Int,
 	var currentETHERC20AndETCChainNameID: Int,
+	var currentLTCChainNameID: Int,
 	var defaultCoinListMD5: String
 ) {
 
@@ -212,6 +214,7 @@ data class AppConfigTable(
 			etcChainNameID: Int,
 			ethERC20AndETCChainNameID: Int,
 			btcChainNameID: Int,
+			ltcChainNameID: Int,
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -221,10 +224,12 @@ data class AppConfigTable(
 							this.isMainnet = isMainnet
 							if (isMainnet) {
 								currentBTCChainNameID = btcChainNameID
+								currentLTCChainNameID = ltcChainNameID
 								currentETCChainNameID = etcChainNameID
 								currentETHERC20AndETCChainNameID = ethERC20AndETCChainNameID
 							} else {
 								currentBTCTestChainNameID = btcChainNameID
+								currentLTCTestChainNameID = ltcChainNameID
 								currentETCTestChainNameID = etcChainNameID
 								currentETHERC20AndETCTestChainNameID = ethERC20AndETCChainNameID
 							}
@@ -291,6 +296,8 @@ data class AppConfigTable(
 							currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
 							currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
 							currentETHERC20AndETCTestChainNameID = ChainNameID.InfuraRopsten.id,
+							currentLTCTestChainNameID = ChainNameID.GoldStoneLTCTest.id,
+							currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
 							defaultCoinListMD5 = ""
 						)
 					)

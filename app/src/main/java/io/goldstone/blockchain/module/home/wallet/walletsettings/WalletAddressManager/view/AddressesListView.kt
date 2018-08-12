@@ -27,6 +27,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class AddressesListView(
 	context: Context,
+	maxCount: Int = 4,
 	private val hold: (
 		moreButton: ImageView,
 		address: String,
@@ -38,7 +39,6 @@ class AddressesListView(
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
 	}
-	private val maxCount = 4
 	var checkAllEvent: Runnable? = null
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()

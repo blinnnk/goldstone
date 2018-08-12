@@ -342,11 +342,12 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
 	
-	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :ercChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain")
+	@Query("SELECT * FROM defaultTokens WHERE chain_id LIKE :ercChain OR chain_id LIKE :ltcChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain")
 	fun getCurrentChainTokens(
 		ercChain: String = Config.getCurrentChain(),
 		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain()
+		btcChain: String = Config.getBTCCurrentChain(),
+		ltcChain: String = Config.getLTCCurrentChain()
 	): List<DefaultTokenTable>
 	
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chain_id LIKE :ercChain OR chain_id LIKE :etcChain OR chain_id LIKE :btcChain)")

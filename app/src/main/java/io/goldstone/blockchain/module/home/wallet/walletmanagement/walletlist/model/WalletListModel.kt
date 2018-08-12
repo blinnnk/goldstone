@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
@@ -20,34 +21,26 @@ data class WalletListModel(
 	var isUsing: Boolean = false,
 	var type: String = ""
 ) {
-	
+
 	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
-		showSubtitleByType(data, true),
-		showSubtitleByType(data, false),
+		getSubtitleByType(data),
+		getSubtitleByType(data),
 		balance,
 		data.isWatchOnly,
 		data.isUsing,
 		type
 	)
-	
+
 	companion object {
-		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
-			return if (wallet.currentETHAndERCAddress.isEmpty()) {
-				if (wallet.currentBTCTestAddress.isEmpty()) {
-					wallet.currentBTCAddress
-				} else {
-					wallet.currentBTCTestAddress
-				}
-			} else if (wallet.currentBTCAddress.isEmpty()) {
-				wallet.currentETHAndERCAddress
-			} else {
-				if (isAddress) {
-					wallet.currentETHAndERCAddress
-				} else {
-					WalletText.multiChainWallet
-				}
+		fun getSubtitleByType(wallet: WalletTable): String {
+			return when (WalletTable.getTargetWalletType(wallet)) {
+				WalletType.LTCOnly -> wallet.currentLTCAddress
+				WalletType.MultiChain -> WalletText.multiChain
+				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
+				WalletType.BTCTestOnly -> wallet.btcTestAddresses
+				WalletType.BTCOnly -> wallet.btcAddresses
 			}
 		}
 	}

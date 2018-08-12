@@ -84,6 +84,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val newLTCAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New LTC Address"
+		HoneyLanguage.Chinese.code -> "新的 LTC 地址"
+		HoneyLanguage.Japanese.code -> "新しい LTC アドレス"
+		HoneyLanguage.Korean.code -> "새로운 LTC 주소"
+		HoneyLanguage.Russian.code -> "Новый адрес LTC"
+		HoneyLanguage.TraditionalChinese.code -> "新的 LTC 地址"
+		else -> ""
+	}
+	@JvmField
 	val viewAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "View All Addresses"
 		HoneyLanguage.Chinese.code -> "查看所有地址"
@@ -121,6 +131,16 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "모든 BTC 주소"
 		HoneyLanguage.Russian.code -> "Все адреса BTC"
 		HoneyLanguage.TraditionalChinese.code -> "所有BTC地址"
+		else -> ""
+	}
+	@JvmField
+	val allLTCAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All LTC Addresses"
+		HoneyLanguage.Chinese.code -> "All LTC Addresses"
+		HoneyLanguage.Japanese.code -> "All LTC Addresses"
+		HoneyLanguage.Korean.code -> "All LTC Addresses"
+		HoneyLanguage.Russian.code -> "All LTC Addresses"
+		HoneyLanguage.TraditionalChinese.code -> "All LTC Addresses"
 		else -> ""
 	}
 	@JvmField

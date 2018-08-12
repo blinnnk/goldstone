@@ -197,6 +197,16 @@ object ChainText {
 		else -> ""
 	}
 	@JvmField
+	val ltcMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "LTC Mainnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "LTC 主网（GoldStone）"
+		HoneyLanguage.Japanese.code -> "LTC メインネットワーク（GoldStone）"
+		HoneyLanguage.Korean.code -> "LTC 주요 네트워크 (GoldStone)"
+		HoneyLanguage.Russian.code -> "Основная сеть LTC (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "LTC 主網（GoldStone）"
+		else -> ""
+	}
+	@JvmField
 	val btcTest = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BTC Testnet (GoldStone)"
 		HoneyLanguage.Chinese.code -> "BTC 测试网（GoldStone）"
@@ -204,6 +214,16 @@ object ChainText {
 		HoneyLanguage.Korean.code -> "BTC 테스트 네트워크 (GoldStone)"
 		HoneyLanguage.Russian.code -> "Сеть тестирования BTC (GoldStone)"
 		HoneyLanguage.TraditionalChinese.code -> "BTC測試網（GoldStone）"
+		else -> ""
+	}
+	@JvmField
+	val ltcTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "LTC Testnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "LTC 测试网（GoldStone）"
+		HoneyLanguage.Japanese.code -> "LTC テストネットワーク（GoldStone）"
+		HoneyLanguage.Korean.code -> "LTC 테스트 네트워크 (GoldStone)"
+		HoneyLanguage.Russian.code -> "Сеть тестирования LTC (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "LTC 測試網（GoldStone）"
 		else -> ""
 	}
 }

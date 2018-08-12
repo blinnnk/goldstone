@@ -37,7 +37,7 @@ class WalletListPresenter(
 		WalletTable.switchCurrentWallet(address) { _ ->
 			WalletTable.getWalletByAddress(address) { it ->
 				it?.apply {
-					WalletTable.getTargetWalletType(this) {
+					WalletTable.getTargetWalletType(this).let {
 						when (it) {
 							WalletType.BTCOnly -> {
 								if (Config.isTestEnvironment()) {
@@ -55,6 +55,18 @@ class WalletListPresenter(
 								if (!Config.isTestEnvironment()) {
 									showConfirmationAlertView("Bitcoin Testnet") {
 										NodeSelectionPresenter.setAllTestnet {
+											fragment.activity?.jump<SplashActivity>()
+										}
+									}
+								} else {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+
+							WalletType.LTCOnly -> {
+								if (Config.isTestEnvironment()) {
+									showConfirmationAlertView("Litecoin Mainnet") {
+										NodeSelectionPresenter.setAllMainnet {
 											fragment.activity?.jump<SplashActivity>()
 										}
 									}
@@ -115,7 +127,7 @@ class WalletListPresenter(
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
 							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { it ->
-								WalletTable.getTargetWalletType(wallet) { walletType ->
+								WalletTable.getTargetWalletType(wallet).let { walletType ->
 									if (it.isEmpty()) {
 										data.add(WalletListModel(wallet, 0.0, walletType.content))
 										completeMark()

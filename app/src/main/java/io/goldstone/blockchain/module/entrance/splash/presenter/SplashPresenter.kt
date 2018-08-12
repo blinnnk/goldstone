@@ -42,6 +42,11 @@ class SplashPresenter(val activity: SplashActivity) {
 							Config.updateCurrentWalletType(WalletType.BTCOnly.content)
 						}
 
+						WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
+							cacheWalletData()
+							Config.updateCurrentWalletType(WalletType.LTCOnly.content)
+						}
+
 						WalletType.ETHERCAndETCOnly -> {
 							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 								cacheWalletData()
@@ -170,6 +175,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentBTCAddress(currentBTCAddress)
 				Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
 				Config.updateCurrentETCAddress(currentETCAddress)
+				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
 				Config.updateCurrentID(id)
 				Config.updateCurrentBalance(balance.orElse(0.0))
