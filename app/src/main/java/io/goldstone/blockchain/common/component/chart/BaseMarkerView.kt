@@ -24,7 +24,7 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
   private var offsetMPPOintF: MPPointF = MPPointF()
   private val drawingOffsetMPPointF = MPPointF()
   
-  lateinit var textViewContent: TextView
+	protected var textViewContent: TextView = TextView(context)
   
   /**
    * Constructor. Sets up the CandleMarkerView with a custom layout resource.
@@ -36,7 +36,7 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
     with(this) {
       relativeLayout {
         backgroundResource = R.drawable.btn_round_gray
-        textViewContent = textView {
+        textViewContent.apply {
           textSize = 10f
           textColor = Color.BLACK
         }.lparams(wrapContent, wrapContent) {

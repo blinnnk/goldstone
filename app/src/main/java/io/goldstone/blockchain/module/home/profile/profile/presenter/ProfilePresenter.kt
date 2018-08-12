@@ -15,7 +15,7 @@ import com.blinnnk.util.SystemUtils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.GoldStoneDialog
-import io.goldstone.blockchain.common.component.chart.ProgressLoadingDialog
+import io.goldstone.blockchain.module.home.profile.profile.view.ProgressLoadingDialog
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -208,11 +208,11 @@ class ProfilePresenter(
 			try {
 				cursor = (fragment.context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).query(query)
 				if (cursor != null && cursor.moveToFirst()) {
-					//已经下载文件大小
+					// 已经下载文件大小
 					bytesAndStatus[0] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-					//下载文件的总大小
+					// 下载文件的总大小
 					bytesAndStatus[1] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
-					//下载状态
+					// 下载状态
 					bytesAndStatus[2] = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
 					
 					filePath = cursor.getString(cursor.getColumnIndex("local_filename"))

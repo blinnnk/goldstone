@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component.chart
+package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.app.Dialog
 import android.content.Context
