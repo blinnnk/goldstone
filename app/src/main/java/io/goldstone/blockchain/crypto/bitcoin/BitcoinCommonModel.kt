@@ -8,10 +8,12 @@ data class MultiChainPath(
 	val ethPath: String,
 	val etcPath: String,
 	val btcPath: String,
-	val btcTestPath: String
+	val testPath: String,
+	val ltcPath: String
 ) {
 	
 	constructor() : this(
+		"",
 		"",
 		"",
 		"",
@@ -23,10 +25,12 @@ data class MultiChainAddresses(
 	val ethAddress: String,
 	val etcAddress: String,
 	val btcAddress: String,
-	val btcTestAddress: String
+	val btcTestAddress: String,
+	val ltcAddress: String
 ) {
 	
 	constructor() : this(
+		"",
 		"",
 		"",
 		"",

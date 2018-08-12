@@ -10,8 +10,10 @@ import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.BTCTest
-import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.ETHERCAndETC
+import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.*
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
@@ -56,6 +58,16 @@ class KeystoreImportPresenter(
 									password,
 									hintInput,
 									privateKey.toString(16),
+									callback
+								)
+							}
+
+							currentType.equals(LTC.content, true) -> {
+								importLTCWallet(
+									walletName,
+									password,
+									hintInput,
+									privateKey,
 									callback
 								)
 							}
@@ -109,6 +121,24 @@ class KeystoreImportPresenter(
 			walletName,
 			fragment.context,
 			true,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
+	private fun importLTCWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: BigInteger,
+		callback: (Boolean) -> Unit
+	) {
+		val wifKey = LTCWalletUtils.generateWIFPrivatekey(privateKey, ChainPrefix.Litecoin, true)
+		PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
+			wifKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
 			hintInput.text?.toString(),
 			callback
 		)

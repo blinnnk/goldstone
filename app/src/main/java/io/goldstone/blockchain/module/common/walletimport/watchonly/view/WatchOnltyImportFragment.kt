@@ -41,7 +41,7 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
-	
+
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val typeSettings by lazy { RoundCell(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
@@ -49,24 +49,24 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var currentType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
 	override val presenter = WatchOnlyImportPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			
+
 			(attentionView.parent as? ViewGroup)?.apply {
 				findViewById<AttentionTextView>(ElementID.attentionText).isNotNull {
 					/** 临时解决异常的 `The specified child already has a parent` 错误 */
 					removeAllViews()
 				}
 			}
-			
+
 			attentionView.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				text = WatchOnlyText.intro
 			}.into(this)
-			
+
 			typeSettings
 				.apply {
 					setMargins<LinearLayout.LayoutParams> {
@@ -75,7 +75,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					}
 					setTitles(ImportWalletText.walletType, currentType)
 				}
-				.click {
+				.click { _ ->
 					PrivateKeyImportFragment.showWalletTypeDashboard(
 						this@WatchOnlyImportFragment,
 						currentType
@@ -85,18 +85,18 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					}
 				}
 				.into(this)
-			
+
 			nameInput.apply {
 				hint = UIUtils.generateDefaultName()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				title = CreateWalletText.name
 			}.into(this)
-			
+
 			addressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				hint = WatchOnlyText.enterDescription
 			}.into(this)
-			
+
 			confirmButton.apply {
 				marginTop = 20.uiPX()
 				setBlueStyle()
@@ -107,7 +107,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					it.showLoadingStatus(false)
 				}
 			}.into(this)
-			
+
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsWatchOnlyWallet.setUnderline()
 			}.click {
@@ -125,6 +125,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.into(this)
 		}
 	}
+
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
 			isNotNull {

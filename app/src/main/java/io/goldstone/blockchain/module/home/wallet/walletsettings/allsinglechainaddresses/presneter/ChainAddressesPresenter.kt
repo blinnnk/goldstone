@@ -45,11 +45,9 @@ class ChainAddressesPresenter(
 		coinType: Int,
 		hasDefaultCell: Boolean = true
 	) {
-		val isBTC = coinType == ChainType.BTC.id
 		AddressManagerFragment.showMoreDashboard(
 			fragment.wrapper,
 			cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-			isBTC,
 			hasDefaultCell,
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
@@ -62,14 +60,11 @@ class ChainAddressesPresenter(
 				}
 			},
 			qrCellClickEvent = { showQRCode(address) },
-			exportBTCPrivateKey = {
-				showPrivateKeyExportFragment(address, isBTC)
-			},
 			keystoreCellClickEvent = {
 				showKeystoreExportFragment(address)
 			},
 			exportPrivateKey = {
-				showPrivateKeyExportFragment(address, isBTC)
+				showPrivateKeyExportFragment(address, coinType)
 			}
 		)
 	}
@@ -86,6 +81,11 @@ class ChainAddressesPresenter(
 							}
 							ChainType.ETC.id -> AddressManagerPresneter.createETCAddress(this, password) {
 								updateAddressManagerDataBy(ChainType.ETC.id, it)
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+							}
+
+							ChainType.LTC.id -> AddressManagerPresneter.createLTCAddress(this, password) {
+								updateAddressManagerDataBy(ChainType.LTC.id, it)
 								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 							}
 
@@ -122,6 +122,7 @@ class ChainAddressesPresenter(
 					ChainType.ETH.id -> it.setEthereumAddressesModel(data)
 					ChainType.ETC.id -> it.setEthereumClassicAddressesModel(data)
 					ChainType.BTC.id -> it.setBitcoinAddressesModel(data)
+					ChainType.LTC.id -> it.setLitecoinAddressesModel(data)
 				}
 			}
 		}
@@ -135,7 +136,7 @@ class ChainAddressesPresenter(
 				when (coinType) {
 					ChainType.ETH.id -> it.presenter.getEthereumAddresses()
 					ChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
-
+					ChainType.LTC.id -> it.presenter.getLitecoinAddresses()
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							it.presenter.getBitcoinTestAddresses()
@@ -155,9 +156,9 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun showPrivateKeyExportFragment(address: String, isBTC: Boolean) {
+	private fun showPrivateKeyExportFragment(address: String, coinType: Int) {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			AddressManagerPresneter.showPrivateKeyExportFragment(address, isBTC, this)
+			AddressManagerPresneter.showPrivateKeyExportFragment(address, coinType, this)
 		}
 	}
 
@@ -186,6 +187,15 @@ class ChainAddressesPresenter(
 					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.ETC.id) {
 						setDefaultAddress(it, currentETCAddress, ChainType.ETC.id)
 						Config.updateCurrentETCAddress(currentETCAddress)
+					}
+				}
+
+				ChainType.LTC.id -> {
+					fragment.asyncData =
+						AddressManagerPresneter.convertToChildAddresses(ltcAddresses).toArrayList()
+					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.LTC.id) {
+						setDefaultAddress(it, currentLTCAddress, ChainType.LTC.id)
+						Config.updateCurrentLTCAddress(currentLTCAddress)
 					}
 				}
 

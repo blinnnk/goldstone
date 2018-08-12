@@ -9,7 +9,7 @@ import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
-import io.goldstone.blockchain.crypto.litecoin.LTCAccountUtils
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.toHexString
 import io.goldstone.blockchain.crypto.walletfile.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -89,8 +89,8 @@ class GoldStoneWalletTest {
 
 	@Test
 	fun generateLitecoinAccount() {
-		LTCAccountUtils.getPrivateKeyFromWIFKey("T8DGhBg9M1WJdTcjLVvsHWZPAFgbov6VckWxHZKix591eGaoS6Ws", ChainPrefix.Litecoin).let {
-			System.out.println("+++$it")
+		LTCWalletUtils.getPrivateKeyFromWIFKey("T8DGhBg9M1WJdTcjLVvsHWZPAFgbov6VckWxHZKix591eGaoS6Ws", ChainPrefix.Litecoin).let {
+			LogUtil.logDebug(positon + "getPrivateKeyFromWIFKey", it)
 		}
 	}
 }

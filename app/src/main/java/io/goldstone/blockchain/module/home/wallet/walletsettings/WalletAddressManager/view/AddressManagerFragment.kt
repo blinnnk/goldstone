@@ -40,11 +40,12 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 	private val currentMultiChainAddressesView by lazy {
-		AddressesListView(context!!) { moreButton, address, isDefault, title ->
+		AddressesListView(context!!, 5) { moreButton, address, isDefault, title ->
 			val chainTYpe = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
 				CryptoSymbol.etc -> ChainType.ETC.id
 				CryptoSymbol.erc -> ChainType.ETH.id
+				CryptoSymbol.ltc -> ChainType.LTC.id
 				else -> ChainType.BTC.id
 			}
 			moreButton.onClick {
@@ -66,7 +67,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	private val ethAndERCAddressesView by lazy {
-		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
@@ -79,7 +80,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	private val etcAddressesView by lazy {
-		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
@@ -92,12 +93,25 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		}
 	}
 	private val btcAddressesView by lazy {
-		AddressesListView(context!!) { moreButton, address, isDefault, _ ->
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
 					ChainType.BTC.id,
+					!isDefault
+				)
+				moreButton.preventDuplicateClicks()
+			}
+		}
+	}
+	private val ltcAddressesView by lazy {
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
+				showCellMoreDashboard(
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.LTC.id,
 					!isDefault
 				)
 				moreButton.preventDuplicateClicks()
@@ -124,16 +138,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						ethAndERCAddressesView.into(this@parent)
 						etcAddressesView.into(this@parent)
 						btcAddressesView.into(this@parent)
+						ltcAddressesView.into(this@parent)
 						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
+						ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
-						if (Config.isTestEnvironment()) {
-							presenter.getBitcoinTestAddresses()
-						} else {
-							presenter.getBitcoinAddresses()
-						}
+						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
+						else presenter.getBitcoinAddresses()
+						presenter.getLitecoinAddresses()
 					} else {
 						hideAddButton()
 						attentionView.into(this@parent)
@@ -167,6 +181,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		btcAddressesView.model = model
 	}
 
+	fun setLitecoinAddressesModel(model: List<Pair<String, String>>) {
+		ltcAddressesView.setTitle(WalletSettingsText.allLTCAddresses)
+		ltcAddressesView.model = model
+	}
+
 	fun showCreatorDashboard() {
 		getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
@@ -195,16 +214,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
 		context?.apply {
 			when (title) {
-				WalletSettingsText.newETHAndERCAddress -> {
-					AddressManagerPresneter.createETHAndERCAddress(this, password) {
-						ethAndERCAddressesView.model = it
-					}
+				WalletSettingsText.newETHAndERCAddress -> AddressManagerPresneter.createETHAndERCAddress(this, password) {
+					ethAndERCAddressesView.model = it
 				}
 
-				WalletSettingsText.newETCAddress -> {
-					AddressManagerPresneter.createETCAddress(this, password) {
-						etcAddressesView.model = it
-					}
+				WalletSettingsText.newETCAddress -> AddressManagerPresneter.createETCAddress(this, password) {
+					etcAddressesView.model = it
+				}
+
+				WalletSettingsText.newLTCAddress -> AddressManagerPresneter.createLTCAddress(this, password) {
+					ltcAddressesView.model = it
 				}
 
 				WalletSettingsText.newBTCAddress -> {
@@ -228,11 +247,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		coinType: Int,
 		hasDefaultCell: Boolean
 	) {
-		val isBTC = ChainType.BTC.id == coinType
 		AddressManagerFragment.showMoreDashboard(
 			getParentContainer(),
 			top,
-			isBTC,
 			hasDefaultCell,
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
@@ -241,7 +258,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-
+						ChainType.LTC.id -> presenter.getLitecoinAddresses()
 						ChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								presenter.getBitcoinTestAddresses()
@@ -261,12 +278,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			},
 			exportPrivateKey = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresneter.showPrivateKeyExportFragment(address, false, this)
-				}
-			},
-			exportBTCPrivateKey = {
-				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresneter.showPrivateKeyExportFragment(address, true, this)
+					AddressManagerPresneter.showPrivateKeyExportFragment(address, coinType, this)
 				}
 			},
 			keystoreCellClickEvent = {
@@ -319,11 +331,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		fun showMoreDashboard(
 			container: ViewGroup?,
 			top: Float,
-			isBTC: Boolean = false,
 			hasDefaultCell: Boolean = true,
 			setDefaultAddressEvent: () -> Unit,
 			qrCellClickEvent: () -> Unit,
-			exportBTCPrivateKey: () -> Unit,
 			exportPrivateKey: () -> Unit,
 			keystoreCellClickEvent: () -> Unit
 		) {
@@ -334,12 +344,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 							when (title) {
 								WalletText.setDefaultAddress -> setDefaultAddressEvent()
 								WalletText.showQRCode -> qrCellClickEvent()
-
-								WalletSettingsText.exportPrivateKey -> {
-									if (isBTC) exportBTCPrivateKey()
-									else exportPrivateKey()
-								}
-
+								WalletSettingsText.exportPrivateKey -> exportPrivateKey()
 								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
 							}
 							cell.preventDuplicateClicks()

@@ -6,6 +6,9 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 
 /**
  * @date 2018/7/14 12:20 PM
@@ -25,7 +28,8 @@ object GenerateMultiChainWallet {
 			DefaultPath.ethPath,
 			DefaultPath.etcPath,
 			DefaultPath.btcPath,
-			DefaultPath.testPath
+			DefaultPath.testPath,
+			DefaultPath.ltcPath
 		)
 		context.generateWallet(password, path.ethPath) { mnemonic, ethAddress ->
 			context.getEthereumWalletByMnemonic(
@@ -46,7 +50,7 @@ object GenerateMultiChainWallet {
 					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
-						path.btcTestPath
+						path.testPath
 					) { btcTestAddress, testSecret ->
 						context.storeBase58PrivateKey(
 							testSecret,
@@ -55,7 +59,29 @@ object GenerateMultiChainWallet {
 							true,
 							false
 						)
-						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress), mnemonic)
+						LTCWalletUtils.generateBase58Keypair(
+							mnemonic,
+							path.ltcPath,
+							ChainPrefix.Litecoin,
+							true
+						).let { ltcKeyPair ->
+							context.storeLTCBase58PrivateKey(
+								ltcKeyPair.privateKey,
+								ltcKeyPair.address,
+								password,
+								false
+							)
+							hold(
+								MultiChainAddresses(
+									ethAddress,
+									etcAddress,
+									btcAddress,
+									btcTestAddress,
+									ltcKeyPair.address
+								),
+								mnemonic
+							)
+						}
 					}
 				}
 			}
@@ -93,7 +119,7 @@ object GenerateMultiChainWallet {
 					)
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
-						path.btcTestPath
+						path.testPath
 					) { btcTestAddress, btcTestBase58Privatekey ->
 						// 存入 `BtcTest PrivateKey` 到 `KeyStore`
 						context.storeBase58PrivateKey(
@@ -103,7 +129,26 @@ object GenerateMultiChainWallet {
 							true,
 							false
 						)
-						hold(MultiChainAddresses(ethAddress, etcAddress, btcAddress, btcTestAddress))
+						LTCWalletUtils.generateBase58Keypair(
+							mnemonic,
+							path.ltcPath,
+							ChainPrefix.Litecoin,
+							true
+						).let { ltcKeyPair ->
+							context.storeLTCBase58PrivateKey(
+								ltcKeyPair.privateKey,
+								ltcKeyPair.address,
+								password,
+								false
+							)
+							hold(MultiChainAddresses(
+								ethAddress,
+								etcAddress,
+								btcAddress,
+								btcTestAddress,
+								ltcKeyPair.address
+							))
+						}
 					}
 				}
 			}

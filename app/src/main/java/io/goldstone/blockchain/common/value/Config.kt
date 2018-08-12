@@ -49,6 +49,7 @@ object Config {
 	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 
+	/** Coin Address In SharedPreference */
 	fun getCurrentEthereumAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 
@@ -79,6 +80,13 @@ object Config {
 			address
 		)
 
+	fun getCurrentLTCAddress(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentLTCAddress)
+
+	fun updateCurrentLTCAddress(address: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLTCAddress, address)
+
+	/** Chain Name in Shared Preference */
 	fun getCurrentName(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentName)
 
@@ -142,6 +150,37 @@ object Config {
 	fun updateCurrentChainName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChainName, chainName)
 
+	/** LTC ChainID And Chain Name in Shared Preference*/
+	fun getLTCCurrentChain(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
+				.equals("Default", true)
+		) {
+			ChainID.ETCMain.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
+		}
+
+	fun getLTCCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.etcMainGasTracker
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
+		}
+
+	fun updateLTCCurrentChain(chainID: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainID)
+
+	fun updateLTCCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.ltcCurrentChainName,
+			chainName
+		)
+
+	/** ETC ChainID And Chain Name in Shared Preference*/
 	fun getETCCurrentChain(): String =
 		if (GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)

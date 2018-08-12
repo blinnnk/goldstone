@@ -301,6 +301,7 @@ class WalletDetailPresenter(
 				WalletType.ETHERCAndETCOnly.content -> currentETHAndERCAddress
 				WalletType.BTCOnly.content -> currentBTCAddress
 				WalletType.BTCTestOnly.content -> currentBTCTestAddress
+				WalletType.LTCOnly.content -> currentLTCAddress
 				else -> WalletText.multiChainWallet
 			}
 			WalletDetailHeaderModel(

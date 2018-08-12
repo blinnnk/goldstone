@@ -30,7 +30,7 @@ object ArgumentKey {
 	const val fromQuickDeposit = "fromQuickDeposit"
 	const val isMainnet = "isMainnet"
 	const val address = "address"
-	const val isBTCAddress = "isBTCAddress"
+	const val chainType = "chainType"
 	const val coinType = "coinType"
 }
 
@@ -45,8 +45,10 @@ object SharesPreference {
 	const val currentChain = "currentChain"
 	const val currentChainName = "currentChainName"
 	const val etcCurrentChain = "etcCurrentChain"
+	const val ltcCurrentChain = "ltcCurrentChain"
 	const val btcCurrentChain = "btcCurrentChain"
 	const val etcCurrentChainName = "etcCurrentChainName"
+	const val ltcCurrentChainName = "ltcCurrentChainName"
 	const val btcCurrentChainName = "btcCurrentChainName"
 	const val currentLanguage = "currentLanguage"
 	const val walletCount = "walletCount"
@@ -57,6 +59,7 @@ object SharesPreference {
 	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
 	const val currentETCAddress = "currentETCAddress"
+	const val currentLTCAddress = "currentLTCAddress"
 	const val currentBTCAddress = "currentBTCAddress"
 	const val currentBTCTestAddress = "currentBTCTestAddress"
 	const val currentName = "currentName"

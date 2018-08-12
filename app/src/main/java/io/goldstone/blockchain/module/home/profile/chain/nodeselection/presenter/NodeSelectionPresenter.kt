@@ -40,49 +40,39 @@ class NodeSelectionPresenter(
 		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 
+	fun updateLTCChainID(nodeName: String) {
+		Config.updateLTCCurrentChainName(nodeName)
+		Config.updateLTCCurrentChain(ChainID.getChainIDByName(nodeName))
+	}
+
 	fun getDefaultOrCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) {
 			when (type) {
 				ChainType.ETH -> {
-					if (Config.getCurrentChain() != ChainID.Main.id) {
-						ChainText.infuraMain
-					} else {
-						Config.getCurrentChainName()
-					}
+					if (Config.getCurrentChain() != ChainID.Main.id) ChainText.infuraMain
+					else Config.getCurrentChainName()
 				}
 
-				ChainType.BTC -> {
-					ChainText.btcMain
-				}
+				ChainType.BTC -> ChainText.btcMain
+				ChainType.LTC -> ChainText.ltcMain
 
 				else -> {
-					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) {
-						ChainText.etcMainGasTracker
-					} else {
-						Config.getETCCurrentChainName()
-					}
+					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) ChainText.etcMainGasTracker
+					else Config.getETCCurrentChainName()
 				}
 			}
 		} else {
 			when (type) {
 				ChainType.ETH -> {
-					if (Config.getCurrentChain() == ChainID.Main.id) {
-						ChainText.infuraRopsten
-					} else {
-						Config.getCurrentChainName()
-					}
+					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.infuraRopsten
+					else Config.getCurrentChainName()
 				}
 
-				ChainType.BTC -> {
-					ChainText.btcTest
-				}
-
+				ChainType.BTC -> ChainText.btcTest
+				ChainType.LTC -> ChainText.ltcTest
 				else -> {
-					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) {
-						ChainText.etcMorden
-					} else {
-						Config.getETCCurrentChainName()
-					}
+					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) ChainText.etcMorden
+					else Config.getETCCurrentChainName()
 				}
 			}
 		}
@@ -107,7 +97,9 @@ class NodeSelectionPresenter(
 					AppConfigTable.updateChainStatus(false) {
 						Config.updateIsTestEnvironment(true)
 						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
+						Config.updateLTCCurrentChain(ChainID.LTCTest.id)
 						Config.updateETCCurrentChain(ChainID.ETCTest.id)
+						// TODO LTC Testnet ID
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
@@ -122,6 +114,9 @@ class NodeSelectionPresenter(
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCTestChainNameID)
 						)
+						Config.updateLTCCurrentChainName(
+							ChainNameID.getChainNameByID(currentLTCTestChainNameID)
+						)
 						callback()
 					}
 				}
@@ -135,6 +130,7 @@ class NodeSelectionPresenter(
 					AppConfigTable.updateChainStatus(true) {
 						Config.updateIsTestEnvironment(false)
 						Config.updateBTCCurrentChain(ChainID.BTCMain.id)
+						Config.updateLTCCurrentChain(ChainID.LTCMain.id)
 						Config.updateETCCurrentChain(ChainID.ETCMain.id)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
@@ -149,6 +145,9 @@ class NodeSelectionPresenter(
 						)
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCChainNameID)
+						)
+						Config.updateLTCCurrentChainName(
+							ChainNameID.getChainNameByID(currentLTCChainNameID)
 						)
 						callback()
 					}

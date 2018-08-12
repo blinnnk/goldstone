@@ -89,7 +89,7 @@ object WalletText {
 	}
 	@JvmField
 	val multiChainWallet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "this is multi-chain wallet"
+		HoneyLanguage.English.code -> "this is a multi-chain wallet"
 		HoneyLanguage.Chinese.code -> "这是多链钱包"
 		HoneyLanguage.Japanese.code -> "これはマルチチェーンウォレットです"
 		HoneyLanguage.Korean.code -> "이것은 다중 체인 지갑입니다."
@@ -115,6 +115,16 @@ object WalletText {
 		HoneyLanguage.Korean.code -> "ETH/ERC20 토큰/ETC"
 		HoneyLanguage.Russian.code -> "ETH/ERC20 Token/ETC"
 		HoneyLanguage.TraditionalChinese.code -> "ETH/ERC20代幣/ETC"
+		else -> ""
+	}
+	@JvmField
+	val ltcMainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "LITCOIN MAINNET"
+		HoneyLanguage.Chinese.code -> "LITCOIN MAINNET"
+		HoneyLanguage.Japanese.code -> "LITCOIN MAINNET"
+		HoneyLanguage.Korean.code -> "LITCOIN MAINNET"
+		HoneyLanguage.Russian.code -> "LITCOIN MAINNET"
+		HoneyLanguage.TraditionalChinese.code -> "LITCOIN MAINNET"
 		else -> ""
 	}
 	@JvmField

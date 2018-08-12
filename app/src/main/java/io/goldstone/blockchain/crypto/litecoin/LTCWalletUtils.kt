@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.litecoin
 
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
@@ -18,7 +19,7 @@ import java.math.BigInteger
  * Bitcoin Prefix: [https://en.bitcoin.it/wiki/List_of_address_prefixes]
  */
 
-object LTCAccountUtils {
+object LTCWalletUtils {
 	/**
 	 * 地址分为压缩地址和非压缩地址, 非压缩地址为 `04` 开头， 配合 `128` 位的控告地址
 	 */
@@ -51,42 +52,50 @@ object LTCAccountUtils {
 		return Base58.encode(Hex.decode(binary))
 	}
 
+	fun generateBase58AddressByWIFKey(
+		wifKey: String,
+		version: ChainPrefix
+	): String {
+		val privateKey =
+			ECKey.fromPrivate(getPrivateKeyFromWIFKey(wifKey, version).toBigInteger(16)).privKey
+		return generateBase58Address(privateKey, version, true)
+	}
+
 	/**
 	 * 前缀 + 私钥哈希 + 压缩标识
 	 * bitcoin Mainnet `80` Testnet `EF`
 	 * 压缩标识
 	 * `empty` 不压缩, `01` 在结尾压缩
 	 */
-	private fun generateWIFPrivatekey(
+	fun generateWIFPrivatekey(
 		privateKey: BigInteger,
 		version: ChainPrefix,
 		isCompress: Boolean
 	): String {
-		val uncompressPrivateKey =
+		val versionPrivateKey =
 			version.privateKey + privateKey.toString(16) + if (isCompress) ChainPrefix.compressEndfix else ""
-		val sha256PrivateKey = Sha256Hash.hash(Hex.decode(uncompressPrivateKey))
+		val sha256PrivateKey = Sha256Hash.hash(Hex.decode(versionPrivateKey))
 		val doubleSha256 = Sha256Hash.hash(sha256PrivateKey)
 		val first4bytes = doubleSha256.toNoPrefixHexString().substring(0, 8)
-		val finalKey = uncompressPrivateKey + first4bytes
+		val finalKey = versionPrivateKey + first4bytes
 		return Base58.encode(Hex.decode(finalKey))
 	}
 
 	@Throws
-	fun getPrivateKeyFromWIFKey(wifKey: String, version: ChainPrefix): String? {
+	fun getPrivateKeyFromWIFKey(wifKey: String, version: ChainPrefix): String {
 		val isValid = isValidWIFKey(wifKey, version)
-		if (!isValid) throw Exception("Wrong WIF")
+		if (!isValid) throw Exception("WIF Key is incorrect")
 		val decodeKey = Base58.decode(wifKey)
 		val decodeHex = decodeKey.toNoPrefixHexString()
 		val dropLast4Bytes = decodeHex.substring(0, decodeHex.length - 8)
-		return dropLast4Bytes.substring(2)
+		return dropLast4Bytes.substring(2, dropLast4Bytes.length - 2)
 	}
 
 	/**
 	 * 判断 双 `Sha256 hash` 的码是否一致, 以及 `Version Code` 是否一致
 	 */
-	private fun isValidWIFKey(wifKey: String, version: ChainPrefix): Boolean {
+	fun isValidWIFKey(wifKey: String, version: ChainPrefix): Boolean {
 		val decode = Base58.decode(wifKey)
-		System.out.println(decode)
 		val decodeHex = decode.toNoPrefixHexString()
 		val versionCode = decodeHex.substring(0, 2)
 		val end4Bytes = decodeHex.substring(decodeHex.length - 8)
@@ -106,5 +115,15 @@ object LTCAccountUtils {
 				"02"
 			} else "03"
 		return prefix + substring(0, 64)
+	}
+
+	fun isValidAddress(address: String): Boolean {
+		return when {
+			address.isEmpty() -> false
+			address.length != CryptoValue.bitcoinAddressLength -> false
+			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
+			!address.substring(0, 1).equals("L", true) -> false
+			else -> true
+		}
 	}
 }

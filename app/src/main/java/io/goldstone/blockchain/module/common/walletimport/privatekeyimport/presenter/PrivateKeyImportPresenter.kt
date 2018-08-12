@@ -11,6 +11,9 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.*
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -28,7 +31,7 @@ import org.jetbrains.anko.runOnUiThread
 class PrivateKeyImportPresenter(
 	override val fragment: PrivateKeyImportFragment
 ) : BasePresenter<PrivateKeyImportFragment>() {
-	
+
 	fun importWalletByPrivateKey(
 		type: CryptoValue.PrivateKeyType,
 		privateKeyInput: EditText,
@@ -66,7 +69,7 @@ class PrivateKeyImportPresenter(
 						hintInput.text?.toString(),
 						callback
 					)
-				
+
 				CryptoValue.PrivateKeyType.BTC -> {
 					setAllMainnet {
 						PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
@@ -80,7 +83,20 @@ class PrivateKeyImportPresenter(
 						)
 					}
 				}
-				
+
+				CryptoValue.PrivateKeyType.LTC -> {
+					setAllMainnet {
+						PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
+							privateKeyInput.text.toString(),
+							passwordValue,
+							walletName,
+							fragment.context,
+							hintInput.text?.toString(),
+							callback
+						)
+					}
+				}
+
 				CryptoValue.PrivateKeyType.BTCTest -> {
 					// 跟随导入的测试网私钥切换全局测试网络状态
 					setAllTestnet {
@@ -98,13 +114,56 @@ class PrivateKeyImportPresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
-	
+
 	companion object {
+		fun importWalletByLTCPrivateKey(
+			wifPrivateKey: String,
+			password: String,
+			name: String,
+			context: Context?,
+			hint: String?,
+			callback: (Boolean) -> Unit
+		) {
+			if (wifPrivateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
+				context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback(false)
+				return
+			}
+			// 检查比特币私钥地址格式是否是对应的网络
+			if (!LTCWalletUtils.isValidWIFKey(wifPrivateKey, ChainPrefix.Litecoin)) {
+				context?.alert(ImportWalletText.invalidLTCPrivateKey)
+				return
+			}
+			LTCWalletUtils.generateBase58AddressByWIFKey(wifPrivateKey, ChainPrefix.Litecoin).let { address ->
+				context?.apply {
+					storeLTCBase58PrivateKey(wifPrivateKey, address, password, true)
+					// 存储可读信息到数据库
+					WalletImportPresenter.insertWalletToDatabase(
+						this,
+						MultiChainAddresses(
+							"",
+							"",
+							"",
+							"",
+							address
+						),
+						name,
+						"",
+						MultiChainPath(),
+						hint
+					) {
+						if (it) setAllTestnet { callback(true) }
+						else callback(false)
+					}
+				}
+			}
+		}
+
 		fun importWalletByBTCPrivateKey(
 			privateKey: String,
 			password: String,
@@ -133,7 +192,7 @@ class PrivateKeyImportPresenter(
 					return
 				}
 			}
-			
+
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
 				context?.apply {
 					// 存储私钥的 `KeyStore` 文件
@@ -151,7 +210,8 @@ class PrivateKeyImportPresenter(
 							"",
 							"",
 							if (isTest) "" else address,
-							if (isTest) address else ""
+							if (isTest) address else "",
+							""
 						),
 						name,
 						"",
@@ -173,7 +233,7 @@ class PrivateKeyImportPresenter(
 				}
 			}
 		}
-		
+
 		/**
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
 		 */
@@ -224,10 +284,10 @@ class PrivateKeyImportPresenter(
 					address?.let {
 						WalletImportPresenter.insertWalletToDatabase(
 							context,
-							MultiChainAddresses(it, it, "", ""),
+							MultiChainAddresses(it, it, "", "", ""),
 							name,
 							"",
-							MultiChainPath("", "", "", ""),
+							MultiChainPath(),
 							hint,
 							callback
 						)
