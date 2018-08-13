@@ -1,11 +1,13 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
 import android.app.DownloadManager
-import android.content.Context
-import android.content.Intent
+import android.app.NotificationManager
+import android.content.*
 import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.*
+import android.support.v4.app.NotificationCompat
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
@@ -45,29 +47,39 @@ class ProfilePresenter(
 	
 	private val downloadHandler: Handler
 	private var downloadId = 0L
+	private var filepath = ""
+	private val notifyManager = GoldStoneAPI.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+	private val builder by lazy {
+		NotificationCompat.Builder(GoldStoneAPI.context, "")
+			.setLargeIcon(BitmapFactory.decodeResource(GoldStoneAPI.context.resources, R.mipmap.ic_launcher))
+			.setSmallIcon(R.drawable.version_icon)
+			.setContentTitle("GoldStone")
+	}
 	
-	private fun resetDownloadId () {
+	private fun resetDownloadState () {
 		downloadId = 0L
+		filepath = ""
 	}
 	init {
 	  downloadHandler = object : Handler() {
 			override fun handleMessage(msg: Message) {
 					when (msg.arg1) {
 						DownloadManager.STATUS_SUCCESSFUL -> {
-							resetDownloadId()
 							progressLoadingDialog.isShowing.isTrue {
 								progressLoadingDialog.setProgress(0, 100)
 								progressLoadingDialog.dismiss()
 							}
-							val path = msg.obj as String
-							path.isNotNull {
-								ApkUtil.installApk(File(path))
+							filepath.isEmpty() isFalse  {
+								ApkUtil.installApk(File(filepath))
 							}
+							resetDownloadState()
+							cancelNotification()
 							
 						}
 						
 						DownloadManager.STATUS_FAILED -> {
-							resetDownloadId()
+							resetDownloadState()
+							cancelNotification()
 							progressLoadingDialog.isShowing.isTrue {
 								progressLoadingDialog.setProgress(0, 100)
 								progressLoadingDialog.dismiss()
@@ -77,12 +89,10 @@ class ProfilePresenter(
 						else -> {
 							progressLoadingDialog.isShowing.isTrue {
 								progressLoadingDialog.setProgress(msg.arg2, 100)
+								updateNptificationProgress(msg.arg2)
 							}
-							
 							getBytesAndStatus()
-							
 						}
-						
 					}
 				
 			}
@@ -204,7 +214,6 @@ class ProfilePresenter(
 			val bytesAndStatus = arrayOf(-1, -1, 0)
 			val query = DownloadManager.Query().setFilterById(downloadId)
 			var cursor: Cursor? = null
-			var filePath: String? = null
 			try {
 				cursor = (fragment.context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).query(query)
 				if (cursor != null && cursor.moveToFirst()) {
@@ -215,7 +224,6 @@ class ProfilePresenter(
 					// 下载状态
 					bytesAndStatus[2] = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
 					
-					filePath = cursor.getString(cursor.getColumnIndex("local_filename"))
 				}
 			} finally {
 				cursor!!.close()
@@ -226,7 +234,6 @@ class ProfilePresenter(
 			val message = downloadHandler.obtainMessage()
 			message.arg1 = bytesAndStatus[2]
 			message.arg2 = progress.toInt()
-			message.obj = filePath
 			downloadHandler.sendMessageDelayed(message, 500)
 			
 		}
@@ -268,15 +275,33 @@ class ProfilePresenter(
 		val request = DownloadManager.Request(Uri.parse(url)).apply {
 			setDescription(description)
 			setTitle(title)
+			setVisibleInDownloadsUi(true)
 			allowScanningByMediaScanner()
-			setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+			setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GoldStone$title.apk")
+			filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath+"/"+"GoldStone$title.apk"
+			
 		}
-		
 		// get download service and enqueue file
 		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+		showNotification(description)
 		return manager.enqueue(request)
 		
+	}
+	
+	private fun showNotification (description: String?) {
+		builder.setProgress(100, 0, false)
+		builder.setContentText(description)
+		notifyManager.notify(1, builder.build())
+	}
+	
+	private fun updateNptificationProgress(progress: Int) {
+		builder.setProgress(100, progress, false)
+		notifyManager.notify(1, builder.build())
+	}
+	
+	private fun cancelNotification() {
+		notifyManager.cancel(1)
 	}
 	
 	private fun showShareChooser() {
