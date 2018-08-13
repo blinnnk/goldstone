@@ -42,6 +42,7 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
         }.lparams(wrapContent, wrapContent) {
           margin = 10
         }
+				addView(textViewContent)
         measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
           View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
         layout(0, 0, measuredWidth, measuredHeight)
@@ -70,7 +71,7 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
 	
 	abstract fun getChartHeight() : Int
   
-  override fun getOffset(): MPPointF? {
+  override fun getOffset(): MPPointF {
     return offsetMPPOintF
   }
   
@@ -78,9 +79,9 @@ abstract class BaseMarkerView(context: Context) : RelativeLayout(context), IMark
     positionX: Float,
     positionY: Float
   ): MPPointF {
-    
-    drawingOffsetMPPointF.x = offsetMPPOintF.x
-    drawingOffsetMPPointF.y = offsetMPPOintF.y
+		val offset = getOffset()
+		drawingOffsetMPPointF.x = offset.x
+    drawingOffsetMPPointF.y = offset.y
     
 
 		val chartWidht = getChartWidth()
