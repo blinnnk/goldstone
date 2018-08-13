@@ -56,7 +56,7 @@ object WalletUtil {
 		return when (symbol) {
 			CryptoSymbol.btc() -> {
 				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCTestAddress()
+					Config.getCurrentBTCSeriesTestAddress()
 				} else {
 					Config.getCurrentBTCAddress()
 				}

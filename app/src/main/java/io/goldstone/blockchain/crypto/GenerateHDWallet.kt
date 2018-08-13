@@ -223,7 +223,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 		WalletType.BTCTestOnly.content -> {
 			verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCTestAddress(),
+				Config.getCurrentBTCSeriesTestAddress(),
 				true,
 				true,
 				hold

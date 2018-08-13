@@ -168,7 +168,7 @@ class TokenDetailPresenter(
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
 						if (Config.isTestEnvironment()) {
 							getBTCData(
-								Config.getCurrentBTCTestAddress(),
+								Config.getCurrentBTCSeriesTestAddress(),
 								withoutLocalDataCallback
 							)
 						} else {
@@ -194,7 +194,7 @@ class TokenDetailPresenter(
 
 			WalletType.BTCTestOnly.content -> {
 				getBTCData(
-					Config.getCurrentBTCTestAddress(),
+					Config.getCurrentBTCSeriesTestAddress(),
 					withoutLocalDataCallback
 				)
 			}

@@ -148,7 +148,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
 						else presenter.getBitcoinAddresses()
-						if (Config.isTestEnvironment()) presenter.getLitecoinAddresses()
+						if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
 						else presenter.getLitecoinAddresses()
 					} else {
 						hideAddButton()

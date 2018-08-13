@@ -70,14 +70,16 @@ class AddressManagerPresneter(
 		WalletTable.getCurrentWallet {
 			val addresses =
 				arrayListOf<Pair<String, String>>().apply {
-					// 如果是测试环境展示 `BTCTest Address`
+					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
 						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
 					}
-					if (currentLTCAddress.isNotEmpty()) {
+					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
+					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
 					}
 					if (currentETHAndERCAddress.isNotEmpty()) {
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
@@ -349,7 +351,7 @@ class AddressManagerPresneter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCTestAddress(),
+				Config.getCurrentBTCSeriesTestAddress(),
 				true,
 				false
 			) { isCorrect ->

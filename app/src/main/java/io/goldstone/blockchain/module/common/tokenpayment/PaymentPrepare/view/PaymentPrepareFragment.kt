@@ -73,7 +73,10 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 					showAccountInfo()
 					// `BTC` 于 ETH, ERC20, ETC 显示不同的配置信息
-					if (rootFragment?.token?.symbol.equals(CryptoSymbol.btc(), true)) {
+					if (
+						rootFragment?.token?.symbol.equals(CryptoSymbol.btc(), true) ||
+						rootFragment?.token?.symbol.equals(CryptoSymbol.ltc, true)
+					) {
 						showCustomChangeAddressCell()
 					} else {
 						showMemoCell()

@@ -162,7 +162,7 @@ class TransactionListPresenter(
 							contacts.find {
 								// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
 								it.ethERCAndETCAddress.equals(item.addressName, true)
-									|| it.btcTestnetAddress.contains(item.addressName, true)
+									|| it.btcSeriesTestnetAddress.contains(item.addressName, true)
 									|| it.btcMainnetAddress.contains(item.addressName, true)
 							}?.name ?: item.addressName
 						if (isEnd) {

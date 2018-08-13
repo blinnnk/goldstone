@@ -80,13 +80,15 @@ data class WalletTable(
 			return when {
 				symbol.equals(CryptoSymbol.btc(), true) -> {
 					if (Config.isTestEnvironment()) {
-						Config.getCurrentBTCTestAddress()
+						Config.getCurrentBTCSeriesTestAddress()
 					} else {
 						Config.getCurrentBTCAddress()
 					}
 				}
-				symbol.equals(CryptoSymbol.ltc, true) ->
-					Config.getCurrentLTCAddress()
+				symbol.equals(CryptoSymbol.ltc, true) -> {
+					if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
+					else Config.getCurrentLTCAddress()
+				}
 				symbol.equals(CryptoSymbol.etc, true) ->
 					Config.getCurrentETCAddress()
 				else ->
@@ -153,6 +155,18 @@ data class WalletTable(
 				callback(
 					it.map {
 						it.currentBTCAddress
+					}.toArrayList()
+				)
+			}
+		}
+
+		fun getAllLTCAddresses(callback: ArrayList<String>.() -> Unit) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then { it ->
+				callback(
+					it.map {
+						it.currentLTCAddress
 					}.toArrayList()
 				)
 			}

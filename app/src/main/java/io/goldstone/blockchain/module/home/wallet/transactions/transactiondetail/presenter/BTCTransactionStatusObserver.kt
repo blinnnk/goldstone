@@ -179,7 +179,7 @@ private fun TransactionDetailPresenter.onBTCTransactionSucceed() {
 private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 	isPending: Boolean
 ) {
-	val address = if (Config.isTestEnvironment()) Config.getCurrentBTCTestAddress()
+	val address = if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
 	else Config.getCurrentBTCAddress()
 	BitcoinApi.getTransactionByHash(
 		currentHash,

@@ -4,6 +4,7 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -47,7 +48,7 @@ object BTCUtils {
 			address.isEmpty() -> false
 			address.length != CryptoValue.bitcoinAddressLength -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
-			!address.substring(0, 1).toIntOrNull().isNull() -> false
+			address.substring(0, 1) != "m" && address.substring(0, 1) != "n" -> false
 			else -> true
 		}
 	}
@@ -60,7 +61,8 @@ object BTCUtils {
 		return when {
 			Address(address).isValid() -> AddressType.ETHERCOrETC
 			isValidMainnetAddress(address) -> AddressType.BTC
-			isValidTestnetAddress(address) -> AddressType.BTCTest
+			isValidTestnetAddress(address) -> AddressType.BTCSeriesTest
+			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
 			else -> null
 		}
 	}
@@ -69,5 +71,6 @@ object BTCUtils {
 enum class AddressType(val value: String) {
 	ETHERCOrETC("ethERCOrETC"),
 	BTC("btc"),
-	BTCTest("btcTest")
+	BTCSeriesTest("btcTest"),
+	LTC("ltc")
 }

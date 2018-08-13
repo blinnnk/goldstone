@@ -15,9 +15,11 @@ import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -31,16 +33,20 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 class ContactInputPresenter(
 	override val fragment: ContactInputFragment
 ) : BasePresenter<ContactInputFragment>() {
-	
+
 	private var nameText = ""
 	private var ethERCAndETCAddressText = ""
 	private var btcMainnetAddressText = ""
 	private var btcTestnetAddressText = ""
-	
+	private var etcAddressText = ""
+	private var ltcAddressText = ""
+	private var bchAddressText = ""
+
 	fun getAddressIfExist(
 		ethERCAndETCInput: EditText,
 		btcMainnetInput: EditText,
-		btcTestnetInput: EditText
+		btcSeriesTestnetInput: EditText,
+		ltcInput: EditText
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddress?.let {
@@ -49,21 +55,25 @@ class ContactInputPresenter(
 						ethERCAndETCInput.setText(it)
 						ethERCAndETCAddressText = it
 					}
-					
+
 					AddressType.BTC -> {
 						btcMainnetInput.setText(it)
 						btcMainnetAddressText = it
 					}
-					
-					AddressType.BTCTest -> {
-						btcTestnetInput.setText(it)
+
+					AddressType.BTCSeriesTest -> {
+						btcSeriesTestnetInput.setText(it)
 						btcTestnetAddressText = it
+					}
+					AddressType.LTC -> {
+						ltcInput.setText(it)
+						ltcAddressText = it
 					}
 				}
 			}
 		}
 	}
-	
+
 	fun addContact() {
 		// 名字必须不为空
 		if (nameText.isEmpty()) {
@@ -73,24 +83,32 @@ class ContactInputPresenter(
 		// 至少有一个地址输入框有输入
 		if ((
 				ethERCAndETCAddressText.count()
-				+ btcMainnetAddressText.count()
-				+ btcTestnetAddressText.count()
-		    ) == 0
+					+ btcMainnetAddressText.count()
+					+ btcTestnetAddressText.count()
+					+ ltcAddressText.count()
+				) == 0
 		) {
 			fragment.context?.alert(ContactText.emptyAddressAlert)
 			return
 		}
 		// 检查是否是合规的以太坊或以太经典的地址格式
 		if (!Address(ethERCAndETCAddressText).isValid() && ethERCAndETCAddressText.isNotEmpty()) {
-			fragment.context?.alert(ContactText.wrongAddressFormat)
+			fragment.context?.alert(ContactText.wrongAddressFormat("ETH/ERC20"))
 			return
 		}
+
+		// 检查是否是合规的以太坊或以太经典的地址格式
+		if (!LTCWalletUtils.isValidAddress(ltcAddressText) && ltcAddressText.isNotEmpty()) {
+			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.ltc))
+			return
+		}
+
 		// 检查是否是合规的测试网比特币私钥地址格式
 		if (
 			btcTestnetAddressText.isNotEmpty() &&
 			!BTCUtils.isValidTestnetAddress(btcTestnetAddressText)
 		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat)
+			fragment.context?.alert(ContactText.wrongAddressFormat("BTCTest"))
 			return
 		}
 		// 检查是否是合规的主网比特币私钥地址格式
@@ -98,7 +116,7 @@ class ContactInputPresenter(
 			btcMainnetAddressText.isNotEmpty() &&
 			!BTCUtils.isValidMainnetAddress(btcMainnetAddressText)
 		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat)
+			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.btc()))
 			return
 		}
 		// 符合以上规则的可以进入插入地址
@@ -110,7 +128,10 @@ class ContactInputPresenter(
 				"",
 				ethERCAndETCAddressText,
 				btcMainnetAddressText,
-				btcTestnetAddressText
+				btcTestnetAddressText,
+				etcAddressText,
+				ltcAddressText,
+				bchAddressText
 			)
 		) {
 			// 通信录的地址是实时显示到账单的, 当通信录有更新的时候清空缓存中的数据
@@ -126,12 +147,13 @@ class ContactInputPresenter(
 			}
 		}
 	}
-	
+
 	fun setConfirmButtonStyle(
 		nameInput: EditText,
 		ethERCAndETCInput: EditText,
 		btcMainnetInput: EditText,
 		btcTestnetInput: EditText,
+		ltcInput: EditText,
 		confirmButton: RoundButton
 	) {
 		nameInput.addTextChangedListener(object : TextWatcher {
@@ -139,7 +161,7 @@ class ContactInputPresenter(
 				nameText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-			
+
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -147,7 +169,7 @@ class ContactInputPresenter(
 				after: Int
 			) {
 			}
-			
+
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -156,13 +178,13 @@ class ContactInputPresenter(
 			) {
 			}
 		})
-		
+
 		ethERCAndETCInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				ethERCAndETCAddressText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-			
+
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -170,7 +192,7 @@ class ContactInputPresenter(
 				after: Int
 			) {
 			}
-			
+
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -179,13 +201,13 @@ class ContactInputPresenter(
 			) {
 			}
 		})
-		
+
 		btcMainnetInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				btcMainnetAddressText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-			
+
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -193,7 +215,7 @@ class ContactInputPresenter(
 				after: Int
 			) {
 			}
-			
+
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -202,13 +224,13 @@ class ContactInputPresenter(
 			) {
 			}
 		})
-		
+
 		btcTestnetInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				btcTestnetAddressText = text.orElse("").toString()
 				setStyle(confirmButton)
 			}
-			
+
 			override fun beforeTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -216,7 +238,30 @@ class ContactInputPresenter(
 				after: Int
 			) {
 			}
-			
+
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+		})
+
+		ltcInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				ltcAddressText = text.orElse("").toString()
+				setStyle(confirmButton)
+			}
+
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
 			override fun onTextChanged(
 				text: CharSequence?,
 				start: Int,
@@ -226,15 +271,16 @@ class ContactInputPresenter(
 			}
 		})
 	}
-	
+
 	private fun setStyle(confirmButton: RoundButton) {
 		if (
 			nameText.count()
 			* (
 				ethERCAndETCAddressText.count()
-				+ btcMainnetAddressText.count()
-				+ btcTestnetAddressText.count()
-			  )
+					+ btcMainnetAddressText.count()
+					+ btcTestnetAddressText.count()
+					+ ltcAddressText.count()
+				)
 			!= 0
 		) {
 			confirmButton.setBlueStyle(20.uiPX())

@@ -71,7 +71,7 @@ object Config {
 	fun updateCurrentBTCAddress(address: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBTCAddress, address)
 
-	fun getCurrentBTCTestAddress(): String =
+	fun getCurrentBTCSeriesTestAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCTestAddress)
 
 	fun updateCurrentBTCTestAddress(address: String) =

@@ -29,7 +29,7 @@ class BitcoinTransactionListPresenter(
 ) : BaseRecyclerPresenter<BitcoinTransactionListFragment, TransactionListModel>() {
 
 	private val address: () -> String = {
-		if (Config.isTestEnvironment()) Config.getCurrentBTCTestAddress()
+		if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
 		else Config.getCurrentBTCAddress()
 	}
 
@@ -100,7 +100,7 @@ class BitcoinTransactionListPresenter(
 			val offset =
 				Math.floor(localData.size / pageSize.toDouble()).toInt() * pageSize
 			val address = if (Config.isTestEnvironment())
-				Config.getCurrentBTCTestAddress()
+				Config.getCurrentBTCSeriesTestAddress()
 			else Config.getCurrentBTCAddress()
 			BitcoinApi.getBTCTransactions(
 				address,

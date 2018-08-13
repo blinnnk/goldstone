@@ -173,7 +173,7 @@ private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
 	fragment.getParentFragment<TokenDetailOverlayFragment> {
 		val myAddress =
 			if (Config.isTestEnvironment())
-				Config.getCurrentBTCTestAddress()
+				Config.getCurrentBTCSeriesTestAddress()
 			else Config.getCurrentBTCAddress()
 		BitcoinSeriesTransactionTable(
 			0,

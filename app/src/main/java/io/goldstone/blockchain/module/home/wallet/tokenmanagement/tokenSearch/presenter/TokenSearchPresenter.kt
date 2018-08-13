@@ -75,7 +75,7 @@ class TokenSearchPresenter(
 			model?.let { searchToken ->
 				DefaultTokenTable.getCurrentChainToken(searchToken.contract) { localToken ->
 					localToken.isNotNull {
-						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
+						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
 						DefaultTokenTable.updateTokenDefaultStatus(
 							localToken?.contract.orEmpty(),
 							switch.isChecked,
