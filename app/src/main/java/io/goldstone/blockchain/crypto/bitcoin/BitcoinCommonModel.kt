@@ -25,7 +25,7 @@ data class MultiChainAddresses(
 	val ethAddress: String,
 	val etcAddress: String,
 	val btcAddress: String,
-	val btcTestAddress: String,
+	val btcSeriesTestAddress: String,
 	val ltcAddress: String
 ) {
 	

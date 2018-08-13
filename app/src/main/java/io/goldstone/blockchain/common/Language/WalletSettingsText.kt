@@ -294,6 +294,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val litecoinAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Litecoin Address"
+		HoneyLanguage.Chinese.code -> "Litecoin Address"
+		HoneyLanguage.Japanese.code -> "Litecoin Address"
+		HoneyLanguage.Korean.code -> "Litecoin Address"
+		HoneyLanguage.Russian.code -> "Litecoin Address"
+		HoneyLanguage.TraditionalChinese.code -> "Litecoin Address"
+		else -> ""
+	}
+	@JvmField
 	val bitcoinAddress: (isYingYongBao: Boolean) -> String = {
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix(it)} Address"

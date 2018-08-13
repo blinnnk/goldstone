@@ -137,7 +137,7 @@ class WalletSettingsListPresenter(
 									completeMark()
 								}
 							}
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
+							AddressManagerPresneter.convertToChildAddresses(btcSeriesTestAddresses).forEach {
 								deleteRoutineWallet(
 									it.first,
 									password,
@@ -174,7 +174,7 @@ class WalletSettingsListPresenter(
 				// 删除 `BTCTest` 包下的所有地址对应的数据
 				WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
 					deleteRoutineWallet(
-						currentBTCTestAddress,
+						currentBTCSeriesTestAddress,
 						password,
 						true,
 						true

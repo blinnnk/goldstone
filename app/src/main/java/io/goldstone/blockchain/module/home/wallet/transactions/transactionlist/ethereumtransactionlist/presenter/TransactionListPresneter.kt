@@ -104,11 +104,7 @@ class TransactionListPresenter(
 					override var asyncCount = size
 					override fun concurrentJobs() {
 						forEach {
-							MyTokenTable.insertBySymbolAndContract(
-								it.symbol,
-								it.contract,
-								Config.getCurrentChain()
-							) {
+							MyTokenTable.insertBySymbolAndContract(it.symbol, it.contract) {
 								completeMark()
 							}
 							// 更新默认显示到管理菜单的状态

@@ -157,7 +157,7 @@ class AddressSelectionPresenter(
 					)
 					return
 				} else {
-					WalletTable.getAllBTCTestnetAddresses {
+					WalletTable.getAllBTCSeriesTestnetAddresses {
 						showAlertIfLocalExistThisAddress(this)
 					}
 				}

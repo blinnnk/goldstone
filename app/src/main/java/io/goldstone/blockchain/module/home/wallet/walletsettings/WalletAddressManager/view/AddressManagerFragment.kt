@@ -145,9 +145,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
+						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
 						else presenter.getBitcoinAddresses()
-						presenter.getLitecoinAddresses()
+						if (Config.isTestEnvironment()) presenter.getLitecoinAddresses()
+						else presenter.getLitecoinAddresses()
 					} else {
 						hideAddButton()
 						attentionView.into(this@parent)
@@ -182,7 +184,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	}
 
 	fun setLitecoinAddressesModel(model: List<Pair<String, String>>) {
-		ltcAddressesView.setTitle(WalletSettingsText.allLTCAddresses)
+		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.model = model
 	}
 
@@ -258,7 +260,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-						ChainType.LTC.id -> presenter.getLitecoinAddresses()
+						ChainType.LTC.id -> {
+							if (Config.isTestEnvironment())
+								presenter.getLitecoinTestAddresses()
+							else presenter.getLitecoinAddresses()
+						}
 						ChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								presenter.getBitcoinTestAddresses()

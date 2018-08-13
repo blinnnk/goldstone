@@ -94,7 +94,7 @@ class WatchOnlyImportPresenter(
 						isUsing = true,
 						isWatchOnly = true,
 						hasBackUpMnemonic = true,
-						currentBTCTestAddress = currentBTCTestAddress,
+						currentBTCSeriesTestAddress = currentBTCTestAddress,
 						currentBTCAddress = currentBTCAddress,
 						currentETCAddress = currentETCAddress,
 						currentLTCAddress = currentLTCAddress,
@@ -106,7 +106,7 @@ class WatchOnlyImportPresenter(
 						ethAddresses = "",
 						etcAddresses = "",
 						btcAddresses = "",
-						btcTestAddresses = "",
+						btcSeriesTestAddresses = "",
 						ltcAddresses = ""
 					)
 				) {
@@ -129,7 +129,7 @@ class WatchOnlyImportPresenter(
 							listOf(
 								Pair(currentBTCAddress, ChainType.BTC.id),
 								Pair(currentLTCAddress, ChainType.LTC.id),
-								Pair(currentBTCTestAddress, ChainType.BTCTest.id),
+								Pair(currentBTCTestAddress, ChainType.AllTest.id),
 								Pair(currentETCAddress, ChainType.ETC.id),
 								Pair(currentETHAndERCAddress, ChainType.ETH.id)
 							)

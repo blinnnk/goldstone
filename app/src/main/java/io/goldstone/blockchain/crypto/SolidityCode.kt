@@ -131,14 +131,14 @@ object CryptoName {
 
 enum class ChainType(val id: Int) {
 	BTC(0),
-	BTCTest(1),
+	AllTest(1),
 	LTC(2),
 	ETH(60),
 	ETC(61),
 	ERC(100); // 需要调大不然可能会和自然 `Type` 冲突
 	companion object {
 	  fun getAllBTCSeriesType(): List<Int> {
-			return listOf(LTC.id, BTCTest.id, BTC.id)
+			return listOf(LTC.id, AllTest.id, BTC.id)
 		}
 	}
 }

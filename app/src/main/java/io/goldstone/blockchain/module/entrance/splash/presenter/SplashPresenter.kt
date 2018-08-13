@@ -173,7 +173,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			doAsync {
 				Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 				Config.updateCurrentBTCAddress(currentBTCAddress)
-				Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+				Config.updateCurrentBTCTestAddress(currentBTCSeriesTestAddress)
 				Config.updateCurrentETCAddress(currentETCAddress)
 				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)

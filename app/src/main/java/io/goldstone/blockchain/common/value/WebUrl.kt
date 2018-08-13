@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.language.HoneyLanguage
  * @author KaySaith
  */
 object WebUrl {
-	
+
 	val webLanguage: (currentLanguageCode: Int) -> String = {
 		when (it) {
 			HoneyLanguage.Chinese.code -> "zh-s"
@@ -42,6 +42,15 @@ object WebUrl {
 	val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
 	const val normalServer = "https://api1.goldstone.io"
 	const val normalSocket = "wss://api1.goldstone.io/ws"
+
+	// BTC Transaction Data API From `blockchain.info`
 	const val btcMain = "https://blockchain.info"
 	const val btcTest = "https://testnet.blockchain.info"
+	// LTC Transaction Data API From `chain.so`
+	val ltcMain: (api: String) -> String = {
+		"https://chain.so/api/v2/$it/LTC"
+	}
+	val ltcTest: (api: String) -> String = {
+		"https://chain.so/api/v2/$it/LTCTEST"
+	}
 }

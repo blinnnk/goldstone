@@ -73,7 +73,7 @@ object LTCWalletUtils {
 		isCompress: Boolean
 	): String {
 		val versionPrivateKey =
-			version.privateKey + privateKey.toString(16) + if (isCompress) ChainPrefix.compressEndfix else ""
+			version.privateKey + privateKey.toString(16) + if (isCompress) ChainPrefix.compressSuffix else ""
 		val sha256PrivateKey = Sha256Hash.hash(Hex.decode(versionPrivateKey))
 		val doubleSha256 = Sha256Hash.hash(sha256PrivateKey)
 		val first4bytes = doubleSha256.toNoPrefixHexString().substring(0, 8)

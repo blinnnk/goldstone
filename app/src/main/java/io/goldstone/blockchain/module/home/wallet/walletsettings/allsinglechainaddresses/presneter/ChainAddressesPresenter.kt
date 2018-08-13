@@ -92,7 +92,7 @@ class ChainAddressesPresenter(
 							ChainType.BTC.id -> {
 								if (Config.isTestEnvironment()) {
 									AddressManagerPresneter.createBTCTestAddress(this, password) {
-										updateAddressManagerDataBy(ChainType.BTCTest.id, it)
+										updateAddressManagerDataBy(ChainType.AllTest.id, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
 								} else {
@@ -200,15 +200,16 @@ class ChainAddressesPresenter(
 				}
 
 				ChainType.BTC.id -> {
-					val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
+					val address =
+						if (Config.isTestEnvironment()) btcSeriesTestAddresses else btcAddresses
 					val currentAddress =
-						if (Config.isTestEnvironment()) currentBTCTestAddress else currentBTCAddress
+						if (Config.isTestEnvironment()) currentBTCSeriesTestAddress else currentBTCAddress
 					fragment.asyncData =
 						AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
 					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
 						setDefaultAddress(it, currentAddress, ChainType.BTC.id)
 						if (Config.isTestEnvironment())
-							Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+							Config.updateCurrentBTCTestAddress(currentBTCSeriesTestAddress)
 						else Config.updateCurrentBTCAddress(currentBTCAddress)
 					}
 				}

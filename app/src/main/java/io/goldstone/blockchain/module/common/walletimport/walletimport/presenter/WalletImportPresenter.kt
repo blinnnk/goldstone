@@ -62,7 +62,7 @@ class WalletImportPresenter(
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcTestAddress,
+					multiChainAddresses.btcSeriesTestAddress,
 					multiChainAddresses.ltcAddress
 				).find { it.isNotEmpty() }.orEmpty()
 
@@ -76,7 +76,7 @@ class WalletImportPresenter(
 							currentETHAndERCAddress = multiChainAddresses.ethAddress,
 							currentETCAddress = multiChainAddresses.etcAddress,
 							currentBTCAddress = multiChainAddresses.btcAddress,
-							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
+							currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTestAddress,
 							currentLTCAddress = multiChainAddresses.ltcAddress,
 							isUsing = true,
 							hint = hint,
@@ -96,8 +96,8 @@ class WalletImportPresenter(
 								multiChainAddresses.btcAddress,
 								getAddressIndexFromPath(multiChainPath.btcPath)
 							),
-							btcTestAddresses = childAddressValue(
-								multiChainAddresses.btcTestAddress,
+							btcSeriesTestAddresses = childAddressValue(
+								multiChainAddresses.btcSeriesTestAddress,
 								getAddressIndexFromPath(multiChainPath.testPath)
 							),
 							ltcAddresses = childAddressValue(

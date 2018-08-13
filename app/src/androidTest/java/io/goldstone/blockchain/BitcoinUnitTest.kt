@@ -47,8 +47,4 @@ class BitcoinUnitTest {
 			}
 		}
 	}
-
-	@Test
-	fun encryptPrivateKey() {
-	}
 }

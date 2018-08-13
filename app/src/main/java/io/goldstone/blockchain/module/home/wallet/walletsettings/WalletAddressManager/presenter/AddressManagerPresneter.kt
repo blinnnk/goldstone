@@ -73,8 +73,8 @@ class AddressManagerPresneter(
 					// 如果是测试环境展示 `BTCTest Address`
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
-					} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCTestAddress, CryptoSymbol.btc()))
+					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
 					}
 					if (currentLTCAddress.isNotEmpty()) {
 						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
@@ -109,7 +109,13 @@ class AddressManagerPresneter(
 
 	fun getBitcoinTestAddresses() {
 		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
+			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
+		}
+	}
+
+	fun getLitecoinTestAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setLitecoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
 		}
 	}
 
@@ -124,7 +130,7 @@ class AddressManagerPresneter(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
-			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newLTCAddress)
+			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress)
 		)
 	}
 
@@ -374,7 +380,7 @@ class AddressManagerPresneter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommitionModel(address, ChainType.BTCTest.id, 1)
+								AddressCommitionModel(address, ChainType.AllTest.id, 1)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -491,8 +497,8 @@ class AddressManagerPresneter(
 						if (Config.isTestEnvironment()) {
 							hold(
 								getTargetAddressIndex(
-									btcTestAddresses,
-									currentBTCTestAddress
+									btcSeriesTestAddresses,
+									currentBTCSeriesTestAddress
 								)
 							)
 						} else {
@@ -512,10 +518,7 @@ class AddressManagerPresneter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(
-							MyTokenTable(it.apply { chain_id = chainID }, address),
-							chainID
-						)
+						MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chainID }, address))
 					}
 				}
 			}

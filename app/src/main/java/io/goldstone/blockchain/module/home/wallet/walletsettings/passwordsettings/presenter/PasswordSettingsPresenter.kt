@@ -86,7 +86,7 @@ class PasswordSettingsPresenter(
 										completeMark()
 									}
 								}
-								AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
+								AddressManagerPresneter.convertToChildAddresses(btcSeriesTestAddresses).forEach {
 									updateKeystorePassword(
 										it.first,
 										oldPassword,
@@ -120,7 +120,7 @@ class PasswordSettingsPresenter(
 					// 删除 `BTCTest` 包下的所有地址对应的数据
 					WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
 						updateKeystorePassword(
-							currentBTCTestAddress,
+							currentBTCSeriesTestAddress,
 							oldPassword,
 							password,
 							passwordHint,

@@ -10,10 +10,12 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -45,15 +47,13 @@ data class MyTokenTable(
 
 	companion object {
 
-		fun insert(model: MyTokenTable, chainID: String) {
+		fun insert(model: MyTokenTable) {
 			GoldStoneDataBase.database.myTokenDao().apply {
 				// 防止重复添加
-				if (getCurrentChainTokenByContractAndAddress(
+				if (getTargetChainTokenByContractAndAddress(
 						model.contract,
 						model.ownerAddress,
-						chainID,
-						chainID,
-						chainID
+						model.chainID
 					).isNull()
 				) {
 					insert(model)
@@ -185,7 +185,6 @@ data class MyTokenTable(
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: String,
-			chainID: String,
 			callback: () -> Unit = {}
 		) {
 			WalletTable.getCurrentWallet {
@@ -204,8 +203,7 @@ data class MyTokenTable(
 									0.0,
 									contract,
 									CryptoValue.chainID(contract)
-								),
-								chainID
+								)
 							)
 							// 没有网络不用检查间隔直接插入数据库
 							GoldStoneAPI.context.runOnUiThread {
@@ -226,7 +224,7 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.equals(CryptoValue.ethContract, true) -> {
+				contract.equals(CryptoValue.ethContract, true) ->
 					GoldStoneEthCall.getEthBalance(
 						ownerAddress,
 						errorCallback,
@@ -235,9 +233,7 @@ data class MyTokenTable(
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				}
-
-				contract.equals(CryptoValue.etcContract, true) -> {
+				contract.equals(CryptoValue.etcContract, true) ->
 					GoldStoneEthCall.getEthBalance(
 						ownerAddress,
 						errorCallback,
@@ -246,19 +242,18 @@ data class MyTokenTable(
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				}
-
-				contract.equals(CryptoValue.ltcContract, true) -> {
-					// TODO Litecoin GetBalance
-					callback(0.0)
-				}
-
-				contract.equals(CryptoValue.btcContract, true) -> {
+				contract.equals(CryptoValue.btcContract, true) ->
 					BitcoinApi.getBalanceByAddress(ownerAddress) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
-				}
+				contract.equals(CryptoValue.ltcContract, true) ->
+					LitecoinApi.getBalanceByAddress(ownerAddress) {
+						// 第三方返回的直接是 转换好的 Double 数据, 为了和现有业务直接融合,
+						// 这里把转换方法调整兼容数据到现有结构
+						val balance = if (convertByDecimal) it else it.toSatoshi().toDouble()
+						callback(balance)
+					}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
@@ -297,13 +292,21 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
 		ercChain: String = Config.getCurrentChain(),
 		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain()
+		btcChain: String = Config.getBTCCurrentChain(),
+		ltcChain: String = Config.getLTCCurrentChain()
+	): MyTokenTable?
+
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	fun getTargetChainTokenByContractAndAddress(
+		contract: String,
+		walletAddress: String,
+		chainID: String
 	): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :ltcChain  OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")

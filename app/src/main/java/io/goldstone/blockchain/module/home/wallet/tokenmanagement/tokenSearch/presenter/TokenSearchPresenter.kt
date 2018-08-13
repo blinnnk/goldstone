@@ -45,10 +45,11 @@ class TokenSearchPresenter(
 					if (it) {
 						canSearch = if (
 							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true)
+							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true) ||
+							Config.getCurrentWalletType().equals(WalletType.LTCOnly.content, true)
 						) {
 							fragment.context.alert(
-								"This is a single bitcoin chain wallet so you canot add other crypot currency"
+								"This is a single block chain wallet so you canot add other crypot currency"
 							)
 							false
 						} else {
@@ -100,11 +101,7 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(
-					switch,
-					it,
-					ChainID.getChainIDBySymbol(it.symbol)
-				)
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
 			}
 		}
 	}
@@ -114,7 +111,6 @@ class TokenSearchPresenter(
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-
 		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
 			content,

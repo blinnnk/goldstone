@@ -121,7 +121,7 @@ object GoldStoneAPI {
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${Config.getCurrentChain()},${Config.getETCCurrentChain()}${Config.getBTCCurrentChain()}"
+				"${Config.getCurrentChain()},${Config.getETCCurrentChain()},${Config.getBTCCurrentChain()},${Config.getLTCCurrentChain()}"
 			),
 			"list",
 			false,
