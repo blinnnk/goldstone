@@ -1,13 +1,13 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
-import android.app.DownloadManager
-import android.app.NotificationManager
+import android.app.*
 import android.content.*
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.*
 import android.support.v4.app.NotificationCompat
+import android.support.v7.app.AlertDialog
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
@@ -31,6 +31,12 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
 import org.jetbrains.anko.*
 import java.io.File
 import java.util.concurrent.Executors
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.support.annotation.RequiresApi
+import com.google.android.gms.common.internal.service.Common
+
 
 /**
  * @date 25/03/2018 10:52 PM
@@ -39,6 +45,8 @@ import java.util.concurrent.Executors
 class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
+	
+	private val INSTALL_PERISSION_REQUEST_CODE = 0x3
 	
 	private var version = ""
 	private val progressLoadingDialog: ProgressLoadingDialog by lazy {
@@ -50,7 +58,7 @@ class ProfilePresenter(
 	private var filepath = ""
 	private val notifyManager = GoldStoneAPI.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 	private val builder by lazy {
-		NotificationCompat.Builder(GoldStoneAPI.context, "")
+		NotificationCompat.Builder(GoldStoneAPI.context, "channel_1")
 			.setLargeIcon(BitmapFactory.decodeResource(GoldStoneAPI.context.resources, R.mipmap.ic_launcher))
 			.setSmallIcon(R.drawable.version_icon)
 			.setContentTitle("GoldStone")
@@ -70,9 +78,15 @@ class ProfilePresenter(
 								progressLoadingDialog.dismiss()
 							}
 							filepath.isEmpty() isFalse  {
-								ApkUtil.installApk(File(filepath))
+								if (checkInstallPermission()) {
+									ApkUtil.installApk(File(filepath))
+									resetDownloadState()
+								}else {
+									if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+										showInstallPermissionAlertDialog()
+									}
+								}
 							}
-							resetDownloadState()
 							cancelNotification()
 							
 						}
@@ -98,6 +112,53 @@ class ProfilePresenter(
 			}
 		}
 	}
+	
+	fun onActivityResult(
+		requestCode: Int,
+		resultCode: Int
+	) {
+		if (requestCode == INSTALL_PERISSION_REQUEST_CODE
+			&& resultCode == Activity.RESULT_OK) {
+				ApkUtil.installApk(File(filepath))
+				resetDownloadState()
+			
+		}
+	}
+	
+	private fun checkInstallPermission() : Boolean {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			return fragment.context?.packageManager!!.canRequestPackageInstalls()
+		}else {
+			return true
+		}
+	}
+	
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	private fun showInstallPermissionAlertDialog() {
+		fragment.context?.let {
+			AlertDialog.Builder(it)
+				.setTitle("需要打开您的安装未知来源的权限")
+				.setNegativeButton(CommonText.cancel, DialogInterface.OnClickListener {
+						dialogInterface, _ -> dialogInterface.dismiss()
+				})
+				.setPositiveButton(CommonText.confirm, DialogInterface.OnClickListener {
+						dialogInterface, _ ->
+						dialogInterface.dismiss()
+						startInstallPermissionSettingActivity()
+						
+				})
+				.show()
+				
+		}
+	}
+	
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	private fun startInstallPermissionSettingActivity() {
+		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.getPackageName())
+		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
+		fragment.startActivityForResult(intent, INSTALL_PERISSION_REQUEST_CODE)
+	}
+	
 	
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
@@ -290,6 +351,9 @@ class ProfilePresenter(
 	}
 	
 	private fun showNotification (description: String?) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			notifyManager.createNotificationChannel(NotificationChannel("channel_1", "download", NotificationManager.IMPORTANCE_LOW))
+		}
 		builder.setProgress(100, 0, false)
 		builder.setContentText(description)
 		notifyManager.notify(1, builder.build())

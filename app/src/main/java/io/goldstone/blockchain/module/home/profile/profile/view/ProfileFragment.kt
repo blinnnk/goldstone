@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.profile.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
@@ -67,6 +68,15 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 		mainActivity?.getHomeFragment()?.apply {
 			presenter.showWalletDetailFragment()
 		}
+	}
+	
+	override fun onActivityResult(
+		requestCode: Int,
+		resultCode: Int,
+		data: Intent?
+	) {
+		super.onActivityResult(requestCode, resultCode, data)
+		presenter.onActivityResult(requestCode, resultCode)
 	}
 }
 

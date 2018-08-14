@@ -13,7 +13,9 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <!-- 相机使用权限 -->
   <uses-permission android:name="android.permission.CAMERA" />
-	
+	<!-- 未知来源授权 -->
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+	<!-- 下载时不提示notification -->
 	<uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
   <!-- 信鸽需要使用的权限 -->

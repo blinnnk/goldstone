@@ -2,4 +2,8 @@
   tools:ignore="MissingDefaultResource">
   <files-path name="app_directory" path="directory/"/>
   <external-path name="app_DCIM" path="DCIM/Camera/" />
+	<root-path
+		name="external_files"
+		path="" />
+	<external-path path="app_download" name="download"/>
 </paths>
