@@ -25,6 +25,8 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.rank.model.RankHeaderModel
+import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -500,6 +502,41 @@ object GoldStoneAPI {
 		}
 	}
 	
+	fun getRankData(
+		rank: String,
+		size: Int,
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<RankTable>) -> Unit) {
+		requestData<RankTable>(
+			APIPath.getRankListData(APIPath.currentUrl, rank, size),
+			"list",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			val data = this
+			context.runOnUiThread {
+				hold(data.toArrayList())
+			}
+		}
+	}
+	
+	fun getRandHeader(
+		errorCallback: (Exception) -> Unit,
+		hold: (RankHeaderModel) -> Unit ) {
+		requestData<String>(
+			APIPath.getRankHeaderData(APIPath.currentUrl),
+			"",
+			true,
+			errorCallback,
+			true
+		) {
+			val rankHeaderModel = Gson().fromJson<RankHeaderModel>(this[0], RankHeaderModel::class.java)
+			context.runOnUiThread {
+				hold(rankHeaderModel)
+			}
+		}
+	}
+	
 	fun getQuotationCurrencyInfo(
 		pair: String,
 		errorCallback: (Exception) -> Unit,
@@ -513,6 +550,7 @@ object GoldStoneAPI {
 			true
 		) {
 			hold(JSONObject(this[0]))
+			
 		}
 	}
 	

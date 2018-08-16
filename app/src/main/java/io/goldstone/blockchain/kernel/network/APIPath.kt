@@ -74,6 +74,23 @@ object APIPath {
 		"$header/chart/lineData?pair=$pair&period=$period&size=$size"
 	}
 	
+	val getRankListData: (
+		header: String,
+		rank: String,
+		size: Int
+	) -> String = { header, rank, size ->
+		val rankStr = if (rank.isEmpty()) "" else "rank=$rank&"
+		"$header/market/coinRank?"+rankStr+"size=$size"
+	}
+	
+	val getRankHeaderData: (
+		header: String
+	) -> String = { header ->
+		"$header/market/globalData"
+	}
+	
+	
+	
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}

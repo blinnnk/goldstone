@@ -13,6 +13,8 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.rank.model.RankDao
+import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
@@ -26,7 +28,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
 		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
 		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
-		(SupportCurrencyTable::class), (BitcoinSeriesTransactionTable::class)],
+		(SupportCurrencyTable::class), (BitcoinSeriesTransactionTable::class), (RankTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )
@@ -43,9 +45,10 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
 	abstract fun bitcoinTransactionDao(): BitcoinTransactionDao
+	abstract fun rankDao(): RankDao
 	
 	companion object {
-		const val databaseVersion = 4
+		const val databaseVersion = 5
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 		
