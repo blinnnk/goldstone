@@ -59,6 +59,15 @@ data class RankTable(
 			}
 		}
 		
+		fun clearRankTable(callback: () -> Unit){
+			doAsync {
+				GoldStoneDataBase.database.rankDao().clear()
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
+			}
+		}
+		
 	}
 }
 
@@ -77,6 +86,8 @@ interface RankDao {
 	@Delete
 	fun delete(rankTable: RankTable)
 	
+	@Query("delete from rankListTable")
+	fun clear()
 	
 	@Update
 	fun update(rankTable: RankTable)

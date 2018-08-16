@@ -83,9 +83,12 @@ class RankPresenter(override val fragment: RankListFragment)
 	private fun insertFirstPageData(rankList: List<RankTable>?) {
 		rankList?.apply {
 			isNotEmpty() isTrue {
-				RankTable.insertRankList(rankList) {
-				
+				RankTable.clearRankTable {
+					RankTable.insertRankList(rankList) {
+					
+					}
 				}
+				
 			}
 		}
 		
