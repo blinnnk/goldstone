@@ -589,9 +589,9 @@ object GoldStoneAPI {
       requestContentType,
       ParameterUtil.prepare(
         true,
-        Pair("pair", "" + priceAlarmClockTable.pair),
+        Pair("pair", priceAlarmClockTable.pair),
         Pair("type", priceAlarmClockTable.priceType),
-        Pair("price", "" + priceAlarmClockTable.price)
+        Pair("price", priceAlarmClockTable.price.toString())
       )
     ).let {
       postRequest(

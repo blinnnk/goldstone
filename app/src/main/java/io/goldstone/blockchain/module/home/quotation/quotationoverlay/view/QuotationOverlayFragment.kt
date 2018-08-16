@@ -10,27 +10,32 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter.
 /**
  * @date 21/04/2018 4:14 PM
  * @author KaySaith
+ * @rewriteDate 16/08/2018 16:33 PM
+ * @rewriter wcx
+ * @description 添加viewAlarmIndicator查看闹铃列表标示
  */
 class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>() {
 
-	private val title by lazy { arguments?.getString(ArgumentKey.quotationOverlayTitle) }
-	private val currencyInfo by lazy {
-		arguments?.getSerializable(ArgumentKey.quotationOverlayInfo) as? QuotationModel
-	}
-	override val presenter = QuotationOverlayPresenter(this)
-	override fun ViewGroup.initView() {
-		when (title) {
-			QuotationText.management -> {
-				presenter.showQutationManagementFragment()
-				overlayView.header.showSearchButton(true) {
-					presenter.showQutationSearchFragment()
-				}
-			}
+  private val title by lazy { arguments?.getString(ArgumentKey.quotationOverlayTitle) }
+  private val viewAlarmIndicator by lazy { arguments?.getString(ArgumentKey.priceAlarmClockTitle) }
+  private val currencyInfo by lazy {
+    arguments?.getSerializable(ArgumentKey.quotationOverlayInfo) as? QuotationModel
+  }
+  override val presenter = QuotationOverlayPresenter(this)
+  override fun ViewGroup.initView() {
+    when (title) {
+      QuotationText.management -> {
+        presenter.showQutationManagementFragment()
+        overlayView.header.showSearchButton(true) {
+          presenter.showQutationSearchFragment()
+        }
+      }
+      else -> presenter.showMarketTokenCenter(
+        currencyInfo,
+        viewAlarmIndicator
+      )
+    }
 
-			else -> presenter.showMarketTokenCenter(currencyInfo)
-			//presenter.showMarketTokenDetailFragment(currencyInfo)
-		}
-
-		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()
-	}
+    headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()
+  }
 }

@@ -1,9 +1,11 @@
 package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter
 
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.migration.Migration
+import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Message
+import android.os.Parcel
+import android.os.Parcelable
+import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -12,14 +14,15 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable.Companion.deleteAllAlarm
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable.Companion.insertPriceAlarm
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListAdapter
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListFragment
-import java.io.Serializable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.view.PriceAlarmClockOverlayFragment
 
 /**
  * @data 07/23/2018 16/32
@@ -29,25 +32,24 @@ import java.io.Serializable
 class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFragment)
   : BaseRecyclerPresenter<PriceAlarmClockListFragment, PriceAlarmClockTable>() {
 
-  private val handler: Handler = object : Handler(), Serializable {
-    override fun handleMessage(msg: Message?) {
-      super.handleMessage(msg)
-      fragment.priceAlarmClockListAdapter.notifyDataSetChanged()
-      updateData()
-//      fragment.getParentFragment<PriceAlarmClockOverlayFragment> {
-//        getExistingAlarmAmount() {
-//          setNowAlarmSize(this)
-//        }
-//      }
-    }
-  }
-  // 更新数据库版本
-  val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-      database.execSQL("ALTER TABLE price_alarm_clock "
-              + " ADD COLUMN onceFlag TEXT");
+  private val handler: Handler = @SuppressLint("HandlerLeak")
+  object : Handler(), Parcelable {
+    override fun writeToParcel(p0: Parcel?, p1: Int) {
     }
 
+    override fun describeContents(): Int {
+      return 0
+    }
+
+    override fun handleMessage(msg: Message?) {
+      super.handleMessage(msg)
+      fragment.getAdapter().notifyDataSetChanged()
+      updateData()
+
+      getExistingAlarmAmount {
+        fragment.setNowAlarmSize(this)
+      }
+    }
   }
 
   override fun updateData() {
@@ -56,8 +58,8 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
       val priceAlarmClockSize = priceAlarmClockTableArrayList.size - 1
       // 检查是否有未添加到后台推送列表的闹铃提醒
       for (index: Int in 0..priceAlarmClockSize) {
-        var priceAlarmClockTable = priceAlarmClockTableArrayList[index]
-        if (priceAlarmClockTable.addId == "0" && priceAlarmClockTable.status!!) {
+        val priceAlarmClockTable = priceAlarmClockTableArrayList[index]
+        if (priceAlarmClockTable.addId == "0" && priceAlarmClockTable.status) {
           filterRepeatData(priceAlarmClockTable) {
             if (this) {
               updateDatabaseRefreshList(priceAlarmClockTable)
@@ -81,35 +83,51 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
 
   fun getDatabaseDataRefreshList(callback: ArrayList<PriceAlarmClockTable>. () -> Unit) {
     PriceAlarmClockTable.getAllPriceAlarm {
+      val priceAlarmClockTableArrayList = getIdenticalSymbolList(it)
       fragment.asyncData.isNull() isTrue {
-        fragment.asyncData = it
+        fragment.asyncData = priceAlarmClockTableArrayList
       } otherwise {
-        diffAndUpdateSingleCellAdapterData<PriceAlarmClockListAdapter>(it)
+        diffAndUpdateSingleCellAdapterData<PriceAlarmClockListAdapter>(priceAlarmClockTableArrayList)
       }
-      callback(it)
+      callback(priceAlarmClockTableArrayList)
     }
   }
 
-  fun addAlarmClock(priceAlarmClockBean: PriceAlarmClockTable, callback: () -> Unit) {
+  fun getIdenticalSymbolList(it: ArrayList<PriceAlarmClockTable>): ArrayList<PriceAlarmClockTable> {
+    val symbol = fragment.getModel()?.symbol
+    val exchangeName = fragment.getModel()?.exchangeName
+    val priceAlarmClockTableArrayList = ArrayList<PriceAlarmClockTable>()
+    val allSize = it.size - 1
+    for (index: Int in 0..allSize) {
+      if (symbol == it[index].symbol && exchangeName == it[index].marketName) {
+        priceAlarmClockTableArrayList.add(it[index])
+      }
+    }
+    return priceAlarmClockTableArrayList
+  }
+
+  fun addDatabaseAlarmClock(
+    priceAlarmClockBean: PriceAlarmClockTable,
+    callback: () -> Unit
+  ) {
     insertPriceAlarm(priceAlarmClockBean) {
       callback()
     }
   }
 
-  fun deleteAllAlarmClock(callback: () -> Unit) {
-    deleteAllAlarm() {
-      callback()
-    }
-  }
-
-  // 显示价格闹钟
+  // 修改闹钟属性
   fun showPriceAlarmModifierFragment(model: PriceAlarmClockTable) {
     model.addId
-//    fragment.activity?.addFragmentAndSetArguments<PriceAlarmClockOverlayFragment>(ContainerID.main) {
-//      putSerializable(ArgumentKey.priceAlarmClockEditorInfo, model)
-//      putSerializable("priceAlarmClockListHandler", handler as Serializable)
-//
-//    }
+    fragment.activity?.addFragmentAndSetArguments<PriceAlarmClockOverlayFragment>(ContainerID.main) {
+      putSerializable(
+        ArgumentKey.priceAlarmClockEditorInfo,
+        model
+      )
+      putParcelable(
+        ArgumentKey.priceAlarmClockListHandler,
+        handler as Parcelable
+      )
+    }
   }
 
   // 获取闹铃配置清单
@@ -118,7 +136,9 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
       GoldStoneAPI.getAlarmConfigList({
         showNetworkExceptionDialog()
       }) {
-        callback(it!!)
+        it?.let {
+          callback(it)
+        }
       }
     }
   }
@@ -137,37 +157,57 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
           if (this) {
             updateDatabaseRefreshList(priceAlarmClockTable)
           } else {
-            GoldStoneAPI.addAlarmClock(
-              priceAlarmClockTable,
-              {
-                updateDatabaseRefreshList(priceAlarmClockTable)
-                showNetworkExceptionDialog()
+            if (priceAlarmClockTable.addId != "0") {
+              GoldStoneAPI.deleteAlarmClock(
+                priceAlarmClockTable,
+                {
+                  showNetworkExceptionDialog()
+                }
+              ) {
+                priceAlarmClockTable.addId = "0"
+                addNetAlarmClock(priceAlarmClockTable)
               }
-            ) {
-              priceAlarmClockTable.addId = it?.id ?: "0"
-              updateDatabaseRefreshList(priceAlarmClockTable)
+            } else {
+              addNetAlarmClock(priceAlarmClockTable)
             }
           }
         }
       } else {
-        filterRepeatData(priceAlarmClockTable) {
-          if (this) {
-            priceAlarmClockTable.addId = "0"
-            updateDatabaseRefreshList(priceAlarmClockTable)
-          } else {
-            GoldStoneAPI.deleteAlarmClock(
-              priceAlarmClockTable,
-              {
-                updateDatabaseRefreshList(priceAlarmClockTable)
-                showNetworkExceptionDialog()
-              }
-            ) {
+        if (priceAlarmClockTable.addId == "0") {
+          updateDatabaseRefreshList(priceAlarmClockTable)
+        } else {
+          filterRepeatData(priceAlarmClockTable) {
+            if (this) {
               priceAlarmClockTable.addId = "0"
               updateDatabaseRefreshList(priceAlarmClockTable)
+            } else {
+              GoldStoneAPI.deleteAlarmClock(
+                priceAlarmClockTable,
+                {
+                  updateDatabaseRefreshList(priceAlarmClockTable)
+                  showNetworkExceptionDialog()
+                }
+              ) {
+                priceAlarmClockTable.addId = "0"
+                updateDatabaseRefreshList(priceAlarmClockTable)
+              }
             }
           }
         }
       }
+    }
+  }
+
+  private fun addNetAlarmClock(priceAlarmClockTable: PriceAlarmClockTable) {
+    GoldStoneAPI.addAlarmClock(
+      priceAlarmClockTable,
+      {
+        updateDatabaseRefreshList(priceAlarmClockTable)
+        showNetworkExceptionDialog()
+      }
+    ) {
+      priceAlarmClockTable.addId = it?.id ?: "0"
+      updateDatabaseRefreshList(priceAlarmClockTable)
     }
   }
 
@@ -236,15 +276,17 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
   private fun showNetworkExceptionDialog() {
     NetworkUtil.hasNetwork(fragment.context) isTrue {
     } otherwise {
-      GoldStoneDialog.show(fragment.context!!) {
-        showOnlyConfirmButton {
-          GoldStoneDialog.remove(context)
+      fragment.context?.let {
+        GoldStoneDialog.show(it) {
+          showOnlyConfirmButton {
+            GoldStoneDialog.remove(context)
+          }
+          setImage(R.drawable.network_browken_banner)
+          setContent(
+            DialogText.networkTitle,
+            DialogText.networkDescription
+          )
         }
-        setImage(R.drawable.network_browken_banner)
-        setContent(
-          DialogText.networkTitle,
-          DialogText.networkDescription
-        )
       }
     }
   }

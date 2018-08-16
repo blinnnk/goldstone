@@ -36,6 +36,7 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "自選管理"
 		else -> ""
 	}
+
 	@JvmField
 	val tokenDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Token"

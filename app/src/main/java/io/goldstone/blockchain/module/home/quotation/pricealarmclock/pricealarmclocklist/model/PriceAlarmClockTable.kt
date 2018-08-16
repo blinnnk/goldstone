@@ -29,19 +29,21 @@ data class PriceAlarmClockTable(
   @ColumnInfo(name = "currency_name")
   var currencyName: String?,
   @ColumnInfo(name = "market_price")
-  var marketPrice: Double?,
+  var marketPrice: String?,
   @ColumnInfo(name = "price")
-  var price: Double?,
+  var price: String?,
   @ColumnInfo(name = "status")
-  var status: Boolean?,
+  var status: Boolean,
   @ColumnInfo(name = "pair")
   var pair: String?,
   @ColumnInfo(name = "price_type")
   var priceType: Int?,
   @ColumnInfo(name = "alarm_type")
-  var alarmType: Int?,
+  var alarmType: Int?, // 0为永久
   var pairDisplay: String?,
-  var position: Int = -1
+  var position: Int = -1,
+  var symbol: String?,
+  var name: String?
 ) : Serializable {
   @Ignore
   constructor() : this(
@@ -50,11 +52,14 @@ data class PriceAlarmClockTable(
     null,
     null,
     null,
+    "0",
+    "0",
+    true,
     null,
     null,
     null,
     null,
-    null,
+    -1,
     null,
     null
   )
@@ -119,6 +124,10 @@ data class PriceAlarmClockTable(
         {
           GoldStoneDataBase.database.priceAlarmClockDao().selectPriceAlarmClocks()
         }) {
+        val size = it.size - 1
+        for (index: Int in 0..size) {
+          it[index].position = index
+        }
         hold(it.toArrayList())
       }
     }
@@ -175,16 +184,4 @@ data class AddAlarmClockModel(
 
 data class DeleteAlarmClockModel(val code: Int) {
 }
-
-///**
-// * @data 07/23/2018 10/41
-// * @author wcx
-// * @description 价格闹钟提醒数据库操作类
-// */
-//@Database(entities = arrayOf(PriceAlarmClockTable::class), version = 1)
-//abstract class PriceAlarmClockDatabase : RoomDatabase() {
-//
-//  abstract fun getPriceAlarmClockDao(): PriceAlarmClockDao
-//
-//}
 

@@ -1,5 +1,9 @@
 package io.goldstone.blockchain.common.language
 
+import io.goldstone.blockchain.common.language.PrepareTransferText.price
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PricePairModel
+
 /**
  * @date 10/08/2018 14:19 PM
  * @author wcx
@@ -13,17 +17,6 @@ object AlarmClockText {
     HoneyLanguage.Korean.code -> "가격 경보"
     HoneyLanguage.Russian.code -> "Ценовой сигнал"
     HoneyLanguage.TraditionalChinese.code -> "價格鬧鈴"
-    else -> ""
-  }
-
-  @JvmField
-  val priceAlarmClockEditor = when (currentLanguage) {
-    HoneyLanguage.English.code -> "Alarm Editor"
-    HoneyLanguage.Chinese.code -> "报警编辑器"
-    HoneyLanguage.Japanese.code -> "アラームエディタ"
-    HoneyLanguage.Korean.code -> "알람 편집기"
-    HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
-    HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
     else -> ""
   }
 
@@ -136,5 +129,195 @@ object AlarmClockText {
     HoneyLanguage.Russian.code -> "когда цена, соответствующая валюте, достигает установленного вами порога, мы отправим вам сигнал тревоги, чтобы сообщить вам."
     HoneyLanguage.TraditionalChinese.code -> "當貨幣對應的價格達到您設定的門檻時，我們會向您發送警報通知您。"
     else -> ""
+  }
+
+  @JvmField
+  val noPriceAlarmTitle = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "还没有任何价格提醒"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val noPriceAlarmContent = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "点击加号创建一个吧，我们会在货币达到您的指定价格时通知你。"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val gotIt = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "知道了"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val viewAlarm = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "查看闹铃"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val achieve = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "达到"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val priceWarning = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Price Threshold"
+    HoneyLanguage.Chinese.code -> "价格预警"
+    HoneyLanguage.Japanese.code -> "価格の閾値"
+    HoneyLanguage.Korean.code -> "가격 한도"
+    HoneyLanguage.Russian.code -> "Порог цены"
+    HoneyLanguage.TraditionalChinese.code -> "價格門檻"
+    else -> ""
+  }
+
+  @JvmField
+  val alarmEditor = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Alarm Editor"
+    HoneyLanguage.Chinese.code -> "报警编辑器"
+    HoneyLanguage.Japanese.code -> "アラームエディタ"
+    HoneyLanguage.Korean.code -> "알람 편집기"
+    HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
+    else -> ""
+  }
+
+  @JvmField
+  val confirmDelete = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Confirm Delete?"
+    HoneyLanguage.Chinese.code -> "确定要删除吗？"
+    HoneyLanguage.Japanese.code -> "アラームエディタ"
+    HoneyLanguage.Korean.code -> "알람 편집기"
+    HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
+    else -> ""
+  }
+
+  @JvmField
+  val confirmDeleteContent = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Confirm Delete?"
+    HoneyLanguage.Chinese.code -> "删除后对应的闹铃也会一并删除"
+    HoneyLanguage.Japanese.code -> "アラームエディタ"
+    HoneyLanguage.Korean.code -> "알람 편집기"
+    HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
+    else -> ""
+  }
+
+  @JvmField
+  val confirmDeleteEditorContent = when (currentLanguage) {
+    HoneyLanguage.English.code -> "Confirm Delete?"
+    HoneyLanguage.Chinese.code -> "删除后对应的闹铃也会一并删除"
+    HoneyLanguage.Japanese.code -> "アラームエディタ"
+    HoneyLanguage.Korean.code -> "알람 편집기"
+    HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
+    HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
+    else -> ""
+  }
+
+  val priceAlarmContent: (
+    pricePairModel: PricePairModel,
+    priceAlarmClockTable: PriceAlarmClockTable
+  ) -> String = { pricePairModel, priceAlarmClockTable ->
+    when (currentLanguage) {
+      HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Russian.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
+        "${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price},高于于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+                "你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
+      } else {
+        "${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price},低于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+                "你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
+      }
+      HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Korean.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.TraditionalChinese.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      else -> ""
+    }
+  }
+
+  val priceAlarmNotificationContent: (
+    pricePairModel: PricePairModel,
+    priceAlarmClockTable: PriceAlarmClockTable
+  ) -> String = { pricePairModel, priceAlarmClockTable ->
+    when (currentLanguage) {
+      HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Russian.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
+        "${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price}，已高于您设定的目标${priceAlarmClockTable.price}"
+      } else {
+        "${pricePairModel.marketName} 市场的${pricePairModel.pairDisplay}达到${pricePairModel.price}，已低于您设定的目标${priceAlarmClockTable.price}"
+      }
+      HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.Korean.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      HoneyLanguage.TraditionalChinese.code -> if (priceAlarmClockTable.priceType == 0) {
+        ""
+      } else {
+        ""
+      }
+      else -> ""
+    }
   }
 }

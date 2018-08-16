@@ -12,24 +12,18 @@ import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmc
 class PriceAlarmClockListAdapter(
   override var dataSet: ArrayList<PriceAlarmClockTable>,
   private val callback: PriceAlarmClockListCell.() -> Unit
-) : HoneyBaseAdapter<
-        PriceAlarmClockTable,
-        PriceAlarmClockListCell
-        >() {
+) : HoneyBaseAdapter<PriceAlarmClockTable, PriceAlarmClockListCell>() {
 
   override fun getItemCount(): Int {
     return dataSet.size
   }
 
-  override fun generateCell(context: Context) = PriceAlarmClockListCell(context).apply {
-    initializeView()
-  }
+  override fun generateCell(context: Context) = PriceAlarmClockListCell(context)
 
   override fun PriceAlarmClockListCell.bindCell(
     data: PriceAlarmClockTable,
     position: Int
   ) {
-    data.position = position
     model = data
     callback(this)
   }
