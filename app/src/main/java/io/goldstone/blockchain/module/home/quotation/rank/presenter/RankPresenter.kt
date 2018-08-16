@@ -68,10 +68,6 @@ class RankPresenter(override val fragment: RankListFragment)
 		getRankData()
 	}
 	
-	override fun updateData() {
-		getRankData()
-	}
-	
 	fun getRankHeaderData() {
 		GoldStoneAPI.getRandHeader( {
 				LogUtil.error("RankPresenter", it)

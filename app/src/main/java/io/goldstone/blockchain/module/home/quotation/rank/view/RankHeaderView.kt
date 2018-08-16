@@ -7,8 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankHeaderModel
 import org.jetbrains.anko.*
 
@@ -22,28 +22,90 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 	
 	private var rankHeaderModel: RankHeaderModel? = null
 	
+	private val textViewMarketCap = TextView(context).apply {
+		layoutParams = LayoutParams(matchParent, wrapContent)
+		textSize = fontSize(15)
+		textColor = Spectrum.darkBlue
+		gravity = Gravity.CENTER
+		typeface = GoldStoneFont.heavy(context)
+		text = "market Cap"
+	}
+	
 	private val totalMarketCap by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			layoutParams = LayoutParams(matchParent, wrapContent)
 			textSize = fontSize(15)
-			textColor = Spectrum.darkBlue
+			textColor = GrayScale.black
 			gravity = Gravity.CENTER
 		}
 	}
-	private val totalvalue by lazy {
-		TextView(context).apply {
+	
+	private val linearLayoutMarketCap by lazy {
+		LinearLayout(context).apply {
 			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			gravity = Gravity.CENTER
+			orientation = LinearLayout.VERTICAL
+			addView(textViewMarketCap)
+			addView(totalMarketCap)
+		}
+	}
+	
+	private val textviewTotalVolume by lazy {
+		TextView(context).apply {
+			layoutParams = LayoutParams(matchParent, wrapContent)
 			textSize = fontSize(15)
 			textColor = Spectrum.darkBlue
 			gravity = Gravity.CENTER
+			typeface = GoldStoneFont.heavy(context)
+			text = "24h Volume"
 		}
 	}
-	private val totalBitcoinPercentageOfMarketCap by lazy {
+	private val totalVolume by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			layoutParams = LayoutParams(matchParent, wrapContent)
 			textSize = fontSize(15)
-			textColor = Spectrum.lightRed
+			textColor =  GrayScale.black
 			gravity = Gravity.CENTER
+		}
+	}
+	
+	private val linearLayoutVolume by lazy {
+		LinearLayout(context).apply {
+			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			gravity = Gravity.CENTER
+			orientation = LinearLayout.VERTICAL
+			addView(textviewTotalVolume)
+			addView(totalVolume)
+		}
+	}
+	
+	private val textviewBTCDominance by lazy {
+		TextView(context).apply {
+			layoutParams = LayoutParams(matchParent, wrapContent)
+			textSize = fontSize(15)
+			textColor = Spectrum.darkBlue
+			typeface = GoldStoneFont.heavy(context)
+			text = "BTC Dominance"
+			gravity = Gravity.CENTER
+		}
+	}
+	
+	private val totalBTCDominance by lazy {
+		TextView(context).apply {
+			layoutParams = LayoutParams(matchParent, wrapContent)
+			textSize = fontSize(15)
+			textColor =  GrayScale.black
+			gravity = Gravity.CENTER
+		}
+	}
+	
+	private val linearLayoutBTCDominance by lazy {
+		LinearLayout(context).apply {
+			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			gravity = Gravity.CENTER
+			orientation = LinearLayout.VERTICAL
+			addView(textviewBTCDominance)
+			addView(totalBTCDominance)
 		}
 	}
 	
@@ -52,16 +114,16 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 		backgroundColor = Color.WHITE
 		
-		addView(totalMarketCap)
-		addView(totalvalue)
-		addView(totalBitcoinPercentageOfMarketCap)
+		addView(linearLayoutMarketCap)
+		addView(linearLayoutVolume)
+		addView(linearLayoutBTCDominance)
 	}
 	
 	fun updateHeaderData(rankHeaderModel: RankHeaderModel) {
 		this.rankHeaderModel = rankHeaderModel
 		totalMarketCap.text = rankHeaderModel.total_market_cap
-		totalvalue.text = rankHeaderModel.total_volume_24h
-		totalBitcoinPercentageOfMarketCap.text = rankHeaderModel.bitcoin_percentage_of_market_cap
+		totalVolume.text = rankHeaderModel.total_volume_24h
+		totalBTCDominance.text = rankHeaderModel.bitcoin_percentage_of_market_cap
 	}
 	
 }

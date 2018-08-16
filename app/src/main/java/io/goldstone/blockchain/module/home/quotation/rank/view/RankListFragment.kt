@@ -42,9 +42,14 @@ class RankListFragment : BaseRecyclerFragment<RankPresenter, RankTable>() {
 				super.onScrollStateChanged(recyclerView, newState)
 				
 				if (newState == RecyclerView.SCROLL_STATE_IDLE){
-					if ((recyclerView.layoutManager as? LinearLayoutManager)!!.findLastVisibleItemPosition() >= asyncData?.lastIndex!!-5){
-						presenter.getRankData()
+					asyncData?.apply {
+						if ((recyclerView.layoutManager as? LinearLayoutManager)!!.findLastVisibleItemPosition() >= lastIndex-2){
+							if (size > 0){
+								presenter.getRankData()
+							}
+						}
 					}
+					
 				}
 			}
 		})
