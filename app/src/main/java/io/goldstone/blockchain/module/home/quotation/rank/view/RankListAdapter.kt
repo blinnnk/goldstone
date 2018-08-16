@@ -30,7 +30,6 @@ class RankListAdapter(override  val dataSet:  ArrayList<RankTable>)
 	
 	override fun RankItemCell.bindCell(data: RankTable, position: Int) {
 		rankModel = data
-		index = position
 	}
 	
 	fun updateRankHeaderViewData(rankHeaderModel: RankHeaderModel) {
