@@ -1,18 +1,18 @@
 package io.goldstone.blockchain.module.home.quotation.rank.model
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * @date: 2018/8/15.
  * @author: yanglihai
- * @description:
+ * @description: 头部信息的model
  */
 data class RankHeaderModel(
-	var total_volume_24h: String,
+	@SerializedName("total_volume_24h")
+	var totalVolume24h: String,
 	var code: String,
-	var total_market_cap: String,
-	var bitcoin_percentage_of_market_cap: String
-	) {
-	
-	
-	
-
-}
+	@SerializedName("total_market_cap")
+	var totalMarketCap: String,
+	@SerializedName("bitcoin_percentage_of_market_cap")
+	var BtcPercentage: String
+)

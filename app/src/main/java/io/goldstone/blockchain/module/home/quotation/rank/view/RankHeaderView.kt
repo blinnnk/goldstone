@@ -15,7 +15,7 @@ import org.jetbrains.anko.*
 /**
  * @date: 2018/8/15.
  * @author: yanglihai
- * @description:
+ * @description: rank的头部view
  */
 
 class RankHeaderView(context: Context) : LinearLayout(context) {
@@ -42,7 +42,7 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 	
 	private val linearLayoutMarketCap by lazy {
 		LinearLayout(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			gravity = Gravity.CENTER
 			orientation = LinearLayout.VERTICAL
 			addView(textViewMarketCap)
@@ -64,14 +64,14 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 		TextView(context).apply {
 			layoutParams = LayoutParams(matchParent, wrapContent)
 			textSize = fontSize(15)
-			textColor =  GrayScale.black
+			textColor = GrayScale.black
 			gravity = Gravity.CENTER
 		}
 	}
 	
 	private val linearLayoutVolume by lazy {
 		LinearLayout(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			gravity = Gravity.CENTER
 			orientation = LinearLayout.VERTICAL
 			addView(textviewTotalVolume)
@@ -94,14 +94,14 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 		TextView(context).apply {
 			layoutParams = LayoutParams(matchParent, wrapContent)
 			textSize = fontSize(15)
-			textColor =  GrayScale.black
+			textColor = GrayScale.black
 			gravity = Gravity.CENTER
 		}
 	}
 	
 	private val linearLayoutBTCDominance by lazy {
 		LinearLayout(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/3, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			gravity = Gravity.CENTER
 			orientation = LinearLayout.VERTICAL
 			addView(textviewBTCDominance)
@@ -112,7 +112,7 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 	init {
 		orientation = LinearLayout.HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
-		backgroundColor = Color.WHITE
+		backgroundColor = Spectrum.white
 		
 		addView(linearLayoutMarketCap)
 		addView(linearLayoutVolume)
@@ -121,9 +121,9 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 	
 	fun updateHeaderData(rankHeaderModel: RankHeaderModel) {
 		this.rankHeaderModel = rankHeaderModel
-		totalMarketCap.text = rankHeaderModel.total_market_cap
-		totalVolume.text = rankHeaderModel.total_volume_24h
-		totalBTCDominance.text = rankHeaderModel.bitcoin_percentage_of_market_cap
+		totalMarketCap.text = rankHeaderModel.totalMarketCap
+		totalVolume.text = rankHeaderModel.totalVolume24h
+		totalBTCDominance.text = rankHeaderModel.BtcPercentage+"%"
 	}
 	
 }

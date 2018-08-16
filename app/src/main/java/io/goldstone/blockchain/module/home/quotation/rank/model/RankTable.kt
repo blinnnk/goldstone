@@ -11,7 +11,7 @@ import java.io.Serializable
 /**
  * @date: 2018/8/16.
  * @author: yanglihai
- * @description:
+ * @description: rank列表数据库table
  */
 @Entity(tableName = "rankListTable")
 data class RankTable(

@@ -14,18 +14,16 @@ import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
 /**
  * @date: 2018/8/14.
  * @author: yanglihai
- * @description:
+ * @description: rank列表fragment
  */
 class RankListFragment : BaseRecyclerFragment<RankPresenter, RankTable>() {
-	override val presenter: RankPresenter = RankPresenter(
-		this)
+	override val presenter: RankPresenter = RankPresenter(this)
 	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<RankTable>?
 	) {
-		recyclerView.adapter = RankListAdapter(
-			asyncData.orEmptyArray())
+		recyclerView.adapter = RankListAdapter(asyncData.orEmptyArray())
 	}
 	
 	override fun onViewCreated(
@@ -41,10 +39,10 @@ class RankListFragment : BaseRecyclerFragment<RankPresenter, RankTable>() {
 			) {
 				super.onScrollStateChanged(recyclerView, newState)
 				
-				if (newState == RecyclerView.SCROLL_STATE_IDLE){
+				if (newState == RecyclerView.SCROLL_STATE_IDLE) {
 					asyncData?.apply {
-						if ((recyclerView.layoutManager as? LinearLayoutManager)!!.findLastVisibleItemPosition() >= lastIndex-2){
-							if (size > 0){
+						if ((recyclerView.layoutManager as? LinearLayoutManager)!!.findLastVisibleItemPosition() >= lastIndex - 2) {
+							if (size > 0) {
 								presenter.getRankData()
 							}
 						}

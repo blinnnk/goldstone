@@ -13,47 +13,42 @@ import io.goldstone.blockchain.module.home.quotation.rank.view.RankListFragment
 /**
  * @date: 2018/8/14.
  * @author: yanglihai
- * @description:
+ * @description: rank逻辑处理的presenter
  */
-class RankPresenter(override val fragment: RankListFragment)
-	: BaseRecyclerPresenter<RankListFragment, RankTable>() {
+class RankPresenter(override val fragment: RankListFragment) :
+	BaseRecyclerPresenter<RankListFragment, RankTable>() {
 	
 	var rank: String = ""
 	var size: Int = 20
 	
 	fun getRankData() {
-		GoldStoneAPI.getRankData(
-			rank ,
-			size ,
-			{
-				if (rank.isEmpty() ) {
-					RankTable.queryRankData {
-						rank = it[it.lastIndex].rank
-						fragment.asyncData?.addAll(it)
-						fragment.recyclerView.adapter!!.notifyDataSetChanged()
-					}
-				}else {
-					Toast.makeText(GoldStoneAPI.context, it.toString(), Toast.LENGTH_LONG).show()
+		GoldStoneAPI.getRankData(rank, size, {
+			if (rank.isEmpty()) {
+				RankTable.queryRankData {
+					rank = it[it.lastIndex].rank
+					fragment.asyncData?.addAll(it)
+					fragment.recyclerView.adapter!!.notifyDataSetChanged()
 				}
-			} ,
-			{
-				
-				var rankNewData: List<RankTable> = it
-				if (rank.isEmpty()) {
-					fragment.asyncData?.clear()
-					it.isEmpty() isTrue {
-						RankTable.queryRankData {
-							rankNewData = it
-						}
-					}otherwise  {
-						insertFirstPageData(it)
-					}
-				}
-				rank = rankNewData[rankNewData.lastIndex].rank
-				fragment.asyncData!!.addAll(rankNewData)
-				fragment.recyclerView.adapter?.notifyDataSetChanged()
+			} else {
+				Toast.makeText(GoldStoneAPI.context, it.toString(), Toast.LENGTH_LONG).show()
 			}
-		)
+		}, {
+			
+			var rankNewData: List<RankTable> = it
+			if (rank.isEmpty()) {
+				fragment.asyncData?.clear()
+				it.isEmpty() isTrue {
+					RankTable.queryRankData {
+						rankNewData = it
+					}
+				} otherwise {
+					insertFirstPageData(it)
+				}
+			}
+			rank = rankNewData[rankNewData.lastIndex].rank
+			fragment.asyncData!!.addAll(rankNewData)
+			fragment.recyclerView.adapter?.notifyDataSetChanged()
+		})
 	}
 	
 	override fun onFragmentViewCreated() {
@@ -69,8 +64,8 @@ class RankPresenter(override val fragment: RankListFragment)
 	}
 	
 	fun getRankHeaderData() {
-		GoldStoneAPI.getRandHeader( {
-				LogUtil.error("RankPresenter", it)
+		GoldStoneAPI.getRandHeader({
+			LogUtil.error("RankPresenter", it)
 		}, {
 			(fragment.recyclerView.adapter as? RankListAdapter)!!.updateRankHeaderViewData(it)
 		})

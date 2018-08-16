@@ -9,26 +9,28 @@ import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
 /**
  * @date: 2018/8/14.
  * @author: yanglihai
- * @description:
+ * @description: rank列表的适配器
  */
-class RankListAdapter(override  val dataSet:  ArrayList<RankTable>)
-	: HoneyBaseAdapterWithHeaderAndFooter<RankTable, View, RankItemCell, View>() {
+class RankListAdapter(override val dataSet: ArrayList<RankTable>) :
+	HoneyBaseAdapterWithHeaderAndFooter<RankTable, View, RankItemCell, View>() {
 	
 	
 	private lateinit var rankHeaderView: RankHeaderView
 	
-	override fun generateCell(context: Context) =
-		RankItemCell(context)
+	override fun generateCell(context: Context) = RankItemCell(context)
 	
 	override fun generateFooter(context: Context) = View(context)
 	
 	
-	override fun generateHeader(context: Context) : View {
+	override fun generateHeader(context: Context): View {
 		rankHeaderView = RankHeaderView(context)
 		return rankHeaderView
 	}
 	
-	override fun RankItemCell.bindCell(data: RankTable, position: Int) {
+	override fun RankItemCell.bindCell(
+		data: RankTable,
+		position: Int
+	) {
 		rankModel = data
 	}
 	

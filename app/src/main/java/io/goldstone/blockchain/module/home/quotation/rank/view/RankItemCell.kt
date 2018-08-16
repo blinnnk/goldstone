@@ -20,12 +20,12 @@ import org.jetbrains.anko.*
 /**
  * @date: 2018/8/15.
  * @author: yanglihai
- * @description:
+ * @description: rank的item
  */
 class RankItemCell(context: Context) : LinearLayout(context) {
 	private val textViewIndex: TextView by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/10, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 10, matchParent)
 			typeface = GoldStoneFont.heavy(context)
 			textSize = fontSize(17)
 			textColor = Spectrum.darkBlue
@@ -34,7 +34,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	}
 	private val imageViewIcon: ImageView by lazy {
 		ImageView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/10,ScreenSize.Width/10)
+			layoutParams = LayoutParams(ScreenSize.Width / 10, ScreenSize.Width / 10)
 			(layoutParams as LinearLayout.LayoutParams).gravity = Gravity.CENTER_VERTICAL
 		}
 	}
@@ -59,7 +59,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	private val linearLayoutSymbol: LinearLayout by lazy {
 		LinearLayout(context).apply {
 			orientation = LinearLayout.VERTICAL
-			layoutParams = MarginLayoutParams(ScreenSize.Width/5, matchParent)
+			layoutParams = MarginLayoutParams(ScreenSize.Width / 5, matchParent)
 			gravity = Gravity.CENTER
 			addView(textViewSymbol)
 			addView(textViewSymbolDescription)
@@ -67,7 +67,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	}
 	private val textViewPrice: TextView by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/5, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 5, matchParent)
 			textSize = fontSize(15)
 			textColor = Color.BLACK
 			gravity = Gravity.CENTER
@@ -75,7 +75,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	}
 	private val textViewChange: TextView by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/5, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 5, matchParent)
 			textSize = fontSize(15)
 			textColor = Spectrum.lightGreen
 			gravity = Gravity.CENTER
@@ -83,7 +83,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	}
 	private val textViewCapValue: TextView by lazy {
 		TextView(context).apply {
-			layoutParams = LayoutParams(ScreenSize.Width/5, matchParent)
+			layoutParams = LayoutParams(ScreenSize.Width / 5, matchParent)
 			textSize = fontSize(15)
 			textColor = Color.BLACK
 			gravity = Gravity.CENTER
@@ -120,10 +120,8 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 		textViewIndex.text = rankModel.rank
 		
 		rankModel.icon.isNull() isFalse {
-			Glide.with(context)
-				.load(Uri.parse(rankModel.icon))
-				.apply(RequestOptions().placeholder(R.mipmap.ic_launcher))
-				.into(imageViewIcon)
+			Glide.with(context).load(Uri.parse(rankModel.icon)).apply(RequestOptions().placeholder(R.mipmap.ic_launcher)).into(
+				imageViewIcon)
 		}
 		
 		textViewSymbol.text = rankModel.symbol
