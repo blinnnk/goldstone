@@ -214,7 +214,14 @@ class MainActivity : AppCompatActivity() {
    */
   private fun showNotificationAlarmPopUps(intent: Intent?) {
     val alarmInfo = intent?.getSerializableExtra(IntentKey.alarmInfoFromNotify)
-    if (alarmInfo.isNull()) return
+    if (alarmInfo.isNull()) {
+      PriceAlarmClockUtils.stopAlarmReceiver(
+        this,
+        1
+      )
+      PriceAlarmClockReceiver.stopAlarmClock()
+      return
+    }
     val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
     if (goldStoneDialogFlag) {
       GoldStoneDialog.show(this) {
