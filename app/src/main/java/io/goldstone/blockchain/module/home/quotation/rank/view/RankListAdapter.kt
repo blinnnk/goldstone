@@ -15,7 +15,7 @@ class RankListAdapter(override val dataSet: ArrayList<RankTable>) :
 	HoneyBaseAdapterWithHeaderAndFooter<RankTable, View, RankItemCell, View>() {
 	
 	
-	private lateinit var rankHeaderView: RankHeaderView
+	lateinit var rankHeaderView: RankHeaderView
 	
 	override fun generateCell(context: Context) = RankItemCell(context)
 	

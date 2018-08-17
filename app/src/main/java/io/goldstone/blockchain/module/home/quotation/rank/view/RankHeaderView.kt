@@ -110,20 +110,33 @@ class RankHeaderView(context: Context) : LinearLayout(context) {
 	}
 	
 	init {
-		orientation = LinearLayout.HORIZONTAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+		orientation = LinearLayout.VERTICAL
+		layoutParams = LinearLayout.LayoutParams(matchParent, 150.uiPX())
 		backgroundColor = Spectrum.white
 		
-		addView(linearLayoutMarketCap)
-		addView(linearLayoutVolume)
-		addView(linearLayoutBTCDominance)
+		linearLayout {
+			orientation = LinearLayout.HORIZONTAL
+			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+			
+			addView(linearLayoutMarketCap)
+			addView(linearLayoutVolume)
+			addView(linearLayoutBTCDominance)
+		}
+		
+		view {
+			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
+			backgroundColor = Spectrum.darkBlue
+			
+		}
+		
+		addView(SuperHeaderBar(context))
 	}
 	
 	fun updateHeaderData(rankHeaderModel: RankHeaderModel) {
 		this.rankHeaderModel = rankHeaderModel
 		totalMarketCap.text = rankHeaderModel.totalMarketCap
 		totalVolume.text = rankHeaderModel.totalVolume24h
-		totalBTCDominance.text = rankHeaderModel.BtcPercentage+"%"
+		totalBTCDominance.text = rankHeaderModel.BtcPercentage + "%"
 	}
 	
 }
