@@ -49,7 +49,7 @@ class SuperHeaderBar(context: Context) : LinearLayout(context) {
 			textSize = fontSize(15)
 			textColor = Spectrum.darkBlue
 			gravity = Gravity.CENTER
-			text = "USD"
+			text = "Price\n(USD)"
 		}
 	}
 	private val textViewChange: TextView by lazy {
