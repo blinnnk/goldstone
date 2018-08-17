@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.rank.view
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,7 +15,7 @@ import org.jetbrains.anko.*
 /**
  * @date: 2018/8/17.
  * @author: yanglihai
- * @description:
+ * @description: 头部悬浮的view
  */
 class SuperHeaderBar(context: Context) : LinearLayout(context) {
 	
@@ -59,7 +58,7 @@ class SuperHeaderBar(context: Context) : LinearLayout(context) {
 			textSize = fontSize(15)
 			textColor = Spectrum.darkBlue
 			gravity = Gravity.CENTER
-			text = "Change(%) \n 24"
+			text = "Change(%) \n 24(h)"
 		}
 	}
 	private val textViewCapValue: TextView by lazy {

@@ -1,22 +1,18 @@
 package io.goldstone.blockchain.module.home.quotation.rank.view
 
-import android.content.Context
-import android.graphics.PixelFormat
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.*
+import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.rank.presenter.RankPresenter
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
-import org.jetbrains.anko.backgroundColor
+import io.goldstone.blockchain.module.home.quotation.rank.presenter.RankPresenter
 import org.jetbrains.anko.matchParent
 
 /**

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.rank.view
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView

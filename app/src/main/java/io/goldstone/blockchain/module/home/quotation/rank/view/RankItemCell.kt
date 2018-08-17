@@ -98,7 +98,7 @@ class RankItemCell(context: Context) : LinearLayout(context) {
 	
 	init {
 		
-		layoutParams = MarginLayoutParams(matchParent, 60.uiPX())
+		layoutParams = MarginLayoutParams(matchParent, 80.uiPX())
 		backgroundColor = Spectrum.darkBlue
 		orientation = LinearLayout.VERTICAL
 		
