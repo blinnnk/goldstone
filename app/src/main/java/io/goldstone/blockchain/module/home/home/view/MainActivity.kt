@@ -6,7 +6,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -27,8 +26,8 @@ import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmClockReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -117,7 +116,6 @@ class MainActivity : AppCompatActivity() {
   override fun onStop() {
     super.onStop()
     backgroundFlag = false
-    Log.e("backgroundFlag1", "++" + backgroundFlag)
   }
 
   override fun onDestroy() {
