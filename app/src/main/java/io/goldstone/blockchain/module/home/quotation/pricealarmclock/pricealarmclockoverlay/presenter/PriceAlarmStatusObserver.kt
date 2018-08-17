@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
@@ -15,6 +14,7 @@ import com.google.gson.JsonArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.PriceAlarmClockNotificationUtils
 import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -36,7 +36,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 abstract class PriceAlarmStatusObserver(private val context: Context) {
   private val handler = Handler(Looper.getMainLooper())
-  private val retryTime = 600000L
+  private val retryTime = 900000L
 
   private fun checkStatusByPrice() {
     if (MainActivity.backgroundFlag) {
@@ -157,6 +157,7 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
     priceAlarmClockTableArrayList: ArrayList<PriceAlarmClockTable>
   ) {
     GoldStoneAPI.context.runOnUiThread {
+
       PriceAlarmClockUtils.sendAlarmReceiver(
         0,
         context,
@@ -175,6 +176,9 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
       val goldStoneDialogFlag = (context as Activity).findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
       if (goldStoneDialogFlag) {
         GoldStoneDialog.show(context) {
+          showButtons {
+            gotItButtonClickEvent(pricePairArrayList, priceAlarmClockTableArrayList)
+          }
           setGoldStoneDialogAttributes(
             this,
             pricePairModel,
@@ -184,9 +188,8 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
           )
         }
       } else {
-        GoldStoneDialog.remove(context)
-        context.findViewById<RelativeLayout>(ContainerID.main).removeView(context.findViewById<GoldStoneDialog>(ElementID.dialog))
         val goldStoneDialog = context.findViewById<GoldStoneDialog>(ElementID.dialog)
+        removeDialog(goldStoneDialog)
         goldStoneDialog.into(context.findViewById<RelativeLayout>(ContainerID.main))
         setGoldStoneDialogAttributes(
           goldStoneDialog,
@@ -195,6 +198,18 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
           pricePairArrayList,
           priceAlarmClockTableArrayList
         )
+      }
+    }
+  }
+
+  fun removeDialog(goldStoneDialog: GoldStoneDialog) {
+    GoldStoneDialog.remove(context)
+    val mainLayout = (context as Activity).findViewById<RelativeLayout>(ContainerID.main)
+    val childCount = mainLayout.childCount - 1
+    for (index: Int in 0..childCount) {
+      val childAt = mainLayout.getChildAt(index)
+      if (childAt == goldStoneDialog) {
+        mainLayout.removeView(goldStoneDialog)
       }
     }
   }
@@ -236,7 +251,15 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
     )
     PriceAlarmClockReceiver.stopAlarmClock()
     GoldStoneDialog.remove(context)
-    (context as Activity).findViewById<RelativeLayout>(ContainerID.main).removeView(context.findViewById<GoldStoneDialog>(ElementID.dialog))
+    val mainLayout = (context as Activity).findViewById<RelativeLayout>(ContainerID.main)
+    val goldStoneDialog = context.findViewById<GoldStoneDialog>(ElementID.dialog)
+    val childCount = mainLayout.childCount - 1
+    for (index: Int in 0..childCount) {
+      val childAt = mainLayout.getChildAt(index)
+      if (childAt == goldStoneDialog) {
+        mainLayout.removeView(goldStoneDialog)
+      }
+    }
     juxtaposeData(
       pricePairArrayList,
       priceAlarmClockTableArrayList
@@ -275,9 +298,6 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
       priceAlarmClockTable
     )
     goldStoneDialog.apply {
-      showButtons {
-        gotItButtonClickEvent(pricePairArrayList, priceAlarmClockTableArrayList)
-      }
 
       getCancelButton().apply {
         text = AlarmClockText.viewAlarm
@@ -287,6 +307,13 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
             priceAlarmClockTableArrayList,
             priceAlarmClockTable
           )
+        }
+      }
+
+      getConfirmButton().apply {
+        text = CommonText.confirm
+        onClick {
+          gotItButtonClickEvent(pricePairArrayList, priceAlarmClockTableArrayList)
         }
       }
 

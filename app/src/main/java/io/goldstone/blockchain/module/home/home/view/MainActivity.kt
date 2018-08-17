@@ -21,7 +21,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.AlarmClockText
-import io.goldstone.blockchain.common.language.AlarmClockText.priceAlarmContent
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
@@ -32,6 +31,7 @@ import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmc
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @rewriteDate 16/08/2018 16:23 PM
@@ -216,12 +216,18 @@ class MainActivity : AppCompatActivity() {
     val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
     if (goldStoneDialogFlag) {
       GoldStoneDialog.show(this) {
+        showOnlyConfirmButton(AlarmClockText.gotIt) {
+          confirmButtonClickEvent()
+        }
         setGoldStoneDialog(this, alarmInfo as XGPushClickedResult)
       }
     } else {
-      GoldStoneDialog.remove(this)
-      findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
       val goldStoneDialog = findViewById<GoldStoneDialog>(ElementID.dialog)
+      if (priceAlarmStatusObserver.isNull()) {
+        priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
+      } else {
+        priceAlarmStatusObserver.removeDialog(goldStoneDialog)
+      }
       goldStoneDialog.into(findViewById<RelativeLayout>(ContainerID.main))
       goldStoneDialog.apply {
         setGoldStoneDialog(this, alarmInfo as XGPushClickedResult)
@@ -231,11 +237,11 @@ class MainActivity : AppCompatActivity() {
 
   private fun setGoldStoneDialog(goldStoneDialog: GoldStoneDialog, alarmInfo: XGPushClickedResult) {
     goldStoneDialog.apply {
-      showOnlyConfirmButton(AlarmClockText.gotIt) {
-        PriceAlarmClockUtils.stopAlarmReceiver(context, 1)
-        PriceAlarmClockReceiver.stopAlarmClock()
-        GoldStoneDialog.remove(context)
-        (context as Activity).findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
+      getConfirmButton().apply {
+        text = AlarmClockText.gotIt
+        onClick {
+          confirmButtonClickEvent()
+        }
       }
 
       setImage(R.drawable.price_alarm_banner)
@@ -246,6 +252,16 @@ class MainActivity : AppCompatActivity() {
         alarmInfo.content
       )
     }
+  }
+
+  private fun confirmButtonClickEvent() {
+    PriceAlarmClockUtils.stopAlarmReceiver(
+      this,
+      1
+    )
+    PriceAlarmClockReceiver.stopAlarmClock()
+    GoldStoneDialog.remove(this)
+    this.findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
   }
 
   private fun registerReceiver() {

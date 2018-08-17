@@ -69,6 +69,16 @@ class PriceAlarmClockReceiver : BroadcastReceiver() {
     val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
     if (PriceAlarmClockProperty.mediaPlayer.isNull()) {
       PriceAlarmClockProperty.mediaPlayer = MediaPlayer()
+      PriceAlarmClockProperty.mediaPlayer!!.setOnErrorListener(object : MediaPlayer.OnErrorListener {
+        override fun onError(
+          p0: MediaPlayer?,
+          p1: Int,
+          p2: Int
+        ): Boolean {
+          p0?.release()
+          return true
+        }
+      })
     }
     try {
       PriceAlarmClockProperty.mediaPlayer?.let {
@@ -76,10 +86,22 @@ class PriceAlarmClockReceiver : BroadcastReceiver() {
           it.stop()
           it.release()
           PriceAlarmClockProperty.mediaPlayer = MediaPlayer()
+          PriceAlarmClockProperty.mediaPlayer!!.setOnErrorListener(object : MediaPlayer.OnErrorListener {
+            override fun onError(
+              p0: MediaPlayer?,
+              p1: Int,
+              p2: Int
+            ): Boolean {
+              p0?.release()
+              return true
+            }
+          })
         }
+        it.reset();
         it.setDataSource(
           context,
-          uri)
+          uri
+        )
         it.setAudioStreamType(AudioManager.STREAM_RING)
         it.isLooping = true
         it.prepare()
@@ -109,6 +131,7 @@ class PriceAlarmClockReceiver : BroadcastReceiver() {
    */
   private fun resumeMediaPlayer() {
     PriceAlarmClockProperty.mediaPlayer?.release()
+    PriceAlarmClockProperty.mediaPlayer = null
   }
 
   /**
