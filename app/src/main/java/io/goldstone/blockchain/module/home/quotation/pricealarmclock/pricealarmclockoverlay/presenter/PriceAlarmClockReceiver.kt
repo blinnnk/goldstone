@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.receiver
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
