@@ -250,16 +250,8 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
       1
     )
     PriceAlarmClockReceiver.stopAlarmClock()
-    GoldStoneDialog.remove(context)
-    val mainLayout = (context as Activity).findViewById<RelativeLayout>(ContainerID.main)
-    val goldStoneDialog = context.findViewById<GoldStoneDialog>(ElementID.dialog)
-    val childCount = mainLayout.childCount - 1
-    for (index: Int in 0..childCount) {
-      val childAt = mainLayout.getChildAt(index)
-      if (childAt == goldStoneDialog) {
-        mainLayout.removeView(goldStoneDialog)
-      }
-    }
+    val goldStoneDialog = (context as Activity).findViewById<GoldStoneDialog>(ElementID.dialog)
+    removeDialog(goldStoneDialog)
     juxtaposeData(
       pricePairArrayList,
       priceAlarmClockTableArrayList

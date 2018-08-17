@@ -49,7 +49,7 @@ object UIUtils {
 
   fun generateDefaultName(): String {
     val name = arrayListOf(
-      WalletNameText.Bear,
+      WalletNameText.Cat,
       WalletNameText.Bull,
       WalletNameText.Elephant,
       WalletNameText.Deer,

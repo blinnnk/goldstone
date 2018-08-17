@@ -132,9 +132,6 @@ class XinGePushReceiver : XGPushBaseReceiver() {
     context: Context?,
     result: XGPushClickedResult?
   ) {
-    if (!MainActivity.backgroundFlag) {
-      alarmClockNotification(context, result)
-    }
     result?.customContent?.let {
       LogUtil.debug(this.javaClass.simpleName, "token: $it")
       when (JSONObject(it).safeGet("uri")) {

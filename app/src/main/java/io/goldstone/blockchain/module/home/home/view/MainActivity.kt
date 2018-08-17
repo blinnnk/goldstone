@@ -28,7 +28,9 @@ import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.receiver.PriceAlarmClockReceiver
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -216,10 +218,13 @@ class MainActivity : AppCompatActivity() {
     val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
     if (goldStoneDialogFlag) {
       GoldStoneDialog.show(this) {
-        showOnlyConfirmButton(AlarmClockText.gotIt) {
+        showButtons(AlarmClockText.gotIt) {
           confirmButtonClickEvent()
         }
-        setGoldStoneDialog(this, alarmInfo as XGPushClickedResult)
+        setGoldStoneDialog(
+          this,
+          alarmInfo as XGPushClickedResult
+        )
       }
     } else {
       val goldStoneDialog = findViewById<GoldStoneDialog>(ElementID.dialog)
@@ -230,7 +235,10 @@ class MainActivity : AppCompatActivity() {
       }
       goldStoneDialog.into(findViewById<RelativeLayout>(ContainerID.main))
       goldStoneDialog.apply {
-        setGoldStoneDialog(this, alarmInfo as XGPushClickedResult)
+        setGoldStoneDialog(
+          this,
+          alarmInfo as XGPushClickedResult
+        )
       }
     }
   }
@@ -241,6 +249,36 @@ class MainActivity : AppCompatActivity() {
         text = AlarmClockText.gotIt
         onClick {
           confirmButtonClickEvent()
+        }
+      }
+
+      getCancelButton().apply {
+        text = AlarmClockText.viewAlarm
+        onClick {
+          (getContext() as Activity).addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+            putString(
+              ArgumentKey.priceAlarmClockTitle,
+              AlarmClockText.viewAlarm
+            )
+            putSerializable(
+              ArgumentKey.quotationOverlayInfo, QuotationModel(
+                "symbol",
+                "name",
+                "price",
+                "-3.642",
+                ArrayList(),
+                "marketName",
+                1.0,
+                "pairDisplay",
+                "pair",
+                "currencyName",
+                "0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0",
+                false
+              )
+            )
+
+            confirmButtonClickEvent()
+          }
         }
       }
 
