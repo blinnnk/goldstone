@@ -7,7 +7,6 @@ package io.goldstone.blockchain.crypto.walletfile
 import io.goldstone.blockchain.crypto.ECKeyPair
 import io.goldstone.blockchain.crypto.PRIVATE_KEY_SIZE
 import io.goldstone.blockchain.crypto.SecureRandomUtils.secureRandom
-import io.goldstone.blockchain.crypto.extensions.toBigInteger
 import io.goldstone.blockchain.crypto.extensions.toBytesPadded
 import io.goldstone.blockchain.crypto.getAddress
 import io.goldstone.blockchain.crypto.kecca.keccak

@@ -10,6 +10,7 @@ enum class BitcoinMethod(
 ) {
 	
 	EstimatesmartFee("estimatesmartfee", "EstimatesmartFee"),
+	EstimateFee("estimatefee", "EstimateFee"),
 	CreateRawTransaction("createrawtransaction", "CreateRawTransaction"),
 	SendRawtTansaction("sendrawtransaction", "SendRawtTansaction"),
 	Getblockcount("getblockcount", "getblockcount")

@@ -45,12 +45,12 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 				layoutParams.height = 35.uiPX() * addresses.size + 30.uiPX()
 			}
 		} else if (model.description.equals(TransactionText.url, true)) {
-			info.into(this)
+			info.visibility = View.VISIBLE
 			info.textColor = Spectrum.darkBlue
 			info.text = model.info.setUnderline()
 			layoutParams.height += 20.uiPX()
 		} else {
-			info.into(this)
+			info.visibility = View.VISIBLE
 			info.text =
 				if (model.info.isEmpty()) {
 					if (model.description.equals(TransactionText.memo, true))
@@ -62,6 +62,7 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 	}
 	private val info by lazy {
 		TextView(context).apply {
+			visibility = View.GONE
 			textSize = fontSize(14)
 			textColor = GrayScale.black
 			typeface = GoldStoneFont.medium(context)
@@ -74,6 +75,7 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 65.uiPX())
 		setHorizontalPadding(PaddingSize.device.toFloat())
+		info.into(this)
 	}
 	
 	fun showAddContactButton(index: Int, hold: ImageView.() -> Unit) {

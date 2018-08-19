@@ -7,6 +7,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
@@ -15,8 +16,6 @@ import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
@@ -37,16 +36,19 @@ data class WalletTable(
 	var currentBTCAddress: String,
 	var currentBTCSeriesTestAddress: String,
 	var currentLTCAddress: String,
+	var currentBCHAddress: String,
 	var ethAddresses: String, // format - "address|index,0x288832ds23...|0"
 	var btcAddresses: String,
 	var btcSeriesTestAddresses: String,
 	var etcAddresses: String,
 	var ltcAddresses: String,
+	var bchAddresses: String,
 	var ethPath: String,
 	var etcPath: String,
 	var btcPath: String,
 	var btcTestPath: String,
 	var ltcPath: String,
+	var bchPath: String,
 	var isUsing: Boolean,
 	var hint: String? = null,
 	var isWatchOnly: Boolean = false,
@@ -66,12 +68,15 @@ data class WalletTable(
 						val btcAddressCount = btcAddresses.split(",").size
 						val btcTestAddressCount = btcSeriesTestAddresses.split(",").size
 						val ltcAddressCount = ltcAddresses.split(",").size
-						hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount + ltcAddressCount)
+						val bchAddressCount = bchAddresses.split(",").size
+						hold(ethAddressCount + etcAddressCount + btcAddressCount + btcTestAddressCount + ltcAddressCount + bchAddressCount)
 					}
 
 					WalletType.ETHERCAndETCOnly.content -> hold(1)
 					WalletType.BTCTestOnly.content -> hold(1)
 					WalletType.BTCOnly.content -> hold(1)
+					WalletType.LTCOnly.content -> hold(1)
+					WalletType.BCHOnly.content -> hold(1)
 				}
 			}
 		}
@@ -88,6 +93,10 @@ data class WalletTable(
 				symbol.equals(CryptoSymbol.ltc, true) -> {
 					if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
 					else Config.getCurrentLTCAddress()
+				}
+				symbol.equals(CryptoSymbol.bch, true) -> {
+					if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
+					else Config.getCurrentBCHAddress()
 				}
 				symbol.equals(CryptoSymbol.etc, true) ->
 					Config.getCurrentETCAddress()
@@ -172,6 +181,18 @@ data class WalletTable(
 			}
 		}
 
+		fun getAllBCHAddresses(callback: ArrayList<String>.() -> Unit) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then { it ->
+				callback(
+					it.map {
+						it.currentBCHAddress
+					}.toArrayList()
+				)
+			}
+		}
+
 		fun getAllBTCSeriesTestnetAddresses(callback: ArrayList<String>.() -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
@@ -215,7 +236,8 @@ data class WalletTable(
 					currentBTCSeriesTestAddress,
 					currentETCAddress,
 					currentETHAndERCAddress,
-					currentLTCAddress
+					currentLTCAddress,
+					currentBCHAddress
 				).filter {
 					it.isNotEmpty()
 				}.apply {
@@ -231,7 +253,8 @@ data class WalletTable(
 				wallet.currentBTCSeriesTestAddress,
 				wallet.currentETCAddress,
 				wallet.currentETHAndERCAddress,
-				wallet.currentLTCAddress
+				wallet.currentLTCAddress,
+				wallet.currentBCHAddress
 			).filter { it.isNotEmpty() }.distinctBy { it }
 		}
 
@@ -240,12 +263,13 @@ data class WalletTable(
 				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
 				Pair(WalletType.BTCTestOnly, walletTable.currentBTCAddress),
 				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentBTCAddress),
-				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress)
+				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress),
+				Pair(WalletType.BCHOnly, walletTable.currentBCHAddress)
 			).filter {
 				it.second.isNotEmpty()
 			}
 			return when (types.size) {
-				4 -> WalletType.MultiChain
+				5 -> WalletType.MultiChain
 				else -> types[0].first
 			}
 		}
@@ -337,6 +361,24 @@ data class WalletTable(
 					ltcAddresses.replace(",", "")
 				} else {
 					ltcAddresses
+				}
+				// 获取最近的 `Address Index` 数值
+				hold(this, pureAddresses.substringAfterLast("|").toInt())
+			}
+		}
+
+		fun getBCHWalletLatestChildAddressIndex(
+			hold: (
+				wallet: WalletTable,
+				ltcChildAddressIndex: Int
+			) -> Unit
+		) {
+			WalletTable.getCurrentWallet {
+				// 清理数据格式
+				val pureAddresses = if (bchAddresses.contains(",")) {
+					bchAddresses.replace(",", "")
+				} else {
+					bchAddresses
 				}
 				// 获取最近的 `Address Index` 数值
 				hold(this, pureAddresses.substringAfterLast("|").toInt())
@@ -448,6 +490,28 @@ data class WalletTable(
 			}
 		}
 
+		fun updateBCHAddresses(
+			newAddress: String,
+			newAddressIndex: Int,
+			callback: (bitcoinCashAddresses: String) -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							val addresses = this.bchAddresses + "," + newAddress + "|$newAddressIndex"
+							update(this.apply {
+								bchAddresses = addresses
+							})
+							GoldStoneAPI.context.runOnUiThread {
+								callback(addresses)
+							}
+						}
+					}
+				}
+			}
+		}
+
 		fun updateBTCTestAddresses(
 			newAddress: String,
 			newAddressIndex: Int,
@@ -536,12 +600,24 @@ data class WalletTable(
 							}
 						}
 
+						ChainType.BCH.id -> {
+							GoldStoneDataBase.database.walletDao().update(
+								this@wallet.apply {
+									currentBCHAddress = newAddress
+									Config.updateCurrentBCHAddress(newAddress)
+								}
+							)
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
+						}
+
 						ChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
 										currentBTCSeriesTestAddress = newAddress
-										Config.updateCurrentBTCTestAddress(newAddress)
+										Config.updateCurrentBTCSeriesTestAddress(newAddress)
 									}
 								)
 							} else {
@@ -600,7 +676,7 @@ data class WalletTable(
 			callback: () -> Unit
 		) {
 			Config.getCurrentIsWatchOnlyOrNot() isTrue {
-				context.alert(Appcompat, AlertText.watchOnly).show()
+				context.alert(AlertText.watchOnly)
 				return
 			}
 			callback()
@@ -655,7 +731,7 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 
-	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCSeriesTestAddress LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentBCHAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCSeriesTestAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
 
 	@Query("SELECT * FROM wallet")

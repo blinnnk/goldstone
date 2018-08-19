@@ -46,7 +46,8 @@ class TokenSearchPresenter(
 						canSearch = if (
 							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
 							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.LTCOnly.content, true)
+							Config.getCurrentWalletType().equals(WalletType.LTCOnly.content, true) ||
+							Config.getCurrentWalletType().equals(WalletType.BCHOnly.content, true)
 						) {
 							fragment.context.alert(
 								"This is a single block chain wallet so you canot add other crypot currency"

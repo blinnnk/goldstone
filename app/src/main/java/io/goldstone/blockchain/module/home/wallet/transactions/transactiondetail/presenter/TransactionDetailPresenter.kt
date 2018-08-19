@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -110,6 +110,8 @@ class TransactionDetailPresenter(
 		return when {
 			symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
 			symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
+			symbol.equals(CryptoSymbol.ltc, true) -> CryptoSymbol.ltc
+			symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
 			else -> CryptoSymbol.eth
 		}
 	}
@@ -152,7 +154,7 @@ class TransactionDetailPresenter(
 			val webTitle =
 				when {
 					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
-					symbol.equals(CryptoSymbol.btc(), true) -> TransactionText.blockChainInfo
+					CryptoSymbol.isBTCSeriesSymbol(symbol) -> TransactionText.insight
 					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
@@ -217,16 +219,16 @@ class TransactionDetailPresenter(
 				)
 			}
 
-			is BitcoinSeriesTransactionTable -> {
+			is BTCSeriesTransactionTable -> {
 				arrayListOf(
-					"${receipt.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
+					"${receipt.fee.toBigDecimal().toPlainString()} ${receipt.symbol}",
 					memo,
 					receipt.fromAddress,
 					TransactionListModel.formatToAddress(receipt.to),
 					currentHash,
 					receipt.blockNumber,
 					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),
-					TransactionListModel.generateTransactionURL(currentHash, CryptoSymbol.btc())
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
 				)
 			}
 
@@ -272,7 +274,7 @@ class TransactionDetailPresenter(
 
 	private fun formatedMinnerFee(): String? {
 		val dataMinerFee =
-			if (data?.token?.symbol.equals(CryptoSymbol.btc(), true))
+			if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol))
 				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
 			else data?.minnerFee
 		return if (data.isNull()) dataFromList?.minerFee

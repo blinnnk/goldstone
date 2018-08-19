@@ -79,4 +79,4 @@ enum class ChainPrefix(val publicKey: String, val privateKey: String) {
 	}
 }
 
-data class Base58KeyPair(val address: String, val privateKey: String)
+data class BaseKeyPair(val address: String, val privateKey: String)

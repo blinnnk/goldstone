@@ -94,6 +94,16 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
+	val newBCHAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New BCH Address"
+		HoneyLanguage.Chinese.code -> "新的 BCH 地址"
+		HoneyLanguage.Japanese.code -> "新しい BCH アドレス"
+		HoneyLanguage.Korean.code -> "새로운 BCH 주소"
+		HoneyLanguage.Russian.code -> "Новый адрес BCH"
+		HoneyLanguage.TraditionalChinese.code -> "新的 BCH 地址"
+		else -> ""
+	}
+	@JvmField
 	val viewAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "View All Addresses"
 		HoneyLanguage.Chinese.code -> "查看所有地址"
@@ -124,13 +134,23 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val allBtCAddresses = when (currentLanguage) {
+	val allBtcAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All BTC Addresses"
 		HoneyLanguage.Chinese.code -> "所有BTC地址"
 		HoneyLanguage.Japanese.code -> "すべてのBTCアドレス"
 		HoneyLanguage.Korean.code -> "모든 BTC 주소"
 		HoneyLanguage.Russian.code -> "Все адреса BTC"
 		HoneyLanguage.TraditionalChinese.code -> "所有BTC地址"
+		else -> ""
+	}
+	@JvmField
+	val allBCHAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All BCH Addresses"
+		HoneyLanguage.Chinese.code -> "所有 BCH 地址"
+		HoneyLanguage.Japanese.code -> "すべての BCH アドレス"
+		HoneyLanguage.Korean.code -> "모든 BCH 주소"
+		HoneyLanguage.Russian.code -> "Все адреса BCH"
+		HoneyLanguage.TraditionalChinese.code -> "所有 BCH 地址"
 		else -> ""
 	}
 	@JvmField
@@ -301,6 +321,16 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "Litecoin Address"
 		HoneyLanguage.Russian.code -> "Litecoin Address"
 		HoneyLanguage.TraditionalChinese.code -> "Litecoin Address"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinCashcoinAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Bitcoin Cash Address"
+		HoneyLanguage.Chinese.code -> "Bitcoin Cash Address"
+		HoneyLanguage.Japanese.code -> "Bitcoin Cash Address"
+		HoneyLanguage.Korean.code -> "Bitcoin Cash Address"
+		HoneyLanguage.Russian.code -> "Bitcoin Cash Address"
+		HoneyLanguage.TraditionalChinese.code -> "Bitcoin Cash Address"
 		else -> ""
 	}
 	@JvmField

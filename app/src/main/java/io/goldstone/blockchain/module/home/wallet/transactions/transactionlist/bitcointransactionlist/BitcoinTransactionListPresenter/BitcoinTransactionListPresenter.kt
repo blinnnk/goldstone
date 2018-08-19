@@ -7,8 +7,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -47,7 +48,6 @@ class BitcoinTransactionListPresenter(
 				fragment.getParentFragment<TransactionFragment>()?.apply {
 					isBTCListShown = Runnable {
 						fragment.showLoadingView(LoadingText.transactionData)
-						// TODO 触底翻页的逻辑
 						loadTransactionsFromDatabase()
 					}
 				}
@@ -57,65 +57,63 @@ class BitcoinTransactionListPresenter(
 
 	private var hasLoadServerData = false
 	private fun loadTransactionsFromDatabase() {
-		BitcoinSeriesTransactionTable.getTransactionsByAddress(address()) { localData ->
-			localData.map { transactions ->
-				TransactionListModel(transactions)
-			}.toArrayList().let {
-				TransactionListPresenter.checkAddressNameInContacts(it) {
-					diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(it)
+		BTCSeriesTransactionTable
+			.getTransactionsByAddressAndChainType(
+				address(),
+				ChainType.BTC.id
+			) { localData ->
+				localData.map { transactions ->
+					TransactionListModel(transactions)
+				}.toArrayList().let {
+					TransactionListPresenter.checkAddressNameInContacts(it) {
+						diffAndUpdateSingleCellAdapterData<BitcoinTransactionListAdapter>(it)
+					}
 				}
-			}
-			// 如果已经更新了网络数据就不再继续执行
-			if (!hasLoadServerData) {
-				doAsync {
-					loadTransactionsFromChain(
-						pageSize,
-						localData,
-						{
-							fragment.removeLoadingView()
-							// TODO ERROR Alert
-						}
-					) { hasData ->
-						GoldStoneAPI.context.runOnUiThread {
-							fragment.removeLoadingView()
-						}
-						if (hasData) {
-							loadTransactionsFromDatabase()
-							hasLoadServerData = true
+				// 如果已经更新了网络数据就不再继续执行
+				if (!hasLoadServerData) {
+					doAsync {
+						loadTransactionsFromChain(
+							localData,
+							{
+								fragment.removeLoadingView()
+								// TODO ERROR Alert
+							}
+						) { hasData ->
+							GoldStoneAPI.context.runOnUiThread {
+								fragment.removeLoadingView()
+							}
+							if (hasData) {
+								loadTransactionsFromDatabase()
+								hasLoadServerData = true
+							}
 						}
 					}
 				}
 			}
-		}
 	}
 
 	companion object {
-		const val pageSize = 40
 		fun loadTransactionsFromChain(
-			pageSize: Int,
-			localData: List<BitcoinSeriesTransactionTable>,
+			localData: List<BTCSeriesTransactionTable>,
 			errorCallback: (Throwable) -> Unit,
 			successCallback: (hasData: Boolean) -> Unit
 		) {
-			val offset =
-				Math.floor(localData.size / pageSize.toDouble()).toInt() * pageSize
 			val address = if (Config.isTestEnvironment())
 				Config.getCurrentBTCSeriesTestAddress()
 			else Config.getCurrentBTCAddress()
 			BitcoinApi.getBTCTransactions(
 				address,
-				pageSize,
-				offset,
 				errorCallback
 			) { transactions ->
 				// Calculate All Inputs to get transfer value
 				successCallback(transactions.map {
 					// 转换数据格式
-					BitcoinSeriesTransactionTable(
+					BTCSeriesTransactionTable(
 						it,
-						CryptoSymbol.btc(),
 						address,
-						false
+						CryptoSymbol.pureBTCSymbol,
+						false,
+						ChainType.BTC.id
 					)
 				}.filterNot { chainData ->
 					// 去除翻页机制导致的不可避免的重复数据
@@ -123,7 +121,7 @@ class BitcoinTransactionListPresenter(
 						localData.find { it.hash.equals(chainData.hash, true) }
 					// 本地的数据更新网络数据, 因为本地可能有  `Pending` 拼接的数据, 所以重复的都首先更新网络
 					!localTransaction?.apply {
-						BitcoinSeriesTransactionTable.updateLocalDataByHash(
+						BTCSeriesTransactionTable.updateLocalDataByHash(
 							hash,
 							this,
 							false,
@@ -132,11 +130,11 @@ class BitcoinTransactionListPresenter(
 					}.isNull()
 				}.map {
 					// 插入转账数据到数据库
-					BitcoinSeriesTransactionTable
+					BTCSeriesTransactionTable
 						.preventRepeatedInsert(it.hash, false, it)
 					// 同样的账单插入一份燃气费的数据
 					if (!it.isReceive) {
-						BitcoinSeriesTransactionTable
+						BTCSeriesTransactionTable
 							.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
 					}
 					TransactionListModel(it)

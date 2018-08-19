@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -15,8 +14,8 @@ import org.json.JSONObject
  * @date 2018/7/23 7:43 PM
  * @author KaySaith
  */
-object BTCJsonRPC {
-	
+object BTCSeriesJsonRPC {
+
 	/**
 	 * 估算交易在 `nblocks` 个区块开始确认的每千字节的大致费用,
 	 * 如果没有足够的交易和区块用来估算则会返回一个负值，-1 表示交易费为 0
@@ -24,13 +23,17 @@ object BTCJsonRPC {
 	fun estimatesmartFee(
 		chainName: String,
 		blocks: Int,
+		isSmartFee: Boolean = true,
 		hold: (Double?) -> Unit
 	) {
+		val method =
+			if (isSmartFee) BitcoinMethod.EstimatesmartFee.method
+			else BitcoinMethod.EstimateFee.method
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
 				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
-				BitcoinMethod.EstimatesmartFee.method,
+				method,
 				1,
 				false,
 				false,
@@ -42,24 +45,27 @@ object BTCJsonRPC {
 				{ error, reason ->
 					LogUtil.error("estimatesmartFee $reason", error)
 				},
-				ChainText.btcTest
+				chainName
 			) {
-				if (it.isNotEmpty())
-					hold(JSONObject(it).safeGet("feerate").toDoubleOrNull())
-				else hold(null)
+				if (it.isNotEmpty()) {
+					val fee =
+						if (!isSmartFee) it.toDoubleOrNull()
+						else JSONObject(it).safeGet("feerate").toDoubleOrNull()
+					hold(fee)
+				} else hold(null)
 			}
 		}
 	}
-	
+
 	fun getCurrentBlockHeight(
-		isTest: Boolean,
+		chainName: String,
 		errorCallback: (Throwable?) -> Unit,
 		hold: (Int?) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
-				isTest,
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				BitcoinMethod.Getblockcount.method,
 				1,
 				false,
@@ -73,22 +79,22 @@ object BTCJsonRPC {
 					errorCallback(error)
 					LogUtil.error("getblockHeight $reason", error)
 				},
-				if (isTest) ChainText.btcTest else ChainText.btcMain
+				chainName
 			) {
 				hold(if (it.isNotEmpty()) it.toInt() else null)
 			}
 		}
 	}
-	
+
 	fun sendRawTransaction(
-		isTest: Boolean,
+		chainName: String,
 		signedMessage: String,
 		hold: (String?) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
-				isTest,
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
 				BitcoinMethod.SendRawtTansaction.method,
 				1,
 				false,
@@ -102,7 +108,7 @@ object BTCJsonRPC {
 				{ error, reason ->
 					LogUtil.error("SendRawtTansaction $reason", error)
 				},
-				if (isTest) ChainText.btcTest else ChainText.btcMain
+				chainName
 			) {
 				// Return Transaction hash
 				hold(if (it.isNotEmpty()) it else null)

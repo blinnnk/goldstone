@@ -65,17 +65,6 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
 		else -> ""
 	}
-
-	@JvmField
-	val btcBalanceNotEnough = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Insufficient funds for transfer and fee"
-		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与矿工费"
-		HoneyLanguage.Japanese.code -> "お客様のアカウントの残高は、振込額と鉱山者の手数料をカバーするには不十分です"
-		HoneyLanguage.Korean.code -> "귀하의 계정 잔액으로 이체 금액과 광부 수수료를 충당 할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Баланса вашего счета недостаточно для покрытия суммы перевода и гонорара шахтера"
-		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與礦工費"
-		else -> ""
-	}
 	@JvmField
 	val transferWrongDecimal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."

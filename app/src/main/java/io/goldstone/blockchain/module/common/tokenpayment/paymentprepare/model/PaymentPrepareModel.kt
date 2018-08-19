@@ -20,7 +20,7 @@ data class PaymentPrepareModel(
 	var gasPrice: BigInteger = BigInteger.ZERO
 ) : Serializable
 
-data class PaymentPrepareBTCModel(
+data class PaymentBTCSeriesModel(
 	val toAddress: String,
 	val fromAddress: String,
 	val changeAddress: String,

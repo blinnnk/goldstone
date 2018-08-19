@@ -47,13 +47,13 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
-	val blockChainInfo = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BlockChain Info"
-		HoneyLanguage.Chinese.code -> "BlockChain信息"
-		HoneyLanguage.Japanese.code -> "ブロックチェーン情報"
-		HoneyLanguage.Korean.code -> "블록 체인 정보"
-		HoneyLanguage.Russian.code -> "Информация о блоке"
-		HoneyLanguage.TraditionalChinese.code -> "BlockChain信息"
+	val insight = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Insigt Info"
+		HoneyLanguage.Chinese.code -> "Insigt Info"
+		HoneyLanguage.Japanese.code -> "Insigt Info"
+		HoneyLanguage.Korean.code -> "Insigt Info"
+		HoneyLanguage.Russian.code -> "Insigt Info"
+		HoneyLanguage.TraditionalChinese.code -> "Insigt Info"
 		else -> ""
 	}
 	@JvmField

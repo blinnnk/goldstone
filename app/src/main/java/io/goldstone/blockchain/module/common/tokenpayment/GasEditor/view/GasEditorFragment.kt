@@ -28,19 +28,19 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
-	
-	val isBTC by lazy {
-		arguments?.getBoolean(ArgumentKey.isBTC).orFalse()
-	}
+
 	val getGasSize: () -> Long? = {
 		arguments?.getLong(ArgumentKey.gasSize)
+	}
+	val isBTCSeries by lazy {
+		arguments?.getBoolean(ArgumentKey.isBTCSeries).orFalse()
 	}
 	private val gasPriceInput by lazy { RoundInput(context!!) }
 	private val gasLimitInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val speedLevelBar by lazy { GasSpeedLevelBar(context!!) }
 	override val presenter = GasEditorPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -48,10 +48,10 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			gasPriceInput.apply {
 				setNumberInput()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
-				title = if (isBTC) TransactionText.satoshiValue else TransactionText.gasPrice
+				title = if (isBTCSeries) TransactionText.satoshiValue else TransactionText.gasPrice
 			}.into(this)
 			// 只有 `ETH ERC20 or ETC` 才有 `GasLimit` 的概念
-			if (!isBTC) {
+			if (!isBTCSeries) {
 				gasLimitInput.apply {
 					setNumberInput()
 					setText(getGasSize().toString())
@@ -59,11 +59,11 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 					title = TransactionText.gasLimit
 				}.into(this)
 			}
-			
+
 			speedLevelBar.apply {
 				setMargins<RelativeLayout.LayoutParams> { topMargin = 30.uiPX() }
 			}.into(this)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm
 				setBlueStyle(20.uiPX())
@@ -73,23 +73,23 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			setProcessValue()
 		}
 	}
-	
+
 	override fun onStart() {
 		super.onStart()
 		val defaultPrice =
-			if (isBTC) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
+			if (isBTCSeries) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
 		gasPriceInput.setText(defaultPrice.toString())
 		gasPrice = defaultPrice
 		getGasSize()?.let { dataSize = it }
 	}
-	
+
 	private val currentValue: (
 		gasPrice: Long,
 		gasSize: Long
 	) -> Double = { gasPrice, gasSize ->
 		val fast = MinerFeeType.Fast.value * gasSize
 		val btcFast = MinerFeeType.Fast.satoshi * gasSize
-		(gasPrice * gasSize) / (if (isBTC) btcFast else fast).toDouble()
+		(gasPrice * gasSize) / (if (isBTCSeries) btcFast else fast).toDouble()
 	}
 	private var gasPrice: Long by observing(0L) {
 		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))
@@ -97,7 +97,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 	private var dataSize: Long by observing(0L) {
 		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))
 	}
-	
+
 	private fun setProcessValue() {
 		gasPriceInput.let { price ->
 			price.afterTextChanged = Runnable {
@@ -106,7 +106,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 				}
 			}
 		}
-		if (isBTC) {
+		if (isBTCSeries) {
 			dataSize = getGasSize().orElse(0L)
 		} else {
 			gasLimitInput.let { limit ->
@@ -118,7 +118,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

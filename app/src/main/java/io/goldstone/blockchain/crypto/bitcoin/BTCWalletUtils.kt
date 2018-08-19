@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.crypto.bitcoin
 
 import io.goldstone.blockchain.crypto.CryptoValue
@@ -23,7 +25,7 @@ object BTCWalletUtils {
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val currentID = if (isTest) testNetID else mainNetID
-		val address = Address(currentID, Utils.sha256hash160(keyPair.pubKey)).toString()
+		val address = Address(currentID, Utils.sha256hash160(keyPair.pubKey)).toBase58()
 		val secret = keyPair.getPrivateKeyEncoded(currentID).toString()
 		hold(address, secret)
 	}
@@ -46,12 +48,12 @@ object BTCWalletUtils {
 		isTest: Boolean,
 		hold: (publicKey: String) -> Unit
 	) {
-		
+
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val chainID = if (isTest) testNetID else mainNetID
 		getKeyPairFromBase58PrivateKey(privateKey, isTest) {
-			hold(Address(chainID, Utils.sha256hash160(it.pubKey)).toString())
+			hold(Address(chainID, Utils.sha256hash160(it.pubKey)).toBase58())
 		}
 	}
 }

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto.bitcoin
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import org.bitcoinj.core.DumpedPrivateKey
@@ -63,6 +64,7 @@ object BTCUtils {
 			isValidMainnetAddress(address) -> AddressType.BTC
 			isValidTestnetAddress(address) -> AddressType.BTCSeriesTest
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
+			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
 			else -> null
 		}
 	}
@@ -71,6 +73,7 @@ object BTCUtils {
 enum class AddressType(val value: String) {
 	ETHERCOrETC("ethERCOrETC"),
 	BTC("btc"),
+	BCH("bch"),
 	BTCSeriesTest("btcTest"),
 	LTC("ltc")
 }

@@ -10,5 +10,6 @@ enum class WalletType(val content: String) {
 	ETHERCAndETCOnly("ethERCAndEtc"),
 	BTCTestOnly("btctestOnly"),
 	LTCOnly("ltcOnly"),
+	BCHOnly("bchOnly"),
 	MultiChain("multiChain")
 }

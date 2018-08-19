@@ -15,6 +15,7 @@ import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -38,6 +39,7 @@ class WatchOnlyImportPresenter(
 	private var currentBTCTestAddress = ""
 	private var currentETCAddress = ""
 	private var currentLTCAddress = ""
+	private var currentBCHAddress = ""
 
 	fun importWatchOnlyWallet(
 		addressType: String,
@@ -72,6 +74,14 @@ class WatchOnlyImportPresenter(
 				}
 			}
 
+			CryptoValue.PrivateKeyType.BCH.content -> {
+				if (!BCHWalletUtils.isValidAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
+			}
+
 			else -> {
 				if (!BTCUtils.isValidTestnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
@@ -98,14 +108,17 @@ class WatchOnlyImportPresenter(
 						currentBTCAddress = currentBTCAddress,
 						currentETCAddress = currentETCAddress,
 						currentLTCAddress = currentLTCAddress,
+						currentBCHAddress = currentBCHAddress,
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
+						bchPath = "",
 						btcTestPath = "",
 						ltcPath = "",
 						ethAddresses = "",
 						etcAddresses = "",
 						btcAddresses = "",
+						bchAddresses = "",
 						btcSeriesTestAddresses = "",
 						ltcAddresses = ""
 					)
@@ -116,7 +129,8 @@ class WatchOnlyImportPresenter(
 							currentETCAddress,
 							currentBTCAddress,
 							currentBTCTestAddress,
-							currentLTCAddress
+							currentLTCAddress,
+							currentBCHAddress
 						),
 						{
 							LogUtil.error(this.javaClass.simpleName)
@@ -129,6 +143,7 @@ class WatchOnlyImportPresenter(
 							listOf(
 								Pair(currentBTCAddress, ChainType.BTC.id),
 								Pair(currentLTCAddress, ChainType.LTC.id),
+								Pair(currentBCHAddress, ChainType.BCH.id),
 								Pair(currentBTCTestAddress, ChainType.AllTest.id),
 								Pair(currentETCAddress, ChainType.ETC.id),
 								Pair(currentETHAndERCAddress, ChainType.ETH.id)
@@ -158,6 +173,10 @@ class WatchOnlyImportPresenter(
 
 			CryptoValue.PrivateKeyType.LTC.content -> {
 				currentLTCAddress = address
+			}
+
+			CryptoValue.PrivateKeyType.BCH.content -> {
+				currentBCHAddress = address
 			}
 
 			else -> {

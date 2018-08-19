@@ -9,12 +9,13 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
+import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinCashTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.EtherScanApi.litcoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
 
@@ -78,7 +79,7 @@ data class TransactionListModel(
 		data.isFee
 	)
 
-	constructor(data: BitcoinSeriesTransactionTable) : this(
+	constructor(data: BTCSeriesTransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else formatToAddress(data.to),
 		data.fromAddress,
@@ -92,26 +93,34 @@ data class TransactionListModel(
 				data.fromAddress
 			)
 		), // 副标题的生成
-		data.value.toDouble().toBTCCount(),
-		CryptoSymbol.btc(),
+		data.value.toDouble(),
+		data.symbol,
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
 		data.to,
 		data.blockNumber,
 		data.hash,
 		"",
-		"${data.fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
-		generateTransactionURL(data.hash, CryptoSymbol.btc()),
+		"${data.fee.toDouble().toBigDecimal()} ${data.symbol}",
+		generateTransactionURL(data.hash, data.symbol),
 		data.isPending,
 		data.timeStamp,
-		data.value.toDouble().toBTCCount().toString(),
+		data.value.toDouble().toString(),
 		false,
-		CryptoValue.btcContract,
+		getContractBySymbol(data.symbol),
 		false,
 		data.isFee
 	)
 
 	companion object {
+		fun getContractBySymbol(symbol: String): String {
+			return when (symbol) {
+				CryptoSymbol.btc() -> CryptoValue.btcContract
+				CryptoSymbol.ltc -> CryptoValue.ltcContract
+				else -> CryptoValue.bchContract
+			}
+		}
+
 		fun formatToAddress(toAddress: String): String {
 			var formatedAddresses = ""
 			// `toAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
@@ -141,6 +150,10 @@ data class TransactionListModel(
 					EtherScanApi.gasTrackerHeader(taxHash)
 				symbol.equals(CryptoSymbol.btc(), true) ->
 					bitcoinTransactionDetail(taxHash)
+				symbol.equals(CryptoSymbol.ltc, true) ->
+					litcoinTransactionDetail(taxHash)
+				symbol.equals(CryptoSymbol.bch, true) ->
+					bitcoinCashTransactionDetail(taxHash)
 				else -> EtherScanApi.transactionDetail(taxHash)
 			}
 		}

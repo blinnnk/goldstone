@@ -18,6 +18,7 @@ import io.goldstone.blockchain.crypto.Address
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
@@ -69,6 +70,11 @@ class ContactInputPresenter(
 						ltcInput.setText(it)
 						ltcAddressText = it
 					}
+
+					AddressType.BCH -> {
+						ltcInput.setText(it)
+						bchAddressText = it
+					}
 				}
 			}
 		}
@@ -86,6 +92,7 @@ class ContactInputPresenter(
 					+ btcMainnetAddressText.count()
 					+ btcTestnetAddressText.count()
 					+ ltcAddressText.count()
+					+ bchAddressText.count()
 				) == 0
 		) {
 			fragment.context?.alert(ContactText.emptyAddressAlert)
@@ -100,6 +107,12 @@ class ContactInputPresenter(
 		// 检查是否是合规的以太坊或以太经典的地址格式
 		if (!LTCWalletUtils.isValidAddress(ltcAddressText) && ltcAddressText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.ltc))
+			return
+		}
+
+		// 检查是否是合规的以太坊或以太经典的地址格式
+		if (!BCHWalletUtils.isValidAddress(bchAddressText) && bchAddressText.isNotEmpty()) {
+			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.bch))
 			return
 		}
 

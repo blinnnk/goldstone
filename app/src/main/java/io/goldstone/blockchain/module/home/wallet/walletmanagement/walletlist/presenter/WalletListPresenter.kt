@@ -75,6 +75,18 @@ class WalletListPresenter(
 								}
 							}
 
+							WalletType.BCHOnly -> {
+								if (Config.isTestEnvironment()) {
+									showConfirmationAlertView(" Bitcoin Cash Mainnet") {
+										NodeSelectionPresenter.setAllMainnet {
+											fragment.activity?.jump<SplashActivity>()
+										}
+									}
+								} else {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+
 							WalletType.MultiChain -> {
 								if (Config.isTestEnvironment()) {
 									NodeSelectionPresenter.setAllTestnet {

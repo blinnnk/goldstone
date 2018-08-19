@@ -13,13 +13,13 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
@@ -27,12 +27,8 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.bitcointransactionlist.bitcointransactionlistPresenter.BitcoinTransactionListPresenter
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.classictransactionlist.presenter.ClassicTransactionListPresenter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -43,7 +39,7 @@ class TokenDetailPresenter(
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
 	private var allData: List<TransactionListModel>? = null
-	private val token by lazy {
+	val token by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 	}
 
@@ -132,7 +128,9 @@ class TokenDetailPresenter(
 
 	private var hasUpdateETCData = false
 	private var hasUpdateBTCData = false
+	private var hasUpdateLTCData = false
 	private var hasUpdateERCData = false
+	private var hasUpdateBCHData = false
 
 	private fun TokenDetailFragment.loadDataFromChain() {
 		when {
@@ -146,6 +144,16 @@ class TokenDetailPresenter(
 				hasUpdateBTCData = true
 			}
 
+			token?.symbol.equals(CryptoSymbol.bch, true) -> {
+				if (!hasUpdateBCHData) loadBCHChainData()
+				hasUpdateBCHData = true
+			}
+
+			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+				if (!hasUpdateLTCData) loadLTCChainData()
+				hasUpdateLTCData = true
+			}
+
 			else -> {
 				if (!hasUpdateERCData) loadERCChainData()
 				hasUpdateERCData = true
@@ -153,7 +161,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun loadDataFromDatabaseOrElse(
+	fun loadDataFromDatabaseOrElse(
 		withoutLocalDataCallback: () -> Unit = {}
 	) {
 		when (Config.getCurrentWalletType()) {
@@ -167,13 +175,47 @@ class TokenDetailPresenter(
 
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
 						if (Config.isTestEnvironment()) {
-							getBTCData(
+							getBTCSeriesData(
 								Config.getCurrentBTCSeriesTestAddress(),
+								ChainType.BTC.id,
 								withoutLocalDataCallback
 							)
 						} else {
-							getBTCData(
+							getBTCSeriesData(
 								Config.getCurrentBTCAddress(),
+								ChainType.BTC.id,
+								withoutLocalDataCallback
+							)
+						}
+					}
+
+					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+						if (Config.isTestEnvironment()) {
+							getBTCSeriesData(
+								Config.getCurrentBTCSeriesTestAddress(),
+								ChainType.LTC.id,
+								withoutLocalDataCallback
+							)
+						} else {
+							getBTCSeriesData(
+								Config.getCurrentLTCAddress(),
+								ChainType.LTC.id,
+								withoutLocalDataCallback
+							)
+						}
+					}
+
+					token?.symbol.equals(CryptoSymbol.bch, true) -> {
+						if (Config.isTestEnvironment()) {
+							getBTCSeriesData(
+								Config.getCurrentBTCSeriesTestAddress(),
+								ChainType.BCH.id,
+								withoutLocalDataCallback
+							)
+						} else {
+							getBTCSeriesData(
+								Config.getCurrentBCHAddress(),
+								ChainType.BCH.id,
 								withoutLocalDataCallback
 							)
 						}
@@ -193,15 +235,17 @@ class TokenDetailPresenter(
 				)
 
 			WalletType.BTCTestOnly.content -> {
-				getBTCData(
+				getBTCSeriesData(
 					Config.getCurrentBTCSeriesTestAddress(),
+					ChainType.BTC.id,
 					withoutLocalDataCallback
 				)
 			}
 
 			WalletType.BTCOnly.content -> {
-				getBTCData(
+				getBTCSeriesData(
 					Config.getCurrentBTCAddress(),
+					ChainType.BTC.id,
 					withoutLocalDataCallback
 				)
 			}
@@ -218,7 +262,7 @@ class TokenDetailPresenter(
 			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
-				fragment.updateChartBy(transactions, address)
+				fragment.updatePageBy(transactions, address)
 				fragment.removeLoadingView()
 			} otherwise {
 				callback()
@@ -227,80 +271,34 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun getBTCData(
+	private fun getBTCSeriesData(
 		address: String,
+		chainType: Int,
 		withouDataCallback: () -> Unit
 	) {
-		BitcoinSeriesTransactionTable.getTransactionsByAddress(address) { transactions ->
-			transactions.isNotEmpty() isTrue {
-				fragment.updateChartBy(
-					transactions.map {
-						TransactionListModel(it)
-					}.sortedByDescending {
-						it.timeStamp
-					},
-					address
-				)
-				fragment.removeLoadingView()
-			} otherwise {
-				withouDataCallback()
-				LogUtil.debug(this.javaClass.simpleName, "There isn't Bitcoin Local Data")
-			}
-		}
-	}
-
-	private fun TokenDetailFragment.loadERCChainData() {
-		doAsync {
-			// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-			TransactionListPresenter.getTokenTransactions(
-				"0",
-				{
-					// ToDo 等自定义的 `Alert` 完成后应当友好提示
-					LogUtil.error("error in getTransactionDataFromEtherScan $it")
-				}
-			) { it ->
-				// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-				it.find {
-					it.contract.equals(token?.contract, true)
-				}.isNotNull {
-					// 有数据后重新执行从数据库拉取数据
-					loadDataFromDatabaseOrElse()
+		BTCSeriesTransactionTable
+			.getTransactionsByAddressAndChainType(
+				address,
+				chainType
+			) { transactions ->
+				transactions.isNotEmpty() isTrue {
+					fragment.updatePageBy(
+						transactions.map {
+							TransactionListModel(it)
+						}.sortedByDescending {
+							it.timeStamp
+						},
+						address
+					)
+					fragment.removeLoadingView()
 				} otherwise {
-					GoldStoneAPI.context.runOnUiThread {
-						// 链上和本地都没有数据就更新一个空数组作为默认
-						updateChartBy(arrayListOf(), Config.getCurrentEthereumAddress())
-						removeLoadingView()
-					}
+					withouDataCallback()
+					LogUtil.debug(this.javaClass.simpleName, "There isn't BTCSeries Local Data")
 				}
 			}
-		}
 	}
 
-	private fun TokenDetailFragment.loadETCChainData() {
-		showLoadingView(LoadingText.transactionData)
-		ClassicTransactionListPresenter.getETCTransactionsFromChain(arrayListOf()) {
-			fragment.removeLoadingView()
-			loadDataFromDatabaseOrElse()
-		}
-	}
-
-	private fun TokenDetailFragment.loadBTCChainData() {
-		showLoadingView(LoadingText.transactionData)
-		BitcoinTransactionListPresenter.loadTransactionsFromChain(
-			BitcoinTransactionListPresenter.pageSize,
-			arrayListOf(),
-			{
-				fragment.removeLoadingView()
-				// TODO ERROR Alert
-			}
-		) {
-			fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-			// TODO 判断数据
-			loadDataFromDatabaseOrElse()
-		}
-	}
-
-	private fun TokenDetailFragment.updateChartBy(
+	fun TokenDetailFragment.updatePageBy(
 		data: List<TransactionListModel>,
 		walletAddress: String
 	) {
@@ -370,7 +368,7 @@ class TokenDetailPresenter(
 							data.balance
 						)
 					}
-				} then {
+				} then { _ ->
 					// 更新数据完毕后在主线程从新从数据库获取数据
 					TokenBalanceTable.getBalanceByContract(contract, walletAddress) {
 						callback(it)

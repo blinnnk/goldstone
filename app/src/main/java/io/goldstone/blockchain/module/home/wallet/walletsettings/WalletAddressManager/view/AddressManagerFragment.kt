@@ -41,18 +41,19 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 5) { moreButton, address, isDefault, title ->
-			val chainTYpe = when (title) {
+			val chainType = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
 				CryptoSymbol.etc -> ChainType.ETC.id
 				CryptoSymbol.erc -> ChainType.ETH.id
 				CryptoSymbol.ltc -> ChainType.LTC.id
+				CryptoSymbol.bch -> ChainType.BCH.id
 				else -> ChainType.BTC.id
 			}
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					chainTYpe,
+					chainType,
 					!isDefault
 				)
 				moreButton.preventDuplicateClicks()
@@ -118,6 +119,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
+
+	private val bchAddressesView by lazy {
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
+				showCellMoreDashboard(
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.BCH.id,
+					!isDefault
+				)
+				moreButton.preventDuplicateClicks()
+			}
+		}
+	}
 	override val presenter = AddressManagerPresneter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -138,18 +153,24 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						ethAndERCAddressesView.into(this@parent)
 						etcAddressesView.into(this@parent)
 						btcAddressesView.into(this@parent)
+						bchAddressesView.into(this@parent)
 						ltcAddressesView.into(this@parent)
 						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 						ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
+						bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
 						else presenter.getBitcoinAddresses()
+						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
 						else presenter.getLitecoinAddresses()
+						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
+						if (Config.isTestEnvironment()) presenter.getBitcoinCashTestAddresses()
+						else presenter.getBitcoinCashAddresses()
 					} else {
 						hideAddButton()
 						attentionView.into(this@parent)
@@ -171,6 +192,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
 		ethAndERCAddressesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethAndERCAddressesView.model = model
+	}
+
+	fun setBitcoinCashAddressesModel(model: List<Pair<String, String>>) {
+		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashcoinAddress)
+		bchAddressesView.model = model
 	}
 
 	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {

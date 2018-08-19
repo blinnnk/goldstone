@@ -46,7 +46,10 @@ class TokenManagementListPresenter(
 
 	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
 		when (Config.getCurrentWalletType()) {
-			WalletType.BTCTestOnly.content, WalletType.BTCOnly.content, WalletType.LTCOnly.content -> {
+			WalletType.BTCTestOnly.content,
+			WalletType.BTCOnly.content,
+			WalletType.LTCOnly.content,
+			WalletType.BCHOnly.content -> {
 				fragment.showAttentionView()
 				callback(false)
 			}

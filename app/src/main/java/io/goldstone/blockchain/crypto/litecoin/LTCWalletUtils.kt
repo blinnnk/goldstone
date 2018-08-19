@@ -8,6 +8,7 @@ import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Sha256Hash
+import org.bitcoinj.params.MainNetParams
 import org.spongycastle.jcajce.provider.digest.RIPEMD160
 import org.spongycastle.util.encoders.Hex
 import java.math.BigInteger
@@ -29,12 +30,12 @@ object LTCWalletUtils {
 		path: String,
 		netVersion: ChainPrefix,
 		isCompress: Boolean
-	): Base58KeyPair {
+	): BaseKeyPair {
 		val seed = Mnemonic.mnemonicToSeed(mnemonic, "")
 		val keyPair = generateKey(seed, path)
 		val base58PrivateKey = generateWIFPrivatekey(keyPair.keyPair.privateKey, netVersion, isCompress)
 		val address = generateBase58Address(keyPair.keyPair.privateKey, netVersion, isCompress)
-		return Base58KeyPair(address, base58PrivateKey)
+		return BaseKeyPair(address, base58PrivateKey)
 	}
 
 	private fun generateBase58Address(
@@ -125,5 +126,16 @@ object LTCWalletUtils {
 			!address.substring(0, 1).equals("L", true) -> false
 			else -> true
 		}
+	}
+}
+
+// An alternative network
+class LitecoinNetParams : MainNetParams() {
+	init {
+		id = "alt.network"
+		addressHeader = 48
+		p2shHeader = 5
+		dumpedPrivateKeyHeader = 176
+//		acceptableAddressCodes = intArrayOf(addressHeader, p2shHeader)
 	}
 }

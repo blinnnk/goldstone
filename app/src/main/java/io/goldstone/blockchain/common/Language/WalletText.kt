@@ -128,6 +128,16 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
+	val bchMainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BCH MAINNET"
+		HoneyLanguage.Chinese.code -> "BCH MAINNET"
+		HoneyLanguage.Japanese.code -> "BCH MAINNET"
+		HoneyLanguage.Korean.code -> "BCH MAINNET"
+		HoneyLanguage.Russian.code -> "BCH MAINNET"
+		HoneyLanguage.TraditionalChinese.code -> "BCH MAINNET"
+		else -> ""
+	}
+	@JvmField
 	val btcMainnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BITCOIN MAINNET"
 		HoneyLanguage.Chinese.code -> "BITCOIN 主网"

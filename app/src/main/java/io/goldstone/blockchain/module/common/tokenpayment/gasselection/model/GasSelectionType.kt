@@ -37,14 +37,15 @@ data class GasSelectionModel(
 		id: Int,
 		price: Long, // Satoshi
 		bytes: Long,
-		currentType: String
+		currentType: String,
+		symbol: String
 	) : this(
 		id,
-		"${(price * bytes).toBTCCount().toBigDecimal()} ${CryptoSymbol.btc()}",
+		"${(price * bytes).toBTCCount().toBigDecimal()} $symbol",
 		"≈ $price Satoshi  * $bytes bytes",
-		calculateBTCType(id, price),
+		calculateBTCSeruesType(id, price),
 		currentType,
-		CryptoSymbol.btc()
+		symbol
 	)
 
 	companion object {
@@ -60,7 +61,7 @@ data class GasSelectionModel(
 			}
 		}
 
-		fun calculateBTCType(id: Int, satoshi: Long): String {
+		fun calculateBTCSeruesType(id: Int, satoshi: Long): String {
 			return if (id == 3) MinerFeeType.Custom.content
 			else {
 				when (satoshi) {

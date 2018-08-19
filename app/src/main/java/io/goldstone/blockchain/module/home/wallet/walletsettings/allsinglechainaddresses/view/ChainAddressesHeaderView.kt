@@ -26,7 +26,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
-	
+
 	private val defaultTitle = textView {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.heavy(context)
@@ -42,7 +42,7 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 		gravity = Gravity.START or Gravity.CENTER_VERTICAL
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX())
 	}
-	
+
 	init {
 		topPadding = 10.uiPX()
 		orientation = VERTICAL
@@ -53,7 +53,7 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 		allAddressTitle.into(this)
 		currentAddress.updateStyle(Companion.CellType.Default)
 	}
-	
+
 	fun setDefaultAddress(
 		index: String,
 		address: String,
@@ -68,19 +68,19 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 			ChainType.ETH.id -> {
 				allAddressTitle.text = WalletSettingsText.allETHAndERCAddresses
 			}
-			
+
 			ChainType.ETC.id -> {
 				allAddressTitle.text = WalletSettingsText.allETCAddresses
 			}
-			
+
 			ChainType.BTC.id -> {
 				allAddressTitle.text =
 					if (Config.isTestEnvironment()) WalletSettingsText.allBtCTestAddresses
-					else WalletSettingsText.allBtCAddresses
+					else WalletSettingsText.allBtcAddresses
 			}
 		}
 	}
-	
+
 	private fun setClickEvent(
 		address: String,
 		showDashboardEvent: GraySqualCellWithButtons.() -> Unit

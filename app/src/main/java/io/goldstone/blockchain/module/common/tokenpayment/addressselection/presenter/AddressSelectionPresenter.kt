@@ -70,6 +70,10 @@ class AddressSelectionPresenter(
 						// TODO LTC By Code
 					}
 
+					token?.symbol.equals(CryptoSymbol.bch, true) -> {
+						// TODO BCH By Code
+					}
+
 					token?.symbol.equals(CryptoSymbol.etc, true)
 						|| token?.symbol.equals(CryptoSymbol.eth, true) -> {
 						DepositPresenter.convertETHOrETCQRCOde(result).let {
@@ -121,13 +125,25 @@ class AddressSelectionPresenter(
 
 			AddressType.LTC -> {
 				if (!token?.symbol.equals(CryptoSymbol.ltc, true)) {
-					System.out.println(token?.symbol)
 					fragment.context.alert(
 						"This is a invalid address type for ${CryptoSymbol.ltc}, Please check it agin"
 					)
 					return
 				} else {
 					WalletTable.getAllLTCAddresses {
+						showAlertIfLocalExistThisAddress(this)
+					}
+				}
+			}
+
+			AddressType.BCH -> {
+				if (!token?.symbol.equals(CryptoSymbol.bch, true)) {
+					fragment.context.alert(
+						"This is a invalid address type for ${CryptoSymbol.bch}, Please check it agin"
+					)
+					return
+				} else {
+					WalletTable.getAllBCHAddresses {
 						showAlertIfLocalExistThisAddress(this)
 					}
 				}
@@ -159,10 +175,7 @@ class AddressSelectionPresenter(
 							"setting in settings first"
 					)
 					return
-				} else if (
-					!token?.symbol.equals(CryptoSymbol.btc(), true) &&
-					!token?.symbol.equals(CryptoSymbol.ltc, true)
-				) {
+				} else if (!CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
 					fragment.context.alert(
 						"This is a invalid address type for Testnet, Please check it agin"
 					)

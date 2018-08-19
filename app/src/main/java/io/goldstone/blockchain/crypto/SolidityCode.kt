@@ -36,6 +36,7 @@ object CryptoValue {
 	const val etcContract = "0x61"
 	const val btcContract = "0x0"
 	const val ltcContract = "0x2"
+	const val bchContract = "0x145"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
@@ -59,6 +60,7 @@ object CryptoValue {
 			it.equals(CryptoValue.ethContract, true) -> Config.getCurrentChain()
 			it.equals(CryptoValue.ltcContract, true) -> Config.getLTCCurrentChain()
 			it.equals(CryptoValue.btcContract, true) -> Config.getBTCCurrentChain()
+			it.equals(CryptoValue.bchContract, true) -> Config.getBCHCurrentChain()
 			else -> Config.getCurrentChain()
 		}
 	}
@@ -77,14 +79,16 @@ object CryptoValue {
 	enum class PrivateKeyType(val content: String) {
 		ETHERCAndETC("ETH, ERC20 And ETC"),
 		BTC("BTC"),
+		BCH("BCH"),
 		BTCTest("BTC Test"),
-		LTC("LTC"),;
+		LTC("LTC"), ;
 
 		companion object {
 			fun getTypeByContent(content: String): PrivateKeyType {
 				return when (content) {
 					ETHERCAndETC.content -> ETHERCAndETC
 					LTC.content -> LTC
+					BCH.content -> BCH
 					BTC.content -> BTC
 					else -> BTCTest
 				}
@@ -101,7 +105,16 @@ object CryptoSymbol {
 	}
 	const val pureBTCSymbol = "BTC"
 	const val ltc = "LTC"
+	const val bch = "BCH"
 	const val erc = "ERC"
+
+	val allBTCSeriesSymbol: () -> List<String> = {
+		listOf(ltc, btc(), bch)
+	}
+
+	fun isBTCSeriesSymbol(symbol: String?): Boolean {
+		return allBTCSeriesSymbol().any { it.equals(symbol, true) }
+	}
 
 	fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
 		return if (
@@ -133,12 +146,25 @@ enum class ChainType(val id: Int) {
 	BTC(0),
 	AllTest(1),
 	LTC(2),
+	BCH(145),
 	ETH(60),
 	ETC(61),
 	ERC(100); // 需要调大不然可能会和自然 `Type` 冲突
+
 	companion object {
-	  fun getAllBTCSeriesType(): List<Int> {
-			return listOf(LTC.id, AllTest.id, BTC.id)
+		fun getAllBTCSeriesType(): List<Int> {
+			return listOf(LTC.id, AllTest.id, BTC.id, BCH.id)
+		}
+
+		fun getChainTypeBySymbol(symbol: String?): Int {
+			return when (symbol) {
+				CryptoSymbol.btc() -> BTC.id
+				CryptoSymbol.ltc -> LTC.id
+				CryptoSymbol.eth -> ETH.id
+				CryptoSymbol.etc -> ETC.id
+				CryptoSymbol.bch -> BCH.id
+				else -> ETH.id
+			}
 		}
 	}
 }
@@ -150,11 +176,13 @@ object DefaultPath {
 	const val btcPath = "m/44'/0'/0'/0/0"
 	const val testPath = "m/44'/1'/0'/0/0"
 	const val ltcPath = "m/44'/2'/0'/0/0"
+	const val bchPath = "m/44'/145'/0'/0/0"
 	// Header Value
 	const val ethPathHeader = "m/44'/60'/"
 	const val etcPathHeader = "m/44'/61'/"
 	const val btcPathHeader = "m/44'/0'/"
 	const val testPathHeader = "m/44'/1'/"
 	const val ltcPathHeader = "m/44'/2'/"
+	const val bchPathHeader = "m/44'/145'/"
 	const val default = "0'/0/0"
 }

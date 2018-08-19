@@ -97,6 +97,18 @@ class AddressManagerPresneter(
 		}
 	}
 
+	fun getBitcoinCashAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(bchAddresses))
+		}
+	}
+
+	fun getBitcoinCashTestAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
+		}
+	}
+
 	fun getEthereumClassicAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
@@ -132,7 +144,8 @@ class AddressManagerPresneter(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
-			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress)
+			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress),
+			Pair(R.drawable.bch_creator_icon, WalletSettingsText.newBCHAddress)
 		)
 	}
 
@@ -159,7 +172,7 @@ class AddressManagerPresneter(
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtCAddresses,
+				WalletSettingsText.allBtcAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
@@ -172,6 +185,16 @@ class AddressManagerPresneter(
 				WalletSettingsText.allLTCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
+			)
+		}
+	}
+
+	fun showAllBCHAddresses(): Runnable {
+		return Runnable {
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
+				WalletSettingsText.allBCHAddresses,
+				WalletSettingsText.viewAddresses,
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
 	}
@@ -393,6 +416,16 @@ class AddressManagerPresneter(
 			}
 		}
 
+		fun createBCHAddress(
+			context: Context,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			System.out.println("$context$password")
+			hold(arrayListOf())
+			// TODO
+		}
+
 		fun createLTCAddress(
 			context: Context,
 			password: String,
@@ -495,6 +528,7 @@ class AddressManagerPresneter(
 					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
 					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
+					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							hold(

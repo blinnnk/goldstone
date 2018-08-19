@@ -35,6 +35,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 					CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
 					CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
 					CryptoSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
+					CryptoSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
 					CryptoSymbol.btc() ->
 						icon.image.imageResource =
 							if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token

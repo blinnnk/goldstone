@@ -137,6 +137,7 @@ class CreateWalletPresenter(
 						multiChainAddresses.btcAddress,
 						multiChainAddresses.btcSeriesTestAddress,
 						multiChainAddresses.ltcAddress,
+						multiChainAddresses.bchAddress,
 						ethAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ethAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
@@ -157,10 +158,15 @@ class CreateWalletPresenter(
 							multiChainAddresses.ltcAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
 						),
+						bchAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.bchAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
+						),
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
 						btcTestPath = DefaultPath.testPath,
+						bchPath = DefaultPath.bchPath,
 						ltcPath = DefaultPath.ltcPath,
 						hint = hint,
 						isUsing = true
@@ -368,7 +374,18 @@ class CreateWalletPresenter(
 								}
 							}
 							ChainID.LTCTest.id -> {
-								if (currentAddresses.ltcAddress.isNotEmpty()) {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+								}
+							}
+
+							ChainID.BCHMain.id -> {
+								if (currentAddresses.bchAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.bchAddress))
+								}
+							}
+							ChainID.BCHTest.id -> {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
 									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
 								}
 							}

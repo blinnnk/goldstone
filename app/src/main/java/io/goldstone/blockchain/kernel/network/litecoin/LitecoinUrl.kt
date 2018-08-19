@@ -9,11 +9,22 @@ import io.goldstone.blockchain.common.value.WebUrl
  */
 
 object LitecoinUrl {
-	private var currentUrl: (api: String) -> String = {
-		if (Config.isTestEnvironment()) WebUrl.ltcTest(it)
-		else WebUrl.ltcMain(it)
+	var currentUrl: () -> String = {
+		if (Config.isTestEnvironment()) WebUrl.ltcTest else WebUrl.ltcMain
 	}
 	val getBalance: (address: String) -> String = { address ->
-		"${currentUrl("get_address_balance")}/$address"
+		"${currentUrl()}/api/addr/$address/balance"
+	}
+
+	val getUnspentInfo: (address: String) -> String = { address ->
+		"${currentUrl()}/api/addr/$address/utxo"
+	}
+
+	val getTransactions: (address: String) -> String = { address ->
+		"${currentUrl()}/api/txs/?address=$address"
+	}
+
+	val getTransactionByHash: (hash: String) -> String = { hash ->
+		"${currentUrl()}/api/tx/$hash"
 	}
 }

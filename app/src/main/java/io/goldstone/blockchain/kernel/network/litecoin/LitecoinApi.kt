@@ -1,9 +1,13 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
+import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONObject
 
 /**
@@ -12,18 +16,71 @@ import org.json.JSONObject
  */
 
 object LitecoinApi {
-	fun getBalanceByAddress(address: String, hold: (Double) -> Unit) {
-		RequisitionUtil.requestUncryptoData<String>(
-			LitecoinUrl.getBalance(address),
-			"data",
-			true,
-			{
-				LogUtil.error("getBitcoinBalance", it)
-			}
+	fun getBalance(address: String, hold: (Long) -> Unit) {
+		BTCSeriesApiUtils.getBalance(LitecoinUrl.getBalance(address), hold)
+	}
+
+	fun getUnspentListByAddress(
+		address: String,
+		hold: (List<UnspentModel>) -> Unit
+	) {
+		BTCSeriesApiUtils.getUnspentListByAddress(LitecoinUrl.getUnspentInfo(address), hold)
+	}
+
+	fun getTransactions(
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (List<JSONObject>) -> Unit
+	) {
+		BTCSeriesApiUtils.getTransactions(
+			LitecoinUrl.getTransactions(address),
+			errorCallback,
+			hold
+		)
+	}
+
+	fun getTransactionByHash(
+		hash: String,
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (BTCSeriesTransactionTable?) -> Unit
+	) {
+		BTCSeriesApiUtils.getTransactionByHash(
+			LitecoinUrl.getTransactionByHash(hash),
+			errorCallback
 		) {
-			val count =
-				JSONObject(this[0]).safeGet("confirmed_balance").toDoubleOrNull() ?: 0.0
-			hold(count)
+			hold(
+				if (isNull()) null
+				else BTCSeriesTransactionTable(
+					it!!,
+					address,
+					CryptoSymbol.ltc,
+					false,
+					ChainType.LTC.id
+				)
+			)
+		}
+	}
+
+	fun getBlockNumberByTransactionHash(
+		hash: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (Int?) -> Unit
+	) {
+		BTCSeriesApiUtils.getTransactionByHash(
+			LitecoinUrl.getTransactionByHash(hash),
+			errorCallback
+		) {
+			hold(
+				if (isNull()) null
+				else {
+					// insight 第三方接口有时候会返回 `-1`
+					val blockNumber =
+						it!!.safeGet("blockheight").toIntOrNull().orZero()
+					if (blockNumber < 0) null
+					else blockNumber
+				}
+			)
 		}
 	}
 }

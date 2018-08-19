@@ -10,10 +10,10 @@ import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
+import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -32,6 +32,7 @@ abstract class BTCTransactionStatusObserver {
 	private val targetIntervla = 6
 	private val retryTime = 20000L
 	private var currentBlockNumber: Int? = null
+	private var maxRetryTimes = 6
 
 	open fun checkStatusByTransaction() {
 		doAsync {
@@ -39,6 +40,9 @@ abstract class BTCTransactionStatusObserver {
 				BitcoinApi.getBlockNumberByTransactionHash(
 					hash,
 					{
+						// 出错失败最大重试次数设定
+						if (maxRetryTimes <= 0) removeObserver()
+						else maxRetryTimes -= 1
 						// TODO ERROR Alert
 						LogUtil.error("Observering getBlockNumberByTransactionHash", it)
 					}
@@ -48,8 +52,8 @@ abstract class BTCTransactionStatusObserver {
 					handler.postDelayed(reDo, retryTime)
 				}
 			} else {
-				BTCJsonRPC.getCurrentBlockHeight(
-					Config.isTestEnvironment(),
+				BTCSeriesJsonRPC.getCurrentBlockHeight(
+					Config.getBTCCurrentChainName(),
 					{
 						removeObserver()
 						// TODO ERROR Alert
@@ -179,8 +183,9 @@ private fun TransactionDetailPresenter.onBTCTransactionSucceed() {
 private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 	isPending: Boolean
 ) {
-	val address = if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-	else Config.getCurrentBTCAddress()
+	val address =
+		if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
+		else Config.getCurrentBTCAddress()
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		address,
@@ -197,8 +202,8 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 		// Update Database
 		transaction?.let {
 			// 更新本地的燃气费记录以及转账记录的相关信息
-			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, false, isPending)
-			BitcoinSeriesTransactionTable.updateLocalDataByHash(currentHash, it, true, isPending)
+			BTCSeriesTransactionTable.updateLocalDataByHash(currentHash, it, false, isPending)
+			BTCSeriesTransactionTable.updateLocalDataByHash(currentHash, it, true, isPending)
 		}
 	}
 }

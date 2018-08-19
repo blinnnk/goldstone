@@ -36,6 +36,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				symbol == CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
 				symbol == CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
 				symbol == CryptoSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
+				symbol == CryptoSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
 				symbol == CryptoSymbol.btc() ->
 					icon.image.imageResource =
 						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token

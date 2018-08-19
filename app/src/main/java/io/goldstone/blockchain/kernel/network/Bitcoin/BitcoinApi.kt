@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
-import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -14,107 +15,74 @@ import org.json.JSONObject
  * @author KaySaith
  */
 object BitcoinApi {
-	
-	fun getBalanceByAddress(address: String, hold: (Long) -> Unit) {
-		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getBalance(BitcoinUrl.currentUrl(), address),
-			address,
-			true,
-			{
-				LogUtil.error("getBitcoinBalance", it)
-			}
-		) {
-			val count = JSONObject(this[0]).safeGet("final_balance").toLongOrNull() ?: 0L
-			hold(count)
-		}
+
+	fun getBalance(address: String, hold: (Long) -> Unit) {
+		BTCSeriesApiUtils.getBalance(BitcoinUrl.getBalance(address), hold)
 	}
-	
+
 	fun getBTCTransactions(
 		address: String,
-		pageSize: Int,
-		offset: Int,
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactions(BitcoinUrl.currentUrl(), address, pageSize, offset),
-			"txs",
-			true,
-			{
-				errorCallback(it)
-				LogUtil.error("getBTCTransactions", it)
-			}
-		) {
-			val jsonArray = JSONArray(this[0])
-			var data = listOf<JSONObject>()
-			(0 until jsonArray.length()).forEach {
-				data += JSONObject(jsonArray[it].toString())
-			}
-			hold(data)
-		}
+		BTCSeriesApiUtils.getTransactions(
+			BitcoinUrl.getTransactionList(address),
+			errorCallback,
+			hold
+		)
 	}
-	
-	fun getUnspentListByAddress(address: String, hold: (List<UnspentModel>) -> Unit) {
-		RequisitionUtil.requestUncryptoData<UnspentModel>(
-			BitcoinUrl.getUnspentInfo(BitcoinUrl.currentUrl(), address),
-			"unspent_outputs",
-			false,
-			{
-				hold(listOf())
-				LogUtil.error("getRawtxByHash", it)
-			}
-		) {
-			hold(if (isNotEmpty()) this else listOf())
-		}
+
+	fun getUnspentListByAddress(
+		address: String,
+		hold: (List<UnspentModel>) -> Unit
+	) {
+		BTCSeriesApiUtils.getUnspentListByAddress(
+			BitcoinUrl.getUnspentInfo(address),
+			hold
+		)
 	}
-	
+
 	fun getTransactionByHash(
 		hash: String,
 		address: String,
 		errorCallback: (Throwable) -> Unit,
-		hold: (BitcoinSeriesTransactionTable?) -> Unit
+		hold: (BTCSeriesTransactionTable?) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
-			"",
-			true,
-			{
-				errorCallback(it)
-				LogUtil.error("Bitcoin getTransactionByHash", it)
-			}
+		BTCSeriesApiUtils.getTransactionByHash(
+			BitcoinUrl.getTransactionByHash(hash),
+			errorCallback
 		) {
 			hold(
-				if (isNotEmpty()) {
-					BitcoinSeriesTransactionTable(
-						JSONObject(this[0]),
-						CryptoSymbol.btc(),
-						address,
-						false
-					)
-				} else null
+				if (isNull()) null
+				else BTCSeriesTransactionTable(
+					it!!,
+					address,
+					CryptoSymbol.pureBTCSymbol,
+					false,
+					ChainType.BTC.id
+				)
 			)
 		}
 	}
-	
+
 	fun getBlockNumberByTransactionHash(
 		hash: String,
 		errorCallback: (Throwable) -> Unit,
 		hold: (Int?) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<String>(
-			BitcoinUrl.getTransactionByHash(BitcoinUrl.currentUrl(), hash),
-			"",
-			true,
-			{
-				hold(null)
-				errorCallback(it)
-				LogUtil.error("getBlockNumberByTransactionHash", it)
-			}
+		BTCSeriesApiUtils.getTransactionByHash(
+			BitcoinUrl.getTransactionByHash(hash),
+			errorCallback
 		) {
 			hold(
-				if (isNotEmpty()) {
-					JSONObject(this[0]).safeGet("block_height").toIntOrNull()
-				} else null
+				if (isNull()) null
+				else {
+					// insight 第三方接口有时候会返回 `-1`
+					val blockNumber =
+						it!!.safeGet("blockheight").toIntOrNull().orZero()
+					if (blockNumber < 0) null
+					else blockNumber
+				}
 			)
 		}
 	}

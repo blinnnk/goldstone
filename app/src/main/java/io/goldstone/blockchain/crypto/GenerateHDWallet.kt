@@ -240,6 +240,26 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 			)
 		}
 
+		WalletType.LTCOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentLTCAddress(),
+				true,
+				true,
+				hold
+			)
+		}
+
+		WalletType.BCHOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentBCHAddress(),
+				true,
+				true,
+				hold
+			)
+		}
+
 		WalletType.ETHERCAndETCOnly.content -> {
 			verifyKeystorePassword(
 				password,

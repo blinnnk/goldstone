@@ -221,10 +221,15 @@ class MarketTokenDetailPresenter(
 		dateType: Int
 	) {
 		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getQuotationCurrencyChart(pair, period, 8, {
-			// Show the error exception to user
-			fragment.context.alert(it.toString().showAfterColonContent())
-		}) {
+		GoldStoneAPI.getQuotationCurrencyChart(
+			pair,
+			period,
+			8,
+			{
+				// Show the error exception to user
+				fragment.context.alert(it.toString().showAfterColonContent())
+			}
+		) {
 			// 把数据更新到数据库
 			it.updateChartDataInDatabaseBy(period, pair)
 			// 更新 `UI` 界面

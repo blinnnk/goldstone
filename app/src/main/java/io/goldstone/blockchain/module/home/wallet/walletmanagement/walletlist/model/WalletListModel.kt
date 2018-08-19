@@ -37,6 +37,7 @@ data class WalletListModel(
 		fun getSubtitleByType(wallet: WalletTable): String {
 			return when (WalletTable.getTargetWalletType(wallet)) {
 				WalletType.LTCOnly -> wallet.currentLTCAddress
+				WalletType.BCHOnly -> wallet.currentBCHAddress
 				WalletType.MultiChain -> WalletText.multiChain
 				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
 				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses
