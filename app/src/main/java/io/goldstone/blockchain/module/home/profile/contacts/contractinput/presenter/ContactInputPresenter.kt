@@ -25,7 +25,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -147,8 +146,6 @@ class ContactInputPresenter(
 				bchAddressText
 			)
 		) {
-			// 通信录的地址是实时显示到账单的, 当通信录有更新的时候清空缓存中的数据
-			memoryTransactionListData = null
 			fragment.getParentFragment<ProfileOverlayFragment> {
 				if (!contactAddress.isNullOrBlank()) {
 					// 从账单详情快捷添加地址进入的页面

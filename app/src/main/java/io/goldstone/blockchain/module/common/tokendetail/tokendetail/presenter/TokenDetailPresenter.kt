@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -130,6 +129,7 @@ class TokenDetailPresenter(
 	private var hasUpdateBTCData = false
 	private var hasUpdateLTCData = false
 	private var hasUpdateERCData = false
+	private var hasUpdateETHData = false
 	private var hasUpdateBCHData = false
 
 	private fun TokenDetailFragment.loadDataFromChain() {
@@ -154,6 +154,11 @@ class TokenDetailPresenter(
 				hasUpdateLTCData = true
 			}
 
+			token?.symbol.equals(CryptoSymbol.eth, true) -> {
+				if (!hasUpdateETHData) loadETHChainData()
+				hasUpdateETHData = true
+			}
+
 			else -> {
 				if (!hasUpdateERCData) loadERCChainData()
 				hasUpdateERCData = true
@@ -174,19 +179,15 @@ class TokenDetailPresenter(
 						)
 
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
-						if (Config.isTestEnvironment()) {
-							getBTCSeriesData(
-								Config.getCurrentBTCSeriesTestAddress(),
-								ChainType.BTC.id,
-								withoutLocalDataCallback
-							)
-						} else {
-							getBTCSeriesData(
-								Config.getCurrentBTCAddress(),
-								ChainType.BTC.id,
-								withoutLocalDataCallback
-							)
-						}
+						val address =
+							if (Config.isTestEnvironment())
+								Config.getCurrentBTCSeriesTestAddress()
+							else Config.getCurrentBTCAddress()
+						getBTCSeriesData(
+							address,
+							ChainType.BTC.id,
+							withoutLocalDataCallback
+						)
 					}
 
 					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
@@ -227,6 +228,13 @@ class TokenDetailPresenter(
 					)
 				}
 			}
+
+			WalletType.BCHOnly.content ->
+				getBTCSeriesData(
+					Config.getCurrentBCHAddress(),
+					ChainType.BTC.id,
+					withoutLocalDataCallback
+				)
 
 			WalletType.ETHERCAndETCOnly.content ->
 				getETHERC20OrETCData(
@@ -303,7 +311,7 @@ class TokenDetailPresenter(
 		walletAddress: String
 	) {
 		allData = data
-		TransactionListPresenter.checkAddressNameInContacts(data) {
+		checkAddressNameInContacts(data) {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {

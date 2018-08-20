@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.*
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
@@ -98,9 +99,14 @@ class PrivateKeyImportPresenter(
 				}
 
 				CryptoValue.PrivateKeyType.BCH -> {
-					setAllMainnet {
-						// TODO Import BCH Private Key
-					}
+					importWalletByBCHPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment.context,
+						hintInput.text?.toString(),
+						callback
+					)
 				}
 
 				CryptoValue.PrivateKeyType.BTCTest -> {
@@ -171,6 +177,59 @@ class PrivateKeyImportPresenter(
 			}
 		}
 
+		fun importWalletByBCHPrivateKey(
+			privateKey: String,
+			password: String,
+			name: String,
+			context: Context?,
+			hint: String?,
+			callback: (Boolean) -> Unit
+		) {
+			if (privateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
+				context?.alert(ImportWalletText.unvalidPrivateKey)
+				callback(false)
+				return
+			}
+			// 检查比特币私钥地址格式是否是对应的网络
+			if (!BTCUtils.isValidMainnetPrivateKey(privateKey)) {
+				context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
+				callback(false)
+				return
+			}
+
+			BCHWalletUtils.getBCHAddressByWIFKey(privateKey).let { address ->
+				context?.apply {
+					// 存储私钥的 `KeyStore` 文件
+					storeBase58PrivateKey(
+						privateKey,
+						address,
+						password,
+						false,
+						true
+					)
+					// 存储可读信息到数据库
+					WalletImportPresenter.insertWalletToDatabase(
+						this,
+						MultiChainAddresses(
+							"",
+							"",
+							"",
+							"",
+							"",
+							address
+						),
+						name,
+						"",
+						MultiChainPath(),
+						hint
+					) {
+						if (it) setAllMainnet { callback(true) }
+						else callback(false)
+					}
+				}
+			}
+		}
+
 		fun importWalletByBTCPrivateKey(
 			privateKey: String,
 			password: String,
@@ -200,7 +259,7 @@ class PrivateKeyImportPresenter(
 				}
 			}
 
-			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest) { address ->
+			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest).let { address ->
 				context?.apply {
 					// 存储私钥的 `KeyStore` 文件
 					storeBase58PrivateKey(

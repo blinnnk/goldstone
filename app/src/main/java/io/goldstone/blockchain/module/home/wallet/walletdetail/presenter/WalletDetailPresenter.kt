@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
-import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailAdapter
@@ -125,14 +124,6 @@ class WalletDetailPresenter(
 		showPinCodeFragment()
 		updateUnreadCount()
 		fragment.getMainActivity()?.backEvent = null
-	}
-
-	fun showTransactionsFragment() {
-		fragment.activity?.apply {
-			findIsItExist(FragmentTag.transaction) isFalse {
-				addFragment<TransactionFragment>(ContainerID.main, FragmentTag.transaction)
-			}
-		}
 	}
 
 	fun showNotificationListFragment() {

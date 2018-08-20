@@ -68,11 +68,11 @@ ZEC   |    133     |        128       | 28 & b8 prefix/('t1')| (28 & bd)/('t3')|
 XTZ   |    ???     |        ???       | 6 & a19f prefix/('tz')|  ??             |  ??
 
  */
-enum class ChainPrefix(val publicKey: String, val privateKey: String) {
-	BitcoinMainnet("00", "80"),
-	Testnet("6F", "EF"),
-	Litecoin("30", "B0"),
-	Dogecoin("1E", "9E");
+enum class ChainPrefix(val publicKey: String, val privateKey: String, val publickeyInt: Int) {
+	BitcoinMainnet("00", "80", 0),
+	Testnet("6F", "EF", 111),
+	Litecoin("30", "B0", 48),
+	Dogecoin("1E", "9E", 30);
 
 	companion object {
 		const val compressSuffix = "01"

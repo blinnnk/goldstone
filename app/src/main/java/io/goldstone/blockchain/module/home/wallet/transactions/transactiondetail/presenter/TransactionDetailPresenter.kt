@@ -22,7 +22,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
-import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -79,12 +78,6 @@ class TransactionDetailPresenter(
 
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
-			is TransactionFragment -> {
-				parent.headerTitle = TransactionText.detail
-				parent.presenter
-					.popFragmentFrom<TransactionDetailFragment>(TransactionFragment.viewPagerSize)
-			}
-
 			is TokenDetailOverlayFragment -> {
 				parent.headerTitle = TokenDetailText.tokenDetail
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
@@ -126,7 +119,6 @@ class TransactionDetailPresenter(
 							fragment.parentFragment?.apply {
 								when (this) {
 									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-									is TransactionFragment -> presenter.removeSelfFromActivity()
 								}
 							}
 							fragment.getMainActivity()?.apply {
@@ -158,9 +150,6 @@ class TransactionDetailPresenter(
 					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
-				is TransactionFragment -> presenter.showTargetFragment<WebViewFragment>(
-					webTitle, TransactionText.detail, argument
-				)
 				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(
 					webTitle, TokenDetailText.tokenDetail, argument
 				)

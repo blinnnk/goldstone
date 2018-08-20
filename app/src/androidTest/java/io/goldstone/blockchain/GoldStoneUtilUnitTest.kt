@@ -36,57 +36,57 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneUtilUnitTest {
-	
+
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	
+
 	@Test
 	fun getSysteDefaultLanguageSymbol() {
 		LogUtil.debug("$positon Get System Language Symbol", CountryCode.currentLanguageSymbol)
 	}
-	
+
 	@Test
 	fun getAppconfig() {
 		AppConfigTable.getAppConfig {
 			LogUtil.debug("$positon + getAppconfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
-	
+
 	@Test
 	fun getSystemParameter() {
 		LogUtil.debug(positon, CountryCode.currentCountry)
 		LogUtil.debug(positon + "getSystemParameter", CountryCode.currentLanguageSymbol)
 	}
-	
+
 	@Test
 	fun hextStringConverter() {
 		LogUtil.debug(positon, "你好".toCryptHexString())
 		LogUtil.debug(positon, "e7bb86e88a82".toUpperCase().toStringFromHex())
 	}
-	
+
 	@Test
 	fun getCurrentWallet() {
 		WalletTable.getCurrentWallet {
 			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
 		}
 	}
-	
+
 	@Test
 	fun getAllWallets() {
 		WalletTable.getAll {
 			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
 		}
 	}
-	
+
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
 			LogUtil.debug("getWatchOnlyAddress", "$it")
 		}
 	}
-	
+
 	@Test
 	fun getMyTokenTable() {
 		doAsync {
@@ -95,14 +95,23 @@ class GoldStoneUtilUnitTest {
 			}
 		}
 	}
-	
+
+	@Test
+	fun getTransactionTable() {
+		doAsync {
+			GoldStoneDataBase.database.transactionDao().getAll().let {
+				LogUtil.debug("getTransactionTable", "$it")
+			}
+		}
+	}
+
 	@Test
 	fun getLatestEthereumChildAddressIndex() {
 		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
 			LogUtil.debug("getLatestEthereumChildAddressIndex + $positon", "$ethereumChildAddressIndex")
 		}
 	}
-	
+
 	@Test
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
@@ -110,14 +119,14 @@ class GoldStoneUtilUnitTest {
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
 		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
 	}
-	
+
 	@Test
 	fun getMyContactTable() {
 		ContactTable.getAllContacts {
 			LogUtil.debug("getMyContactTable", "$it")
 		}
 	}
-	
+
 	@Test
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
@@ -130,7 +139,7 @@ class GoldStoneUtilUnitTest {
 			LogUtil.debug("getCoinInfo", "$it")
 		}
 	}
-	
+
 	@Test
 	fun newEthereumChildAddress() {
 		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->

@@ -152,7 +152,6 @@ class SplashActivity : AppCompatActivity() {
 							prepareYingYongBaoInReviewStatus {
 								hasAccountThenLogin()
 							}
-							cleanMemoryDataLastAccount()
 						}
 					}
 				}

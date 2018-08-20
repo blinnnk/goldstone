@@ -18,6 +18,8 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -34,14 +36,14 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
-		if (transaction.symbol.equals(CryptoSymbol.btc(), true)) {
-			getBitcoinSeriesTransaction(transaction)
-		} else {
-			/**
-			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
-			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
-			 */
-			getETHERC20OrETCTransaction(transaction)
+		/**
+		 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
+		 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+		 */
+		when {
+			CryptoSymbol.isBTCSeriesSymbol(transaction.symbol) ->
+				getBitcoinSeriesTransaction(transaction)
+			else -> getETHERC20OrETCTransaction(transaction)
 		}
 	}
 }
@@ -134,11 +136,22 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 		currentHash,
 		info.isReceived
 	) { localTransaction ->
-		if (localTransaction.isNull()) {
+		if (localTransaction.isNull() || localTransaction?.blockNumber?.toIntOrNull().isNull()) {
 			fragment.apply {
 				showLoadingView(LoadingText.transactionData)
-				updateBTCTransactionByNotificationHash(info) {
-					removeLoadingView()
+				when {
+					info.symbol.equals(CryptoSymbol.pureBTCSymbol, true) ->
+						updateBTCTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}
+					info.symbol.equals(CryptoSymbol.ltc, true) ->
+						updateLTCTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}
+					info.symbol.equals(CryptoSymbol.bch, true) -> {
+						updateBCHTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}}
 				}
 			}
 		} else {
@@ -165,6 +178,62 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	callback: () -> Unit
 ) {
 	BitcoinApi.getTransactionByHash(
+		currentHash,
+		info.fromAddress,
+		{
+			LogUtil.error("updateBTCTransactionByNotificationHash", it)
+			fragment.context?.alert(it.toString())
+		}
+	) { receipt ->
+		// 通过 `Notification` 获取确实信息
+		receipt?.apply {
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+		}?.toAsyncData()?.let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
+			}
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
+	info: NotificationTransactionInfo,
+	callback: () -> Unit
+) {
+	LitecoinApi.getTransactionByHash(
+		currentHash,
+		info.fromAddress,
+		{
+			LogUtil.error("updateBTCTransactionByNotificationHash", it)
+			fragment.context?.alert(it.toString())
+		}
+	) { receipt ->
+		// 通过 `Notification` 获取确实信息
+		receipt?.apply {
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+		}?.toAsyncData()?.let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
+			}
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
+	info: NotificationTransactionInfo,
+	callback: () -> Unit
+) {
+	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
 		{

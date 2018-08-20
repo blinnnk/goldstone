@@ -32,28 +32,26 @@ object BTCWalletUtils {
 
 	private fun getKeyPairFromBase58PrivateKey(
 		privateKey: String,
-		isTest: Boolean,
-		hold: (ECKey) -> Unit
-	) {
+		isTest: Boolean
+	): ECKey {
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val currentID = if (isTest) testNetID else mainNetID
-		return hold(
-			DumpedPrivateKey.fromBase58(currentID, privateKey).key
-		)
+		return DumpedPrivateKey.fromBase58(currentID, privateKey).key
 	}
 
 	fun getPublicKeyFromBase58PrivateKey(
 		privateKey: String,
-		isTest: Boolean,
-		hold: (publicKey: String) -> Unit
-	) {
-
+		isTest: Boolean
+	): String {
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val chainID = if (isTest) testNetID else mainNetID
-		getKeyPairFromBase58PrivateKey(privateKey, isTest) {
-			hold(Address(chainID, Utils.sha256hash160(it.pubKey)).toBase58())
-		}
+		return Address(
+			chainID,
+			Utils.sha256hash160(
+				getKeyPairFromBase58PrivateKey(privateKey, isTest).pubKey
+			)
+		).toBase58()
 	}
 }

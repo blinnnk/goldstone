@@ -5,7 +5,6 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -17,7 +16,7 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadERCChainData() {
 	doAsync {
 		// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-		TransactionListPresenter.getTokenTransactions(
+		getTokenTransactions(
 			"0",
 			{
 				// ToDo 等自定义的 `Alert` 完成后应当友好提示

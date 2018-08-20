@@ -41,6 +41,8 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 		when (Config.getCurrentWalletType()) {
 			WalletType.BTCTestOnly.content -> context.alert(AlertText.testnetOnly)
 			WalletType.BTCOnly.content -> context.alert(AlertText.mainnetOnly)
+			WalletType.LTCOnly.content -> context.alert(AlertText.mainnetOnly)
+			WalletType.BCHOnly.content -> context.alert(AlertText.mainnetOnly)
 			else -> callback()
 		}
 	}

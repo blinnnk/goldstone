@@ -21,35 +21,36 @@ import org.jetbrains.anko.uiThread
 class KeystoreExportPresenter(
 	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
-	
+
 	private val address by lazy {
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
-	
+
 	fun getKeystoreJson(password: String, hold: (String?) -> Unit) {
 		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold(null)
 			return
 		}
-		
+
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		
 		address?.let { getKeystoreByAddress(password, it, hold) }
 	}
-	
+
 	private fun getKeystoreByAddress(
 		password: String,
 		address: String,
 		hold: String?.() -> Unit
 	) {
-		val isBTC = address.length == CryptoValue.bitcoinAddressLength
+		// `BCH` 的地址包含 `:` 所以作为判断条件之一
+		val isBTCSeries =
+			address.length == CryptoValue.bitcoinAddressLength || address.contains(":")
 		doAsync {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (isBTC) {
+			if (isBTCSeries) {
 				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
@@ -60,23 +61,22 @@ class KeystoreExportPresenter(
 			}
 		}
 	}
-	
+
 	private fun getBTCKeystoreFile(
 		walletAddress: String,
 		password: String,
 		isSingleChainWallet: Boolean,
 		hold: (String?) -> Unit
 	) {
-		val filename = CryptoValue.filename(walletAddress, true, isSingleChainWallet)
 		fragment.context?.exportBase58KeyStoreFile(
-			filename,
+			walletAddress,
 			password,
 			isSingleChainWallet
 		) {
 			hold(it)
 		}
 	}
-	
+
 	private fun getETHERC20OrETCKeystoreFile(
 		address: String,
 		password: String,

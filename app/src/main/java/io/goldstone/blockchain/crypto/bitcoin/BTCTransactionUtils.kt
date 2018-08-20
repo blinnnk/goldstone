@@ -2,6 +2,7 @@
 
 package io.goldstone.blockchain.crypto.bitcoin
 
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.bitcoinj.core.*
@@ -126,10 +127,11 @@ object BTCSeriesTransactionUtils {
 			// 把消费列表的值加起来
 			money += it.value
 		}
+
 		// 输出-转给别人
 		transaction.addOutput(
 			Coin.valueOf(sendValue),
-			Address.fromBase58(network, toAddress)
+			Address.fromBase58(network, BCHWalletUtils.formatedToLegacy(toAddress, network))
 		)
 		// 消费列表总金额 - 已经转账的金额 - 手续费 就等于需要返回给自己的金额了
 		val leave = money - sendValue - fee
@@ -138,7 +140,7 @@ object BTCSeriesTransactionUtils {
 			// 输出-转给自己
 			transaction.addOutput(
 				Coin.valueOf(leave),
-				Address.fromBase58(network, changeAddress)
+				Address.fromBase58(network, BCHWalletUtils.formatedToLegacy(changeAddress, network))
 			)
 		}
 		// 输入未消费列表项

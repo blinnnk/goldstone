@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -17,27 +18,30 @@ import org.jetbrains.anko.runOnUiThread
 
 fun TokenDetailPresenter.loadBCHChainData() {
 	fragment.showLoadingView(LoadingText.transactionData)
-	loadLitecoinTransactionsFromChain(
+	loadBCHTransactionsFromChain(
 		arrayListOf(),
 		{
 			fragment.removeLoadingView()
-			// TODO ERROR Alert
+			LogUtil.error("loadBCHChainData", it)
 		}
 	) {
-		fragment.context?.runOnUiThread { fragment.removeLoadingView() }
+		fragment.context?.runOnUiThread {
+			fragment.removeLoadingView()
+		}
 		// TODO 判断数据
 		loadDataFromDatabaseOrElse()
 	}
 }
 
-private fun loadLitecoinTransactionsFromChain(
+private fun loadBCHTransactionsFromChain(
 	localData: List<BTCSeriesTransactionTable>,
 	errorCallback: (Throwable) -> Unit,
 	successCallback: (hasData: Boolean) -> Unit
 ) {
-	val address = if (Config.isTestEnvironment())
-		Config.getCurrentBTCSeriesTestAddress()
-	else Config.getCurrentBCHAddress()
+	val address =
+		if (Config.isTestEnvironment())
+			Config.getCurrentBTCSeriesTestAddress()
+		else Config.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactions(
 		address,
 		errorCallback

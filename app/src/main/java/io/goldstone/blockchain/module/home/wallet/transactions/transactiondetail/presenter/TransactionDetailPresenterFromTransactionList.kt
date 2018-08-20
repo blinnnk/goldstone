@@ -10,7 +10,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.memoryTransactionListData
 
 /**
  * @date 2018/6/6 3:59 PM
@@ -74,10 +73,6 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 			fragment.asyncData = generateModels(this).apply {
 				this[1].info = memo
 			}
-			// 更新内存里面的数据
-			memoryTransactionListData?.find {
-				it.transactionHash == dataFromList?.transactionHash
-			}?.memo = memo
 			updateHeaderValue(headerData)
 		}
 	}

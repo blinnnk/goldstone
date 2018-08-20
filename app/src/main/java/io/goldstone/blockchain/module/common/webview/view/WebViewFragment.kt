@@ -31,7 +31,6 @@ import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transaction.view.TransactionFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.*
 
@@ -83,11 +82,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				}
 
 				is QuotationOverlayFragment -> {
-					presenter.popFragmentFrom<WebViewFragment>()
-				}
-
-				is TransactionFragment -> {
-					headerTitle = TransactionText.detail
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
 
