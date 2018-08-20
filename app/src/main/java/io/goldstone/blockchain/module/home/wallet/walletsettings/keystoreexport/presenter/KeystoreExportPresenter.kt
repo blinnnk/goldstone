@@ -27,7 +27,6 @@ class KeystoreExportPresenter(
 	}
 
 	fun getKeystoreJson(password: String, hold: (String?) -> Unit) {
-		System.out.println("hello 1")
 		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold(null)
@@ -37,7 +36,6 @@ class KeystoreExportPresenter(
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		System.out.println("hello 2")
 		address?.let { getKeystoreByAddress(password, it, hold) }
 	}
 
@@ -53,7 +51,6 @@ class KeystoreExportPresenter(
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
 			if (isBTCSeries) {
-				System.out.println("hello 4 $isSingleChainWallet")
 				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
@@ -71,13 +68,11 @@ class KeystoreExportPresenter(
 		isSingleChainWallet: Boolean,
 		hold: (String?) -> Unit
 	) {
-		System.out.println("hello 5")
 		fragment.context?.exportBase58KeyStoreFile(
 			walletAddress,
 			password,
 			isSingleChainWallet
 		) {
-			System.out.println("hello 6 $it")
 			hold(it)
 		}
 	}

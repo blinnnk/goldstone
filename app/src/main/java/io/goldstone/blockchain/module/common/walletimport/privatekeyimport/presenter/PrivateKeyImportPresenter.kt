@@ -198,7 +198,6 @@ class PrivateKeyImportPresenter(
 			}
 
 			BCHWalletUtils.getBCHAddressByWIFKey(privateKey).let { address ->
-				System.out.println("address$address")
 				context?.apply {
 					// 存储私钥的 `KeyStore` 文件
 					storeBase58PrivateKey(
@@ -208,7 +207,6 @@ class PrivateKeyImportPresenter(
 						false,
 						true
 					)
-					System.out.println("hello bch 100")
 					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
 						this,

@@ -35,9 +35,10 @@ private fun loadLitecoinTransactionsFromChain(
 	errorCallback: (Throwable) -> Unit,
 	successCallback: (hasData: Boolean) -> Unit
 ) {
-	val address = if (Config.isTestEnvironment())
-		Config.getCurrentBTCSeriesTestAddress()
-	else Config.getCurrentBCHAddress()
+	val address =
+		if (Config.isTestEnvironment())
+			Config.getCurrentBTCSeriesTestAddress()
+		else Config.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactions(
 		address,
 		errorCallback

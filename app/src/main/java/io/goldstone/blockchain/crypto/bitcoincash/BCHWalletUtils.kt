@@ -2,6 +2,7 @@
 
 package io.goldstone.blockchain.crypto.bitcoincash
 
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
@@ -37,8 +38,19 @@ object BCHWalletUtils {
 	}
 
 	fun isValidAddress(address: String): Boolean {
-		// TODO
-		System.out.println(address)
-		return true
+		return when {
+			address.length < CryptoValue.bitcoinAddressLength -> false
+			address.contentEquals(":") &&
+				!address.substringAfter(":")
+					.substring(0, 1).equals("q", true) -> false
+			address.substring(0, 1).equals("q", true) &&
+				address.length < CryptoValue.bip39AddressLength -> false
+			// TODO 暂时私钥导入的 BCH 不支持测试网, 这里还没考虑好这种级别的架构.
+			address.length == CryptoValue.bitcoinAddressLength &&
+				address.substring(0, 1).equals("m", true) -> false
+			address.length == CryptoValue.bitcoinAddressLength &&
+				address.substring(0, 1).equals("n", true) -> false
+			else -> true
+		}
 	}
 }

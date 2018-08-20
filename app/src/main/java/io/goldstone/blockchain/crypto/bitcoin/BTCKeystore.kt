@@ -28,7 +28,6 @@ fun Context.storeBase58PrivateKey(
 	isTestNet: Boolean,
 	isSingleChainWallet: Boolean
 ) {
-	System.out.println("hello bch 99")
 	val net = if (isTestNet) TestNet3Params.get() else MainNetParams.get()
 	val finalFilename = if (isSingleChainWallet) "$singleChainFilename$fileName" else fileName
 	val keystoreFile by lazy { File(filesDir!!, finalFilename) }
@@ -38,7 +37,6 @@ fun Context.storeBase58PrivateKey(
 		val eckey = DumpedPrivateKey.fromBase58(net, base58PrivateKey).key
 		/** Import Private Key to Keystore */
 		keyStore.importECDSAKey(eckey.privKeyBytes, password)
-		System.out.println("hello bch 99.9")
 	} catch (error: Exception) {
 		LogUtil.error("generateWallet", error)
 	}
@@ -72,7 +70,6 @@ fun Context.exportBase58KeyStoreFile(
 	isSingleChainWallet: Boolean,
 	hold: (String?) -> Unit
 ) {
-	System.out.println("hello 7")
 	getKeystoreFile(
 		walletAddress,
 		password,

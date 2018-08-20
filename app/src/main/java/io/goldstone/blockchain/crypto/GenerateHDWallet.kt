@@ -127,12 +127,9 @@ fun Context.getKeystoreFile(
 	val filename = CryptoValue.filename(walletAddress, isBTCSeriesWallet, isSingleChainWallet)
 	val keystoreFile by lazy { File(filesDir!!, filename) }
 	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	System.out.println("hello 200 $filename")
 	if (isBTCSeriesOrSingChainWallet) {
 		try {
-			System.out.println("hello 10")
 			hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)))
-			System.out.println("hello 11${String(keyStore.exportKey(keyStore.accounts.get(0), password, password))}")
 		} catch (error: Exception) {
 			runOnUiThread {
 				errorCallback(error)
@@ -141,7 +138,6 @@ fun Context.getKeystoreFile(
 			LogUtil.error("getKeystoreFile", error)
 		}
 	} else {
-		System.out.println("hello 13")
 		(0 until keyStore.accounts.size()).forEach { index ->
 			keyStore.accounts.get(index).address.hex.let {
 				it.equals(walletAddress, true) isTrue {

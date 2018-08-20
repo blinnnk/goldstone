@@ -47,7 +47,6 @@ class KeystoreImportPresenter(
 				else nameInput.text.toString()
 			doAsync {
 				getPrivatekeyByKeystoreFile(keystore, password) {
-					System.out.println("privatekey $it")
 					if (it.isNull()) callback(false)
 
 					it?.let { privateKey ->
@@ -73,7 +72,6 @@ class KeystoreImportPresenter(
 							}
 
 							currentType.equals(BCH.content, true) -> {
-								System.out.println("hello bch")
 								importBCHWallet(
 									walletName,
 									password,
@@ -162,7 +160,6 @@ class KeystoreImportPresenter(
 		privateKey: String,
 		callback: (Boolean) -> Unit
 	) {
-		System.out.println("base58 $privateKey")
 		PrivateKeyImportPresenter.importWalletByBCHPrivateKey(
 			privateKey,
 			password.text.toString(),
