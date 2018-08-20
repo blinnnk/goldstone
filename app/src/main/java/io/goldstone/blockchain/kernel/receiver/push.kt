@@ -23,7 +23,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.bitcoincash.BechCashUtil
+import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -236,7 +236,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		private fun prepareAddressData(model: AddressCommitionModel): String {
 			return if (model.chainType == 1) {
 				val bchTestAddress =
-					BechCashUtil.instance.encodeCashAdrressByLegacy(model.address).substringAfter(":")
+					BCHUtil.instance.encodeCashAdrressByLegacy(model.address).substringAfter(":")
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),

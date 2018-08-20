@@ -8,7 +8,7 @@ import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.bitcoincash.BechCashUtil
+import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.fail
@@ -41,7 +41,7 @@ class LitecoinUnitTest {
 		val address = ECKey.fromPrivate(generateKey(seed, DefaultPath.bchPath).keyPair.privateKey).toAddress(MainNetParams.get())
 		System.out.println(
 			"++++bch +++ (${address.toBase58()})" +
-			BechCashUtil.instance.encodeCashAdrressByLegacy(address.toBase58())
+				BCHUtil.instance.encodeCashAdrressByLegacy(address.toBase58())
 		)
 	}
 

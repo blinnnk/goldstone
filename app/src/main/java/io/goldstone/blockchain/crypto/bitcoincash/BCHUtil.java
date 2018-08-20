@@ -5,40 +5,19 @@ package io.goldstone.blockchain.crypto.bitcoincash;
  * @date 2018/8/15 10:56 AM
  */
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
-import java.util.Map.Entry;
-
 // C++ conversion to java
 // DOC : https://github.com/bitcoincashorg/spec/blob/master/cashaddr.md
 // CODE : https://github.com/Bitcoin-ABC/bitcoin-abc/blob/6c9c42ccb093820d5dd6f32f02c657c25ce5f823/src/cashaddr.cpp
-public class BechCashUtil {
-  public static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+public class BCHUtil {
+  private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 
-  /**
-   * The cashaddr character set for decoding.
-   */
-  public static final byte[] CHARSET_REV = { // 127
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 16+
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 2
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 3
-    15, -1, 10, 17, 21, 20, 26, 30, +7, +5, -1, -1, -1, -1, -1, -1, // 4
-    -1, 29, -1, 24, 13, 25, +9, +8, 23, -1, 18, 22, 31, 27, 19, -1, // 5
-    +1, +0, +3, 16, 11, 28, 12, 14, +6, +4, +2, -1, -1, -1, -1, -1, // 6
-    -1, 29, -1, 24, 13, 25, +9, +8, 23, -1, 18, 22, 31, 27, 19, -1, // 7
-    +1, +0, +3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1 ////// 8
-  };
+  public static final BCHUtil instance = new BCHUtil();
 
-  private BechCashUtil() {
-  }
-
-  public static final BechCashUtil instance = new BechCashUtil();
-
-  public static BechCashUtil getInstance() {
+  public static BCHUtil getInstance() {
     return instance;
   }
 
-  public byte[] cat(byte[] x, byte[] data) {
+  private byte[] cat(byte[] x, byte[] data) {
     byte[] dest = new byte[x.length + data.length];
     System.arraycopy(x, 0, dest, 0, x.length);
     System.arraycopy(data, 0, dest, x.length, data.length);
@@ -49,8 +28,8 @@ public class BechCashUtil {
    * This function will compute what 8 5-bit values to XOR into the last 8 input values, in order to make the checksum 0. These 8 values are packed together in a single 40-bit
    * integer. The higher bits correspond to earlier values.
    */
-  public long polyMod(byte[] v) {
-    /**
+  private long polyMod(byte[] v) {
+    /*
      * The input is interpreted as a list of coefficients of a polynomial over F = GF(32), with an implicit 1 in front. If the input is [v0,v1,v2,v3,v4], that polynomial is v(x) =
      * 1*x^5 + v0*x^4 + v1*x^3 + v2*x^2 + v3*x + v4. The implicit 1 guarantees that [v0,v1,v2,...] has a distinct checksum from [0,v0,v1,v2,...].
      *
@@ -70,7 +49,7 @@ public class BechCashUtil {
      */
     long c = 1;
     for (byte d : v) {
-      /**
+      /*
        * We want to update `c` to correspond to a polynomial with one extra term. If the initial value of `c` consists of the coefficients of c(x) = f(x) mod g(x), we modify it to
        * correspond to c'(x) = (f(x) * x + d) mod g(x), where d is the next input to process.
        *
@@ -130,19 +109,14 @@ public class BechCashUtil {
       }
     }
 
-    /**
+    /*
      * PolyMod computes what value to xor into the final values to make the checksum 0. However, if we required that the checksum was 0, it would be the case that appending a 0 to a
      * valid list of values would result in a new valid list. For that reason, cashaddr requires the resulting checksum to be 1 instead.
      */
     return c ^ 1;
   }
 
-  public char lowerCase(char c) {
-    // ASCII black magic.
-    return (char) (c | 0x20);
-  }
-
-  public byte[] expandPrefix(String prefix) {
+  private byte[] expandPrefix(String prefix) {
     byte[] ret = new byte[prefix.length() + 1];
     for (int i = 0; i < prefix.length(); ++i) {
       ret[i] = (byte) (prefix.charAt(i) & 0x1f);
@@ -151,11 +125,7 @@ public class BechCashUtil {
     return ret;
   }
 
-  public boolean verifyChecksum(String prefix, byte[] payload) {
-    return polyMod(cat(expandPrefix(prefix), payload)) == 0;
-  }
-
-  public byte[] createChecksum(String prefix, byte[] payload) {
+  private byte[] createChecksum(String prefix, byte[] payload) {
     byte[] enc = cat(cat(expandPrefix(prefix), payload), //
       new byte[8]);// Append 8 zeroes.
     // Determine what to XOR into those 8 zeroes.
@@ -169,17 +139,10 @@ public class BechCashUtil {
     return ret;
   }
 
-  /**
-   * not do 8 -> 5 format
-   *
-   * @param prefix
-   * @param payload
-   * @return
-   */
-  public String bechEncode(byte[] payload, String prefix) {
+  private String bechEncode(byte[] payload, String prefix) {
     byte[] checksum = createChecksum(prefix, payload);
     byte[][] combined = new byte[][]{payload, checksum};
-    StringBuffer ret = new StringBuffer(prefix).append(':');
+    StringBuilder ret = new StringBuilder(prefix).append(':');
 
     for (byte[] cs : combined) {
       for (byte c : cs) {
@@ -190,88 +153,6 @@ public class BechCashUtil {
     return ret.toString();
   }
 
-  /**
-   * Decode a cashaddr string. 5 format !
-   */
-  public Entry<String, byte[]> bechDecode(String str, String defaultPrefix) {
-    // Go over the string and do some sanity checks.
-    boolean lower = false, upper = false, hasNumber = false;
-    int prefixSize = 0;
-    for (int i = 0; i < str.length(); ++i) {
-      byte c = (byte) str.charAt(i);
-      if (c >= 'a' && c <= 'z') {
-        lower = true;
-        continue;
-      }
-
-      if (c >= 'A' && c <= 'Z') {
-        upper = true;
-        continue;
-      }
-
-      if (c >= '0' && c <= '9') {
-        // We cannot have numbers in the prefix.
-        hasNumber = true;
-        continue;
-      }
-
-      if (c == ':') {
-        // The separator cannot be the first character, cannot have number
-        // and there must not be 2 separators.
-        if (hasNumber || i == 0 || prefixSize != 0) {
-          throw new IllegalArgumentException("The separator cannot be the first character, cannot have number and there must not be 2 separators");
-        }
-
-        prefixSize = i;
-        continue;
-      }
-
-      // We have an unexpected character.
-      throw new IllegalArgumentException("Have an unexpected character." + (char) c);
-    }
-
-    // We can't have both upper case and lowercase.
-    if (upper && lower) {
-      throw new IllegalArgumentException("can't have both uppercase and lowercase");
-    }
-
-    // Get the prefix.
-    StringBuffer prefix = new StringBuffer();
-    if (prefixSize == 0) {
-      prefix.append(defaultPrefix);
-    } else {
-      for (int i = 0; i < prefixSize; ++i) {
-        prefix.append(lowerCase(str.charAt(i)));
-      }
-
-      // Now add the ':' in the size.
-      prefixSize++;
-    }
-
-    // Decode values.
-    byte[] values = bechDecode(str.substring(prefixSize));
-
-    // Verify the checksum.
-    if (!verifyChecksum(prefix.toString(), values)) {
-      throw new IllegalArgumentException("VerifyChecksum error");
-    }
-    // 40 bit checksum
-    return new SimpleEntry<>(prefix.toString(), Arrays.copyOf(values, values.length - 8));
-  }
-
-  protected byte[] bechDecode(String str) {
-    byte[] values = new byte[str.length()];
-    for (int i = 0; i < str.length(); ++i) {
-      byte c = (byte) str.charAt(i);
-      // We have an invalid char in there.
-      if (c > 127 || CHARSET_REV[c] == -1) {
-        throw new IllegalArgumentException("Char at 0-127 ! But " + (int) c);
-      }
-
-      values[i] = CHARSET_REV[c];
-    }
-    return values;
-  }
 
   // ---------------------------
   // 上面代码修改自 C++ 下面为添加
@@ -279,9 +160,6 @@ public class BechCashUtil {
 
   /**
    * bch old address to new address (payload)
-   *
-   * @param btc
-   * @return
    */
   public String encodeCashAdrressByLegacy(String btc) {
     byte[] b58 = Base58.decode(btc);
@@ -295,7 +173,6 @@ public class BechCashUtil {
     // prefix doc list : https://en.bitcoin.it/wiki/List_of_address_prefixes
     String prefix;
     if (ver == 0) {
-      b58[0] = 0;
       prefix = "bitcoincash";
     } else if (ver == 5) {
       b58[0] = 8;
@@ -309,47 +186,13 @@ public class BechCashUtil {
     } else {
       throw new IllegalArgumentException("unsupport format");
     }
-    byte[] payload = payloadEncode(b58, 0, len);
-    if (ver == 0) {
-      prefix = "bitcoincash";
-    } else if (ver == 0x6F) {
-      prefix = "bchtest";
-    }
-    String address = bechEncode(payload, prefix);
-    return address;
+    byte[] payload = payloadEncode(b58, len);
+    return bechEncode(payload, prefix);
   }
 
-  /**
-   * 5 -> 8
-   *
-   * @param
-   * @return
-   */
-  public byte[] payloadDecode(byte[] payload, int off, int len) {
-    BitArray from = new BitArray(payload, off, len);
-    int nlen = len * 5 / 8;// int
-    BitArray to = new BitArray(new byte[nlen]);
-    for (int i = 0, j = i; i < to.bitLength(); i++, j++) {
-      if (i % 5 == 0) {
-        j += 3;
-      }
-      if (from.get(j)) {
-        to.set(i);
-      }
-    }
-    return to.toArray();
-  }
 
-  /**
-   * 8 -> 5
-   *
-   * @param data
-   * @param off
-   * @param len
-   * @return
-   */
-  public byte[] payloadEncode(byte[] data, int off, int len) {
-    BitArray from = new BitArray(data, off, len);
+  private byte[] payloadEncode(byte[] data, int len) {
+    BitArray from = new BitArray(data, 0, len);
     int nlen = (int) Math.ceil(len * 8 / 5.0);
     BitArray to = new BitArray(new byte[nlen]);
     for (int i = 0, j = i; i < from.bitLength(); i++, j++) {

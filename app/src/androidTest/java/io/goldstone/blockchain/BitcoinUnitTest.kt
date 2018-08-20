@@ -6,8 +6,6 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.junit.Rule
@@ -32,19 +30,6 @@ class BitcoinUnitTest {
 		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
 		BitcoinApi.getBalance(address) {
 			LogUtil.debug("$positon getBitcoinBalance", "$it")
-		}
-	}
-
-	@Test
-	fun getBitcoinAddress() {
-		val seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal"
-
-		BTCWalletUtils.getBitcoinWalletByMnemonic(seedCode, DefaultPath.btcPath) { address, secret ->
-			LogUtil.debug("getBitcoinAddress", "$address and $secret")
-
-			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(secret, false) {
-				LogUtil.debug("getBitcoinAddress", it)
-			}
 		}
 	}
 }

@@ -69,7 +69,7 @@ class TokenDetailOverlayPresenter(
 			if (isFromQuickTransfer) {
 				fragment.apply {
 					setValueHeader(token)
-					addFragmentAndSetArgument<DepositFragment>(ContainerID.content) {}
+					addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.deposit
 				}
 			} else {

@@ -406,11 +406,26 @@ class AddressManagerPresneter(
 								false
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							// `BTCTest` 是 `BTCSeries` 公用的地址
 							insertNewAddressToMyToken(
 								CryptoSymbol.btc(),
 								CryptoValue.btcContract,
 								address,
 								ChainID.BTCTest.id
+							)
+							// 插入 LTC 账号
+							insertNewAddressToMyToken(
+								CryptoSymbol.ltc,
+								CryptoValue.ltcContract,
+								address,
+								ChainID.LTCTest.id
+							)
+							// 插入 BCH 账号
+							insertNewAddressToMyToken(
+								CryptoSymbol.bch,
+								CryptoValue.bchContract,
+								address,
+								ChainID.BCHTest.id
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(

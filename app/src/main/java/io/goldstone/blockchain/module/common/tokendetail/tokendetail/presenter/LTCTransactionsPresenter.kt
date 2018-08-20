@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -21,11 +22,12 @@ fun TokenDetailPresenter.loadLTCChainData() {
 		arrayListOf(),
 		{
 			fragment.removeLoadingView()
-			// TODO ERROR Alert
+			LogUtil.error("loadLTCChainData", it)
 		}
 	) {
-		fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-		// TODO 翻页
+		fragment.context?.runOnUiThread {
+			fragment.removeLoadingView()
+		}
 		loadDataFromDatabaseOrElse()
 	}
 }
@@ -67,16 +69,14 @@ private fun loadLitecoinTransactionsFromChain(
 			}.isNull()
 		}.map {
 			// 插入转账数据到数据库
-			BTCSeriesTransactionTable
-				.preventRepeatedInsert(it.hash, false, it)
+			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
 			// 同样的账单插入一份燃气费的数据
 			if (!it.isReceive) {
-				BTCSeriesTransactionTable
-					.preventRepeatedInsert(
-						it.hash,
-						true,
-						it.apply { isFee = true }
-					)
+				BTCSeriesTransactionTable.preventRepeatedInsert(
+					it.hash,
+					true,
+					it.apply { isFee = true }
+				)
 			}
 			TransactionListModel(it)
 		}.isNotEmpty())

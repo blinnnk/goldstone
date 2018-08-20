@@ -14,9 +14,11 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.deleteAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -116,18 +118,18 @@ class WalletSettingsListPresenter(
 
 						override fun concurrentJobs() {
 							listOf(
-								ethAddresses,
-								etcAddresses,
-								btcAddresses,
-								btcSeriesTestAddresses,
-								ltcAddresses,
-								bchAddresses
-							).forEach { chainAddresses ->
-								AddressManagerPresneter.convertToChildAddresses(chainAddresses).forEach {
+								Pair(ethAddresses, ChainType.ETH.id),
+								Pair(etcAddresses, ChainType.ETC.id),
+								Pair(btcAddresses, ChainType.BTC.id),
+								Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
+								Pair(ltcAddresses, ChainType.LTC.id),
+								Pair(bchAddresses, ChainType.BCH.id)
+							).forEach { account ->
+								AddressManagerPresneter.convertToChildAddresses(account.first).forEach {
 									deleteRoutineWallet(
 										it.first,
 										password,
-										false,
+										account.second,
 										false,
 										true
 									) {
@@ -152,7 +154,7 @@ class WalletSettingsListPresenter(
 					deleteRoutineWallet(
 						currentBTCSeriesTestAddress,
 						password,
-						true,
+						ChainType.AllTest.id,
 						true
 					) {
 						activity?.jump<SplashActivity>()
@@ -163,7 +165,7 @@ class WalletSettingsListPresenter(
 					deleteRoutineWallet(
 						currentLTCAddress,
 						password,
-						true,
+						ChainType.LTC.id,
 						true
 					) {
 						activity?.jump<SplashActivity>()
@@ -174,7 +176,7 @@ class WalletSettingsListPresenter(
 					deleteRoutineWallet(
 						currentBCHAddress,
 						password,
-						true,
+						ChainType.BCH.id,
 						true
 					) {
 						activity?.jump<SplashActivity>()
@@ -185,7 +187,7 @@ class WalletSettingsListPresenter(
 					deleteRoutineWallet(
 						currentBTCAddress,
 						password,
-						true,
+						ChainType.BTC.id,
 						true
 					) {
 						activity?.jump<SplashActivity>()
@@ -193,10 +195,12 @@ class WalletSettingsListPresenter(
 				}
 				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
 				WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
+					// 以太坊和以太经典及 `ERC20 Token` 的账单不需要判断 `ChainType` 就可以删除, 这里传入的 `ChainType` 可以不传
+					// 这里只是预留以及符合大逻辑而保留了参数
 					deleteRoutineWallet(
 						currentETHAndERCAddress,
 						password,
-						false,
+						ChainType.ETH.id,
 						true
 					) {
 						activity?.jump<SplashActivity>()
@@ -209,7 +213,7 @@ class WalletSettingsListPresenter(
 	private fun Fragment.deleteRoutineWallet(
 		address: String,
 		password: String,
-		isBTCAccount: Boolean,
+		chainType: Int,
 		isSingleChainWallet: Boolean,
 		justDeleteData: Boolean = false,
 		callback: () -> Unit
@@ -218,7 +222,7 @@ class WalletSettingsListPresenter(
 		context?.deleteAccount(
 			address,
 			password,
-			isBTCAccount,
+			ChainType.isBTCSeriesChainType(chainType),
 			isSingleChainWallet
 		) {
 			it isFalse {
@@ -229,6 +233,7 @@ class WalletSettingsListPresenter(
 			// delete all records of this `address` in `myTokenTable`
 			MyTokenTable.deleteByAddress(address) {
 				TransactionTable.deleteByAddress(address) {
+					BTCSeriesTransactionTable.deleteByAddress(address, chainType)
 					TokenBalanceTable.deleteByAddress(address) {
 						if (justDeleteData) {
 							callback()

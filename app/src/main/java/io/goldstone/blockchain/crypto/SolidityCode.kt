@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto
 
+import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 
 /**
@@ -140,6 +141,30 @@ object CryptoName {
 	const val ltc = "Litecoin"
 	const val bch = "Bitcoin Cash"
 	val allChainName = listOf(etc.replace(" ", ""), eth, btc, ltc, bch.replace(" ", ""))
+
+	fun getBTCSeriesChainIDByName(name: String): String {
+		return listOf(
+			Pair(ltc, Config.getLTCCurrentChain()),
+			Pair(bch, Config.getBCHCurrentChain()),
+			Pair(btc, Config.getBTCCurrentChain())
+		).first {
+			it.first
+				.replace(" ", "")
+				.equals(name, true)
+		}.second
+	}
+
+	fun getBTCSeriesContractByChainName(name: String) : String {
+		return listOf(
+			Pair(ltc, CryptoValue.ltcContract),
+			Pair(bch, CryptoValue.bchContract),
+			Pair(btc, CryptoValue.btcContract)
+		).first {
+			it.first
+				.replace(" ", "")
+				.equals(name, true)
+		}.second
+	}
 }
 
 enum class ChainType(val id: Int) {
@@ -154,6 +179,10 @@ enum class ChainType(val id: Int) {
 	companion object {
 		fun getAllBTCSeriesType(): List<Int> {
 			return listOf(LTC.id, AllTest.id, BTC.id, BCH.id)
+		}
+
+		fun isBTCSeriesChainType(id: Int): Boolean {
+			return getAllBTCSeriesType().any { it == id }
 		}
 
 		fun getChainTypeBySymbol(symbol: String?): Int {

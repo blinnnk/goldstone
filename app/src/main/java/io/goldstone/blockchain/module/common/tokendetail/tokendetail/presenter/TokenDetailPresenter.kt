@@ -229,6 +229,13 @@ class TokenDetailPresenter(
 				}
 			}
 
+			WalletType.BCHOnly.content ->
+				getBTCSeriesData(
+					Config.getCurrentBCHAddress(),
+					ChainType.BTC.id,
+					withoutLocalDataCallback
+				)
+
 			WalletType.ETHERCAndETCOnly.content ->
 				getETHERC20OrETCData(
 					Config.getCurrentEthereumAddress(),

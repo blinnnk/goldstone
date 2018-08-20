@@ -26,12 +26,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneServerUnitTest {
-	
+
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	
+
 	@Test
 	fun searchTokenBySymbolOrContract() {
 		// Change any symbo or contract value to test the result
@@ -44,7 +44,7 @@ class GoldStoneServerUnitTest {
 			assertTrue("Search token with `tr` by symbol or contract is empty", it.isNotEmpty())
 		}
 	}
-	
+
 	@Test
 	fun searchQuotationByPair() {
 		// Change any symbo value to test the result
@@ -57,7 +57,7 @@ class GoldStoneServerUnitTest {
 			assertTrue("Search pair quotation with `tr` is empty", it.isNotEmpty())
 		}
 	}
-	
+
 	@Test
 	fun getShareContent() {
 		GoldStoneAPI.getShareContent(
@@ -71,7 +71,7 @@ class GoldStoneServerUnitTest {
 			assertTrue("Share url is empty", it.url.isNotEmpty())
 		}
 	}
-	
+
 	@Test
 	fun getNotificationList() {
 		NotificationTable.getAllNotifications { localData ->
@@ -87,7 +87,7 @@ class GoldStoneServerUnitTest {
 			}
 		}
 	}
-	
+
 	@Test
 	fun getTermsFromServer() {
 		GoldStoneAPI.getTerms(
@@ -100,7 +100,7 @@ class GoldStoneServerUnitTest {
 			assertTrue("Terms is empty", it.isNotEmpty())
 		}
 	}
-	
+
 	@Test
 	fun getConfigList() {
 		GoldStoneAPI.getConfigList(
@@ -111,14 +111,14 @@ class GoldStoneServerUnitTest {
 			LogUtil.debug(positon, it.toString())
 		}
 	}
-	
+
 	@Test
 	fun getWebUrlValue() {
 		val terms =
 			"${WebUrl.header}/${WebUrl.webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
 		LogUtil.debug("getWebUrlValue", terms)
 	}
-	
+
 	@Test
 	fun getUnreadCount() {
 		AppConfigTable.getAppConfig {
@@ -133,7 +133,7 @@ class GoldStoneServerUnitTest {
 			}
 		}
 	}
-	
+
 	@Test
 	fun getETCTransactions() {
 		GoldStoneAPI.getETCTransactions(

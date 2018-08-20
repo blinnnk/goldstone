@@ -4,10 +4,15 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.crypto.bitcoincash.BechCashUtil
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import org.bitcoinj.params.TestNet3Params
+import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -68,7 +73,7 @@ data class BTCSeriesTransactionTable(
 				fromAddress.contains(":") ||
 				fromAddress.substring(0, 1).equals("q", true)
 			) {
-				BechCashUtil.instance
+				BCHUtil.instance
 					.encodeCashAdrressByLegacy(toAddress)
 					.substringAfter(":")
 			} else toAddress
@@ -80,7 +85,7 @@ data class BTCSeriesTransactionTable(
 				val isLegacy = if (myAddress.contains(":")) false
 				else !myAddress.substring(0, 1).equals("q", true)
 				if (isLegacy)
-					BechCashUtil.instance
+					BCHUtil.instance
 						.encodeCashAdrressByLegacy(myAddress)
 						.substringAfter(":")
 				else myAddress
@@ -101,7 +106,9 @@ data class BTCSeriesTransactionTable(
 				toAddresses += JSONArray(JSONObject(JSONObject(out[it].toString()).safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 			}
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
-			return toAddresses.filterNot { it.equals(getFromAddress(data), true) }
+			return toAddresses.filterNot {
+				it.equals(getFromAddress(data), true)
+			}
 		}
 
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
@@ -193,6 +200,42 @@ data class BTCSeriesTransactionTable(
 			GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
 				if (getTransactionByHash(hash, isFee).isNull()) {
 					insert(transaction)
+				}
+			}
+		}
+
+		fun deleteByAddress(address: String, chainType: Int, callback: () -> Unit = {}) {
+			doAsync {
+				GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
+					// `BCH` 的 `nnsight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
+					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
+					val formatedAddress =
+						if (
+							chainType == ChainType.BCH.id &&
+							(
+								address.substring(0, 1).equals("m", true) ||
+									address.substring(0, 1).equals("n", true)
+								)
+						) BCHWalletUtils.formatedToLegacy(address, TestNet3Params.get())
+						else address
+
+					val data = getDataByAddressAndChainType(formatedAddress, chainType)
+					if (data.isEmpty()) {
+						callback()
+						return@doAsync
+					}
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount: Int = data.size
+						override fun concurrentJobs() {
+							data.forEach {
+								delete(it)
+								completeMark()
+							}
+						}
+
+						override fun getResultInMainThread() = false
+						override fun mergeCallBack() = callback()
+					}.start()
 				}
 			}
 		}

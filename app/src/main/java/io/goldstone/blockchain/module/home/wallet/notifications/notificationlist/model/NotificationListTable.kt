@@ -63,7 +63,7 @@ data class NotificationTable(
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.notificationDao().getAllNotifications()
-			} then {
+			} then { it ->
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}

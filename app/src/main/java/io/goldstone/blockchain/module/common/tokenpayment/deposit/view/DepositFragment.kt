@@ -98,8 +98,19 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 					token?.symbol.equals(CryptoSymbol.btc(), true) -> {
 						if (Config.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
-						else
-							qrView.setAddressText(currentBTCAddress)
+						else qrView.setAddressText(currentBTCAddress)
+					}
+
+					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+						if (Config.isTestEnvironment())
+							qrView.setAddressText(currentBTCSeriesTestAddress)
+						else qrView.setAddressText(currentLTCAddress)
+					}
+
+					token?.symbol.equals(CryptoSymbol.bch, true) -> {
+						if (Config.isTestEnvironment())
+							qrView.setAddressText(currentBTCSeriesTestAddress)
+						else qrView.setAddressText(currentBCHAddress)
 					}
 
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
