@@ -77,11 +77,19 @@ class AddressManagerPresneter(
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
 						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
 					}
+					// Litecoin Mainnet and Testnet Addresses
 					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
 						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
 					}
+					// Bitcoin Cash Mainnet and Testnet Addresses
+					if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+						add(Pair(currentBCHAddress, CryptoSymbol.bch))
+					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.bch))
+					}
+					// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
 					if (currentETHAndERCAddress.isNotEmpty()) {
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))

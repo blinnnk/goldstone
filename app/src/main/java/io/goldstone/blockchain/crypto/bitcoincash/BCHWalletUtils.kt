@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto.bitcoincash
 
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
@@ -27,6 +28,12 @@ object BCHWalletUtils {
 		val address =
 			BechCashUtil.instance.encodeCashAdrressByLegacy(legacyAddress)
 		return BaseKeyPair(address, ecKey.getPrivateKeyAsWiF(net))
+	}
+
+	fun getBCHAddressByWIFKey(privatekey: String): String {
+		return BechCashUtil.instance.encodeCashAdrressByLegacy(
+			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privatekey, false)
+		)
 	}
 
 	fun isValidAddress(address: String): Boolean {

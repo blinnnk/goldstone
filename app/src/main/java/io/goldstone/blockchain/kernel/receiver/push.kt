@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoincash.BechCashUtil
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -181,13 +182,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								.plus(bchSeries)
 								.map {
 									AddressCommitionModel(it.first, it.second, option)
-								}.map {
-									generateJSONObject(
-										Pair("address", it.address),
-										Pair("chain_type", it.chainType),
-										Pair("option", it.option)
-									)
-								}
+								}.map { prepareAddressData(it) }
 						GoldStoneAPI.registerWalletAddresses(
 							AesCrypto.encrypt("$all").orEmpty(),
 							{
@@ -200,6 +195,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
 					WalletType.BTCOnly.content ->
 						registerSingleAddress(AddressCommitionModel(currentBTCAddress, ChainType.BTC.id, option))
+					WalletType.BCHOnly.content ->
+						registerSingleAddress(AddressCommitionModel(currentBCHAddress, ChainType.BCH.id, option))
+					WalletType.LTCOnly.content ->
+						registerSingleAddress(AddressCommitionModel(currentLTCAddress, ChainType.LTC.id, option))
 					WalletType.BTCTestOnly.content ->
 						registerSingleAddress(
 							AddressCommitionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
@@ -211,13 +210,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		}
 
 		fun registerSingleAddress(model: AddressCommitionModel) {
-			listOf(model).map {
-				generateJSONObject(
-					Pair("address", it.address),
-					Pair("chain_type", it.chainType),
-					Pair("option", it.option)
-				)
-			}.let { it ->
+			listOf(model).map { prepareAddressData(it) }.let { it ->
 				GoldStoneAPI.registerWalletAddresses(
 					AesCrypto.encrypt("$it").orEmpty(),
 					{
@@ -235,6 +228,27 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 						}
 					}
 				}
+			}
+		}
+
+		// 因为 `BCH` 的地址特殊格式, 以及 `Bip44` 复用 `ChainType 1` 作为 `AllTest Path`
+		// 所以, `BCH` 客户端单独注册特殊格式给服务器用于服务器监听转账 `Push` 使用
+		private fun prepareAddressData(model: AddressCommitionModel): String {
+			return if (model.chainType == 1) {
+				val bchTestAddress =
+					BechCashUtil.instance.encodeCashAdrressByLegacy(model.address).substringAfter(":")
+				generateJSONObject(
+					Pair("address", model.address),
+					Pair("chain_type", model.chainType),
+					Pair("option", model.option),
+					Pair("extra", "bchtest:$bchTestAddress")
+				)
+			} else {
+				generateJSONObject(
+					Pair("address", model.address),
+					Pair("chain_type", model.chainType),
+					Pair("option", model.option)
+				)
 			}
 		}
 

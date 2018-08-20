@@ -31,7 +31,7 @@ import java.math.BigInteger
 class KeystoreImportPresenter(
 	override val fragment: KeystoreImportFragment
 ) : BasePresenter<KeystoreImportFragment>() {
-	
+
 	fun importKeystoreWallet(
 		currentType: String,
 		keystore: String,
@@ -47,8 +47,9 @@ class KeystoreImportPresenter(
 				else nameInput.text.toString()
 			doAsync {
 				getPrivatekeyByKeystoreFile(keystore, password) {
+					System.out.println("privatekey $it")
 					if (it.isNull()) callback(false)
-					
+
 					it?.let { privateKey ->
 						when {
 							currentType.equals(ETHERCAndETC.content, true) -> {
@@ -70,7 +71,18 @@ class KeystoreImportPresenter(
 									callback
 								)
 							}
-							
+
+							currentType.equals(BCH.content, true) -> {
+								System.out.println("hello bch")
+								importBCHWallet(
+									walletName,
+									password,
+									hintInput,
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(MainNetParams.get()),
+									callback
+								)
+							}
+
 							currentType.equals(BTCTest.content, true) -> {
 								importBitcoinWallet(
 									walletName,
@@ -81,7 +93,7 @@ class KeystoreImportPresenter(
 									callback
 								)
 							}
-							
+
 							else -> {
 								importBitcoinWallet(
 									walletName,
@@ -101,12 +113,12 @@ class KeystoreImportPresenter(
 			callback(false)
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
-	
+
 	private fun importETHERC20OrETCWallet(
 		walletName: String,
 		password: EditText,
@@ -142,7 +154,25 @@ class KeystoreImportPresenter(
 			callback
 		)
 	}
-	
+
+	private fun importBCHWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: String,
+		callback: (Boolean) -> Unit
+	) {
+		System.out.println("base58 $privateKey")
+		PrivateKeyImportPresenter.importWalletByBCHPrivateKey(
+			privateKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
 	private fun importBitcoinWallet(
 		walletName: String,
 		password: EditText,
@@ -161,7 +191,7 @@ class KeystoreImportPresenter(
 			callback
 		)
 	}
-	
+
 	private fun getPrivatekeyByKeystoreFile(
 		keystore: String,
 		password: EditText,

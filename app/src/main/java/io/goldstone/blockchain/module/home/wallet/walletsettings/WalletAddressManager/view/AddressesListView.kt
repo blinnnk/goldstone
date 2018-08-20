@@ -44,7 +44,7 @@ class AddressesListView(
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
 			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
-			if (this[0].second.toIntOrNull().isNull()) {
+			if (isNotEmpty() && this[0].second.toIntOrNull().isNull()) {
 				hideButton()
 			} else {
 				updateButtonTitle("${CommonText.checkAll} (${model?.size})")

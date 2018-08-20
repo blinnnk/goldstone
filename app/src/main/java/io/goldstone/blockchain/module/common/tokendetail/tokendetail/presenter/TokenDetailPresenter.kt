@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.presenter.TransactionListPresenter
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -157,7 +156,7 @@ class TokenDetailPresenter(
 
 			token?.symbol.equals(CryptoSymbol.eth, true) -> {
 				if (!hasUpdateETHData) loadETHChainData()
-					hasUpdateETHData = true
+				hasUpdateETHData = true
 			}
 
 			else -> {
@@ -305,7 +304,7 @@ class TokenDetailPresenter(
 		walletAddress: String
 	) {
 		allData = data
-		TransactionListPresenter.checkAddressNameInContacts(data) {
+		checkAddressNameInContacts(data) {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
