@@ -5,11 +5,20 @@ package io.goldstone.blockchain.common.value
  * @author KaySaith
  */
 enum class WalletType(val content: String) {
-	
+
 	BTCOnly("btcOnly"),
 	ETHERCAndETCOnly("ethERCAndEtc"),
 	BTCTestOnly("btctestOnly"),
 	LTCOnly("ltcOnly"),
 	BCHOnly("bchOnly"),
-	MultiChain("multiChain")
+	MultiChain("multiChain");
+
+	companion object {
+		fun isBTCSeriesType(type: String): Boolean {
+			return type == BTCOnly.content ||
+				type == BTCTestOnly.content ||
+				type == LTCOnly.content ||
+				type == BCHOnly.content
+		}
+	}
 }

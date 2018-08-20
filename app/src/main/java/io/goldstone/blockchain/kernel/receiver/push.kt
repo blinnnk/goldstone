@@ -160,6 +160,12 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 						val btcSeries =
 							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
 								.map { Pair(it.first, ChainType.BTC.id) }
+						val ltcSeries =
+							AddressManagerPresneter.convertToChildAddresses(ltcAddresses)
+								.map { Pair(it.first, ChainType.LTC.id) }
+						val bchSeries =
+							AddressManagerPresneter.convertToChildAddresses(bchAddresses)
+								.map { Pair(it.first, ChainType.BCH.id) }
 						val btcTestSeries =
 							AddressManagerPresneter.convertToChildAddresses(btcSeriesTestAddresses)
 								.map { Pair(it.first, ChainType.AllTest.id) }
@@ -171,6 +177,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								.plus(btcSeries)
 								.plus(btcTestSeries)
 								.plus(etcSeries)
+								.plus(ltcSeries)
+								.plus(bchSeries)
 								.map {
 									AddressCommitionModel(it.first, it.second, option)
 								}.map {

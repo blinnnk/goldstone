@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoincash
 
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -25,7 +23,6 @@ object BitcoinCashApi {
 		address: String,
 		hold: (List<UnspentModel>) -> Unit
 	) {
-		System.out.println("hello url ${BitcoinCashUrl.getUnspentInfo(address)}")
 		BTCSeriesApiUtils.getUnspentListByAddress(BitcoinCashUrl.getUnspentInfo(address), hold)
 	}
 
@@ -60,28 +57,6 @@ object BitcoinCashApi {
 					false,
 					ChainType.BCH.id
 				)
-			)
-		}
-	}
-
-	fun getBlockNumberByTransactionHash(
-		hash: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (Int?) -> Unit
-	) {
-		BTCSeriesApiUtils.getTransactionByHash(
-			BitcoinCashUrl.getTransactionByHash(hash),
-			errorCallback
-		) {
-			hold(
-				if (isNull()) null
-				else {
-					// insight 第三方接口有时候会返回 `-1`
-					val blockNumber =
-						it!!.safeGet("blockheight").toIntOrNull().orZero()
-					if (blockNumber < 0) null
-					else blockNumber
-				}
 			)
 		}
 	}

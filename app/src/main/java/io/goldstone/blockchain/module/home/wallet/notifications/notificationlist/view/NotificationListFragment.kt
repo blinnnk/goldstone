@@ -26,7 +26,7 @@ class NotificationListFragment :
 		asyncData: ArrayList<NotificationTable>?
 	) {
 		recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
-			onClick {
+			onClick { _ ->
 				model?.apply {
 					if (type == 1) {
 						presenter.showWebFragment(title, actionContent)

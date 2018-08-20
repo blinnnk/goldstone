@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -43,12 +44,7 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (
-							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.LTCOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.BCHOnly.content, true)
-						) {
+						canSearch = if (WalletType.isBTCSeriesType(Config.getCurrentWalletType())) {
 							fragment.context.alert(
 								"This is a single block chain wallet so you canot add other crypot currency"
 							)
@@ -60,9 +56,16 @@ class TokenSearchPresenter(
 				}
 			) { defaultTokens ->
 				canSearch isTrue {
-					searchTokenByContractOrSymbol(defaultTokens) {
+					searchTokenByContractOrSymbol(defaultTokens) { reesult ->
 						context?.runOnUiThread {
-							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
+							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
+								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult.filterNot {
+									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
+								}.toArrayList())
+							} else {
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult)
+							}
 							fragment.removeLoadingView()
 						}
 					}

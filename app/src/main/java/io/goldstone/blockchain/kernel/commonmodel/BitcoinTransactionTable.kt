@@ -52,7 +52,7 @@ data class BTCSeriesTransactionTable(
 		getFromAddress(data),
 		getToAddresses(data).toString(),
 		myAddress,
-		!getFromAddress(data).equals(myAddress, true),
+		isReceive(getFromAddress(data), myAddress),
 		getTransactionValue(data, myAddress),
 		data.safeGet("fees"),
 		data.safeGet("size"),
@@ -62,6 +62,20 @@ data class BTCSeriesTransactionTable(
 	)
 
 	companion object {
+
+		private fun isReceive(fromAddress: String, toAddress: String): Boolean {
+			val formatToAddress = if (
+				fromAddress.contains(":") ||
+				fromAddress.substring(0, 1).equals("q", true)
+			) {
+				BechCashUtil.instance
+					.encodeCashAdrressByLegacy(toAddress)
+					.substringAfter(":")
+			} else {
+				toAddress
+			}
+			return !fromAddress.equals(formatToAddress, true)
+		}
 
 		private fun convertToBCHOrDefaultAddress(myAddress: String, targetAddress: String): String {
 			return if (targetAddress.substring(0, 1).equals("q", true)) {

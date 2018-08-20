@@ -262,7 +262,7 @@ data class WalletTable(
 			val types = listOf(
 				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
 				Pair(WalletType.BTCTestOnly, walletTable.currentBTCAddress),
-				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentBTCAddress),
+				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentETHAndERCAddress),
 				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress),
 				Pair(WalletType.BCHOnly, walletTable.currentBCHAddress)
 			).filter {
@@ -270,7 +270,12 @@ data class WalletTable(
 			}
 			return when (types.size) {
 				5 -> WalletType.MultiChain
-				else -> types[0].first
+				else -> try {
+					types[0].first
+				} catch (error: Exception) {
+					// 解析出错的时候显示默认值
+					WalletType.MultiChain
+				}
 			}
 		}
 

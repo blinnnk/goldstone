@@ -29,9 +29,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	changeAddress: String,
 	callback: (isSuccess: Boolean) -> Unit
 ) {
-	System.out.println("prepare bch paymentModel")
 	generateBCHPaymentModel(count, changeAddress) {
-		System.out.println("payment bchModel $it")
 		it isNotNull {
 			fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
@@ -53,7 +51,6 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	changeAddress: String,
 	hold: (PaymentBTCSeriesModel?) -> Unit
 ) {
-	System.out.println("hello 1")
 	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
@@ -63,22 +60,18 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 		3,
 		false
 	) { feePerByte ->
-		System.out.println("hello 2 $feePerByte")
 		if (feePerByte.orZero() < 0) {
 			// TODO Alert
 			return@estimatesmartFee
 		}
-		System.out.println("hello 3")
 		// 签名测速总的签名后的信息的 `Size`
 		BitcoinCashApi.getUnspentListByAddress(myAddress) { unspents ->
-			System.out.println("hello 4$unspents")
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				hold(null)
 				return@getUnspentListByAddress
 			}
 
-			System.out.println("hello 4.1.1")
 			val size = BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 				count.toSatoshi(),
 				1L,
@@ -88,7 +81,6 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				CryptoValue.signedSecret, // 测算 `MessageSize` 的默认无效私钥
 				Config.isTestEnvironment()
 			).messageSize
-			System.out.println("hello 8 $size token ${getToken()?.symbol}")
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
@@ -99,7 +91,6 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				unitFee,
 				size.toLong()
 			).let {
-				System.out.println("hello 9 $it")
 				GoldStoneAPI.context.runOnUiThread {
 					hold(it)
 				}

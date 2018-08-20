@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -112,6 +114,41 @@ object BTCSeriesJsonRPC {
 			) {
 				// Return Transaction hash
 				hold(if (it.isNotEmpty()) it else null)
+			}
+		}
+	}
+
+	fun getConfirmations(
+		chainName: String,
+		txID: String,
+		errorCallback: (Throwable?, String?) -> Unit,
+		hold: (Int?) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareJsonRPC(
+				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+				BitcoinMethod.GetRawTransaction.method,
+				null,
+				false,
+				false,
+				txID,
+				1
+			)
+		).let { it ->
+			RequisitionUtil.callChainBy(
+				it,
+				errorCallback,
+				chainName
+			) {
+				val confirmations = try {
+					JSONObject(it).safeGet("confirmations").toIntOrNull()
+				} catch (error: Exception) {
+					LogUtil.error("getConfirmations", error)
+					null
+				}
+				// Return Transaction hash
+				hold(if (confirmations.isNull()) null else confirmations)
 			}
 		}
 	}

@@ -75,8 +75,7 @@ object GenerateMultiChainWallet {
 							)
 							BCHWalletUtils.generateBCHKeyPair(
 								mnemonic,
-								path.bchPath,
-								false
+								path.bchPath
 							).let { bchKeyPair ->
 								context.storeBase58PrivateKey(
 									ltcKeyPair.privateKey,
@@ -158,12 +157,11 @@ object GenerateMultiChainWallet {
 							)
 							BCHWalletUtils.generateBCHKeyPair(
 								mnemonic,
-								path.bchPath,
-								false
+								path.bchPath
 							).let { bchKeyPair ->
 								context.storeBase58PrivateKey(
-									ltcKeyPair.privateKey,
-									ltcKeyPair.address,
+									bchKeyPair.privateKey,
+									bchKeyPair.address,
 									password,
 									false,
 									false

@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
@@ -421,9 +422,48 @@ class AddressManagerPresneter(
 			password: String,
 			hold: (ArrayList<Pair<String, String>>) -> Unit
 		) {
-			System.out.println("$context$password")
-			hold(arrayListOf())
-			// TODO
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentBCHAddress(),
+				true,
+				false
+			) { isCorrect ->
+				if (!isCorrect) {
+					context.alert(CommonText.wrongPassword)
+					return@verifyKeystorePassword
+				}
+
+				WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let { encryptoMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
+						BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
+							context.storeBase58PrivateKey(
+								bchKeyPair.privateKey,
+								bchKeyPair.address,
+								password,
+								false,
+								false
+							)
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							insertNewAddressToMyToken(
+								CryptoSymbol.bch,
+								CryptoValue.bchContract,
+								bchKeyPair.address,
+								ChainID.BCHMain.id
+							)
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommitionModel(bchKeyPair.address, ChainType.BCH.id, 1)
+							)
+							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
+							}
+						}
+					}
+				}
+			}
 		}
 
 		fun createLTCAddress(

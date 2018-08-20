@@ -9,7 +9,6 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Utils
 import org.bitcoinj.params.MainNetParams
-import org.bitcoinj.params.TestNet3Params
 
 /**
  * @date 2018/8/15 11:21 AM
@@ -19,14 +18,11 @@ import org.bitcoinj.params.TestNet3Params
 object BCHWalletUtils {
 	fun generateBCHKeyPair(
 		mnemonic: String,
-		path: String,
-		isTest: Boolean
+		path: String
 	): BaseKeyPair {
 		val seed = Mnemonic.mnemonicToSeed(mnemonic)
 		val ecKey = ECKey.fromPrivate(generateKey(seed, path).keyPair.privateKey)
-		val net =
-			if (isTest) TestNet3Params.get()
-			else MainNetParams.get()
+		val net = MainNetParams.get()
 		val legacyAddress = Address(net, Utils.sha256hash160(ecKey.pubKey)).toBase58()
 		val address =
 			BechCashUtil.instance.encodeCashAdrressByLegacy(legacyAddress)

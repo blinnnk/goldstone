@@ -11,7 +11,6 @@ import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import org.bitcoinj.core.Transaction
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -72,9 +71,7 @@ fun GasSelectionPresenter.transferBCH(
 		}
 		prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
-			System.out.println("fromAddress $fromAddress")
 			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents ->
-				System.out.println("unspents$unspents")
 				BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 					value,
 					fee,

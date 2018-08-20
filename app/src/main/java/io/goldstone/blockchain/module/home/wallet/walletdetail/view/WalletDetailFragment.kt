@@ -7,8 +7,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.bitcoincash.BechCashUtil
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
@@ -49,7 +47,6 @@ class WalletDetailFragment :
 			}
 		}
 
-		System.out.println("fuckfuck++"+BechCashUtil.instance.encodeCashAdrressByLegacy("mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"))
 	}
 
 	fun showMiniLoadingView() {

@@ -108,7 +108,6 @@ object BTCSeriesTransactionUtils {
 		var money = 0L
 		val utxos = arrayListOf<UTXO>()
 		unspentModel.forEach {
-			System.out.println("unspent $it")
 			//当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
 			// 就跳出循环, 这个时候就得到了合符条件的utxos数组
 			if (money >= (sendValue + fee)) {
@@ -134,8 +133,6 @@ object BTCSeriesTransactionUtils {
 		)
 		// 消费列表总金额 - 已经转账的金额 - 手续费 就等于需要返回给自己的金额了
 		val leave = money - sendValue - fee
-		System.out.println("leave$leave")
-		System.out.println("money$money sendValue $sendValue fee $fee")
 		// 输出-转给自己
 		if (leave > 0) {
 			// 输出-转给自己
@@ -148,7 +145,6 @@ object BTCSeriesTransactionUtils {
 		utxos.forEach {
 
 			val outPoint = TransactionOutPoint(network, it.index, it.hash)
-			System.out.println("value coin" + it.value)
 			if (isBCH) {
 				// `BCH` 的签名需要 `ForkeID` 控件里的方法有 `BUG` 这里重新自定义了有方法
 				transaction.addSignedInputd(
