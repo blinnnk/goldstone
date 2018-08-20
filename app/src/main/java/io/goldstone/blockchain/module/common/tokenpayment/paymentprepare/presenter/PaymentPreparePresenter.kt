@@ -22,11 +22,11 @@ import org.jetbrains.anko.support.v4.toast
 class PaymentPreparePresenter(
 	override val fragment: PaymentPrepareFragment
 ) : BasePresenter<PaymentPrepareFragment>() {
-	
+
 	private val rootFragment by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 	}
-	
+
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		setSymbol()
@@ -37,11 +37,11 @@ class PaymentPreparePresenter(
 			}
 		}
 	}
-	
+
 	fun getToken(): WalletDetailCellModel? {
 		return rootFragment?.token
 	}
-	
+
 	fun goToGasEditorFragment(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
@@ -49,28 +49,47 @@ class PaymentPreparePresenter(
 			callback()
 		} else {
 			fragment.toast(LoadingText.calculateGas)
-			if (getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
-				prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
-					if (!isSuccessful) {
-						fragment.context.alert(
-							AlertText.btcBalanceNotEnough
-						)
+			when {
+				getToken()?.symbol.equals(CryptoSymbol.btc(), true) ->
+					prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
+						if (!isSuccessful) {
+							fragment.context.alert(
+								AlertText.balanceNotEnough
+							)
+						}
+						callback()
 					}
-					callback()
+				getToken()?.symbol.equals(CryptoSymbol.ltc, true) ->
+					prepareLTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
+						if (!isSuccessful) {
+							fragment.context.alert(
+								AlertText.balanceNotEnough
+							)
+						}
+						callback()
+					}
+				getToken()?.symbol.equals(CryptoSymbol.bch, true) -> {
+					prepareBCHPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
+						if (!isSuccessful) {
+							fragment.context.alert(
+								AlertText.balanceNotEnough
+							)
+						}
+						callback()
+					}
 				}
-			} else {
-				prepareETHERC20ETCPaymentModel(count, callback)
+				else -> prepareETHERC20ETCPaymentModel(count, callback)
 			}
 		}
 	}
-	
+
 	fun backEvent(fragment: TokenDetailOverlayFragment) {
 		fragment.apply {
 			headerTitle = TokenDetailText.address
 			presenter.popFragmentFrom<PaymentPrepareFragment>()
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		rootFragment?.apply {
 			overlayView.header.backButton.onClick {
@@ -78,7 +97,7 @@ class PaymentPreparePresenter(
 			}
 		}
 	}
-	
+
 	private fun setSymbol() {
 		fragment.setSymbolAndPrice(
 			rootFragment?.token?.symbol.orEmpty(),

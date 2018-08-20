@@ -14,7 +14,7 @@ import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toUnitValue
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
@@ -130,7 +130,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 	info: NotificationTransactionInfo
 ) {
-	BitcoinSeriesTransactionTable.getTransactionsByHash(
+	BTCSeriesTransactionTable.getTransactionsByHash(
 		currentHash,
 		info.isReceived
 	) { localTransaction ->
@@ -230,7 +230,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	}
 }
 
-private fun BitcoinSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
+private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
 		"${fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
 		"",

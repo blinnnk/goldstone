@@ -7,20 +7,22 @@ import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl
+import io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl
 
 /**
  * @date 31/03/2018 8:09 PM
  * @author KaySaith
  */
 object APIPath {
-	
+
 	/** GoldStone Basic Api Address */
 	var currentUrl = WebUrl.normalServer
-	
+
 	fun updateServerUrl(newUrl: String) {
 		currentUrl = newUrl
 	}
-	
+
 	const val serverStatus = "https://gs.blinnnk.com/index/serverStatus"
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
@@ -71,7 +73,7 @@ object APIPath {
 }
 
 object EtherScanApi {
-	
+
 	private val apikey: () -> String = { etherScanKeys.getRandom() }
 	private const val mainHeader = "https://api.etherscan.io"
 	private const val ropstanHeader = "https://api-ropsten.etherscan.io"
@@ -111,8 +113,15 @@ object EtherScanApi {
 	val gasTrackerHeader: (taxHash: String) -> String = {
 		"https://gastracker.io/tx/$it"
 	}
+
 	val bitcoinTransactionDetail: (taxHash: String) -> String = {
 		"${BitcoinUrl.currentUrl()}/tx/$it"
+	}
+	val litcoinTransactionDetail: (taxHash: String) -> String = {
+		"${LitecoinUrl.currentUrl()}/tx/$it"
+	}
+	val bitcoinCashTransactionDetail: (taxHash: String) -> String = {
+		"${BitcoinCashUrl.currentUrl()}/tx/$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"

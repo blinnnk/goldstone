@@ -24,7 +24,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
-	
+
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)
@@ -44,7 +44,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 				setShareEvent()
 			}
 			prepareSymbolPrice()
-			
+
 			inputView.inputTextListener {
 				inputView.updateCurrencyValue(symbolPrice)
 				if (it.toDoubleOrNull().isNull()) {
@@ -55,7 +55,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-	
+
 	private var symbolPrice: Double = 0.0
 	private fun prepareSymbolPrice() {
 		getParentFragment<TokenDetailOverlayFragment> {
@@ -64,7 +64,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-	
+
 	private fun setConfirmButtonEvent() {
 		qrView.saveQRImageEvent = Runnable {
 			val value = inputView.getValue()
@@ -73,7 +73,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-	
+
 	private fun setShareEvent() {
 		qrView.shareEvent = Runnable {
 			val value = inputView.getValue()
@@ -82,26 +82,26 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-	
+
 	fun setQRImage(bitmap: Bitmap?) {
 		qrView.setQRImage(bitmap)
 	}
-	
+
 	fun setInputViewDescription(symbol: String) {
 		inputView.setHeaderSymbol(symbol, true)
 	}
-	
+
 	private fun setAddressText() {
 		WalletTable.getCurrentWallet {
 			getParentFragment<TokenDetailOverlayFragment> {
 				when {
 					token?.symbol.equals(CryptoSymbol.btc(), true) -> {
 						if (Config.isTestEnvironment())
-							qrView.setAddressText(currentBTCTestAddress)
+							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else
 							qrView.setAddressText(currentBTCAddress)
 					}
-					
+
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
 						qrView.setAddressText(currentETCAddress)
 					else -> qrView.setAddressText(currentETHAndERCAddress)
@@ -109,7 +109,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

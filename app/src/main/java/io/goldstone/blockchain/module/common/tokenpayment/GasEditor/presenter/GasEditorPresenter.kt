@@ -26,20 +26,20 @@ data class GasFee(var gasLimit: Long, val gasPrice: Long) : Serializable
 class GasEditorPresenter(
 	override val fragment: GasEditorFragment
 ) : BasePresenter<GasEditorFragment>() {
-	
+
 	fun confirmGasCustom(gasPrice: Long, gasLimit: Long) {
 		if (gasPrice <= 0 || gasLimit <= 0) {
 			fragment.context?.alert(AlertText.gasEditorEmpty)
 			return
 		}
-		
+
 		if (gasLimit < fragment.getGasSize() ?: CryptoValue.ethMinGasLimit) {
 			fragment.context?.alert(
 				"${AlertText.gasLimitValue} ${fragment.getGasSize() ?: CryptoValue.ethMinGasLimit}"
 			)
 			return
 		}
-		
+
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			childFragmentManager.fragments.forEach {
 				it.updateGasSelectionList(gasLimit, gasPrice)
@@ -48,9 +48,9 @@ class GasEditorPresenter(
 			}
 		}
 	}
-	
+
 	private fun Fragment.updateGasSelectionList(gasLimit: Long, gasPrice: Long) {
-		if (fragment.isBTC) {
+		if (fragment.isBTCSeries) {
 			if (this is GasSelectionFragment) {
 				MinerFeeType.Custom.satoshi = gasPrice
 				arguments?.putSerializable(
@@ -70,7 +70,7 @@ class GasEditorPresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.activity?.let { SoftKeyboard.hide(it) }

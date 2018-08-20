@@ -22,7 +22,7 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<WalletListModel>?
 	) {
-		asyncData?.let {
+		asyncData?.let { it ->
 			recyclerView.adapter = WalletListAdapter(it) {
 				onClick {
 					presenter.switchWallet(model.address)

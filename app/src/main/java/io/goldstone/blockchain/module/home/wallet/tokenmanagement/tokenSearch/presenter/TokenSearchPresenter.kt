@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -43,12 +44,9 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (
-							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true)
-						) {
+						canSearch = if (WalletType.isBTCSeriesType(Config.getCurrentWalletType())) {
 							fragment.context.alert(
-								"This is a single bitcoin chain wallet so you canot add other crypot currency"
+								"This is a single block chain wallet so you canot add other crypot currency"
 							)
 							false
 						} else {
@@ -58,9 +56,16 @@ class TokenSearchPresenter(
 				}
 			) { defaultTokens ->
 				canSearch isTrue {
-					searchTokenByContractOrSymbol(defaultTokens) {
+					searchTokenByContractOrSymbol(defaultTokens) { reesult ->
 						context?.runOnUiThread {
-							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
+							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
+								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult.filterNot {
+									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
+								}.toArrayList())
+							} else {
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult)
+							}
 							fragment.removeLoadingView()
 						}
 					}
@@ -74,7 +79,7 @@ class TokenSearchPresenter(
 			model?.let { searchToken ->
 				DefaultTokenTable.getCurrentChainToken(searchToken.contract) { localToken ->
 					localToken.isNotNull {
-						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
+						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
 						DefaultTokenTable.updateTokenDefaultStatus(
 							localToken?.contract.orEmpty(),
 							switch.isChecked,
@@ -100,11 +105,7 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(
-					switch,
-					it,
-					ChainID.getChainIDBySymbol(it.symbol)
-				)
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
 			}
 		}
 	}
@@ -114,7 +115,6 @@ class TokenSearchPresenter(
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-
 		fragment.showLoadingView(LoadingText.searchingToken)
 		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
 			content,

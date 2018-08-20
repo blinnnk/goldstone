@@ -193,14 +193,16 @@ object ContactText {
 		else -> ""
 	}
 	@JvmField
-	val wrongAddressFormat = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect wallet address format"
-		HoneyLanguage.Chinese.code -> "钱包地址格式错误"
-		HoneyLanguage.Japanese.code -> "ウォレットアドレス形式が間違っています"
-		HoneyLanguage.Korean.code -> "지갑주소 포맷 오류"
-		HoneyLanguage.Russian.code -> "Неправильный формат адреса кошелька"
-		HoneyLanguage.TraditionalChinese.code -> "錢包地址格式有誤"
-		else -> ""
+	val wrongAddressFormat: (symbol: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "Incorrect $it wallet address format"
+			HoneyLanguage.Chinese.code -> "$it 钱包地址格式错误"
+			HoneyLanguage.Japanese.code -> "$it ウォレットアドレス形式が間違っています"
+			HoneyLanguage.Korean.code -> "$it 지갑주소 포맷 오류"
+			HoneyLanguage.Russian.code -> "$it Неправильный формат адреса кошелька"
+			HoneyLanguage.TraditionalChinese.code -> "$it 錢包地址格式有誤"
+			else -> ""
+		}
 	}
 	@JvmField
 	val contactName = when (currentLanguage) {
@@ -232,6 +234,18 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的比特幣主網地址"
 		else -> ""
 	}
+
+	@JvmField
+	val ltcAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Litecoin Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的莱特币主网地址"
+		HoneyLanguage.Japanese.code -> "Enter Litecoin Mainnet address that you want to store"
+		HoneyLanguage.Korean.code -> "Enter Litecoin Mainnet address that you want to store"
+		HoneyLanguage.Russian.code -> "Enter Litecoin Mainnet address that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter Litecoin Mainnet address that you want to store"
+		else -> ""
+	}
+
 	@JvmField
 	val btcTestnetAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Testnet address that you want to store"

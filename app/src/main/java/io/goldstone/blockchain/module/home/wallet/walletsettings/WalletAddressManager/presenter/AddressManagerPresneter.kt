@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
@@ -70,14 +71,16 @@ class AddressManagerPresneter(
 		WalletTable.getCurrentWallet {
 			val addresses =
 				arrayListOf<Pair<String, String>>().apply {
-					// 如果是测试环境展示 `BTCTest Address`
+					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
-					} else if (currentBTCTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCTestAddress, CryptoSymbol.btc()))
+					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
 					}
-					if (currentLTCAddress.isNotEmpty()) {
+					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
 						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
+					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
 					}
 					if (currentETHAndERCAddress.isNotEmpty()) {
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
@@ -95,6 +98,18 @@ class AddressManagerPresneter(
 		}
 	}
 
+	fun getBitcoinCashAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(bchAddresses))
+		}
+	}
+
+	fun getBitcoinCashTestAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
+		}
+	}
+
 	fun getEthereumClassicAddresses() {
 		WalletTable.getCurrentWallet {
 			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
@@ -109,7 +124,13 @@ class AddressManagerPresneter(
 
 	fun getBitcoinTestAddresses() {
 		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcTestAddresses))
+			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
+		}
+	}
+
+	fun getLitecoinTestAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setLitecoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
 		}
 	}
 
@@ -124,7 +145,8 @@ class AddressManagerPresneter(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
-			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newLTCAddress)
+			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress),
+			Pair(R.drawable.bch_creator_icon, WalletSettingsText.newBCHAddress)
 		)
 	}
 
@@ -151,7 +173,7 @@ class AddressManagerPresneter(
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtCAddresses,
+				WalletSettingsText.allBtcAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
@@ -164,6 +186,16 @@ class AddressManagerPresneter(
 				WalletSettingsText.allLTCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
+			)
+		}
+	}
+
+	fun showAllBCHAddresses(): Runnable {
+		return Runnable {
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
+				WalletSettingsText.allBCHAddresses,
+				WalletSettingsText.viewAddresses,
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
 	}
@@ -343,7 +375,7 @@ class AddressManagerPresneter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCTestAddress(),
+				Config.getCurrentBTCSeriesTestAddress(),
 				true,
 				false
 			) { isCorrect ->
@@ -374,9 +406,58 @@ class AddressManagerPresneter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommitionModel(address, ChainType.BTCTest.id, 1)
+								AddressCommitionModel(address, ChainType.AllTest.id, 1)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
+							}
+						}
+					}
+				}
+			}
+		}
+
+		fun createBCHAddress(
+			context: Context,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentBCHAddress(),
+				true,
+				false
+			) { isCorrect ->
+				if (!isCorrect) {
+					context.alert(CommonText.wrongPassword)
+					return@verifyKeystorePassword
+				}
+
+				WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let { encryptoMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
+						BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
+							context.storeBase58PrivateKey(
+								bchKeyPair.privateKey,
+								bchKeyPair.address,
+								password,
+								false,
+								false
+							)
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							insertNewAddressToMyToken(
+								CryptoSymbol.bch,
+								CryptoValue.bchContract,
+								bchKeyPair.address,
+								ChainID.BCHMain.id
+							)
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommitionModel(bchKeyPair.address, ChainType.BCH.id, 1)
+							)
+							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
@@ -487,12 +568,13 @@ class AddressManagerPresneter(
 					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
 					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
+					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							hold(
 								getTargetAddressIndex(
-									btcTestAddresses,
-									currentBTCTestAddress
+									btcSeriesTestAddresses,
+									currentBTCSeriesTestAddress
 								)
 							)
 						} else {
@@ -512,10 +594,7 @@ class AddressManagerPresneter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(
-							MyTokenTable(it.apply { chain_id = chainID }, address),
-							chainID
-						)
+						MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chainID }, address))
 					}
 				}
 			}

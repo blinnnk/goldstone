@@ -40,6 +40,11 @@ class NodeSelectionPresenter(
 		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 
+	fun updateBCHChainID(nodeName: String) {
+		Config.updateBCHCurrentChainName(nodeName)
+		Config.updateBCHCurrentChain(ChainID.getChainIDByName(nodeName))
+	}
+
 	fun updateLTCChainID(nodeName: String) {
 		Config.updateLTCCurrentChainName(nodeName)
 		Config.updateLTCCurrentChain(ChainID.getChainIDByName(nodeName))
@@ -55,6 +60,7 @@ class NodeSelectionPresenter(
 
 				ChainType.BTC -> ChainText.btcMain
 				ChainType.LTC -> ChainText.ltcMain
+				ChainType.BCH -> ChainText.bchMain
 
 				else -> {
 					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) ChainText.etcMainGasTracker
@@ -70,6 +76,7 @@ class NodeSelectionPresenter(
 
 				ChainType.BTC -> ChainText.btcTest
 				ChainType.LTC -> ChainText.ltcTest
+				ChainType.BCH -> ChainText.bchTest
 				else -> {
 					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) ChainText.etcMorden
 					else Config.getETCCurrentChainName()
@@ -98,6 +105,7 @@ class NodeSelectionPresenter(
 						Config.updateIsTestEnvironment(true)
 						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
 						Config.updateLTCCurrentChain(ChainID.LTCTest.id)
+						Config.updateBCHCurrentChain(ChainID.BCHTest.id)
 						Config.updateETCCurrentChain(ChainID.ETCTest.id)
 						// TODO LTC Testnet ID
 						Config.updateCurrentChain(
@@ -113,6 +121,9 @@ class NodeSelectionPresenter(
 						)
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCTestChainNameID)
+						)
+						Config.updateBCHCurrentChainName(
+							ChainNameID.getChainNameByID(currentBCHTestChainNameID)
 						)
 						Config.updateLTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentLTCTestChainNameID)
@@ -131,6 +142,7 @@ class NodeSelectionPresenter(
 						Config.updateIsTestEnvironment(false)
 						Config.updateBTCCurrentChain(ChainID.BTCMain.id)
 						Config.updateLTCCurrentChain(ChainID.LTCMain.id)
+						Config.updateBCHCurrentChain(ChainID.BCHMain.id)
 						Config.updateETCCurrentChain(ChainID.ETCMain.id)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
@@ -145,6 +157,9 @@ class NodeSelectionPresenter(
 						)
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCChainNameID)
+						)
+						Config.updateBCHCurrentChainName(
+							ChainNameID.getChainNameByID(currentBCHChainNameID)
 						)
 						Config.updateLTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentLTCChainNameID)

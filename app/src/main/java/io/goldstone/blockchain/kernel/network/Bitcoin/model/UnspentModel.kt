@@ -7,17 +7,13 @@ import com.google.gson.annotations.SerializedName
  * @author KaySaith
  */
 data class UnspentModel(
-	@SerializedName("tx_output_n")
+	@SerializedName("vout")
 	val outputNumber: Long,
-	@SerializedName("script")
-	val script: String,
-	@SerializedName("value")
+	@SerializedName("scriptPubKey")
+	val scriptPubKey: String,
+	@SerializedName("satoshis")
 	val value: Long,
-	@SerializedName("value_hex")
-	val balanceHex: String,
-	@SerializedName("tx_hash")
-	val littleEndianHash: String,
-	@SerializedName("tx_hash_big_endian")
+	@SerializedName("txid")
 	val txid: String,
 	@SerializedName("confirmations")
 	val confirmations: Int
@@ -26,8 +22,6 @@ data class UnspentModel(
 		0,
 		"",
 		0L,
-		"",
-		"",
 		"",
 		0
 	)

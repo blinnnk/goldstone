@@ -23,11 +23,11 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 		)
 		updateHeaderValue(headerData)
 		headerModel = headerData
-		if (token.symbol.equals(CryptoSymbol.btc(), true)) {
-			observerBTCTransaction()
-		} else {
-			// 监听 `ETH, ERC20 or ETC` 的转账状态
-			observerTransaction()
+		when {
+			token.symbol.equals(CryptoSymbol.btc(), true) -> observerBTCTransaction()
+			token.symbol.equals(CryptoSymbol.ltc, true) -> observerLTCTransaction()
+			token.symbol.equals(CryptoSymbol.bch, true) -> observerBCHTransaction()
+			else -> observerTransaction()
 		}
 	}
 }

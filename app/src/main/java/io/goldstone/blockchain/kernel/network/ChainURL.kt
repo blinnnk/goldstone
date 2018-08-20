@@ -28,6 +28,8 @@ object ChainURL {
 			ChainText.btcMain -> ChainURL.btcMain
 			ChainText.ltcMain -> ChainURL.ltcMain
 			ChainText.ltcTest -> ChainURL.ltcTest
+			ChainText.bchMain -> ChainURL.bchMain
+			ChainText.bchTest -> ChainURL.bchTest
 			else -> ChainURL.main
 		}
 	}
@@ -63,6 +65,7 @@ object ChainURL {
 			ChainType.ETC -> Config.getETCCurrentChainName()
 			ChainType.BTC -> Config.getBTCCurrentChainName()
 			ChainType.LTC -> Config.getLTCCurrentChainName()
+			ChainType.BCH -> Config.getBCHCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -73,6 +76,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
 			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
 			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
+			symbol.equals(CryptoSymbol.bch, true) -> Config.getBCHCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -83,6 +87,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
 			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
 			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
+			symbol.equals(CryptoSymbol.bch, true) -> ChainType.BCH
 			else -> ChainType.ETH
 		}
 	}

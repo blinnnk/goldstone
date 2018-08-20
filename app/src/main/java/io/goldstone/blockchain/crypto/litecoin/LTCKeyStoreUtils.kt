@@ -11,11 +11,6 @@ import org.jetbrains.anko.doAsync
 import java.io.File
 
 /**
- * @date 2018/8/12 12:47 PM
- * @author KaySaith
- */
-
-/**
  * @date 2018/8/1 12:13 AM
  * @author KaySaith
  * @important

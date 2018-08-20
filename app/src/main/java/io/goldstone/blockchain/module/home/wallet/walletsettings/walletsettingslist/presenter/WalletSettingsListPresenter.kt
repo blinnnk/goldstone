@@ -115,48 +115,24 @@ class WalletSettingsListPresenter(
 						override var asyncCount = 4
 
 						override fun concurrentJobs() {
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses).forEach {
-								deleteRoutineWallet(
-									it.first,
-									password,
-									false,
-									false,
-									true
-								) {
-									completeMark()
-								}
-							}
-							AddressManagerPresneter.convertToChildAddresses(etcAddresses).forEach {
-								deleteRoutineWallet(
-									it.first,
-									password,
-									false,
-									false,
-									true
-								) {
-									completeMark()
-								}
-							}
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses).forEach {
-								deleteRoutineWallet(
-									it.first,
-									password,
-									true,
-									false,
-									true
-								) {
-									completeMark()
-								}
-							}
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses).forEach {
-								deleteRoutineWallet(
-									it.first,
-									password,
-									true,
-									false,
-									true
-								) {
-									completeMark()
+							listOf(
+								ethAddresses,
+								etcAddresses,
+								btcAddresses,
+								btcSeriesTestAddresses,
+								ltcAddresses,
+								bchAddresses
+							).forEach { chainAddresses ->
+								AddressManagerPresneter.convertToChildAddresses(chainAddresses).forEach {
+									deleteRoutineWallet(
+										it.first,
+										password,
+										false,
+										false,
+										true
+									) {
+										completeMark()
+									}
 								}
 							}
 						}
@@ -174,7 +150,29 @@ class WalletSettingsListPresenter(
 				// 删除 `BTCTest` 包下的所有地址对应的数据
 				WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
 					deleteRoutineWallet(
-						currentBTCTestAddress,
+						currentBTCSeriesTestAddress,
+						password,
+						true,
+						true
+					) {
+						activity?.jump<SplashActivity>()
+					}
+				}
+				// 删除 `BTCTest` 包下的所有地址对应的数据
+				WalletType.LTCOnly.content -> WalletTable.getCurrentWallet {
+					deleteRoutineWallet(
+						currentLTCAddress,
+						password,
+						true,
+						true
+					) {
+						activity?.jump<SplashActivity>()
+					}
+				}
+				// 删除 `BTCTest` 包下的所有地址对应的数据
+				WalletType.BCHOnly.content -> WalletTable.getCurrentWallet {
+					deleteRoutineWallet(
+						currentBCHAddress,
 						password,
 						true,
 						true

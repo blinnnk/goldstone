@@ -71,10 +71,10 @@ object Config {
 	fun updateCurrentBTCAddress(address: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBTCAddress, address)
 
-	fun getCurrentBTCTestAddress(): String =
+	fun getCurrentBTCSeriesTestAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCTestAddress)
 
-	fun updateCurrentBTCTestAddress(address: String) =
+	fun updateCurrentBTCSeriesTestAddress(address: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
 			SharesPreference.currentBTCTestAddress,
 			address
@@ -85,6 +85,12 @@ object Config {
 
 	fun updateCurrentLTCAddress(address: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLTCAddress, address)
+
+	fun getCurrentBCHAddress(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBCHAddress)
+
+	fun updateCurrentBCHAddress(address: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBCHAddress, address)
 
 	/** Chain Name in Shared Preference */
 	fun getCurrentName(): String =
@@ -177,6 +183,36 @@ object Config {
 	fun updateLTCCurrentChainName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
 			SharesPreference.ltcCurrentChainName,
+			chainName
+		)
+
+	/** BCH ChainID And Chain Name in Shared Preference */
+	fun getBCHCurrentChain(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
+				.equals("Default", true)
+		) {
+			ChainID.ETCMain.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
+		}
+
+	fun getBCHCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.etcMainGasTracker
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
+		}
+
+	fun updateBCHCurrentChain(chainID: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainID)
+
+	fun updateBCHCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.bchCurrentChainName,
 			chainName
 		)
 

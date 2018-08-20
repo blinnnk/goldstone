@@ -27,45 +27,43 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import org.jetbrains.anko.relativeLayout
 
 class MainActivity : AppCompatActivity() {
-	
+
 	var backEvent: Runnable? = null
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
-	
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
-		
+
 		transparentStatus()
-		
-		relativeLayout {
+
+		setContentView(relativeLayout {
 			id = ContainerID.main
 			savedInstanceState.isNull {
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 				addFragment<HomeFragment>(this.id, FragmentTag.home)
 			}
-		}.let {
-			setContentView(it)
-		}
+		})
 		registerReceiver()
 	}
-	
+
 	private var currentIntent: Intent? = null
 	override fun onNewIntent(intent: Intent?) {
 		super.onNewIntent(intent)
 		// App 存在的时候记录 `Intent`
 		currentIntent = intent
 	}
-	
+
 	override fun onResume() {
 		super.onResume()
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
 	}
-	
+
 	fun sendAnalyticsData(className: String) {
 		tracker?.setScreenName(className)
 		tracker?.send(
@@ -75,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 			).build()
 		)
 	}
-	
+
 	fun showLoadingView() {
 		findViewById<RelativeLayout>(ContainerID.main)?.let { layout ->
 			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
@@ -84,18 +82,18 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-	
+
 	fun removeLoadingView() {
 		findViewById<RelativeLayout>(ContainerID.main)?.apply {
 			loadingView?.let { removeView(it) }
 		}
 	}
-	
+
 	override fun onDestroy() {
 		super.onDestroy()
 		unregisterReceiver(netWorkReceiver)
 	}
-	
+
 	override fun onBackPressed() {
 		recoveryBackEventFromOtherApp()
 		if (backEvent.isNull()) {
@@ -104,18 +102,18 @@ class MainActivity : AppCompatActivity() {
 			backEvent?.run()
 		}
 	}
-	
+
 	fun getHomeFragment(): HomeFragment? {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home).let {
 			return if (it.isNull()) null
 			else it as? HomeFragment
 		}
 	}
-	
+
 	fun getMainContainer(): RelativeLayout? {
 		return findViewById(ContainerID.main)
 	}
-	
+
 	// 防止重绘的专用方法
 	fun hideHomeFragment() {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
@@ -124,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-	
+
 	// 防止重绘的专用方法
 	fun showHomeFragment() {
 		getHomeFragment()?.let {
@@ -136,15 +134,15 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-	
+
 	fun getWalletDetailFragment(): WalletDetailFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.walletDetail)
 	}
-	
+
 	fun getQuotationFragment(): QuotationFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.quotation)
 	}
-	
+
 	private fun recoveryBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
 			if (it is BaseOverlayFragment<*>) {
@@ -157,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-	
+
 	/**
 	 * 接受到 `Push` 跳转到 `NotificationFragment`
 	 */
@@ -176,14 +174,14 @@ class MainActivity : AppCompatActivity() {
 			currentIntent = null
 		}
 	}
-	
+
 	private fun registerReceiver() {
 		netWorkReceiver = ConnectionChangeReceiver()
 		val intentFilter = IntentFilter()
 		intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
 		registerReceiver(netWorkReceiver, intentFilter)
 	}
-	
+
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		this.saveDataToSharedPreferences(SharesPreference.activityIsResult, TinyNumber.True.value)

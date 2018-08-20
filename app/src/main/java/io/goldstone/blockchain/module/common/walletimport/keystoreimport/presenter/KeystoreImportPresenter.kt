@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.*
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils

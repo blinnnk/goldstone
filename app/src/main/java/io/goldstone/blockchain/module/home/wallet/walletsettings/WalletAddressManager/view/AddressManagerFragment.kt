@@ -41,18 +41,19 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 5) { moreButton, address, isDefault, title ->
-			val chainTYpe = when (title) {
+			val chainType = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
 				CryptoSymbol.etc -> ChainType.ETC.id
 				CryptoSymbol.erc -> ChainType.ETH.id
 				CryptoSymbol.ltc -> ChainType.LTC.id
+				CryptoSymbol.bch -> ChainType.BCH.id
 				else -> ChainType.BTC.id
 			}
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					address,
-					chainTYpe,
+					chainType,
 					!isDefault
 				)
 				moreButton.preventDuplicateClicks()
@@ -118,6 +119,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
+
+	private val bchAddressesView by lazy {
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
+				showCellMoreDashboard(
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.BCH.id,
+					!isDefault
+				)
+				moreButton.preventDuplicateClicks()
+			}
+		}
+	}
 	override val presenter = AddressManagerPresneter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -138,16 +153,27 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						ethAndERCAddressesView.into(this@parent)
 						etcAddressesView.into(this@parent)
 						btcAddressesView.into(this@parent)
-						ltcAddressesView.into(this@parent)
 						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
+						if (!Config.isTestEnvironment()) {
+							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
+							bchAddressesView.into(this@parent)
+							ltcAddressesView.into(this@parent)
+							ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
+							bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
+						}
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
-						ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
+						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
 						else presenter.getBitcoinAddresses()
-						presenter.getLitecoinAddresses()
+						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
+						if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
+						else presenter.getLitecoinAddresses()
+						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
+						if (Config.isTestEnvironment()) presenter.getBitcoinCashTestAddresses()
+						else presenter.getBitcoinCashAddresses()
 					} else {
 						hideAddButton()
 						attentionView.into(this@parent)
@@ -171,18 +197,29 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 		ethAndERCAddressesView.model = model
 	}
 
+	fun setBitcoinCashAddressesModel(model: List<Pair<String, String>>) {
+		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashcoinAddress)
+		bchAddressesView.model = model
+	}
+
 	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.model = model
 	}
 
+	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
-		btcAddressesView.setTitle(WalletSettingsText.bitcoinAddress(Config.getYingYongBaoInReviewStatus()))
+		val title = if (Config.isTestEnvironment()) {
+			"${CryptoSymbol.btc()}/${CryptoSymbol.ltc}/${CryptoSymbol.bch} Test Addresses"
+		} else {
+			WalletSettingsText.bitcoinAddress(Config.getYingYongBaoInReviewStatus())
+		}
+		btcAddressesView.setTitle(title)
 		btcAddressesView.model = model
 	}
 
 	fun setLitecoinAddressesModel(model: List<Pair<String, String>>) {
-		ltcAddressesView.setTitle(WalletSettingsText.allLTCAddresses)
+		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.model = model
 	}
 
@@ -222,8 +259,28 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					etcAddressesView.model = it
 				}
 
-				WalletSettingsText.newLTCAddress -> AddressManagerPresneter.createLTCAddress(this, password) {
-					ltcAddressesView.model = it
+				WalletSettingsText.newLTCAddress -> {
+					if (Config.isTestEnvironment()) {
+						AddressManagerPresneter.createBTCTestAddress(this, password) {
+							btcAddressesView.model = it
+						}
+					} else {
+						AddressManagerPresneter.createLTCAddress(this, password) {
+							ltcAddressesView.model = it
+						}
+					}
+				}
+
+				WalletSettingsText.newBCHAddress -> {
+					if (Config.isTestEnvironment()) {
+						AddressManagerPresneter.createBTCTestAddress(this, password) {
+							btcAddressesView.model = it
+						}
+					} else {
+						AddressManagerPresneter.createBCHAddress(this, password) {
+							bchAddressesView.model = it
+						}
+					}
 				}
 
 				WalletSettingsText.newBTCAddress -> {
@@ -258,7 +315,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-						ChainType.LTC.id -> presenter.getLitecoinAddresses()
+						ChainType.LTC.id -> {
+							if (Config.isTestEnvironment())
+								presenter.getLitecoinTestAddresses()
+							else presenter.getLitecoinAddresses()
+						}
 						ChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								presenter.getBitcoinTestAddresses()

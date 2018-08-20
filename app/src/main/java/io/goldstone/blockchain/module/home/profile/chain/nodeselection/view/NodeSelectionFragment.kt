@@ -47,7 +47,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.etc, ChainText.goldStoneEtcMorderTest),
 		Pair(CryptoName.etc, ChainText.etcMorden),
 		Pair(CryptoName.btc, ChainText.btcTest),
-		Pair(CryptoName.ltc, ChainText.ltcTest)
+		Pair(CryptoName.ltc, ChainText.ltcTest),
+		Pair(CryptoName.bch, ChainText.bchTest)
 	)
 	private val mainnetNodeList = arrayListOf(
 		Pair(CryptoName.eth, ChainText.goldStoneMain),
@@ -55,7 +56,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.etc, ChainText.goldStoneEtcMain),
 		Pair(CryptoName.etc, ChainText.etcMainGasTracker),
 		Pair(CryptoName.btc, ChainText.btcMain),
-		Pair(CryptoName.ltc, ChainText.ltcMain)
+		Pair(CryptoName.ltc, ChainText.ltcMain),
+		Pair(CryptoName.bch, ChainText.bchMain)
 	)
 	private val confirmButton by lazy {
 		RoundButton(context!!)
@@ -78,6 +80,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						CryptoName.eth -> NodeSelectionSectionCell(context).ethType().into(this)
 						CryptoName.btc -> NodeSelectionSectionCell(context).btcType().into(this)
 						CryptoName.ltc -> NodeSelectionSectionCell(context).ltcType().into(this)
+						CryptoName.bch -> NodeSelectionSectionCell(context).bchType().into(this)
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
 					// Nodes of One Chain
@@ -102,6 +105,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							pair.first.equals(CryptoName.etc, true) -> 10
 							pair.first.equals(CryptoName.btc, true) -> 20
 							pair.first.equals(CryptoName.ltc, true) -> 30
+							pair.first.equals(CryptoName.bch, true) -> 40
 							else -> 0
 						}
 						NodeSelectionCell(context).setData(pair.second, isSelected, id).click { it ->
@@ -129,6 +133,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 									presenter.updateERC20ChainID(pair.second)
 								pair.first.equals(CryptoName.btc, true) ->
 									presenter.updateBTCChainID(pair.second)
+								pair.first.equals(CryptoName.bch, true) ->
+									presenter.updateBCHChainID(pair.second)
 								pair.first.equals(CryptoName.ltc, true) ->
 									presenter.updateLTCChainID(pair.second)
 								else -> presenter.updateETCChainID(pair.second)
@@ -153,6 +159,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							),
 							ChainNameID.getChainNameIDByName(
 								selectedNode.find {
+									it.first.equals(CryptoName.bch, true)
+								}?.second.orEmpty()
+							),
+							ChainNameID.getChainNameIDByName(
+								selectedNode.find {
 									it.first.equals(CryptoName.ltc, true)
 								}?.second.orEmpty()
 							)
@@ -170,6 +181,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			CryptoName.eth -> ChainType.ETH
 			CryptoName.btc -> ChainType.BTC
 			CryptoName.ltc -> ChainType.LTC
+			CryptoName.bch -> ChainType.BCH
 			else -> ChainType.ETC
 		}
 	}
@@ -179,6 +191,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			ChainType.ETC -> 10
 			ChainType.BTC -> 20
 			ChainType.LTC -> 30
+			ChainType.BCH -> 40
 			else -> 0
 		}
 		(start until maxIndex + start).forEach {

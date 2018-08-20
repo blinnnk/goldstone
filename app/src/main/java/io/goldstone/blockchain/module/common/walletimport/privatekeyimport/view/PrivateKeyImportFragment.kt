@@ -192,7 +192,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						CryptoValue.PrivateKeyType.ETHERCAndETC.content,
 						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTC.content),
 						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTCTest.content, true),
-						CryptoValue.PrivateKeyType.LTC.content
+						CryptoValue.PrivateKeyType.LTC.content,
+						CryptoValue.PrivateKeyType.BCH.content
 					)
 				override var defaultRadio = type
 

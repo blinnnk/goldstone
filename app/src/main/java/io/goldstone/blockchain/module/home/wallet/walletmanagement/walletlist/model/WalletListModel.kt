@@ -14,8 +14,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 data class WalletListModel(
 	var id: Int = 0,
 	var addressName: String = "",
-	var address: String = "",
-	var subtitle: String = "",
+	var address: String = "", // 切换钱包的时候用于比对的值
+	var subtitle: String = "", // 显示的副标题
 	var balance: Double = 0.0,
 	var isWatchOnly: Boolean = false,
 	var isUsing: Boolean = false,
@@ -25,7 +25,7 @@ data class WalletListModel(
 	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
-		getSubtitleByType(data),
+		WalletTable.getAddressesByWallet(data).first(),
 		getSubtitleByType(data),
 		balance,
 		data.isWatchOnly,
@@ -37,9 +37,10 @@ data class WalletListModel(
 		fun getSubtitleByType(wallet: WalletTable): String {
 			return when (WalletTable.getTargetWalletType(wallet)) {
 				WalletType.LTCOnly -> wallet.currentLTCAddress
+				WalletType.BCHOnly -> wallet.currentBCHAddress
 				WalletType.MultiChain -> WalletText.multiChain
 				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
-				WalletType.BTCTestOnly -> wallet.btcTestAddresses
+				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses
 				WalletType.BTCOnly -> wallet.btcAddresses
 			}
 		}

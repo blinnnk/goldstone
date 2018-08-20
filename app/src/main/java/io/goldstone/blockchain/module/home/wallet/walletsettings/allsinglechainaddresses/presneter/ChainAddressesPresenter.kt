@@ -89,10 +89,15 @@ class ChainAddressesPresenter(
 								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 							}
 
+							ChainType.BCH.id -> AddressManagerPresneter.createBCHAddress(this, password) {
+								updateAddressManagerDataBy(ChainType.BCH.id, it)
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
+							}
+
 							ChainType.BTC.id -> {
 								if (Config.isTestEnvironment()) {
 									AddressManagerPresneter.createBTCTestAddress(this, password) {
-										updateAddressManagerDataBy(ChainType.BTCTest.id, it)
+										updateAddressManagerDataBy(ChainType.AllTest.id, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
 								} else {
@@ -122,6 +127,7 @@ class ChainAddressesPresenter(
 					ChainType.ETH.id -> it.setEthereumAddressesModel(data)
 					ChainType.ETC.id -> it.setEthereumClassicAddressesModel(data)
 					ChainType.BTC.id -> it.setBitcoinAddressesModel(data)
+					ChainType.BCH.id -> it.setBitcoinCashAddressesModel(data)
 					ChainType.LTC.id -> it.setLitecoinAddressesModel(data)
 				}
 			}
@@ -137,6 +143,7 @@ class ChainAddressesPresenter(
 					ChainType.ETH.id -> it.presenter.getEthereumAddresses()
 					ChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
 					ChainType.LTC.id -> it.presenter.getLitecoinAddresses()
+					ChainType.BCH.id -> it.presenter.getBitcoinCashAddresses()
 					ChainType.BTC.id -> {
 						if (Config.isTestEnvironment()) {
 							it.presenter.getBitcoinTestAddresses()
@@ -199,16 +206,26 @@ class ChainAddressesPresenter(
 					}
 				}
 
+				ChainType.BCH.id -> {
+					fragment.asyncData =
+						AddressManagerPresneter.convertToChildAddresses(ltcAddresses).toArrayList()
+					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BCH.id) {
+						setDefaultAddress(it, currentBCHAddress, ChainType.BCH.id)
+						Config.updateCurrentLTCAddress(currentBCHAddress)
+					}
+				}
+
 				ChainType.BTC.id -> {
-					val address = if (Config.isTestEnvironment()) btcTestAddresses else btcAddresses
+					val address =
+						if (Config.isTestEnvironment()) btcSeriesTestAddresses else btcAddresses
 					val currentAddress =
-						if (Config.isTestEnvironment()) currentBTCTestAddress else currentBTCAddress
+						if (Config.isTestEnvironment()) currentBTCSeriesTestAddress else currentBTCAddress
 					fragment.asyncData =
 						AddressManagerPresneter.convertToChildAddresses(address).toArrayList()
 					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BTC.id) {
 						setDefaultAddress(it, currentAddress, ChainType.BTC.id)
 						if (Config.isTestEnvironment())
-							Config.updateCurrentBTCTestAddress(currentBTCTestAddress)
+							Config.updateCurrentBTCSeriesTestAddress(currentBTCSeriesTestAddress)
 						else Config.updateCurrentBTCAddress(currentBTCAddress)
 					}
 				}

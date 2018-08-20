@@ -81,6 +81,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val customBCHPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.Chinese.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.Japanese.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.Korean.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.Russian.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom Bitcoin Cash Path"
+		else -> ""
+	}
+	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
 		HoneyLanguage.Chinese.code -> "默认路径"

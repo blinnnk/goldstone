@@ -160,9 +160,15 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 						val btcSeries =
 							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
 								.map { Pair(it.first, ChainType.BTC.id) }
+						val ltcSeries =
+							AddressManagerPresneter.convertToChildAddresses(ltcAddresses)
+								.map { Pair(it.first, ChainType.LTC.id) }
+						val bchSeries =
+							AddressManagerPresneter.convertToChildAddresses(bchAddresses)
+								.map { Pair(it.first, ChainType.BCH.id) }
 						val btcTestSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses)
-								.map { Pair(it.first, ChainType.BTCTest.id) }
+							AddressManagerPresneter.convertToChildAddresses(btcSeriesTestAddresses)
+								.map { Pair(it.first, ChainType.AllTest.id) }
 						val etcSeries =
 							AddressManagerPresneter.convertToChildAddresses(etcAddresses)
 								.map { Pair(it.first, ChainType.ETC.id) }
@@ -171,6 +177,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								.plus(btcSeries)
 								.plus(btcTestSeries)
 								.plus(etcSeries)
+								.plus(ltcSeries)
+								.plus(bchSeries)
 								.map {
 									AddressCommitionModel(it.first, it.second, option)
 								}.map {
@@ -193,7 +201,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					WalletType.BTCOnly.content ->
 						registerSingleAddress(AddressCommitionModel(currentBTCAddress, ChainType.BTC.id, option))
 					WalletType.BTCTestOnly.content ->
-						registerSingleAddress(AddressCommitionModel(currentBTCTestAddress, ChainType.BTCTest.id, option))
+						registerSingleAddress(
+							AddressCommitionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
+						)
 					WalletType.ETHERCAndETCOnly.content ->
 						registerSingleAddress(AddressCommitionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
 				}

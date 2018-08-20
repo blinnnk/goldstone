@@ -49,7 +49,7 @@ class PrivateKeyExportPresenter(
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
 			when (chainType) {
-				ChainType.BTC.id, ChainType.BTCTest.id -> getBTCPrivateKeyByAddress(
+				ChainType.BTC.id, ChainType.AllTest.id -> getBTCPrivateKeyByAddress(
 					it,
 					password,
 					isSingleChainWallet,

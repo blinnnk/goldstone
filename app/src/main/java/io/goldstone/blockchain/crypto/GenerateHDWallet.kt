@@ -223,7 +223,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 		WalletType.BTCTestOnly.content -> {
 			verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCTestAddress(),
+				Config.getCurrentBTCSeriesTestAddress(),
 				true,
 				true,
 				hold
@@ -234,6 +234,26 @@ fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean
 			verifyKeystorePassword(
 				password,
 				Config.getCurrentBTCAddress(),
+				true,
+				true,
+				hold
+			)
+		}
+
+		WalletType.LTCOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentLTCAddress(),
+				true,
+				true,
+				hold
+			)
+		}
+
+		WalletType.BCHOnly.content -> {
+			verifyKeystorePassword(
+				password,
+				Config.getCurrentBCHAddress(),
 				true,
 				true,
 				hold

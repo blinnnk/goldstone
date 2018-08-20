@@ -1,26 +1,23 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
+import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -28,14 +25,15 @@ import java.math.BigInteger
  * @date 2018/7/25 9:38 PM
  * @author KaySaith
  */
-fun GasSelectionPresenter.updateBTCGasSettings(container: LinearLayout) {
+fun GasSelectionPresenter.updateBTCGasSettings(symbol: String, container: LinearLayout) {
 	defaultSatoshiValue.forEachIndexed { index, minner ->
 		container.findViewById<GasSelectionCell>(index)?.let { cell ->
 			cell.model = GasSelectionModel(
 				index,
 				minner.toString().toLong(),
-				prepareBTCModel?.signedMessageSize ?: 226,
-				currentMinerType
+				prepareBTCSeriesModel?.signedMessageSize ?: 226,
+				currentMinerType,
+				symbol
 			)
 		}
 	}
@@ -54,7 +52,7 @@ fun GasSelectionPresenter.insertCustomBTCSatoshi() {
 }
 
 fun GasSelectionPresenter.transferBTC(
-	prepareBTCModel: PaymentPrepareBTCModel,
+	prepareBTCModel: PaymentBTCSeriesModel,
 	password: String,
 	callback: () -> Unit
 ) {
@@ -70,7 +68,7 @@ fun GasSelectionPresenter.transferBTC(
 		prepareBTCModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
 			BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
-				BTCTransactionUtils.generateSignedRawTransaction(
+				BTCSeriesTransactionUtils.generateBTCSignedRawTransaction(
 					value,
 					fee,
 					toAddress,
@@ -79,17 +77,22 @@ fun GasSelectionPresenter.transferBTC(
 					secret!!,
 					Config.isTestEnvironment()
 				).let { signedModel ->
-					BTCJsonRPC.sendRawTransaction(
-						Config.isTestEnvironment(),
+					BTCSeriesJsonRPC.sendRawTransaction(
+						Config.getBTCCurrentChainName(),
 						signedModel.signedMessage
 					) { hash ->
 						hash?.let {
 							// 插入 `Pending` 数据到本地数据库
-							insertBTCPendingDataDatabase(this, fee, signedModel.messageSize, it)
+							insertBTCSeriesPendingDataDatabase(
+								this,
+								fee,
+								signedModel.messageSize,
+								it
+							)
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
-									prepareReceiptModelFromBTC(this@model, fee, it)
+									prepareReceiptModelFromBTCSeries(this@model, fee, it)
 								)
 								callback()
 							}
@@ -117,23 +120,6 @@ private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 	)
 }
 
-private fun GasSelectionPresenter.prepareReceiptModelFromBTC(
-	raw: PaymentPrepareBTCModel,
-	fee: Long,
-	taxHash: String
-): ReceiptModel {
-	return ReceiptModel(
-		raw.fromAddress,
-		raw.toAddress,
-		fee.toString(),
-		raw.value.toBigInteger(),
-		getToken()!!,
-		taxHash,
-		System.currentTimeMillis(),
-		prepareModel?.memo
-	)
-}
-
 fun GasSelectionPresenter.prepareToTransferBTC(
 	footer: GasSelectionFooter,
 	callback: () -> Unit
@@ -154,9 +140,19 @@ fun GasSelectionPresenter.prepareToTransferBTC(
 	}
 }
 
+fun GasSelectionPresenter.checkBCHBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
+	prepareBTCSeriesModel?.apply {
+		BitcoinCashApi.getBalance(fromAddress) {
+			GoldStoneAPI.context.runOnUiThread {
+				hold(it.toSatoshi() > value + fee.toSatoshi())
+			}
+		}
+	}
+}
+
 fun GasSelectionPresenter.checkBTCBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
-	prepareBTCModel?.apply {
-		BitcoinApi.getBalanceByAddress(fromAddress) {
+	prepareBTCSeriesModel?.apply {
+		BitcoinApi.getBalance(fromAddress) {
 			GoldStoneAPI.context.runOnUiThread {
 				hold(it > value + fee.toSatoshi())
 			}
@@ -164,45 +160,12 @@ fun GasSelectionPresenter.checkBTCBalanceIsValid(fee: Double, hold: Boolean.() -
 	}
 }
 
-private fun GasSelectionPresenter.insertBTCPendingDataDatabase(
-	raw: PaymentPrepareBTCModel,
-	fee: Long,
-	size: Int,
-	taxHash: String
-) {
-	fragment.getParentFragment<TokenDetailOverlayFragment> {
-		val myAddress =
-			if (Config.isTestEnvironment())
-				Config.getCurrentBTCTestAddress()
-			else Config.getCurrentBTCAddress()
-		BitcoinSeriesTransactionTable(
-			0,
-			getToken()?.symbol.orEmpty(),
-			"Waiting",
-			0,
-			System.currentTimeMillis().toString(),
-			taxHash,
-			myAddress,
-			raw.toAddress,
-			myAddress,
-			false,
-			raw.value.toString(),
-			fee.toString(),
-			size.toString(),
-			false,
-			true
-		).apply {
-			// 插入 PendingData
-			GoldStoneDataBase.database
-				.bitcoinTransactionDao()
-				.insert(this)
-			// 插入 FeeData
-			GoldStoneDataBase.database
-				.bitcoinTransactionDao()
-				.insert(this.apply {
-					isPending = false
-					isFee = true
-				})
+fun GasSelectionPresenter.checkLTCBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
+	prepareBTCSeriesModel?.apply {
+		LitecoinApi.getBalance(fromAddress) {
+			GoldStoneAPI.context.runOnUiThread {
+				hold(it > value + fee.toSatoshi())
+			}
 		}
 	}
 }

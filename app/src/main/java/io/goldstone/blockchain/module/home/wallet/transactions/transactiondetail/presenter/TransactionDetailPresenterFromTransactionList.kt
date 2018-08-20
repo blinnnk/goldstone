@@ -31,12 +31,18 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 
 		when {
-			symbol.equals(CryptoSymbol.btc(), true) -> {
+			CryptoSymbol.isBTCSeriesSymbol(symbol) -> {
 				dataFromList?.let {
 					fragment.asyncData = generateModels(it)
 					updateHeaderValue(headerData)
 					fragment.removeLoadingView()
-					if (isPending) observerBTCTransaction()
+					if (isPending) {
+						when {
+							symbol.equals(CryptoSymbol.btc(), true) -> observerBTCTransaction()
+							symbol.equals(CryptoSymbol.bch, true) -> observerBCHTransaction()
+							else -> observerLTCTransaction()
+						}
+					}
 				}
 			}
 

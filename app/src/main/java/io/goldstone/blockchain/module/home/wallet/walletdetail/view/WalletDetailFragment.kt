@@ -46,6 +46,7 @@ class WalletDetailFragment :
 				presenter.setQuickTransferEvent(false)
 			}
 		}
+
 	}
 
 	fun showMiniLoadingView() {

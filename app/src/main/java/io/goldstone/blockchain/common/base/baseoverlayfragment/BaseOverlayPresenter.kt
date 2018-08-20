@@ -7,6 +7,7 @@ import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
@@ -15,9 +16,9 @@ import io.goldstone.blockchain.common.value.ContainerID
  * @author KaySaith
  */
 abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
-	
+
 	abstract val fragment: T
-	
+
 	open fun removeSelfFromActivity() {
 		fragment.removeSelf()
 		/**
@@ -28,7 +29,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		}
 		fragment.getMainActivity()?.backEvent = null
 	}
-	
+
 	/**
 	 * 为了体验, 之前的 `Fragment` 都是使用隐藏,
 	 * @important 当级别超过 `2` 层记得去从隐藏到显示
@@ -47,7 +48,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						showCloseButton(true)
 					}
 				}
-				
+
 				if (viewPagerSize > 0) {
 					(0 until size).forEach {
 						if (this[it].isHidden) {
@@ -68,7 +69,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			}
 		}
 	}
-	
+
 	inline fun <reified T : Fragment> showTargetFragment(
 		title: String,
 		previousTitle: String,
@@ -80,21 +81,25 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			if (viewPagerSize > 0) {
 				childFragmentManager.fragments.apply {
 					forEachIndexed { index, fragment ->
-						if (index in lastIndex - viewPagerSize .. lastIndex) {
+						if (index in lastIndex - viewPagerSize..lastIndex) {
 							hideChildFragment(fragment)
 						}
 					}
 					addSubFragment<T>(bundle, previousTitle, viewPagerSize)
 				}
 			} else {
-				childFragmentManager.fragments.last()?.let {
-					hideChildFragment(it)
-					addSubFragment<T>(bundle, previousTitle, 0)
+				try {
+					childFragmentManager.fragments.last()?.let {
+						hideChildFragment(it)
+						addSubFragment<T>(bundle, previousTitle, 0)
+					}
+				} catch (error: Exception) {
+					LogUtil.error("showTargetFragment", error)
 				}
 			}
 		}
 	}
-	
+
 	inline fun <reified T : Fragment> BaseOverlayFragment<*>.addSubFragment(
 		bundle: Bundle,
 		previousTitle: String,
@@ -111,30 +116,30 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			showCloseButton(false)
 		}
 	}
-	
+
 	fun onFragmentAttach() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentCreateView() {
 		// Do Something When fragment Attach
 	}
-	
+
 	open fun onFragmentViewCreated() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentDetach() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentDestroy() {
 	}
-	
+
 	open fun onFragmentResume() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentShowFromHidden() {
 		// Do Something
 	}

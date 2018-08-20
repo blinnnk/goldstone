@@ -97,6 +97,12 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
+				CryptoValue.PrivateKeyType.BCH -> {
+					setAllMainnet {
+						// TODO Import BCH Private Key
+					}
+				}
+
 				CryptoValue.PrivateKeyType.BTCTest -> {
 					// 跟随导入的测试网私钥切换全局测试网络状态
 					setAllTestnet {
@@ -150,7 +156,8 @@ class PrivateKeyImportPresenter(
 							"",
 							"",
 							"",
-							address
+							address,
+							""
 						),
 						name,
 						"",
@@ -211,6 +218,7 @@ class PrivateKeyImportPresenter(
 							"",
 							if (isTest) "" else address,
 							if (isTest) address else "",
+							"",
 							""
 						),
 						name,
@@ -284,7 +292,14 @@ class PrivateKeyImportPresenter(
 					address?.let {
 						WalletImportPresenter.insertWalletToDatabase(
 							context,
-							MultiChainAddresses(it, it, "", "", ""),
+							MultiChainAddresses(
+								it,
+								it,
+								"",
+								"",
+								"",
+								""
+							),
 							name,
 							"",
 							MultiChainPath(),

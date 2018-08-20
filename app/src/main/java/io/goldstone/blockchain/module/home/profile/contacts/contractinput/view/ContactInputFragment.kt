@@ -34,6 +34,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val ethERCAndETCAddressInput by lazy { WalletEditText(context!!) }
 	private val btcMainnetAddressInput by lazy { WalletEditText(context!!) }
+	private val ltcAddressInput by lazy { WalletEditText(context!!) }
 	private val btcTestnetAddressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = ContactInputPresenter(this)
@@ -57,6 +58,11 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 				hint = ContactText.btcMainnetAddress
 			}.into(this)
+
+			ltcAddressInput.apply {
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				hint = ContactText.ltcAddress
+			}.into(this)
 			
 			btcTestnetAddressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -74,7 +80,8 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			presenter.getAddressIfExist(
 				ethERCAndETCAddressInput,
 				btcMainnetAddressInput,
-				btcTestnetAddressInput
+				btcTestnetAddressInput,
+				ltcAddressInput
 			)
 		}
 	}
@@ -89,6 +96,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			ethERCAndETCAddressInput,
 			btcMainnetAddressInput,
 			btcTestnetAddressInput,
+			ltcAddressInput,
 			confirmButton
 		)
 	}

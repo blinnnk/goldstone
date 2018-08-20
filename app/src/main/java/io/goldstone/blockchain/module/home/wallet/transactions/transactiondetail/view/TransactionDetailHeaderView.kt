@@ -24,6 +24,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TransactionSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.*
 
@@ -96,7 +97,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			if (headerModel.isReceive) TransactionText.transferResultReceived
 			else TransactionText.transferResultSent
 		info.title.text =
-			"$type ${headerModel.count.toBigDecimal().toPlainString()} " +
+			"$type ${headerModel.count.formatCount()} " +
 			"${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address

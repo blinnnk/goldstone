@@ -6,6 +6,7 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
@@ -29,7 +30,8 @@ object GenerateMultiChainWallet {
 			DefaultPath.etcPath,
 			DefaultPath.btcPath,
 			DefaultPath.testPath,
-			DefaultPath.ltcPath
+			DefaultPath.ltcPath,
+			DefaultPath.bchPath
 		)
 		context.generateWallet(password, path.ethPath) { mnemonic, ethAddress ->
 			context.getEthereumWalletByMnemonic(
@@ -71,16 +73,28 @@ object GenerateMultiChainWallet {
 								password,
 								false
 							)
-							hold(
-								MultiChainAddresses(
+							BCHWalletUtils.generateBCHKeyPair(
+								mnemonic,
+								path.bchPath
+							).let { bchKeyPair ->
+								context.storeBase58PrivateKey(
+									ltcKeyPair.privateKey,
+									ltcKeyPair.address,
+									password,
+									false,
+									false
+								)
+								hold(MultiChainAddresses(
 									ethAddress,
 									etcAddress,
 									btcAddress,
 									btcTestAddress,
-									ltcKeyPair.address
+									ltcKeyPair.address,
+									bchKeyPair.address
 								),
-								mnemonic
-							)
+									mnemonic
+								)
+							}
 						}
 					}
 				}
@@ -141,13 +155,26 @@ object GenerateMultiChainWallet {
 								password,
 								false
 							)
-							hold(MultiChainAddresses(
-								ethAddress,
-								etcAddress,
-								btcAddress,
-								btcTestAddress,
-								ltcKeyPair.address
-							))
+							BCHWalletUtils.generateBCHKeyPair(
+								mnemonic,
+								path.bchPath
+							).let { bchKeyPair ->
+								context.storeBase58PrivateKey(
+									bchKeyPair.privateKey,
+									bchKeyPair.address,
+									password,
+									false,
+									false
+								)
+								hold(MultiChainAddresses(
+									ethAddress,
+									etcAddress,
+									btcAddress,
+									btcTestAddress,
+									ltcKeyPair.address,
+									bchKeyPair.address
+								))
+							}
 						}
 					}
 				}

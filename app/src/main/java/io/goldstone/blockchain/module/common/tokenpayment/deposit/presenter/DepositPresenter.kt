@@ -54,7 +54,7 @@ class DepositPresenter(
 				token?.symbol.equals(CryptoSymbol.btc()) -> {
 					if (Config.isTestEnvironment()) {
 						generateBitcoinCode(
-							Config.getCurrentBTCTestAddress(),
+							Config.getCurrentBTCSeriesTestAddress(),
 							amount
 						)
 					} else {

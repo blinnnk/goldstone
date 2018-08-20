@@ -21,9 +21,12 @@ data class ContactTable(
 	var defaultAddress: String,
 	var ethERCAndETCAddress: String,
 	var btcMainnetAddress: String,
-	var btcTestnetAddress: String
-) : Serializable {
-	
+	var btcSeriesTestnetAddress: String,
+	var etcAddress: String,
+	var ltcAddress: String,
+	var bchAddress: String
+	) : Serializable {
+
 	@Ignore constructor() : this(
 		0,
 		"",
@@ -31,11 +34,14 @@ data class ContactTable(
 		"",
 		"",
 		"",
+		"",
+		"",
+		"",
 		""
 	)
-	
+
 	companion object {
-		
+
 		fun insertContact(
 			contact: ContactTable,
 			callback: () -> Unit = {}
@@ -46,7 +52,7 @@ data class ContactTable(
 				callback()
 			}
 		}
-		
+
 		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().getAllContacts()
@@ -54,7 +60,7 @@ data class ContactTable(
 				callback(it.toArrayList())
 			}
 		}
-		
+
 		fun hasContacts(address: String, hasContact: (Boolean) -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().getContactByAddress(address)
@@ -62,7 +68,7 @@ data class ContactTable(
 				hasContact(!it.isNull())
 			}
 		}
-		
+
 		fun deleteContactByID(
 			id: Int,
 			callback: () -> Unit
@@ -80,22 +86,22 @@ data class ContactTable(
 
 @Dao
 interface ContractDao {
-	
+
 	@Query("SELECT * FROM contact ORDER BY id DESC")
 	fun getAllContacts(): List<ContactTable>
-	
+
 	@Query("SELECT * FROM contact WHERE id LIKE :id")
 	fun getContacts(id: Int): ContactTable?
-	
-	@Query("SELECT * FROM contact WHERE (ethERCAndETCAddress LIKE :address OR btcMainnetAddress LIKE :address OR btcTestnetAddress LIKE :address)")
+
+	@Query("SELECT * FROM contact WHERE (ethERCAndETCAddress LIKE :address OR bchAddress LIKE :address  OR ltcAddress LIKE :address  OR etcAddress LIKE :address  OR btcMainnetAddress LIKE :address OR btcSeriesTestnetAddress LIKE :address)")
 	fun getContactByAddress(address: String): ContactTable?
-	
+
 	@Insert
 	fun insert(contact: ContactTable)
-	
+
 	@Delete
 	fun delete(contact: ContactTable)
-	
+
 	@Update
 	fun update(contact: ContactTable)
 }

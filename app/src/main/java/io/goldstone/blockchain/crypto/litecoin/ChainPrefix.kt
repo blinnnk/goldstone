@@ -75,8 +75,8 @@ enum class ChainPrefix(val publicKey: String, val privateKey: String) {
 	Dogecoin("1E", "9E");
 
 	companion object {
-		const val compressEndfix = "01"
+		const val compressSuffix = "01"
 	}
 }
 
-data class Base58KeyPair(val address: String, val privateKey: String)
+data class BaseKeyPair(val address: String, val privateKey: String)

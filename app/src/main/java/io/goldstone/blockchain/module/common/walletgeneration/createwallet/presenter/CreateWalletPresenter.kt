@@ -135,8 +135,9 @@ class CreateWalletPresenter(
 						multiChainAddresses.ethAddress,
 						multiChainAddresses.etcAddress,
 						multiChainAddresses.btcAddress,
-						multiChainAddresses.btcTestAddress,
+						multiChainAddresses.btcSeriesTestAddress,
 						multiChainAddresses.ltcAddress,
+						multiChainAddresses.bchAddress,
 						ethAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ethAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
@@ -149,18 +150,23 @@ class CreateWalletPresenter(
 							multiChainAddresses.btcAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
 						),
-						btcTestAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.btcTestAddress,
+						btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.btcSeriesTestAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
 						),
 						ltcAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ltcAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
 						),
+						bchAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.bchAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
+						),
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
 						btcTestPath = DefaultPath.testPath,
+						bchPath = DefaultPath.bchPath,
 						ltcPath = DefaultPath.ltcPath,
 						hint = hint,
 						isUsing = true
@@ -341,45 +347,46 @@ class CreateWalletPresenter(
 							ChainID.Kovan.id,
 							ChainID.Rinkeby.id -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.ethAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ethAddress))
 								}
 							}
 
 							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.etcAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.etcAddress))
 								}
 							}
 
 							ChainID.BTCMain.id -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.btcAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcAddress))
 								}
 							}
 
 							ChainID.BTCTest.id -> {
-								if (currentAddresses.btcTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.btcTestAddress),
-										it.chain_id
-									)
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
 								}
 							}
-							ChainID.LTCMain.id, ChainID.LTCTest.id -> {
+							ChainID.LTCMain.id -> {
 								if (currentAddresses.ltcAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.ltcAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ltcAddress))
+								}
+							}
+							ChainID.LTCTest.id -> {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+								}
+							}
+
+							ChainID.BCHMain.id -> {
+								if (currentAddresses.bchAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.bchAddress))
+								}
+							}
+							ChainID.BCHTest.id -> {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
 								}
 							}
 						}

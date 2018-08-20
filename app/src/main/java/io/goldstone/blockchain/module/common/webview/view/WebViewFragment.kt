@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.text.Html
 import android.view.Gravity
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -40,19 +41,19 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class WebViewFragment : BaseFragment<WebViewPresenter>() {
-	
+
 	private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
 	private val loading by lazy {
 		ProgressBar(this.context, null, R.attr.progressBarStyleInverse)
 	}
 	private lateinit var webView: WebView
 	override val presenter = WebViewPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			backgroundColor = Spectrum.white
-			
+
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
 				showWebView()
 			} otherwise {
@@ -60,7 +61,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		super.setBaseBackEvent(activity, parent)
 		// 这里高度复用导致了一些耦合, 暂时额外判断. 之后重构再优化. By KaySaith
@@ -70,33 +71,33 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 					headerTitle = TransactionText.detail
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
-				
+
 				is NotificationFragment -> {
 					headerTitle = NotificationText.notification
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
-				
+
 				is WalletGenerationFragment -> {
 					headerTitle = CreateWalletText.create
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
-				
+
 				is QuotationOverlayFragment -> {
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
-				
+
 				is TransactionFragment -> {
 					headerTitle = TransactionText.detail
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
-				
+
 				is WalletSettingsFragment -> {
 					presenter.popFragmentFrom<WebViewFragment>()
 				}
 			}
 		}
 	}
-	
+
 	@SuppressLint("SetJavaScriptEnabled")
 	private fun ViewGroup.showWebView() {
 		loading.apply {
@@ -115,11 +116,14 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			webViewClient = WebViewClient()
 			this.loadUrl(urlPath)
 			layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-			
-			webViewClient = object : WebViewClient() {
-				override fun onPageFinished(view: WebView, url: String) {
-					alpha = 1f
-					removeView(loading)
+
+			webChromeClient = object : WebChromeClient() {
+				override fun onProgressChanged(view: WebView?, newProgress: Int) {
+					super.onProgressChanged(view, newProgress)
+					if (newProgress == 100) {
+						alpha = 1f
+						removeView(loading)
+					}
 				}
 			}
 		}
@@ -131,7 +135,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			}
 		}
 	}
-	
+
 	private fun ViewGroup.showLocalContent() {
 		if (urlPath.equals(WebUrl.terms, true)) {
 			scrollView {

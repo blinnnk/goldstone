@@ -62,8 +62,9 @@ class WalletImportPresenter(
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcTestAddress,
-					multiChainAddresses.ltcAddress
+					multiChainAddresses.btcSeriesTestAddress,
+					multiChainAddresses.ltcAddress,
+					multiChainAddresses.bchAddress
 				).find { it.isNotEmpty() }.orEmpty()
 
 			WalletTable.getWalletByAddress(currentAddress) { it ->
@@ -76,8 +77,9 @@ class WalletImportPresenter(
 							currentETHAndERCAddress = multiChainAddresses.ethAddress,
 							currentETCAddress = multiChainAddresses.etcAddress,
 							currentBTCAddress = multiChainAddresses.btcAddress,
-							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
+							currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTestAddress,
 							currentLTCAddress = multiChainAddresses.ltcAddress,
+							currentBCHAddress = multiChainAddresses.bchAddress,
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -96,19 +98,24 @@ class WalletImportPresenter(
 								multiChainAddresses.btcAddress,
 								getAddressIndexFromPath(multiChainPath.btcPath)
 							),
-							btcTestAddresses = childAddressValue(
-								multiChainAddresses.btcTestAddress,
+							btcSeriesTestAddresses = childAddressValue(
+								multiChainAddresses.btcSeriesTestAddress,
 								getAddressIndexFromPath(multiChainPath.testPath)
 							),
 							ltcAddresses = childAddressValue(
 								multiChainAddresses.ltcAddress,
 								getAddressIndexFromPath(multiChainPath.ltcPath)
 							),
+							bchAddresses = childAddressValue(
+								multiChainAddresses.bchAddress,
+								getAddressIndexFromPath(multiChainPath.bchPath)
+							),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,
 							btcTestPath = multiChainPath.testPath,
-							ltcPath = multiChainPath.ltcPath
+							ltcPath = multiChainPath.ltcPath,
+							bchPath = multiChainPath.bchPath
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息

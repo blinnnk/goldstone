@@ -66,15 +66,16 @@ class AddressSelectionPresenter(
 						}
 					}
 
-					token?.symbol.equals(CryptoSymbol.etc, true) -> {
-						DepositPresenter.convertETHOrETCQRCOde(result).let {
-							isCorrectCoinOrChainID(it) {
-								showPaymentPrepareFragment(it.walletAddress, it.amount)
-							}
-						}
+					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+						// TODO LTC By Code
 					}
 
-					token?.symbol.equals(CryptoSymbol.eth, true) -> {
+					token?.symbol.equals(CryptoSymbol.bch, true) -> {
+						// TODO BCH By Code
+					}
+
+					token?.symbol.equals(CryptoSymbol.etc, true)
+						|| token?.symbol.equals(CryptoSymbol.eth, true) -> {
 						DepositPresenter.convertETHOrETCQRCOde(result).let {
 							isCorrectCoinOrChainID(it) {
 								showPaymentPrepareFragment(it.walletAddress, it.amount)
@@ -88,10 +89,7 @@ class AddressSelectionPresenter(
 		}
 	}
 
-	fun showPaymentPrepareFragment(
-		toAddress: String,
-		count: Double = 0.0
-	) {
+	fun showPaymentPrepareFragment(toAddress: String, count: Double = 0.0) {
 		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
 		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
 			localAddresses.any { it.equals(toAddress, true) } isTrue {
@@ -125,6 +123,32 @@ class AddressSelectionPresenter(
 				}
 			}
 
+			AddressType.LTC -> {
+				if (!token?.symbol.equals(CryptoSymbol.ltc, true)) {
+					fragment.context.alert(
+						"This is a invalid address type for ${CryptoSymbol.ltc}, Please check it agin"
+					)
+					return
+				} else {
+					WalletTable.getAllLTCAddresses {
+						showAlertIfLocalExistThisAddress(this)
+					}
+				}
+			}
+
+			AddressType.BCH -> {
+				if (!token?.symbol.equals(CryptoSymbol.bch, true)) {
+					fragment.context.alert(
+						"This is a invalid address type for ${CryptoSymbol.bch}, Please check it agin"
+					)
+					return
+				} else {
+					WalletTable.getAllBCHAddresses {
+						showAlertIfLocalExistThisAddress(this)
+					}
+				}
+			}
+
 			AddressType.BTC -> {
 				if (Config.isTestEnvironment()) {
 					fragment.context.alert(
@@ -134,7 +158,7 @@ class AddressSelectionPresenter(
 					return
 				} else if (!token?.symbol.equals(CryptoSymbol.btc(), true)) {
 					fragment.context.alert(
-						"This is a invalid address type, Please check it agin"
+						"This is a invalid address type for ${CryptoSymbol.btc()}, Please check it agin"
 					)
 					return
 				} else {
@@ -144,20 +168,20 @@ class AddressSelectionPresenter(
 				}
 			}
 
-			AddressType.BTCTest -> {
+			AddressType.BTCSeriesTest -> {
 				if (!Config.isTestEnvironment()) {
 					fragment.context.alert(
 						"this is a testnet address, please switch your local net " +
 							"setting in settings first"
 					)
 					return
-				} else if (!token?.symbol.equals(CryptoSymbol.btc(), true)) {
+				} else if (!CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
 					fragment.context.alert(
-						"This is a invalid address type, Please check it agin"
+						"This is a invalid address type for Testnet, Please check it agin"
 					)
 					return
 				} else {
-					WalletTable.getAllBTCTestnetAddresses {
+					WalletTable.getAllBTCSeriesTestnetAddresses {
 						showAlertIfLocalExistThisAddress(this)
 					}
 				}
@@ -278,16 +302,22 @@ class AddressSelectionPresenter(
 			} otherwise {
 				if (fragment.asyncData.isNullOrEmpty()) {
 					// 根据当前的 `Coin Type` 来选择展示地址的哪一项
-					fragment.asyncData = if (token?.symbol.equals(CryptoSymbol.btc(), true)) {
-						contacts.map {
+					fragment.asyncData = when {
+						token?.symbol.equals(CryptoSymbol.btc(), true) -> contacts.map {
 							it.apply {
 								defaultAddress =
-									if (Config.isTestEnvironment()) it.btcTestnetAddress
+									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
 									else it.btcMainnetAddress
 							}
 						}.toArrayList()
-					} else {
-						contacts.map {
+						token?.symbol.equals(CryptoSymbol.ltc, true) -> contacts.map {
+							it.apply {
+								defaultAddress =
+									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+									else it.ltcAddress
+							}
+						}.toArrayList()
+						else -> contacts.map {
 							it.apply {
 								defaultAddress = ethERCAndETCAddress
 							}

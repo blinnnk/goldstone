@@ -55,7 +55,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.etcPath,
 		DefaultPath.btcPath,
 		DefaultPath.testPath,
-		DefaultPath.ltcPath
+		DefaultPath.ltcPath,
+		DefaultPath.bchPath
 	)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -130,7 +131,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[1],
 							defaultPath[2],
 							defaultPath[3],
-							defaultPath[4]
+							defaultPath[4],
+							defaultPath[5]
 						),
 						mnemonicInput.text.toString(),
 						passwordInput.text.toString(),
@@ -175,7 +177,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
 			DefaultPath.testPathHeader
 		),
-		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader)
+		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader),
+		Pair(ImportWalletText.customBCHPath, DefaultPath.bchPathHeader)
 	)
 
 	private fun showPatSettingsDashboard() {

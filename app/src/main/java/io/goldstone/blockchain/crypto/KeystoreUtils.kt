@@ -22,7 +22,13 @@ data class KeystoreModel(
 	var version: Int
 )
 
-fun String.toJsonObject() = JSONObject(substring(indexOf("{"), lastIndexOf("}") + 1))
+fun String.toJsonObject(): JSONObject {
+	return if (contains("{")) {
+		JSONObject(substring(indexOf("{"), lastIndexOf("}") + 1))
+	} else {
+		JSONObject("{content:$this}")
+	}
+}
 
 fun String.convertKeystoreToModel(): KeystoreModel {
 	val address = toJsonObject()["address"].toString()

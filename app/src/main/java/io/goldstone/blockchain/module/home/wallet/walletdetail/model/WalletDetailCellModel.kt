@@ -139,6 +139,8 @@ data class WalletDetailCellModel(
 											token.ownerAddress,
 											false,
 											{ error, reason ->
+												// 如果出错的话余额暂时设定用旧的值
+												tokenList.add(WalletDetailCellModel(targetToken, token.balance))
 												completeMark()
 												fragment.context?.apply { chainError(reason, error, this) }
 											}

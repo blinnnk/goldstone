@@ -4,43 +4,39 @@ import android.os.Bundle
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.otherwise
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.bitcoin.BTCTransactionUtils
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.bitcoin.BTCJsonRPC
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareBTCModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.runOnUiThread
 
 /**
- * @date 2018/7/25 3:13 PM
+ * @date 2018/8/15 4:53 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareBTCPaymentModel(
+
+fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
 	callback: (isSuccess: Boolean) -> Unit
 ) {
-	generateBTCPaymentModel(count, changeAddress) {
+	generateBCHPaymentModel(count, changeAddress) {
 		it isNotNull {
 			fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
 					TokenDetailText.customGas,
 					TokenDetailText.paymentValue,
 					Bundle().apply {
-						putSerializable(ArgumentKey.btcPrepareModel, it)
+						putSerializable(ArgumentKey.btcSeriesPrepareModel, it)
 					})
 				callback(true)
 			}
@@ -50,47 +46,33 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 	}
 }
 
-fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
-	if (address.isNotEmpty()) {
-		val isValidAddress = if (Config.isTestEnvironment()) {
-			BTCUtils.isValidTestnetAddress(address)
-		} else {
-			BTCUtils.isValidMainnetAddress(address)
-		}
-		if (isValidAddress) {
-			fragment.updateChangeAddress(CryptoUtils.scaleTo22(address))
-		} else {
-			fragment.context.alert(ImportWalletText.addressFromatAlert)
-		}
-		fragment.activity?.let { SoftKeyboard.hide(it) }
-		return isValidAddress
-	} else {
-		return false
-	}
-}
-
-private fun PaymentPreparePresenter.generateBTCPaymentModel(
+private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (PaymentPrepareBTCModel?) -> Unit
+	hold: (PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
 	val chainName =
-		if (Config.isTestEnvironment()) ChainText.btcTest else ChainText.btcMain
+		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
-	BTCJsonRPC.estimatesmartFee(chainName, 3) { feePerByte ->
+	BTCSeriesJsonRPC.estimatesmartFee(
+		chainName,
+		3,
+		false
+	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			// TODO Alert
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		BitcoinApi.getUnspentListByAddress(myAddress) { unspents ->
+		BitcoinCashApi.getUnspentListByAddress(myAddress) { unspents ->
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				hold(null)
 				return@getUnspentListByAddress
 			}
-			val size = BTCTransactionUtils.generateSignedRawTransaction(
+
+			val size = BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 				count.toSatoshi(),
 				1L,
 				fragment.address.orEmpty(),
@@ -99,8 +81,9 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 				CryptoValue.signedSecret, // 测算 `MessageSize` 的默认无效私钥
 				Config.isTestEnvironment()
 			).messageSize
+			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
-			PaymentPrepareBTCModel(
+			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
 				WalletTable.getAddressBySymbol(getToken()?.symbol),
 				changeAddress,

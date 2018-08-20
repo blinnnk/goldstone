@@ -28,6 +28,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
@@ -72,12 +73,10 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 					inputView.into(this)
 
 					showAccountInfo()
-					// `BTC` 于 ETH, ERC20, ETC 显示不同的配置信息
-					if (rootFragment?.token?.symbol.equals(CryptoSymbol.btc(), true)) {
+					// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
+					if (CryptoSymbol.isBTCSeriesSymbol(rootFragment?.token?.symbol))
 						showCustomChangeAddressCell()
-					} else {
-						showMemoCell()
-					}
+					else showMemoCell()
 
 					showUnitPrice()
 
@@ -210,9 +209,16 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}.apply {
 				confirmEvent = Runnable {
 					val customAddress = addressInput.text?.toString().orEmpty()
-					presenter.isValidAddressOrElse(customAddress) isTrue {
-						// 更新默认的自定义找零地址
-						changeAddress = customAddress
+					if (presenter.getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
+						presenter.isValidAddressOrElse(customAddress) isTrue {
+							// 更新默认的自定义找零地址
+							changeAddress = customAddress
+						}
+					} else {
+						presenter.isValidLTCAddressOrElse(customAddress) isTrue {
+							// 更新默认的自定义找零地址
+							changeAddress = customAddress
+						}
 					}
 				}
 			}.into(this)

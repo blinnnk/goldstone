@@ -300,8 +300,9 @@ class WalletDetailPresenter(
 			val subtitle = when (Config.getCurrentWalletType()) {
 				WalletType.ETHERCAndETCOnly.content -> currentETHAndERCAddress
 				WalletType.BTCOnly.content -> currentBTCAddress
-				WalletType.BTCTestOnly.content -> currentBTCTestAddress
+				WalletType.BTCTestOnly.content -> currentBTCSeriesTestAddress
 				WalletType.LTCOnly.content -> currentLTCAddress
+				WalletType.BCHOnly.content -> currentBCHAddress
 				else -> WalletText.multiChainWallet
 			}
 			WalletDetailHeaderModel(
