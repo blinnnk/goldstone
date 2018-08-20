@@ -239,6 +239,7 @@ class TransactionListPresenter(
 					doAsync {
 						GoldStoneAPI.getTransactionListByAddress(
 							startBlock,
+							Config.getCurrentEthereumAddress(),
 							{
 								// 只弹出一次错误信息
 								if (!hasError) {

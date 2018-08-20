@@ -130,6 +130,7 @@ class TokenDetailPresenter(
 	private var hasUpdateBTCData = false
 	private var hasUpdateLTCData = false
 	private var hasUpdateERCData = false
+	private var hasUpdateETHData = false
 	private var hasUpdateBCHData = false
 
 	private fun TokenDetailFragment.loadDataFromChain() {
@@ -154,6 +155,11 @@ class TokenDetailPresenter(
 				hasUpdateLTCData = true
 			}
 
+			token?.symbol.equals(CryptoSymbol.eth, true) -> {
+				if (!hasUpdateETHData) loadETHChainData()
+					hasUpdateETHData = true
+			}
+
 			else -> {
 				if (!hasUpdateERCData) loadERCChainData()
 				hasUpdateERCData = true
@@ -174,19 +180,15 @@ class TokenDetailPresenter(
 						)
 
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
-						if (Config.isTestEnvironment()) {
-							getBTCSeriesData(
-								Config.getCurrentBTCSeriesTestAddress(),
-								ChainType.BTC.id,
-								withoutLocalDataCallback
-							)
-						} else {
-							getBTCSeriesData(
-								Config.getCurrentBTCAddress(),
-								ChainType.BTC.id,
-								withoutLocalDataCallback
-							)
-						}
+						val address =
+							if (Config.isTestEnvironment())
+								Config.getCurrentBTCSeriesTestAddress()
+							else Config.getCurrentBTCAddress()
+						getBTCSeriesData(
+							address,
+							ChainType.BTC.id,
+							withoutLocalDataCallback
+						)
 					}
 
 					token?.symbol.equals(CryptoSymbol.ltc, true) -> {

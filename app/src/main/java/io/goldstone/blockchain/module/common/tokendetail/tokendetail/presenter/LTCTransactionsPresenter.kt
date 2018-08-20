@@ -25,7 +25,7 @@ fun TokenDetailPresenter.loadLTCChainData() {
 		}
 	) {
 		fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-		// TODO 判断数据
+		// TODO 翻页
 		loadDataFromDatabaseOrElse()
 	}
 }

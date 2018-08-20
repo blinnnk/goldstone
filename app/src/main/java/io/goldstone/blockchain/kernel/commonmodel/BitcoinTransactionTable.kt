@@ -71,9 +71,7 @@ data class BTCSeriesTransactionTable(
 				BechCashUtil.instance
 					.encodeCashAdrressByLegacy(toAddress)
 					.substringAfter(":")
-			} else {
-				toAddress
-			}
+			} else toAddress
 			return !fromAddress.equals(formatToAddress, true)
 		}
 

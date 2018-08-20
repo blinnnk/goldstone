@@ -292,8 +292,8 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
+		address: String,
 		errorCallback: (Throwable) -> Unit,
-		address: String = Config.getCurrentEthereumAddress(),
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUncryptoData<TransactionTable>(

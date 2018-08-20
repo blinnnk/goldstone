@@ -65,7 +65,6 @@ class WalletDetailFragment :
 		 * recyclerView, and not in the same layer with `RecyclerView's headerView`
 		 */
 		slideHeader.apply {
-			historyButton.onClick { presenter.showTransactionsFragment() }
 			notifyButton.onClick { presenter.showNotificationListFragment() }
 		}
 	}
