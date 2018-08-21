@@ -19,16 +19,18 @@ class TransactionDetailAdapter(
 	private val hold: TransactionDetailCell.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<TransactionDetailModel, TransactionDetailHeaderView, TransactionDetailCell, View>() {
-	
+
+	private var hasUpdateLayoutHeight = false
+
 	override fun generateCell(context: Context) =
 		TransactionDetailCell(context)
-	
+
 	override fun generateFooter(context: Context) =
 		View(context)
-	
+
 	override fun generateHeader(context: Context) =
 		TransactionDetailHeaderView(context)
-	
+
 	override fun TransactionDetailCell.bindCell(
 		data: TransactionDetailModel,
 		position: Int
@@ -38,12 +40,15 @@ class TransactionDetailAdapter(
 			!model.description.equals(CommonText.from, true)
 			&& !model.description.equals(CommonText.to, true)
 		) {
-			updateHeightByText(
-				data.info,
-				fontSize(14),
-				ScreenSize.widthWithPadding,
-				200.uiPX()
-			)
+			if (!hasUpdateLayoutHeight) {
+				updateHeightByText(
+					data.info,
+					fontSize(14),
+					ScreenSize.widthWithPadding,
+					200.uiPX()
+				)
+				hasUpdateLayoutHeight = true
+			}
 		}
 		hold(this)
 	}
