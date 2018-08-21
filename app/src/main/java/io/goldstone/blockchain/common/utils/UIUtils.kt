@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import java.text.SimpleDateFormat
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -94,6 +95,11 @@ object TimeUtils {
 		) + " " + DateUtils.formatDateTime(
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
 		)
+	}
+	fun formatMdDate(date: Long) : String {
+		val simpleDateFormat = SimpleDateFormat("M/d")
+		return simpleDateFormat.format(java.util.Date(date))
+		
 	}
 }
 
