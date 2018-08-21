@@ -146,7 +146,7 @@ class TransactionDetailPresenter(
 			val webTitle =
 				when {
 					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
-					CryptoSymbol.isBTCSeriesSymbol(symbol) -> TransactionText.insight
+					CryptoSymbol.isBTCSeriesSymbol(symbol) -> TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {

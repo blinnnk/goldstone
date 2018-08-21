@@ -47,13 +47,13 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
-	val insight = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Insigt Info"
-		HoneyLanguage.Chinese.code -> "Insigt Info"
-		HoneyLanguage.Japanese.code -> "Insigt Info"
-		HoneyLanguage.Korean.code -> "Insigt Info"
-		HoneyLanguage.Russian.code -> "Insigt Info"
-		HoneyLanguage.TraditionalChinese.code -> "Insigt Info"
+	val transactionWeb = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Transaction Info"
+		HoneyLanguage.Chinese.code -> "Transaction Info"
+		HoneyLanguage.Japanese.code -> "Transaction Info"
+		HoneyLanguage.Korean.code -> "Transaction Info"
+		HoneyLanguage.Russian.code -> "Transaction Info"
+		HoneyLanguage.TraditionalChinese.code -> "Transaction Info"
 		else -> ""
 	}
 	@JvmField
