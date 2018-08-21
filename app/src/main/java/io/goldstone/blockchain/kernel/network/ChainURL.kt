@@ -130,6 +130,39 @@ object ChainURL {
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
 
+	/** Transaction Html View */
+	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC/tx/"
+	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC/tx/"
+
+	private const val btcMainnetWeb = "https://www.blocktrail.com/BTC/tx/"
+	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC/tx/"
+
+	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc/tx/"
+	private const val ltcTestnetWeb = "https://chain.so/tx/LTCTEST/"
+
+	private const val etcMainnetWeb = "https://gastracker.io/tx/"
+	private const val etcTestnetWeb = "http://mordenexplorer.ethernode.io/tx/"
+
+	val etcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) etcTestnetWeb
+		else etcMainnetWeb
+	}
+
+	val bchWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) bchTestnetWeb
+		else bchMainnetWeb
+	}
+
+	val ltcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) ltcTestnetWeb
+		else ltcMainnetWeb
+	}
+
+	val btcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) btcTestnetWeb
+		else btcMainnetWeb
+	}
+
 	@JvmStatic
 	fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
 		return !ChainURL.uncryptChainName.any { it.equals(name, true) }

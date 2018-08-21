@@ -40,7 +40,7 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 	private val currentMultiChainAddressesView by lazy {
-		AddressesListView(context!!, 5) { moreButton, address, isDefault, title ->
+		AddressesListView(context!!, 6) { moreButton, address, isDefault, title ->
 			val chainType = when (title) {
 				CryptoSymbol.eth -> ChainType.ETH.id
 				CryptoSymbol.etc -> ChainType.ETC.id

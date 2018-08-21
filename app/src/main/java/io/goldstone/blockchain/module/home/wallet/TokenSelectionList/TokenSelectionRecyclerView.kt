@@ -84,7 +84,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 				val model = WalletDetailCellModel(
 					token,
 					balance.orElse(0.0),
-					true
+					false
 				)
 				// 显示 `ContentOverlay`
 				(context as? MainActivity)?.apply {
