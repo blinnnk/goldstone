@@ -51,6 +51,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			attentionView.apply {
+				isCenter()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				text = ImportWalletText.exportPrivateKey
 			}.into(this)
