@@ -1,21 +1,18 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
-import android.app.DownloadManager
-import android.content.Context
-import android.content.Intent
+import android.app.*
+import android.content.*
+import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
+import android.os.*
+import android.support.v4.app.NotificationCompat
+import android.support.v7.app.AlertDialog
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -25,8 +22,21 @@ import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.*
+import java.io.File
+import java.util.concurrent.Executors
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import android.support.annotation.RequiresApi
+import com.blinnnk.util.*
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.module.home.profile.profile.view.ProgressLoadingDialog
+
 
 /**
  * @date 25/03/2018 10:52 PM
@@ -35,9 +45,125 @@ import org.jetbrains.anko.runOnUiThread
 class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
-
+	
+	private val installPermissionRequestCode = 0x3
+	
 	private var version = ""
-
+	private val progressLoadingDialog: ProgressLoadingDialog by lazy {
+		ProgressLoadingDialog(fragment.context)
+	}
+	
+	private val downloadHandler: Handler
+	private var downloadId = 0L
+	private var filepath = ""
+	private val notifyManager = GoldStoneAPI.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+	private val builder by lazy {
+		NotificationCompat.Builder(GoldStoneAPI.context, "channel_1")
+			.setLargeIcon(BitmapFactory.decodeResource(GoldStoneAPI.context.resources, R.mipmap.ic_launcher))
+			.setSmallIcon(R.drawable.version_icon)
+			.setContentTitle("GoldStone")
+	}
+	
+	private fun resetDownloadState () {
+		downloadId = 0L
+		filepath = ""
+	}
+	init {
+	  downloadHandler = object : Handler() {
+			override fun handleMessage(msg: Message) {
+					when (msg.arg1) {
+						DownloadManager.STATUS_SUCCESSFUL -> {
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(0, 100)
+								progressLoadingDialog.dismiss()
+							}
+							filepath.isEmpty() isFalse  {
+								if (checkInstallPermission()) {
+									ApkUtil.installApk(File(filepath))
+									resetDownloadState()
+								}else {
+									if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+										showInstallPermissionAlertDialog()
+									}
+								}
+							}
+							cancelNotification()
+							
+						}
+						
+						DownloadManager.STATUS_FAILED -> {
+							resetDownloadState()
+							cancelNotification()
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(0, 100)
+								progressLoadingDialog.dismiss()
+							}
+						}
+						
+						else -> {
+							updateNptificationProgress(msg.arg2)
+							progressLoadingDialog.isShowing.isTrue {
+								progressLoadingDialog.setProgress(msg.arg2, 100)
+							}
+							getBytesAndStatus()
+						}
+					}
+				
+			}
+		}
+	}
+	
+	fun onActivityResult(
+		requestCode: Int,
+		resultCode: Int
+	) {
+		if (requestCode == installPermissionRequestCode
+			&& resultCode == Activity.RESULT_OK) {
+				ApkUtil.installApk(File(filepath))
+				resetDownloadState()
+			
+		}
+	}
+	
+	private fun checkInstallPermission() : Boolean {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			return fragment.context?.packageManager!!.canRequestPackageInstalls()
+		}else {
+			return true
+		}
+	}
+	
+	private fun showInstallPermissionAlertDialog() {
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+		
+		fragment.context?.let {
+			AlertDialog.Builder(it)
+				.setTitle("需要打开您的安装未知来源的权限")
+				.setNegativeButton(CommonText.cancel, DialogInterface.OnClickListener {
+						dialogInterface, _ -> dialogInterface.dismiss()
+				})
+				.setPositiveButton(CommonText.confirm, DialogInterface.OnClickListener {
+						dialogInterface, _ ->
+						dialogInterface.dismiss()
+						startInstallPermissionSettingActivity()
+						
+				})
+				.show()
+				
+		}
+	}
+	
+	private fun startInstallPermissionSettingActivity() {
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+		
+		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.getPackageName())
+		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
+		fragment.startActivityForResult(intent, installPermissionRequestCode)
+	}
+	
+	
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
 			val data = arrayListOf(
@@ -91,7 +217,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	fun showTargetFragment(title: String) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.profileOverlay) isFalse {
@@ -108,18 +234,22 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	private var newVersionDescription = ""
 	private var newVersionName = ""
 	private var newVersionUrl = ""
-
+	
 	fun showUpgradeDialog() {
+		if (downloadId != 0L) {
+			progressLoadingDialog.show()
+			return
+		}
 		fragment.context?.let {
 			GoldStoneDialog.show(it) {
 				showButtons(CommonText.upgrade) {
 					downloadNewVersion {
 						GoldStoneDialog.remove(it)
-						fragment.context?.alert("Application is downloading now")
+						showDownloadProgress()
 					}
 				}
 				setContent(newVersionName, newVersionDescription)
@@ -127,7 +257,55 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
+	
+	private fun showDownloadProgress() {
+		fragment.context?.apply {
+			if (downloadId != 0L) {
+				progressLoadingDialog.show()
+				getBytesAndStatus()
+				
+			}
+		}
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		downloadHandler.removeCallbacksAndMessages(null)
+	}
+	
+	private fun getBytesAndStatus() {
+		Executors.newSingleThreadExecutor().execute {
+			val bytesAndStatus = arrayOf(-1, -1, 0)
+			val query = DownloadManager.Query().setFilterById(downloadId)
+			var cursor: Cursor? = null
+			try {
+				cursor = (fragment.context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).query(query)
+				if (cursor != null && cursor.moveToFirst()) {
+					// 已经下载文件大小
+					bytesAndStatus[0] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+					// 下载文件的总大小
+					bytesAndStatus[1] = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+					// 下载状态
+					bytesAndStatus[2] = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+					
+				}
+			} finally {
+				cursor!!.close()
+				
+			}
+			
+			val progress = (bytesAndStatus[0].toFloat()) / (bytesAndStatus[1].toFloat() ) * 100
+			val message = downloadHandler.obtainMessage()
+			message.arg1 = bytesAndStatus[2]
+			message.arg2 = progress.toInt()
+			downloadHandler.sendMessageDelayed(message, 500)
+			
+		}
+		
+		
+	}
+	
 	private fun checkVersion() {
 		fragment.context?.let { context ->
 			GoldStoneAPI.getNewVersionOrElse { versionModel ->
@@ -146,31 +324,54 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	private fun downloadNewVersion(callback: () -> Unit) {
 		object : CheckPermission(fragment.activity) {
 			override var permissionType = PermissionCategory.Write
 		}.start {
 			doAsync {
-				download(newVersionUrl, newVersionName, newVersionDescription)
+				downloadId = download(newVersionUrl, newVersionName, newVersionDescription)
 				fragment.context?.runOnUiThread { callback() }
 			}
 		}
 	}
-
-	private fun download(url: String, title: String, description: String) {
+	
+	private fun download(url: String, title: String, description: String) : Long {
 		val request = DownloadManager.Request(Uri.parse(url)).apply {
 			setDescription(description)
 			setTitle(title)
+			setVisibleInDownloadsUi(true)
 			allowScanningByMediaScanner()
-			setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "$title.apk")
+			setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+			setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GoldStone$title.apk")
+			filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath+"/"+"GoldStone$title.apk"
+			
 		}
 		// get download service and enqueue file
 		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-		manager.enqueue(request)
+		showNotification(description)
+		return manager.enqueue(request)
+		
 	}
-
+	
+	private fun showNotification (description: String?) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			notifyManager.createNotificationChannel(NotificationChannel("channel_1", "download", NotificationManager.IMPORTANCE_LOW))
+		}
+		builder.setProgress(100, 0, false)
+		builder.setContentText(description)
+		notifyManager.notify(1, builder.build())
+	}
+	
+	private fun updateNptificationProgress(progress: Int) {
+		builder.setProgress(100, progress, false)
+		notifyManager.notify(1, builder.build())
+	}
+	
+	private fun cancelNotification() {
+		notifyManager.cancel(1)
+	}
+	
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
 		fun getShareContentThenShowView(content: String) {
@@ -181,14 +382,14 @@ class ProfilePresenter(
 			intent.type = "text/plain"
 			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 		}
-
+		
 		AppConfigTable.getAppConfig {
 			it?.apply {
 				getShareContentThenShowView(shareContent)
 			}
 		}
 	}
-
+	
 	// 这个方法是为了内部使用的隐藏方法
 	private var clickTimes = 10
 	private var hasShownGoldStoneID = false
@@ -204,7 +405,7 @@ class ProfilePresenter(
 			}
 		}
 	}
-
+	
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguageCode())
 }
