@@ -46,7 +46,7 @@ class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
 	
-	private val INSTALL_PERISSION_REQUEST_CODE = 0x3
+	private val installPermissionRequestCode = 0x3
 	
 	private var version = ""
 	private val progressLoadingDialog: ProgressLoadingDialog by lazy {
@@ -101,9 +101,9 @@ class ProfilePresenter(
 						}
 						
 						else -> {
+							updateNptificationProgress(msg.arg2)
 							progressLoadingDialog.isShowing.isTrue {
 								progressLoadingDialog.setProgress(msg.arg2, 100)
-								updateNptificationProgress(msg.arg2)
 							}
 							getBytesAndStatus()
 						}
@@ -117,7 +117,7 @@ class ProfilePresenter(
 		requestCode: Int,
 		resultCode: Int
 	) {
-		if (requestCode == INSTALL_PERISSION_REQUEST_CODE
+		if (requestCode == installPermissionRequestCode
 			&& resultCode == Activity.RESULT_OK) {
 				ApkUtil.installApk(File(filepath))
 				resetDownloadState()
@@ -133,8 +133,10 @@ class ProfilePresenter(
 		}
 	}
 	
-	@RequiresApi(api = Build.VERSION_CODES.O)
 	private fun showInstallPermissionAlertDialog() {
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+		
 		fragment.context?.let {
 			AlertDialog.Builder(it)
 				.setTitle("需要打开您的安装未知来源的权限")
@@ -152,11 +154,13 @@ class ProfilePresenter(
 		}
 	}
 	
-	@RequiresApi(api = Build.VERSION_CODES.O)
 	private fun startInstallPermissionSettingActivity() {
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+		
 		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.getPackageName())
 		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
-		fragment.startActivityForResult(intent, INSTALL_PERISSION_REQUEST_CODE)
+		fragment.startActivityForResult(intent, installPermissionRequestCode)
 	}
 	
 	
@@ -326,7 +330,6 @@ class ProfilePresenter(
 			override var permissionType = PermissionCategory.Write
 		}.start {
 			doAsync {
-				newVersionUrl = "http://s.toutiao.com/UsMYE/"
 				downloadId = download(newVersionUrl, newVersionName, newVersionDescription)
 				fragment.context?.runOnUiThread { callback() }
 			}

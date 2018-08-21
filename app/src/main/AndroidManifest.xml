@@ -90,15 +90,6 @@
 		<meta-data
 			android:name="android.notch_support"
 			android:value="true"/>
-		<provider
-			android:name=".common.base.CustFileProvider"
-			android:authorities="io.goldstone.blockchain.cust.fileprovider"
-			android:exported="false"
-			android:grantUriPermissions="true">
-			<meta-data
-				android:name="android.support.FILE_PROVIDER_PATHS"
-				android:resource="@xml/provider_paths" />
-		</provider>
 	</application>
 
 </manifest>
