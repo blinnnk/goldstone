@@ -10,10 +10,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AlertDialog
@@ -59,7 +56,15 @@ class ProfilePresenter(
 		ProgressLoadingDialog(fragment.context!!)
 	}
 
-	private val downloadHandler: Handler
+	private val downloadHandler: Handler by lazy {
+		Handler()
+	}
+	private val progressRunnable: Runnable by lazy {
+		Runnable {
+			getBytesAndStatus()
+		}
+	}
+
 	private var downloadId = 0L
 	private var filepath = ""
 	private val notifyManager =
@@ -76,48 +81,42 @@ class ProfilePresenter(
 		filepath = ""
 	}
 
-	init {
-		downloadHandler = @SuppressLint("HandlerLeak")
-		object : Handler() {
-			override fun handleMessage(message: Message) {
-				when (message.arg1) {
-					DownloadManager.STATUS_SUCCESSFUL -> {
-						progressLoadingDialog.isShowing.isTrue {
-							progressLoadingDialog.setProgress(0, 100)
-							progressLoadingDialog.dismiss()
-						}
-						filepath.isEmpty() isFalse {
-							if (checkInstallPermission()) {
-								ApkUtil.installApk(File(filepath))
-								resetDownloadState()
-							} else {
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-									showInstallPermissionAlertDialog()
-								}
-							}
-						}
-						cancelNotification()
-
-					}
-
-					DownloadManager.STATUS_FAILED -> {
+	private fun onProgressUpdate(status: Int, progress: Int) {
+		when (status) {
+			DownloadManager.STATUS_SUCCESSFUL -> {
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(0, 100)
+					progressLoadingDialog.dismiss()
+				}
+				filepath.isEmpty() isFalse {
+					if (checkInstallPermission()) {
+						ApkUtil.installApk(File(filepath))
 						resetDownloadState()
-						cancelNotification()
-						progressLoadingDialog.isShowing.isTrue {
-							progressLoadingDialog.setProgress(0, 100)
-							progressLoadingDialog.dismiss()
+					} else {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+							showInstallPermissionAlertDialog()
 						}
-					}
-
-					else -> {
-						updateNotificationProgress(message.arg2)
-						progressLoadingDialog.isShowing.isTrue {
-							progressLoadingDialog.setProgress(message.arg2, 100)
-						}
-						getBytesAndStatus()
 					}
 				}
+				cancelNotification()
 
+			}
+
+			DownloadManager.STATUS_FAILED -> {
+				resetDownloadState()
+				cancelNotification()
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(0, 100)
+					progressLoadingDialog.dismiss()
+				}
+			}
+
+			else -> {
+				updateNotificationProgress(progress)
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(progress, 100)
+				}
+				downloadHandler.postDelayed(progressRunnable, 500)
 			}
 		}
 	}
@@ -278,7 +277,7 @@ class ProfilePresenter(
 
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
-		downloadHandler.removeCallbacksAndMessages(null)
+		downloadHandler.removeCallbacks(progressRunnable)
 	}
 
 	private fun getBytesAndStatus() {
@@ -303,10 +302,11 @@ class ProfilePresenter(
 			}
 
 			val progress = (bytesAndStatus[0].toFloat()) / (bytesAndStatus[1].toFloat()) * 100
-			val message = downloadHandler.obtainMessage()
-			message.arg1 = bytesAndStatus[2]
-			message.arg2 = progress.toInt()
-			downloadHandler.sendMessageDelayed(message, 500)
+			fragment.context?.apply {
+				runOnUiThread {
+					onProgressUpdate(bytesAndStatus[2], progress.toInt())
+				}
+			}
 		}
 	}
 
