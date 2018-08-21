@@ -17,9 +17,11 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
@@ -40,6 +42,9 @@ import org.json.JSONObject
 /**
  * @date 19/04/2018 4:33 PM
  * @author KaySaith
+ * @rewriteDate 16/08/2018 16:23 PM
+ * @rewriter wcx
+ * @description 增加alarmClockNotification()处理价格闹铃推送处理
  */
 class XinGePushReceiver : XGPushBaseReceiver() {
 
@@ -81,6 +86,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		notifiShowedRlt: XGPushShowedResult?
 	) {
 		if (context == null || notifiShowedRlt == null) return
+		if (notifiShowedRlt.title == AlarmClockText.priceWarning) {
+			if (!MainActivity.backgroundFlag) {
+				PriceAlarmClockUtils.sendAlarmReceiver(
+					0,
+					context,
+					1)
+			}
+		}
 		// Normal Notification
 	}
 
@@ -125,9 +138,33 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				ClassURI.transactionDetail -> {
 					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
+				ClassURI.priceAlarmView -> {
+					if (!MainActivity.backgroundFlag) {
+						alarmClockNotification(
+							context,
+							result
+						)
+					}
+				}
 			}
 		}
 		clearAppIconRedot()
+	}
+
+	private fun alarmClockNotification(
+		context: Context?,
+		result: XGPushClickedResult?
+	) {
+		val intent = Intent(
+			context,
+			MainActivity::class.java
+		)
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+		intent.putExtra(
+			IntentKey.alarmInfoFromNotify,
+			result
+		)
+		context?.startActivity(intent)
 	}
 
 	private fun handlTransactionNotification(

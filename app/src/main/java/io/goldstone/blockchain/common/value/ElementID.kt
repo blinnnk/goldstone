@@ -3,9 +3,12 @@ package io.goldstone.blockchain.common.value
 /**
  * @date 21/03/2018 7:32 PM
  * @author KaySaith
+ * @rewriteDate 16/08/2018 16:21 PM
+ * @rewriter wcx
+ * @description 增加deleteButton,topBottomLineCellTitle
  */
 object ContainerID {
-	
+
 	const val splash = 10001
 	const val overlay = 10002
 	const val content = 10003
@@ -32,6 +35,8 @@ object ElementID {
 	const val mask = 20017
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
+	const val deleteButton = 20020
+	const val topBottomLineCellTitle = 20021
 }
 
 object ViewPagerID {

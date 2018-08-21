@@ -1,30 +1,45 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.app.Activity
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.findChildFragmentByTag
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
+import com.tencent.android.tpush.XGPushClickedResult
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
+import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmClockReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmStatusObserver
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
+import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.sdk25.coroutines.onClick
+
+/**
+ * @rewriteDate 16/08/2018 16:23 PM
+ * @rewriter wcx
+ * @description 增加showNotificationAlarmPopUps()处理价格闹钟跳转逻辑,初始化priceAlarmStatusObserver价格闹铃轮询
+ */
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,12 +47,17 @@ class MainActivity : AppCompatActivity() {
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
+	private lateinit var priceAlarmStatusObserver: PriceAlarmStatusObserver
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
+
+		backgroundFlag = true
+		// 轮询价格闹铃监听
+		priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
 
 		transparentStatus()
 
@@ -60,8 +80,15 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onResume() {
 		super.onResume()
+		backgroundFlag = true
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
+		showNotificationAlarmPopUps(currentIntent ?: intent)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		backgroundFlag = false
 	}
 
 	fun sendAnalyticsData(className: String) {
@@ -92,6 +119,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onDestroy() {
 		super.onDestroy()
 		unregisterReceiver(netWorkReceiver)
+		priceAlarmStatusObserver.removeObserver()
 	}
 
 	override fun onBackPressed() {
@@ -173,6 +201,116 @@ class MainActivity : AppCompatActivity() {
 			presenter.showNotificationListFragment()
 			currentIntent = null
 		}
+	}
+
+	/**
+	 * 接受到 `Push` 弹出闹铃弹窗
+	 */
+	private fun showNotificationAlarmPopUps(intent: Intent?) {
+		val alarmInfo = intent?.getSerializableExtra(IntentKey.alarmInfoFromNotify)
+		if (alarmInfo.isNull()) {
+			PriceAlarmClockUtils.stopAlarmReceiver(
+				this,
+				1
+			)
+			PriceAlarmClockReceiver.stopAlarmClock()
+			return
+		}
+		val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
+		if (goldStoneDialogFlag) {
+			GoldStoneDialog.show(this) {
+				showButtons(AlarmClockText.gotIt) {
+					confirmButtonClickEvent()
+				}
+				setGoldStoneDialog(
+					this,
+					alarmInfo as XGPushClickedResult
+				)
+			}
+		} else {
+			val goldStoneDialog = findViewById<GoldStoneDialog>(ElementID.dialog)
+			if (priceAlarmStatusObserver.isNull()) {
+				priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
+			} else {
+				priceAlarmStatusObserver.removeDialog(goldStoneDialog)
+			}
+			goldStoneDialog.into(findViewById<RelativeLayout>(ContainerID.main))
+			goldStoneDialog.apply {
+				setGoldStoneDialog(
+					this,
+					alarmInfo as XGPushClickedResult
+				)
+			}
+		}
+	}
+
+	private fun confirmButtonClickEvent() {
+		PriceAlarmClockUtils.stopAlarmReceiver(
+			this,
+			1
+		)
+		PriceAlarmClockReceiver.stopAlarmClock()
+		GoldStoneDialog.remove(this)
+		this.findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
+	}
+
+	private fun setGoldStoneDialog(
+		goldStoneDialog: GoldStoneDialog,
+		alarmInfo: XGPushClickedResult
+	) {
+		goldStoneDialog.apply {
+			getConfirmButton().apply {
+				text = AlarmClockText.gotIt
+				onClick {
+					confirmButtonClickEvent()
+				}
+			}
+
+			getCancelButton().apply {
+				text = AlarmClockText.viewAlarm
+				onClick {
+					(getContext() as Activity).addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+						putString(
+							ArgumentKey.priceAlarmClockTitle,
+							AlarmClockText.viewAlarm
+						)
+						putSerializable(
+							ArgumentKey.quotationOverlayInfo, QuotationModel(
+								"symbol",
+								"name",
+								"price",
+								"-3.642",
+								ArrayList(),
+								"marketName",
+								1.0,
+								"pairDisplay",
+								"pair",
+								"currencyName",
+								"0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0",
+								false
+							)
+						)
+
+						confirmButtonClickEvent()
+					}
+				}
+			}
+
+			setImage(R.drawable.price_alarm_banner)
+			setImageLayoutParams(
+				300.uiPX(),
+				180.uiPX()
+			)
+
+			setContent(
+				alarmInfo.title,
+				alarmInfo.content
+			)
+		}
+	}
+
+	companion object {
+		var backgroundFlag = false
 	}
 
 	private fun registerReceiver() {

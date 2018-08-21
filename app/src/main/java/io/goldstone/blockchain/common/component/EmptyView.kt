@@ -10,6 +10,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.*
@@ -21,6 +22,9 @@ import org.jetbrains.anko.wrapContent
 /**
  * @date 09/04/2018 6:52 PM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:08 PM
+ * @rewriter wcx
+ * @description 添加PriceAlarmClock枚举类型显示价格闹钟空数据view
  */
 enum class EmptyType {
 	
@@ -30,7 +34,8 @@ enum class EmptyType {
 	Search,
 	QuotationSearch,
 	Quotation,
-	WalletDetail
+	WalletDetail,
+	PriceAlarmClock
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -145,6 +150,11 @@ class EmptyView(context: Context) : LinearLayout(context) {
 						QuotationText.addQuotationChartPlaceholderSubtitle
 					)
 				}.into(this)
+			}
+			EmptyType.PriceAlarmClock -> {
+				icon.imageResource = R.drawable.no_price_alarm
+				introTitles.title.text = AlarmClockText.noPriceAlarmTitle
+				introTitles.subtitle.text = AlarmClockText.noPriceAlarmContent
 			}
 		}
 	}

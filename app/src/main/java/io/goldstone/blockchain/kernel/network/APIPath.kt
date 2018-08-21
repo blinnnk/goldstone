@@ -13,6 +13,9 @@ import io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl
 /**
  * @date 31/03/2018 8:09 PM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:01 PM
+ * @rewriter wcx
+ * @description 增加价格闹铃提醒的添加addAlarmClock、删除deleteAlarmClock、获取配置清单getAlarmConfigList、批量拉取价格列表getPricePairs地址
  */
 object APIPath {
 
@@ -38,6 +41,10 @@ object APIPath {
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
+	val getAlarmConfigList: (header: String) -> String = { "$it/index/getConfigList" }
+	val getPricePairs: (header: String) -> String = { "$it/alert/pairPrice" }
+	val addAlarmClock: (header: String) -> String = { "$it/alert/add" }
+	val deleteAlarmClock: (header: String) -> String = { "$it/alert/remove" }
 	val defaultTokenList: (
 		header: String,
 		md5: String

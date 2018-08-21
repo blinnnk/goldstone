@@ -21,6 +21,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenD
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
@@ -33,6 +34,9 @@ import org.jetbrains.anko.support.v4.UI
 /**
  * @date 23/03/2018 3:46 PM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:08 PM
+ * @rewriter wcx
+ * @description 修改showEmptyView()添加判断PriceAlarmClockListFragment类型逻辑
  */
 abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D>
 	: Fragment() {
@@ -275,6 +279,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				is QuotationSearchFragment -> setStyle(EmptyType.QuotationSearch)
 				is QuotationFragment -> setStyle(EmptyType.Quotation)
 				is WalletDetailFragment -> setStyle(EmptyType.WalletDetail)
+				is PriceAlarmClockListFragment -> setStyle(EmptyType.PriceAlarmClock)
 				else -> setStyle(EmptyType.TransactionDetail)
 			}
 		}

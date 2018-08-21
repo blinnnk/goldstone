@@ -22,6 +22,10 @@ import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUncryptoDat
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AddAlarmClockModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.DeleteAlarmClockModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -44,6 +48,9 @@ import org.json.JSONObject
  * @Important
  * 请求 `Parameters` 以及请求 `Response` 的加密规则是, GoldStone 自有 Server 业务以及 GoldStone
  * 自有节点进行双向加密解密. 第三方接口和节点不加密. 如 `EtherScan`, `Infura` 和 `GasTracker` 等。
+ * @rewriteDate 10/08/2018 16:01 PM
+ * @rewriter wcx
+ * @description 增加价格闹铃提醒的添加addAlarmClock、删除deleteAlarmClock、获取配置清单getAlarmConfigList、批量拉取价格列表getPricePairs接口
  */
 object GoldStoneAPI {
 
@@ -524,6 +531,105 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			hold(CoinInfoModel(JSONObject(this[0]), symbol, chainID))
+		}
+	}
+
+	@JvmStatic
+	fun getAlarmConfigList(
+		errorCallback: (Exception) -> Unit = {},
+		hold: (AlarmConfigListModel?) -> Unit
+	) {
+		requestData<String>(
+			APIPath.getAlarmConfigList(APIPath.currentUrl),
+			"",
+			true,
+			errorCallback,
+			isEncrypt = true
+		) {
+			val data = JSONObject(this[0])
+			val gson = Gson()
+			val addAlarmClock = gson.fromJson(data.toString(), AlarmConfigListModel::class.java)
+			GoldStoneAPI.context.runOnUiThread {
+				hold(addAlarmClock)
+			}
+		}
+	}
+
+	@JvmStatic
+	fun getPricePairs(
+		pair_list: JsonArray,
+		errorCallback: (Exception) -> Unit = {},
+		hold: (String) -> Unit
+	) {
+		RequestBody.create(
+			requestContentType,
+			ParameterUtil.prepare(
+				true,
+				Pair("pair_list", pair_list)
+			)
+		).let {
+			postRequest(
+				it,
+				APIPath.getPricePairs(APIPath.currentUrl),
+				errorCallback,
+				true
+			) {
+				hold(it)
+			}
+		}
+	}
+
+	@JvmStatic
+	fun addAlarmClock(
+		priceAlarmClockTable: PriceAlarmClockTable,
+		errorCallback: (Exception) -> Unit = {},
+		hold: (AddAlarmClockModel?) -> Unit
+	) {
+		RequestBody.create(
+			requestContentType,
+			ParameterUtil.prepare(
+				true,
+				Pair("pair", priceAlarmClockTable.pair),
+				Pair("type", priceAlarmClockTable.priceType),
+				Pair("price", priceAlarmClockTable.price.toString())
+			)
+		).let {
+			postRequest(
+				it,
+				APIPath.addAlarmClock(APIPath.currentUrl),
+				errorCallback,
+				true
+			) {
+				val gson = Gson()
+				val addAlarmClock = gson.fromJson(it, AddAlarmClockModel::class.java)
+				hold(addAlarmClock)
+			}
+		}
+	}
+
+	@JvmStatic
+	fun deleteAlarmClock(
+		priceAlarmClockTable: PriceAlarmClockTable,
+		errorCallback: (Exception) -> Unit = {},
+		hold: (DeleteAlarmClockModel?) -> Unit
+	) {
+		RequestBody.create(
+			requestContentType,
+			ParameterUtil.prepare(
+				true,
+				Pair("id", "" + priceAlarmClockTable.addId)
+			)
+		).let {
+			postRequest(
+				it,
+				APIPath.deleteAlarmClock(APIPath.currentUrl),
+				errorCallback,
+				true
+			) {
+				val gson = Gson()
+				val deleteAlarmClock = gson.fromJson(it, DeleteAlarmClockModel::class.java)
+				hold(deleteAlarmClock)
+			}
 		}
 	}
 }

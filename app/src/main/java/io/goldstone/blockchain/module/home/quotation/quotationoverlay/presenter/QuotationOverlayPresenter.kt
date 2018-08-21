@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter
 
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -15,17 +16,29 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.Quotat
 /**
  * @date 21/04/2018 4:14 PM
  * @author KaySaith
+ * @rewriteDate 16/08/2018 16:33 PM
+ * @rewriter wcx
+ * @description 修改showMarketTokenCenter()判断查看闹铃列表标示
  */
 class QuotationOverlayPresenter(
 	override val fragment: QuotationOverlayFragment
 ) : BaseOverlayPresenter<QuotationOverlayFragment>() {
-	
+
 	fun showQutationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
 	}
 
-	fun showMarketTokenCenter(model: QuotationModel?) {
+	fun showMarketTokenCenter(
+		model: QuotationModel?,
+		viewAlarmIndicator: String?
+	) {
 		fragment.addFragmentAndSetArgument<MarketTokenCenterFragment>(ContainerID.content) {
+			if (viewAlarmIndicator == AlarmClockText.viewAlarm) {
+				putString(
+					ArgumentKey.priceAlarmClockTitle,
+					AlarmClockText.viewAlarm
+				)
+			}
 			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
 		}
 	}
@@ -35,7 +48,7 @@ class QuotationOverlayPresenter(
 			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
 		}
 	}
-	
+
 	fun showQutationSearchFragment() {
 		showTargetFragment<QuotationSearchFragment>(
 			QuotationText.search,

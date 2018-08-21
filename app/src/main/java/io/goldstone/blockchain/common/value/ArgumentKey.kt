@@ -3,6 +3,9 @@ package io.goldstone.blockchain.common.value
 /**
  * @date 26/03/2018 1:03 AM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:17 PM
+ * @rewriter wcx
+ * @description 添加价格闹钟相关文本priceAlarmClockTitle,priceAlarmClockEditorInfo
  */
 object ArgumentKey {
 	
@@ -32,10 +35,14 @@ object ArgumentKey {
 	const val address = "address"
 	const val chainType = "chainType"
 	const val coinType = "coinType"
+	const val priceAlarmClockTitle = "priceAlarmClock"
+	const val priceAlarmClockEditorInfo = "priceAlarmClockEditor"
+	const val priceAlarmClockListHandler = "priceAlarmClockListHandler"
 }
 
 object IntentKey {
 	const val hashFromNotify = "hashFromNotify"
+	const val alarmInfoFromNotify = "alarmInfoFromNotify"
 }
 
 object SharesPreference {

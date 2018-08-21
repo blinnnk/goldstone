@@ -8,12 +8,16 @@ import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListFragment
 import java.util.*
 
 @SuppressLint("ViewConstructor")
 /**
  * @date 2018/8/9 5:03 PM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:01 PM
+ * @rewriter wcx
+ * @description 更换alarmDetail指向PriceAlarmClockListFragment
  */
 
 class MarketTokeCenterViewPager(val fragment: Fragment) : ViewPager(fragment.context!!) {
@@ -22,7 +26,7 @@ class MarketTokeCenterViewPager(val fragment: Fragment) : ViewPager(fragment.con
 	private val marketDetail by lazy {
 		MarketTokenDetailFragment()
 	}
-	private val alarmDetail by lazy { Fragment() }
+	private val alarmDetail by lazy { PriceAlarmClockListFragment() }
 
 	init {
 		id = ViewPagerID.transactions

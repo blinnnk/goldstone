@@ -23,14 +23,18 @@ import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ElementID.deleteButton
 import org.jetbrains.anko.*
 
 /**
  * @date 22/03/2018 2:37 AM
  * @author KaySaith
+ * @rewriteDate 10/08/2018 16:01 PM
+ * @rewriter wcx
+ * @description 添加删除按钮deleteButton,添加显示隐藏addButton方法
  */
 class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
-	
+
 	var title: TextView
 	val closeButton by lazy {
 		HeaderIcon(context).apply {
@@ -53,6 +57,13 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
+	val deleteButton by lazy {
+		HeaderIcon(context).apply {
+			id = ElementID.deleteButton
+			imageResource = R.drawable.price_alarm_delete
+			setLeftPosition()
+		}
+	}
 	private val searchButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.searchButton
@@ -72,12 +83,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	}
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
-	
+
 	init {
 		backgroundColor = Spectrum.blue
 		elevation = ShadowSize.Header
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, headerHeight)
-		
+
 		title = textView {
 			textColor = Spectrum.white
 			textSize = fontSize(15)
@@ -85,12 +96,12 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = RelativeLayout.LayoutParams(matchParent, headerHeight)
 		}
-		
+
 		paint.color = GrayScale.lightGray
 		paint.isAntiAlias = true
 		paint.style = Paint.Style.FILL
 	}
-	
+
 	fun showCloseButton(isShow: Boolean) {
 		findViewById<ImageView>(ElementID.closeButton).apply {
 			if (isShow) {
@@ -100,7 +111,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
 	fun showScanButton(
 		isShow: Boolean,
 		isLeft: Boolean = false,
@@ -117,7 +128,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
 	fun showBackButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
@@ -136,7 +147,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
 	fun showAddButton(
 		isShow: Boolean,
 		isLeft: Boolean = true,
@@ -162,7 +173,34 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
+	fun onlyShowAddButton() {
+		addButton.visibility = View.VISIBLE
+	}
+
+	fun onlyHideAddButton() {
+		addButton.visibility = View.GONE
+	}
+
+	fun showdeleteButton(
+		isShow: Boolean,
+		setClickEvent: ImageView.() -> Unit = {}
+	) {
+		findViewById<ImageView>(ElementID.deleteButton).let {
+			it.isNull() isTrue {
+				isShow isTrue {
+					deleteButton.click { setClickEvent(deleteButton) }.into(this)
+				}
+			} otherwise {
+				isShow isTrue {
+					deleteButton.click { setClickEvent(deleteButton) }
+				} otherwise {
+					removeView(it)
+				}
+			}
+		}
+	}
+
 	fun searchInputLinstener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
 		searchInput.editText.setOnFocusChangeListener { _, isChanged ->
 			isFocus(isChanged)
@@ -173,7 +211,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 					action(content.toString())
 				}
 			}
-			
+
 			override fun beforeTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -181,7 +219,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				after: Int
 			) {
 			}
-			
+
 			override fun onTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -191,7 +229,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		})
 	}
-	
+
 	fun showSearchButton(
 		isShow: Boolean,
 		setClickEvent: () -> Unit = {}
@@ -204,13 +242,13 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			removeView(it)
 		}
 	}
-	
+
 	fun showSearchInput(
 		isShow: Boolean = true,
 		cancelEvent: () -> Unit = {}
 	) {
 		showCloseButton(!isShow)
-		
+
 		isShow.isFalse {
 			title.visibility = View.VISIBLE
 			searchInput.visibility = View.GONE
@@ -242,15 +280,15 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 }
 
 class HeaderIcon(context: Context) : ImageView(context) {
-	
+
 	private val iconSize = 30.uiPX()
-	
+
 	init {
 		setColorFilter(GrayScale.lightGray)
 		scaleType = ImageView.ScaleType.CENTER_INSIDE
 		addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
 	}
-	
+
 	fun setLeftPosition() {
 		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
 			topMargin = 18.uiPX()
@@ -258,7 +296,7 @@ class HeaderIcon(context: Context) : ImageView(context) {
 			alignParentLeft()
 		}
 	}
-	
+
 	fun setRightPosition() {
 		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
 			topMargin = 18.uiPX()
