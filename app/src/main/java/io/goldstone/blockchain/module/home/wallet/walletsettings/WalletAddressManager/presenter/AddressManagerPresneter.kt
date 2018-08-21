@@ -546,15 +546,18 @@ class AddressManagerPresneter(
 		}
 
 		fun getCellDashboardMenu(
-			hasDefaultCell: Boolean = true
+			hasDefaultCell: Boolean = true,
+			isBCH: Boolean = false
 		): List<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
 				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
-				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey)
+				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
+				Pair(R.drawable.bch_creator_icon, WalletText.getBCHLegacyAddress)
 			).apply {
 				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
+				if (!isBCH) remove(find { it.second == WalletText.getBCHLegacyAddress })
 			}
 		}
 

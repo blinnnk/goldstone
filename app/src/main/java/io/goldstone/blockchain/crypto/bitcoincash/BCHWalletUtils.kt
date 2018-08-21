@@ -57,7 +57,11 @@ object BCHWalletUtils {
 		}
 	}
 
-	fun formatedToLegacy(address: String, network: NetworkParameters): String {
+	fun isNewCashAddress(address: String): Boolean {
+		return address.contains(":") || address.substring(0, 1).equals("q", true)
+	}
+
+	fun formattedToLegacy(address: String, network: NetworkParameters): String {
 		val prefix =
 			if (network == TestNet3Params.get()) ChainPrefix.Testnet
 			else ChainPrefix.BitcoinMainnet

@@ -2,14 +2,17 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechain
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -17,6 +20,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechaina
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -49,6 +53,7 @@ class ChainAddressesPresenter(
 			fragment.wrapper,
 			cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 			hasDefaultCell,
+			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
 					// 更新钱包默认地址, 同时更新首页的数据
@@ -65,6 +70,12 @@ class ChainAddressesPresenter(
 			},
 			exportPrivateKey = {
 				showPrivateKeyExportFragment(address, coinType)
+			},
+			convertBCHAddressToLegacy = {
+				val legacyAddress = BCHWalletUtils.formattedToLegacy(address, MainNetParams.get())
+				fragment.context.alert(legacyAddress)
+				fragment.context?.clickToCopy(legacyAddress)
+				AddressManagerFragment.removeDashboard(fragment.context)
 			}
 		)
 	}
