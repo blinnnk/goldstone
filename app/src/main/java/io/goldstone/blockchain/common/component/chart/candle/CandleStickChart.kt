@@ -22,7 +22,7 @@ import io.goldstone.blockchain.common.value.Spectrum
  */
 open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 	
-  private var xRangeVisibleNum = 10f
+  private var xRangeVisibleNum = 30f
 	
   constructor(context: Context) : super(context)
   
@@ -63,13 +63,13 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 		val candleDecreasingColor = Spectrum.red
 		val candleIncreasingColor = Spectrum.green
 		val candleNeutralColor = Color.BLUE
-		val candleBarSpace = 0.2f
+		val candleBarSpace = 0.1f
 		val candleShadowWidth = 2f // 蜡烛柄宽度
 		
 		resetTracking()
     clear()
 	
-		mXAxis.labelCount = if (dataRows.size > xRangeVisibleNum) xRangeVisibleNum.toInt() else dataRows.size
+		mXAxis.labelCount = if (dataRows.size > xRangeVisibleNum) 10 else dataRows.size/2
 		
 		val dataSet = CandleDataSet(dataRows, "Candle Set")
     
@@ -103,7 +103,7 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 		val gridLineColor = Color.rgb(236, 236, 236)
 		val xAxisSpace = 0.5f
 		
-		xRangeVisibleNum = 10f
+		xRangeVisibleNum = 30f
 		minOffset = 0f
 		
     isScaleXEnabled = false

@@ -225,7 +225,7 @@ class MarketTokenDetailPresenter(
 		dateType: Int
 	) {
 		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, 20, {
+		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, 100, {
 			// Show the error exception to user
 			fragment.context.alert(it.toString().showAfterColonContent())
 		}) {
