@@ -58,20 +58,12 @@ class AddressSelectionPresenter(
 				}
 			} else {
 				when {
-					token?.symbol.equals(CryptoSymbol.btc(), true) -> {
+					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
 						DepositPresenter.convertBitcoinQRCode(result).let {
 							isCorrectCoinOrChainID(it) {
 								showPaymentPrepareFragment(it.walletAddress, it.amount)
 							}
 						}
-					}
-
-					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
-						// TODO LTC By Code
-					}
-
-					token?.symbol.equals(CryptoSymbol.bch, true) -> {
-						// TODO BCH By Code
 					}
 
 					token?.symbol.equals(CryptoSymbol.etc, true)
@@ -227,6 +219,38 @@ class AddressSelectionPresenter(
 					}
 
 					!qrModel.chainID.equals(Config.getBTCCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+
+					else -> callback()
+				}
+			}
+
+			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.ltcContract, true) -> {
+						fragment.context.alert(QRText.invalidContract)
+						return
+					}
+
+					!qrModel.chainID.equals(Config.getLTCCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+
+					else -> callback()
+				}
+			}
+
+			token?.symbol.equals(CryptoSymbol.bch, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.bchContract, true) -> {
+						fragment.context.alert(QRText.invalidContract)
+						return
+					}
+
+					!qrModel.chainID.equals(Config.getBCHCurrentChain(), true) -> {
 						fragment.context.alert(CommonText.wrongChainID)
 						return
 					}
