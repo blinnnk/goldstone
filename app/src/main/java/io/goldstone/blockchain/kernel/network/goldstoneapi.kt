@@ -493,6 +493,23 @@ object GoldStoneAPI {
 			hold(this.toArrayList())
 		}
 	}
+	
+	fun getQuotationCurrencyCandleChart(
+		pair: String,
+		period: String,
+		size: Int,
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<CandleChartModel>) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getQuotationCurrencyCandleChart(APIPath.currentUrl, pair, period, size),
+			"ticks",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
+	}
 
 	fun getQuotationCurrencyInfo(
 		pair: String,
