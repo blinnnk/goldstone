@@ -101,6 +101,7 @@ object BTCSeriesTransactionUtils {
 		network: NetworkParameters,
 		isBCH: Boolean
 	): BTCSignedModel {
+		System.out.println("toad $toAddress adn $changeAddress net $network")
 		// 传入主网参数
 		val transaction = Transaction(network)
 		val privateKey =
@@ -127,7 +128,10 @@ object BTCSeriesTransactionUtils {
 			// 把消费列表的值加起来
 			money += it.value
 		}
-
+		System.out.println("shit ${BCHWalletUtils.formattedToLegacy(toAddress, network)}")
+		System.out.println("shit2 ${BCHWalletUtils.formattedToLegacy(changeAddress, network)}")
+		System.out.println("hell fuck ${Address.fromBase58(network, BCHWalletUtils.formattedToLegacy(toAddress, network)).toBase58()}")
+		System.out.println("hell fuck2 ${Address.fromBase58(network, BCHWalletUtils.formattedToLegacy(changeAddress, network)).toBase58()}")
 		// 输出-转给别人
 		transaction.addOutput(
 			Coin.valueOf(sendValue),
@@ -148,8 +152,8 @@ object BTCSeriesTransactionUtils {
 
 			val outPoint = TransactionOutPoint(network, it.index, it.hash)
 			if (isBCH) {
-				// `BCH` 的签名需要 `ForkeID` 控件里的方法有 `BUG` 这里重新自定义了有方法
-				transaction.addSignedInputd(
+				// `BCH` 的签名需要 `ForkID` 控件里的方法有 `BUG` 这里重新自定义了有方法
+				transaction.addBCHSignedInput(
 					outPoint,
 					it.script,
 					ecKey,
@@ -173,7 +177,7 @@ object BTCSeriesTransactionUtils {
 }
 
 @Throws(ScriptException::class)
-fun Transaction.addSignedInputd(
+fun Transaction.addBCHSignedInput(
 	prevOut: TransactionOutPoint,
 	scriptPubKey: Script,
 	sigKey: ECKey,

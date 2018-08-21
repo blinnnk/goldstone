@@ -142,7 +142,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		isLeft: Boolean = true,
 		setClickEvent: () -> Unit = {}
 	) {
-		findViewById<ImageView>(ElementID.addButton).let {
+		findViewById<ImageView>(ElementID.addButton).let { it ->
 			it.isNull() isTrue {
 				isShow isTrue {
 					if (!isLeft) addButton.setRightPosition()

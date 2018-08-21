@@ -91,7 +91,8 @@ data class WalletTable(
 					}
 				}
 				symbol.equals(CryptoSymbol.ltc, true) -> {
-					if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
+					if (Config.isTestEnvironment())
+						Config.getCurrentBTCSeriesTestAddress()
 					else Config.getCurrentLTCAddress()
 				}
 				symbol.equals(CryptoSymbol.bch, true) -> {

@@ -32,12 +32,12 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 class NotificationListPresenter(
 	override val fragment: NotificationListFragment
 ) : BaseRecyclerPresenter<NotificationListFragment, NotificationTable>() {
-	
+
 	override fun updateData() {
 		super.updateData()
 		getDataFromDatabase()
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()
@@ -45,7 +45,7 @@ class NotificationListPresenter(
 			?.presenter
 			?.updateUnreadCount()
 	}
-	
+
 	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<TransactionDetailFragment>(
@@ -56,7 +56,7 @@ class NotificationListPresenter(
 				})
 		}
 	}
-	
+
 	fun showWebFragment(title: String, url: String) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<WebViewFragment>(
@@ -67,7 +67,7 @@ class NotificationListPresenter(
 				})
 		}
 	}
-	
+
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView(LoadingText.notificationData)
 		NotificationTable.getAllNotifications { localData ->
@@ -85,7 +85,7 @@ class NotificationListPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateDataFromServer(requestTime: Long) {
 		GoldStoneAPI.getNotificationList(
 			requestTime,
@@ -101,7 +101,7 @@ class NotificationListPresenter(
 			}
 		}
 	}
-	
+
 	private fun showServerErrorDialog() {
 		// Error callback
 		fragment.context?.let {

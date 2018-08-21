@@ -393,7 +393,7 @@ class ProfilePresenter(
 		}
 	}
 
-	// 这个方法是为了内部使用的隐藏方法
+	// 这个方法是为了内部使用查看 `GoldStoneID` 的隐藏方法
 	private var clickTimes = 10
 	private var hasShownGoldStoneID = false
 	fun showGoldStoneID() {

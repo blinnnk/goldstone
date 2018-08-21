@@ -39,8 +39,7 @@ private fun loadBCHTransactionsFromChain(
 	successCallback: (hasData: Boolean) -> Unit
 ) {
 	val address =
-		if (Config.isTestEnvironment())
-			Config.getCurrentBTCSeriesTestAddress()
+		if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
 		else Config.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactions(
 		address,

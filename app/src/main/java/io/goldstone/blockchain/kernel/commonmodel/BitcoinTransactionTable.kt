@@ -8,9 +8,11 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
 import org.jetbrains.anko.doAsync
 import org.json.JSONArray
@@ -69,27 +71,41 @@ data class BTCSeriesTransactionTable(
 	companion object {
 
 		private fun isReceive(fromAddress: String, toAddress: String): Boolean {
-			val formatToAddress = if (
-				fromAddress.contains(":") ||
-				fromAddress.substring(0, 1).equals("q", true)
-			) {
-				BCHUtil.instance
-					.encodeCashAdrressByLegacy(toAddress)
-					.substringAfter(":")
-			} else toAddress
+			val formatToAddress =
+				if (BCHWalletUtils.isNewCashAddress(fromAddress)) {
+					if (!BCHWalletUtils.isNewCashAddress(toAddress))
+						BCHUtil.instance
+							.encodeCashAdrressByLegacy(toAddress)
+							.substringAfter(":")
+					else {
+						if (toAddress.contains(":"))
+							toAddress.substringAfter(":")
+						else toAddress
+					}
+				} else {
+					if (BTCUtils.isValidTestnetAddress(fromAddress))
+						BCHWalletUtils.formattedToLegacy(toAddress, TestNet3Params.get())
+					else BCHWalletUtils.formattedToLegacy(toAddress, MainNetParams.get())
+				}
 			return !fromAddress.equals(formatToAddress, true)
 		}
 
 		private fun convertToBCHOrDefaultAddress(myAddress: String, targetAddress: String): String {
-			return if (targetAddress.substring(0, 1).equals("q", true)) {
-				val isLegacy = if (myAddress.contains(":")) false
-				else !myAddress.substring(0, 1).equals("q", true)
-				if (isLegacy)
+			return if (BCHWalletUtils.isNewCashAddress(targetAddress)) {
+				val myAddressIsLegacy = !BCHWalletUtils.isNewCashAddress(myAddress)
+				if (myAddressIsLegacy)
 					BCHUtil.instance
 						.encodeCashAdrressByLegacy(myAddress)
 						.substringAfter(":")
-				else myAddress
-			} else myAddress
+				else {
+					if (myAddress.contains(":")) myAddress.substringAfter(":")
+					else myAddress
+				}
+			} else {
+				if (BTCUtils.isValidTestnetAddress(targetAddress))
+					BCHWalletUtils.formattedToLegacy(myAddress, TestNet3Params.get())
+				else BCHWalletUtils.formattedToLegacy(myAddress, MainNetParams.get())
+			}
 		}
 
 		private fun getFromAddress(data: JSONObject): String {

@@ -65,6 +65,7 @@ object BCHWalletUtils {
 		val prefix =
 			if (network == TestNet3Params.get()) ChainPrefix.Testnet
 			else ChainPrefix.BitcoinMainnet
+		System.out.println("prefix $prefix")
 		return when {
 			address.contains(":") ->
 				AddressConverter.toLegacyAddress(address.substringAfter(":"), prefix)

@@ -32,7 +32,6 @@ object LitecoinApi {
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
-		System.out.println("fuck ${LitecoinUrl.getTransactions(address)}")
 		BTCSeriesApiUtils.getTransactions(
 			LitecoinUrl.getTransactions(address),
 			errorCallback,

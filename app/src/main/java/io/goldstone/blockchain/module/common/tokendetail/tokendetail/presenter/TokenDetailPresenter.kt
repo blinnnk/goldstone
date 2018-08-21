@@ -282,7 +282,7 @@ class TokenDetailPresenter(
 	private fun getBTCSeriesData(
 		address: String,
 		chainType: Int,
-		withouDataCallback: () -> Unit
+		withoutDataCallback: () -> Unit
 	) {
 		BTCSeriesTransactionTable
 			.getTransactionsByAddressAndChainType(
@@ -300,7 +300,7 @@ class TokenDetailPresenter(
 					)
 					fragment.removeLoadingView()
 				} otherwise {
-					withouDataCallback()
+					withoutDataCallback()
 					LogUtil.debug(this.javaClass.simpleName, "There isn't BTCSeries Local Data")
 				}
 			}
