@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -57,7 +58,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	changeAddress: String,
 	hold: (PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
+	val myAddress = WalletTable.getAddressBySymbol(CryptoSymbol.ltc)
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -73,13 +74,16 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 				hold(null)
 				return@getUnspentListByAddress
 			}
+			val calculateFeeSecret =
+				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				else CryptoValue.ltcMainnetSignedSecret
 			val size = BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
 				count.toSatoshi(),
 				1L,
 				fragment.address.orEmpty(),
 				changeAddress,
 				unspents,
-				CryptoValue.signedSecret, // 测算 `MessageSize` 的默认无效私钥
+				calculateFeeSecret, // 测算 `MessageSize` 的默认无效私钥
 				Config.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费

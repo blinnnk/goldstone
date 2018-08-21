@@ -219,7 +219,7 @@ class ChainAddressesPresenter(
 
 				ChainType.BCH.id -> {
 					fragment.asyncData =
-						AddressManagerPresneter.convertToChildAddresses(ltcAddresses).toArrayList()
+						AddressManagerPresneter.convertToChildAddresses(bchAddresses).toArrayList()
 					AddressManagerPresneter.getCurrentAddressIndexByChainType(ChainType.BCH.id) {
 						setDefaultAddress(it, currentBCHAddress, ChainType.BCH.id)
 						Config.updateCurrentLTCAddress(currentBCHAddress)

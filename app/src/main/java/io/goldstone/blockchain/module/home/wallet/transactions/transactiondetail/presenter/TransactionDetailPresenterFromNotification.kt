@@ -301,7 +301,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 
 private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		"${fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		"${fee.toDouble().toBTCCount().toBigDecimal()} $symbol",
 		"",
 		fromAddress,
 		TransactionListModel.formatToAddress(to),

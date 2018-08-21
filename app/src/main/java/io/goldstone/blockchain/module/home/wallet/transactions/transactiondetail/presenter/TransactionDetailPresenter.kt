@@ -195,7 +195,7 @@ class TransactionDetailPresenter(
 
 			is TransactionTable -> {
 				arrayListOf(
-					formatedMinnerFee(),
+					formattedMinerFee(),
 					memo,
 					if (receipt.isReceive) receipt.to
 					else fromAddress,
@@ -223,7 +223,7 @@ class TransactionDetailPresenter(
 
 			else -> {
 				arrayListOf(
-					formatedMinnerFee(),
+					formattedMinerFee(),
 					memo,
 					fromAddress,
 					data?.toAddress.orEmpty(),
@@ -246,11 +246,7 @@ class TransactionDetailPresenter(
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let { models ->
-			return if (
-				data?.token?.symbol.equals(CryptoSymbol.btc(), true)
-				|| dataFromList?.symbol.equals(CryptoSymbol.btc(), true)
-				|| notificationData?.symbol.equals(CryptoSymbol.btc(), true)
-			) {
+			return if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol)) {
 				// 如果是 `比特币` 账单不显示 `Memo`
 				models.filterNot {
 					it.description.equals(TransactionText.memo, true)
@@ -261,7 +257,7 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	private fun formatedMinnerFee(): String? {
+	private fun formattedMinerFee(): String? {
 		val dataMinerFee =
 			if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol))
 				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -55,35 +54,6 @@ object BTCSeriesJsonRPC {
 						else JSONObject(it).safeGet("feerate").toDoubleOrNull()
 					hold(fee)
 				} else hold(null)
-			}
-		}
-	}
-
-	fun getCurrentBlockHeight(
-		chainName: String,
-		errorCallback: (Throwable?) -> Unit,
-		hold: (Int?) -> Unit
-	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
-				BitcoinMethod.Getblockcount.method,
-				1,
-				false,
-				false,
-				null
-			)
-		).let { it ->
-			RequisitionUtil.callChainBy(
-				it,
-				{ error, reason ->
-					errorCallback(error)
-					LogUtil.error("getblockHeight $reason", error)
-				},
-				chainName
-			) {
-				hold(if (it.isNotEmpty()) it.toInt() else null)
 			}
 		}
 	}

@@ -20,36 +20,36 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class TransactionDetailFragment :
 	BaseRecyclerFragment<TransactionDetailPresenter, TransactionDetailModel>() {
-	
+
 	override val presenter = TransactionDetailPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TransactionDetailModel>?
 	) {
 		recyclerView.adapter = TransactionDetailAdapter(asyncData.orEmptyArray()) cell@{
-				if (
-					model.description.equals(CommonText.from, true)
-					|| model.description.equals(CommonText.to, true)
-				) {
-					presenter.showAddContactsButton(this)
-				}
-				
-				onClick {
-					if (model.description.equals(TransactionText.url, true)) {
-						presenter.showTransactionWebFragment()
-						// 还原 `Header` 样式
-						getParentFragment<TokenDetailOverlayFragment> {
-							recoverHeader()
-						}
-					} else {
-						this@cell.context?.clickToCopy(model.info)
-					}
-					preventDuplicateClicks()
-				}
+			if (
+				model.description.equals(CommonText.from, true)
+				|| model.description.equals(CommonText.to, true)
+			) {
+				presenter.showAddContactsButton(this)
 			}
+
+			onClick {
+				if (model.description.equals(TransactionText.url, true)) {
+					presenter.showTransactionWebFragment()
+					// 还原 `Header` 样式
+					getParentFragment<TokenDetailOverlayFragment> {
+						recoverHeader()
+					}
+				} else {
+					this@cell.context?.clickToCopy(model.info)
+				}
+				preventDuplicateClicks()
+			}
+		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		parentFragment?.let {
 			presenter.runBackEventBy(it)

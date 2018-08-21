@@ -58,9 +58,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
-	private var changeAddress: String = WalletTable.getAddressBySymbol(CryptoSymbol.btc())
+	private lateinit var changeAddress: String
 	override val presenter = PaymentPreparePresenter(this)
+
 	override fun AnkoContext<Fragment>.initView() {
+		changeAddress = WalletTable.getAddressBySymbol(rootFragment?.token?.symbol)
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)

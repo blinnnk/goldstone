@@ -5,6 +5,3 @@ package io.goldstone.blockchain.kernel.network.litecoin
  * @author KaySaith
  */
 
-class LTCJsonRPC {
-
-}
