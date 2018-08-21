@@ -54,6 +54,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			attentionView.apply {
+				isCenter()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				text = ImportWalletText.exportKeystore
 			}.into(this)
