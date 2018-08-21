@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.util.getParentFragment
+import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.QuotationText
@@ -22,9 +23,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.*
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -56,7 +55,7 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun updateChartByMenu(chartView: MarketTokenChart, buttonID: Int) {
+	fun updateChartByMenu(chartView: MarketTokenCandleChart, buttonID: Int) {
 		val period = when (buttonID) {
 			MarketTokenDetailChartType.WEEK.code -> MarketTokenDetailChartType.WEEK.info
 			MarketTokenDetailChartType.DAY.code -> MarketTokenDetailChartType.DAY.info
@@ -83,7 +82,7 @@ class MarketTokenDetailPresenter(
 					}
 					if (data.isNullOrBlank()) {
 						// 更新网络数据
-						chartView.updateChartDataBy(pair, period, dateType)
+						chartView.updateCandleChartDataBy(pair, period, dateType)
 						// 本地数据库如果没有数据就跳出逻辑
 						return@getSelectionByPair
 					} else {
@@ -91,19 +90,19 @@ class MarketTokenDetailPresenter(
 						val jsonArray = JSONArray(data)
 						// 把数据转换成需要的格式
 						(0 until jsonArray.length()).map {
-							ChartModel(JSONObject(jsonArray[it]?.toString()))
+							CandleChartModel(JSONObject(jsonArray[it]?.toString()))
 						}.toArrayList().let { it ->
 							val databaseTime = it.maxBy {
-								it.timestamp
-							}?.timestamp?.toLongOrNull().orElse(0)
+								it.time
+							}?.time?.toLongOrNull().orElse(0)
 							// 校验数据库的数据时间是否有效，是否需要更新
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
 								isTrue {
 									// 合规就更新本地数据库的数据
-									chartView.updateChartUI(it, dateType)
+									chartView.updateCandleChartUI(it, dateType)
 								} otherwise {
 									// 不合规就更新网络数据
-									chartView.updateChartDataBy(pair, period, dateType)
+									chartView.updateCandleChartDataBy(pair, period, dateType)
 								}
 							}
 						}
@@ -236,6 +235,23 @@ class MarketTokenDetailPresenter(
 			updateChartUI(it, dateType)
 		}
 	}
+	
+	private fun MarketTokenCandleChart.updateCandleChartDataBy(
+		pair: String,
+		period: String,
+		dateType: Int
+	) {
+		fragment.getMainActivity()?.showLoadingView()
+		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, 100, {
+			// Show the error exception to user
+			fragment.context.alert(it.toString().showAfterColonContent())
+		}) {
+			// 把数据更新到数据库
+			it.updateCandleChartDataInDatabaseBy(period, pair)
+			// 更新 `UI` 界面
+			updateCandleChartUI(it, dateType)
+		}
+	}
 
 	private fun checkDatabaseTimeIsValidBy(
 		period: String,
@@ -290,6 +306,36 @@ class MarketTokenDetailPresenter(
 			}
 		}
 	}
+	private fun MarketTokenCandleChart.updateCandleChartUI(
+		data: ArrayList<CandleChartModel>,
+		dateType: Int
+	) {
+		LogUtil.error("$dateType")
+		fragment.context?.apply {
+			runOnUiThread {
+				fragment.getMainActivity()?.removeLoadingView()
+				// 服务器抓取的数据返回有一定概率返回错误格式数据
+				try {
+					resetData(
+						data.sortedBy {
+							it.time.toLongOrNull().orElse(0)
+						}.mapIndexed {
+								index, entry -> CandleEntry(index.toFloat(),
+							entry.high.toFloat(),
+							entry.low.toFloat(),
+							entry.open.toFloat(),
+							entry.close.toFloat(),
+							entry.time)
+						}.toArrayList()
+					)
+					
+				} catch (error: Exception) {
+					LogUtil.error("updateChartUI", error)
+					return@runOnUiThread
+				}
+			}
+		}
+	}
 
 	private fun ArrayList<ChartModel>.updateChartDataInDatabaseBy(
 		period: String,
@@ -309,6 +355,31 @@ class MarketTokenDetailPresenter(
 					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
 				}
 
+				MarketTokenDetailChartType.Hour.info -> {
+					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
+				}
+			}
+		}
+	}
+	
+	private fun ArrayList<CandleChartModel>.updateCandleChartDataInDatabaseBy(
+		period: String,
+		pair: String
+	) {
+		map { JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}") }.let {
+			when (period) {
+				MarketTokenDetailChartType.WEEK.info -> {
+					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
+				}
+				
+				MarketTokenDetailChartType.DAY.info -> {
+					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
+				}
+				
+				MarketTokenDetailChartType.MONTH.info -> {
+					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
+				}
+				
 				MarketTokenDetailChartType.Hour.info -> {
 					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
 				}
