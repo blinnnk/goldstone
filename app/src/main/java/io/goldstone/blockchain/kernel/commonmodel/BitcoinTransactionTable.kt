@@ -216,10 +216,11 @@ data class BTCSeriesTransactionTable(
 								address.substring(0, 1).equals("m", true) ||
 									address.substring(0, 1).equals("n", true)
 								)
-						) BCHWalletUtils.formatedToLegacy(address, TestNet3Params.get())
+						) BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
 						else address
 
-					val data = getDataByAddressAndChainType(formatedAddress, chainType)
+					val data =
+						getDataByAddressAndChainType(formatedAddress, chainType)
 					if (data.isEmpty()) {
 						callback()
 						return@doAsync

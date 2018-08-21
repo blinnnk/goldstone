@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
@@ -24,11 +25,13 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -308,6 +311,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			getParentContainer(),
 			top,
 			hasDefaultCell,
+			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
 				AddressManagerPresneter.setDefaultAddress(coinType, address) {
 					// 更新默认地址后同时更新首页的列表
@@ -346,6 +350,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 				getParentFragment<WalletSettingsFragment> {
 					AddressManagerPresneter.showKeystoreExportFragment(address, this)
 				}
+			},
+			convertBCHAddressToLegacy = {
+				val legacyAddress = BCHWalletUtils.formattedToLegacy(address, MainNetParams.get())
+				context.alert(legacyAddress)
+				context?.clickToCopy(legacyAddress)
+				AddressManagerFragment.removeDashboard(context)
 			}
 		)
 	}
@@ -393,10 +403,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			container: ViewGroup?,
 			top: Float,
 			hasDefaultCell: Boolean = true,
+			isCashAddress: Boolean,
 			setDefaultAddressEvent: () -> Unit,
 			qrCellClickEvent: () -> Unit,
 			exportPrivateKey: () -> Unit,
-			keystoreCellClickEvent: () -> Unit
+			keystoreCellClickEvent: () -> Unit,
+			convertBCHAddressToLegacy: () -> Unit
 		) {
 			container?.apply {
 				if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
@@ -407,15 +419,17 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 								WalletText.showQRCode -> qrCellClickEvent()
 								WalletSettingsText.exportPrivateKey -> exportPrivateKey()
 								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
+								WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()
 							}
 							cell.preventDuplicateClicks()
 						}
 					}
 					creatorDashBoard.model =
-						AddressManagerPresneter.getCellDashboardMenu(hasDefaultCell)
+						AddressManagerPresneter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
 					creatorDashBoard.into(this)
 					// 防止超出屏幕便捷的尺寸弥补
-					val overHeightSize = ScreenSize.fullHeight - creatorDashBoard.getOverlayHeight() - top
+					val overHeightSize =
+						ScreenSize.fullHeight - creatorDashBoard.getOverlayHeight() - top
 					creatorDashBoard.setTopValue(top + if (overHeightSize < 0f) overHeightSize else 0f)
 				}
 			}

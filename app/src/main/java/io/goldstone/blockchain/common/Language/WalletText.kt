@@ -88,6 +88,16 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
+	val getBCHLegacyAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Get Legacy Address"
+		HoneyLanguage.Chinese.code -> "Get Legacy Address"
+		HoneyLanguage.Japanese.code -> "Get Legacy Address"
+		HoneyLanguage.Korean.code -> "Get Legacy Address"
+		HoneyLanguage.Russian.code -> "Get Legacy Address"
+		HoneyLanguage.TraditionalChinese.code -> "Get Legacy Address"
+		else -> ""
+	}
+	@JvmField
 	val multiChainWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "this is a multi-chain wallet"
 		HoneyLanguage.Chinese.code -> "这是多链钱包"
