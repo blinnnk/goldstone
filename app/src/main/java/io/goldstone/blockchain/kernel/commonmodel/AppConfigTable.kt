@@ -24,7 +24,7 @@ import org.jetbrains.anko.runOnUiThread
  * @date 23/04/2018 2:42 PM
  * @author KaySaith
  * @important
- * [deviceID] 这个 ID 是自身业务服务器和客户端用来做
+ * [goldStoneID] 这个 ID 是自身业务服务器和客户端用来做
  * 唯一校验的值, 不是常规意义的 `Device ID`
  */
 @Entity(tableName = "appConfig")

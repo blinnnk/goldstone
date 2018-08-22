@@ -29,6 +29,7 @@ object ArgumentKey {
 	const val fromQuickTransfer = "fromQuickTransfer"
 	const val fromQuickDeposit = "fromQuickDeposit"
 	const val isMainnet = "isMainnet"
+	const val addressModel = "addressModel"
 	const val address = "address"
 	const val chainType = "chainType"
 	const val coinType = "coinType"

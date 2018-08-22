@@ -127,7 +127,7 @@ class WalletDetailPresenter(
 	}
 
 	fun showNotificationListFragment() {
-		XinGePushReceiver.clearAppIconRedot()
+		XinGePushReceiver.clearAppIconReDot()
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.notification) isFalse {
 				addFragment<NotificationFragment>(ContainerID.main, FragmentTag.notification)

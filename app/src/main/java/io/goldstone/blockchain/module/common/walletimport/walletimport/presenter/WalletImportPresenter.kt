@@ -8,6 +8,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -65,7 +67,7 @@ class WalletImportPresenter(
 					multiChainAddresses.btcSeriesTestAddress,
 					multiChainAddresses.ltcAddress,
 					multiChainAddresses.bchAddress
-				).find { it.isNotEmpty() }.orEmpty()
+				).first { it.isNotEmpty() }
 
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {
@@ -127,6 +129,7 @@ class WalletImportPresenter(
 							},
 							callback
 						)
+
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerAddressesForPush()
 					}

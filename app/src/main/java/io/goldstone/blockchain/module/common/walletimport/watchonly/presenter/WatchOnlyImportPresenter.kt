@@ -19,7 +19,7 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommitionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -149,7 +149,7 @@ class WatchOnlyImportPresenter(
 								Pair(currentETHAndERCAddress, ChainType.ETH.id)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
-						XinGePushReceiver.registerSingleAddress(AddressCommitionModel(current.first, current.second, 1))
+						XinGePushReceiver.registerSingleAddress(AddressCommissionModel(current.first, current.second, 1))
 						fragment.activity?.jump<SplashActivity>()
 					}
 				}

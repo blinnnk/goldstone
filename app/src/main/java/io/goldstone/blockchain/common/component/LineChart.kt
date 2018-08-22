@@ -174,7 +174,7 @@ abstract class LineChart(context: Context) : LineChartView(context) {
 			style = Paint.Style.FILL
 			color = GrayScale.lightGray
 		})
-		// 设定便捷字体颜色
+		// 设定边界字体颜色
 		this.setLabelsColor(GrayScale.midGray)
 		// 设定外界 `Border` 颜色
 		this.setAxisColor(Color.argb(0, 0, 0, 0))

@@ -124,7 +124,7 @@ class DepositPresenter(
 		// 没有设置 `金额`
 		return when (amount) {
 			0.0 ->
-				"bitcoin:$walletAddress"
+				"litecoin:$walletAddress"
 			// 有设置 `燃气费` 或 `Memo`
 			else -> "litecoin:$walletAddress?amount=$amount"
 		}
@@ -136,9 +136,7 @@ class DepositPresenter(
 	): String {
 		// 没有设置 `金额`
 		return when (amount) {
-			0.0 ->
-				"bitcoin:$walletAddress"
-			// 有设置 `燃气费` 或 `Memo`
+			0.0 -> "bitcoinCash:$walletAddress"
 			else -> "bitcoinCash:$walletAddress?amount=$amount"
 		}
 	}
@@ -210,18 +208,20 @@ class DepositPresenter(
 			}
 		}
 
-		fun convertBitcoinQRCode(content: String): QRCodeModel {
+		fun convertBitcoinQRCode(content: String): QRCodeModel? {
 			val chainName = content.substringBefore(":")
 			val chainID = CryptoName.getBTCSeriesChainIDByName(chainName)
 			val contract = CryptoName.getBTCSeriesContractByChainName(chainName)
-
+			if (chainID.isNullOrEmpty() || contract.isNullOrEmpty()) {
+				return null
+			}
 			return if (content.contains("?")) {
 				val address = content.substringBefore("?").substringAfter(":")
 				val amount = content.substringAfter("amount=").toDoubleOrNull().orZero()
-				QRCodeModel(amount, address, contract, chainID)
+				QRCodeModel(amount, address, contract!!, chainID!!)
 			} else {
 				val address = content.substringAfter(":")
-				QRCodeModel(0.0, address, contract, chainID)
+				QRCodeModel(0.0, address, contract!!, chainID!!)
 			}
 		}
 	}

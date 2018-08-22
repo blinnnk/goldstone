@@ -30,12 +30,12 @@ object BCHWalletUtils {
 		val net = MainNetParams.get()
 		val legacyAddress = Address(net, Utils.sha256hash160(ecKey.pubKey)).toBase58()
 		val address =
-			BCHUtil.instance.encodeCashAdrressByLegacy(legacyAddress)
+			BCHUtil.instance.encodeCashAddressByLegacy(legacyAddress)
 		return BaseKeyPair(address, ecKey.getPrivateKeyAsWiF(net))
 	}
 
 	fun getBCHAddressByWIFKey(privatekey: String): String {
-		return BCHUtil.instance.encodeCashAdrressByLegacy(
+		return BCHUtil.instance.encodeCashAddressByLegacy(
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privatekey, false)
 		)
 	}

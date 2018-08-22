@@ -26,7 +26,7 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
@@ -125,7 +125,7 @@ class WalletSettingsListPresenter(
 								Pair(ltcAddresses, ChainType.LTC.id),
 								Pair(bchAddresses, ChainType.BCH.id)
 							).forEach { account ->
-								AddressManagerPresneter.convertToChildAddresses(account.first).forEach {
+								AddressManagerPresenter.convertToChildAddresses(account.first).forEach {
 									deleteRoutineWallet(
 										it.first,
 										password,

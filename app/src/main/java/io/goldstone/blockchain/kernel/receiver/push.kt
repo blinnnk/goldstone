@@ -28,10 +28,10 @@ import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommitionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
@@ -123,14 +123,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		result?.customContent?.let {
 			when (JSONObject(it).safeGet("uri")) {
 				ClassURI.transactionDetail -> {
-					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
+					handleTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
 			}
 		}
-		clearAppIconRedot()
+		clearAppIconReDot()
 	}
 
-	private fun handlTransactionNotification(
+	private fun handleTransactionNotification(
 		context: Context?,
 		content: String?
 	) {
@@ -141,7 +141,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	}
 
 	companion object {
-		fun clearAppIconRedot() {
+		fun clearAppIconReDot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =
 				GoldStoneAPI.context.applicationContext?.getSystemService(
@@ -153,63 +153,66 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		fun registerAddressesForPush(isRemove: Boolean = false) {
 			val option = if (isRemove) 0 else 1
 			WalletTable.getCurrentWallet {
-				when (Config.getCurrentWalletType()) {
-					WalletType.MultiChain.content -> {
-						val ethseries =
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses)
-								.map { Pair(it.first, ChainType.ETH.id) }
-						val btcSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
-								.map { Pair(it.first, ChainType.BTC.id) }
-						val ltcSeries =
-							AddressManagerPresneter.convertToChildAddresses(ltcAddresses)
-								.map { Pair(it.first, ChainType.LTC.id) }
-						val bchSeries =
-							AddressManagerPresneter.convertToChildAddresses(bchAddresses)
-								.map { Pair(it.first, ChainType.BCH.id) }
-						val btcTestSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcSeriesTestAddresses)
-								.map { Pair(it.first, ChainType.AllTest.id) }
-						val etcSeries =
-							AddressManagerPresneter.convertToChildAddresses(etcAddresses)
-								.map { Pair(it.first, ChainType.ETC.id) }
-						val all =
-							ethseries
-								.plus(btcSeries)
-								.plus(btcTestSeries)
-								.plus(etcSeries)
-								.plus(ltcSeries)
-								.plus(bchSeries)
-								.map {
-									AddressCommitionModel(it.first, it.second, option)
-								}.map { prepareAddressData(it) }
-						GoldStoneAPI.registerWalletAddresses(
-							AesCrypto.encrypt("$all").orEmpty(),
-							{
-								LogUtil.error("registerAddressesAfterGenerateWallet", it)
+				WalletTable.getWalletType { type ->
+					when (type) {
+						WalletType.MultiChain -> {
+							val ethSeries =
+								AddressManagerPresenter.convertToChildAddresses(ethAddresses)
+									.map { Pair(it.first, ChainType.ETH.id) }
+							val btcSeries =
+								AddressManagerPresenter.convertToChildAddresses(btcAddresses)
+									.map { Pair(it.first, ChainType.BTC.id) }
+							val ltcSeries =
+								AddressManagerPresenter.convertToChildAddresses(ltcAddresses)
+									.map { Pair(it.first, ChainType.LTC.id) }
+							val bchSeries =
+								AddressManagerPresenter.convertToChildAddresses(bchAddresses)
+									.map { Pair(it.first, ChainType.BCH.id) }
+							val btcTestSeries =
+								AddressManagerPresenter.convertToChildAddresses(btcSeriesTestAddresses)
+									.map { Pair(it.first, ChainType.AllTest.id) }
+							val etcSeries =
+								AddressManagerPresenter.convertToChildAddresses(etcAddresses)
+									.map { Pair(it.first, ChainType.ETC.id) }
+							val all =
+								ethSeries
+									.plus(btcSeries)
+									.plus(btcTestSeries)
+									.plus(etcSeries)
+									.plus(ltcSeries)
+									.plus(bchSeries)
+									.map {
+										AddressCommissionModel(it.first, it.second, option)
+									}.map { prepareAddressData(it) }
+							GoldStoneAPI.registerWalletAddresses(
+								AesCrypto.encrypt("$all").orEmpty(),
+								{
+									LogUtil.error("registerAddressesAfterGenerateWallet", it)
+								}
+							) {
+								if (!isRemove) updateRegisterAddressesStatus(it)
 							}
-						) {
-							if (!isRemove) updateRegisterAddressesStatus(it)
 						}
-					}
 
-					WalletType.BTCOnly.content ->
-						registerSingleAddress(AddressCommitionModel(currentBTCAddress, ChainType.BTC.id, option))
-					WalletType.BCHOnly.content ->
-						registerSingleAddress(AddressCommitionModel(currentBCHAddress, ChainType.BCH.id, option))
-					WalletType.LTCOnly.content ->
-						registerSingleAddress(AddressCommitionModel(currentLTCAddress, ChainType.LTC.id, option))
-					WalletType.BTCTestOnly.content ->
-						registerSingleAddress(
-							AddressCommitionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
-						)
-					WalletType.ETHERCAndETCOnly.content ->
-						registerSingleAddress(AddressCommitionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
+						WalletType.BTCOnly -> {
+							registerSingleAddress(AddressCommissionModel(currentBTCAddress, ChainType.BTC.id, option))
+						}
+						WalletType.BCHOnly ->
+							registerSingleAddress(AddressCommissionModel(currentBCHAddress, ChainType.BCH.id, option))
+						WalletType.LTCOnly ->
+							registerSingleAddress(AddressCommissionModel(currentLTCAddress, ChainType.LTC.id, option))
+						WalletType.BTCTestOnly ->
+							registerSingleAddress(
+								AddressCommissionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
+							)
+						WalletType.ETHERCAndETCOnly ->
+							registerSingleAddress(AddressCommissionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
+					}
 				}
 			}
 		}
 
-		fun registerSingleAddress(model: AddressCommitionModel) {
+		fun registerSingleAddress(model: AddressCommissionModel) {
 			listOf(model).map { prepareAddressData(it) }.let { it ->
 				GoldStoneAPI.registerWalletAddresses(
 					AesCrypto.encrypt("$it").orEmpty(),
@@ -233,10 +236,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 
 		// 因为 `BCH` 的地址特殊格式, 以及 `Bip44` 复用 `ChainType 1` 作为 `AllTest Path`
 		// 所以, `BCH` 客户端单独注册特殊格式给服务器用于服务器监听转账 `Push` 使用
-		private fun prepareAddressData(model: AddressCommitionModel): String {
+		private fun prepareAddressData(model: AddressCommissionModel): String {
 			return if (model.chainType == 1) {
 				val bchTestAddress =
-					BCHUtil.instance.encodeCashAdrressByLegacy(model.address).substringAfter(":")
+					BCHUtil.instance.encodeCashAddressByLegacy(model.address).substringAfter(":")
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),

@@ -29,7 +29,7 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
@@ -40,7 +40,7 @@ import org.jetbrains.anko.support.v4.toast
  * @date 2018/7/11 12:44 AM
  * @author KaySaith
  */
-class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
+class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 6) { moreButton, address, isDefault, title ->
@@ -136,7 +136,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			}
 		}
 	}
-	override val presenter = AddressManagerPresneter(this)
+	override val presenter = AddressManagerPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		showCreatorDashboard()
@@ -254,21 +254,23 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 	private fun createChildAddressByButtonTitle(title: String, password: String) {
 		context?.apply {
 			when (title) {
-				WalletSettingsText.newETHAndERCAddress -> AddressManagerPresneter.createETHAndERCAddress(this, password) {
-					ethAndERCAddressesView.model = it
-				}
+				WalletSettingsText.newETHAndERCAddress ->
+					AddressManagerPresenter.createETHAndERCAddress(this, password) {
+						ethAndERCAddressesView.model = it
+					}
 
-				WalletSettingsText.newETCAddress -> AddressManagerPresneter.createETCAddress(this, password) {
-					etcAddressesView.model = it
-				}
+				WalletSettingsText.newETCAddress ->
+					AddressManagerPresenter.createETCAddress(this, password) {
+						etcAddressesView.model = it
+					}
 
 				WalletSettingsText.newLTCAddress -> {
 					if (Config.isTestEnvironment()) {
-						AddressManagerPresneter.createBTCTestAddress(this, password) {
+						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
 					} else {
-						AddressManagerPresneter.createLTCAddress(this, password) {
+						AddressManagerPresenter.createLTCAddress(this, password) {
 							ltcAddressesView.model = it
 						}
 					}
@@ -276,11 +278,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 				WalletSettingsText.newBCHAddress -> {
 					if (Config.isTestEnvironment()) {
-						AddressManagerPresneter.createBTCTestAddress(this, password) {
+						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
 					} else {
-						AddressManagerPresneter.createBCHAddress(this, password) {
+						AddressManagerPresenter.createBCHAddress(this, password) {
 							bchAddressesView.model = it
 						}
 					}
@@ -288,11 +290,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 
 				WalletSettingsText.newBTCAddress -> {
 					if (Config.isTestEnvironment()) {
-						AddressManagerPresneter.createBTCTestAddress(this, password) {
+						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
 					} else {
-						AddressManagerPresneter.createBTCAddress(this, password) {
+						AddressManagerPresenter.createBTCAddress(this, password) {
 							btcAddressesView.model = it
 						}
 					}
@@ -313,7 +315,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				AddressManagerPresneter.setDefaultAddress(coinType, address) {
+				AddressManagerPresenter.setDefaultAddress(coinType, address) {
 					// 更新默认地址后同时更新首页的列表
 					updateWalletDetail()
 					when (coinType) {
@@ -338,17 +340,17 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 			},
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresneter.showQRCodeFragment(address, this)
+					AddressManagerPresenter.showQRCodeFragment(address, this)
 				}
 			},
 			exportPrivateKey = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresneter.showPrivateKeyExportFragment(address, coinType, this)
+					AddressManagerPresenter.showPrivateKeyExportFragment(address, coinType, this)
 				}
 			},
 			keystoreCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresneter.showKeystoreExportFragment(address, this)
+					AddressManagerPresenter.showKeystoreExportFragment(address, this)
 				}
 			},
 			convertBCHAddressToLegacy = {
@@ -425,7 +427,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresneter>() {
 						}
 					}
 					creatorDashBoard.model =
-						AddressManagerPresneter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
+						AddressManagerPresenter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
 					creatorDashBoard.into(this)
 					// 防止超出屏幕便捷的尺寸弥补
 					val overHeightSize =

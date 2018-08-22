@@ -59,10 +59,11 @@ class AddressSelectionPresenter(
 			} else {
 				when {
 					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
-						DepositPresenter.convertBitcoinQRCode(result).let {
-							isCorrectCoinOrChainID(it) {
-								showPaymentPrepareFragment(it.walletAddress, it.amount)
-							}
+						val qrModel =
+							DepositPresenter.convertBitcoinQRCode(result)
+						if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
+						else isCorrectCoinOrChainID(qrModel!!) {
+							showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
 						}
 					}
 
@@ -103,10 +104,8 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.ETHERCOrETC -> {
-				if (token?.symbol.equals(CryptoSymbol.btc(), true)) {
-					fragment.context.alert(
-						"this is not a valid bitcoin address"
-					)
+				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
+					fragment.context.alert("this is not a valid bitcoin address")
 					return
 				}
 
@@ -339,6 +338,13 @@ class AddressSelectionPresenter(
 								defaultAddress =
 									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
 									else it.ltcAddress
+							}
+						}.toArrayList()
+						token?.symbol.equals(CryptoSymbol.bch, true) -> contacts.map {
+							it.apply {
+								defaultAddress =
+									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+									else it.bchAddress
 							}
 						}.toArrayList()
 						else -> contacts.map {

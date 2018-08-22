@@ -24,7 +24,7 @@ import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommitionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -39,7 +39,7 @@ import org.jetbrains.anko.doAsync
  * @date 2018/7/11 12:44 AM
  * @author KaySaith
  */
-class AddressManagerPresneter(
+class AddressManagerPresenter(
 	override val fragment: AddressManagerFragment
 ) : BasePresenter<AddressManagerFragment>() {
 
@@ -281,7 +281,7 @@ class AddressManagerPresneter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommitionModel(address, ChainType.ETH.id, 1)
+							AddressCommissionModel(address, ChainType.ETH.id, 1)
 						)
 						WalletTable.updateETHAndERCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
@@ -314,7 +314,7 @@ class AddressManagerPresneter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommitionModel(address, ChainType.ETC.id, 1)
+							AddressCommissionModel(address, ChainType.ETC.id, 1)
 						)
 						WalletTable.updateETCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
@@ -362,7 +362,7 @@ class AddressManagerPresneter(
 								)
 								// 注册新增的子地址
 								XinGePushReceiver.registerSingleAddress(
-									AddressCommitionModel(address, ChainType.BTC.id, 1)
+									AddressCommissionModel(address, ChainType.BTC.id, 1)
 								)
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
@@ -429,7 +429,7 @@ class AddressManagerPresneter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommitionModel(address, ChainType.AllTest.id, 1)
+								AddressCommissionModel(address, ChainType.AllTest.id, 1)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -478,7 +478,7 @@ class AddressManagerPresneter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommitionModel(bchKeyPair.address, ChainType.BCH.id, 1)
+								AddressCommissionModel(bchKeyPair.address, ChainType.BCH.id, 1)
 							)
 							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -526,7 +526,7 @@ class AddressManagerPresneter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommitionModel(ltcKeyPair.address, ChainType.LTC.id, 1)
+								AddressCommissionModel(ltcKeyPair.address, ChainType.LTC.id, 1)
 							)
 							WalletTable.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())

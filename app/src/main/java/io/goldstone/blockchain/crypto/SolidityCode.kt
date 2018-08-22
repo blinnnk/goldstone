@@ -71,8 +71,12 @@ object CryptoValue {
 		(!it.equals(ethContract, true)
 			&& !it.equals(etcContract, true))
 	}
-	val pathCointType: (path: String) -> Int = {
+	val pathCoinType: (path: String) -> Int = {
 		it.replace("'", "").split("/")[2].toInt()
+	}
+
+	val isBTCSeriesAddress: (address: String) -> Boolean = {
+		it.length == CryptoValue.bitcoinAddressLength || it.contains(":")
 	}
 	// 比特的 `Bip44` 的比特币测试地址的  `CoinType` 为 `1`
 	val isBTCTest: (pathCointType: Int) -> Boolean = {
@@ -144,28 +148,28 @@ object CryptoName {
 	const val bch = "Bitcoin Cash"
 	val allChainName = listOf(etc.replace(" ", ""), eth, btc, ltc, bch.replace(" ", ""))
 
-	fun getBTCSeriesChainIDByName(name: String): String {
+	fun getBTCSeriesChainIDByName(name: String): String? {
 		return listOf(
 			Pair(ltc, Config.getLTCCurrentChain()),
 			Pair(bch, Config.getBCHCurrentChain()),
 			Pair(btc, Config.getBTCCurrentChain())
-		).first {
+		).firstOrNull {
 			it.first
 				.replace(" ", "")
 				.equals(name, true)
-		}.second
+		}?.second
 	}
 
-	fun getBTCSeriesContractByChainName(name: String) : String {
+	fun getBTCSeriesContractByChainName(name: String) : String? {
 		return listOf(
 			Pair(ltc, CryptoValue.ltcContract),
 			Pair(bch, CryptoValue.bchContract),
 			Pair(btc, CryptoValue.btcContract)
-		).first {
+		).firstOrNull {
 			it.first
 				.replace(" ", "")
 				.equals(name, true)
-		}.second
+		}?.second
 	}
 }
 

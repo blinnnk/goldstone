@@ -258,7 +258,6 @@ class PrivateKeyImportPresenter(
 					return
 				}
 			}
-
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privateKey, isTest).let { address ->
 				context?.apply {
 					// 存储私钥的 `KeyStore` 文件
