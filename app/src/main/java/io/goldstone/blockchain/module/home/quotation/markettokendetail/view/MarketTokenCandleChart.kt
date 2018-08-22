@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.content.Context
+import android.view.MotionEvent
 import android.widget.RelativeLayout
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.chart.candle.CandleStickChart
@@ -17,4 +18,11 @@ class MarketTokenCandleChart : CandleStickChart {
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 250.uiPX())
 	}
+	
+	
+	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+		requestDisallowInterceptTouchEvent(true)
+		return super.dispatchTouchEvent(ev)
+	}
+	
 }

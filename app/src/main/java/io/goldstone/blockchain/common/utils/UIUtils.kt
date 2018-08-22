@@ -96,10 +96,25 @@ object TimeUtils {
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
+	
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成月日，例如 8/15
+	 */
 	fun formatMdDate(date: Long) : String {
 		val simpleDateFormat = SimpleDateFormat("M/d")
 		return simpleDateFormat.format(java.util.Date(date))
-		
+	}
+	
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成时分，例如12:00
+	 */
+	fun formathmDate(date: Long) : String {
+		val simpleDateFormat = SimpleDateFormat("hh:mm")
+		return simpleDateFormat.format(java.util.Date(date))
 	}
 }
 

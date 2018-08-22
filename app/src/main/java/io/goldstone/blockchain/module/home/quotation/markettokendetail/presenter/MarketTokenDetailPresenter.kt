@@ -316,7 +316,7 @@ class MarketTokenDetailPresenter(
 				fragment.getMainActivity()?.removeLoadingView()
 				// 服务器抓取的数据返回有一定概率返回错误格式数据
 				try {
-					resetData(
+					resetData(dateType,
 						data.sortedBy {
 							it.time.toLongOrNull().orElse(0)
 						}.mapIndexed {
