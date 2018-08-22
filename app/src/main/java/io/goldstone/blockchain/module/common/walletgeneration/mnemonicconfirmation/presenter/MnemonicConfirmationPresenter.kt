@@ -45,7 +45,7 @@ class MnemonicConfirmationPresenter(
 
 	override fun onFragmentViewCreated() {
 		// 如果在窗前钱包的界面用户点击了关闭按钮那么直接切换钱包
-		if(fragment.activity is MainActivity) {
+		if (fragment.activity is MainActivity) {
 			fragment.getParentFragment<WalletGenerationFragment> {
 				overlayView.header.closeButton.onClick {
 					activity?.jump<SplashActivity>()

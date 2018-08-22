@@ -75,8 +75,8 @@ enum class ChainID(val id: String) {
 			)
 		}
 
-		fun getAllEthereumChainID(): ArrayList<String> {
-			return arrayListOf(
+		fun getAllEthereumChainID(): List<String> {
+			return listOf(
 				ChainID.Main.id,
 				ChainID.Ropsten.id,
 				ChainID.Kovan.id,
@@ -86,7 +86,7 @@ enum class ChainID(val id: String) {
 
 		fun getChainNameByID(chainID: String): String {
 			return when (chainID) {
-				// Third Pardy Nodes
+				// Third Party Nodes
 				Kovan.id -> ChainText.infuraKovan
 				Ropsten.id -> ChainText.infuraRopsten
 				Main.id -> ChainText.infuraMain
@@ -143,7 +143,6 @@ enum class ChainID(val id: String) {
 }
 
 // `ChainName ID` 这个值是用来通过国际化的 `Name` 找回对应的 `ID` 的值
-
 enum class ChainNameID(val id: Int) {
 	GoldStoneETHMain(0),
 	GoldStoneRopsten(1),
@@ -167,7 +166,7 @@ enum class ChainNameID(val id: Int) {
 	companion object {
 		fun getChainNameByID(chainNameID: Int): String {
 			return when (chainNameID) {
-				0 -> ChainText.mainnet
+				0 -> ChainText.goldStoneMain
 				1 -> ChainText.ropsten
 				2 -> ChainText.rinkeby
 				3 -> ChainText.kovan
@@ -191,7 +190,7 @@ enum class ChainNameID(val id: Int) {
 
 		fun getChainNameIDByName(chainName: String): Int {
 			return when (chainName) {
-				ChainText.mainnet -> 0
+				ChainText.goldStoneMain -> 0
 				ChainText.ropsten -> 1
 				ChainText.rinkeby -> 2
 				ChainText.kovan -> 3
