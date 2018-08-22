@@ -32,9 +32,6 @@ import org.jetbrains.anko.*
 /**
  * @date 2018/5/19 11:45 AM
  * @author KaySaith
- * @rewriteDate 10/08/2018 16:13 PM
- * @rewriter wcx
- * @description 添加setImageLayoutParams根据图片宽高比例调整
  */
 class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 
@@ -80,16 +77,6 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 
 	fun <T> setImage(src: T) {
 		image.glideImage(src)
-	}
-
-	fun setImageLayoutParams(
-		width: Int,
-		height: Int
-	) {
-		image.layoutParams = LinearLayout.LayoutParams(
-			width,
-			height
-		)
 	}
 
 	fun setContent(

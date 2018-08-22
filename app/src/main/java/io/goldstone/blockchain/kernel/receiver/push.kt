@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.kernel.receiver
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
@@ -87,11 +88,12 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	) {
 		if (context == null || notifiShowedRlt == null) return
 		if (notifiShowedRlt.title == AlarmClockText.priceWarning) {
-			if (!MainActivity.backgroundFlag) {
+			if (!backgroundFlag) {
 				PriceAlarmClockUtils.sendAlarmReceiver(
 					0,
 					context,
-					1)
+					1
+				)
 			}
 		}
 		// Normal Notification
@@ -139,7 +141,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
 				ClassURI.priceAlarmView -> {
-					if (!MainActivity.backgroundFlag) {
+					if (!backgroundFlag) {
 						alarmClockNotification(
 							context,
 							result
@@ -178,6 +180,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	}
 
 	companion object {
+		var backgroundFlag = false
 		fun clearAppIconRedot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =

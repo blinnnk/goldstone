@@ -17,121 +17,110 @@ import java.util.*
  */
 @Entity(tableName = "price_alarm_clock")
 data class PriceAlarmClockTable(
-  @PrimaryKey(autoGenerate = true)
-  @ColumnInfo(name = "_id")
-  var id: Int,
-  @ColumnInfo(name = "add_id")
-  var addId: String,
-  @ColumnInfo(name = "create_time")
-  var createTime: String?,
-  @ColumnInfo(name = "market_name")
-  var marketName: String?,
-  @ColumnInfo(name = "currency_name")
-  var currencyName: String?,
-  @ColumnInfo(name = "market_price")
-  var marketPrice: String?,
-  @ColumnInfo(name = "price")
-  var price: String?,
-  @ColumnInfo(name = "status")
-  var status: Boolean,
-  @ColumnInfo(name = "pair")
-  var pair: String?,
-  @ColumnInfo(name = "price_type")
-  var priceType: Int?,
-  @ColumnInfo(name = "alarm_type")
-  var alarmType: Int?, // 0为永久
-  var pairDisplay: String?,
-  var position: Int = -1,
-  var symbol: String?,
-  var name: String?
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	var addId: String,
+	var createTime: String,
+	var marketName: String,
+	var currencyName: String,
+	var marketPrice: String,
+	var price: String,
+	var status: Boolean,
+	var pair: String,
+	var priceType: Int,
+	var alarmType: Int = 0, // 0为永久
+	var pairDisplay: String,
+	var position: Int = -1,
+	var symbol: String = "",
+	var name: String?
 ) : Serializable {
-  @Ignore
-  constructor() : this(
-    0,
-    "0",
-    null,
-    null,
-    null,
-    "0",
-    "0",
-    true,
-    null,
-    null,
-    null,
-    null,
-    -1,
-    null,
-    null
-  )
+	@Ignore
+	constructor() : this(
+		0,
+		"0",
+		"",
+		"",
+		"",
+		"0",
+		"0",
+		true,
+		"",
+		0,
+		0,
+		"",
+		-1,
+		"",
+		null
+	)
 
-  companion object {
-    fun insertPriceAlarm(
-      priceAlarmClockTable: PriceAlarmClockTable,
-      callback: () -> Unit
-    ) {
-      doAsync {
-        GoldStoneDataBase.database.priceAlarmClockDao().apply {
-          insertPriceAlarmClock(priceAlarmClockTable)
-        }
-        GoldStoneAPI.context.runOnUiThread {
-          callback()
-        }
-      }
-    }
+	companion object {
+		fun insertPriceAlarm(
+			priceAlarmClockTable: PriceAlarmClockTable,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.priceAlarmClockDao().apply {
+					insertPriceAlarmClock(priceAlarmClockTable)
+				}
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
+			}
+		}
 
-    fun updatePriceAlarm(
-      priceAlarmClockTable: PriceAlarmClockTable,
-      callback: () -> Unit
-    ) {
-      doAsync {
-        GoldStoneDataBase.database.priceAlarmClockDao().apply {
-          updatePriceAlarmClock(priceAlarmClockTable)
-        }
-        GoldStoneAPI.context.runOnUiThread {
-          callback()
-        }
-      }
-    }
+		fun updatePriceAlarm(
+			priceAlarmClockTable: PriceAlarmClockTable,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.priceAlarmClockDao().apply {
+					updatePriceAlarmClock(priceAlarmClockTable)
+				}
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
+			}
+		}
 
-    fun deleteAllAlarm(callback: () -> Unit) {
-      doAsync {
-        GoldStoneDataBase.database.priceAlarmClockDao().apply {
-          deleteAllPriceAlarmClock()
-        }
+		fun deleteAllAlarm(callback: () -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.priceAlarmClockDao().apply {
+					deleteAllPriceAlarmClock()
+				}
 
-        GoldStoneAPI.context.runOnUiThread {
-          callback()
-        }
-      }
-    }
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
+			}
+		}
 
-    fun deleteAlarm(
-      priceAlarmClockTable: PriceAlarmClockTable,
-      callback: () -> Unit
-    ) {
-      doAsync {
-        GoldStoneDataBase.database.priceAlarmClockDao().apply {
-          deletePriceAlarmClock(priceAlarmClockTable)
-        }
-        GoldStoneAPI.context.runOnUiThread {
-          callback()
-        }
-      }
-    }
+		fun deleteAlarm(
+			priceAlarmClockTable: PriceAlarmClockTable,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.priceAlarmClockDao().apply {
+					deletePriceAlarmClock(priceAlarmClockTable)
+				}
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
+				}
+			}
+		}
 
-    fun getAllPriceAlarm(hold: (ArrayList<PriceAlarmClockTable>) -> Unit) {
-      coroutinesTask(
-        {
-          GoldStoneDataBase.database.priceAlarmClockDao().selectPriceAlarmClocks()
-        }) {
-        val size = it.size - 1
-        for (index: Int in 0..size) {
-          it[index].position = index
-        }
-        hold(it.toArrayList())
-      }
-    }
-  }
+		fun getAllPriceAlarm(hold: (ArrayList<PriceAlarmClockTable>) -> Unit) {
+			coroutinesTask(
+				{
+					GoldStoneDataBase.database.priceAlarmClockDao().selectPriceAlarmClocks()
+				}) {
+				val size = it.size - 1
+				for (index: Int in 0..size) {
+					it[index].position = index
+				}
+				hold(it.toArrayList())
+			}
+		}
+	}
 }
 
 /**
@@ -142,46 +131,49 @@ data class PriceAlarmClockTable(
 @Dao
 interface PriceAlarmClockDao {
 
-  @Insert
-  fun insertPriceAlarmClock(user: PriceAlarmClockTable)
+	@Insert
+	fun insertPriceAlarmClock(user: PriceAlarmClockTable)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insertPriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insertPriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
 
-  @Delete
-  fun deletePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
+	@Delete
+	fun deletePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
 
-  @Query("DELETE FROM price_alarm_clock")
-  fun deleteAllPriceAlarmClock()
+	@Query("DELETE FROM price_alarm_clock")
+	fun deleteAllPriceAlarmClock()
 
-  @Query("select * from price_alarm_clock")
-  fun selectPriceAlarmClocks(): List<PriceAlarmClockTable>
+	@Query("select * from price_alarm_clock")
+	fun selectPriceAlarmClocks(): List<PriceAlarmClockTable>
 
-  @Update
-  fun updatePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
+	@Update
+	fun updatePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
 
-  @Update
-  fun updatePriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
+	@Update
+	fun updatePriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
 }
 
 data class AlarmConfigListModel(
-  val code: Int,
-  val list: List<ListBean>
+	val code: Int,
+	val list: List<ListBean>
 ) {
-  data class ListBean(
-    val on_off: String,
-    val name: String,
-    val value: String
-  ) {
-  }
+	data class ListBean(
+		val onOff: String,
+		val name: String,
+		val value: String
+	)
 }
 
 data class AddAlarmClockModel(
-  val code: Int,
-  val id: String
-) {
-}
+	val code: Int,
+	val id: String
+)
 
-data class DeleteAlarmClockModel(val code: Int) {
-}
+data class DeleteAlarmClockModel(val code: Int)
 
+data class PricePairModel(
+	var pair: String,
+	var price: String,
+	var marketName: String = "",
+	var pairDisplay: String = ""
+)

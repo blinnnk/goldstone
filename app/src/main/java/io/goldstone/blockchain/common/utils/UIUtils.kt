@@ -25,9 +25,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 /**
  * @date 21/03/2018 9:07 PM
  * @author KaySaith
- * @rewriteDate 10/08/2018 16:01 PM
- * @rewriter wcx
- * @description 增加TimeUtils中formatEnglishDate方法
  */
 object UIUtils {
 
@@ -96,48 +93,6 @@ object TimeUtils {
 		)
 	}
 
-	// 将时间戳转化为界面显示的英文时间格式的工具
-	fun formatEnglishDate(timeStamp: Long): String {
-		val time = timeStamp.toMillsecond()
-		val formatDateTime = DateUtils.formatDateTime(
-			GoldStoneAPI.context,
-			time,
-			DateUtils.FORMAT_SHOW_YEAR
-		)
-		val splitYear = formatDateTime.split("年")
-		val splitMonth = splitYear[1].split("月")
-		val splitDay = splitMonth[1].split("日")
-
-		var englishData = ""
-		when (splitMonth[0]) {
-			"1" ->
-				englishData = "Jan ${splitDay[0]},${splitYear[0]}"
-			"2" ->
-				englishData = "Feb ${splitDay[0]},${splitYear[0]}"
-			"3" ->
-				englishData = "Mar ${splitDay[0]},${splitYear[0]}"
-			"4" ->
-				englishData = "Apr ${splitDay[0]},${splitYear[0]}"
-			"5" ->
-				englishData = "May ${splitDay[0]},${splitYear[0]}"
-			"6" ->
-				englishData = "Jun ${splitDay[0]},${splitYear[0]}"
-			"7" ->
-				englishData = "Jul ${splitDay[0]},${splitYear[0]}"
-			"8" ->
-				englishData = "Aug ${splitDay[0]},${splitYear[0]}"
-			"9" ->
-				englishData = "Sep ${splitDay[0]},${splitYear[0]}"
-			"10" ->
-				englishData = "Oct ${splitDay[0]},${splitYear[0]}"
-			"11" ->
-				englishData = "Nov ${splitDay[0]},${splitYear[0]}"
-			"12" ->
-				englishData = "Dec ${splitDay[0]},${splitYear[0]}"
-
-		}
-		return englishData
-	}
 }
 
 fun String.toMillsecond(): Long {

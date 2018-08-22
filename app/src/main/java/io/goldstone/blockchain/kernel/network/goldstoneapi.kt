@@ -539,18 +539,16 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit = {},
 		hold: (AlarmConfigListModel?) -> Unit
 	) {
-		requestData<String>(
+		requestData<AlarmConfigListModel>(
 			APIPath.getAlarmConfigList(APIPath.currentUrl),
 			"",
 			true,
 			errorCallback,
 			isEncrypt = true
 		) {
-			val data = JSONObject(this[0])
-			val gson = Gson()
-			val addAlarmClock = gson.fromJson(data.toString(), AlarmConfigListModel::class.java)
+			val addAlarmClockList = this
 			GoldStoneAPI.context.runOnUiThread {
-				hold(addAlarmClock)
+				hold(addAlarmClockList[0])
 			}
 		}
 	}
@@ -604,6 +602,15 @@ object GoldStoneAPI {
 				val addAlarmClock = gson.fromJson(it, AddAlarmClockModel::class.java)
 				hold(addAlarmClock)
 			}
+			postRequestGetJsonObject<AddAlarmClockModel>(
+				it,
+				"data_list",
+				APIPath.addAlarmClock(APIPath.currentUrl),
+				errorCallback = errorCallback,
+				isEncrypt = true
+			) {
+				hold(it[0])
+			}
 		}
 	}
 
@@ -617,18 +624,17 @@ object GoldStoneAPI {
 			requestContentType,
 			ParameterUtil.prepare(
 				true,
-				Pair("id", "" + priceAlarmClockTable.addId)
+				Pair("id", priceAlarmClockTable.addId.toString())
 			)
 		).let {
-			postRequest(
+			postRequestGetJsonObject<DeleteAlarmClockModel>(
 				it,
+				"data_list",
 				APIPath.deleteAlarmClock(APIPath.currentUrl),
-				errorCallback,
-				true
+				errorCallback = errorCallback,
+				isEncrypt = true
 			) {
-				val gson = Gson()
-				val deleteAlarmClock = gson.fromJson(it, DeleteAlarmClockModel::class.java)
-				hold(deleteAlarmClock)
+				hold(it[0])
 			}
 		}
 	}

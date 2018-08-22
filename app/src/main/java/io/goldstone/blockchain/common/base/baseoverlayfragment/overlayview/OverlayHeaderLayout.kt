@@ -174,15 +174,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun onlyShowAddButton() {
-		addButton.visibility = View.VISIBLE
-	}
-
-	fun onlyHideAddButton() {
-		addButton.visibility = View.GONE
-	}
-
-	fun showdeleteButton(
+	fun showDeleteButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
 	) {

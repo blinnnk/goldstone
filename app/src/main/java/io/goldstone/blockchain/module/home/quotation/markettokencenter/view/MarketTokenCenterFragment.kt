@@ -70,14 +70,6 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 				// `MenuBar` 滑动选中动画
 				onPageChangeListener {
 					onPageScrolled { position, percent, _ ->
-						getParentFragment<QuotationOverlayFragment> {
-							if (position == 0) {
-								overlayView.header.onlyHideAddButton()
-							} else {
-								overlayView.header.onlyShowAddButton()
-							}
-						}
-
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 					}
 				}

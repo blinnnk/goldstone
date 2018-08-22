@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
@@ -26,8 +25,9 @@ import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmClockReceiver
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclockoverlay.presenter.PriceAlarmStatusObserver
+import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmClockReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
 
-		backgroundFlag = true
+		XinGePushReceiver.backgroundFlag = true
 		// 轮询价格闹铃监听
 		priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
 
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onResume() {
 		super.onResume()
-		backgroundFlag = true
+		XinGePushReceiver.backgroundFlag = true
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
 		showNotificationAlarmPopUps(currentIntent ?: intent)
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onStop() {
 		super.onStop()
-		backgroundFlag = false
+		XinGePushReceiver.backgroundFlag = false
 	}
 
 	fun sendAnalyticsData(className: String) {
@@ -267,9 +267,10 @@ class MainActivity : AppCompatActivity() {
 			}
 
 			getCancelButton().apply {
+				val context = this.context
 				text = AlarmClockText.viewAlarm
 				onClick {
-					(getContext() as Activity).addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+					(context as Activity).addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 						putString(
 							ArgumentKey.priceAlarmClockTitle,
 							AlarmClockText.viewAlarm
@@ -297,20 +298,12 @@ class MainActivity : AppCompatActivity() {
 			}
 
 			setImage(R.drawable.price_alarm_banner)
-			setImageLayoutParams(
-				300.uiPX(),
-				180.uiPX()
-			)
 
 			setContent(
 				alarmInfo.title,
 				alarmInfo.content
 			)
 		}
-	}
-
-	companion object {
-		var backgroundFlag = false
 	}
 
 	private fun registerReceiver() {
