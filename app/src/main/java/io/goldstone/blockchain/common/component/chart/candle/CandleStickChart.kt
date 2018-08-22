@@ -105,8 +105,8 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
     invalidate()
 	
 	
-		calcuteHandler.removeCallbacks(calcuteRunnable)
-		calcuteHandler.post(calcuteRunnable)
+		calculateHandler.removeCallbacks(calculateRunnable)
+		calculateHandler.post(calculateRunnable)
   }
   
   private fun resetAxisStyle() {
@@ -241,7 +241,7 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 	 * @author: yanglihai
 	 * @description: 计算图标显示的第一个蜡烛的下标
 	 */
-	private fun calcuteVisibleIndes() {
+	private fun calculateVisibleIndex() {
 		val trans = getTransformer(mData.dataSets[0].axisDependency)
 		val buffers = FloatArray(4)
 		realData.forEachIndexed {
@@ -264,17 +264,14 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 		}
 	}
 	
-	private val calcuteHandler = Handler()
+	private val calculateHandler = Handler()
 	
-	private val calcuteRunnable = Runnable {
-		doAsync {
-			calcuteVisibleIndes()
-		}
+	private val calculateRunnable = Runnable {
+		doAsync { calculateVisibleIndex() }
 	}
-	
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
-		calcuteHandler.removeCallbacks(calcuteRunnable)
+		calculateHandler.removeCallbacks(calculateRunnable)
 	}
 	
 	/**
@@ -287,9 +284,7 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 		mIndicesToHighlight?.apply {
 			tempHighlight = arrayOf(this[0])
 		}
-		
 		super.clear()
-		
 		tempHighlight?.apply {
 			mIndicesToHighlight = this
 		}
@@ -298,15 +293,9 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 	private fun formateDateByType(date: Long) : String {
 		val formatDateString: String
 		when(dateType) {
-			DateUtils.FORMAT_SHOW_TIME -> {
-				formatDateString = TimeUtils.formathmDate(date)
-			}
-			else -> {
-				formatDateString = TimeUtils.formatMdDate(date)
-			}
+			DateUtils.FORMAT_SHOW_TIME -> formatDateString = TimeUtils.formathmDate(date)
+			else -> formatDateString = TimeUtils.formatMdDate(date)
 		}
-		
 		return formatDateString
 	}
-	
 }

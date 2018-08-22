@@ -20,7 +20,10 @@ import com.github.mikephil.charting.utils.Utils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.component.chart.XValueFormatter
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import java.util.*
 
 /**
@@ -32,7 +35,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	
 	private var chartColor: Int = Color.RED
 	private var chartShadowResource: Int = R.drawable.fade_red
-	
+	private var labelTextSize = fontSize(8)
 	abstract fun isDrawPoints(): Boolean
 	abstract fun isPerformBezier(): Boolean
 	abstract fun dragEnable() : Boolean
@@ -60,12 +63,13 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		initAxisStyle()
 	}
 	
-	fun initAxisStyle() {
+	protected fun initAxisStyle() {
 		
 		chartColor = Color.RED
+		labelTextSize = fontSize(8)
 		
-		val gridlineColor = Color.rgb(236, 236, 236)
-		val labelColor = Color.rgb(152, 152, 152)
+		val gridlineColor = GrayScale.lightGray
+		val labelColor = GrayScale.midGray
 		
 		isScaleXEnabled = false
 		isScaleYEnabled = false
@@ -98,7 +102,11 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 							result = if (entry.data == 0) "" else  TimeUtils.formatMdDate(entry.data as Long)
 						}
 						if (entry.data is String) {
-							result = if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+							try {
+								result = if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+							}catch (exception: NumberFormatException) {
+								result = entry.data.toString()
+							}
 						}
 					}else {
 						result = ""
@@ -114,12 +122,16 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			System.out.println("+++$labelColor")
 			textColor = labelColor
 			mAxisMinimum = 10f
+			textSize = labelTextSize
+			typeface = GoldStoneFont.heavy(context)
 		}
 		mAxisLeft.apply {
 			axisLineColor = gridlineColor
 			gridColor = gridlineColor
-			textColor = Color.rgb(152, 152, 152)
+			textColor = labelColor
 			setLabelCount(4, true)
+			textSize = labelTextSize
+			typeface = GoldStoneFont.heavy(context)
 		}
 		
 		axisRight.apply {
@@ -203,6 +215,8 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				setVisibleXRangeMinimum(xRangeVisibleNum)
 			}
 		}
+		
+		invalidate()
 	}
 	
 	fun setChartColorAndShadowResource(color: Int, resource: Int) {
