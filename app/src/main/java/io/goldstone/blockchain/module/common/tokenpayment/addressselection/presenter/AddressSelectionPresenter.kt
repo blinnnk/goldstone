@@ -104,7 +104,7 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (isValidMultiChainAddress(toAddress)) {
+		when (isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
 			null -> {
 				fragment.context?.alert(ImportWalletText.addressFromatAlert)
 				return

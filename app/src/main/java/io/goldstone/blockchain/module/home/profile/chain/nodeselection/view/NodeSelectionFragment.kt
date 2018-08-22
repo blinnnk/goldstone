@@ -122,7 +122,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}
 				confirmButton.apply {
 					text = CommonText.confirm
-					setBlueStyle(50.uiPX())
+					setBlueStyle(30.uiPX())
 				}.click { _ ->
 					fromMainnetSetting?.let { it ->
 						// 更新是否是测试环境的参数

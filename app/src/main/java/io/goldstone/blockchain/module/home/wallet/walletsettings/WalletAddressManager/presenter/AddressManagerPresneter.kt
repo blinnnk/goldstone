@@ -554,9 +554,11 @@ class AddressManagerPresneter(
 				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
 				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
-				Pair(R.drawable.bch_creator_icon, WalletText.getBCHLegacyAddress)
+				Pair(R.drawable.bch_address_convert_icon, WalletText.getBCHLegacyAddress)
 			).apply {
+				// 如果当前 `Cell` 就是默认地址, 不限时设置默认地址的选项
 				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
+				// 如果当前 `Cell` 不是 `BCH` 那么不限时转换 `BCH` 地址的选项
 				if (!isBCH) remove(find { it.second == WalletText.getBCHLegacyAddress })
 			}
 		}

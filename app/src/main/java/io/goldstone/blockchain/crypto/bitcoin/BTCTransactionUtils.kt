@@ -127,7 +127,6 @@ object BTCSeriesTransactionUtils {
 			// 把消费列表的值加起来
 			money += it.value
 		}
-
 		// 输出-转给别人
 		transaction.addOutput(
 			Coin.valueOf(sendValue),
@@ -148,8 +147,8 @@ object BTCSeriesTransactionUtils {
 
 			val outPoint = TransactionOutPoint(network, it.index, it.hash)
 			if (isBCH) {
-				// `BCH` 的签名需要 `ForkeID` 控件里的方法有 `BUG` 这里重新自定义了有方法
-				transaction.addSignedInputd(
+				// `BCH` 的签名需要 `ForkID` 控件里的方法有 `BUG` 这里重新自定义了有方法
+				transaction.addBCHSignedInput(
 					outPoint,
 					it.script,
 					ecKey,
@@ -173,7 +172,7 @@ object BTCSeriesTransactionUtils {
 }
 
 @Throws(ScriptException::class)
-fun Transaction.addSignedInputd(
+fun Transaction.addBCHSignedInput(
 	prevOut: TransactionOutPoint,
 	scriptPubKey: Script,
 	sigKey: ECKey,

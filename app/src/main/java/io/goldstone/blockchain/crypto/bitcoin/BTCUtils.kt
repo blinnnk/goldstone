@@ -2,6 +2,7 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
@@ -58,10 +59,11 @@ object BTCUtils {
 		return isValidTestnetAddress(address) || isValidMainnetAddress(address)
 	}
 
-	fun isValidMultiChainAddress(address: String): AddressType? {
+	fun isValidMultiChainAddress(address: String, symbol: String? = null): AddressType? {
 		return when {
 			Address(address).isValid() -> AddressType.ETHERCOrETC
-			isValidMainnetAddress(address) -> AddressType.BTC
+			isValidMainnetAddress(address)
+				&& !symbol.equals(CryptoSymbol.bch, true) -> AddressType.BTC
 			isValidTestnetAddress(address) -> AddressType.BTCSeriesTest
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
 			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH

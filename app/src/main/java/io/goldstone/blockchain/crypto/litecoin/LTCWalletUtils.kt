@@ -136,6 +136,6 @@ class LitecoinNetParams : MainNetParams() {
 		addressHeader = 48
 		p2shHeader = 5
 		dumpedPrivateKeyHeader = 176
-//		acceptableAddressCodes = intArrayOf(addressHeader, p2shHeader)
+		acceptableAddressCodes = intArrayOf(addressHeader, p2shHeader)
 	}
 }

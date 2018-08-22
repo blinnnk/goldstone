@@ -18,9 +18,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class NotificationListFragment :
 	BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
-	
+
 	override val presenter = NotificationListPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<NotificationTable>?
@@ -33,7 +33,7 @@ class NotificationListFragment :
 					} else {
 						val fromAddress: String
 						val toAddress: String
-						if (NotificationTable.getSymbol(extra.orEmpty()).equals(CryptoSymbol.btc(), true)) {
+						if (CryptoSymbol.isBTCSeriesSymbol(NotificationTable.getSymbol(extra.orEmpty()))) {
 							// TODO Bitcoin Transaction FromAddress 需要处理多 FromAddress 地址的情况
 							fromAddress =
 								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address
@@ -63,7 +63,7 @@ class NotificationListFragment :
 			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
