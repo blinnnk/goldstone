@@ -19,7 +19,7 @@ class NodeSelectionPresenter(
 ) : BasePresenter<NodeSelectionFragment>() {
 
 	/**
-	 * `ChainID` 会重复使用导致获取 `ChainName` 并不能准确, 所以切换 `Chain` 的时候存储 `NodeName`
+	 * `ChainID` 会重复使用导致获取 `Chain` 并不能准确, 所以切换 `Chain` 的时候存储
 	 */
 	fun updateERC20ChainID(nodeName: String) {
 		Config.updateCurrentChainName(nodeName)
@@ -107,7 +107,6 @@ class NodeSelectionPresenter(
 						Config.updateLTCCurrentChain(ChainID.LTCTest.id)
 						Config.updateBCHCurrentChain(ChainID.BCHTest.id)
 						Config.updateETCCurrentChain(ChainID.ETCTest.id)
-						// TODO LTC Testnet ID
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
