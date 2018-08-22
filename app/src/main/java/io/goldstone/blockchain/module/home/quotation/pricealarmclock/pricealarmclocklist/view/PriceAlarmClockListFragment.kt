@@ -37,7 +37,7 @@ import org.jetbrains.anko.wrapContent
 class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPresenter, PriceAlarmClockTable>() {
 	private lateinit var priceAlarmClockListAdapter: PriceAlarmClockListAdapter
 	private var nowAlarmSize = 1
-	private var maxAlarmSize = 8
+	private var maxAlarmSize = 50
 	private var priceAlarmClockCreatorView: PriceAlarmClockCreaterView? = null
 	override val presenter: PriceAlarmClockListPresenter = PriceAlarmClockListPresenter(this)
 	private val quotationModel by lazy { getParentFragment<MarketTokenCenterFragment>()?.currencyInfo }
@@ -53,13 +53,7 @@ class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPres
 			topMargin = 15.uiPX()
 		}
 		presenter.getAlarmConfigList {
-			val alarmConfigArrayList = this.list
-			val size = alarmConfigArrayList.size - 1
-			for (index: Int in 0..size) {
-				if (alarmConfigArrayList[index].name == "alertMaxCount") {
-					maxAlarmSize = alarmConfigArrayList[index].value.toInt()
-				}
-			}
+			maxAlarmSize = this
 		}
 		presenter.getExistingAlarmAmount {
 			nowAlarmSize = this
@@ -104,35 +98,19 @@ class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPres
 			getParentFragment<QuotationOverlayFragment> {
 				overlayView.header.showAddButton(true) {
 					quotationModel?.let {
-						showAddAlarmClockDashboard(overlayView)
+						showAddAlarmClockDashboard(overlayView, it)
 					}
 				}
 			}
 		}
 	}
 
-	private fun showAddAlarmClockDashboard(overlayView: OverlayView) {
+	private fun showAddAlarmClockDashboard(
+		overlayView: OverlayView,
+		quotationModel: QuotationModel
+	) {
 		if (nowAlarmSize < maxAlarmSize) {
-			if (quotationModel?.price == ValueTag.emptyPrice) {
-				quotationModel?.price = "0"
-			}
-			val priceAlarmClockTable = PriceAlarmClockTable(
-				0,
-				"0",
-				"",
-				quotationModel?.exchangeName ?: "",
-				quotationModel?.quoteSymbol?.toUpperCase() ?: "",
-				quotationModel?.price ?: "",
-				quotationModel?.price ?: "",
-				false,
-				quotationModel?.pair ?: "",
-				0,
-				0,
-				quotationModel?.pairDisplay ?: "",
-				-1,
-				quotationModel?.symbol ?: "",
-				quotationModel?.name
-			)
+			val priceAlarmClockTable = PriceAlarmClockTable(quotationModel)
 			overlayView.apply {
 				DashboardOverlay(context) {
 					priceAlarmClockCreatorView = PriceAlarmClockCreaterView(context).apply {
@@ -144,17 +122,17 @@ class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPres
 						setPriceChooseContent(priceAlarmClockTable)
 						setCurrencyName(priceAlarmClockTable.currencyName)
 						setAlarmChooseContent(priceAlarmClockTable.alarmType)
-						val moreThanCell = getMoreThanPriceCell()
-						val lessThanCell = getLessThanPriceCell()
-						moreThanCell.setOnClickListener {
-							moreThanCell.setSwitchStatusBy(true)
-							lessThanCell.setSwitchStatusBy(false)
+						val greaterThanPriceCell = getGreaterThanPriceCell()
+						val lessThanPriceCell = getLessThanPriceCell()
+						greaterThanPriceCell.setOnClickListener {
+							greaterThanPriceCell.setSwitchStatusBy(true)
+							lessThanPriceCell.setSwitchStatusBy(false)
 							setPriceType(0)
 							setAutomaticChoosePriceType(true)
 						}
-						lessThanCell.setOnClickListener {
-							moreThanCell.setSwitchStatusBy(false)
-							lessThanCell.setSwitchStatusBy(true)
+						lessThanPriceCell.setOnClickListener {
+							greaterThanPriceCell.setSwitchStatusBy(false)
+							lessThanPriceCell.setSwitchStatusBy(true)
 							setPriceType(1)
 							setAutomaticChoosePriceType(true)
 						}
@@ -163,13 +141,13 @@ class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPres
 				}.apply {
 					confirmEvent = Runnable {
 						// 点击事件
-						val formatEnglishDate = TimeUtils.formatDate(System.currentTimeMillis())
+						val formatDate = TimeUtils.formatDate(System.currentTimeMillis())
 						priceAlarmClockTable.price = priceAlarmClockCreatorView?.getTargetPriceEditTextContent() ?: ""
 						priceAlarmClockTable.priceType = priceAlarmClockCreatorView?.getPriceType() ?: 0
 						priceAlarmClockTable.alarmType = priceAlarmClockCreatorView?.getAlarmTypeView()?.getAlarmType() ?: 0
-						priceAlarmClockTable.createTime = formatEnglishDate
+						priceAlarmClockTable.createTime = formatDate
 						priceAlarmClockTable.status = true
-						presenter.addDatabaseAlarmClock(priceAlarmClockTable) {
+						presenter.insertAlarmClockToDatabase(priceAlarmClockTable) {
 							presenter.getDatabaseDataRefreshList {
 								presenter.updateData()
 								nowAlarmSize = this.size
@@ -191,7 +169,4 @@ class PriceAlarmClockListFragment : BaseRecyclerFragment<PriceAlarmClockListPres
 		return quotationModel
 	}
 
-	fun getAdapter(): PriceAlarmClockListAdapter {
-		return priceAlarmClockListAdapter
-	}
 }

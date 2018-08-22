@@ -240,10 +240,7 @@ object AlarmClockText {
 		else -> ""
 	}
 
-	val priceAlarmContent: (
-		pricePairModel: PricePairModel,
-		priceAlarmClockTable: PriceAlarmClockTable
-	) -> String = { pricePairModel, priceAlarmClockTable ->
+	val priceAlarmContent: (priceAlarmClockTable: PriceAlarmClockTable) -> String = { priceAlarmClockTable ->
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
 				""
@@ -256,10 +253,10 @@ object AlarmClockText {
 				""
 			}
 			HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
-				"${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price},高于于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice},高于于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
 					"你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
 			} else {
-				"${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price},低于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice},低于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
 					"你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
 			}
 			HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
@@ -281,10 +278,7 @@ object AlarmClockText {
 		}
 	}
 
-	val priceAlarmNotificationContent: (
-		pricePairModel: PricePairModel,
-		priceAlarmClockTable: PriceAlarmClockTable
-	) -> String = { pricePairModel, priceAlarmClockTable ->
+	val priceAlarmNotificationContent: (priceAlarmClockTable: PriceAlarmClockTable) -> String = { priceAlarmClockTable ->
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
 				""
@@ -297,9 +291,9 @@ object AlarmClockText {
 				""
 			}
 			HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
-				"${pricePairModel.marketName}市场的${pricePairModel.pairDisplay}达到${pricePairModel.price}，已高于您设定的目标${priceAlarmClockTable.price}"
+				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice}，已高于您设定的目标${priceAlarmClockTable.price}"
 			} else {
-				"${pricePairModel.marketName} 市场的${pricePairModel.pairDisplay}达到${pricePairModel.price}，已低于您设定的目标${priceAlarmClockTable.price}"
+				"${priceAlarmClockTable.marketName} 市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice}，已低于您设定的目标${priceAlarmClockTable.price}"
 			}
 			HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
 				""

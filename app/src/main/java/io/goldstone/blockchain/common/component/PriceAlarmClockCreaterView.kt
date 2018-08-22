@@ -175,11 +175,7 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 							inputPrice.toString(),
 							priceAlarmClockTable.currencyName
 						)
-						if (inputPrice < priceAlarmClockTable.marketPrice.toDouble()) {
-							changePriceType(false)
-						} else {
-							changePriceType(true)
-						}
+						changePriceType(inputPrice > priceAlarmClockTable.marketPrice.toDouble())
 					}
 				}
 			}
@@ -219,7 +215,7 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 		this.automaticChoosePriceTypeFlag = automaticChoosePriceTypeFlag
 	}
 
-	fun getMoreThanPriceCell(): BaseRadioCell {
+	fun getGreaterThanPriceCell(): BaseRadioCell {
 		return priceTypeView.getRepeatingCell()
 	}
 

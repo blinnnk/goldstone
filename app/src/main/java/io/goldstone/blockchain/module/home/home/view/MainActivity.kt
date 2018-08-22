@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 		val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
 		if (goldStoneDialogFlag) {
 			GoldStoneDialog.show(this) {
-				showButtons(AlarmClockText.gotIt) {
+				showButtons(AlarmClockText.viewAlarm) {
 					confirmButtonClickEvent()
 				}
 				setGoldStoneDialog(
@@ -235,16 +235,10 @@ class MainActivity : AppCompatActivity() {
 				priceAlarmStatusObserver.removeDialog(goldStoneDialog)
 			}
 			goldStoneDialog.into(findViewById<RelativeLayout>(ContainerID.main))
-			goldStoneDialog.apply {
-				setGoldStoneDialog(
-					this,
-					alarmInfo as XGPushClickedResult
-				)
-			}
 		}
 	}
 
-	private fun confirmButtonClickEvent() {
+	private fun cancelButtonClickEvent() {
 		PriceAlarmClockUtils.stopAlarmReceiver(
 			this,
 			1
@@ -254,46 +248,42 @@ class MainActivity : AppCompatActivity() {
 		this.findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
 	}
 
+	private fun confirmButtonClickEvent() {
+		addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+			putString(
+				ArgumentKey.priceAlarmClockTitle,
+				AlarmClockText.viewAlarm
+			)
+			putSerializable(
+				ArgumentKey.quotationOverlayInfo, QuotationModel(
+					"symbol",
+					"name",
+					"price",
+					"",
+					ArrayList(),
+					"marketName",
+					0.0,
+					"pairDisplay",
+					"pair",
+					"currencyName",
+					"",
+					false
+				)
+			)
+
+			cancelButtonClickEvent()
+		}
+	}
+
 	private fun setGoldStoneDialog(
 		goldStoneDialog: GoldStoneDialog,
 		alarmInfo: XGPushClickedResult
 	) {
 		goldStoneDialog.apply {
-			getConfirmButton().apply {
+			getCancelButton().apply {
 				text = AlarmClockText.gotIt
 				onClick {
-					confirmButtonClickEvent()
-				}
-			}
-
-			getCancelButton().apply {
-				val context = this.context
-				text = AlarmClockText.viewAlarm
-				onClick {
-					(context as Activity).addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-						putString(
-							ArgumentKey.priceAlarmClockTitle,
-							AlarmClockText.viewAlarm
-						)
-						putSerializable(
-							ArgumentKey.quotationOverlayInfo, QuotationModel(
-								"symbol",
-								"name",
-								"price",
-								"-3.642",
-								ArrayList(),
-								"marketName",
-								1.0,
-								"pairDisplay",
-								"pair",
-								"currencyName",
-								"0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0",
-								false
-							)
-						)
-
-						confirmButtonClickEvent()
-					}
+					cancelButtonClickEvent()
 				}
 			}
 

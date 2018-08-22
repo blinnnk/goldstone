@@ -3,8 +3,12 @@ package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarm
 import android.arch.persistence.room.*
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
@@ -53,15 +57,34 @@ data class PriceAlarmClockTable(
 		null
 	)
 
+	constructor(quotationModel: QuotationModel) : this(
+		0,
+		"0",
+		"",
+		quotationModel.exchangeName,
+		quotationModel.quoteSymbol.toUpperCase(),
+		if (quotationModel.price == ValueTag.emptyPrice) "0" else quotationModel.price,
+		quotationModel.price,
+		false,
+		quotationModel.pair,
+		0,
+		0,
+		quotationModel.pairDisplay,
+		-1,
+		quotationModel.symbol,
+		quotationModel.name
+	)
+
 	companion object {
 		fun insertPriceAlarm(
 			priceAlarmClockTable: PriceAlarmClockTable,
 			callback: () -> Unit
 		) {
-			doAsync {
+			load {
 				GoldStoneDataBase.database.priceAlarmClockDao().apply {
 					insertPriceAlarmClock(priceAlarmClockTable)
 				}
+			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
@@ -72,10 +95,11 @@ data class PriceAlarmClockTable(
 			priceAlarmClockTable: PriceAlarmClockTable,
 			callback: () -> Unit
 		) {
-			doAsync {
+			load {
 				GoldStoneDataBase.database.priceAlarmClockDao().apply {
 					updatePriceAlarmClock(priceAlarmClockTable)
 				}
+			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
@@ -83,11 +107,11 @@ data class PriceAlarmClockTable(
 		}
 
 		fun deleteAllAlarm(callback: () -> Unit) {
-			doAsync {
+			load {
 				GoldStoneDataBase.database.priceAlarmClockDao().apply {
 					deleteAllPriceAlarmClock()
 				}
-
+			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
@@ -98,10 +122,11 @@ data class PriceAlarmClockTable(
 			priceAlarmClockTable: PriceAlarmClockTable,
 			callback: () -> Unit
 		) {
-			doAsync {
+			load {
 				GoldStoneDataBase.database.priceAlarmClockDao().apply {
 					deletePriceAlarmClock(priceAlarmClockTable)
 				}
+			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
@@ -113,8 +138,8 @@ data class PriceAlarmClockTable(
 				{
 					GoldStoneDataBase.database.priceAlarmClockDao().selectPriceAlarmClocks()
 				}) {
-				val size = it.size - 1
-				for (index: Int in 0..size) {
+				val size = it.size
+				for (index: Int in 0 until size) {
 					it[index].position = index
 				}
 				hold(it.toArrayList())

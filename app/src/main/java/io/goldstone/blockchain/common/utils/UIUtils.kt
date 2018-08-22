@@ -92,7 +92,6 @@ object TimeUtils {
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
-
 }
 
 fun String.toMillsecond(): Long {
