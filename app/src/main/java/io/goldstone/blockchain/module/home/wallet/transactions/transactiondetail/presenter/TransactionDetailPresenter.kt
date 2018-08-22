@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
@@ -124,7 +125,7 @@ class TransactionDetailPresenter(
 							fragment.getMainActivity()?.apply {
 								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
 									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-									putString(ArgumentKey.address, address)
+									putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
 								}
 							}
 							preventDuplicateClicks()

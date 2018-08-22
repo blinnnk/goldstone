@@ -27,7 +27,7 @@ import org.jetbrains.anko.textColor
  */
 class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 	
-	var addressCells: List<TransactionAddressCell> = listOf()
+	private var addressCells: List<TransactionAddressCell> = listOf()
 	var model: TransactionDetailModel by observing(TransactionDetailModel()) {
 		if (
 			model.description.equals(CommonText.from, true)

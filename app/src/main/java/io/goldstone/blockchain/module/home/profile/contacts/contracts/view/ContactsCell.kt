@@ -80,6 +80,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 			Pair("${CryptoSymbol.etc}/${CryptoSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
 			Pair(CryptoSymbol.btc(), btcMainnetAddress.isNotEmpty()),
 			Pair(CryptoSymbol.ltc, ltcAddress.isNotEmpty()),
+			Pair(CryptoSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
 		)
 		val count = addresses.filter { it.second }.size

@@ -96,3 +96,12 @@ fun String.showAfterColonContent(): String {
 	return if (contains(":")) toString().substringAfter(":")
 	else this
 }
+
+inline fun<reified T: Fragment> Fragment.getChildFragment(): T? {
+	return try {
+		childFragmentManager.fragments.find { it is T } as? T
+	} catch (error: Exception) {
+		LogUtil.error("getChildFragment", error)
+		null
+	}
+}

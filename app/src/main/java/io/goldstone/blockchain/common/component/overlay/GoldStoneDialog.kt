@@ -129,7 +129,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			hold: GoldStoneDialog.() -> Unit
 		) {
 			// 判断父级所在主题添加到不同的顶层 `Layout` 里面
-			(context as? Activity)?.let {
+			(context as? Activity)?.let { it ->
 				when (it) {
 					is SplashActivity -> {
 						it.findViewById<RelativeLayout>(ContainerID.splash)?.apply {

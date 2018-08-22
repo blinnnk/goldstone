@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.bitcoincash;
 
-/**
+/*
  * @author KaySaith
  * @date 2018/8/15 10:56 AM
  */
@@ -139,7 +139,7 @@ public class BCHUtil {
     return ret;
   }
 
-  private String bechEncode(byte[] payload, String prefix) {
+  private String bchEncode(byte[] payload, String prefix) {
     byte[] checksum = createChecksum(prefix, payload);
     byte[][] combined = new byte[][]{payload, checksum};
     StringBuilder ret = new StringBuilder(prefix).append(':');
@@ -161,7 +161,7 @@ public class BCHUtil {
   /**
    * bch old address to new address (payload)
    */
-  public String encodeCashAdrressByLegacy(String btc) {
+  public String encodeCashAddressByLegacy(String btc) {
     byte[] b58 = Base58.decode(btc);
     if (b58.length != 25) {
       throw new IllegalArgumentException("Bitcoin address is 25 bytes !");
@@ -187,7 +187,7 @@ public class BCHUtil {
       throw new IllegalArgumentException("unsupport format");
     }
     byte[] payload = payloadEncode(b58, len);
-    return bechEncode(payload, prefix);
+    return bchEncode(payload, prefix);
   }
 
 

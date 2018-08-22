@@ -122,7 +122,7 @@ class SplashActivity : AppCompatActivity() {
 			WalletTable.getAll {
 				if (isNotEmpty()) {
 					registerDeviceForPush()
-					// 把 `GoldStoneID` 存储到 `Sharepreference` 里面
+					// 把 `GoldStoneID` 存储到 `SharePreference` 里面
 					Config.updateGoldStoneID(goldStoneID)
 				}
 			}

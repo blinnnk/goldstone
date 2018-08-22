@@ -4,10 +4,7 @@ import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.TinyNumber
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
@@ -56,15 +53,15 @@ class TokenSearchPresenter(
 				}
 			) { defaultTokens ->
 				canSearch isTrue {
-					searchTokenByContractOrSymbol(defaultTokens) { reesult ->
+					searchTokenByContractOrSymbol(defaultTokens) { result ->
 						context?.runOnUiThread {
 							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
 								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
-								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult.filterNot {
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot {
 									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
 								}.toArrayList())
 							} else {
-								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(reesult)
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result)
 							}
 							fragment.removeLoadingView()
 						}
@@ -116,7 +113,7 @@ class TokenSearchPresenter(
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		fragment.showLoadingView(LoadingText.searchingToken)
-		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
+		GoldStoneAPI.getTokenInfoBySymbolFromServer(
 			content,
 			{ it ->
 				// Usually this kinds of Exception will be connect to the service Timeout
@@ -130,16 +127,20 @@ class TokenSearchPresenter(
 			MyTokenTable.getMyTokens { localTokens ->
 				if (!result.isNullOrEmpty()) {
 					// 从服务器请求目标结果
-					hold(result.map { serverToken ->
-						// 更新使用中的按钮状态
-						DefaultTokenTable(serverToken).apply {
-							val status = localTokens.any {
-								it.contract.equals(serverToken.contract, true)
+					try {
+						hold(result.map { serverToken ->
+							// 更新使用中的按钮状态
+							DefaultTokenTable(serverToken).apply {
+								val status = localTokens.any {
+									it.contract.equals(serverToken.contract, true)
+								}
+								isDefault = status
+								isUsed = status
 							}
-							isDefault = status
-							isUsed = status
-						}
-					}.toArrayList())
+						}.toArrayList())
+					} catch (error: Exception) {
+						LogUtil.error("getTokenInfoBySymbolFromServer", error)
+					}
 				} else {
 					if (isSearchingSymbol) {
 						hold(arrayListOf())

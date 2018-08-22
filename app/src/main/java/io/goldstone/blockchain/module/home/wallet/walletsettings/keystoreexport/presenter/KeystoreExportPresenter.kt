@@ -45,12 +45,10 @@ class KeystoreExportPresenter(
 		hold: String?.() -> Unit
 	) {
 		// `BCH` 的地址包含 `:` 所以作为判断条件之一
-		val isBTCSeries =
-			address.length == CryptoValue.bitcoinAddressLength || address.contains(":")
 		doAsync {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (isBTCSeries) {
+			if (CryptoValue.isBTCSeriesAddress(address)) {
 				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}

@@ -58,20 +58,13 @@ class AddressSelectionPresenter(
 				}
 			} else {
 				when {
-					token?.symbol.equals(CryptoSymbol.btc(), true) -> {
-						DepositPresenter.convertBitcoinQRCode(result).let {
-							isCorrectCoinOrChainID(it) {
-								showPaymentPrepareFragment(it.walletAddress, it.amount)
-							}
+					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
+						val qrModel =
+							DepositPresenter.convertBitcoinQRCode(result)
+						if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
+						else isCorrectCoinOrChainID(qrModel!!) {
+							showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
 						}
-					}
-
-					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
-						// TODO LTC By Code
-					}
-
-					token?.symbol.equals(CryptoSymbol.bch, true) -> {
-						// TODO BCH By Code
 					}
 
 					token?.symbol.equals(CryptoSymbol.etc, true)
@@ -111,10 +104,8 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.ETHERCOrETC -> {
-				if (token?.symbol.equals(CryptoSymbol.btc(), true)) {
-					fragment.context.alert(
-						"this is not a valid bitcoin address"
-					)
+				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
+					fragment.context.alert("this is not a valid bitcoin address")
 					return
 				}
 
@@ -235,6 +226,38 @@ class AddressSelectionPresenter(
 				}
 			}
 
+			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.ltcContract, true) -> {
+						fragment.context.alert(QRText.invalidContract)
+						return
+					}
+
+					!qrModel.chainID.equals(Config.getLTCCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+
+					else -> callback()
+				}
+			}
+
+			token?.symbol.equals(CryptoSymbol.bch, true) -> {
+				when {
+					!qrModel.contractAddress.equals(CryptoValue.bchContract, true) -> {
+						fragment.context.alert(QRText.invalidContract)
+						return
+					}
+
+					!qrModel.chainID.equals(Config.getBCHCurrentChain(), true) -> {
+						fragment.context.alert(CommonText.wrongChainID)
+						return
+					}
+
+					else -> callback()
+				}
+			}
+
 			else -> {
 				when {
 					!qrModel.contractAddress.equals(token?.contract, true) -> {
@@ -315,6 +338,13 @@ class AddressSelectionPresenter(
 								defaultAddress =
 									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
 									else it.ltcAddress
+							}
+						}.toArrayList()
+						token?.symbol.equals(CryptoSymbol.bch, true) -> contacts.map {
+							it.apply {
+								defaultAddress =
+									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+									else it.bchAddress
 							}
 						}.toArrayList()
 						else -> contacts.map {

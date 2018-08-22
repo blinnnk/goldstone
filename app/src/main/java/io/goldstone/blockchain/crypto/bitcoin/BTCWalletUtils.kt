@@ -21,7 +21,7 @@ object BTCWalletUtils {
 		val seed = Mnemonic.mnemonicToSeed(mnemonicCode, "")
 		val keyPair =
 			ECKey.fromPrivate(generateKey(seed, path).keyPair.privateKey, true)
-		val isTest = CryptoValue.isBTCTest(CryptoValue.pathCointType(path))
+		val isTest = CryptoValue.isBTCTest(CryptoValue.pathCoinType(path))
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val currentID = if (isTest) testNetID else mainNetID

@@ -236,6 +236,17 @@ object ContactText {
 	}
 
 	@JvmField
+	val bchAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.Korean.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.Russian.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		else -> ""
+	}
+
+	@JvmField
 	val ltcAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Litecoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的莱特币主网地址"

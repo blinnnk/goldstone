@@ -1,8 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.extension.measureTextWidth
+import com.blinnnk.extension.resetViewHeightByText
 import com.blinnnk.extension.updateHeightByText
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
@@ -19,8 +22,6 @@ class TransactionDetailAdapter(
 	private val hold: TransactionDetailCell.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<TransactionDetailModel, TransactionDetailHeaderView, TransactionDetailCell, View>() {
-
-	private var hasUpdateLayoutHeight = false
 
 	override fun generateCell(context: Context) =
 		TransactionDetailCell(context)
@@ -40,17 +41,14 @@ class TransactionDetailAdapter(
 			!model.description.equals(CommonText.from, true)
 			&& !model.description.equals(CommonText.to, true)
 		) {
-			if (!hasUpdateLayoutHeight) {
-				updateHeightByText(
-					data.info,
-					fontSize(14),
-					ScreenSize.widthWithPadding,
-					200.uiPX()
-				)
-				hasUpdateLayoutHeight = true
-			}
+			resetViewHeightByText(
+				60.uiPX(),
+				data.info,
+				fontSize(12),
+				ScreenSize.widthWithPadding,
+				200.uiPX()
+			)
 		}
 		hold(this)
 	}
 }
-

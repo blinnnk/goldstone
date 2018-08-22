@@ -4,6 +4,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
@@ -45,34 +46,35 @@ class ContactInputPresenter(
 	fun getAddressIfExist(
 		ethERCAndETCInput: EditText,
 		btcMainnetInput: EditText,
+		bchInput: EditText,
 		btcSeriesTestnetInput: EditText,
 		ltcInput: EditText
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
-			contactAddress?.let {
-				when (BTCUtils.isValidMultiChainAddress(it)) {
+			contactAddressModel?.let {
+				when (BTCUtils.isValidMultiChainAddress(it.address, it.symbol)) {
 					AddressType.ETHERCOrETC -> {
-						ethERCAndETCInput.setText(it)
-						ethERCAndETCAddressText = it
+						ethERCAndETCInput.setText(it.address)
+						ethERCAndETCAddressText = it.address
 					}
 
 					AddressType.BTC -> {
-						btcMainnetInput.setText(it)
-						btcMainnetAddressText = it
-					}
-
-					AddressType.BTCSeriesTest -> {
-						btcSeriesTestnetInput.setText(it)
-						btcTestnetAddressText = it
-					}
-					AddressType.LTC -> {
-						ltcInput.setText(it)
-						ltcAddressText = it
+						btcMainnetInput.setText(it.address)
+						btcMainnetAddressText = it.address
 					}
 
 					AddressType.BCH -> {
-						ltcInput.setText(it)
-						bchAddressText = it
+						bchInput.setText(it.address)
+						bchAddressText = it.address
+					}
+
+					AddressType.BTCSeriesTest -> {
+						btcSeriesTestnetInput.setText(it.address)
+						btcTestnetAddressText = it.address
+					}
+					AddressType.LTC -> {
+						ltcInput.setText(it.address)
+						ltcAddressText = it.address
 					}
 				}
 			}
@@ -147,7 +149,7 @@ class ContactInputPresenter(
 			)
 		) {
 			fragment.getParentFragment<ProfileOverlayFragment> {
-				if (!contactAddress.isNullOrBlank()) {
+				if (!contactAddressModel.isNull()) {
 					// 从账单详情快捷添加地址进入的页面
 					replaceFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 					activity?.apply { SoftKeyboard.hide(this) }
@@ -164,11 +166,12 @@ class ContactInputPresenter(
 		btcMainnetInput: EditText,
 		btcTestnetInput: EditText,
 		ltcInput: EditText,
+		bchInput: EditText,
 		confirmButton: RoundButton
 	) {
 		nameInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				nameText = text.orElse("").toString()
+				nameText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -191,7 +194,7 @@ class ContactInputPresenter(
 
 		ethERCAndETCInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				ethERCAndETCAddressText = text.orElse("").toString()
+				ethERCAndETCAddressText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -214,7 +217,7 @@ class ContactInputPresenter(
 
 		btcMainnetInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				btcMainnetAddressText = text.orElse("").toString()
+				btcMainnetAddressText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -237,7 +240,7 @@ class ContactInputPresenter(
 
 		btcTestnetInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				btcTestnetAddressText = text.orElse("").toString()
+				btcTestnetAddressText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -260,7 +263,30 @@ class ContactInputPresenter(
 
 		ltcInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
-				ltcAddressText = text.orElse("").toString()
+				ltcAddressText = text.toString().orElse("")
+				setStyle(confirmButton)
+			}
+
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+		})
+
+		bchInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				bchAddressText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -290,6 +316,7 @@ class ContactInputPresenter(
 					+ btcMainnetAddressText.count()
 					+ btcTestnetAddressText.count()
 					+ ltcAddressText.count()
+					+ bchAddressText.count()
 				)
 			!= 0
 		) {

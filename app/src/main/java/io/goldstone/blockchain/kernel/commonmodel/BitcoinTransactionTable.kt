@@ -75,7 +75,7 @@ data class BTCSeriesTransactionTable(
 				if (BCHWalletUtils.isNewCashAddress(fromAddress)) {
 					if (!BCHWalletUtils.isNewCashAddress(toAddress))
 						BCHUtil.instance
-							.encodeCashAdrressByLegacy(toAddress)
+							.encodeCashAddressByLegacy(toAddress)
 							.substringAfter(":")
 					else {
 						if (toAddress.contains(":"))
@@ -95,7 +95,7 @@ data class BTCSeriesTransactionTable(
 				val myAddressIsLegacy = !BCHWalletUtils.isNewCashAddress(myAddress)
 				if (myAddressIsLegacy)
 					BCHUtil.instance
-						.encodeCashAdrressByLegacy(myAddress)
+						.encodeCashAddressByLegacy(myAddress)
 						.substringAfter(":")
 				else {
 					if (myAddress.contains(":")) myAddress.substringAfter(":")
