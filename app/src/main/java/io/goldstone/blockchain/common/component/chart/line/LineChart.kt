@@ -141,10 +141,19 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			setDrawGridLines(false)
 		}
 		
-//		animateY(1000)
+		animateY(1000)
 	}
 	
-	fun resetData(dataRows: List<Entry>) {
+	fun resetData(dataRows: List<Entry>, fitLabelCount: Boolean) {
+		
+		if (fitLabelCount) {
+			mXAxis.labelCount = dataRows.size - 1
+		}
+		
+		resetData(dataRows)
+	}
+	
+	open fun resetData(dataRows: List<Entry>) {
 		
 		val pointColor = Color.BLACK
 		val chartWidth = 3f

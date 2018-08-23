@@ -24,16 +24,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	val menu = ButtonMenu(context)
 	
-	private val blinnnkLineChart = object : LineChart(context) {
-		override fun dragEnable(): Boolean = false
-		
-		override fun touchEnable(): Boolean = false
-		
-		override fun isDrawPoints(): Boolean = true
-		
-		override fun isPerformBezier(): Boolean = true
-		
-	}
+	private val blinnnkLineChart = TokenDetaiHeaderLineChart(context)
 	
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
@@ -67,7 +58,8 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			data.mapIndexed {
 					index, chartPoint ->
 					Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-			}.toArrayList()
+			}.toArrayList(),
+			true
 		)
 	}
 }

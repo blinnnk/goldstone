@@ -196,6 +196,10 @@ open class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
   }
   
   fun setEmptyData() {
+		if (realData.size != 0) {
+			return
+		}
+		
     val candleEntrySet = arrayListOf<CandleEntry>()
 		
 		(0 until xRangeVisibleNum.toInt()).forEach {
