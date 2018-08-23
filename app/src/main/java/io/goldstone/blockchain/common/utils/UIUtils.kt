@@ -113,7 +113,7 @@ object TimeUtils {
 	 * @description: 把日期转换成时分，例如12:00
 	 */
 	fun formatHmDate(date: Long) : String {
-		val simpleDateFormat = SimpleDateFormat("hh:mm")
+		val simpleDateFormat = SimpleDateFormat("HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
 	/**
@@ -122,7 +122,7 @@ object TimeUtils {
 	 * @description: 把日期转换成日期+时间，例如8-25 12:00
 	 */
 	fun formatMdHmDate(date: Long) : String {
-		val simpleDateFormat = SimpleDateFormat("M-d hh:mm")
+		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
 }
