@@ -104,7 +104,7 @@ object ImportWalletText {
 	val importWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import Wallet"
 		HoneyLanguage.Chinese.code -> "导入钱包"
-		HoneyLanguage.Japanese.code -> "ウォレットのインポート"
+		HoneyLanguage.Japanese.code -> "ウォレットをインポート"
 		HoneyLanguage.Korean.code -> "지갑 도입"
 		HoneyLanguage.Russian.code -> "Импорт кошелька"
 		HoneyLanguage.TraditionalChinese.code -> "導入錢包"

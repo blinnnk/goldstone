@@ -146,17 +146,17 @@ object TransactionText {
 		HoneyLanguage.Chinese.code -> "燃气费上限"
 		HoneyLanguage.Japanese.code -> "ガス料金上限"
 		HoneyLanguage.Korean.code -> "가스요금 상한"
-		HoneyLanguage.Russian.code -> "Лимит платы за газ"
+		HoneyLanguage.Russian.code -> "Лредел"
 		HoneyLanguage.TraditionalChinese.code -> "燃氣費上限"
 		else -> ""
 	}
 	@JvmField
 	val gasPrice = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Gas Price (Gwei)"
-		HoneyLanguage.Chinese.code -> "燃气单价"
+		HoneyLanguage.English.code -> "Gas Price"
+		HoneyLanguage.Chinese.code -> "单价"
 		HoneyLanguage.Japanese.code -> "ガス料金単価"
 		HoneyLanguage.Korean.code -> "가스단가"
-		HoneyLanguage.Russian.code -> "Цена за газ"
+		HoneyLanguage.Russian.code -> "Цена"
 		HoneyLanguage.TraditionalChinese.code -> "燃氣單價"
 		else -> ""
 	}

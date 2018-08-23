@@ -19,11 +19,11 @@ object ChainText {
 	@JvmField
 	val isUsing = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Using Now"
-		HoneyLanguage.Chinese.code -> "立即使用"
-		HoneyLanguage.Japanese.code -> "直ちに使用する"
-		HoneyLanguage.Korean.code -> "지금 사용하기"
-		HoneyLanguage.Russian.code -> "Использовать сейчас"
-		HoneyLanguage.TraditionalChinese.code -> "立即使用"
+		HoneyLanguage.Chinese.code -> "正在使用"
+		HoneyLanguage.Japanese.code -> "使用中"
+		HoneyLanguage.Korean.code -> "사용중"
+		HoneyLanguage.Russian.code -> "При использовании"
+		HoneyLanguage.TraditionalChinese.code -> "正在使用"
 		else -> ""
 	}
 	@JvmField
