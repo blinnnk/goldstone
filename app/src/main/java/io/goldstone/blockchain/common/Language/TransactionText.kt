@@ -116,6 +116,20 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "區塊高度"
 		else -> ""
 	}
+
+
+	@JvmField
+	val pendingBlockConfirmation = when (currentLanguage) {
+		// 当区块还没产生时，账单详情页区块高度的显示文案
+		HoneyLanguage.English.code -> "Pending confirmation"
+		HoneyLanguage.Chinese.code -> "等待区块确认"
+		HoneyLanguage.Japanese.code -> "確認を待っています"
+		HoneyLanguage.Korean.code -> "대기 블록 확인"
+		HoneyLanguage.Russian.code -> "Ожидание подтверждения"
+		HoneyLanguage.TraditionalChinese.code -> "等待區塊確認"
+		else -> ""
+	}
+
 	@JvmField
 	val transactionDate = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Date"
@@ -409,4 +423,5 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "自定義"
 		else -> ""
 	}
+
 }
