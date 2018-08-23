@@ -21,10 +21,10 @@ object CommonText {
 	val gotIt = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Got It"
 		HoneyLanguage.Chinese.code -> "知道了"
-		HoneyLanguage.Japanese.code -> "Got It"
-		HoneyLanguage.Korean.code -> "Got It"
-		HoneyLanguage.Russian.code -> "Got It"
-		HoneyLanguage.TraditionalChinese.code -> "Got It"
+		HoneyLanguage.Japanese.code -> "閉じる"
+		HoneyLanguage.Korean.code -> "나는 알고있다"
+		HoneyLanguage.Russian.code -> "Я знаю"
+		HoneyLanguage.TraditionalChinese.code -> "知道了"
 		else -> ""
 	}
 
@@ -51,11 +51,11 @@ object CommonText {
 	@JvmField
 	val checkAll = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Check All"
-		HoneyLanguage.Chinese.code -> "Check All"
-		HoneyLanguage.Japanese.code -> "Check All"
-		HoneyLanguage.Korean.code -> "Check All"
-		HoneyLanguage.Russian.code -> "Check All"
-		HoneyLanguage.TraditionalChinese.code -> "Check All"
+		HoneyLanguage.Chinese.code -> "查看全部"
+		HoneyLanguage.Japanese.code -> "チェック"
+		HoneyLanguage.Korean.code -> "모두보기"
+		HoneyLanguage.Russian.code -> "Посмотреть все"
+		HoneyLanguage.TraditionalChinese.code -> "查看全部"
 		else -> ""
 	}
 

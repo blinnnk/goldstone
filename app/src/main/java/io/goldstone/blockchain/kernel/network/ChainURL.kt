@@ -38,7 +38,7 @@ object ChainURL {
 			ChainText.etcMorden -> ChainURL.etcMorderTest
 			ChainText.etcMainGasTracker -> ChainURL.etcMain
 			ChainText.goldStoneEtcMain -> ChainURL.etcGoldStoneMain
-			ChainText.goldStoneEtcMorderTest -> ChainURL.etcGoldStoneMorderTest
+			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMorderTest
 			else -> ChainURL.etcMain
 		}
 	}
@@ -56,7 +56,7 @@ object ChainURL {
 			ChainText.etcMorden,
 			ChainText.etcMainGasTracker,
 			ChainText.goldStoneEtcMain,
-			ChainText.goldStoneEtcMorderTest
+			ChainText.goldStoneEtcMordenTest
 		)
 
 	fun getChainNameByChainType(type: ChainType): String {
