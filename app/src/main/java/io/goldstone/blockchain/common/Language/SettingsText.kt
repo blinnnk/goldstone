@@ -122,7 +122,7 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "用户协议"
 		HoneyLanguage.Japanese.code -> "ユーザー契約書"
 		HoneyLanguage.Korean.code -> "유저협의서"
-		HoneyLanguage.Russian.code -> "Пользовательское соглашение"
+		HoneyLanguage.Russian.code -> "Консультация"
 		HoneyLanguage.TraditionalChinese.code -> "用戶協議"
 		else -> ""
 	}
@@ -172,7 +172,7 @@ object ProfileText {
 		HoneyLanguage.Chinese.code -> "钱包管理"
 		HoneyLanguage.Japanese.code -> "ウォレット管理"
 		HoneyLanguage.Korean.code -> "월렛 관리"
-		HoneyLanguage.Russian.code -> "Управление кошельком"
+		HoneyLanguage.Russian.code -> "Все кошельки"
 		HoneyLanguage.TraditionalChinese.code -> "錢包管理"
 		else -> ""
 	}

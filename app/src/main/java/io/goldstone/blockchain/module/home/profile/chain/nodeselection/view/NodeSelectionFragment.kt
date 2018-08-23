@@ -44,7 +44,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.eth, ChainText.infuraKovan),
 		Pair(CryptoName.eth, ChainText.rinkeby),
 		Pair(CryptoName.eth, ChainText.infuraRinkeby),
-		Pair(CryptoName.etc, ChainText.goldStoneEtcMorderTest),
+		Pair(CryptoName.etc, ChainText.goldStoneEtcMordenTest),
 		Pair(CryptoName.etc, ChainText.etcMorden),
 		Pair(CryptoName.btc, ChainText.btcTest),
 		Pair(CryptoName.ltc, ChainText.ltcTest),
