@@ -96,7 +96,9 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 				fragment.address.orEmpty(),
 				changeAddress,
 				unspents,
-				CryptoValue.signedSecret, // 测算 `MessageSize` 的默认无效私钥
+				// 测算 `MessageSize` 的默认无效私钥
+				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				else CryptoValue.signedBTCMainnetSecret,
 				Config.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费

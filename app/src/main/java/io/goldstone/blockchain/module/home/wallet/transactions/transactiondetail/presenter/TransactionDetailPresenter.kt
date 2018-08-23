@@ -8,7 +8,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
@@ -124,7 +125,7 @@ class TransactionDetailPresenter(
 							fragment.getMainActivity()?.apply {
 								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
 									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-									putString(ArgumentKey.address, address)
+									putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
 								}
 							}
 							preventDuplicateClicks()
@@ -169,7 +170,7 @@ class TransactionDetailPresenter(
 			data?.timestamp
 				?: dataFromList?.timeStamp?.toLongOrNull()
 				?: notificationData?.timeStamp.orElse(0L)
-		val date = TimeUtils.formatDate(timstamp.toMillsecond())
+		val date = TimeUtils.formatDate(timstamp.toMillisecond())
 		val memo =
 			if (data?.memo.isNull()) TransactionText.noMemo
 			else data?.memo
@@ -216,7 +217,7 @@ class TransactionDetailPresenter(
 					TransactionListModel.formatToAddress(receipt.to),
 					currentHash,
 					receipt.blockNumber,
-					TimeUtils.formatDate(receipt.timeStamp.toMillsecond()),
+					TimeUtils.formatDate(receipt.timeStamp.toMillisecond()),
 					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
 				)
 			}

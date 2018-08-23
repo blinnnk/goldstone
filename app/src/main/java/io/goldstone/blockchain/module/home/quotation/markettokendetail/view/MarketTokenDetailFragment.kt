@@ -32,12 +32,12 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
 	private val chartView by lazy { MarketTokenCandleChart(context!!) }
-	private val priceHistroy by lazy { PriceHistoryView(context!!) }
+	private val priceHistory by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }
 	private val tokenInfoLink by lazy {
 		TokenInfoLink(context!!) { link, title ->
-			presenter.showWebfragumentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
+			presenter.showWebFragmentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
 		}
 	}
 	private val tokenSocialMedia by lazy {
@@ -87,7 +87,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					currentPriceInfo.model = CurrentPriceModel(it)
 				}
 
-				priceHistroy.into(this)
+				priceHistory.into(this)
 				tokenInfo
 					.click {
 						getParentFragment<MarketTokenCenterFragment>()
@@ -102,7 +102,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.setCurrencyInfo(
 					currencyInfo,
 					tokenInformation,
-					priceHistroy,
+					priceHistory,
 					tokenInfo,
 					tokenInfoLink,
 					tokenSocialMedia

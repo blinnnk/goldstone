@@ -4,7 +4,7 @@ import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode
@@ -52,7 +52,7 @@ data class TransactionListModel(
 		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
-				data.timeStamp.toMillsecond(),
+				data.timeStamp.toMillisecond(),
 				DateAndTimeText.getDateText()
 			) + descriptionText(
 				data.isReceive,
@@ -85,7 +85,7 @@ data class TransactionListModel(
 		data.fromAddress,
 		CryptoUtils.scaleTo32(
 			HoneyDateUtil.getSinceTime(
-				data.timeStamp.toMillsecond(),
+				data.timeStamp.toMillisecond(),
 				DateAndTimeText.getDateText()
 			) + descriptionText(
 				data.to.contains(data.recordAddress, true),

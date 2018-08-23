@@ -75,7 +75,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						}
 						setTitles(ImportWalletText.walletType, currentType)
 					}
-					.click {
+					.click { _ ->
 						showWalletTypeDashboard(
 							this@PrivateKeyImportFragment,
 							currentType

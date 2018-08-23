@@ -26,7 +26,7 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
@@ -99,8 +99,10 @@ class WalletSettingsListPresenter(
 			} else {
 				val password = passwordInput?.text.toString()
 				fragment.context?.verifyCurrentWalletKeyStorePassword(password) {
-					if (it) fragment.deleteWalletData(password)
-					else fragment.context.alert(CommonText.wrongPassword)
+					GoldStoneAPI.context.runOnUiThread {
+						if (it) fragment.deleteWalletData(password)
+						else fragment.context.alert(CommonText.wrongPassword)
+					}
 				}
 			}
 		}
@@ -113,19 +115,19 @@ class WalletSettingsListPresenter(
 			when (Config.getCurrentWalletType()) {
 				// 删除多链钱包下的所有地址对应的数据
 				WalletType.MultiChain.content -> {
+					val addresses = listOf(
+						Pair(ethAddresses, ChainType.ETH.id),
+						Pair(etcAddresses, ChainType.ETC.id),
+						Pair(btcAddresses, ChainType.BTC.id),
+						Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
+						Pair(ltcAddresses, ChainType.LTC.id),
+						Pair(bchAddresses, ChainType.BCH.id)
+					)
 					object : ConcurrentAsyncCombine() {
-						override var asyncCount = 4
-
+						override var asyncCount = addresses.size
 						override fun concurrentJobs() {
-							listOf(
-								Pair(ethAddresses, ChainType.ETH.id),
-								Pair(etcAddresses, ChainType.ETC.id),
-								Pair(btcAddresses, ChainType.BTC.id),
-								Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
-								Pair(ltcAddresses, ChainType.LTC.id),
-								Pair(bchAddresses, ChainType.BCH.id)
-							).forEach { account ->
-								AddressManagerPresneter.convertToChildAddresses(account.first).forEach {
+							addresses.forEach { account ->
+								AddressManagerPresenter.convertToChildAddresses(account.first).forEach {
 									deleteRoutineWallet(
 										it.first,
 										password,

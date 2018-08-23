@@ -218,66 +218,71 @@ fun Context.deleteAccount(
 	}
 }
 
-fun Context.verifyCurrentWalletKeyStorePassword(password: String, hold: (Boolean) -> Unit) {
-	when (Config.getCurrentWalletType()) {
-		WalletType.BTCTestOnly.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentBTCSeriesTestAddress(),
-				true,
-				true,
-				hold
-			)
-		}
+fun Context.verifyCurrentWalletKeyStorePassword(
+	password: String,
+	hold: (Boolean) -> Unit
+) {
+	doAsync {
+		when (Config.getCurrentWalletType()) {
+			WalletType.BTCTestOnly.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentBTCSeriesTestAddress(),
+					true,
+					true,
+					hold
+				)
+			}
 
-		WalletType.BTCOnly.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentBTCAddress(),
-				true,
-				true,
-				hold
-			)
-		}
+			WalletType.BTCOnly.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentBTCAddress(),
+					true,
+					true,
+					hold
+				)
+			}
 
-		WalletType.LTCOnly.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentLTCAddress(),
-				true,
-				true,
-				hold
-			)
-		}
+			WalletType.LTCOnly.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentLTCAddress(),
+					true,
+					true,
+					hold
+				)
+			}
 
-		WalletType.BCHOnly.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentBCHAddress(),
-				true,
-				true,
-				hold
-			)
-		}
+			WalletType.BCHOnly.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentBCHAddress(),
+					true,
+					true,
+					hold
+				)
+			}
 
-		WalletType.ETHERCAndETCOnly.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentEthereumAddress(),
-				false,
-				true,
-				hold
-			)
-		}
-		// 多链钱包随便找一个名下钱包地址进行验证即可
-		WalletType.MultiChain.content -> {
-			verifyKeystorePassword(
-				password,
-				Config.getCurrentBTCAddress(),
-				true,
-				false,
-				hold
-			)
+			WalletType.ETHERCAndETCOnly.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentEthereumAddress(),
+					false,
+					true,
+					hold
+				)
+			}
+			// 多链钱包随便找一个名下钱包地址进行验证即可
+			WalletType.MultiChain.content -> {
+				verifyKeystorePassword(
+					password,
+					Config.getCurrentBTCAddress(),
+					true,
+					false,
+					hold
+				)
+			}
 		}
 	}
 }
@@ -327,7 +332,7 @@ fun Context.updatePassword(
 	walletAddress: String,
 	oldPassword: String,
 	newPassword: String,
-	isBTCWallet: Boolean,
+	isBTCSeriesWallet: Boolean,
 	isSingleChainWallet: Boolean,
 	errorCallback: (Throwable) -> Unit,
 	callback: () -> Unit
@@ -336,7 +341,7 @@ fun Context.updatePassword(
 		getPrivateKey(
 			walletAddress,
 			oldPassword,
-			isBTCWallet,
+			isBTCSeriesWallet,
 			isSingleChainWallet,
 			{ error ->
 				uiThread {
@@ -347,17 +352,17 @@ fun Context.updatePassword(
 			deleteAccount(
 				walletAddress,
 				oldPassword,
-				isBTCWallet,
+				isBTCSeriesWallet,
 				isSingleChainWallet
 			) { isSuccessful ->
 				if (isSuccessful) {
 					getWalletByPrivateKey(
 						privateKey,
 						newPassword,
-						CryptoValue.filename(walletAddress, isBTCWallet, isSingleChainWallet)
-					) {
+						CryptoValue.filename(walletAddress, isBTCSeriesWallet, isSingleChainWallet)
+					) { privateKey ->
 						uiThread {
-							it isNotNull {
+							privateKey isNotNull {
 								callback()
 							} otherwise {
 								errorCallback(Throwable("private is null"))

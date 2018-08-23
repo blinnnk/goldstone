@@ -34,73 +34,62 @@ class WalletListPresenter(
 	}
 
 	fun switchWallet(address: String) {
-		WalletTable.switchCurrentWallet(address) { _ ->
-			WalletTable.getWalletByAddress(address) { it ->
-				it?.apply {
-					WalletTable.getTargetWalletType(this).let {
-						when (it) {
-							WalletType.BTCOnly -> {
-								if (Config.isTestEnvironment()) {
-									showConfirmationAlertView("Bitcoin Mainnet") {
-										NodeSelectionPresenter.setAllMainnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-
-							WalletType.BTCTestOnly -> {
-								if (!Config.isTestEnvironment()) {
-									showConfirmationAlertView("Bitcoin Testnet") {
-										NodeSelectionPresenter.setAllTestnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-
-							WalletType.LTCOnly -> {
-								if (Config.isTestEnvironment()) {
-									showConfirmationAlertView("Litecoin Mainnet") {
-										NodeSelectionPresenter.setAllMainnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-
-							WalletType.BCHOnly -> {
-								if (Config.isTestEnvironment()) {
-									showConfirmationAlertView(" Bitcoin Cash Mainnet") {
-										NodeSelectionPresenter.setAllMainnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-
-							WalletType.MultiChain -> {
-								if (Config.isTestEnvironment()) {
-									NodeSelectionPresenter.setAllTestnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								} else {
+		WalletTable.switchCurrentWallet(address) { it ->
+			it?.apply {
+				WalletTable.getTargetWalletType(this).let {
+					when (it) {
+						WalletType.BTCOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView("Bitcoin Mainnet") {
 									NodeSelectionPresenter.setAllMainnet {
 										fragment.activity?.jump<SplashActivity>()
 									}
 								}
-							}
-
-							else -> fragment.activity?.jump<SplashActivity>()
+							} else fragment.activity?.jump<SplashActivity>()
 						}
+
+						WalletType.BTCTestOnly -> {
+							if (!Config.isTestEnvironment()) {
+								showConfirmationAlertView("Bitcoin Testnet") {
+									NodeSelectionPresenter.setAllTestnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.LTCOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView("Litecoin Mainnet") {
+									NodeSelectionPresenter.setAllMainnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.BCHOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView(" Bitcoin Cash Mainnet") {
+									NodeSelectionPresenter.setAllMainnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.MultiChain -> {
+							if (Config.isTestEnvironment()) {
+								NodeSelectionPresenter.setAllTestnet {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							} else {
+								NodeSelectionPresenter.setAllMainnet {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+						}
+						else -> fragment.activity?.jump<SplashActivity>()
 					}
 				}
 			}
@@ -138,13 +127,13 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { it ->
+							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { myTokens ->
 								WalletTable.getTargetWalletType(wallet).let { walletType ->
-									if (it.isEmpty()) {
+									if (myTokens.isEmpty()) {
 										data.add(WalletListModel(wallet, 0.0, walletType.content))
 										completeMark()
 									} else {
-										val balance = it.sumByDouble { walletToken ->
+										val balance = myTokens.sumByDouble { walletToken ->
 											val thisToken = allTokens.find {
 												it.contract.equals(walletToken.contract, true)
 											}!!
@@ -155,11 +144,7 @@ class WalletListPresenter(
 										}
 
 										// 计算当前钱包下的 `token` 对应的货币总资产
-										WalletListModel(
-											wallet,
-											balance,
-											walletType.content
-										).let {
+										WalletListModel(wallet, balance, walletType.content).let {
 											data.add(it)
 											completeMark()
 										}
@@ -170,8 +155,7 @@ class WalletListPresenter(
 					}
 
 					// 因为结果集是在异步状态下准备, 返回的数据按照 `id` 重新排序
-					override fun mergeCallBack() =
-						hold(data.sortedByDescending { it.id }.toArrayList())
+					override fun mergeCallBack() = hold(data.sortedByDescending { it.id }.toArrayList())
 				}.start()
 			}
 		}

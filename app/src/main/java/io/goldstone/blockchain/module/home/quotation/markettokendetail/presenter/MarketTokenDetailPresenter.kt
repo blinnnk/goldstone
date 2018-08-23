@@ -13,6 +13,7 @@ import com.blinnnk.util.getParentFragment
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
@@ -144,7 +145,7 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebfragumentWithLink(
+	fun showWebFragmentWithLink(
 		link: String,
 		title: String,
 		previousTitle: String
@@ -166,7 +167,7 @@ class MarketTokenDetailPresenter(
 	fun setCurrencyInfo(
 		currencyInfo: QuotationModel?,
 		tokenInformation: TokenInformation,
-		priceHistroy: PriceHistoryView,
+		priceHistory: PriceHistoryView,
 		tokenInfo: TokenInfoView,
 		tokenInfoLink: TokenInfoLink,
 		tokenSocialMedia: TokenSocialMedia
@@ -178,13 +179,15 @@ class MarketTokenDetailPresenter(
 					tokenData.marketCap.isEmpty()
 					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != Config.getCurrentLanguageCode()
 				) {
-					// 本地没有数据的话从服务端拉取 `Coin Infomation`
-					loadCoinInfoFromServer(info) {
-						val data = TokenInformationModel(it, info.symbol)
-						tokenInformation.model = data
-						tokenInfo.setTokenDescription(it.description)
-						tokenInfoLink.model = data
-						tokenSocialMedia.model = data
+					// 本地没有数据的话从服务端拉取 `Coin Information`
+					NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
+						loadCoinInfoFromServer(info) {
+							val data = TokenInformationModel(it, info.symbol)
+							tokenInformation.model = data
+							tokenInfo.setTokenDescription(it.description)
+							tokenInfoLink.model = data
+							tokenSocialMedia.model = data
+						}
 					}
 				} else {
 					tokenInfo.setTokenDescription(tokenData.description)
@@ -192,11 +195,13 @@ class MarketTokenDetailPresenter(
 					tokenInfoLink.model = tokenData
 					tokenSocialMedia.model = tokenData
 				}
-				priceHistroy.model = priceData
+				priceHistory.model = priceData
 			}
+			// 检查是否有网络
+			if (!NetworkUtil.hasNetwork(fragment.context)) return
 			// 更新行情价目网络数据, 更新界面并更新数据库
 			getCurrencyInfoFromServer(info) { priceData ->
-				priceHistroy.model = priceData
+				priceHistory.model = priceData
 				QuotationSelectionTable.getSelectionByPair(info.pair) {
 					doAsync {
 						if (it.isNull()) return@doAsync
@@ -400,7 +405,8 @@ class MarketTokenDetailPresenter(
 			info.pair,
 			{
 				// Show error information to user
-				fragment.context.alert(it.toString().showAfterColonContent())
+				fragment.context.alert(DialogText.networkDescription)
+				LogUtil.error("getCurrencyInfoFromServer", it)
 			}
 		) { serverData ->
 			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.profileoverlay.view
 import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.profile.profileoverlay.presenter.ProfileOverlayPresenter
 
 /**
@@ -14,8 +15,8 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
 	val title by lazy {
 		arguments?.getString(ArgumentKey.profileTitle)
 	}
-	val contactAddress by lazy {
-		arguments?.getString(ArgumentKey.address)
+	val contactAddressModel by lazy {
+		arguments?.getSerializable(ArgumentKey.addressModel) as? ContactModel
 	}
 	override val presenter = ProfileOverlayPresenter(this)
 	

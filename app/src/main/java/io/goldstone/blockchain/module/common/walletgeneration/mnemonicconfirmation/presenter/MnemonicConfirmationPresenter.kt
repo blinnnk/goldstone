@@ -20,6 +20,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 22/03/2018 11:40 PM
@@ -28,7 +29,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 class MnemonicConfirmationPresenter(
 	override val fragment: MnemonicConfirmationFragment
 ) : BasePresenter<MnemonicConfirmationFragment>() {
-	
+
 	fun clickConfirmationButton(
 		correct: String,
 		current: String
@@ -41,11 +42,22 @@ class MnemonicConfirmationPresenter(
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)
 		}
 	}
-	
+
+	override fun onFragmentViewCreated() {
+		// 如果在窗前钱包的界面用户点击了关闭按钮那么直接切换钱包
+		if (fragment.activity is MainActivity) {
+			fragment.getParentFragment<WalletGenerationFragment> {
+				overlayView.header.closeButton.onClick {
+					activity?.jump<SplashActivity>()
+				}
+			}
+		}
+	}
+
 	private fun compareMnemonicCode(correct: String, current: String): Boolean {
 		return correct.equals(current, true)
 	}
-	
+
 	private fun validAndContinue() {
 		val currentActivity = fragment.activity
 		when (currentActivity) {
@@ -54,19 +66,19 @@ class MnemonicConfirmationPresenter(
 					presenter.removeSelfFromActivity()
 					currentActivity.showSucceedDialog()
 				}
-				
+
 				fragment.getParentFragment<WalletGenerationFragment> {
 					presenter.removeSelfFromActivity()
 					fragment.activity?.jump<SplashActivity>()
 				}
 			}
-			
+
 			is SplashActivity -> {
 				fragment.activity?.jump<SplashActivity>()
 			}
 		}
 	}
-	
+
 	private fun Context.showSucceedDialog() {
 		GoldStoneDialog.show(this) {
 			showOnlyConfirmButton {
@@ -76,7 +88,7 @@ class MnemonicConfirmationPresenter(
 			setContent(CommonText.succeed, DialogText.backUpMnemonicSucceed)
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		fragment.parentFragment.apply {
 			fun BaseOverlayFragment<*>.resetEvent() {
@@ -86,7 +98,7 @@ class MnemonicConfirmationPresenter(
 					presenter.popFragmentFrom<MnemonicConfirmationFragment>()
 				}
 			}
-			
+
 			when (this) {
 				is WalletGenerationFragment -> resetEvent()
 				is WalletSettingsFragment -> resetEvent()

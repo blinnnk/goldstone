@@ -5,6 +5,8 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -40,43 +42,43 @@ class GoldStoneUtilUnitTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 
 	@Test
-	fun getSysteDefaultLanguageSymbol() {
-		LogUtil.debug("$positon Get System Language Symbol", CountryCode.currentLanguageSymbol)
+	fun getSystemDefaultLanguageSymbol() {
+		LogUtil.debug("$position Get System Language Symbol", CountryCode.currentLanguageSymbol)
 	}
 
 	@Test
-	fun getAppconfig() {
+	fun getAppConfig() {
 		AppConfigTable.getAppConfig {
-			LogUtil.debug("$positon + getAppconfig", it.apply { it?.terms = "" }.toString())
+			LogUtil.debug("$position + getAppconfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
 
 	@Test
 	fun getSystemParameter() {
-		LogUtil.debug(positon, CountryCode.currentCountry)
-		LogUtil.debug(positon + "getSystemParameter", CountryCode.currentLanguageSymbol)
+		LogUtil.debug(position, CountryCode.currentCountry)
+		LogUtil.debug(position + "getSystemParameter", CountryCode.currentLanguageSymbol)
 	}
 
 	@Test
-	fun hextStringConverter() {
-		LogUtil.debug(positon, "你好".toCryptHexString())
-		LogUtil.debug(positon, "e7bb86e88a82".toUpperCase().toStringFromHex())
+	fun hexStringConverter() {
+		LogUtil.debug(position, "你好".toCryptHexString())
+		LogUtil.debug(position, "e7bb86e88a82".toUpperCase().toStringFromHex())
 	}
 
 	@Test
 	fun getCurrentWallet() {
 		WalletTable.getCurrentWallet {
-			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
 
 	@Test
 	fun getAllWallets() {
 		WalletTable.getAll {
-			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
 
@@ -108,7 +110,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getLatestEthereumChildAddressIndex() {
 		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
-			LogUtil.debug("getLatestEthereumChildAddressIndex + $positon", "$ethereumChildAddressIndex")
+			LogUtil.debug("getLatestEthereumChildAddressIndex + $position", "$ethereumChildAddressIndex")
 		}
 	}
 
@@ -156,5 +158,14 @@ class GoldStoneUtilUnitTest {
 			}
 		}
 	}
+
+	data class PricePairModel(val pair: String, val price: String)
+	data class PriceAlarmClockTable(
+		val pair: String,
+		val price: String,
+		val priceType: Int,
+		val status: Boolean,
+		var marketPrice: String
+	)
 }
 

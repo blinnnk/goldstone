@@ -122,7 +122,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
 	) {
-		findViewById<ImageView>(ElementID.backButton).let {
+		findViewById<ImageView>(ElementID.backButton).let { it ->
 			it.isNull() isTrue {
 				isShow isTrue {
 					backButton.click { setClickEvent(backButton) }.into(this)

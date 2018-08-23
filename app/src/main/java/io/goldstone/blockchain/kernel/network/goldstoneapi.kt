@@ -113,7 +113,7 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getTokenInfoBySymbolFromGoldStone(
+	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<TokenSearchModel>) -> Unit

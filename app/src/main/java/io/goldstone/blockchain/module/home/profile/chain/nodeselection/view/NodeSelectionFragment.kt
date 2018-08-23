@@ -123,10 +123,10 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				confirmButton.apply {
 					text = CommonText.confirm
 					setBlueStyle(30.uiPX())
-				}.click { _ ->
-					fromMainnetSetting?.let { it ->
+				}.click {
+					fromMainnetSetting?.let { fromMainnet ->
 						// 更新是否是测试环境的参数
-						Config.updateIsTestEnvironment(!it)
+						Config.updateIsTestEnvironment(!fromMainnet)
 						selectedNode.forEach { pair ->
 							when {
 								pair.first.equals(CryptoName.eth, true) ->
@@ -141,28 +141,28 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							}
 						}
 						AppConfigTable.updateChainInfo(
-							it,
-							ChainNameID.getChainNameIDByName(
+							fromMainnet,
+							etcChainNameID = ChainNameID.getChainNameIDByName(
 								selectedNode.find {
 									it.first.equals(CryptoName.etc, true)
 								}?.second.orEmpty()
 							),
-							ChainNameID.getChainNameIDByName(
+							ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
 								selectedNode.find {
 									it.first.equals(CryptoName.eth, true)
 								}?.second.orEmpty()
 							),
-							ChainNameID.getChainNameIDByName(
+							btcChainNameID = ChainNameID.getChainNameIDByName(
 								selectedNode.find {
 									it.first.equals(CryptoName.btc, true)
 								}?.second.orEmpty()
 							),
-							ChainNameID.getChainNameIDByName(
+							bchChainNameID = ChainNameID.getChainNameIDByName(
 								selectedNode.find {
 									it.first.equals(CryptoName.bch, true)
 								}?.second.orEmpty()
 							),
-							ChainNameID.getChainNameIDByName(
+							ltcChainNameID = ChainNameID.getChainNameIDByName(
 								selectedNode.find {
 									it.first.equals(CryptoName.ltc, true)
 								}?.second.orEmpty()

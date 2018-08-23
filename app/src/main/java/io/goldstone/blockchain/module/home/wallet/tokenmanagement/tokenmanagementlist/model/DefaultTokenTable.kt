@@ -83,7 +83,7 @@ data class DefaultTokenTable(
 		0,
 		"",
 		data.contract,
-		data.iconUrl,
+		data.iconUrl.orEmpty(),
 		data.symbol,
 		0,
 		data.price.toDoubleOrNull().orZero(),

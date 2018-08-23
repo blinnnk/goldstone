@@ -19018,8 +19018,8 @@ io.goldstone.blockchain.common.utils.UIUtilsKt -> d.a.a.a.e.N:
     int[] getViewAbsolutelyPositionInScreen(android.view.View) -> a
     java.lang.Boolean detectnochScreenInAndroidP(android.app.Activity) -> final
     java.lang.Boolean isTargetDevice(java.lang.String) -> b
-    long toMillsecond(java.lang.String) -> a
-    long toMillsecond(long) -> extends
+    long toMillisecond(java.lang.String) -> a
+    long toMillisecond(long) -> extends
     void setTransparentStatusBar(android.app.Activity) -> const
     void transparentStatus(android.app.Activity) -> class
 io.goldstone.blockchain.common.value.ApkChannel -> d.a.a.a.f.a:
@@ -19353,7 +19353,7 @@ io.goldstone.blockchain.crypto.CryptoValue -> d.a.a.b.j:
     kotlin.jvm.functions.Function1 chainID -> c
     kotlin.jvm.functions.Function1 isBTCTest -> f
     kotlin.jvm.functions.Function1 isToken -> d
-    kotlin.jvm.functions.Function1 pathCointType -> e
+    kotlin.jvm.functions.Function1 pathCoinType -> e
     kotlin.jvm.functions.Function1 singleChainFile -> a
     kotlin.jvm.functions.Function3 filename -> b
     kotlin.jvm.functions.Function1 getChainID() -> c
@@ -19382,7 +19382,7 @@ io.goldstone.blockchain.crypto.CryptoValue$isBTCTest$1 -> d.a.a.b.m:
     io.goldstone.blockchain.crypto.CryptoValue$isBTCTest$1 INSTANCE -> a
 io.goldstone.blockchain.crypto.CryptoValue$isToken$1 -> d.a.a.b.n:
     io.goldstone.blockchain.crypto.CryptoValue$isToken$1 INSTANCE -> a
-io.goldstone.blockchain.crypto.CryptoValue$pathCointType$1 -> d.a.a.b.o:
+io.goldstone.blockchain.crypto.CryptoValue$pathCoinType$1 -> d.a.a.b.o:
     io.goldstone.blockchain.crypto.CryptoValue$pathCointType$1 INSTANCE -> a
 io.goldstone.blockchain.crypto.CryptoValue$singleChainFile$1 -> d.a.a.b.p:
     io.goldstone.blockchain.crypto.CryptoValue$singleChainFile$1 INSTANCE -> a
@@ -19790,7 +19790,7 @@ io.goldstone.blockchain.crypto.bitcoincash.BCHUtil -> d.a.a.b.e.b:
     byte[] expandPrefix(java.lang.String) -> b
     byte[] payloadEncode(byte[],int) -> else
     java.lang.String bechEncode(byte[],java.lang.String) -> if
-    java.lang.String encodeCashAdrressByLegacy(java.lang.String) -> a
+    java.lang.String encodeCashAddressByLegacy(java.lang.String) -> a
     long polyMod(byte[]) -> short
 io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils -> d.a.a.b.e.c:
     io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils INSTANCE -> a

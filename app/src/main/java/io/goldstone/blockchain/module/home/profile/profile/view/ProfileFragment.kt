@@ -74,6 +74,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			presenter.showWalletDetailFragment()
 		}
 	}
+
 	override fun onActivityResult(
 		requestCode: Int,
 		resultCode: Int,
