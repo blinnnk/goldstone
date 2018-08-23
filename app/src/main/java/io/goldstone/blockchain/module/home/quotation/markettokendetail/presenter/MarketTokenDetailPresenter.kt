@@ -12,6 +12,8 @@ import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
@@ -199,17 +201,23 @@ class MarketTokenDetailPresenter(
 			if (!NetworkUtil.hasNetwork(fragment.context)) return
 			// 更新行情价目网络数据, 更新界面并更新数据库
 			getCurrencyInfoFromServer(info) { priceData ->
+				if (priceData.isNull()) {
+					// 容错, 当 `Server` 返回空数据的时候跳出逻辑
+					return@getCurrencyInfoFromServer
+				}
 				priceHistory.model = priceData
-				QuotationSelectionTable.getSelectionByPair(info.pair) {
+				QuotationSelectionTable.getSelectionByPair(info.pair) { selectionTable ->
 					doAsync {
-						if (it.isNull()) return@doAsync
+						if (selectionTable.isNull()) return@doAsync
 						else
 							GoldStoneDataBase.database.quotationSelectionDao()
-								.update(it!!.apply {
-									high24 = priceData.dayHighest
-									low24 = priceData.dayLow
-									highTotal = priceData.totalHighest
-									lowTotal = priceData.totalLow
+								.update(selectionTable!!.apply {
+									priceData?.apply {
+										high24 = dayHighest
+										low24 = dayLow
+										highTotal = totalHighest
+										lowTotal = totalLow
+									}
 								})
 					}
 				}
@@ -320,12 +328,14 @@ class MarketTokenDetailPresenter(
 
 	private fun getCurrencyInfoFromServer(
 		info: QuotationModel,
-		hold: (PriceHistoryModel) -> Unit
+		hold: (PriceHistoryModel?) -> Unit
 	) {
 		GoldStoneAPI.getQuotationCurrencyInfo(
 			info.pair,
 			{
 				// Show error information to user
+				hold(null)
+				System.out.println("Thread${Thread.currentThread().name}")
 				fragment.context.alert(DialogText.networkDescription)
 				LogUtil.error("getCurrencyInfoFromServer", it)
 			}
@@ -372,10 +382,11 @@ class MarketTokenDetailPresenter(
 	) {
 		val chainID = when {
 			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
-			info.contract.isNotEmpty() -> ChainID.Main.id
 			info.symbol.equals(CryptoSymbol.btc(), true) -> ChainID.BTCMain.id
-			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.BTCMain.id
-			else -> ""
+			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.LTCMain.id
+			info.symbol.equals(CryptoSymbol.bch, true) -> ChainID.BCHMain.id
+			info.symbol.equals(CryptoSymbol.etc, true) -> ChainID.ETCMain.id
+			else -> ChainID.Main.id
 		}
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,

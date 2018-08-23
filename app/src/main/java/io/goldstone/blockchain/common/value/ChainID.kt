@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.value
 
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 2018/5/25 8:14 PM
@@ -23,6 +24,18 @@ enum class ChainID(val id: String) {
 	LTCTest("4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0");
 
 	companion object {
+
+		fun getThirdPartyURLByChainID(chainID: String): String {
+			return when (chainID) {
+				BTCMain.id -> WebUrl.btcMain
+				BTCTest.id -> WebUrl.btcTest
+				LTCMain.id -> WebUrl.ltcMain
+				LTCTest.id -> WebUrl.ltcTest
+				BCHMain.id -> WebUrl.bchMain
+				BCHTest.id -> WebUrl.bchTest
+				else -> ""
+			}
+		}
 
 		fun getChainIDBySymbol(symbol: String): String {
 			return when {

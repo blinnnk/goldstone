@@ -25,7 +25,7 @@ object BitcoinUrl {
 	val getUnspentInfo: (address: String) -> String = { address ->
 		"${currentUrl()}/api/addr/$address/utxo"
 	}
-	val getTransactionByHash: (hash: String) -> String = { hash ->
-		"${currentUrl()}/api/tx/$hash"
+	val getTransactionByHash: (header: String, hash: String) -> String = { header, hash ->
+		"$header/api/tx/$hash"
 	}
 }

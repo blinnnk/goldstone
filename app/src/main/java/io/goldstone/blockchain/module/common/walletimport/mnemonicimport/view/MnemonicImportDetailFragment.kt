@@ -2,8 +2,12 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View.OVER_SCROLL_ALWAYS
 import android.widget.LinearLayout
+import android.widget.OverScroller
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.CreateWalletText
@@ -105,19 +109,17 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					title = CreateWalletText.hint
 				}.into(this)
 
-				agreementView
-					.click {
-						getParentFragment<WalletImportFragment> {
-							presenter.showTargetFragment<WebViewFragment>(
-								ProfileText.terms,
-								ImportWalletText.importWallet,
-								Bundle().apply {
-									putString(ArgumentKey.webViewUrl, WebUrl.terms)
-								}
-							)
-						}
+				agreementView.click {
+					getParentFragment<WalletImportFragment> {
+						presenter.showTargetFragment<WebViewFragment>(
+							ProfileText.terms,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.terms)
+							}
+						)
 					}
-					.into(this)
+				}.into(this)
 
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
@@ -140,9 +142,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
 						walletNameInput.text.toString()
-					) { isScuccessful ->
+					) { isSuccessful ->
 						it.showLoadingStatus(false)
-						if (isScuccessful) activity?.jump<SplashActivity>()
+						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 
@@ -165,6 +167,16 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}
 		}
 	}
+
+	// 根据业务需要更改子集的值, 所以采用 `MutableList`
+	private val defaultValue = mutableListOf(
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default
+	)
 
 	private val pathInfo = listOf(
 		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
@@ -195,7 +207,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							y -= 10.uiPX()
 							tag = "pathEdit$index"
 							setTitle(it.second)
-							getEditText().setText(DefaultPath.default)
+							getEditText().setText(defaultValue[index])
 						}.into(this)
 					}.into(this)
 				}
@@ -204,6 +216,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					defaultPath.clear()
 					pathInfo.forEachIndexed { index, pair ->
 						findViewWithTag<TitleEditText>("pathEdit$index")?.let {
+							// 更新默认值的子集数据, 下次在打开的时候显示上次编辑过的数据
+							defaultValue[index] = it.getText()
 							defaultPath.add(pair.second + it.getText())
 						}
 					}

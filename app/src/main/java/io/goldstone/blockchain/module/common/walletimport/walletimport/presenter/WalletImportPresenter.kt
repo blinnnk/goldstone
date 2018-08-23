@@ -67,7 +67,7 @@ class WalletImportPresenter(
 					multiChainAddresses.btcSeriesTestAddress,
 					multiChainAddresses.ltcAddress,
 					multiChainAddresses.bchAddress
-				).first { it.isNotEmpty() }
+				).firstOrNull { it.isNotEmpty() }.orEmpty()
 
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {

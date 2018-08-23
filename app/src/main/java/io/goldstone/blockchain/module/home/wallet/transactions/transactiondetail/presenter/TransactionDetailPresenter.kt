@@ -120,6 +120,7 @@ class TransactionDetailPresenter(
 							fragment.parentFragment?.apply {
 								when (this) {
 									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+									is NotificationFragment -> presenter.removeSelfFromActivity()
 								}
 							}
 							fragment.getMainActivity()?.apply {

@@ -11,6 +11,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -121,6 +122,7 @@ private fun TransactionDetailPresenter.getBCHTransactionFromChain(
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		address,
+		BitcoinCashUrl.currentUrl(),
 		{
 			fragment.context?.alert(it.toString())
 		}

@@ -24,7 +24,7 @@ object BitcoinCashUrl {
 		"${currentUrl()}/api/txs/?address=$address"
 	}
 
-	val getTransactionByHash: (hash: String) -> String = { hash ->
-		"${currentUrl()}/api/tx/$hash"
+	val getTransactionByHash: (header: String, hash: String) -> String = { header, hash ->
+		"$header/api/tx/$hash"
 	}
 }

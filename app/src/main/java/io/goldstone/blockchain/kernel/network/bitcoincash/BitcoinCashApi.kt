@@ -41,11 +41,12 @@ object BitcoinCashApi {
 	fun getTransactionByHash(
 		hash: String,
 		address: String,
+		targetNet: String,
 		errorCallback: (Throwable) -> Unit,
 		hold: (BTCSeriesTransactionTable?) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactionByHash(
-			BitcoinCashUrl.getTransactionByHash(hash),
+			BitcoinCashUrl.getTransactionByHash(targetNet, hash),
 			errorCallback
 		) {
 			hold(
