@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -151,7 +152,8 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 					info.symbol.equals(CryptoSymbol.bch, true) -> {
 						updateBCHTransactionByNotificationHash(info) {
 							removeLoadingView()
-						}}
+						}
+					}
 				}
 			}
 		} else {
@@ -257,9 +259,7 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 	}
 }
 
-private fun TransactionDetailPresenter.updateHeaderFromNotification(
-	info: NotificationTransactionInfo
-) {
+private fun TransactionDetailPresenter.updateHeaderFromNotification(info: NotificationTransactionInfo) {
 	prepareHeaderValueFromNotification(
 		if (info.isReceived) info.fromAddress else info.toAddress,
 		notificationData?.value.orElse(0.0),
@@ -301,8 +301,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 
 private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		"${fee.toDouble().toBTCCount().toBigDecimal()} $symbol",
-		"",
+		"${fee.toDouble().toBTCCount().formatCount()} $symbol",
 		fromAddress,
 		TransactionListModel.formatToAddress(to),
 		hash,
@@ -312,7 +311,6 @@ private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetail
 	)
 	arrayListOf(
 		TransactionText.minerFee,
-		TransactionText.memo,
 		CommonText.from,
 		CommonText.to,
 		TransactionText.transactionHash,

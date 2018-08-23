@@ -402,7 +402,7 @@ class TokenDetailPresenter(
 					val currentMills =
 						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
-						it.timeStamp.toMillsecond() in index.daysAgoInMills()..currentMills
+						it.timeStamp.toMillisecond() in index.daysAgoInMills()..currentMills
 					}.sumByDouble {
 						if (it.isFee) {
 							it.minerFee.substringBefore(" ").toDouble() * -1

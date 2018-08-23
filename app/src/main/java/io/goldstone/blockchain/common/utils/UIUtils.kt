@@ -80,15 +80,15 @@ object TimeUtils {
 		val stamp = if (timeStamp.contains(".")) timeStamp.substringBefore(".").toLong()
 		else timeStamp.toLong()
 		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_YEAR
+			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_TIME
+			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_TIME
 		)
 	}
 
 	// 将时间戳转化为界面显示的时间格式的工具
 	fun formatDate(timeStamp: Long): String {
-		val time = timeStamp.toMillsecond()
+		val time = timeStamp.toMillisecond()
 		return DateUtils.formatDateTime(
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
@@ -97,7 +97,7 @@ object TimeUtils {
 	}
 }
 
-fun String.toMillsecond(): Long {
+fun String.toMillisecond(): Long {
 	val timestamp = toBigDecimal().toString().toLong().orElse(0L)
 	return when {
 		count() == 10 -> timestamp * 1000
@@ -107,8 +107,8 @@ fun String.toMillsecond(): Long {
 	}
 }
 
-fun Long.toMillsecond(): Long {
-	return toString().toMillsecond()
+fun Long.toMillisecond(): Long {
+	return toString().toMillisecond()
 }
 
 fun Activity.transparentStatus() {

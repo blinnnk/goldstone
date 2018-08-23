@@ -5,7 +5,6 @@ package io.goldstone.blockchain.common.utils
  * @author KaySaith
  */
 enum class TinyNumber(val value: Int) {
-	
 	True(1),
 	False(0)
 }

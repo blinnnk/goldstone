@@ -146,10 +146,10 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	}
 
 	private fun showHomeFragment(isShow: Boolean) {
-		activity?.let {
-			if (it is MainActivity) {
-				if (isShow) it.showHomeFragment()
-				else it.hideHomeFragment()
+		activity?.apply {
+			if (this is MainActivity) {
+				if (isShow) showHomeFragment()
+				else hideHomeFragment()
 			}
 		}
 	}
@@ -161,7 +161,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		showTabBarView()
 	}
 
-	open fun setTrasparentStatus() {
+	open fun setTransparentStatus() {
 		activity?.apply {
 			if (!Config.isNotchScreen()) {
 				setTransparentStatusBar()
@@ -173,7 +173,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		super.onDestroy()
 		presenter.onFragmentDestroy()
 		setBackEvent()
-		setTrasparentStatus()
+		setTransparentStatus()
 	}
 
 	override fun onResume() {
@@ -206,14 +206,14 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 							}
 						} else {
 							try {
-								lastChild.childFragmentManager.fragments.last()?.let {
-									when (it) {
-										is BaseFragment<*> -> it.recoveryBackEvent()
-										is BaseRecyclerFragment<*, *> -> it.recoveryBackEvent()
+								lastChild.childFragmentManager.fragments.last()?.apply {
+									when (this) {
+										is BaseFragment<*> -> recoveryBackEvent()
+										is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
 									}
 								}
 							} catch (error: Exception) {
-								LogUtil.error(this.javaClass.simpleName, error)
+								LogUtil.error(javaClass.simpleName, error)
 							}
 						}
 					}

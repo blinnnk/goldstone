@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter
 
+import com.blinnnk.extension.getChildFragment
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.clickToCopy
@@ -8,7 +9,6 @@ import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getChildFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.Config

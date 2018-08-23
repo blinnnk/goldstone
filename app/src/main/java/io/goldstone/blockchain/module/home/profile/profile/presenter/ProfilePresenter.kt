@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.app.NotificationChannel
@@ -76,51 +75,6 @@ class ProfilePresenter(
 			.setContentTitle("GoldStone")
 	}
 
-	private fun resetDownloadState() {
-		downloadId = 0L
-		filepath = ""
-	}
-
-	private fun onProgressUpdate(status: Int, progress: Int) {
-		when (status) {
-			DownloadManager.STATUS_SUCCESSFUL -> {
-				progressLoadingDialog.isShowing.isTrue {
-					progressLoadingDialog.setProgress(0, 100)
-					progressLoadingDialog.dismiss()
-				}
-				filepath.isEmpty() isFalse {
-					if (checkInstallPermission()) {
-						ApkUtil.installApk(File(filepath))
-						resetDownloadState()
-					} else {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-							showInstallPermissionAlertDialog()
-						}
-					}
-				}
-				cancelNotification()
-
-			}
-
-			DownloadManager.STATUS_FAILED -> {
-				resetDownloadState()
-				cancelNotification()
-				progressLoadingDialog.isShowing.isTrue {
-					progressLoadingDialog.setProgress(0, 100)
-					progressLoadingDialog.dismiss()
-				}
-			}
-
-			else -> {
-				updateNotificationProgress(progress)
-				progressLoadingDialog.isShowing.isTrue {
-					progressLoadingDialog.setProgress(progress, 100)
-				}
-				downloadHandler.postDelayed(progressRunnable, 500)
-			}
-		}
-	}
-
 	fun onActivityResult(
 		requestCode: Int,
 		resultCode: Int
@@ -133,43 +87,6 @@ class ProfilePresenter(
 			resetDownloadState()
 		}
 	}
-
-	private fun checkInstallPermission(): Boolean {
-		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			fragment.context?.packageManager!!.canRequestPackageInstalls()
-		} else {
-			true
-		}
-	}
-
-	private fun showInstallPermissionAlertDialog() {
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-
-		fragment.context?.let {
-			AlertDialog.Builder(it)
-				.setTitle("需要打开您的安装未知来源的权限")
-				.setNegativeButton(CommonText.cancel) { dialogInterface, _ ->
-					dialogInterface.dismiss()
-				}
-				.setPositiveButton(CommonText.confirm) { dialogInterface, _ ->
-					dialogInterface.dismiss()
-					startInstallPermissionSettingActivity()
-				}
-				.show()
-
-		}
-	}
-
-	private fun startInstallPermissionSettingActivity() {
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-
-		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.packageName)
-		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
-		fragment.startActivityForResult(intent, installPermissionRequestCode)
-	}
-
 
 	override fun updateData() {
 		ContactTable.getAllContacts { contactCount ->
@@ -263,6 +180,87 @@ class ProfilePresenter(
 				setImage(R.drawable.version_banner)
 			}
 		}
+	}
+
+	private fun resetDownloadState() {
+		downloadId = 0L
+		filepath = ""
+	}
+
+	private fun onProgressUpdate(status: Int, progress: Int) {
+		when (status) {
+			DownloadManager.STATUS_SUCCESSFUL -> {
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(0, 100)
+					progressLoadingDialog.dismiss()
+				}
+				filepath.isEmpty() isFalse {
+					if (checkInstallPermission()) {
+						ApkUtil.installApk(File(filepath))
+						resetDownloadState()
+					} else {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+							showInstallPermissionAlertDialog()
+						}
+					}
+				}
+				cancelNotification()
+
+			}
+
+			DownloadManager.STATUS_FAILED -> {
+				resetDownloadState()
+				cancelNotification()
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(0, 100)
+					progressLoadingDialog.dismiss()
+				}
+			}
+
+			else -> {
+				updateNotificationProgress(progress)
+				progressLoadingDialog.isShowing.isTrue {
+					progressLoadingDialog.setProgress(progress, 100)
+				}
+				downloadHandler.postDelayed(progressRunnable, 500)
+			}
+		}
+	}
+
+	private fun checkInstallPermission(): Boolean {
+		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			fragment.context?.packageManager!!.canRequestPackageInstalls()
+		} else {
+			true
+		}
+	}
+
+	private fun showInstallPermissionAlertDialog() {
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+
+		fragment.context?.let {
+			AlertDialog.Builder(it)
+				.setTitle("需要打开您的安装未知来源的权限")
+				.setNegativeButton(CommonText.cancel) { dialogInterface, _ ->
+					dialogInterface.dismiss()
+				}
+				.setPositiveButton(CommonText.confirm) { dialogInterface, _ ->
+					dialogInterface.dismiss()
+					startInstallPermissionSettingActivity()
+				}
+				.show()
+
+		}
+	}
+
+	private fun startInstallPermissionSettingActivity() {
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+
+		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.packageName)
+		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
+		fragment.startActivityForResult(intent, installPermissionRequestCode)
 	}
 
 

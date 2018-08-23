@@ -30,7 +30,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 	
 	lateinit var container: RelativeLayout
 	private val keyboard by lazy { NumberKeyboard(context!!) }
-	private val passcodeInput by lazy { PasscodeInput(context!!) }
+	private val passwordInput by lazy { PasscodeInput(context!!) }
 	private var failedAttention: TextView? = null
 	override val presenter = PasscodePresenter(this)
 	
@@ -42,8 +42,8 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 				setStyle(GradientType.Blue)
 				lparams(matchParent, matchParent)
 			}.into(this)
-			
-			passcodeInput.apply {
+
+			passwordInput.apply {
 				y += ScreenSize.Height * 0.18f
 			}.into(this)
 			
@@ -67,7 +67,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 	
 	fun resetHeaderStyle() {
 		keyboard.resetCode()
-		passcodeInput.swipe()
+		passwordInput.swipe()
 	}
 	
 	fun showFailedAttention(content: String) {
@@ -101,9 +101,9 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 				if (isFrozen) return@Runnable
 				presenter.unlockOrAlert(getEnteredCode()) {
 					getEnteredCode().isEmpty() isTrue {
-						passcodeInput.recoveryStyle()
+						passwordInput.recoveryStyle()
 					} otherwise {
-						passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
+						passwordInput.setEnteredStyle(getEnteredCode().lastIndex)
 					}
 				}
 			}

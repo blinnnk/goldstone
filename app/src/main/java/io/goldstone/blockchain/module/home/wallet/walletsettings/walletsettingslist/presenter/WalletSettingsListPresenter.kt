@@ -99,8 +99,10 @@ class WalletSettingsListPresenter(
 			} else {
 				val password = passwordInput?.text.toString()
 				fragment.context?.verifyCurrentWalletKeyStorePassword(password) {
-					if (it) fragment.deleteWalletData(password)
-					else fragment.context.alert(CommonText.wrongPassword)
+					GoldStoneAPI.context.runOnUiThread {
+						if (it) fragment.deleteWalletData(password)
+						else fragment.context.alert(CommonText.wrongPassword)
+					}
 				}
 			}
 		}
@@ -113,18 +115,18 @@ class WalletSettingsListPresenter(
 			when (Config.getCurrentWalletType()) {
 				// 删除多链钱包下的所有地址对应的数据
 				WalletType.MultiChain.content -> {
+					val addresses = listOf(
+						Pair(ethAddresses, ChainType.ETH.id),
+						Pair(etcAddresses, ChainType.ETC.id),
+						Pair(btcAddresses, ChainType.BTC.id),
+						Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
+						Pair(ltcAddresses, ChainType.LTC.id),
+						Pair(bchAddresses, ChainType.BCH.id)
+					)
 					object : ConcurrentAsyncCombine() {
-						override var asyncCount = 4
-
+						override var asyncCount = addresses.size
 						override fun concurrentJobs() {
-							listOf(
-								Pair(ethAddresses, ChainType.ETH.id),
-								Pair(etcAddresses, ChainType.ETC.id),
-								Pair(btcAddresses, ChainType.BTC.id),
-								Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
-								Pair(ltcAddresses, ChainType.LTC.id),
-								Pair(bchAddresses, ChainType.BCH.id)
-							).forEach { account ->
+							addresses.forEach { account ->
 								AddressManagerPresenter.convertToChildAddresses(account.first).forEach {
 									deleteRoutineWallet(
 										it.first,

@@ -27,9 +27,9 @@ class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
 		headerTitle = ImportWalletText.importWallet
 	}
 	
-	override fun setTrasparentStatus() {
+	override fun setTransparentStatus() {
 		if (activity !is MainActivity) {
-			super.setTrasparentStatus()
+			super.setTransparentStatus()
 		}
 	}
 }
