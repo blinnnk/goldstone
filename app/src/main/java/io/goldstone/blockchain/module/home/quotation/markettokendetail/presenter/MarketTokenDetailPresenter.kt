@@ -241,10 +241,12 @@ class MarketTokenDetailPresenter(
 		period: String,
 		dateType: Int
 	) {
+		val size = 100 // 请求的数据条目数量
 		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, 100, {
+		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, size, {
 			// Show the error exception to user
 			fragment.context.alert(it.toString().showAfterColonContent())
+			updateCandleChartUI(arrayListOf(), dateType)
 		}) {
 			// 把数据更新到数据库
 			it.updateCandleChartDataInDatabaseBy(period, pair)
@@ -315,24 +317,27 @@ class MarketTokenDetailPresenter(
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
 				// 服务器抓取的数据返回有一定概率返回错误格式数据
-				try {
-					resetData(dateType,
-						data.sortedBy {
-							it.time.toLongOrNull().orElse(0)
-						}.mapIndexed {
-								index, entry -> CandleEntry(index.toFloat(),
-							entry.high.toFloat(),
-							entry.low.toFloat(),
-							entry.open.toFloat(),
-							entry.close.toFloat(),
-							entry.time)
-						}.toArrayList()
-					)
-					
-				} catch (error: Exception) {
-					LogUtil.error("updateChartUI", error)
-					return@runOnUiThread
+				data.isEmpty() isFalse {
+					try {
+						resetData(dateType,
+							data.sortedBy {
+								it.time.toLongOrNull().orElse(0)
+							}.mapIndexed {
+									index, entry -> CandleEntry(index.toFloat(),
+								entry.high.toFloat(),
+								entry.low.toFloat(),
+								entry.open.toFloat(),
+								entry.close.toFloat(),
+								entry.time)
+							}.toArrayList()
+						)
+						
+					} catch (error: Exception) {
+						LogUtil.error("updateChartUI", error)
+						return@runOnUiThread
+					}
 				}
+				
 			}
 		}
 	}

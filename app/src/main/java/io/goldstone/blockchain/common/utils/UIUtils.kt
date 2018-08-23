@@ -112,8 +112,17 @@ object TimeUtils {
 	 * @author: yanglihai
 	 * @description: 把日期转换成时分，例如12:00
 	 */
-	fun formathmDate(date: Long) : String {
+	fun formatHmDate(date: Long) : String {
 		val simpleDateFormat = SimpleDateFormat("hh:mm")
+		return simpleDateFormat.format(java.util.Date(date))
+	}
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成日期+时间，例如8-25 12:00
+	 */
+	fun formatMdHmDate(date: Long) : String {
+		val simpleDateFormat = SimpleDateFormat("M-d hh:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
 }
