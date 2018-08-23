@@ -1,5 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength

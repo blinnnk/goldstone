@@ -23,6 +23,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presen
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
 import org.jetbrains.anko.verticalLayout
 
 /**
@@ -41,55 +42,58 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 	override val presenter = ContactInputPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		verticalLayout {
-			gravity = Gravity.CENTER_HORIZONTAL
+		scrollView {
 			lparams(matchParent, matchParent)
-			nameInput.apply {
-				title = ContactText.contactName
-				setTextInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-			}.into(this)
+			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
+				lparams(matchParent, matchParent)
+				nameInput.apply {
+					title = ContactText.contactName
+					setTextInput()
+					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+				}.into(this)
 
-			ethERCAndETCAddressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.ethERCAndETChint
-			}.into(this)
+				ethERCAndETCAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					hint = ContactText.ethERCAndETChint
+				}.into(this)
 
-			btcMainnetAddressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.btcMainnetAddress
-			}.into(this)
+				btcMainnetAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					hint = ContactText.btcMainnetAddress
+				}.into(this)
 
-			bchAddressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.bchAddress
-			}.into(this)
+				bchAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					hint = ContactText.bchAddress
+				}.into(this)
 
-			ltcAddressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.ltcAddress
-			}.into(this)
+				ltcAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					hint = ContactText.ltcAddress
+				}.into(this)
 
-			btcTestnetAddressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				hint = ContactText.btcTestnetAddress
-				visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
-			}.into(this)
+				btcTestnetAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					hint = ContactText.btcTestnetAddress
+					visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
+				}.into(this)
 
-			confirmButton.apply {
-				text = CommonText.confirm
-				setGrayStyle(20.uiPX())
-			}.click {
-				presenter.addContact()
-			}.into(this)
+				confirmButton.apply {
+					text = CommonText.confirm
+					setGrayStyle(20.uiPX())
+				}.click {
+					presenter.addContact()
+				}.into(this)
 
-			presenter.getAddressIfExist(
-				ethERCAndETCAddressInput,
-				btcMainnetAddressInput,
-				bchAddressInput,
-				btcTestnetAddressInput,
-				ltcAddressInput
-			)
+				presenter.getAddressIfExist(
+					ethERCAndETCAddressInput,
+					btcMainnetAddressInput,
+					bchAddressInput,
+					btcTestnetAddressInput,
+					ltcAddressInput
+				)
+			}
 		}
 	}
 

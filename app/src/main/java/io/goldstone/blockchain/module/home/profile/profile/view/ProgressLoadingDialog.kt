@@ -62,7 +62,6 @@ class ProgressLoadingDialog(context: Context) : Dialog(context) {
 			this.max = max
 			this.progress = progress
 		}
-
 	}
 
 }

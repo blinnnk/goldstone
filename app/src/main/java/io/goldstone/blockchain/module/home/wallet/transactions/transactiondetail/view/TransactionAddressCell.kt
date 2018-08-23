@@ -56,7 +56,7 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 
 	fun setAddress(address: String) {
 		val fixWidthAddress = object : FixTextLength() {
-			override val maxWidth: Float = ScreenSize.widthWithPadding - 80.uiPX() * 1f
+			override val maxWidth: Float = ScreenSize.widthWithPadding - 90.uiPX() * 1f
 			override var text: String = address
 			override val textSize: Float = fontSize(12.uiPX())
 		}.getFixString(true)

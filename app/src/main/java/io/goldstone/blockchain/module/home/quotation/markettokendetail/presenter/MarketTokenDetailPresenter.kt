@@ -99,13 +99,10 @@ class MarketTokenDetailPresenter(
 							}?.timestamp?.toLongOrNull().orElse(0)
 							// 校验数据库的数据时间是否有效，是否需要更新
 							checkDatabaseTimeIsValidBy(period, databaseTime) {
-								isTrue {
-									// 合规就更新本地数据库的数据
-									chartView.updateChartUI(it, dateType)
-								} otherwise {
-									// 不合规就更新网络数据
-									chartView.updateChartDataBy(pair, period, dateType)
-								}
+								// 合规就更新本地数据库的数据
+								if (this) chartView.updateChartUI(it, dateType)
+								// 不合规就更新网络数据
+								else chartView.updateChartDataBy(pair, period, dateType)
 							}
 						}
 					}
@@ -180,13 +177,15 @@ class MarketTokenDetailPresenter(
 					tokenData.marketCap.isEmpty()
 					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != Config.getCurrentLanguageCode()
 				) {
-					// 本地没有数据的话从服务端拉取 `Coin Infomation`
-					loadCoinInfoFromServer(info) {
-						val data = TokenInformationModel(it, info.symbol)
-						tokenInformation.model = data
-						tokenInfo.setTokenDescription(it.description)
-						tokenInfoLink.model = data
-						tokenSocialMedia.model = data
+					// 本地没有数据的话从服务端拉取 `Coin Information`
+					NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
+						loadCoinInfoFromServer(info) {
+							val data = TokenInformationModel(it, info.symbol)
+							tokenInformation.model = data
+							tokenInfo.setTokenDescription(it.description)
+							tokenInfoLink.model = data
+							tokenSocialMedia.model = data
+						}
 					}
 				} else {
 					tokenInfo.setTokenDescription(tokenData.description)
@@ -196,6 +195,8 @@ class MarketTokenDetailPresenter(
 				}
 				priceHistory.model = priceData
 			}
+			// 检查是否有网络
+			if (!NetworkUtil.hasNetwork(fragment.context)) return
 			// 更新行情价目网络数据, 更新界面并更新数据库
 			getCurrencyInfoFromServer(info) { priceData ->
 				priceHistory.model = priceData
@@ -321,19 +322,17 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		hold: (PriceHistoryModel) -> Unit
 	) {
-		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			GoldStoneAPI.getQuotationCurrencyInfo(
-				info.pair,
-				{
-					// Show error information to user
-					fragment.context.alert(DialogText.networkDescription)
-					LogUtil.error("getCurrencyInfoFromServer", it)
-				}
-			) { serverData ->
-				val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
-				fragment.context?.runOnUiThread {
-					hold(priceData)
-				}
+		GoldStoneAPI.getQuotationCurrencyInfo(
+			info.pair,
+			{
+				// Show error information to user
+				fragment.context.alert(DialogText.networkDescription)
+				LogUtil.error("getCurrencyInfoFromServer", it)
+			}
+		) { serverData ->
+			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
+			fragment.context?.runOnUiThread {
+				hold(priceData)
 			}
 		}
 	}

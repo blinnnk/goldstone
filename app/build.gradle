@@ -77,10 +77,10 @@ dependencies {
   implementation 'com.android.support:recyclerview-v7:28.0.0-rc01'
   // Kotlin
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
-  // Anko
+  // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.2.0'
+  implementation 'com.blinnnk:honeyui:0.3.2.1'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin

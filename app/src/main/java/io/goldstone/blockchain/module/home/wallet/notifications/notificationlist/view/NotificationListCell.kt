@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.toMillsecond
+import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -33,7 +33,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		}
 		date.text =
 			HoneyDateUtil.getSinceTime(
-				model?.createTime?.toMillsecond().orElse(0),
+				model?.createTime?.toMillisecond().orElse(0),
 				DateAndTimeText.getDateText()
 			)
 		WalletTable.getAll {

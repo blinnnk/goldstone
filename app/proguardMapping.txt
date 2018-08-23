@@ -19018,8 +19018,8 @@ io.goldstone.blockchain.common.utils.UIUtilsKt -> d.a.a.a.e.N:
     int[] getViewAbsolutelyPositionInScreen(android.view.View) -> a
     java.lang.Boolean detectnochScreenInAndroidP(android.app.Activity) -> final
     java.lang.Boolean isTargetDevice(java.lang.String) -> b
-    long toMillsecond(java.lang.String) -> a
-    long toMillsecond(long) -> extends
+    long toMillisecond(java.lang.String) -> a
+    long toMillisecond(long) -> extends
     void setTransparentStatusBar(android.app.Activity) -> const
     void transparentStatus(android.app.Activity) -> class
 io.goldstone.blockchain.common.value.ApkChannel -> d.a.a.a.f.a:
