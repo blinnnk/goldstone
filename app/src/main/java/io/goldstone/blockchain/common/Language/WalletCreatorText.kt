@@ -13,7 +13,7 @@ object CreateWalletText {
 	val attention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password strength is critical for the security of your wallet. We will be unable to recover your password, so make sure save it yourself, and in a very secure way!"
 		HoneyLanguage.Chinese.code -> "越强的密码越安全，请尽量设置更复杂的密码。我们不会为您保管密码，请您谨慎保管。"
-		HoneyLanguage.Japanese.code -> "強力なパスワードであればあるほど安全です。そのため、できるだけより複雑なパスワードを設定して下さい。弊社はお客様に代わってバスワードを保管することはありませんので、気をつけて保管するようにして下さい。"
+		HoneyLanguage.Japanese.code -> "強力なパスワードであればあるほど安全です。弊社はお客様に代わってバスワードを保管することはありませんので、気をつけて保管するようにして下さい。"
 		HoneyLanguage.Korean.code -> "복잡한 비밀번호일 수록 더 안전합니다, 최대한 복잡한 비밀번호를 설정하십시오. 당사는 귀하의 비밀번호를 보관하지 않으니 귀하께서 잘 보관하십시오. "
 		HoneyLanguage.Russian.code -> "Чем сильнее пароль, тем он безопаснее, пожалуйста настройте более сложный пароль. Мы не будем хранить Ваш пароль, пожалуйста, храните его в безопасности."
 		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管。"
@@ -23,9 +23,9 @@ object CreateWalletText {
 	val create = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Start a New Wallet"
 		HoneyLanguage.Chinese.code -> "创建钱包"
-		HoneyLanguage.Japanese.code -> "ウォレットの新規作成"
+		HoneyLanguage.Japanese.code -> "ウォレットを新規作成"
 		HoneyLanguage.Korean.code -> "지갑 만들기"
-		HoneyLanguage.Russian.code -> "Создание нового Кошелька"
+		HoneyLanguage.Russian.code -> "Новый кошелек"
 		HoneyLanguage.TraditionalChinese.code -> "產生錢包"
 		else -> ""
 	}
@@ -33,7 +33,7 @@ object CreateWalletText {
 	val passwordRules = when (currentLanguage) {
 		HoneyLanguage.English.code -> "A secure passwords must contain both upper and lower case letters, at least one number, and a minimum of 8 characters"
 		HoneyLanguage.Chinese.code -> "请设置更安全的密码，同时包含英文大小写和数字，不少于8位"
-		HoneyLanguage.Japanese.code -> "アルファベット大文字・小文字・数字を組み合わせた形で、8桁以下のより安全なパスワードを設定して下さい"
+		HoneyLanguage.Japanese.code -> "アルファベット大文字・小文字・数字を組み合わせた形で、8桁以上のより安全なパスワードを設定して下さい"
 		HoneyLanguage.Korean.code -> "더 안전한 비밀번호를 설정하고, 영문 대소문자와 숫자를 동시에 포함하되 최소 8자리 수여야 합니다"
 		HoneyLanguage.Russian.code -> "Пожалуйста настройте более безопасный пароль, который содержит как заглавные, так и строчные буквы, и как минимум одну цифру, пароль должен быть не более 8 символов"
 		HoneyLanguage.TraditionalChinese.code -> "越強的密碼越安全，請盡量設置更複雜的密碼。我們不會為您保管密碼，請您謹慎保管"

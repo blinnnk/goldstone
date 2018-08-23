@@ -18411,7 +18411,7 @@ io.goldstone.blockchain.common.language.ChainText -> d.a.a.a.d.c:
     java.lang.String etcMainGasTracker -> r
     java.lang.String etcMorden -> o
     java.lang.String goldStoneEtcMain -> p
-    java.lang.String goldStoneEtcMorderTest -> q
+    java.lang.String goldStoneEtcMordenTest -> q
     java.lang.String goldStoneMain -> g
     java.lang.String infuraKovan -> k
     java.lang.String infuraMain -> h
