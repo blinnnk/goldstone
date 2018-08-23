@@ -5,6 +5,7 @@ import android.graphics.*
 import android.os.Handler
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
@@ -103,7 +104,9 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
     setVisibleXRangeMinimum(xRangeVisibleNum.toFloat())
     invalidate()
 		calculateHandler.removeCallbacks(calculateRunnable)
-		calculateHandler.post(calculateRunnable)
+		if (needCalculate) {
+			calculateHandler.postDelayed(calculateRunnable, 15)
+		}
   }
   
   private fun resetAxisStyle() {
@@ -253,22 +256,41 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			measurePaint.textSize = axisLeft.textSize
 			val rect = Rect()
 			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
-			if (buffers[0] > rect.width()) {
+			if (buffers[0] > rect.width() + 20) {
 				resetMaxMin(index)
 				return
 			}
 		}
 	}
 	
+	override fun onTouchEvent(event: MotionEvent): Boolean {
+		if (event.action == MotionEvent.ACTION_DOWN) {
+			needCalculate = true
+			calculateHandler.removeCallbacks(calculateRunnable)
+			calculateHandler.post(calculateRunnable)
+		}else if (event.action == MotionEvent.ACTION_UP) {
+			calculateHandler.postDelayed(disCalculateRunnable, 1000)
+		}
+		return super.onTouchEvent(event)
+	}
+	
+	
 	private val calculateHandler = Handler()
 	
 	private val calculateRunnable = Runnable {
 		doAsync { calculateVisibleIndex() }
 	}
+	
+	private val disCalculateRunnable = Runnable {
+		needCalculate = false
+	}
+	private var needCalculate = false
+	
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
 		calculateHandler.removeCallbacks(calculateRunnable)
 	}
+	
 	
 	/**
 	 * @date: 2018/8/22

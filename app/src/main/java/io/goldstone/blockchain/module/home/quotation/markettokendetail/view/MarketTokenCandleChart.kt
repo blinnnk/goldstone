@@ -27,6 +27,7 @@ class MarketTokenCandleChart : CandleStickChart {
 	private val hightValueRunnable by lazy {
 		Runnable {
 			mIndicesToHighlight = null
+			invalidate()
 		}
 	}
 	

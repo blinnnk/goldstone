@@ -153,7 +153,9 @@ object RequisitionUtil {
 					// 结果返回为 `Empty` 或 `Null`
 					if (data.isNullOrBlank()) {
 						LogUtil.error("$keyName data.isNullOrBlank")
-						errorCallback(Exception())
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback(Exception())
+						}
 						GoldStoneCode.showErrorCodeReason(data)
 						return
 					}
