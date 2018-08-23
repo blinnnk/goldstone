@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component
 
 import android.content.Context
 import android.view.Gravity
+import android.view.MotionEvent
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.blinnnk.extension.addCorner
@@ -20,7 +21,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class WalletEditText(context: Context) : EditText(context) {
-	
+
 	init {
 		addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 80.uiPX()).apply {
@@ -32,5 +33,13 @@ class WalletEditText(context: Context) : EditText(context) {
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.heavy(context)
 		gravity = Gravity.START
+		// EditText 内部滚动优先父布局
+		setOnTouchListener { view, event ->
+			view.parent.requestDisallowInterceptTouchEvent(true)
+			if ((event.action and MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+				view.parent.requestDisallowInterceptTouchEvent(false)
+			}
+			return@setOnTouchListener false
+		}
 	}
 }

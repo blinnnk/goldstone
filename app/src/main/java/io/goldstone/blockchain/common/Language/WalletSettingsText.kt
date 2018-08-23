@@ -20,12 +20,12 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val containsBTCTest = when (currentLanguage) {
-		HoneyLanguage.English.code -> "(Contains ${CryptoSymbol.btc()} Test Address)"
-		HoneyLanguage.Chinese.code -> "(包含  ${CryptoSymbol.btc()} 测试链地址)"
-		HoneyLanguage.Japanese.code -> "(BTCテストチェーンアドレスが含まれています)"
-		HoneyLanguage.Korean.code -> "(BTC 테스트 체인 주소가 들어 있습니다)"
-		HoneyLanguage.Russian.code -> "(Contains BTC Test Address)"
-		HoneyLanguage.TraditionalChinese.code -> "(包含 BTC 測試鏈地址)"
+		HoneyLanguage.English.code -> "(Contains Test Address)"
+		HoneyLanguage.Chinese.code -> "(包含测试链地址)"
+		HoneyLanguage.Japanese.code -> "(テストチェーンアドレスが含まれています)"
+		HoneyLanguage.Korean.code -> "(테스트 체인 주소가 들어 있습니다)"
+		HoneyLanguage.Russian.code -> "(Contains Test Address)"
+		HoneyLanguage.TraditionalChinese.code -> "(包含測試鏈地址)"
 		else -> ""
 	}
 

@@ -175,6 +175,10 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 	}
 }
 
+/**
+ * 通知中心的拉取 是混合主网和测试网的状态, 所以这里需要通过 `ChainID` 来决定
+ * 是从主网请求数据还是测试网络请求数据
+ */
 fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	info: NotificationTransactionInfo,
 	callback: () -> Unit
@@ -182,6 +186,7 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -210,6 +215,7 @@ fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
 	LitecoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -238,6 +244,7 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -301,7 +308,7 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 
 private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		"${fee.toDouble().toBTCCount().formatCount()} $symbol",
+		"${fee.toDouble().toBigDecimal().toPlainString()} $symbol",
 		fromAddress,
 		TransactionListModel.formatToAddress(to),
 		hash,

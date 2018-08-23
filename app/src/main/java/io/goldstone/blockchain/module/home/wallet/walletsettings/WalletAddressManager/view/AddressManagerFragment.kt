@@ -29,6 +29,7 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.verifyKeystorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
@@ -340,7 +341,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			},
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresenter.showQRCodeFragment(address, this)
+					// `BCH` 需要在二维码页面下转换 `CashAddress` 和 `Legacy` 所以需要标记 `BCH Symbol`
+					val symbol = if (coinType == ChainType.BCH.id) CryptoSymbol.bch else ""
+					AddressManagerPresenter
+						.showQRCodeFragment(ContactModel(address, symbol), this)
 				}
 			},
 			exportPrivateKey = {

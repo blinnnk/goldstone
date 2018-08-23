@@ -13,8 +13,10 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.getViewAbsolutelyPositionInScreen
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
@@ -65,7 +67,10 @@ class ChainAddressesPresenter(
 					fragment.toast(CommonText.succeed)
 				}
 			},
-			qrCellClickEvent = { showQRCode(address) },
+			qrCellClickEvent = {
+				val symbol = if (coinType == ChainType.BCH.id) CryptoSymbol.bch else ""
+				showQRCode(ContactModel(address, symbol))
+			},
 			keystoreCellClickEvent = {
 				showKeystoreExportFragment(address)
 			},
@@ -172,10 +177,13 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun showQRCode(address: String) {
+	private fun showQRCode(addressModel: ContactModel) {
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment> {
-			AddressManagerPresenter.showQRCodeFragment(address, this)
+			AddressManagerPresenter.showQRCodeFragment(
+				addressModel,
+				this
+			)
 		}
 	}
 

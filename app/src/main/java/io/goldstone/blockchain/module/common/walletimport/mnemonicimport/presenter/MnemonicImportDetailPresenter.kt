@@ -8,10 +8,12 @@ import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -104,6 +106,13 @@ class MnemonicImportDetailPresenter(
 			password,
 			multiChainPath
 		) { multiChainAddresses ->
+			// 如果地址已经存在则会返回空的多链地址 `Model`
+			if (multiChainAddresses.ethAddress.isEmpty()) {
+				fragment.context.alert(ImportWalletText.existAddress)
+				callback(false)
+				return@import
+			}
+
 			WalletImportPresenter.insertWalletToDatabase(
 				fragment.context,
 				multiChainAddresses,

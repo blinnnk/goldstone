@@ -43,7 +43,7 @@ object WebUrl {
 	const val normalServer = "https://api1.goldstone.io"
 	const val normalSocket = "wss://api1.goldstone.io/ws"
 
-	// BTC Transaction Data API From `blockchain.info`
+	// BTC Transaction Data API From `blockChain.info`
 	const val btcMain = "https://insight.bitpay.com"
 	const val btcTest = "https://test-insight.bitpay.com"
 	// LTC Transaction Data API From `insight`

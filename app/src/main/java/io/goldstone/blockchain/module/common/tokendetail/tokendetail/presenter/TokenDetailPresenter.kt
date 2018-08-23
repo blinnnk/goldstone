@@ -42,10 +42,6 @@ class TokenDetailPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
 	}
 
-	override fun onFragmentHiddenChanged(isHidden: Boolean) {
-		loadDataFromDatabaseOrElse()
-	}
-
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.recoveryValueHeader()
