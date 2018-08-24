@@ -130,7 +130,7 @@ object ProfileText {
 	val version = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Version"
 		HoneyLanguage.Chinese.code -> "软件版本"
-		HoneyLanguage.Japanese.code -> "ソフトウェアバージョン"
+		HoneyLanguage.Japanese.code -> "バージョン"
 		HoneyLanguage.Korean.code -> "소프트웨어 버전"
 		HoneyLanguage.Russian.code -> "Информация о версии"
 		HoneyLanguage.TraditionalChinese.code -> "Version"

@@ -55,7 +55,7 @@ object CreateWalletText {
 		HoneyLanguage.Chinese.code -> "用户协议"
 		HoneyLanguage.Japanese.code -> "ユーザー契約書"
 		HoneyLanguage.Korean.code -> "유저협의서"
-		HoneyLanguage.Russian.code -> "Пользовательское соглашение"
+		HoneyLanguage.Russian.code -> "Консультация"
 		HoneyLanguage.TraditionalChinese.code -> "用戶協議"
 		else -> ""
 	}

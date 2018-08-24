@@ -412,7 +412,7 @@ object ImportMenubar {
 		HoneyLanguage.Chinese.code -> "观察钱包"
 		HoneyLanguage.Japanese.code -> "観察ウォレット"
 		HoneyLanguage.Korean.code -> "지갑 관찰"
-		HoneyLanguage.Russian.code -> "Кошелек только для просмотра"
+		HoneyLanguage.Russian.code -> "Наблюдательный кошелек"
 		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"
 		else -> ""
 	}
