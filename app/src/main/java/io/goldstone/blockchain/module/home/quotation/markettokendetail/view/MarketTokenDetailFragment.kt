@@ -31,7 +31,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	}
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
-	private val chartView by lazy { MarketTokenChart(context!!) }
+	private val candleChart by lazy { MarketTokenCandleChart(context!!) }
 	private val priceHistory by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }
@@ -65,16 +65,16 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				)
 				menu.getButton { button ->
 					button.onClick {
-						presenter.updateChartByMenu(chartView, button.id)
+						presenter.updateChartByMenu(candleChart, button.id)
 						menu.selected(button.id)
 						button.preventDuplicateClicks()
 					}
 				}
 				menu.selected(MarketTokenDetailChartType.Hour.code)
-				chartView.into(this)
+				candleChart.into(this)
 				// 默认加载小时的图标数据
 				presenter.updateChartByMenu(
-					chartView, MarketTokenDetailChartType.Hour.code
+					candleChart, MarketTokenDetailChartType.Hour.code
 				)
 
 				currentPriceInfo.apply {

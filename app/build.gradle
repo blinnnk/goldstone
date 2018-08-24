@@ -111,6 +111,8 @@ dependencies {
   implementation 'com.google.android.gms:play-services-analytics:16.0.1'
   // Wave Animation
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
+  //MPAndroidChart
+  implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }
 
 kotlin {

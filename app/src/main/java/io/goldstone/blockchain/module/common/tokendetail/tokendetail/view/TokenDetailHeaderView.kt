@@ -2,16 +2,13 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
 import android.widget.RelativeLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setCenterInParent
-import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.LineChart
+import com.github.mikephil.charting.data.Entry
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.TokenDetailSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
@@ -23,39 +20,32 @@ import org.jetbrains.anko.matchParent
 class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
 	val menu = ButtonMenu(context)
-	private val chartView = object : LineChart(context) {
-		override fun setChartValueType() = LineChart.Companion.ChartType.Assets
-		override fun canClickPoint() = true
-		override fun setChartStyle() = LineChart.Companion.Style.PointStyle
-		override fun hasAnimation() = true
-	}
+	
+	private val lineChart = TokenDetailHeaderLineChart(context)
 	
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
-		chartView.apply {
+		lineChart.apply {
 			layoutParams = RelativeLayout.LayoutParams(
-				ScreenSize.Width - 20.uiPX(),
-				TokenDetailSize.headerHeight - menu.layoutParams.height - 40.uiPX()
-			)
+				ScreenSize.widthWithPadding,
+				TokenDetailSize.headerHeight - menu.layoutParams.height - 40.uiPX())
 			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+			
+			lineChart.setChartColorAndShadowResource(Spectrum.blue, R.drawable.fade_green)
 		}.into(this)
 		
 		menu.apply {
 			y -= 10.uiPX()
-			titles = arrayListOf(
-				CommonText.all,
-				CommonText.deposit,
-				CommonText.send,
-				CommonText.failed
-			)
-		}
-			.into(this)
+			titles = arrayListOf(CommonText.all, CommonText.deposit, CommonText.send, CommonText.failed)
+		}.into(this)
 		menu.setAlignParentBottom()
 		menu.setCenterInParent()
 		menu.selected(0)
 	}
 	
 	fun setCharData(data: ArrayList<ChartPoint>) {
-		chartView.updateData(data)
+		lineChart.resetData(data.mapIndexed { index, chartPoint ->
+			Entry(index.toFloat(), chartPoint.value, chartPoint.label)
+		}.toArrayList(), true)
 	}
 }
