@@ -52,8 +52,12 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		post { setEmptyData() }
   }
 	
-  open fun resetData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
-		
+	open fun resetData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
+		postCalculate()
+		notifyData(dateType, dataRows)
+	}
+	
+	private fun notifyData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
 		this.dateType = dateType
 		realData = dataRows
 		isScaleXEnabled = false
@@ -232,7 +236,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 				}
 			}
 			mXAxis.textSize = labelTextSize
-			resetData(dateType, realData)
+			notifyData(dateType, realData)
 		}
 	}
 	
@@ -265,15 +269,19 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		if (event.action == MotionEvent.ACTION_DOWN) {
-			needCalculate = true
-			calculateHandler.removeCallbacks(calculateRunnable)
-			calculateHandler.post(calculateRunnable)
+			postCalculate()
 		}else if (event.action == MotionEvent.ACTION_UP) {
-			calculateHandler.postDelayed(disCalculateRunnable, 1000)
+			calculateHandler.postDelayed(disCalculateRunnable, 2000)
 		}
 		return super.onTouchEvent(event)
 	}
 	
+	fun postCalculate(){
+		calculateHandler.removeCallbacks(disCalculateRunnable)
+		needCalculate = true
+		calculateHandler.removeCallbacks(calculateRunnable)
+		calculateHandler.post(calculateRunnable)
+	}
 	
 	private val calculateHandler = Handler()
 	
