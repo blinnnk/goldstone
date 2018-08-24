@@ -26,6 +26,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
@@ -231,15 +232,15 @@ class AddressManagerPresenter(
 
 		}
 
-		fun showQRCodeFragment(address: String, walltSettingsFragment: WalletSettingsFragment) {
-			walltSettingsFragment.apply {
+		fun showQRCodeFragment(addressModel: ContactModel, walletSettingsFragment: WalletSettingsFragment) {
+			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
 				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
 					WalletText.showQRCode,
 					WalletSettingsText.viewAddresses,
-					Bundle().apply { putString(ArgumentKey.address, address) }
+					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
 				)
 			}
 		}

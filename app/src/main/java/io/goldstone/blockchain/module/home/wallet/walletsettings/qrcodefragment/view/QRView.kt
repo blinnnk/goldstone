@@ -3,8 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment
 import android.content.Context
 import android.graphics.Bitmap
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
@@ -13,10 +15,15 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/5/8 12:23 PM
@@ -27,6 +34,7 @@ class QRView(context: Context) : LinearLayout(context) {
 
 	var saveQRImageEvent: Runnable? = null
 	var shareEvent: Runnable? = null
+	var convertEvent: Runnable? = null
 
 	private val address by lazy { AttentionTextView(context) }
 	private val qrImage by lazy { ImageView(context) }
@@ -34,6 +42,7 @@ class QRView(context: Context) : LinearLayout(context) {
 	private val shareButton by lazy { RoundButton(context) }
 	private val copyAddressButton by lazy { RoundButton(context) }
 	private var buttonsLayout: LinearLayout
+	private val convertToLegacyButton by lazy { TextView(context) }
 
 	init {
 		orientation = VERTICAL
@@ -50,10 +59,26 @@ class QRView(context: Context) : LinearLayout(context) {
 			setMargins<LinearLayout.LayoutParams> { topMargin = (-15).uiPX() }
 		}.into(this)
 
+		convertToLegacyButton.apply {
+			textSize = fontSize(12)
+			layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
+			gravity = Gravity.CENTER
+			textColor = Spectrum.blue
+			typeface = GoldStoneFont.heavy(context)
+			visibility = View.GONE
+		}.click {
+			convertEvent?.run()
+		}.into(this)
+
 		buttonsLayout = verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 		}
+	}
+
+	fun showFormattedButton(status: Boolean) {
+		convertToLegacyButton.visibility = if (status) View.VISIBLE else View.GONE
+		convertToLegacyButton.text = "Convert BCH Address Formatted"
 	}
 
 	fun setAddressText(address: String) {

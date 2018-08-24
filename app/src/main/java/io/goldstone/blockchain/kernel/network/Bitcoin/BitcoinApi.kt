@@ -42,14 +42,16 @@ object BitcoinApi {
 		)
 	}
 
+	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
 	fun getTransactionByHash(
 		hash: String,
 		address: String,
+		targetNet: String,
 		errorCallback: (Throwable) -> Unit,
 		hold: (BTCSeriesTransactionTable?) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactionByHash(
-			BitcoinUrl.getTransactionByHash(hash),
+			BitcoinUrl.getTransactionByHash(targetNet, hash),
 			errorCallback
 		) {
 			hold(
@@ -65,25 +67,4 @@ object BitcoinApi {
 		}
 	}
 
-	fun getBlockNumberByTransactionHash(
-		hash: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (Int?) -> Unit
-	) {
-		BTCSeriesApiUtils.getTransactionByHash(
-			BitcoinUrl.getTransactionByHash(hash),
-			errorCallback
-		) {
-			hold(
-				if (isNull()) null
-				else {
-					// insight 第三方接口有时候会返回 `-1`
-					val blockNumber =
-						it!!.safeGet("blockheight").toIntOrNull().orZero()
-					if (blockNumber < 0) null
-					else blockNumber
-				}
-			)
-		}
-	}
 }

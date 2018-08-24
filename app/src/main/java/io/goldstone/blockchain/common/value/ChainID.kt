@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.value
 
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 2018/5/25 8:14 PM
@@ -23,6 +24,18 @@ enum class ChainID(val id: String) {
 	LTCTest("4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0");
 
 	companion object {
+
+		fun getThirdPartyURLByChainID(chainID: String): String {
+			return when (chainID) {
+				BTCMain.id -> WebUrl.btcMain
+				BTCTest.id -> WebUrl.btcTest
+				LTCMain.id -> WebUrl.ltcMain
+				LTCTest.id -> WebUrl.ltcTest
+				BCHMain.id -> WebUrl.bchMain
+				BCHTest.id -> WebUrl.bchTest
+				else -> ""
+			}
+		}
 
 		fun getChainIDBySymbol(symbol: String): String {
 			return when {
@@ -102,7 +115,7 @@ enum class ChainID(val id: String) {
 				Kovan.id -> ChainText.kovan
 				Rinkeby.id -> ChainText.rinkeby
 				ETCMain.id -> ChainText.goldStoneEtcMain
-				ETCTest.id -> ChainText.goldStoneEtcMorderTest
+				ETCTest.id -> ChainText.goldStoneEtcMordenTest
 				BTCTest.id -> ChainText.btcTest
 				LTCTest.id -> ChainText.ltcTest
 				BCHTest.id -> ChainText.bchTest
@@ -125,7 +138,7 @@ enum class ChainID(val id: String) {
 				// ETC Node
 				ChainText.etcMorden -> ETCTest.id
 				ChainText.goldStoneEtcMain -> ETCMain.id
-				ChainText.goldStoneEtcMorderTest -> ETCTest.id
+				ChainText.goldStoneEtcMordenTest -> ETCTest.id
 				ChainText.etcMainGasTracker -> ETCMain.id
 				// BTC Node
 				ChainText.btcMain -> BTCMain.id
@@ -175,7 +188,7 @@ enum class ChainNameID(val id: Int) {
 				6 -> ChainText.infuraRinkeby
 				7 -> ChainText.infuraKovan
 				8 -> ChainText.goldStoneEtcMain
-				9 -> ChainText.goldStoneEtcMorderTest
+				9 -> ChainText.goldStoneEtcMordenTest
 				10 -> ChainText.etcMainGasTracker
 				11 -> ChainText.etcMorden
 				12 -> ChainText.btcMain
@@ -199,7 +212,7 @@ enum class ChainNameID(val id: Int) {
 				ChainText.infuraRinkeby -> 6
 				ChainText.infuraKovan -> 7
 				ChainText.goldStoneEtcMain -> 8
-				ChainText.goldStoneEtcMorderTest -> 9
+				ChainText.goldStoneEtcMordenTest -> 9
 				ChainText.etcMainGasTracker -> 10
 				ChainText.etcMorden -> 11
 				ChainText.btcMain -> 12

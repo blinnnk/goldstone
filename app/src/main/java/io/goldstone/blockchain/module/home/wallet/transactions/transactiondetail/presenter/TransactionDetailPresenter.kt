@@ -120,6 +120,7 @@ class TransactionDetailPresenter(
 							fragment.parentFragment?.apply {
 								when (this) {
 									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+									is NotificationFragment -> presenter.removeSelfFromActivity()
 								}
 							}
 							fragment.getMainActivity()?.apply {
@@ -229,7 +230,7 @@ class TransactionDetailPresenter(
 					fromAddress,
 					data?.toAddress.orEmpty(),
 					currentHash,
-					"Waiting...",
+					TransactionText.pendingBlockConfirmation,
 					date,
 					TransactionListModel.generateTransactionURL(currentHash, symbol)
 				)

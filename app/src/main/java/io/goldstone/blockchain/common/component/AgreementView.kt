@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -10,14 +11,13 @@ import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 
 /**
@@ -30,20 +30,18 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 
 	val radioButton = HoneyRadioButton(context)
 	val textView = TextView(context)
-
 	private var isChecked = false
+	private val maxWidth = ScreenSize.widthWithPadding - PaddingSize.device * 2
 
 	init {
-
 		setWillNotDraw(false)
-
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX()).apply {
+		layoutParams = LinearLayout.LayoutParams(maxWidth, 30.uiPX()).apply {
 			topMargin = 20.uiPX()
 		}
 
 		val terms = CreateWalletText.agreementName
 		textView.apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 30.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
 			text = CustomTargetTextStyle(
 				terms,
 				"${CreateWalletText.agreementPreString} $terms ${CreateWalletText.agreementPostString}",
@@ -61,17 +59,16 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 			scaleX = 0.7f
 			scaleY = 0.7f
 			setColorStyle(GrayScale.midGray, Spectrum.green)
-		}.click { setRadioStatus() }.into(this)
-
+		}.click {
+			setRadioStatus()
+		}.into(this)
 		// 增大点击区域
 		radioButton.layoutParams.width += 80.uiPX()
-		radioButton.x = (ScreenSize.Width - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 45.uiPX()
-
+		radioButton.x = (maxWidth - textView.text.measureTextWidth(9.uiPX().toFloat())) / 2f - 50.uiPX()
 	}
 
 	fun setRadioStatus() {
 		isChecked = !isChecked
 		radioButton.isChecked = isChecked
 	}
-
 }

@@ -13,20 +13,16 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
  * @author KaySaith
  */
 class WalletImportFragment : BaseOverlayFragment<WalletImportPresenter>() {
-	
 	val menuBar by lazy { MenuBar(context!!) }
-	val viewPager by lazy {
-		WalletImportViewPager(this)
-	}
+	val viewPager by lazy { WalletImportViewPager(this) }
 	override val presenter = WalletImportPresenter(this)
-	
 	override fun ViewGroup.initView() {
 		addView(viewPager)
 		menuBar.into(this)
 		presenter.onClickMenuBarItem()
 		headerTitle = ImportWalletText.importWallet
 	}
-	
+
 	override fun setTransparentStatus() {
 		if (activity !is MainActivity) {
 			super.setTransparentStatus()

@@ -116,6 +116,20 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "區塊高度"
 		else -> ""
 	}
+
+
+	@JvmField
+	val pendingBlockConfirmation = when (currentLanguage) {
+		// 当区块还没产生时，账单详情页区块高度的显示文案
+		HoneyLanguage.English.code -> "Pending confirmation"
+		HoneyLanguage.Chinese.code -> "等待区块确认"
+		HoneyLanguage.Japanese.code -> "確認を待っています"
+		HoneyLanguage.Korean.code -> "대기 블록 확인"
+		HoneyLanguage.Russian.code -> "Ожидание подтверждения"
+		HoneyLanguage.TraditionalChinese.code -> "等待區塊確認"
+		else -> ""
+	}
+
 	@JvmField
 	val transactionDate = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Date"
@@ -132,17 +146,17 @@ object TransactionText {
 		HoneyLanguage.Chinese.code -> "燃气费上限"
 		HoneyLanguage.Japanese.code -> "ガス料金上限"
 		HoneyLanguage.Korean.code -> "가스요금 상한"
-		HoneyLanguage.Russian.code -> "Лимит платы за газ"
+		HoneyLanguage.Russian.code -> "Лредел"
 		HoneyLanguage.TraditionalChinese.code -> "燃氣費上限"
 		else -> ""
 	}
 	@JvmField
 	val gasPrice = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Gas Price (Gwei)"
-		HoneyLanguage.Chinese.code -> "燃气单价"
+		HoneyLanguage.English.code -> "Gas Price"
+		HoneyLanguage.Chinese.code -> "单价"
 		HoneyLanguage.Japanese.code -> "ガス料金単価"
 		HoneyLanguage.Korean.code -> "가스단가"
-		HoneyLanguage.Russian.code -> "Цена за газ"
+		HoneyLanguage.Russian.code -> "Цена"
 		HoneyLanguage.TraditionalChinese.code -> "燃氣單價"
 		else -> ""
 	}
@@ -409,4 +423,5 @@ object PrepareTransferText {
 		HoneyLanguage.TraditionalChinese.code -> "自定義"
 		else -> ""
 	}
+
 }

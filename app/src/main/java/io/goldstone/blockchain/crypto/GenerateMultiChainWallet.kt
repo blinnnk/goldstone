@@ -109,6 +109,8 @@ object GenerateMultiChainWallet {
 		path: MultiChainPath,
 		hold: (multiChainAddresses: MultiChainAddresses) -> Unit
 	) {
+		// TODO 这里是否要引入重复助记词的架构还在思考, 目前通过同一助记词修改 `Path`
+		// 还是有有一定的问题. 比较隐蔽暂时待定.
 		context.getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
 			if (ethAddress.equals(ImportWalletText.existAddress, true)) {
 				hold(MultiChainAddresses())

@@ -33,7 +33,7 @@ object EmptyText {
 		HoneyLanguage.Japanese.code -> "何の取引記録もありません"
 		HoneyLanguage.Korean.code -> "임의의 거래기록이 없습니다"
 		HoneyLanguage.Russian.code -> "Отсутствует какая-либо история операций"
-		HoneyLanguage.TraditionalChinese.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "還沒有任何交易記錄"
 		else -> ""
 	}
 	@JvmField
@@ -44,6 +44,26 @@ object EmptyText {
 		HoneyLanguage.Korean.code -> "블록체인에서 거래가 없으므로, 귀하한테 도표와 기록정보가 없습니다 "
 		HoneyLanguage.Russian.code -> "В блокчейне нет операций, поэтому отсутствуют диаграммы и история"
 		HoneyLanguage.TraditionalChinese.code -> "區塊鏈中沒有交易，所以您沒有圖表和記錄"
+		else -> ""
+	}
+	@JvmField
+	val notificationListTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Empty Here"
+		HoneyLanguage.Chinese.code -> "没有新消息"
+		HoneyLanguage.Japanese.code -> "もありません"
+		HoneyLanguage.Korean.code -> "새 알림 메시지가 없습니다"
+		HoneyLanguage.Russian.code -> "Нет нового уведомления"
+		HoneyLanguage.TraditionalChinese.code -> "還沒有任何交易記錄"
+		else -> ""
+	}
+	@JvmField
+	val notificationListSubtitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "We will remind you when there are new transfers or other notifications."
+		HoneyLanguage.Chinese.code -> "当有新的转账或其他通知消息时我们会在这里提醒您"
+		HoneyLanguage.Japanese.code -> "新しい転送やその他の通知があった場合にお知らせします。"
+		HoneyLanguage.Korean.code -> "새로운 전송이나 기타 알림이있을 때 알려드립니다."
+		HoneyLanguage.Russian.code -> "Напоминаем, когда появляются новые переводы или другие уведомления."
+		HoneyLanguage.TraditionalChinese.code -> "當有新的轉賬或其他通知消息時我們會在這裡提醒您"
 		else -> ""
 	}
 	@JvmField

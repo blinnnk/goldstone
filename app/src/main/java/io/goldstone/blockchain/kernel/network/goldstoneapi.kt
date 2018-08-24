@@ -427,10 +427,7 @@ object GoldStoneAPI {
 		postRequestGetJsonObject<String>(
 			RequestBody.create(
 				requestContentType,
-				ParameterUtil.prepare(
-					true,
-					Pair("time", time)
-				)
+				ParameterUtil.prepare(true, Pair("time", time))
 			),
 			"message_list",
 			APIPath.getNotification(APIPath.currentUrl),
@@ -440,14 +437,14 @@ object GoldStoneAPI {
 		) { it ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
 			val notificationData = arrayListOf<NotificationTable>()
-			val jsonarray = JSONArray(it[0])
+			val jsonArray = JSONArray(it[0])
 			GoldStoneAPI.context.runOnUiThread {
-				if (jsonarray.length() == 0) {
+				if (jsonArray.length() == 0) {
 					hold(arrayListOf())
 				} else {
-					(0 until jsonarray.length()).forEach {
-						notificationData.add(NotificationTable(JSONObject(jsonarray[it].toString())))
-						if (it == jsonarray.length() - 1) {
+					(0 until jsonArray.length()).forEach {
+						notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
+						if (it == jsonArray.length() - 1) {
 							hold(notificationData)
 						}
 					}
