@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.component.chart.line.LineChart
  * @author: yanglihai
  * @description:
  */
-class TokenDetaiHeaderLineChart(context: Context) : LineChart(context) {
+class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 	
 	override val lineLabelCount: Int = 6
 	
