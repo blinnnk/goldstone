@@ -47,6 +47,26 @@ object EmptyText {
 		else -> ""
 	}
 	@JvmField
+	val notificationListTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Empty Here"
+		HoneyLanguage.Chinese.code -> "没有新消息"
+		HoneyLanguage.Japanese.code -> "もありません"
+		HoneyLanguage.Korean.code -> "새 알림 메시지가 없습니다"
+		HoneyLanguage.Russian.code -> "Нет нового уведомления"
+		HoneyLanguage.TraditionalChinese.code -> "還沒有任何交易記錄"
+		else -> ""
+	}
+	@JvmField
+	val notificationListSubtitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "We will remind you when there are new transfers or other notifications."
+		HoneyLanguage.Chinese.code -> "当有新的转账或其他通知消息时我们会在这里提醒您"
+		HoneyLanguage.Japanese.code -> "新しい転送やその他の通知があった場合にお知らせします。"
+		HoneyLanguage.Korean.code -> "새로운 전송이나 기타 알림이있을 때 알려드립니다."
+		HoneyLanguage.Russian.code -> "Напоминаем, когда появляются новые переводы или другие уведомления."
+		HoneyLanguage.TraditionalChinese.code -> "當有新的轉賬或其他通知消息時我們會在這裡提醒您"
+		else -> ""
+	}
+	@JvmField
 	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
 		HoneyLanguage.Chinese.code -> "没有找到这个Token"
