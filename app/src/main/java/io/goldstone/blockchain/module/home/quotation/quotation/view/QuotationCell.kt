@@ -94,20 +94,12 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	}
 	
 	private val linechart = object : LineChart(context) {
-		override fun lineLabelCount(): Int = 4
-		
-		override fun dragEnable(): Boolean = false
-		
-		override fun touchEnable(): Boolean = false
-		
-		override fun isDrawPoints(): Boolean = false
-		
-		override fun isPerformBezier(): Boolean = true
-		
-		override fun animateEnable(): Boolean = false
-		
-		
-		
+		override val isDrawPoints: Boolean = false
+		override val isPerformBezier: Boolean = true
+		override val dragEnable: Boolean = false
+		override val touchEnable: Boolean = false
+		override val animateEnable: Boolean = false
+		override val lineLabelCount: Int = 4
 	}
 	
 	init {

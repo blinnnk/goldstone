@@ -35,12 +35,12 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	private var chartColor: Int = Color.RED
 	private var chartShadowResource: Int = R.drawable.fade_red
 	private var labelTextSize = fontSize(8)
-	abstract fun isDrawPoints(): Boolean
-	abstract fun isPerformBezier(): Boolean
-	abstract fun dragEnable() : Boolean
-	abstract fun touchEnable() : Boolean
-	abstract fun animateEnable() : Boolean
-	abstract fun lineLabelCount(): Int
+	abstract val isDrawPoints: Boolean
+	abstract val isPerformBezier: Boolean
+	abstract val dragEnable : Boolean
+	abstract val touchEnable : Boolean
+	abstract val animateEnable : Boolean
+	abstract val lineLabelCount: Int
 	
 	constructor(context: Context) : super(context)
 	
@@ -75,7 +75,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		isScaleXEnabled = false
 		isScaleYEnabled = false
 		mPinchZoomEnabled = true
-		isDragEnabled = dragEnable()
+		isDragEnabled = dragEnable
 		legend.isEnabled = false // 标签是否显示
 		description.isEnabled = false // 描述信息展示
 		
@@ -130,7 +130,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			axisLineColor = gridlineColor
 			gridColor = gridlineColor
 			textColor = labelColor
-			setLabelCount(lineLabelCount(), true)
+			setLabelCount(lineLabelCount, true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
 		}
@@ -142,7 +142,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			setDrawGridLines(false)
 		}
 		
-		if (animateEnable()){
+		if (animateEnable){
 			animateY(1000)
 		}
 	}
@@ -179,7 +179,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				}
 				
 				// 平划的曲线
-				if (isPerformBezier()) {
+				if (isPerformBezier) {
 					mode = LineDataSet.Mode.CUBIC_BEZIER
 					cubicIntensity = 0.2f
 				}
@@ -189,7 +189,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				
 				color = chartColor
 				lineWidth = chartWidth
-				if (isDrawPoints()) {
+				if (isDrawPoints) {
 					val pointRadius = arrayListOf(7f, 4f)
 					// 峰值点
 					setDrawCircles(true)
@@ -219,7 +219,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			
 			// set data
 			setData(data)
-			if (dragEnable()){
+			if (dragEnable){
 				val xRangeVisibleNum = 8f
 				// set visible num xRange
 				setVisibleXRangeMaximum(xRangeVisibleNum)
@@ -256,6 +256,6 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	}
 	
 	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-		return if (touchEnable()) { super.dispatchTouchEvent(ev)} else { false }
+		return if (touchEnable) { super.dispatchTouchEvent(ev)} else { false }
 	}
 }

@@ -11,17 +11,17 @@ import io.goldstone.blockchain.common.component.chart.line.LineChart
  */
 class TokenDetaiHeaderLineChart(context: Context) : LineChart(context) {
 	
-	override fun dragEnable(): Boolean = false
+	override val lineLabelCount: Int = 6
 	
-	override fun touchEnable(): Boolean = true
+	override val dragEnable: Boolean = false
 	
-	override fun isDrawPoints(): Boolean = true
+	override val touchEnable: Boolean = true
 	
-	override fun isPerformBezier(): Boolean = true
+	override val isDrawPoints: Boolean = true
 	
-	override fun animateEnable(): Boolean = true
+	override val isPerformBezier: Boolean = true
 	
-	override fun lineLabelCount(): Int = 6
+	override val animateEnable: Boolean = true
 	
 	override fun resetData(dataRows: List<Entry>) {
 		
