@@ -171,7 +171,7 @@ object WalletText {
 	val watchOnly = when (currentLanguage) {
 		HoneyLanguage.English.code -> "WATCH ONLY"
 		HoneyLanguage.Chinese.code -> "观察钱包"
-		HoneyLanguage.Japanese.code -> "観測ウォレット"
+		HoneyLanguage.Japanese.code -> "観察ウォレット"
 		HoneyLanguage.Korean.code -> "관측 지갑"
 		HoneyLanguage.Russian.code -> "Наблюдательный кошелек"
 		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"
