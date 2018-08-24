@@ -99,7 +99,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override val dragEnable: Boolean = false
 		override val touchEnable: Boolean = false
 		override val animateEnable: Boolean = false
-		override val lineLabelCount: Int = 4
+		override fun lineLabelCount(): Int = 4
 	}
 	
 	init {

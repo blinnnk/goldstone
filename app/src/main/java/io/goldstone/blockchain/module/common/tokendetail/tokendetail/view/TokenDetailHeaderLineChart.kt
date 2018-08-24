@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.component.chart.line.LineChart
  */
 class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 	
-	override val lineLabelCount: Int = 6
+	override fun lineLabelCount(): Int = 6
 	
 	override val dragEnable: Boolean = false
 	

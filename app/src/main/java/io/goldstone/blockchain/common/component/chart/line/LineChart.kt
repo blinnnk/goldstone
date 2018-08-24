@@ -5,10 +5,8 @@ import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
@@ -19,7 +17,6 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
 import com.github.mikephil.charting.utils.Utils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
-import io.goldstone.blockchain.common.component.chart.XValueFormatter
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.*
@@ -40,7 +37,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	abstract val dragEnable : Boolean
 	abstract val touchEnable : Boolean
 	abstract val animateEnable : Boolean
-	abstract val lineLabelCount: Int
+	abstract fun lineLabelCount(): Int
 	
 	constructor(context: Context) : super(context)
 	
@@ -64,12 +61,11 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		initAxisStyle()
 	}
 	
-	protected fun initAxisStyle() {
-		
+	private fun initAxisStyle() {
 		chartColor = Color.RED
 		labelTextSize = fontSize(8)
 		
-		val gridlineColor = GrayScale.lightGray
+		val gridLineColor = GrayScale.lightGray
 		val labelColor = GrayScale.midGray
 		
 		isScaleXEnabled = false
@@ -96,17 +92,17 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				if (!this@LineChart.data.isNull() ||
 					!this@LineChart.data.getDataSetByIndex(0).isNull()){
 					val position = value.toInt()
-					var values = (this@LineChart.data.getDataSetByIndex(0) as LineDataSet).values
+					val values = (this@LineChart.data.getDataSetByIndex(0) as LineDataSet).values
 					if (position < values.size) {
 						val entry = values[position]
 						if ((entry.data is Long)) {
 							result = if (entry.data == 0) "" else  TimeUtils.formatMdDate(entry.data as Long)
 						}
 						if (entry.data is String) {
-							try {
-								result = if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+							result = try {
+								if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
 							}catch (exception: NumberFormatException) {
-								result = entry.data.toString()
+								entry.data.toString()
 							}
 						}
 					}else {
@@ -119,7 +115,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			position = XAxis.XAxisPosition.BOTTOM
 			setDrawAxisLine(false)
 			setDrawLabels(true)
-			gridColor = gridlineColor
+			gridColor = gridLineColor
 			System.out.println("+++$labelColor")
 			textColor = labelColor
 			mAxisMinimum = 10f
@@ -127,16 +123,16 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			typeface = GoldStoneFont.heavy(context)
 		}
 		mAxisLeft.apply {
-			axisLineColor = gridlineColor
-			gridColor = gridlineColor
+			axisLineColor = gridLineColor
+			gridColor = gridLineColor
 			textColor = labelColor
-			setLabelCount(lineLabelCount, true)
+			setLabelCount(lineLabelCount(), true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
 		}
 		
 		axisRight.apply {
-			axisLineColor = gridlineColor
+			axisLineColor = gridLineColor
 			isEnabled = true
 			setDrawLabels(false)
 			setDrawGridLines(false)
