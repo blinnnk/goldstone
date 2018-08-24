@@ -37,7 +37,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	abstract val dragEnable : Boolean
 	abstract val touchEnable : Boolean
 	abstract val animateEnable : Boolean
-	abstract fun lineLabelCount(): Int
+	abstract fun lineLabelCount() : Int
 	
 	constructor(context: Context) : super(context)
 	

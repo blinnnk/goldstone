@@ -16,9 +16,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
  * @author: yanglihai
  * @description: 详情的蜡烛图
  */
-class MarketTokenCandleChart : CandleStickChart {
-	
-	constructor(context: Context) : super(context)
+class MarketTokenCandleChart(context: Context) : CandleStickChart(context) {
 	
 	private val hightValueHandler by lazy {
 		Handler()
@@ -52,12 +50,10 @@ class MarketTokenCandleChart : CandleStickChart {
 	
 	
 	override fun formateDateByType(date: Long): String {
-		val formatDateString: String
-		when(dateType) {
-			DateUtils.FORMAT_SHOW_TIME -> formatDateString = TimeUtils.formatMdHmDate(date)
-			else -> formatDateString = TimeUtils.formatMdDate(date)
+		return when(dateType) {
+			DateUtils.FORMAT_SHOW_TIME -> TimeUtils.formatMdHmDate(date)
+			else -> TimeUtils.formatMdDate(date)
 		}
-		return formatDateString
 		
 	}
 	
