@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.*
 import com.blinnnk.extension.*
@@ -48,16 +47,16 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
+				linechart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
+				linechart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
 		
-		blinnnkLineChart.resetData(
+		linechart.resetData(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
 			}.toArrayList()
@@ -94,7 +93,9 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		}
 	}
 	
-	private val blinnnkLineChart = object : LineChart(context) {
+	private val linechart = object : LineChart(context) {
+		override fun lineLabelCount(): Int = 4
+		
 		override fun dragEnable(): Boolean = false
 		
 		override fun touchEnable(): Boolean = false
@@ -102,6 +103,10 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override fun isDrawPoints(): Boolean = false
 		
 		override fun isPerformBezier(): Boolean = true
+		
+		override fun animateEnable(): Boolean = false
+		
+		
 		
 	}
 	
@@ -121,7 +126,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			tokenPrice.setAlignParentRight()
 			
-			blinnnkLineChart.apply {
+			linechart.apply {
 				id = ElementID.chartView
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
 				setMargins<RelativeLayout.LayoutParams> {

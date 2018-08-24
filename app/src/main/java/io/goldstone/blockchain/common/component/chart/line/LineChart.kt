@@ -22,8 +22,7 @@ import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.component.chart.XValueFormatter
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import java.util.*
 
 /**
@@ -40,6 +39,8 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	abstract fun isPerformBezier(): Boolean
 	abstract fun dragEnable() : Boolean
 	abstract fun touchEnable() : Boolean
+	abstract fun animateEnable() : Boolean
+	abstract fun lineLabelCount(): Int
 	
 	constructor(context: Context) : super(context)
 	
@@ -129,7 +130,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			axisLineColor = gridlineColor
 			gridColor = gridlineColor
 			textColor = labelColor
-			setLabelCount(4, true)
+			setLabelCount(lineLabelCount(), true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
 		}
@@ -141,11 +142,12 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			setDrawGridLines(false)
 		}
 		
-		animateY(1000)
+		if (animateEnable()){
+			animateY(1000)
+		}
 	}
 	
 	fun resetData(dataRows: List<Entry>, fitLabelCount: Boolean) {
-		
 		if (fitLabelCount) {
 			mXAxis.labelCount = dataRows.size - 1
 		}
@@ -155,7 +157,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	
 	open fun resetData(dataRows: List<Entry>) {
 		
-		val pointColor = Color.BLACK
+		val pointColor = Spectrum.deepBlue
 		val chartWidth = 3f
 		
 		val dataSet: LineDataSet
@@ -188,7 +190,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				color = chartColor
 				lineWidth = chartWidth
 				if (isDrawPoints()) {
-					val pointRadius = arrayListOf(5f, 2f)
+					val pointRadius = arrayListOf(7f, 4f)
 					// 峰值点
 					setDrawCircles(true)
 					setCircleColor(pointColor)
