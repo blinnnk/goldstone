@@ -104,7 +104,7 @@ object CommonText {
 	val cancel = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CANCEL"
 		HoneyLanguage.Chinese.code -> "取消"
-		HoneyLanguage.Japanese.code -> "キャンセルする"
+		HoneyLanguage.Japanese.code -> "キャンセル"
 		HoneyLanguage.Korean.code -> "취소"
 		HoneyLanguage.Russian.code -> "Отменить"
 		HoneyLanguage.TraditionalChinese.code -> "取消"
