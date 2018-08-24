@@ -9,7 +9,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
  */
 
 class TokenDetailCell(context: Context) : TransactionListCell(context) {
-
   init {
 
   }

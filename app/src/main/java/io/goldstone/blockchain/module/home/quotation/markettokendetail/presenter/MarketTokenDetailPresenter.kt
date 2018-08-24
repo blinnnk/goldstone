@@ -335,7 +335,6 @@ class MarketTokenDetailPresenter(
 			{
 				// Show error information to user
 				hold(null)
-				System.out.println("Thread${Thread.currentThread().name}")
 				fragment.context.alert(DialogText.networkDescription)
 				LogUtil.error("getCurrencyInfoFromServer", it)
 			}

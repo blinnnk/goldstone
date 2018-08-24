@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
-import io.goldstone.blockchain.common.value.GoldStoneCrayptoKey
+import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
@@ -185,7 +185,7 @@ object RequisitionUtil {
 
 	/** 请求 ehterScan, blockchain.info 的数据是明文请求不需要加密 */
 	@JvmStatic
-	inline fun <reified T> requestUncryptoData(
+	inline fun <reified T> requestUnCryptoData(
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
@@ -236,7 +236,7 @@ object RequisitionUtil {
 		val timeStamp = System.currentTimeMillis().toString()
 		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
 		val sign =
-			(goldStoneID + "0" + GoldStoneCrayptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
+			(goldStoneID + "0" + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
 		Request.Builder()
 			.url(path)
 			.apply {

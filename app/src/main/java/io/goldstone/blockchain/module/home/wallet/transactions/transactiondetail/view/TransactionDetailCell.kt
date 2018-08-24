@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel.Companion.convertMultiToOrFromAddresses
+import org.jetbrains.anko.firstChild
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 
@@ -26,7 +28,6 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
-	
 	private var addressCells: List<TransactionAddressCell> = listOf()
 	var model: TransactionDetailModel by observing(TransactionDetailModel()) {
 		if (
@@ -71,13 +72,13 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 			y -= 3.uiPX()
 		}
 	}
-	
+
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 65.uiPX())
 		setHorizontalPadding(PaddingSize.device.toFloat())
 		info.into(this)
 	}
-	
+
 	fun showAddContactButton(index: Int, hold: ImageView.() -> Unit) {
 		addressCells.isNotEmpty() isTrue {
 			addressCells[index].apply {

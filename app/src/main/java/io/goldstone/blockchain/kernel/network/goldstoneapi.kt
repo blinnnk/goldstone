@@ -18,7 +18,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequest
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequestGetJsonObject
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestData
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUncryptoData
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoData
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
@@ -276,7 +276,7 @@ object GoldStoneAPI {
 		address: String = Config.getCurrentEthereumAddress(),
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
-		requestUncryptoData<ERC20TransactionModel>(
+		requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
 			"result",
 			false,
@@ -296,7 +296,7 @@ object GoldStoneAPI {
 		errorCallback: (Throwable) -> Unit,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
-		requestUncryptoData<TransactionTable>(
+		requestUnCryptoData<TransactionTable>(
 			EtherScanApi.transactions(address, startBlock),
 			"result",
 			false,
