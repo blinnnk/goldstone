@@ -3,7 +3,6 @@
 package io.goldstone.blockchain.kernel.receiver
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
@@ -18,19 +17,21 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommitionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresneter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
@@ -41,7 +42,7 @@ import org.json.JSONObject
  * @author KaySaith
  */
 class XinGePushReceiver : XGPushBaseReceiver() {
-	
+
 	@SuppressLint("InvalidWakeLockTag", "WrongConstant")
 	private fun showNotificationOnLockScreen(
 		context: Context,
@@ -67,14 +68,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		builder.setContentTitle("GoldStone").setContentText(content).setSmallIcon(R.mipmap.ic_launcher)
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 	}
-	
+
 	override fun onSetTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-	
+
 	override fun onNotifactionShowedResult(
 		context: Context?,
 		notifiShowedRlt: XGPushShowedResult?
@@ -82,7 +83,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null || notifiShowedRlt == null) return
 		// Normal Notification
 	}
-	
+
 	override fun onUnregisterResult(
 		context: Context?,
 		p1: Int
@@ -91,21 +92,21 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			return
 		}
 	}
-	
+
 	override fun onDeleteTagResult(
 		p0: Context?,
 		p1: Int,
 		p2: String?
 	) {
 	}
-	
+
 	override fun onRegisterResult(
 		p0: Context?,
 		p1: Int,
 		p2: XGPushRegisterResult?
 	) {
 	}
-	
+
 	@SuppressLint("PrivateResource")
 	override fun onTextMessage(
 		context: Context?,
@@ -114,7 +115,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		if (context == null) return
 		showNotificationOnLockScreen(context, message.toString())
 	}
-	
+
 	override fun onNotifactionClickedResult(
 		context: Context?,
 		result: XGPushClickedResult?
@@ -122,14 +123,14 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		result?.customContent?.let {
 			when (JSONObject(it).safeGet("uri")) {
 				ClassURI.transactionDetail -> {
-					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
+					handleTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
 			}
 		}
-		clearAppIconRedot()
+		clearAppIconReDot()
 	}
-	
-	private fun handlTransactionNotification(
+
+	private fun handleTransactionNotification(
 		context: Context?,
 		content: String?
 	) {
@@ -138,9 +139,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		intent.putExtra(IntentKey.hashFromNotify, content)
 		context?.startActivity(intent)
 	}
-	
+
 	companion object {
-		fun clearAppIconRedot() {
+		fun clearAppIconReDot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =
 				GoldStoneAPI.context.applicationContext?.getSystemService(
@@ -148,138 +149,79 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				) as NotificationManager
 			notificationManager.cancelAll()
 		}
-		
+
 		fun registerAddressesForPush(isRemove: Boolean = false) {
 			val option = if (isRemove) 0 else 1
 			WalletTable.getCurrentWallet {
-				when (Config.getCurrentWalletType()) {
-					WalletType.MultiChain.content -> {
-						val ethseries =
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses)
-								.map { Pair(it.first, ChainType.ETH.id) }
-						val btcSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
-								.map { Pair(it.first, ChainType.BTC.id) }
-						val btcTestSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses)
-								.map { Pair(it.first, ChainType.BTCTest.id) }
-						val etcSeries =
-							AddressManagerPresneter.convertToChildAddresses(etcAddresses)
-								.map { Pair(it.first, ChainType.ETC.id) }
-						val all =
-							ethseries
-								.plus(btcSeries)
-								.plus(btcTestSeries)
-								.plus(etcSeries)
-								.map {
-									AddressCommitionModel(it.first, it.second, option)
-								}.map {
-									generateJSONObject(
-										Pair("address", it.address),
-										Pair("chain_type", it.chainType),
-										Pair("option", it.option)
-									)
+				WalletTable.getWalletType { type ->
+					when (type) {
+						WalletType.MultiChain -> {
+							val ethSeries =
+								AddressManagerPresenter.convertToChildAddresses(ethAddresses)
+									.map { Pair(it.first, ChainType.ETH.id) }
+							val btcSeries =
+								AddressManagerPresenter.convertToChildAddresses(btcAddresses)
+									.map { Pair(it.first, ChainType.BTC.id) }
+							val ltcSeries =
+								AddressManagerPresenter.convertToChildAddresses(ltcAddresses)
+									.map { Pair(it.first, ChainType.LTC.id) }
+							val bchSeries =
+								AddressManagerPresenter.convertToChildAddresses(bchAddresses)
+									.map { Pair(it.first, ChainType.BCH.id) }
+							val btcTestSeries =
+								AddressManagerPresenter.convertToChildAddresses(btcSeriesTestAddresses)
+									.map { Pair(it.first, ChainType.AllTest.id) }
+							val etcSeries =
+								AddressManagerPresenter.convertToChildAddresses(etcAddresses)
+									.map { Pair(it.first, ChainType.ETC.id) }
+							val all =
+								ethSeries
+									.plus(btcSeries)
+									.plus(btcTestSeries)
+									.plus(etcSeries)
+									.plus(ltcSeries)
+									.plus(bchSeries)
+									.map {
+										AddressCommissionModel(it.first, it.second, option)
+									}.map { prepareAddressData(it) }
+							GoldStoneAPI.registerWalletAddresses(
+								AesCrypto.encrypt("$all").orEmpty(),
+								{
+									LogUtil.error("registerAddressesAfterGenerateWallet", it)
 								}
-						GoldStoneAPI.registerWalletAddresses(
-							AesCrypto.encrypt("$all").orEmpty(),
-							{
-								LogUtil.error("registerAddressesAfterGenerateWallet", it)
+							) {
+								if (!isRemove) updateRegisterAddressesStatus(it)
 							}
-						) {
-							updateRegisterAddressesStatus(it)
 						}
-					}
-					
-					WalletType.BTCOnly.content -> {
-						val btcSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcAddresses)
-								.map {
-									Pair(it.first, ChainType.BTC.id)
-								}.map {
-									AddressCommitionModel(it.first, it.second, option)
-								}.map {
-									generateJSONObject(
-										Pair("address", it.address),
-										Pair("chain_type", it.chainType),
-										Pair("option", it.option)
-									)
-								}
-						GoldStoneAPI.registerWalletAddresses(
-							AesCrypto.encrypt("$btcSeries").orEmpty(),
-							{
-								LogUtil.error("registerAddressesAfterGenerateWallet", it)
-							}
-						) {
-							updateRegisterAddressesStatus(it)
+
+						WalletType.BTCOnly -> {
+							registerSingleAddress(AddressCommissionModel(currentBTCAddress, ChainType.BTC.id, option))
 						}
-					}
-					
-					WalletType.BTCTestOnly.content -> {
-						val btcTestSeries =
-							AddressManagerPresneter.convertToChildAddresses(btcTestAddresses)
-								.map {
-									Pair(it.first, ChainType.BTCTest.id)
-								}.map {
-									AddressCommitionModel(it.first, it.second, option)
-								}.map {
-									generateJSONObject(
-										Pair("address", it.address),
-										Pair("chain_type", it.chainType),
-										Pair("option", it.option)
-									)
-								}
-						GoldStoneAPI.registerWalletAddresses(
-							AesCrypto.encrypt("$btcTestSeries").orEmpty(),
-							{
-								LogUtil.error("registerAddressesAfterGenerateWallet", it)
-							}
-						) {
-							updateRegisterAddressesStatus(it)
-						}
-					}
-					
-					WalletType.ETHERCAndETCOnly.content -> {
-						val ethSeries =
-							AddressManagerPresneter.convertToChildAddresses(ethAddresses)
-								.map {
-									Pair(it.first, ChainType.ETH.id)
-								}.map {
-									AddressCommitionModel(it.first, it.second, option)
-								}.map {
-									generateJSONObject(
-										Pair("address", it.address),
-										Pair("chain_type", it.chainType),
-										Pair("option", it.option)
-									)
-								}
-						GoldStoneAPI.registerWalletAddresses(
-							AesCrypto.encrypt("$ethSeries").orEmpty(),
-							{
-								LogUtil.error("registerAddressesAfterGenerateWallet", it)
-							}
-						) {
-							updateRegisterAddressesStatus(it)
-						}
+						WalletType.BCHOnly ->
+							registerSingleAddress(AddressCommissionModel(currentBCHAddress, ChainType.BCH.id, option))
+						WalletType.LTCOnly ->
+							registerSingleAddress(AddressCommissionModel(currentLTCAddress, ChainType.LTC.id, option))
+						WalletType.BTCTestOnly ->
+							registerSingleAddress(
+								AddressCommissionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
+							)
+						WalletType.ETHERCAndETCOnly ->
+							registerSingleAddress(AddressCommissionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
 					}
 				}
 			}
 		}
-		
-		fun registerSingleAddress(model: AddressCommitionModel) {
-			listOf(model).map {
-				generateJSONObject(
-					Pair("address", it.address),
-					Pair("chain_type", it.chainType),
-					Pair("option", it.option)
-				)
-			}.let {
+
+		fun registerSingleAddress(model: AddressCommissionModel) {
+			listOf(model).map { prepareAddressData(it) }.let { it ->
 				GoldStoneAPI.registerWalletAddresses(
 					AesCrypto.encrypt("$it").orEmpty(),
 					{
 						LogUtil.error("registerAddressesAfterGenerateWallet", it)
 					}
 				) {
-					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
+					// 如果是注册地址 `option = 1` 的情况下在数据库标记注册成功与否的状态
+					if (model.option == 1) GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSucceed ->
 						isSucceed isTrue {
 							AppConfigTable.updateRegisterAddressesStatus(true)
 							LogUtil.debug("XinGePushReceiver", "code: $it")
@@ -291,7 +233,28 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				}
 			}
 		}
-		
+
+		// 因为 `BCH` 的地址特殊格式, 以及 `Bip44` 复用 `ChainType 1` 作为 `AllTest Path`
+		// 所以, `BCH` 客户端单独注册特殊格式给服务器用于服务器监听转账 `Push` 使用
+		private fun prepareAddressData(model: AddressCommissionModel): String {
+			return if (model.chainType == 1) {
+				val bchTestAddress =
+					BCHUtil.instance.encodeCashAddressByLegacy(model.address).substringAfter(":")
+				generateJSONObject(
+					Pair("address", model.address),
+					Pair("chain_type", model.chainType),
+					Pair("option", model.option),
+					Pair("extra", "bchtest:$bchTestAddress")
+				)
+			} else {
+				generateJSONObject(
+					Pair("address", model.address),
+					Pair("chain_type", model.chainType),
+					Pair("option", model.option)
+				)
+			}
+		}
+
 		private fun <T> generateJSONObject(vararg pairs: Pair<String, T>): String {
 			var content = ""
 			pairs.forEach {
@@ -302,7 +265,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			}
 			return "{${content.substringBeforeLast(",")}}"
 		}
-		
+
 		private fun updateRegisterAddressesStatus(code: String) {
 			GoldStoneCode.isSuccess(code.toJsonObject()["code"]) { isSucceed ->
 				isSucceed isTrue {
@@ -318,7 +281,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 }
 
 @SuppressLint("HardwareIds")
-fun Application.registerDeviceForPush() {
+fun Context.registerDeviceForPush() {
 	// 为测试方便设置，发布上线时设置为 `false`
 	XGPushConfig.enableDebug(this, false)
 	XGPushManager.registerPush(this, object : XGIOperateCallback {
@@ -334,7 +297,7 @@ fun Application.registerDeviceForPush() {
 				XinGePushReceiver.registerAddressesForPush()
 			}
 		}
-		
+
 		override fun onFail(
 			data: Any?, errCode: Int, message: String?
 		) {
@@ -369,11 +332,13 @@ fun Context.registerDevice(
 						LogUtil.error("registerDevice")
 						callback()
 					}
-				) {
+				) { it ->
 					// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) {
-						saveDataToSharedPreferences(SharesPreference.registerPush, token)
-						uiThread { callback() }
+					GoldStoneCode.isSuccess(it.toJsonObject()["code"]) { isSuccessful ->
+						if (isSuccessful) {
+							saveDataToSharedPreferences(SharesPreference.registerPush, token)
+							uiThread { callback() }
+						}
 					}
 				}
 			}

@@ -6,7 +6,7 @@ import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -68,7 +68,9 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 				subtitle.text = if (it.isFee) {
 					when {
 						it.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-						it.symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+						it.symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
+						it.symbol.equals(CryptoSymbol.ltc, true) -> CryptoSymbol.ltc
+						it.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
 						else -> CryptoSymbol.eth
 					}
 				} else it.symbol

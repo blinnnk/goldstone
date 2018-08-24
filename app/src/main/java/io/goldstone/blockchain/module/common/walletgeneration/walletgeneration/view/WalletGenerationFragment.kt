@@ -17,9 +17,9 @@ class WalletGenerationFragment : BaseOverlayFragment<WalletGenerationPresenter>(
 		presenter.showCreateWalletFragment()
 	}
 	
-	override fun setTrasparentStatus() {
+	override fun setTransparentStatus() {
 		if (activity !is MainActivity) {
-			super.setTrasparentStatus()
+			super.setTransparentStatus()
 		}
 	}
 }

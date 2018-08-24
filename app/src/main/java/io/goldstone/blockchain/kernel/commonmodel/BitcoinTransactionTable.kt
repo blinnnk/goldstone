@@ -1,10 +1,20 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import org.bitcoinj.params.MainNetParams
+import org.bitcoinj.params.TestNet3Params
+import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,7 +23,7 @@ import org.json.JSONObject
  * @author KaySaith
  */
 @Entity(tableName = "bitcoinTransactionList")
-data class BitcoinSeriesTransactionTable(
+data class BTCSeriesTransactionTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
 	var symbol: String,
@@ -29,59 +39,100 @@ data class BitcoinSeriesTransactionTable(
 	val fee: String,
 	var size: String,
 	var isFee: Boolean,
-	var isPending: Boolean
+	var isPending: Boolean,
+	var chainType: Int
 ) {
-	
+
 	constructor(
 		data: JSONObject,
-		symbol: String,
 		myAddress: String,
-		isFee: Boolean
+		symbol: String,
+		isFee: Boolean,
+		chainType: Int
 	) : this(
 		0,
 		symbol,
-		data.safeGet("block_height"),
-		data.safeGet("tx_index").toInt(),
+		data.safeGet("blockheight"),
+		0,
 		data.safeGet("time"),
-		data.safeGet("hash"),
+		data.safeGet("txid"),
 		getFromAddress(data),
 		getToAddresses(data).toString(),
 		myAddress,
-		!getFromAddress(data).equals(myAddress, true),
+		isReceive(getFromAddress(data), myAddress),
 		getTransactionValue(data, myAddress),
-		getFeeSatoshi(data),
+		data.safeGet("fees"),
 		data.safeGet("size"),
 		isFee,
-		false
+		false,
+		chainType
 	)
-	
+
 	companion object {
-		private fun getFromAddress(data: JSONObject): String {
-			val inputs = JSONArray(data.safeGet("inputs"))
-			return JSONObject(
-				JSONObject(inputs[0].toString()).safeGet("prev_out")
-			).safeGet("addr")
+
+		private fun isReceive(fromAddress: String, toAddress: String): Boolean {
+			val formatToAddress =
+				if (BCHWalletUtils.isNewCashAddress(fromAddress)) {
+					if (!BCHWalletUtils.isNewCashAddress(toAddress))
+						BCHUtil.instance
+							.encodeCashAddressByLegacy(toAddress)
+							.substringAfter(":")
+					else {
+						if (toAddress.contains(":"))
+							toAddress.substringAfter(":")
+						else toAddress
+					}
+				} else {
+					if (BTCUtils.isValidTestnetAddress(fromAddress))
+						BCHWalletUtils.formattedToLegacy(toAddress, TestNet3Params.get())
+					else BCHWalletUtils.formattedToLegacy(toAddress, MainNetParams.get())
+				}
+			return !fromAddress.equals(formatToAddress, true)
 		}
-		
+
+		private fun convertToBCHOrDefaultAddress(myAddress: String, targetAddress: String): String {
+			return if (BCHWalletUtils.isNewCashAddress(targetAddress)) {
+				val myAddressIsLegacy = !BCHWalletUtils.isNewCashAddress(myAddress)
+				if (myAddressIsLegacy)
+					BCHUtil.instance
+						.encodeCashAddressByLegacy(myAddress)
+						.substringAfter(":")
+				else {
+					if (myAddress.contains(":")) myAddress.substringAfter(":")
+					else myAddress
+				}
+			} else {
+				if (BTCUtils.isValidTestnetAddress(targetAddress))
+					BCHWalletUtils.formattedToLegacy(myAddress, TestNet3Params.get())
+				else BCHWalletUtils.formattedToLegacy(myAddress, MainNetParams.get())
+			}
+		}
+
+		private fun getFromAddress(data: JSONObject): String {
+			val inputs = JSONArray(data.safeGet("vin"))
+			return JSONObject(inputs[0].toString()).safeGet("addr")
+		}
+
 		private fun getToAddresses(
 			data: JSONObject
 		): List<String> {
-			val out = JSONArray(data.safeGet("out"))
+			val out = JSONArray(data.safeGet("vout"))
 			var toAddresses = listOf<String>()
 			(0 until out.length()).forEach {
-				toAddresses += JSONObject(out[it].toString()).safeGet("addr")
+				toAddresses += JSONArray(JSONObject(JSONObject(out[it].toString()).safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 			}
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
-			return toAddresses.filterNot { it.equals(getFromAddress(data), true) }
+			return toAddresses.filterNot {
+				it.equals(getFromAddress(data), true)
+			}
 		}
-		
+
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
-			return (getTotalValue(data) - getFeeSatoshi(data).toLong() - getChangeValue(
-				myAddress,
-				data
-			).toLong()).toString()
+			val totalWithoutFee = data.safeGet("valueOut").toDoubleOrNull().orZero()
+			return (
+				totalWithoutFee - getChangeValue(myAddress, data).toDoubleOrNull().orZero()).toString()
 		}
-		
+
 		/**
 		 * 理论上, 比特币的转账地址都可以定义为找零地址, 而若当用户更改不为人所知的自己可以控制的 `ChangeAddress`
 		 * 我们是无从得知的。这里我们假定输出地址就是发起转账的地址为找零地址。并把对应的 `Value` 定义为 `ChangeValue`、
@@ -91,55 +142,58 @@ data class BitcoinSeriesTransactionTable(
 			toAddress: String,
 			data: JSONObject
 		): String {
-			val out = JSONArray(data.safeGet("out"))
-			var changeValue = 0L
-			val mineIsTo = getFromAddress(data).equals(toAddress, true)
+			val out = JSONArray(data.safeGet("vout"))
+			var changeValue = 0.0
+			val formatToAddress = convertToBCHOrDefaultAddress(toAddress, getFromAddress(data))
+			val mineIsTo = getFromAddress(data).equals(formatToAddress, true)
 			(0 until out.length()).forEach {
 				val child = JSONObject(out[it].toString())
+				val childAddress = JSONArray(JSONObject(child.safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 				changeValue +=
-					if (child.safeGet("addr").equals(toAddress, true) == mineIsTo) {
-						child.safeGet("value").toLong()
+					if (childAddress.equals(formatToAddress, true) == mineIsTo) {
+						child.safeGet("value").toDoubleOrNull().orZero()
 					} else {
-						0L
+						0.0
 					}
 			}
 			return changeValue.toString()
 		}
-		
-		fun getTransactionsByAddress(
+
+		fun getTransactionsByAddressAndChainType(
 			address: String,
-			hold: (List<BitcoinSeriesTransactionTable>) -> Unit
+			chainType: Int,
+			hold: (List<BTCSeriesTransactionTable>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase
 					.database
-					.bitcoinTransactionDao()
-					.getDataByAddress(address)
+					.btcSeriesTransactionDao()
+					.getDataByAddressAndChainType(address, chainType)
 			} then (hold)
 		}
-		
+
 		fun getTransactionsByHash(
 			hash: String,
 			isReceive: Boolean,
-			hold: (BitcoinSeriesTransactionTable?) -> Unit
+			hold: (BTCSeriesTransactionTable?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase
 					.database
-					.bitcoinTransactionDao()
+					.btcSeriesTransactionDao()
 					.getDataByHash(hash, isReceive)
 			} then (hold)
 		}
-		
+
 		fun updateLocalDataByHash(
 			hash: String,
-			newData: BitcoinSeriesTransactionTable,
+			newData: BTCSeriesTransactionTable,
 			isFee: Boolean,
 			isPending: Boolean
 		) {
 			GoldStoneDataBase
 				.database
-				.bitcoinTransactionDao()
+				.btcSeriesTransactionDao()
 				.apply {
 					getTransactionByHash(hash, isFee)
 						?.let {
@@ -153,54 +207,80 @@ data class BitcoinSeriesTransactionTable(
 						}
 				}
 		}
-		
-		private fun getTotalValue(data: JSONObject): Long {
-			val inputs = JSONArray(data.safeGet("inputs"))
-			var totalValue = 0L
-			(0 until inputs.length()).forEach {
-				totalValue += JSONObject(
-					JSONObject(inputs[it].toString()).safeGet("prev_out")
-				).safeGet("value").toLong()
+
+		fun preventRepeatedInsert(
+			hash: String,
+			isFee: Boolean,
+			transaction: BTCSeriesTransactionTable
+		) {
+			GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
+				if (getTransactionByHash(hash, isFee).isNull()) {
+					insert(transaction)
+				}
 			}
-			return totalValue
 		}
-		
-		private fun getTotalOutValue(data: JSONObject): Long {
-			val out = JSONArray(data.safeGet("out"))
-			var totalValue = 0L
-			(0 until out.length()).forEach {
-				totalValue += JSONObject(out[it].toString()).safeGet("value").toLong()
+
+		fun deleteByAddress(address: String, chainType: Int, callback: () -> Unit = {}) {
+			doAsync {
+				GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
+					// `BCH` 的 `nnsight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
+					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
+					val formatedAddress =
+						if (
+							chainType == ChainType.BCH.id &&
+							(
+								address.substring(0, 1).equals("m", true) ||
+									address.substring(0, 1).equals("n", true)
+								)
+						) BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+						else address
+
+					val data =
+						getDataByAddressAndChainType(formatedAddress, chainType)
+					if (data.isEmpty()) {
+						callback()
+						return@doAsync
+					}
+					object : ConcurrentAsyncCombine() {
+						override var asyncCount: Int = data.size
+						override fun concurrentJobs() {
+							data.forEach {
+								delete(it)
+								completeMark()
+							}
+						}
+
+						override fun getResultInMainThread() = false
+						override fun mergeCallBack() = callback()
+					}.start()
+				}
 			}
-			return totalValue
 		}
-		
-		private fun getFeeSatoshi(data: JSONObject): String {
-			return (getTotalValue(data) - getTotalOutValue(data)).toString()
-		}
+
 	}
 }
 
 @Dao
-interface BitcoinTransactionDao {
-	
+interface BTCSeriesTransactionDao {
+
 	@Query("SELECT * FROM bitcoinTransactionList")
-	fun getAll(): List<BitcoinSeriesTransactionTable>
-	
-	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address  ORDER BY timeStamp DESC")
-	fun getDataByAddress(address: String): List<BitcoinSeriesTransactionTable>
-	
+	fun getAll(): List<BTCSeriesTransactionTable>
+
+	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType ORDER BY timeStamp DESC")
+	fun getDataByAddressAndChainType(address: String, chainType: Int): List<BTCSeriesTransactionTable>
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
-	fun getDataByHash(hash: String, isReceive: Boolean): BitcoinSeriesTransactionTable?
-	
+	fun getDataByHash(hash: String, isReceive: Boolean): BTCSeriesTransactionTable?
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isFee LIKE :isFee")
-	fun getTransactionByHash(hash: String, isFee: Boolean): BitcoinSeriesTransactionTable?
-	
+	fun getTransactionByHash(hash: String, isFee: Boolean): BTCSeriesTransactionTable?
+
 	@Insert
-	fun insert(table: BitcoinSeriesTransactionTable)
-	
+	fun insert(table: BTCSeriesTransactionTable)
+
 	@Update
-	fun update(table: BitcoinSeriesTransactionTable)
-	
+	fun update(table: BTCSeriesTransactionTable)
+
 	@Delete
-	fun delete(table: BitcoinSeriesTransactionTable)
+	fun delete(table: BTCSeriesTransactionTable)
 }

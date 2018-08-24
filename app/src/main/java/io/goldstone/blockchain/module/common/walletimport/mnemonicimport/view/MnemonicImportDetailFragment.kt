@@ -2,12 +2,25 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View.OVER_SCROLL_ALWAYS
 import android.widget.LinearLayout
+import android.widget.OverScroller
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.cell.RoundCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
@@ -30,7 +43,7 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
-	
+
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val pathSettings by lazy { RoundCell(context!!) }
@@ -45,9 +58,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.ethPath,
 		DefaultPath.etcPath,
 		DefaultPath.btcPath,
-		DefaultPath.btcTestPath
+		DefaultPath.testPath,
+		DefaultPath.ltcPath,
+		DefaultPath.bchPath
 	)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
@@ -57,7 +72,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					hint = ImportWalletText.mnemonicHint
 					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				}.into(this)
-				
+
 				pathSettings
 					.apply {
 						setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
@@ -68,46 +83,44 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					}
 					.click { showPatSettingsDashboard() }
 					.into(this)
-				
+
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
-				
+
 				passwordInput.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
 				}.into(this)
-				
+
 				repeatPassword.apply {
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.repeatPassword
 				}.into(this)
-				
+
 				hintInput.apply {
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
-				
-				agreementView
-					.click {
-						getParentFragment<WalletImportFragment> {
-							presenter.showTargetFragment<WebViewFragment>(
-								ProfileText.terms,
-								ImportWalletText.importWallet,
-								Bundle().apply {
-									putString(ArgumentKey.webViewUrl, WebUrl.terms)
-								}
-							)
-						}
+
+				agreementView.click {
+					getParentFragment<WalletImportFragment> {
+						presenter.showTargetFragment<WebViewFragment>(
+							ProfileText.terms,
+							ImportWalletText.importWallet,
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.terms)
+							}
+						)
 					}
-					.into(this)
-				
+				}.into(this)
+
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle()
@@ -119,7 +132,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[0],
 							defaultPath[1],
 							defaultPath[2],
-							defaultPath[3]
+							defaultPath[3],
+							defaultPath[4],
+							defaultPath[5]
 						),
 						mnemonicInput.text.toString(),
 						passwordInput.text.toString(),
@@ -127,13 +142,13 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
 						walletNameInput.text.toString()
-					) { isScuccessful ->
+					) { isSuccessful ->
 						it.showLoadingStatus(false)
-						if (isScuccessful) activity?.jump<SplashActivity>()
+						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
-				
-				
+
+
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsMnemonic.setUnderline()
 				}.click {
@@ -152,14 +167,32 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}
 		}
 	}
-	
+
+	// 根据业务需要更改子集的值, 所以采用 `MutableList`
+	private val defaultValue = mutableListOf(
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default,
+		DefaultPath.default
+	)
+
 	private val pathInfo = listOf(
 		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
 		Pair(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader),
-		Pair(ImportWalletText.customBitcoinPath, DefaultPath.btcPathHeader),
-		Pair(ImportWalletText.customBTCTestPath, DefaultPath.btcTestPathHeader)
+		Pair(
+			ImportWalletText.customBitcoinPath(Config.getYingYongBaoInReviewStatus()),
+			DefaultPath.btcPathHeader
+		),
+		Pair(
+			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
+			DefaultPath.testPathHeader
+		),
+		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader),
+		Pair(ImportWalletText.customBCHPath, DefaultPath.bchPathHeader)
 	)
-	
+
 	private fun showPatSettingsDashboard() {
 		getParentContainer()?.apply {
 			DashboardOverlay(context) {
@@ -167,13 +200,14 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					TopBottomLineCell(context).apply {
 						layoutParams = LinearLayout.LayoutParams(
 							ScreenSize.widthWithPadding - 40.uiPX(),
-							100.uiPX()
+							85.uiPX()
 						)
 						setTitle(it.first, fontSize(14))
 						TitleEditText(context).apply {
+							y -= 10.uiPX()
 							tag = "pathEdit$index"
 							setTitle(it.second)
-							getEditText().setText(DefaultPath.default)
+							getEditText().setText(defaultValue[index])
 						}.into(this)
 					}.into(this)
 				}
@@ -182,6 +216,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					defaultPath.clear()
 					pathInfo.forEachIndexed { index, pair ->
 						findViewWithTag<TitleEditText>("pathEdit$index")?.let {
+							// 更新默认值的子集数据, 下次在打开的时候显示上次编辑过的数据
+							defaultValue[index] = it.getText()
 							defaultPath.add(pair.second + it.getText())
 						}
 					}
@@ -189,13 +225,13 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			}.into(this)
 		}
 	}
-	
+
 	private fun RoundInput.setPasswordSafeLevel() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
 		}
 	}
-	
+
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
 			isNotNull {

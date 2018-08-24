@@ -11,12 +11,12 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.BaseCell
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.base.basecell.BaseCell
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor

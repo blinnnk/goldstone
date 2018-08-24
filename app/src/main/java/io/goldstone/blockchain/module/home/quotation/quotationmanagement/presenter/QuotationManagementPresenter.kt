@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
@@ -15,19 +15,19 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
-	
+
 	override fun updateData() {
 		updateSelectionsData()
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 	}
-	
+
 	private fun updateSelectionsData(callback: () -> Unit = {}) {
-		QuotationSelectionTable.getMySelections {
-			it.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
+		QuotationSelectionTable.getMySelections { selections ->
+			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
 				fragment.apply {
 					asyncData.isNull() isTrue {
 						asyncData = orderedData
@@ -39,14 +39,14 @@ class QuotationManagementPresenter(
 			callback()
 		}
 	}
-	
+
 	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
 		fragment.updateSelectionOrderID()
 	}
-	
+
 	private fun getCurrentAsyncData() =
 		fragment.asyncData.orEmptyArray()
-	
+
 	private fun QuotationManagementFragment.updateSelectionOrderID() {
 		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { fromPosition, toPosition ->
 			val data = getCurrentAsyncData()
@@ -68,7 +68,7 @@ class QuotationManagementPresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		// 更新数据
 		updateSelectionsData()

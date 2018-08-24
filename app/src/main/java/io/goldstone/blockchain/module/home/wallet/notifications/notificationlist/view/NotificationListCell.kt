@@ -7,10 +7,14 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.baseInfocell.BaseValueCell
+import io.goldstone.blockchain.common.base.basecell.BaseValueCell
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.toMillsecond
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.toMillisecond
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -29,7 +33,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		}
 		date.text =
 			HoneyDateUtil.getSinceTime(
-				model?.createTime?.toMillsecond().orElse(0),
+				model?.createTime?.toMillisecond().orElse(0),
 				DateAndTimeText.getDateText()
 			)
 		WalletTable.getAll {

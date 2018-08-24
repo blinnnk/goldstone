@@ -21,15 +21,14 @@ object FragmentTag {
 	const val pinCode = "pincode"
 	const val notification = "notification"
 	const val tokenManagement = "tokenManagement"
+	const val tokenMarketDetail = "tokenMarketDetail"
+	const val alarmDetail = "alarmDetail"
 	const val tokenDetail = "tokenDetail"
-	const val etcTransactions = "etcTransactions"
-	const val btcTransactions = "btcTransactions"
-	const val ethERC20Transactions = "ethERC20Transactions"
 }
 
 object LogTag {
-	const val error = "ERROR"
-	const val debug = "DEBUG"
+	const val error = "GoldStoneERROR"
+	const val debug = "GoldStoneDEBUG"
 }
 
 object ErrorTag {

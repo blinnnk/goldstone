@@ -7,9 +7,14 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.orTrue
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainNameID
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -24,7 +29,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
-	
+
 	private val fromMainnetSetting by lazy {
 		arguments?.getBoolean(ArgumentKey.isMainnet)
 	}
@@ -39,16 +44,20 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		Pair(CryptoName.eth, ChainText.infuraKovan),
 		Pair(CryptoName.eth, ChainText.rinkeby),
 		Pair(CryptoName.eth, ChainText.infuraRinkeby),
-		Pair(CryptoName.etc, ChainText.goldStoneEtcMorderTest),
+		Pair(CryptoName.etc, ChainText.goldStoneEtcMordenTest),
 		Pair(CryptoName.etc, ChainText.etcMorden),
-		Pair(CryptoName.btc, ChainText.btcTest)
+		Pair(CryptoName.btc, ChainText.btcTest),
+		Pair(CryptoName.ltc, ChainText.ltcTest),
+		Pair(CryptoName.bch, ChainText.bchTest)
 	)
 	private val mainnetNodeList = arrayListOf(
 		Pair(CryptoName.eth, ChainText.goldStoneMain),
 		Pair(CryptoName.eth, ChainText.infuraMain),
 		Pair(CryptoName.etc, ChainText.goldStoneEtcMain),
 		Pair(CryptoName.etc, ChainText.etcMainGasTracker),
-		Pair(CryptoName.btc, ChainText.btcMain)
+		Pair(CryptoName.btc, ChainText.btcMain),
+		Pair(CryptoName.ltc, ChainText.ltcMain),
+		Pair(CryptoName.bch, ChainText.bchMain)
 	)
 	private val confirmButton by lazy {
 		RoundButton(context!!)
@@ -56,7 +65,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private lateinit var container: LinearLayout
 	private val selectedNode = arrayListOf<Pair<String, String>>()
 	override val presenter = NodeSelectionPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -70,6 +79,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					when (chain.first) {
 						CryptoName.eth -> NodeSelectionSectionCell(context).ethType().into(this)
 						CryptoName.btc -> NodeSelectionSectionCell(context).btcType().into(this)
+						CryptoName.ltc -> NodeSelectionSectionCell(context).ltcType().into(this)
+						CryptoName.bch -> NodeSelectionSectionCell(context).bchType().into(this)
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
 					// Nodes of One Chain
@@ -93,9 +104,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						val id = index + when {
 							pair.first.equals(CryptoName.etc, true) -> 10
 							pair.first.equals(CryptoName.btc, true) -> 20
+							pair.first.equals(CryptoName.ltc, true) -> 30
+							pair.first.equals(CryptoName.bch, true) -> 40
 							else -> 0
 						}
-						NodeSelectionCell(context).setData(pair.second, isSelected, id).click {
+						NodeSelectionCell(context).setData(pair.second, isSelected, id).click { it ->
 							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
 							selectedNode.find {
@@ -109,25 +122,51 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}
 				confirmButton.apply {
 					text = CommonText.confirm
-					setBlueStyle(50.uiPX())
+					setBlueStyle(30.uiPX())
 				}.click {
-					fromMainnetSetting?.let {
+					fromMainnetSetting?.let { fromMainnet ->
 						// 更新是否是测试环境的参数
-						Config.updateIsTestEnvironment(!it)
+						Config.updateIsTestEnvironment(!fromMainnet)
 						selectedNode.forEach { pair ->
 							when {
 								pair.first.equals(CryptoName.eth, true) ->
 									presenter.updateERC20ChainID(pair.second)
 								pair.first.equals(CryptoName.btc, true) ->
 									presenter.updateBTCChainID(pair.second)
+								pair.first.equals(CryptoName.bch, true) ->
+									presenter.updateBCHChainID(pair.second)
+								pair.first.equals(CryptoName.ltc, true) ->
+									presenter.updateLTCChainID(pair.second)
 								else -> presenter.updateETCChainID(pair.second)
 							}
 						}
 						AppConfigTable.updateChainInfo(
-							it,
-							selectedNode.find { it.first.equals(CryptoName.etc, true) }?.second!!,
-							selectedNode.find { it.first.equals(CryptoName.eth, true) }?.second!!,
-							selectedNode.find { it.first.equals(CryptoName.btc, true) }?.second!!
+							fromMainnet,
+							etcChainNameID = ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.etc, true)
+								}?.second.orEmpty()
+							),
+							ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.eth, true)
+								}?.second.orEmpty()
+							),
+							btcChainNameID = ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.btc, true)
+								}?.second.orEmpty()
+							),
+							bchChainNameID = ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.bch, true)
+								}?.second.orEmpty()
+							),
+							ltcChainNameID = ChainNameID.getChainNameIDByName(
+								selectedNode.find {
+									it.first.equals(CryptoName.ltc, true)
+								}?.second.orEmpty()
+							)
 						) {
 							activity?.jump<SplashActivity>()
 						}
@@ -136,19 +175,23 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			}
 		}
 	}
-	
+
 	private fun getChainTypeByName(name: String): ChainType {
 		return when (name) {
 			CryptoName.eth -> ChainType.ETH
 			CryptoName.btc -> ChainType.BTC
+			CryptoName.ltc -> ChainType.LTC
+			CryptoName.bch -> ChainType.BCH
 			else -> ChainType.ETC
 		}
 	}
-	
+
 	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
 		val start = when (type) {
 			ChainType.ETC -> 10
 			ChainType.BTC -> 20
+			ChainType.LTC -> 30
+			ChainType.BCH -> 40
 			else -> 0
 		}
 		(start until maxIndex + start).forEach {

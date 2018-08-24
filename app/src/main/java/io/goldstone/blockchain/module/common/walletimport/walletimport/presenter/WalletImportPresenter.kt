@@ -5,9 +5,11 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -22,7 +24,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 class WalletImportPresenter(
 	override val fragment: WalletImportFragment
 ) : BaseOverlayPresenter<WalletImportFragment>() {
-	
+
 	fun onClickMenuBarItem() {
 		fragment.apply {
 			menuBar.clickEvent = Runnable {
@@ -33,20 +35,20 @@ class WalletImportPresenter(
 			}
 		}
 	}
-	
+
 	companion object {
-		
+
 		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
 			return if (index == -1) ""
 			else "$address|$index"
 		}
-		
+
 		fun getAddressIndexFromPath(path: String): Int {
 			return if (path.isEmpty()) -1
 			else path.substringAfterLast("/").toInt()
 		}
-		
+
 		fun insertWalletToDatabase(
 			context: Context?,
 			multiChainAddresses: MultiChainAddresses,
@@ -62,10 +64,12 @@ class WalletImportPresenter(
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcTestAddress
-				).find { it.isNotEmpty() }.orEmpty()
-			
-			WalletTable.getWalletByAddress(currentAddress) {
+					multiChainAddresses.btcSeriesTestAddress,
+					multiChainAddresses.ltcAddress,
+					multiChainAddresses.bchAddress
+				).firstOrNull { it.isNotEmpty() }.orEmpty()
+
+			WalletTable.getWalletByAddress(currentAddress) { it ->
 				it.isNull() isTrue {
 					// 在数据库记录钱包信息
 					WalletTable.insert(
@@ -75,7 +79,9 @@ class WalletImportPresenter(
 							currentETHAndERCAddress = multiChainAddresses.ethAddress,
 							currentETCAddress = multiChainAddresses.etcAddress,
 							currentBTCAddress = multiChainAddresses.btcAddress,
-							currentBTCTestAddress = multiChainAddresses.btcTestAddress,
+							currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTestAddress,
+							currentLTCAddress = multiChainAddresses.ltcAddress,
+							currentBCHAddress = multiChainAddresses.bchAddress,
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -94,14 +100,24 @@ class WalletImportPresenter(
 								multiChainAddresses.btcAddress,
 								getAddressIndexFromPath(multiChainPath.btcPath)
 							),
-							btcTestAddresses = childAddressValue(
-								multiChainAddresses.btcTestAddress,
-								getAddressIndexFromPath(multiChainPath.btcTestPath)
+							btcSeriesTestAddresses = childAddressValue(
+								multiChainAddresses.btcSeriesTestAddress,
+								getAddressIndexFromPath(multiChainPath.testPath)
+							),
+							ltcAddresses = childAddressValue(
+								multiChainAddresses.ltcAddress,
+								getAddressIndexFromPath(multiChainPath.ltcPath)
+							),
+							bchAddresses = childAddressValue(
+								multiChainAddresses.bchAddress,
+								getAddressIndexFromPath(multiChainPath.bchPath)
 							),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,
-							btcTestPath = multiChainPath.btcTestPath
+							btcTestPath = multiChainPath.testPath,
+							ltcPath = multiChainPath.ltcPath,
+							bchPath = multiChainPath.bchPath
 						)
 					) {
 						// 创建钱包并获取默认的 `token` 信息
@@ -113,6 +129,7 @@ class WalletImportPresenter(
 							},
 							callback
 						)
+
 						// 注册钱包地址用于发送 `Push`
 						XinGePushReceiver.registerAddressesForPush()
 					}

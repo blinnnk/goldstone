@@ -6,13 +6,15 @@ import android.view.ViewGroup
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletText
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -22,7 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
  * @author KaySaith
  */
 class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresenter>() {
-	
+
 	val token by lazy {
 		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
 	}
@@ -35,7 +37,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 	var confirmButton: RoundButton? = null
 	private var valueHeader: TwoLineTitles? = null
 	override val presenter = TokenDetailOverlayPresenter(this)
-	
+
 	override fun ViewGroup.initView() {
 		setValueHeader(token)
 		when {
@@ -44,7 +46,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 			else -> presenter.showTokenDetailFragment(token)
 		}
 	}
-	
+
 	@SuppressLint("SetTextI18n")
 	fun setValueHeader(token: WalletDetailCellModel?) {
 		overlayView.header.title.isHidden()
@@ -52,12 +54,10 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 			customHeader = {
 				valueHeader = TwoLineTitles(context)
 				valueHeader?.apply {
-					title.text = "${WalletText.tokenDetailHeaderText} ${token?.symbol}"
+					title.text = "${WalletText.tokenDetailHeaderText} ${CryptoSymbol.updateSymbolIfInReview(token?.symbol.orEmpty())}"
 					subtitle.text =
 						CryptoUtils.scaleTo32(
-							"${token?.count} ${token?.symbol} ≈ ${token?.currency?.formatCurrency()} " +
-							"(${Config.getCurrencyCode
-							()})"
+							"${token?.count?.formatCount(5)} ${CryptoSymbol.updateSymbolIfInReview(token?.symbol.orEmpty())} ≈ ${token?.currency?.formatCurrency()} (${Config.getCurrencyCode()})"
 						)
 					setBigWhiteStyle(fontSize(14).toInt())
 					isCenter = true
@@ -71,12 +71,12 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 			valueHeader?.visibility = View.VISIBLE
 		}
 	}
-	
+
 	fun recoverHeader() {
 		overlayView.header.title.visibility = View.VISIBLE
 		valueHeader?.visibility = View.GONE
 	}
-	
+
 	fun recoveryValueHeader() {
 		overlayView.header.title.visibility = View.GONE
 		valueHeader?.visibility = View.VISIBLE

@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58KeyStoreFile
@@ -21,35 +21,34 @@ import org.jetbrains.anko.uiThread
 class KeystoreExportPresenter(
 	override val fragment: KeystoreExportFragment
 ) : BasePresenter<KeystoreExportFragment>() {
-	
+
 	private val address by lazy {
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
-	
+
 	fun getKeystoreJson(password: String, hold: (String?) -> Unit) {
 		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold(null)
 			return
 		}
-		
+
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		
 		address?.let { getKeystoreByAddress(password, it, hold) }
 	}
-	
+
 	private fun getKeystoreByAddress(
 		password: String,
 		address: String,
 		hold: String?.() -> Unit
 	) {
-		val isBTC = address.length == CryptoValue.bitcoinAddressLength
+		// `BCH` 的地址包含 `:` 所以作为判断条件之一
 		doAsync {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (isBTC) {
+			if (CryptoValue.isBTCSeriesAddress(address)) {
 				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
@@ -60,23 +59,22 @@ class KeystoreExportPresenter(
 			}
 		}
 	}
-	
+
 	private fun getBTCKeystoreFile(
 		walletAddress: String,
 		password: String,
 		isSingleChainWallet: Boolean,
 		hold: (String?) -> Unit
 	) {
-		val filename = CryptoValue.filename(walletAddress, true, isSingleChainWallet)
 		fragment.context?.exportBase58KeyStoreFile(
-			filename,
+			walletAddress,
 			password,
 			isSingleChainWallet
 		) {
 			hold(it)
 		}
 	}
-	
+
 	private fun getETHERC20OrETCKeystoreFile(
 		address: String,
 		password: String,

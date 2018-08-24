@@ -8,14 +8,20 @@ import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.LoadingView
-import io.goldstone.blockchain.common.component.RoundButton
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import org.jetbrains.anko.*
@@ -25,12 +31,12 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class StartingFragment : BaseFragment<StartingPresenter>() {
-	
+
 	override val presenter = StartingPresenter(this)
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }
 	private val logoSize = 220.uiPX()
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
@@ -51,7 +57,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					typeface = GoldStoneFont.black(context)
 					gravity = Gravity.CENTER_HORIZONTAL
 				}
-				
+
 				textView(SplashText.slogan) {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
@@ -61,7 +67,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				centerHorizontally()
 				topMargin = (ScreenSize.Height * 0.2).toInt() + logoSize
 			}
-			
+
 			WalletTable.getAll {
 				// 本地没有钱包的情况下显示登录和导入按钮
 				if (isEmpty()) {
@@ -74,7 +80,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						}.click {
 							presenter.showCreateWalletFragment()
 						}.into(this)
-						
+
 						importButton.apply {
 							text = ImportWalletText.importWallet.toUpperCase()
 							marginTop = PaddingSize.content

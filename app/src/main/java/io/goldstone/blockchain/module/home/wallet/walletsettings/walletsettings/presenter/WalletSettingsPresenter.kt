@@ -8,12 +8,12 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
@@ -37,17 +37,17 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
 class WalletSettingsPresenter(
 	override val fragment: WalletSettingsFragment
 ) : BaseOverlayPresenter<WalletSettingsFragment>() {
-	
+
 	override fun onFragmentViewCreated() {
 		showCurrentWalletInfo()
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		// 页面销毁的时候更新钱包首页, 刷新余额以及更新钱包地址的可能
 		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
-	
+
 	fun showTargetFragmentByTitle(title: String) {
 		when (title) {
 			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
@@ -58,12 +58,12 @@ class WalletSettingsPresenter(
 			WalletSettingsText.backUpMnemonic -> showMnemonicBackUpFragment()
 		}
 	}
-	
+
 	fun showWalletSettingListFragment() {
 		setCustomHeader()
 		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)
 	}
-	
+
 	private fun setCustomHeader() {
 		fragment.apply {
 			customHeader = {
@@ -82,7 +82,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-	
+
 	private fun showHintEditorFragment() {
 		fragment.apply {
 			// 判断是否是只读钱包
@@ -103,7 +103,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-	
+
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -120,21 +120,21 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-	
+
 	private fun showAllMyAddressesFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
 			replaceFragmentAndSetArgument<AddressManagerFragment>(ContainerID.content)
 		}
 	}
-	
+
 	private fun showWalletNameEditorFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
 			replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content)
 		}
 	}
-	
+
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
 			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -143,7 +143,7 @@ class WalletSettingsPresenter(
 			}
 		}
 	}
-	
+
 	private fun WalletSettingsFragment.recoveryHeaderStyle() {
 		recoveryOverlayHeader()
 		header?.visibility = View.GONE
@@ -154,14 +154,14 @@ class WalletSettingsPresenter(
 			header.showCloseButton(false)
 		}
 	}
-	
+
 	private fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
 				title.text = Config.getCurrentName()
-				WalletTable.getWalletAddressCount {
-					val description = if (it == 1) "" else "(Contains BTC Test Address)"
-					subtitle.text = "there are $it addresses in this wallet $description"
+				WalletTable.getWalletAddressCount { count ->
+					val description = if (count == 1) "" else WalletSettingsText.containsBTCTest
+					subtitle.text = WalletSettingsText.addressCountSubtitle(count, description)
 					isCenter = false
 				}
 			}

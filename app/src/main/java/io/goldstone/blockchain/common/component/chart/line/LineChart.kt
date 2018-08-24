@@ -5,10 +5,8 @@ import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
@@ -19,8 +17,9 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
 import com.github.mikephil.charting.utils.Utils
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
-import io.goldstone.blockchain.common.component.chart.XValueFormatter
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.value.*
 import java.util.*
 
 /**
@@ -32,11 +31,13 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	
 	private var chartColor: Int = Color.RED
 	private var chartShadowResource: Int = R.drawable.fade_red
-	
-	abstract fun isDrawPoints(): Boolean
-	abstract fun isPerformBezier(): Boolean
-	abstract fun dragEnable() : Boolean
-	abstract fun touchEnable() : Boolean
+	private var labelTextSize = fontSize(8)
+	abstract val isDrawPoints: Boolean
+	abstract val isPerformBezier: Boolean
+	abstract val dragEnable : Boolean
+	abstract val touchEnable : Boolean
+	abstract val animateEnable : Boolean
+	abstract fun lineLabelCount() : Int
 	
 	constructor(context: Context) : super(context)
 	
@@ -60,17 +61,17 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		initAxisStyle()
 	}
 	
-	fun initAxisStyle() {
-		
+	private fun initAxisStyle() {
 		chartColor = Color.RED
+		labelTextSize = fontSize(8)
 		
-		val gridlineColor = Color.rgb(236, 236, 236)
-		val labelColor = Color.rgb(152, 152, 152)
+		val gridLineColor = GrayScale.lightGray
+		val labelColor = GrayScale.midGray
 		
 		isScaleXEnabled = false
 		isScaleYEnabled = false
 		mPinchZoomEnabled = true
-		isDragEnabled = dragEnable()
+		isDragEnabled = dragEnable
 		legend.isEnabled = false // 标签是否显示
 		description.isEnabled = false // 描述信息展示
 		
@@ -91,14 +92,18 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				if (!this@LineChart.data.isNull() ||
 					!this@LineChart.data.getDataSetByIndex(0).isNull()){
 					val position = value.toInt()
-					var values = (this@LineChart.data.getDataSetByIndex(0) as LineDataSet).values
+					val values = (this@LineChart.data.getDataSetByIndex(0) as LineDataSet).values
 					if (position < values.size) {
 						val entry = values[position]
 						if ((entry.data is Long)) {
 							result = if (entry.data == 0) "" else  TimeUtils.formatMdDate(entry.data as Long)
 						}
 						if (entry.data is String) {
-							result = if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+							result = try {
+								if ((entry.data as String).isEmpty()) "" else TimeUtils.formatMdDate((entry.data as String).toLong())
+							}catch (exception: NumberFormatException) {
+								entry.data.toString()
+							}
 						}
 					}else {
 						result = ""
@@ -110,31 +115,45 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			position = XAxis.XAxisPosition.BOTTOM
 			setDrawAxisLine(false)
 			setDrawLabels(true)
-			gridColor = gridlineColor
+			gridColor = gridLineColor
 			System.out.println("+++$labelColor")
 			textColor = labelColor
 			mAxisMinimum = 10f
+			textSize = labelTextSize
+			typeface = GoldStoneFont.heavy(context)
 		}
 		mAxisLeft.apply {
-			axisLineColor = gridlineColor
-			gridColor = gridlineColor
-			textColor = Color.rgb(152, 152, 152)
-			setLabelCount(4, true)
+			axisLineColor = gridLineColor
+			gridColor = gridLineColor
+			textColor = labelColor
+			setLabelCount(lineLabelCount(), true)
+			textSize = labelTextSize
+			typeface = GoldStoneFont.heavy(context)
 		}
 		
 		axisRight.apply {
-			axisLineColor = gridlineColor
+			axisLineColor = gridLineColor
 			isEnabled = true
 			setDrawLabels(false)
 			setDrawGridLines(false)
 		}
 		
-//		animateY(1000)
+		if (animateEnable){
+			animateY(1000)
+		}
 	}
 	
-	fun resetData(dataRows: List<Entry>) {
+	fun resetData(dataRows: List<Entry>, fitLabelCount: Boolean) {
+		if (fitLabelCount) {
+			mXAxis.labelCount = dataRows.size - 1
+		}
 		
-		val pointColor = Color.BLACK
+		resetData(dataRows)
+	}
+	
+	open fun resetData(dataRows: List<Entry>) {
+		
+		val pointColor = Spectrum.deepBlue
 		val chartWidth = 3f
 		
 		val dataSet: LineDataSet
@@ -156,7 +175,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				}
 				
 				// 平划的曲线
-				if (isPerformBezier()) {
+				if (isPerformBezier) {
 					mode = LineDataSet.Mode.CUBIC_BEZIER
 					cubicIntensity = 0.2f
 				}
@@ -166,8 +185,8 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				
 				color = chartColor
 				lineWidth = chartWidth
-				if (isDrawPoints()) {
-					val pointRadius = arrayListOf(5f, 2f)
+				if (isDrawPoints) {
+					val pointRadius = arrayListOf(7f, 4f)
 					// 峰值点
 					setDrawCircles(true)
 					setCircleColor(pointColor)
@@ -196,13 +215,14 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			
 			// set data
 			setData(data)
-			if (dragEnable()){
+			if (dragEnable){
 				val xRangeVisibleNum = 8f
 				// set visible num xRange
 				setVisibleXRangeMaximum(xRangeVisibleNum)
 				setVisibleXRangeMinimum(xRangeVisibleNum)
 			}
 		}
+		invalidate()
 	}
 	
 	fun setChartColorAndShadowResource(color: Int, resource: Int) {
@@ -231,6 +251,6 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 	}
 	
 	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-		return if (touchEnable()) { super.dispatchTouchEvent(ev)} else { false }
+		return if (touchEnable) { super.dispatchTouchEvent(ev)} else { false }
 	}
 }

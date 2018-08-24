@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.os.Bundle
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.TokenDetailText
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode

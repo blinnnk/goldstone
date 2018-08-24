@@ -8,10 +8,14 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
@@ -28,12 +32,12 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 class NotificationListPresenter(
 	override val fragment: NotificationListFragment
 ) : BaseRecyclerPresenter<NotificationListFragment, NotificationTable>() {
-	
+
 	override fun updateData() {
 		super.updateData()
 		getDataFromDatabase()
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()
@@ -41,7 +45,7 @@ class NotificationListPresenter(
 			?.presenter
 			?.updateUnreadCount()
 	}
-	
+
 	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<TransactionDetailFragment>(
@@ -52,7 +56,7 @@ class NotificationListPresenter(
 				})
 		}
 	}
-	
+
 	fun showWebFragment(title: String, url: String) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<WebViewFragment>(
@@ -63,7 +67,7 @@ class NotificationListPresenter(
 				})
 		}
 	}
-	
+
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView(LoadingText.notificationData)
 		NotificationTable.getAllNotifications { localData ->
@@ -81,7 +85,7 @@ class NotificationListPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateDataFromServer(requestTime: Long) {
 		GoldStoneAPI.getNotificationList(
 			requestTime,
@@ -97,7 +101,7 @@ class NotificationListPresenter(
 			}
 		}
 	}
-	
+
 	private fun showServerErrorDialog() {
 		// Error callback
 		fragment.context?.let {

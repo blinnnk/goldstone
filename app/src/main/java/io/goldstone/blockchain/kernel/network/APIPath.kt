@@ -6,21 +6,20 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 31/03/2018 8:09 PM
  * @author KaySaith
  */
 object APIPath {
-	
+
 	/** GoldStone Basic Api Address */
 	var currentUrl = WebUrl.normalServer
-	
+
 	fun updateServerUrl(newUrl: String) {
 		currentUrl = newUrl
 	}
-	
+
 	const val serverStatus = "https://gs.blinnnk.com/index/serverStatus"
 	val getCurrencyRate: (header: String) -> String = { "$it/index/exchangeRate?currency=" }
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
@@ -35,6 +34,7 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
+	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val defaultTokenList: (
 		header: String,
 		md5: String
@@ -64,7 +64,6 @@ object APIPath {
 	) -> String = { header, pair, period, size ->
 		"$header/market/lineData?pair=$pair&period=$period&size=$size"
 	}
-	
 	val getQuotationCurrencyCandleChart: (
 		header: String,
 		pair: String,
@@ -90,14 +89,13 @@ object APIPath {
 	}
 	
 	
-	
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}
 }
 
 object EtherScanApi {
-	
+
 	private val apikey: () -> String = { etherScanKeys.getRandom() }
 	private const val mainHeader = "https://api.etherscan.io"
 	private const val ropstanHeader = "https://api-ropsten.etherscan.io"
@@ -135,10 +133,16 @@ object EtherScanApi {
 		}
 	}
 	val gasTrackerHeader: (taxHash: String) -> String = {
-		"https://gastracker.io/tx/$it"
+		"${ChainURL.etcWebHeader()}$it"
 	}
 	val bitcoinTransactionDetail: (taxHash: String) -> String = {
-		"${BitcoinUrl.currentUrl()}/tx/$it"
+		"${ChainURL.btcWebHeader()}$it"
+	}
+	val litcoinTransactionDetail: (taxHash: String) -> String = {
+		"${ChainURL.ltcWebHeader()}$it"
+	}
+	val bitcoinCashTransactionDetail: (taxHash: String) -> String = {
+		"${ChainURL.bchWebHeader()}$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"

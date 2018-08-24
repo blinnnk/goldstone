@@ -48,16 +48,16 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
+				linechart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				blinnnkLineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
+				linechart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
 		
-		blinnnkLineChart.resetData(
+		linechart.resetData(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
 			}.toArrayList()
@@ -93,16 +93,13 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			y += 52.uiPX()
 		}
 	}
-	
-	private val blinnnkLineChart = object : LineChart(context) {
-		override fun dragEnable(): Boolean = false
-		
-		override fun touchEnable(): Boolean = false
-		
-		override fun isDrawPoints(): Boolean = false
-
-		override fun isPerformBezier(): Boolean = true
-
+	private val linechart = object : LineChart(context) {
+		override val isDrawPoints: Boolean = false
+		override val isPerformBezier: Boolean = true
+		override val dragEnable: Boolean = false
+		override val touchEnable: Boolean = false
+		override val animateEnable: Boolean = false
+		override fun lineLabelCount(): Int = 4
 	}
 	
 	init {
@@ -121,7 +118,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			tokenPrice.setAlignParentRight()
 			
-			blinnnkLineChart.apply {
+			linechart.apply {
 				id = ElementID.chartView
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
 				setMargins<RelativeLayout.LayoutParams> {

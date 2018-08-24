@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
-import io.goldstone.blockchain.common.value.WalletText
+import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
@@ -13,41 +14,34 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 data class WalletListModel(
 	var id: Int = 0,
 	var addressName: String = "",
-	var address: String = "",
-	var subtitle: String = "",
+	var address: String = "", // 切换钱包的时候用于比对的值
+	var subtitle: String = "", // 显示的副标题
 	var balance: Double = 0.0,
 	var isWatchOnly: Boolean = false,
 	var isUsing: Boolean = false,
 	var type: String = ""
 ) {
-	
+
 	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
-		showSubtitleByType(data, true),
-		showSubtitleByType(data, false),
+		WalletTable.getAddressesByWallet(data).first(),
+		getSubtitleByType(data),
 		balance,
 		data.isWatchOnly,
 		data.isUsing,
 		type
 	)
-	
+
 	companion object {
-		fun showSubtitleByType(wallet: WalletTable, isAddress: Boolean): String {
-			return if (wallet.currentETHAndERCAddress.isEmpty()) {
-				if (wallet.currentBTCTestAddress.isEmpty()) {
-					wallet.currentBTCAddress
-				} else {
-					wallet.currentBTCTestAddress
-				}
-			} else if (wallet.currentBTCAddress.isEmpty()) {
-				wallet.currentETHAndERCAddress
-			} else {
-				if (isAddress) {
-					wallet.currentETHAndERCAddress
-				} else {
-					WalletText.multiChainWallet
-				}
+		fun getSubtitleByType(wallet: WalletTable): String {
+			return when (WalletTable.getTargetWalletType(wallet)) {
+				WalletType.LTCOnly -> wallet.currentLTCAddress
+				WalletType.BCHOnly -> wallet.currentBCHAddress
+				WalletType.MultiChain -> WalletText.multiChain
+				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
+				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses
+				WalletType.BTCOnly -> wallet.btcAddresses
 			}
 		}
 	}

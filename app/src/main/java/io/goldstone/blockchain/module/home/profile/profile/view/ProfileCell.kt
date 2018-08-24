@@ -10,10 +10,14 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.base.BaseCell
-import io.goldstone.blockchain.common.component.SquareIcon
+import io.goldstone.blockchain.common.base.basecell.BaseCell
+import io.goldstone.blockchain.common.component.button.SquareIcon
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CommonCellSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.rightPadding

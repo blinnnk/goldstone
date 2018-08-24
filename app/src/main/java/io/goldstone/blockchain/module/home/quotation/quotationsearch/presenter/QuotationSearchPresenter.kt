@@ -3,11 +3,11 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
-import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -22,11 +22,11 @@ import org.jetbrains.anko.runOnUiThread
 class QuotationSearchPresenter(
 	override val fragment: QuotationSearchFragment
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-	
+
 	private var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -43,7 +43,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-	
+
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
 		isSelect: Boolean = true,
@@ -61,7 +61,7 @@ class QuotationSearchPresenter(
 			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
 		}
 	}
-	
+
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
@@ -93,7 +93,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-	
+
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
@@ -102,7 +102,7 @@ class QuotationSearchPresenter(
 			}.toArrayList())
 		}
 	}
-	
+
 	companion object {
 		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
 			val parameter = JsonArray().apply { add(pair) }

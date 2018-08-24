@@ -6,18 +6,15 @@ import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import me.itangqi.waveloadingview.WaveLoadingView
@@ -29,17 +26,19 @@ import java.util.*
  * @author KaySaith
  */
 class WalletListCardCell(context: Context) : RelativeLayout(context) {
-	
+
 	var model: WalletListModel by observing(WalletListModel()) {
 		val currentType = when {
 			model.isWatchOnly -> WalletText.watchOnly
 			model.type.equals(WalletType.ETHERCAndETCOnly.content, true) -> WalletText.ethERCAndETC
+			model.type.equals(WalletType.LTCOnly.content, true) -> WalletText.ltcMainnet
+			model.type.equals(WalletType.BCHOnly.content, true) -> WalletText.bchMainnet
 			model.type.equals(WalletType.BTCOnly.content, true) -> WalletText.btcMainnet
 			model.type.equals(WalletType.BTCTestOnly.content, true) -> WalletText.bitcoinTestnet
 			else -> WalletText.multiChain
 		}
 		nameInfo.title.text = model.addressName
-		nameInfo.subtitle.text = CryptoUtils.scaleTo32(model.subtitle)
+		nameInfo.subtitle.text = model.subtitle.scaleTo(28)
 		walletInfo.title.text = currentType
 		walletInfo.subtitle.text = WalletText.baseBip44
 		balanceInfo.title.text = model.balance.formatCurrency()
@@ -67,7 +66,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 	}
 	private val avatar = ImageView(context)
 	private var container: RelativeLayout
-	
+
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 175.uiPX())
 		container = relativeLayout {

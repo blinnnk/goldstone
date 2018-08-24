@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.*
 
@@ -17,7 +17,7 @@ data class GasSelectionModel(
 	var currentType: String = "",
 	val unitSymbol: String = CryptoSymbol.eth
 ) {
-	
+
 	constructor(
 		id: Int,
 		gWei: Double,
@@ -32,21 +32,22 @@ data class GasSelectionModel(
 		currentType,
 		unitSymbol
 	)
-	
+
 	constructor(
 		id: Int,
 		price: Long, // Satoshi
 		bytes: Long,
-		currentType: String
+		currentType: String,
+		symbol: String
 	) : this(
 		id,
-		"${(price * bytes).toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
+		"${(price * bytes).toBTCCount().toBigDecimal()} $symbol",
 		"≈ $price Satoshi  * $bytes bytes",
-		calculateBTCType(id, price),
+		calculateBTCSeruesType(id, price),
 		currentType,
-		CryptoSymbol.btc
+		symbol
 	)
-	
+
 	companion object {
 		fun calculateType(id: Int, gWei: Double): String {
 			return if (id == 3) MinerFeeType.Custom.content
@@ -59,8 +60,8 @@ data class GasSelectionModel(
 				}
 			}
 		}
-		
-		fun calculateBTCType(id: Int, satoshi: Long): String {
+
+		fun calculateBTCSeruesType(id: Int, satoshi: Long): String {
 			return if (id == 3) MinerFeeType.Custom.content
 			else {
 				when (satoshi) {

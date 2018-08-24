@@ -10,6 +10,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.EmptyText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.imageView
@@ -28,7 +30,8 @@ enum class EmptyType {
 	Search,
 	QuotationSearch,
 	Quotation,
-	WalletDetail
+	WalletDetail,
+	NotificationList
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -70,7 +73,8 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
 			}
-			
+
+
 			EmptyType.WalletDetail -> {
 				val viewSize = 300.uiPX()
 				val hasEnoughSpace =
@@ -107,7 +111,13 @@ class EmptyView(context: Context) : LinearLayout(context) {
 					y += 45.uiPX()
 				}
 			}
-			
+
+			EmptyType.NotificationList -> {
+				icon.imageResource = R.drawable.notification_list_empty_icon
+				introTitles.title.text = EmptyText.notificationListTitle
+				introTitles.subtitle.text = EmptyText.notificationListSubtitle
+			}
+
 			EmptyType.TransactionDetail -> {
 				icon.imageResource = R.drawable.transaction_empty_icon
 				introTitles.title.text = EmptyText.tokenDetailTitle

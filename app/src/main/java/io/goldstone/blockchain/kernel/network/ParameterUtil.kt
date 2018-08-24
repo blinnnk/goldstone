@@ -33,7 +33,7 @@ object ParameterUtil {
 	fun <T> prepareJsonRPC(
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,
-		id: Int,
+		id: Int?,
 		hasLatest: Boolean,
 		isRPC2: Boolean,
 		vararg parameters: T?
@@ -49,8 +49,9 @@ object ParameterUtil {
 			if (content.isEmpty()) ""
 			else content.substringBeforeLast(",") + latest
 		val rpcVersion = if (isRPC2) 2.0 else 1.0
+		val rpcID = if (id.isNull()) "" else ",\"id\":$id"
 		val rpcContent =
-			"{\"jsonrpc\":\"$rpcVersion\", \"method\":\"$method\", \"params\":[$finalParameter], \"id\":$id}"
+			"{\"jsonrpc\":\"$rpcVersion\", \"method\":\"$method\", \"params\":[$finalParameter]$rpcID}"
 		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
 	

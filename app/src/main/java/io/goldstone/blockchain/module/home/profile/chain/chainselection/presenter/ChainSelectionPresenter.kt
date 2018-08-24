@@ -4,9 +4,9 @@ import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainText
-import io.goldstone.blockchain.common.value.ProfileText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment

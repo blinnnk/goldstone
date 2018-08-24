@@ -7,11 +7,11 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.GraySqualCell
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.DateAndTimeText
+import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.DateAndTimeText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout

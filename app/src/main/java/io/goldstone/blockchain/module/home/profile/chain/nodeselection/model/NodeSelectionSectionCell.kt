@@ -21,11 +21,11 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class NodeSelectionSectionCell(context: Context) : LinearLayout(context) {
-	
+
 	private val titles = TwoLineTitles(context)
 	private val icon = ImageView(context)
 	private val cellHeight = 50.uiPX()
-	
+
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
 			topMargin = 20.uiPX()
@@ -46,21 +46,35 @@ class NodeSelectionSectionCell(context: Context) : LinearLayout(context) {
 			}
 			.into(this)
 	}
-	
+
 	fun ethType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.eth_icon
 		titles.title.text = CryptoSymbol.eth
 		titles.subtitle.text = CryptoName.eth
 		return this
 	}
-	
+
 	fun btcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.btc_icon
-		titles.title.text = CryptoSymbol.btc
-		titles.subtitle.text = CryptoName.btc
+		titles.title.text = CryptoSymbol.btc()
+		titles.subtitle.text = CryptoSymbol.updateNameIfInReview(CryptoName.btc)
 		return this
 	}
-	
+
+	fun ltcType(): NodeSelectionSectionCell {
+		icon.imageResource = R.drawable.ltc_icon
+		titles.title.text = CryptoSymbol.ltc
+		titles.subtitle.text = CryptoName.ltc
+		return this
+	}
+
+	fun bchType(): NodeSelectionSectionCell {
+		icon.imageResource = R.drawable.bch_icon
+		titles.title.text = CryptoSymbol.bch
+		titles.subtitle.text = CryptoName.bch
+		return this
+	}
+
 	fun etcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.etc_icon
 		titles.title.text = CryptoSymbol.etc

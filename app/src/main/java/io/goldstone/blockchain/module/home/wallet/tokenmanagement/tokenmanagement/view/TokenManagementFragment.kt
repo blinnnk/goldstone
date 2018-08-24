@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.value.TokenManagementText
+import io.goldstone.blockchain.common.language.TokenManagementText
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.presenter.TokenManagementPresenter
 
 /**

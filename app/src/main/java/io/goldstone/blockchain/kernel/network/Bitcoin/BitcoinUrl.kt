@@ -8,29 +8,24 @@ import io.goldstone.blockchain.common.value.WebUrl
  * @author KaySaith
  */
 object BitcoinUrl {
-	
+
 	var currentUrl: () -> String = {
-		if (Config.isTestEnvironment()) WebUrl.btcTest else WebUrl.btcMain
+		if (Config.isTestEnvironment()) WebUrl.btcTest
+		else WebUrl.btcMain
 	}
-	val getBalance: (header: String, address: String) -> String = { header, address ->
-		"$header/balance?active=$address"
+
+	val getBalance: (address: String) -> String = { address ->
+		"${currentUrl()}/api/addr/$address/balance"
 	}
-	val getUnspentInfo: (header: String, address: String) -> String = { header, address ->
-		"$header/unspent?active=$address"
+
+	val getTransactionList: (address: String) -> String = {
+		"${currentUrl()}/api/txs/?address=$it"
 	}
-	val getTransactions: (
-		header: String,
-		address: String,
-		pageSize: Int,
-		offset: Int
-	) -> String = { header, address, pageSize, offset ->
-		// `limit` 每页 `10` 条数据
-		"$header/rawaddr/$address?limit=$pageSize&offset=$offset"
+
+	val getUnspentInfo: (address: String) -> String = { address ->
+		"${currentUrl()}/api/addr/$address/utxo"
 	}
-	val getTransactionByHash: (
-		header: String,
-		hash: String
-	) -> String = { header, hash ->
-		"$header/rawtx/$hash"
+	val getTransactionByHash: (header: String, hash: String) -> String = { header, hash ->
+		"$header/api/tx/$hash"
 	}
 }

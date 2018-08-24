@@ -12,7 +12,7 @@ import io.goldstone.blockchain.crypto.utils.clean0xPrefix
  * @author KaySaith
  */
 object WalletUtil {
-	
+
 	fun getKeyPairFromWalletFile(
 		walletJSON: String,
 		password: String,
@@ -47,21 +47,37 @@ object WalletUtil {
 			null
 		}
 	}
-	
+
 	fun isValidPrivateKey(key: String): Boolean {
 		return key.clean0xPrefix().length == 63 || key.clean0xPrefix().length == 64
 	}
-	
+
 	fun getAddressBySymbol(symbol: String): String {
 		return when (symbol) {
-			CryptoSymbol.btc -> {
+			CryptoSymbol.btc() -> {
 				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCTestAddress()
+					Config.getCurrentBTCSeriesTestAddress()
 				} else {
 					Config.getCurrentBTCAddress()
 				}
 			}
-			
+
+			CryptoSymbol.ltc -> {
+				if (Config.isTestEnvironment()) {
+					Config.getCurrentBTCSeriesTestAddress()
+				} else {
+					Config.getCurrentLTCAddress()
+				}
+			}
+
+			CryptoSymbol.bch -> {
+				if (Config.isTestEnvironment()) {
+					Config.getCurrentBTCSeriesTestAddress()
+				} else {
+					Config.getCurrentBCHAddress()
+				}
+			}
+
 			CryptoSymbol.etc ->
 				Config.getCurrentETCAddress()
 			else ->

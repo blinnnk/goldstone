@@ -4,14 +4,15 @@ import android.widget.EditText
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.AlertText
-import io.goldstone.blockchain.common.value.CreateWalletText
-import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.BTCTest
-import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.ETHERCAndETC
+import io.goldstone.blockchain.crypto.CryptoValue.PrivateKeyType.*
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.walletfile.WalletUtil
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
@@ -30,7 +31,7 @@ import java.math.BigInteger
 class KeystoreImportPresenter(
 	override val fragment: KeystoreImportFragment
 ) : BasePresenter<KeystoreImportFragment>() {
-	
+
 	fun importKeystoreWallet(
 		currentType: String,
 		keystore: String,
@@ -47,7 +48,7 @@ class KeystoreImportPresenter(
 			doAsync {
 				getPrivatekeyByKeystoreFile(keystore, password) {
 					if (it.isNull()) callback(false)
-					
+
 					it?.let { privateKey ->
 						when {
 							currentType.equals(ETHERCAndETC.content, true) -> {
@@ -59,7 +60,27 @@ class KeystoreImportPresenter(
 									callback
 								)
 							}
-							
+
+							currentType.equals(LTC.content, true) -> {
+								importLTCWallet(
+									walletName,
+									password,
+									hintInput,
+									privateKey,
+									callback
+								)
+							}
+
+							currentType.equals(BCH.content, true) -> {
+								importBCHWallet(
+									walletName,
+									password,
+									hintInput,
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(MainNetParams.get()),
+									callback
+								)
+							}
+
 							currentType.equals(BTCTest.content, true) -> {
 								importBitcoinWallet(
 									walletName,
@@ -70,7 +91,7 @@ class KeystoreImportPresenter(
 									callback
 								)
 							}
-							
+
 							else -> {
 								importBitcoinWallet(
 									walletName,
@@ -90,12 +111,12 @@ class KeystoreImportPresenter(
 			callback(false)
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
-	
+
 	private fun importETHERC20OrETCWallet(
 		walletName: String,
 		password: EditText,
@@ -113,7 +134,42 @@ class KeystoreImportPresenter(
 			callback
 		)
 	}
-	
+
+	private fun importLTCWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: BigInteger,
+		callback: (Boolean) -> Unit
+	) {
+		val wifKey = LTCWalletUtils.generateWIFPrivatekey(privateKey, ChainPrefix.Litecoin, true)
+		PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
+			wifKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
+	private fun importBCHWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: String,
+		callback: (Boolean) -> Unit
+	) {
+		PrivateKeyImportPresenter.importWalletByBCHPrivateKey(
+			privateKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
 	private fun importBitcoinWallet(
 		walletName: String,
 		password: EditText,
@@ -132,7 +188,7 @@ class KeystoreImportPresenter(
 			callback
 		)
 	}
-	
+
 	private fun getPrivatekeyByKeystoreFile(
 		keystore: String,
 		password: EditText,

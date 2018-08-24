@@ -12,15 +12,19 @@ import com.blinnnk.util.ReasonText
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import com.blinnnk.util.replaceFragmentAndSetArgument
+import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.RoundButton
 import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.DefaultPath
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
@@ -45,11 +49,11 @@ import org.jetbrains.anko.runOnUiThread
 class CreateWalletPresenter(
 	override val fragment: CreateWalletFragment
 ) : BasePresenter<CreateWalletFragment>() {
-	
+
 	private var nameText = ""
 	private var passwordText = ""
 	private var repeatPasswordText = ""
-	
+
 	fun showAgreementFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
@@ -60,7 +64,7 @@ class CreateWalletPresenter(
 			argument
 		)
 	}
-	
+
 	fun generateWalletWith(
 		isAgree: Boolean,
 		hintInput: EditText,
@@ -82,7 +86,7 @@ class CreateWalletPresenter(
 			)
 		}
 	}
-	
+
 	fun updateConfirmButtonStyle(
 		nameInput: RoundInput,
 		passwordInput: RoundInput,
@@ -103,7 +107,7 @@ class CreateWalletPresenter(
 			setConfirmButtonStyle(confirmButton)
 		}
 	}
-	
+
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
 		if (passwordText.count() * repeatPasswordText.count() != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
@@ -111,7 +115,7 @@ class CreateWalletPresenter(
 			confirmButton.setGrayStyle(20.uiPX())
 		}
 	}
-	
+
 	private fun Context.generateWalletWith(
 		password: String,
 		name: String,
@@ -131,7 +135,9 @@ class CreateWalletPresenter(
 						multiChainAddresses.ethAddress,
 						multiChainAddresses.etcAddress,
 						multiChainAddresses.btcAddress,
-						multiChainAddresses.btcTestAddress,
+						multiChainAddresses.btcSeriesTestAddress,
+						multiChainAddresses.ltcAddress,
+						multiChainAddresses.bchAddress,
 						ethAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ethAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
@@ -144,14 +150,24 @@ class CreateWalletPresenter(
 							multiChainAddresses.btcAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
 						),
-						btcTestAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.btcTestAddress,
+						btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.btcSeriesTestAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+						),
+						ltcAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.ltcAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
+						),
+						bchAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.bchAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
 						),
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
-						btcTestPath = DefaultPath.btcTestPath,
+						btcTestPath = DefaultPath.testPath,
+						bchPath = DefaultPath.bchPath,
+						ltcPath = DefaultPath.ltcPath,
 						hint = hint,
 						isUsing = true
 					)
@@ -173,13 +189,13 @@ class CreateWalletPresenter(
 							}
 						}
 					}
-					
+
 					XinGePushReceiver.registerAddressesForPush()
 				}
 			}
 		}
 	}
-	
+
 	private fun saveEncryptMnemonic(
 		mnemonic: String?,
 		address: String,
@@ -194,7 +210,7 @@ class CreateWalletPresenter(
 			}
 		}
 	}
-	
+
 	private fun showMnemonicBackupFragment(arguments: Bundle) {
 		// 创建钱包一旦成功跳转到 `备份助记词` 界面就不准许再回到创建的界面防止重复创建账号
 		// 所以这里使用了覆盖 `Fragment` 的方法
@@ -205,14 +221,14 @@ class CreateWalletPresenter(
 			headerTitle = CreateWalletText.mnemonicBackUp
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletGenerationFragment>(fragment)
 	}
-	
+
 	companion object {
-		
+
 		fun showPasswordSafeLevel(passwordInput: RoundInput) {
 			passwordInput.apply {
 				val password = text.toString()
@@ -223,7 +239,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
@@ -245,7 +261,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		fun checkInputValue(
 			name: String,
 			password: String,
@@ -256,16 +272,17 @@ class CreateWalletPresenter(
 			callback: (password: String, walletName: String) -> Unit
 		) {
 			if (password.isEmpty()) {
-				context?.alert(CreateWalletText.emptyRepeatPasswordAlert)
+				context.alert(CreateWalletText.emptyRepeatPasswordAlert)
 				failedCallback()
 				return
 			}
+
 			isAgree isFalse {
 				context?.alert(CreateWalletText.agreeRemind)
 				failedCallback()
 				return
 			}
-			
+
 			if (password != repeatPassword) {
 				context?.alert(CreateWalletText.passwordRepeatAlert)
 				failedCallback()
@@ -285,7 +302,7 @@ class CreateWalletPresenter(
 				normal = CreateWalletText.safetyLevelNoraml
 				high = CreateWalletText.safetyLevelHigh
 			}
-			
+
 			doAsync {
 				password.checkPasswordInRules(reason) { _, reasons ->
 					GoldStoneAPI.context.runOnUiThread {
@@ -299,7 +316,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
 			currentAddresses: MultiChainAddresses,
 			callback: (Boolean) -> Unit
@@ -316,7 +333,7 @@ class CreateWalletPresenter(
 				}
 			}
 		}
-		
+
 		private fun List<DefaultTokenTable>.insertNewAccount(
 			currentAddresses: MultiChainAddresses,
 			callback: () -> Unit
@@ -331,44 +348,53 @@ class CreateWalletPresenter(
 							ChainID.Kovan.id,
 							ChainID.Rinkeby.id -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.ethAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ethAddress))
 								}
 							}
-							
+
 							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.etcAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.etcAddress))
 								}
 							}
-							
+
 							ChainID.BTCMain.id -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.btcAddress),
-										it.chain_id
-									)
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcAddress))
 								}
 							}
-							
+
 							ChainID.BTCTest.id -> {
-								if (currentAddresses.btcTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(
-										MyTokenTable(it, currentAddresses.btcTestAddress),
-										it.chain_id
-									)
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+								}
+							}
+							ChainID.LTCMain.id -> {
+								if (currentAddresses.ltcAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ltcAddress))
+								}
+							}
+							ChainID.LTCTest.id -> {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+								}
+							}
+
+							ChainID.BCHMain.id -> {
+								if (currentAddresses.bchAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.bchAddress))
+								}
+							}
+							ChainID.BCHTest.id -> {
+								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
 								}
 							}
 						}
 						completeMark()
 					}
 				}
-				
+
 				override fun mergeCallBack() = callback()
 			}.start()
 		}

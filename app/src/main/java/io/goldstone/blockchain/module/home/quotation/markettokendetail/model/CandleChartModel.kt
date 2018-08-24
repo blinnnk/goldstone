@@ -22,8 +22,10 @@ class CandleChartModel (
 	val time: String
 ) {
 	constructor(data: JSONObject) : this(
-		data.safeGet("high"), data.safeGet("low"),
-			data.safeGet("close"), data.safeGet("open"),
+		data.safeGet("high"),
+		data.safeGet("low"),
+		data.safeGet("close"),
+		data.safeGet("open"),
 		data.safeGet("time")
 	
 	)

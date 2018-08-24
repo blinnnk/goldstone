@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.home.profile.currency.view
 import android.content.Context
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.BaseRadioCell
+import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 
 /**

@@ -32,7 +32,7 @@ data class NotificationTable(
 	val title: String = "",
 	val createTime: Long = 0L,
 	val action: String = "",
-	val actionContent: String = "", // hash or weburl
+	val actionContent: String = "", // hash or WebURL
 	val type: Int = 0,
 	val extra: String? = ""
 ) {
@@ -63,7 +63,7 @@ data class NotificationTable(
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.notificationDao().getAllNotifications()
-			} then {
+			} then { it ->
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}

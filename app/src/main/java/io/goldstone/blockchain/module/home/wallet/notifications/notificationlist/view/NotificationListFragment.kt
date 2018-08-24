@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -18,22 +18,22 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class NotificationListFragment :
 	BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
-	
+
 	override val presenter = NotificationListPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<NotificationTable>?
 	) {
 		recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
-			onClick {
+			onClick { _ ->
 				model?.apply {
 					if (type == 1) {
 						presenter.showWebFragment(title, actionContent)
 					} else {
 						val fromAddress: String
 						val toAddress: String
-						if (NotificationTable.getSymbol(extra.orEmpty()).equals(CryptoSymbol.btc, true)) {
+						if (CryptoSymbol.isBTCSeriesSymbol(NotificationTable.getSymbol(extra.orEmpty()))) {
 							// TODO Bitcoin Transaction FromAddress 需要处理多 FromAddress 地址的情况
 							fromAddress =
 								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address
@@ -63,7 +63,7 @@ class NotificationListFragment :
 			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null

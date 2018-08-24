@@ -9,10 +9,10 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons
-import io.goldstone.blockchain.common.component.GraySqualCellWithButtons.Companion
-import io.goldstone.blockchain.common.component.TopBottomLineCell
-import io.goldstone.blockchain.common.value.CommonText
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
+import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -27,6 +27,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class AddressesListView(
 	context: Context,
+	maxCount: Int = 4,
 	private val hold: (
 		moreButton: ImageView,
 		address: String,
@@ -38,13 +39,12 @@ class AddressesListView(
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
 	}
-	private val maxCount = 4
 	var checkAllEvent: Runnable? = null
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
 			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
-			if (this[0].second.toIntOrNull().isNull()) {
+			if (isNotEmpty() && this[0].second.toIntOrNull().isNull()) {
 				hideButton()
 			} else {
 				updateButtonTitle("${CommonText.checkAll} (${model?.size})")

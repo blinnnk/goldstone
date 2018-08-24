@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
-import io.goldstone.blockchain.common.value.ChainText
+import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -13,7 +13,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
  * @author KaySaith
  */
 object ChainURL {
-	
+
 	val currentChain: (currentChainName: String) -> String = {
 		when (it) {
 			ChainText.goldStoneMain -> ChainURL.main
@@ -26,6 +26,10 @@ object ChainURL {
 			ChainText.infuraMain -> ChainURL.infuraMain
 			ChainText.btcTest -> ChainURL.btcTest
 			ChainText.btcMain -> ChainURL.btcMain
+			ChainText.ltcMain -> ChainURL.ltcMain
+			ChainText.ltcTest -> ChainURL.ltcTest
+			ChainText.bchMain -> ChainURL.bchMain
+			ChainText.bchTest -> ChainURL.bchTest
 			else -> ChainURL.main
 		}
 	}
@@ -34,17 +38,11 @@ object ChainURL {
 			ChainText.etcMorden -> ChainURL.etcMorderTest
 			ChainText.etcMainGasTracker -> ChainURL.etcMain
 			ChainText.goldStoneEtcMain -> ChainURL.etcGoldStoneMain
-			ChainText.goldStoneEtcMorderTest -> ChainURL.etcGoldStoneMorderTest
+			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMorderTest
 			else -> ChainURL.etcMain
 		}
 	}
-	val currentBTCChain: (currentChainName: String) -> String = {
-		when (it) {
-			ChainText.btcMain -> ChainURL.btcMain
-			ChainText.btcTest -> ChainURL.btcTest
-			else -> ChainURL.btcMain
-		}
-	}
+
 	val uncryptChainName = listOf(
 		ChainText.etcMorden,
 		ChainText.etcMainGasTracker,
@@ -58,36 +56,42 @@ object ChainURL {
 			ChainText.etcMorden,
 			ChainText.etcMainGasTracker,
 			ChainText.goldStoneEtcMain,
-			ChainText.goldStoneEtcMorderTest
+			ChainText.goldStoneEtcMordenTest
 		)
-	
+
 	fun getChainNameByChainType(type: ChainType): String {
 		return when (type) {
 			ChainType.ETH -> Config.getCurrentChainName()
 			ChainType.ETC -> Config.getETCCurrentChainName()
-			ChainType.BTC -> Config.getBTCCurrentChain()
+			ChainType.BTC -> Config.getBTCCurrentChainName()
+			ChainType.LTC -> Config.getLTCCurrentChainName()
+			ChainType.BCH -> Config.getBCHCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
-	
+
 	fun getChainNameBySymbol(symbol: String): String {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
 			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
-			symbol.equals(CryptoSymbol.btc, true) -> Config.getBTCCurrentChainName()
+			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
+			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
+			symbol.equals(CryptoSymbol.bch, true) -> Config.getBCHCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
-	
+
 	fun getChainTypeBySymbol(symbol: String): ChainType {
 		return when {
 			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
 			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
-			symbol.equals(CryptoSymbol.btc, true) -> ChainType.BTC
+			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
+			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
+			symbol.equals(CryptoSymbol.bch, true) -> ChainType.BCH
 			else -> ChainType.ETH
 		}
 	}
-	
+
 	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
 		return when {
 			transaction.isERC20Token -> transaction.to
@@ -97,7 +101,7 @@ object ChainURL {
 			else -> CryptoValue.ethContract
 		}
 	}
-	
+
 	private val infuraKey: () -> String = {
 		infuraKeys.getRandom()
 	}
@@ -109,6 +113,12 @@ object ChainURL {
 	/** BTC Chain Address */
 	private const val btcMain = "https://btc-node-mainnet.goldstone.io/btc"
 	private const val btcTest = "https://btc-node-testnet.goldstone.io/btc"
+	/** LTC Chain Address */
+	private const val ltcMain = "https://btc-node-mainnet.goldstone.io/ltc"
+	private const val ltcTest = "https://btc-node-testnet.goldstone.io/ltc"
+	/** BCH Chain Address */
+	private const val bchMain = "https://btc-node-mainnet.goldstone.io/bch"
+	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMorderTest = "https://web3.gastracker.io/morden"
@@ -119,7 +129,40 @@ object ChainURL {
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
-	
+
+	/** Transaction Html View */
+	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC/tx/"
+	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC/tx/"
+
+	private const val btcMainnetWeb = "https://www.blocktrail.com/BTC/tx/"
+	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC/tx/"
+
+	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc/tx/"
+	private const val ltcTestnetWeb = "https://chain.so/tx/LTCTEST/"
+
+	private const val etcMainnetWeb = "https://gastracker.io/tx/"
+	private const val etcTestnetWeb = "http://mordenexplorer.ethernode.io/tx/"
+
+	val etcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) etcTestnetWeb
+		else etcMainnetWeb
+	}
+
+	val bchWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) bchTestnetWeb
+		else bchMainnetWeb
+	}
+
+	val ltcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) ltcTestnetWeb
+		else ltcMainnetWeb
+	}
+
+	val btcWebHeader: () -> String = {
+		if (Config.isTestEnvironment()) btcTestnetWeb
+		else btcMainnetWeb
+	}
+
 	@JvmStatic
 	fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
 		return !ChainURL.uncryptChainName.any { it.equals(name, true) }

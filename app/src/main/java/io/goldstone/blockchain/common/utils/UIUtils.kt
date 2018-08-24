@@ -17,12 +17,11 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.WalletNameText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -82,15 +81,15 @@ object TimeUtils {
 		val stamp = if (timeStamp.contains(".")) timeStamp.substringBefore(".").toLong()
 		else timeStamp.toLong()
 		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_YEAR
+			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillsecond(), DateUtils.FORMAT_SHOW_TIME
+			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_TIME
 		)
 	}
 
 	// 将时间戳转化为界面显示的时间格式的工具
 	fun formatDate(timeStamp: Long): String {
-		val time = timeStamp.toMillsecond()
+		val time = timeStamp.toMillisecond()
 		return DateUtils.formatDateTime(
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
@@ -98,14 +97,37 @@ object TimeUtils {
 		)
 	}
 	
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成月日，例如 8/15
+	 */
 	fun formatMdDate(date: Long) : String {
 		val simpleDateFormat = SimpleDateFormat("M/d")
 		return simpleDateFormat.format(java.util.Date(date))
-		
+	}
+	
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成时分，例如12:00
+	 */
+	fun formatHmDate(date: Long) : String {
+		val simpleDateFormat = SimpleDateFormat("HH:mm")
+		return simpleDateFormat.format(java.util.Date(date))
+	}
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成日期+时间，例如8-25 12:00
+	 */
+	fun formatMdHmDate(date: Long) : String {
+		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
+		return simpleDateFormat.format(java.util.Date(date))
 	}
 }
 
-fun String.toMillsecond(): Long {
+fun String.toMillisecond(): Long {
 	val timestamp = toBigDecimal().toString().toLong().orElse(0L)
 	return when {
 		count() == 10 -> timestamp * 1000
@@ -115,8 +137,8 @@ fun String.toMillsecond(): Long {
 	}
 }
 
-fun Long.toMillsecond(): Long {
-	return toString().toMillsecond()
+fun Long.toMillisecond(): Long {
+	return toString().toMillisecond()
 }
 
 fun Activity.transparentStatus() {
@@ -164,7 +186,7 @@ private fun isTargetDevice(name: String): Boolean? {
 private fun Activity.detectnochScreenInAndroidP(): Boolean? {
 	return if (Build.VERSION.SDK_INT >= 28) {
 		try {
-			View(this).rootWindowInsets.displayCutout?.safeInsetTop ?:0 > 30.uiPX()
+			View(this).rootWindowInsets.displayCutout?.safeInsetTop ?: 0 > 30.uiPX()
 		} catch (error: Exception) {
 			LogUtil.error("detectnochScreenInAndroidP", error)
 			null

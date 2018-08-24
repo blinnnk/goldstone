@@ -4,10 +4,10 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletSettingsText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -26,63 +26,76 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 class WalletListPresenter(
 	override val fragment: WalletListFragment
 ) : BaseRecyclerPresenter<WalletListFragment, WalletListModel>() {
-	
+
 	override fun updateData() {
 		updateAllWalletBalance {
 			fragment.asyncData = this
 		}
 	}
-	
+
 	fun switchWallet(address: String) {
-		WalletTable.switchCurrentWallet(address) {
-			WalletTable.getWalletByAddress(address) {
-				it?.apply {
-					WalletTable.getTargetWalletType(this) {
-						when (it) {
-							WalletType.BTCOnly -> {
-								if (Config.isTestEnvironment()) {
-									showConfirmationAlertView("Bitcoin Mainnet") {
-										NodeSelectionPresenter.setAllMainnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-							
-							WalletType.BTCTestOnly -> {
-								if (!Config.isTestEnvironment()) {
-									showConfirmationAlertView("Bitcoin Testnet") {
-										NodeSelectionPresenter.setAllTestnet {
-											fragment.activity?.jump<SplashActivity>()
-										}
-									}
-								} else {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							}
-							
-							WalletType.MultiChain -> {
-								if (Config.isTestEnvironment()) {
-									NodeSelectionPresenter.setAllTestnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								} else {
+		WalletTable.switchCurrentWallet(address) { it ->
+			it?.apply {
+				WalletTable.getTargetWalletType(this).let {
+					when (it) {
+						WalletType.BTCOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView("Bitcoin Mainnet") {
 									NodeSelectionPresenter.setAllMainnet {
 										fragment.activity?.jump<SplashActivity>()
 									}
 								}
-							}
-							
-							else -> fragment.activity?.jump<SplashActivity>()
+							} else fragment.activity?.jump<SplashActivity>()
 						}
+
+						WalletType.BTCTestOnly -> {
+							if (!Config.isTestEnvironment()) {
+								showConfirmationAlertView("Bitcoin Testnet") {
+									NodeSelectionPresenter.setAllTestnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.LTCOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView("Litecoin Mainnet") {
+									NodeSelectionPresenter.setAllMainnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.BCHOnly -> {
+							if (Config.isTestEnvironment()) {
+								showConfirmationAlertView(" Bitcoin Cash Mainnet") {
+									NodeSelectionPresenter.setAllMainnet {
+										fragment.activity?.jump<SplashActivity>()
+									}
+								}
+							} else fragment.activity?.jump<SplashActivity>()
+						}
+
+						WalletType.MultiChain -> {
+							if (Config.isTestEnvironment()) {
+								NodeSelectionPresenter.setAllTestnet {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							} else {
+								NodeSelectionPresenter.setAllMainnet {
+									fragment.activity?.jump<SplashActivity>()
+								}
+							}
+						}
+						else -> fragment.activity?.jump<SplashActivity>()
 					}
 				}
 			}
 		}
 	}
-	
+
 	private fun showConfirmationAlertView(content: String, callback: () -> Unit) {
 		fragment.context?.showAlertView(
 			"Switch Chain Network",
@@ -92,7 +105,7 @@ class WalletListPresenter(
 			callback()
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			overlayView.header.showCloseButton(false)
@@ -102,7 +115,7 @@ class WalletListPresenter(
 			}
 		}
 	}
-	
+
 	private fun updateAllWalletBalance(hold: ArrayList<WalletListModel>.() -> Unit) {
 		val data = ArrayList<WalletListModel>()
 		// 获取全部本机钱包
@@ -114,13 +127,13 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) {
-								WalletTable.getTargetWalletType(wallet) { walletType ->
-									if (it.isEmpty()) {
+							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { myTokens ->
+								WalletTable.getTargetWalletType(wallet).let { walletType ->
+									if (myTokens.isEmpty()) {
 										data.add(WalletListModel(wallet, 0.0, walletType.content))
 										completeMark()
 									} else {
-										val balance = it.sumByDouble { walletToken ->
+										val balance = myTokens.sumByDouble { walletToken ->
 											val thisToken = allTokens.find {
 												it.contract.equals(walletToken.contract, true)
 											}!!
@@ -129,12 +142,9 @@ class WalletListPresenter(
 												thisToken.decimals
 											) * thisToken.price
 										}
+
 										// 计算当前钱包下的 `token` 对应的货币总资产
-										WalletListModel(
-											wallet,
-											balance,
-											walletType.content
-										).let {
+										WalletListModel(wallet, balance, walletType.content).let {
 											data.add(it)
 											completeMark()
 										}
@@ -143,10 +153,9 @@ class WalletListPresenter(
 							}
 						}
 					}
-					
+
 					// 因为结果集是在异步状态下准备, 返回的数据按照 `id` 重新排序
-					override fun mergeCallBack() =
-						hold(data.sortedByDescending { it.id }.toArrayList())
+					override fun mergeCallBack() = hold(data.sortedByDescending { it.id }.toArrayList())
 				}.start()
 			}
 		}

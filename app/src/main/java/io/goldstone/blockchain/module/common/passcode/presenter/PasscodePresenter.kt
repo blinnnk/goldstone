@@ -25,12 +25,12 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 class PasscodePresenter(
 	override val fragment: PasscodeFragment
 ) : BasePresenter<PasscodeFragment>() {
-	
+
 	private var currentFrozenTime = 0L
 	private val handler = Handler()
-	
+
 	fun unlockOrAlert(passcode: String, action: () -> Unit) {
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig { it ->
 			var retryTimes = it?.retryTimes.orZero()
 			checkPasscode(passcode) {
 				it isTrue {
@@ -46,6 +46,8 @@ class PasscodePresenter(
 							currentFrozenTime = oneMinute
 							refreshRunnable.run()
 						}
+						// 进入冻结状态后恢复重试次数
+						resetConfig()
 					} else {
 						fragment.resetHeaderStyle()
 						fragment.showFailedAttention("incorrect passcode $retryTimes retry times left")
@@ -55,7 +57,7 @@ class PasscodePresenter(
 			action()
 		}
 	}
-	
+
 	fun isFrozenStatus(callback: (Boolean) -> Unit = {}) {
 		AppConfigTable.getAppConfig {
 			it?.frozenTime.isNull() isFalse {
@@ -73,7 +75,7 @@ class PasscodePresenter(
 			}
 		}
 	}
-	
+
 	private val refreshRunnable: Runnable by lazy {
 		Runnable {
 			currentFrozenTime -= 1000L
@@ -86,11 +88,11 @@ class PasscodePresenter(
 			}
 		}
 	}
-	
+
 	override fun onFragmentDetach() {
 		handler.removeCallbacks(refreshRunnable)
 	}
-	
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fun AppCompatActivity.recoverBackEventAfterPinCode() {
@@ -105,10 +107,10 @@ class PasscodePresenter(
 							}
 						}
 					}
-					
+
 					is BaseFragment<*> -> recoveryBackEvent()
 					is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
-					
+
 					is BaseOverlayFragment<*> -> {
 						childFragmentManager.fragments.last()?.apply {
 							when (this) {
@@ -127,7 +129,7 @@ class PasscodePresenter(
 			}
 		}
 	}
-	
+
 	private fun resetConfig() {
 		AppConfigTable.apply {
 			updateRetryTimes(Count.retry)
@@ -135,12 +137,12 @@ class PasscodePresenter(
 		}
 		currentFrozenTime = 0L
 	}
-	
+
 	@SuppressLint("SetTextI18n")
 	private fun setRemainingFrozenTime(currentFrozenTime: Long): String {
 		return "you have to wait ${currentFrozenTime / 1000} seconds"
 	}
-	
+
 	private fun PasscodeFragment.removePasscodeFragment(callback: () -> Unit = {}) {
 		activity?.let {
 			container.updateAlphaAnimation(0f) {
@@ -149,7 +151,7 @@ class PasscodePresenter(
 			}
 		}
 	}
-	
+
 	private fun checkPasscode(passcode: String, hold: (Boolean) -> Unit) {
 		if (passcode.length >= Count.pinCode)
 		// 从数据库获取本机的 `Passcode`

@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.component.GoldStoneDialog.Companion.chainError
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog.Companion.chainError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -95,9 +95,7 @@ data class WalletDetailCellModel(
 							}
 						}
 
-						override fun mergeCallBack() {
-							hold(tokenList)
-						}
+						override fun mergeCallBack() = hold(tokenList)
 					}.start()
 				}
 			}
@@ -141,6 +139,8 @@ data class WalletDetailCellModel(
 											token.ownerAddress,
 											false,
 											{ error, reason ->
+												// 如果出错的话余额暂时设定用旧的值
+												tokenList.add(WalletDetailCellModel(targetToken, token.balance))
 												completeMark()
 												fragment.context?.apply { chainError(reason, error, this) }
 											}
@@ -186,7 +186,7 @@ data class WalletDetailCellModel(
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
 		) {
-			map { it.contract }.toJsonArray {
+			map { it.contract }.toJsonArray { it ->
 				GoldStoneAPI.getPriceByContractAddress(
 					it,
 					{

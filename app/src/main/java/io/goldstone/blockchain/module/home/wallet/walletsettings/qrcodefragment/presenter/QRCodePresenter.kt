@@ -16,9 +16,10 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.QRText
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import org.jetbrains.anko.support.v4.toast
 import java.io.File
@@ -32,20 +33,20 @@ import java.util.*
 open class QRCodePresenter(
 	override val fragment: QRCodeFragment
 ) : BasePresenter<QRCodeFragment>() {
-	
-	private val address by lazy {
-		fragment.arguments?.getString(ArgumentKey.address)
+
+	val addressModel by lazy {
+		fragment.arguments?.getSerializable(ArgumentKey.addressModel) as? ContactModel
 	}
-	
+
 	override fun onFragmentViewCreated() {
-		address?.let {
-			fragment.setAddressText(it)
-			fragment.setQRImage(generateQRCode(it))
+		addressModel?.let {
+			fragment.setAddressText(it.address)
+			fragment.setQRImage(generateQRCode(it.address))
 		}
 	}
-	
+
 	companion object {
-		
+
 		fun generateQRCode(content: String): Bitmap? {
 			return try {
 				val size = (ScreenSize.Width * 0.8).toInt()
@@ -56,7 +57,7 @@ open class QRCodePresenter(
 				null
 			}
 		}
-		
+
 		fun saveQRCodeImageToAlbum(
 			content: String,
 			fragment: Fragment,
@@ -73,7 +74,7 @@ open class QRCodePresenter(
 				fragment.toast(QRText.savedAttention)
 			}
 		}
-		
+
 		fun shareQRImage(
 			fragment: Fragment,
 			content: String
@@ -85,7 +86,7 @@ open class QRCodePresenter(
 				fragment.activity?.startActivity(Intent.createChooser(intent, QRText.shareQRTitle))
 			}
 		}
-		
+
 		fun scanQRCode(fragment: Fragment) {
 			val integrator = IntentIntegrator.forSupportFragment(fragment)
 			integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
@@ -97,7 +98,7 @@ open class QRCodePresenter(
 			integrator.setBarcodeImageEnabled(true)
 			integrator.initiateScan()
 		}
-		
+
 		private fun saveImage(
 			bitmap: Bitmap,
 			fragment: Fragment,

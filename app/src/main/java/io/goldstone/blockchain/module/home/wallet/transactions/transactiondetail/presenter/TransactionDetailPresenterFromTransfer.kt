@@ -23,11 +23,11 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 		)
 		updateHeaderValue(headerData)
 		headerModel = headerData
-		if (token.symbol.equals(CryptoSymbol.btc, true)) {
-			observerBTCTransaction()
-		} else {
-			// 监听 `ETH, ERC20 or ETC` 的转账状态
-			observerTransaction()
+		when {
+			token.symbol.equals(CryptoSymbol.btc(), true) -> observerBTCTransaction()
+			token.symbol.equals(CryptoSymbol.ltc, true) -> observerLTCTransaction()
+			token.symbol.equals(CryptoSymbol.bch, true) -> observerBCHTransaction()
+			else -> observerTransaction()
 		}
 	}
 }
@@ -35,8 +35,8 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 fun TransactionDetailPresenter.showConformationInterval(
 	intervalCount: Int
 ) {
-	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-		it?.apply {
+	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) { it ->
+		it.apply {
 			headerModel?.let {
 				updateHeaderValue(it)
 			}
@@ -47,7 +47,7 @@ fun TransactionDetailPresenter.showConformationInterval(
 
 fun TransactionDetailPresenter.updateConformationBarFinished() {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-		it?.apply {
+		it.apply {
 			updateConformationBar(CryptoValue.confirmBlockNumber)
 		}
 	}

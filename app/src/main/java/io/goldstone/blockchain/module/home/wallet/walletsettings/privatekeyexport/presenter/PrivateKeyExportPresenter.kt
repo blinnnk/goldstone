@@ -2,17 +2,21 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpo
 
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.uiThread
 
 /**
  * @date 06/04/2018 1:02 AM
@@ -21,14 +25,14 @@ import org.jetbrains.anko.uiThread
 class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {
-	
+
 	private val address by lazy {
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
-	private val isBTCAddress by lazy {
-		fragment.arguments?.getBoolean(ArgumentKey.isBTCAddress)
+	private val chainType by lazy {
+		fragment.arguments?.getInt(ArgumentKey.chainType)
 	}
-	
+
 	fun getPrivateKeyByAddress(
 		password: String,
 		hold: String?.() -> Unit
@@ -38,27 +42,37 @@ class PrivateKeyExportPresenter(
 			hold("")
 			return
 		}
-		
+
 		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		
+
 		address?.let {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (isBTCAddress == true) getBTCPrivateKeyByAddress(
-				it,
-				password,
-				isSingleChainWallet,
-				hold
-			)
-			else getETHERCorETCPrivateKeyByAddress(
-				it,
-				password,
-				isSingleChainWallet,
-				hold
-			)
+			when (chainType) {
+				ChainType.BTC.id,
+				ChainType.BCH.id,
+				ChainType.AllTest.id -> getBTCPrivateKeyByAddress(
+					it,
+					password,
+					isSingleChainWallet,
+					hold
+				)
+				ChainType.LTC.id -> fragment.context?.exportLTCBase58PrivateKey(
+					it,
+					password,
+					isSingleChainWallet,
+					hold
+				)
+				else -> getETHERCorETCPrivateKeyByAddress(
+					it,
+					password,
+					isSingleChainWallet,
+					hold
+				)
+			}
 		}
 	}
-	
+
 	private fun getETHERCorETCPrivateKeyByAddress(
 		address: String,
 		password: String,
@@ -71,14 +85,15 @@ class PrivateKeyExportPresenter(
 				password,
 				false,
 				isSingleChainWallet,
-				{
-					uiThread { hold("") }
+				{ error ->
+					GoldStoneAPI.context.runOnUiThread { hold("") }
+					LogUtil.error("getPrivateKey", error)
 				},
 				hold
 			)
 		}
 	}
-	
+
 	private fun getBTCPrivateKeyByAddress(
 		address: String,
 		password: String,

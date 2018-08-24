@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.isFalse
-import io.goldstone.blockchain.common.base.BaseRecyclerView
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 
 /**

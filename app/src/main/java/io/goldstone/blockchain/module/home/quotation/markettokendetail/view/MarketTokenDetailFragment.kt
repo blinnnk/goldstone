@@ -5,18 +5,15 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.ButtonMenu
-import io.goldstone.blockchain.common.component.ContentScrollOverlayView
+import io.goldstone.blockchain.common.component.button.ButtonMenu
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
-import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -28,19 +25,19 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
-	
+
 	val currencyInfo by lazy {
-		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
+		getParentFragment<MarketTokenCenterFragment>()?.currencyInfo
 	}
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
-	private val chartView by lazy { MarketTokenCandleChart(context!!) }
-	private val priceHistroy by lazy { PriceHistoryView(context!!) }
+	private val candleChart by lazy { MarketTokenCandleChart(context!!) }
+	private val priceHistory by lazy { PriceHistoryView(context!!) }
 	private val tokenInfo by lazy { TokenInfoView(context!!) }
 	private val tokenInformation by lazy { TokenInformation(context!!) }
 	private val tokenInfoLink by lazy {
 		TokenInfoLink(context!!) { link, title ->
-			presenter.showWebfragumentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
+			presenter.showWebFragmentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
 		}
 	}
 	private val tokenSocialMedia by lazy {
@@ -49,7 +46,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		}
 	}
 	override val presenter = MarketTokenDetailPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -68,18 +65,18 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				)
 				menu.getButton { button ->
 					button.onClick {
-						presenter.updateChartByMenu(chartView, button.id)
+						presenter.updateChartByMenu(candleChart, button.id)
 						menu.selected(button.id)
 						button.preventDuplicateClicks()
 					}
 				}
 				menu.selected(MarketTokenDetailChartType.Hour.code)
-				chartView.into(this)
+				candleChart.into(this)
 				// 默认加载小时的图标数据
 				presenter.updateChartByMenu(
-					chartView, MarketTokenDetailChartType.Hour.code
+					candleChart, MarketTokenDetailChartType.Hour.code
 				)
-				
+
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						topMargin = 20.uiPX()
@@ -89,13 +86,14 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				currencyInfo?.let {
 					currentPriceInfo.model = CurrentPriceModel(it)
 				}
-				
-				priceHistroy.into(this)
+
+				priceHistory.into(this)
 				tokenInfo
 					.click {
-						getParentContainer()?.let {
-							presenter.showAllDescription(it)
-						}
+						getParentFragment<MarketTokenCenterFragment>()
+							?.getParentContainer()?.apply {
+								presenter.showAllDescription(this)
+							}
 					}
 					.into(this)
 				tokenInformation.into(this)
@@ -104,7 +102,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.setCurrencyInfo(
 					currencyInfo,
 					tokenInformation,
-					priceHistroy,
+					priceHistory,
 					tokenInfo,
 					tokenInfoLink,
 					tokenSocialMedia
@@ -115,24 +113,18 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 			}
 		}
 	}
-	
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
-		val overlay = getParentContainer()
-			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-		if (overlay.isNull()) {
-			super.setBaseBackEvent(activity, parent)
-			// 恢复回退事件
-			activity?.getHomeFragment()
-				?.findChildFragmentByTag<QuotationFragment>(FragmentTag.quotation)
-				?.apply {
-					updateBackEvent()
+
+	companion object {
+		fun removeContentOverlayOrElse(
+			fragment: MarketTokenCenterFragment,
+			callback: () -> Unit
+		) {
+			fragment.getParentContainer()
+				?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+				.apply {
+					if (isNull()) callback()
+					else this?.remove()
 				}
-		} else {
-			// 如果存在悬浮层销毁悬浮层
-			overlay?.remove()
 		}
 	}
 }

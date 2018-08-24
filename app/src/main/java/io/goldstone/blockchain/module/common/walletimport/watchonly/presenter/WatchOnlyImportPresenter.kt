@@ -6,16 +6,20 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.Address
+import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -29,12 +33,14 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 class WatchOnlyImportPresenter(
 	override val fragment: WatchOnlyImportFragment
 ) : BasePresenter<WatchOnlyImportFragment>() {
-	
+
 	private var currentETHAndERCAddress = ""
 	private var currentBTCAddress = ""
 	private var currentBTCTestAddress = ""
 	private var currentETCAddress = ""
-	
+	private var currentLTCAddress = ""
+	private var currentBCHAddress = ""
+
 	fun importWatchOnlyWallet(
 		addressType: String,
 		addressInput: EditText,
@@ -51,7 +57,7 @@ class WatchOnlyImportPresenter(
 					return
 				}
 			}
-			
+
 			CryptoValue.PrivateKeyType.BTC.content -> {
 				if (!BTCUtils.isValidMainnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
@@ -59,7 +65,23 @@ class WatchOnlyImportPresenter(
 					return
 				}
 			}
-			
+
+			CryptoValue.PrivateKeyType.LTC.content -> {
+				if (!LTCWalletUtils.isValidAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
+			}
+
+			CryptoValue.PrivateKeyType.BCH.content -> {
+				if (!BCHWalletUtils.isValidAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
+			}
+
 			else -> {
 				if (!BTCUtils.isValidTestnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
@@ -72,7 +94,7 @@ class WatchOnlyImportPresenter(
 		else nameInput.text.toString()
 		// 准备对应的地址
 		setAddressByChainType(address, addressType)
-		WalletTable.getWalletByAddress(address) {
+		WalletTable.getWalletByAddress(address) { it ->
 			it.isNull() isTrue {
 				WalletTable.insert(
 					WalletTable(
@@ -82,17 +104,23 @@ class WatchOnlyImportPresenter(
 						isUsing = true,
 						isWatchOnly = true,
 						hasBackUpMnemonic = true,
-						currentBTCTestAddress = currentBTCTestAddress,
+						currentBTCSeriesTestAddress = currentBTCTestAddress,
 						currentBTCAddress = currentBTCAddress,
 						currentETCAddress = currentETCAddress,
+						currentLTCAddress = currentLTCAddress,
+						currentBCHAddress = currentBCHAddress,
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
+						bchPath = "",
 						btcTestPath = "",
+						ltcPath = "",
 						ethAddresses = "",
 						etcAddresses = "",
 						btcAddresses = "",
-						btcTestAddresses = ""
+						bchAddresses = "",
+						btcSeriesTestAddresses = "",
+						ltcAddresses = ""
 					)
 				) {
 					CreateWalletPresenter.generateMyTokenInfo(
@@ -100,16 +128,28 @@ class WatchOnlyImportPresenter(
 							currentETHAndERCAddress,
 							currentETCAddress,
 							currentBTCAddress,
-							currentBTCTestAddress
+							currentBTCTestAddress,
+							currentLTCAddress,
+							currentBCHAddress
 						),
 						{
 							LogUtil.error(this.javaClass.simpleName)
 							callback()
 						}
-					) {
+					) { _ ->
 						callback()
 						// 注册钱包地址用于发送 `Push`
-						XinGePushReceiver.registerAddressesForPush()
+						val addressPairs =
+							listOf(
+								Pair(currentBTCAddress, ChainType.BTC.id),
+								Pair(currentLTCAddress, ChainType.LTC.id),
+								Pair(currentBCHAddress, ChainType.BCH.id),
+								Pair(currentBTCTestAddress, ChainType.AllTest.id),
+								Pair(currentETCAddress, ChainType.ETC.id),
+								Pair(currentETHAndERCAddress, ChainType.ETH.id)
+							)
+						val current = addressPairs.first { it.first.isNotEmpty() }
+						XinGePushReceiver.registerSingleAddress(AddressCommissionModel(current.first, current.second, 1))
 						fragment.activity?.jump<SplashActivity>()
 					}
 				}
@@ -119,25 +159,33 @@ class WatchOnlyImportPresenter(
 			}
 		}
 	}
-	
+
 	private fun setAddressByChainType(address: String, addressType: String) {
 		when (addressType) {
 			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
 				currentETHAndERCAddress = address
 				currentETCAddress = address
 			}
-			
+
 			CryptoValue.PrivateKeyType.BTC.content -> {
 				currentBTCAddress = address
 			}
-			
+
+			CryptoValue.PrivateKeyType.LTC.content -> {
+				currentLTCAddress = address
+			}
+
+			CryptoValue.PrivateKeyType.BCH.content -> {
+				currentBCHAddress = address
+			}
+
 			else -> {
 				Config.updateIsTestEnvironment(true)
 				currentBTCTestAddress = address
 			}
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)

@@ -81,7 +81,7 @@ data class TransactionTable(
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
 ) {
-	
+
 	/** 默认的 `constructor` */
 	@Ignore
 	constructor() : this(
@@ -109,7 +109,7 @@ data class TransactionTable(
 		"",
 		""
 	)
-	
+
 	constructor(data: TransactionTable) : this(
 		0,
 		data.blockNumber,
@@ -136,7 +136,7 @@ data class TransactionTable(
 		data.symbol,
 		Config.getCurrentEthereumAddress()
 	)
-	
+
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
 		0,
@@ -166,7 +166,7 @@ data class TransactionTable(
 		false,
 		data.logIndex
 	)
-	
+
 	constructor(
 		data: JSONObject,
 		isETC: Boolean = false,
@@ -205,7 +205,7 @@ data class TransactionTable(
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
 		chainID = chainID
 	)
-	
+
 	constructor(data: ETCTransactionModel) : this(
 		0,
 		data.blockNumber.toIntFromHex().toString(),
@@ -238,9 +238,9 @@ data class TransactionTable(
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
-	
+
 	companion object {
-		
+
 		fun updateModelInfo(
 			transaction: TransactionTable,
 			isERC20Token: Boolean,
@@ -258,7 +258,7 @@ data class TransactionTable(
 				this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
 			}
 		}
-		
+
 		// `ERC` 类型的 `Transactions` 专用
 		fun getERCTransactionsByAddress(
 			address: String,
@@ -269,7 +269,7 @@ data class TransactionTable(
 					.database
 					.transactionDao()
 					.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
-			} then {
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -278,7 +278,7 @@ data class TransactionTable(
 				hold(result)
 			}
 		}
-		
+
 		fun getETCTransactionsByAddress(
 			address: String,
 			hold: (ArrayList<TransactionListModel>) -> Unit
@@ -288,7 +288,7 @@ data class TransactionTable(
 					.database
 					.transactionDao()
 					.getETCTransactionsByAddress(address)
-			} then {
+			} then { it ->
 				val result = if (it.isEmpty()) {
 					arrayListOf()
 				} else {
@@ -297,7 +297,7 @@ data class TransactionTable(
 				hold(result)
 			}
 		}
-		
+
 		fun getCurrentChainByAddressAndContract(
 			walletAddress: String,
 			contract: String,
@@ -341,7 +341,7 @@ data class TransactionTable(
 				}
 			}
 		}
-		
+
 		fun deleteByAddress(address: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.transactionDao().apply {
@@ -358,14 +358,14 @@ data class TransactionTable(
 								completeMark()
 							}
 						}
-						
+
 						override fun getResultInMainThread() = false
 						override fun mergeCallBack() = callback()
 					}.start()
 				}
 			}
 		}
-		
+
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
@@ -403,18 +403,16 @@ data class TransactionTable(
 				}
 			}
 		}
-		
+
 		fun getTransactionByHash(
 			taxHash: String,
 			hold: (List<TransactionTable>) -> Unit
 		) {
 			GoldStoneDataBase.database.transactionDao().apply {
-				getTransactionByTaxHash(taxHash).let {
-					hold(it)
-				}
+				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
-		
+
 		fun getByHashAndReceivedStatus(
 			hash: String,
 			isReceived: Boolean,
@@ -430,7 +428,10 @@ data class TransactionTable(
 
 @Dao
 interface TransactionDao {
-	
+
+	@Query("SELECT * FROM transactionList")
+	fun getAll(): List<TransactionTable>
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
@@ -438,7 +439,7 @@ interface TransactionDao {
 		walletAddress: String,
 		chainID: String
 	): List<TransactionTable>
-	
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
 	)
@@ -447,23 +448,23 @@ interface TransactionDao {
 		symbol: String = CryptoSymbol.etc,
 		chainID: String = Config.getETCCurrentChain()
 	): List<TransactionTable>
-	
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
 	)
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
-	
+
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
 	fun getTransactionByTaxHash(
 		taxHash: String
 	): List<TransactionTable>
-	
+
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
 	fun getByTaxHashAndReceivedStatus(
 		taxHash: String,
 		isReceive: Boolean
 	): TransactionTable?
-	
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC"
 	)
@@ -471,7 +472,7 @@ interface TransactionDao {
 		walletAddress: String,
 		contract: String
 	): List<TransactionTable>
-	
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
@@ -480,7 +481,7 @@ interface TransactionDao {
 		contract: String,
 		chainID: String = Config.getCurrentChain()
 	): List<TransactionTable>
-	
+
 	@Query(
 		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND isFee LIKE :isFee AND chainID LIKE :chainID ORDER BY timeStamp DESC"
 	)
@@ -489,13 +490,13 @@ interface TransactionDao {
 		isFee: Boolean,
 		chainID: String
 	): List<TransactionTable>
-	
+
 	@Insert
 	fun insert(token: TransactionTable)
-	
+
 	@Update
 	fun update(token: TransactionTable)
-	
+
 	@Delete
 	fun delete(token: TransactionTable)
 }

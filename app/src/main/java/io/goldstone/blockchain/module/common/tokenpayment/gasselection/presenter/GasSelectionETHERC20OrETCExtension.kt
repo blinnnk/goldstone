@@ -2,12 +2,12 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.component.GoldStoneDialog
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.AlertText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.utils.*
@@ -38,7 +38,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	hold: Boolean.() -> Unit
 ) {
 	when {
-	// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
+		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
 		token?.contract.equals(CryptoValue.ethContract, true) -> {
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
@@ -53,7 +53,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
 			}
 		}
-		
+
 		token?.contract.equals(CryptoValue.etcContract, true) -> {
 			MyTokenTable.getBalanceWithContract(
 				token?.contract!!,
@@ -68,7 +68,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
 			}
 		}
-		
+
 		else -> {
 			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			// 首先查询 `Token Balance` 余额
@@ -167,7 +167,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 				callback()
 				return@getCurrentETHORETCPrivateKey
 			}
-			
+
 			prepareModel?.apply model@{
 				// 更新 `prepareModel`  的 `gasPrice` 的值
 				this.gasPrice = getSelectedGasPrice(currentMinerType)
@@ -278,7 +278,8 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 fun GasSelectionPresenter.getUnitSymbol(): String {
 	return when {
 		getToken()?.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-		getToken()?.symbol.equals(CryptoSymbol.btc, true) -> CryptoSymbol.btc
+		getToken()?.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
+		getToken()?.symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
 		else -> CryptoSymbol.eth
 	}
 }

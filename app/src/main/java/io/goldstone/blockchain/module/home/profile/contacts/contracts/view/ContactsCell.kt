@@ -14,6 +14,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.CryptoSymbol
@@ -30,7 +31,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 open class ContactsCell(context: Context) : HorizontalScrollView(context) {
-	
+
 	var clickEvent: Runnable? = null
 	var model: ContactTable by observing(ContactTable()) {
 		info.apply {
@@ -41,7 +42,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 			fontIcon.text = model.name.substring(0, 1).toUpperCase()
 		}
 	}
-	
+
 	fun setSlideCell(isSlide: Boolean) {
 		if (isSlide) {
 			findViewById<RelativeLayout>(ElementID.slideCellContainer).isNull {
@@ -63,7 +64,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 			}
 		}
 	}
-	
+
 	fun onClickDeleteButton(action: () -> Unit) {
 		deleteButton.apply {
 			onClick {
@@ -73,12 +74,14 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 			}
 		}
 	}
-	
+
 	private fun ContactTable.generateSubtitleIntro(): String {
 		val addresses = listOf(
 			Pair("${CryptoSymbol.etc}/${CryptoSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
-			Pair(CryptoSymbol.btc, btcMainnetAddress.isNotEmpty()),
-			Pair("BTCTest", btcTestnetAddress.isNotEmpty())
+			Pair(CryptoSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair(CryptoSymbol.ltc, ltcAddress.isNotEmpty()),
+			Pair(CryptoSymbol.bch, bchAddress.isNotEmpty()),
+			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
 		)
 		val count = addresses.filter { it.second }.size
 		val allTypes = addresses.filter { it.second }.map { it.first }.toString()
@@ -86,7 +89,7 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 		val unit = if (count > 1) "Addresses" else "Address"
 		return "$count $unit $type"
 	}
-	
+
 	private val fontIcon by lazy {
 		TextView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(50.uiPX(), 50.uiPX())
@@ -110,13 +113,13 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 	}
 	private val cellHeight = 75.uiPX()
 	private val deleteButtonWidth = 100.uiPX()
-	
+
 	init {
 		isHorizontalScrollBarEnabled = false
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
 		setMargins<LinearLayout.LayoutParams> { leftMargin = PaddingSize.device }
 	}
-	
+
 	private fun ViewGroup.showContent() {
 		// 这个是实际显示的部分
 		relativeLayout {
@@ -138,21 +141,21 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 			}
 		}
 	}
-	
+
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		style = Paint.Style.FILL
 		color = GrayScale.lightGray
 	}
-	
+
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		
+
 		canvas?.drawLine(
 			0f, height - BorderSize.default, width.toFloat(), height - BorderSize.default, paint
 		)
 	}
-	
+
 	private fun HorizontalScrollView.slide() {
 		onTouch { _, event ->
 			when (event.action) {

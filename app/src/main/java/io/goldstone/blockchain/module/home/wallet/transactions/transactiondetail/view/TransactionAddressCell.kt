@@ -11,14 +11,13 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -28,7 +27,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class TransactionAddressCell(context: Context) : RelativeLayout(context) {
-	
+
 	private val addressTextView = TextView(context)
 	private val copyButton = ImageView(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
@@ -40,7 +39,7 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 		scaleType = ImageView.ScaleType.CENTER_INSIDE
 		visibility = View.GONE
 	}
-	
+
 	init {
 		y -= 15.uiPX()
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 35.uiPX())
@@ -54,12 +53,16 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 		}.into(this)
 		copyButton.into(this)
 	}
-	
+
 	fun setAddress(address: String) {
-		val scaleCount = if (BTCUtils.isBTCAddress(address)) 14 else 18
-		addressTextView.text = CryptoUtils.scaleMiddleAddress(address, scaleCount)
+		val fixWidthAddress = object : FixTextLength() {
+			override val maxWidth: Float = ScreenSize.widthWithPadding - 90.uiPX() * 1f
+			override var text: String = address
+			override val textSize: Float = fontSize(12.uiPX())
+		}.getFixString(true)
+		addressTextView.text = fixWidthAddress
 	}
-	
+
 	fun getButton(): ImageView {
 		return copyButton
 	}

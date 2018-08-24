@@ -2,16 +2,18 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presen
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ImportWalletText
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -20,7 +22,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 class MnemonicImportDetailPresenter(
 	override val fragment: MnemonicImportDetailFragment
 ) : BasePresenter<MnemonicImportDetailFragment>() {
-	
+
 	fun importWalletByMnemonic(
 		multiChainPath: MultiChainPath,
 		mnemonic: String,
@@ -36,9 +38,9 @@ class MnemonicImportDetailPresenter(
 			callback(false)
 			return
 		}
-		
+
 		if (!isValidPath(multiChainPath)) return
-		
+
 		CreateWalletPresenter.checkInputValue(
 			name,
 			password,
@@ -52,7 +54,7 @@ class MnemonicImportDetailPresenter(
 					.replaceWithPattern()
 					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
-			
+
 			Mnemonic.validateMnemonic(mnemonicContent) isFalse {
 				fragment.context?.alert(ImportWalletText.mnemonicAlert)
 				callback(false)
@@ -68,23 +70,26 @@ class MnemonicImportDetailPresenter(
 			}
 		}
 	}
-	
+
 	private fun isValidPath(multiChainPath: MultiChainPath): Boolean {
-		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildPath(multiChainPath.ethPath)) {
+		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.ethPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			false
-		} else if (multiChainPath.btcPath.isNotEmpty() && !isVaildPath(multiChainPath.btcPath)) {
+		} else if (multiChainPath.btcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.btcPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			false
-		} else if (multiChainPath.btcTestPath.isNotEmpty() && !isVaildPath(multiChainPath.btcTestPath)) {
+		} else if (multiChainPath.testPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.testPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			false
-		} else if (multiChainPath.etcPath.isNotEmpty() && !isVaildPath(multiChainPath.etcPath)) {
+		} else if (multiChainPath.ltcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.ltcPath)) {
+			fragment.context?.alert(ImportWalletText.pathAlert)
+			false
+		} else if (multiChainPath.etcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.etcPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			false
 		} else true
 	}
-	
+
 	private fun importWallet(
 		mnemonic: String,
 		multiChainPath: MultiChainPath,
@@ -101,12 +106,13 @@ class MnemonicImportDetailPresenter(
 			password,
 			multiChainPath
 		) { multiChainAddresses ->
-			// 本地若存有当前多链钱包则直接跳出逻辑
-			if (multiChainAddresses.btcAddress.isEmpty() || multiChainAddresses.ethAddress.isEmpty()) {
+			// 如果地址已经存在则会返回空的多链地址 `Model`
+			if (multiChainAddresses.ethAddress.isEmpty()) {
 				fragment.context.alert(ImportWalletText.existAddress)
 				callback(false)
 				return@import
 			}
+
 			WalletImportPresenter.insertWalletToDatabase(
 				fragment.context,
 				multiChainAddresses,
@@ -118,13 +124,13 @@ class MnemonicImportDetailPresenter(
 			)
 		}
 	}
-	
+
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
-	
-	private fun isVaildPath(path: String): Boolean {
+
+	private fun isVaildBIP44Path(path: String): Boolean {
 		// 最小 3 位数字
 		if (path.length < 3) return false
 		// 格式化无用信息

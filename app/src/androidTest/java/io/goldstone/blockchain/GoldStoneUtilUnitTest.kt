@@ -5,6 +5,8 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -36,57 +38,57 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneUtilUnitTest {
-	
+
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
-	
+	private val position = this.javaClass.simpleName
+
 	@Test
-	fun getSysteDefaultLanguageSymbol() {
-		LogUtil.debug("$positon Get System Language Symbol", CountryCode.currentLanguageSymbol)
+	fun getSystemDefaultLanguageSymbol() {
+		LogUtil.debug("$position Get System Language Symbol", CountryCode.currentLanguageSymbol)
 	}
-	
+
 	@Test
-	fun getAppconfig() {
+	fun getAppConfig() {
 		AppConfigTable.getAppConfig {
-			LogUtil.debug("$positon + getAppconfig", it.apply { it?.terms = "" }.toString())
+			LogUtil.debug("$position + getAppconfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
-	
+
 	@Test
 	fun getSystemParameter() {
-		LogUtil.debug(positon, CountryCode.currentCountry)
-		LogUtil.debug(positon + "getSystemParameter", CountryCode.currentLanguageSymbol)
+		LogUtil.debug(position, CountryCode.currentCountry)
+		LogUtil.debug(position + "getSystemParameter", CountryCode.currentLanguageSymbol)
 	}
-	
+
 	@Test
-	fun hextStringConverter() {
-		LogUtil.debug(positon, "你好".toCryptHexString())
-		LogUtil.debug(positon, "e7bb86e88a82".toUpperCase().toStringFromHex())
+	fun hexStringConverter() {
+		LogUtil.debug(position, "你好".toCryptHexString())
+		LogUtil.debug(position, "e7bb86e88a82".toUpperCase().toStringFromHex())
 	}
-	
+
 	@Test
 	fun getCurrentWallet() {
 		WalletTable.getCurrentWallet {
-			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
-	
+
 	@Test
 	fun getAllWallets() {
 		WalletTable.getAll {
-			LogUtil.debug("getWalletByEthseriesAddress + $positon", this.toString())
+			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
-	
+
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
 			LogUtil.debug("getWatchOnlyAddress", "$it")
 		}
 	}
-	
+
 	@Test
 	fun getMyTokenTable() {
 		doAsync {
@@ -95,14 +97,23 @@ class GoldStoneUtilUnitTest {
 			}
 		}
 	}
-	
+
+	@Test
+	fun getTransactionTable() {
+		doAsync {
+			GoldStoneDataBase.database.transactionDao().getAll().let {
+				LogUtil.debug("getTransactionTable", "$it")
+			}
+		}
+	}
+
 	@Test
 	fun getLatestEthereumChildAddressIndex() {
 		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
-			LogUtil.debug("getLatestEthereumChildAddressIndex + $positon", "$ethereumChildAddressIndex")
+			LogUtil.debug("getLatestEthereumChildAddressIndex + $position", "$ethereumChildAddressIndex")
 		}
 	}
-	
+
 	@Test
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
@@ -110,18 +121,18 @@ class GoldStoneUtilUnitTest {
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
 		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
 	}
-	
+
 	@Test
 	fun getMyContactTable() {
 		ContactTable.getAllContacts {
 			LogUtil.debug("getMyContactTable", "$it")
 		}
 	}
-	
+
 	@Test
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
-			CryptoSymbol.btc,
+			CryptoSymbol.btc(),
 			ChainID.BTCMain.id,
 			{
 				LogUtil.error("getCoinInfo", it)
@@ -130,7 +141,7 @@ class GoldStoneUtilUnitTest {
 			LogUtil.debug("getCoinInfo", "$it")
 		}
 	}
-	
+
 	@Test
 	fun newEthereumChildAddress() {
 		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
@@ -147,5 +158,14 @@ class GoldStoneUtilUnitTest {
 			}
 		}
 	}
+
+	data class PricePairModel(val pair: String, val price: String)
+	data class PriceAlarmClockTable(
+		val pair: String,
+		val price: String,
+		val priceType: Int,
+		val status: Boolean,
+		var marketPrice: String
+	)
 }
 

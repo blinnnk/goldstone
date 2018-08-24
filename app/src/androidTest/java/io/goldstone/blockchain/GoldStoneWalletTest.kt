@@ -8,6 +8,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.toHexString
 import io.goldstone.blockchain.crypto.walletfile.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -25,12 +27,12 @@ import java.math.BigInteger
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class GoldStoneWalletTest {
-	
+
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
 	private val positon = this.javaClass.simpleName
-	
+
 	@Test
 	fun signTransaction() {
 		val transaction = Transaction().apply {
@@ -51,7 +53,7 @@ class GoldStoneWalletTest {
 		LogUtil.logDebug(positon + "signTransaction", result)
 		Assert.assertTrue("Sign Transaction wrong", result.equals(expected, true))
 	}
-	
+
 	@Test
 	fun decryptKeystoreFile() {
 		val walletJSON =
@@ -83,5 +85,12 @@ class GoldStoneWalletTest {
 			"Wrong Keystore Value",
 			address.equals(expectValue, true)
 		)
+	}
+
+	@Test
+	fun generateLitecoinAccount() {
+		LTCWalletUtils.getPrivateKeyFromWIFKey("T8DGhBg9M1WJdTcjLVvsHWZPAFgbov6VckWxHZKix591eGaoS6Ws", ChainPrefix.Litecoin).let {
+			LogUtil.logDebug(positon + "getPrivateKeyFromWIFKey", it)
+		}
 	}
 }

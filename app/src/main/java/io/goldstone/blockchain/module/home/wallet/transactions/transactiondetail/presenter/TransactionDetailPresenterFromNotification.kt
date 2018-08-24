@@ -3,21 +3,24 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.CommonText
-import io.goldstone.blockchain.common.value.LoadingText
-import io.goldstone.blockchain.common.value.TransactionText
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toUnitValue
-import io.goldstone.blockchain.kernel.commonmodel.BitcoinSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -34,14 +37,14 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 	/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
 	notificationData?.let { transaction ->
 		currentHash = transaction.hash
-		if (transaction.symbol.equals(CryptoSymbol.btc, true)) {
-			getBitcoinSeriesTransaction(transaction)
-		} else {
-			/**
-			 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
-			 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
-			 */
-			getETHERC20OrETCTransaction(transaction)
+		/**
+		 * 查看本地数据库是否已经记录了这条交易, 这种情况存在于, 用户收到 push 并没有打开通知中心
+		 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
+		 */
+		when {
+			CryptoSymbol.isBTCSeriesSymbol(transaction.symbol) ->
+				getBitcoinSeriesTransaction(transaction)
+			else -> getETHERC20OrETCTransaction(transaction)
 		}
 	}
 }
@@ -130,15 +133,27 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 	info: NotificationTransactionInfo
 ) {
-	BitcoinSeriesTransactionTable.getTransactionsByHash(
+	BTCSeriesTransactionTable.getTransactionsByHash(
 		currentHash,
 		info.isReceived
 	) { localTransaction ->
-		if (localTransaction.isNull()) {
+		if (localTransaction.isNull() || localTransaction?.blockNumber?.toIntOrNull().isNull()) {
 			fragment.apply {
 				showLoadingView(LoadingText.transactionData)
-				updateBTCTransactionByNotificationHash(info) {
-					removeLoadingView()
+				when {
+					info.symbol.equals(CryptoSymbol.pureBTCSymbol, true) ->
+						updateBTCTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}
+					info.symbol.equals(CryptoSymbol.ltc, true) ->
+						updateLTCTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}
+					info.symbol.equals(CryptoSymbol.bch, true) -> {
+						updateBCHTransactionByNotificationHash(info) {
+							removeLoadingView()
+						}
+					}
 				}
 			}
 		} else {
@@ -160,6 +175,10 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 	}
 }
 
+/**
+ * 通知中心的拉取 是混合主网和测试网的状态, 所以这里需要通过 `ChainID` 来决定
+ * 是从主网请求数据还是测试网络请求数据
+ */
 fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	info: NotificationTransactionInfo,
 	callback: () -> Unit
@@ -167,6 +186,7 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -188,9 +208,65 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	}
 }
 
-private fun TransactionDetailPresenter.updateHeaderFromNotification(
-	info: NotificationTransactionInfo
+fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
+	info: NotificationTransactionInfo,
+	callback: () -> Unit
 ) {
+	LitecoinApi.getTransactionByHash(
+		currentHash,
+		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
+		{
+			LogUtil.error("updateBTCTransactionByNotificationHash", it)
+			fragment.context?.alert(it.toString())
+		}
+	) { receipt ->
+		// 通过 `Notification` 获取确实信息
+		receipt?.apply {
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+		}?.toAsyncData()?.let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
+			}
+		}
+	}
+}
+
+fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
+	info: NotificationTransactionInfo,
+	callback: () -> Unit
+) {
+	BitcoinCashApi.getTransactionByHash(
+		currentHash,
+		info.fromAddress,
+		ChainID.getThirdPartyURLByChainID(info.chainID),
+		{
+			LogUtil.error("updateBTCTransactionByNotificationHash", it)
+			fragment.context?.alert(it.toString())
+		}
+	) { receipt ->
+		// 通过 `Notification` 获取确实信息
+		receipt?.apply {
+			this.symbol = notificationData?.symbol.orEmpty()
+			this.timeStamp = info.timeStamp.toString()
+			this.isReceive = info.isReceived
+		}?.toAsyncData()?.let {
+			fragment.context?.runOnUiThread {
+				if (fragment.asyncData.isNull()) fragment.asyncData = it
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				updateHeaderFromNotification(info)
+				callback()
+			}
+		}
+	}
+}
+
+private fun TransactionDetailPresenter.updateHeaderFromNotification(info: NotificationTransactionInfo) {
 	prepareHeaderValueFromNotification(
 		if (info.isReceived) info.fromAddress else info.toAddress,
 		notificationData?.value.orElse(0.0),
@@ -230,10 +306,9 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	}
 }
 
-private fun BitcoinSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
+private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		"${fee.toDouble().toBTCCount().toBigDecimal()} ${CryptoSymbol.btc}",
-		"",
+		"${fee.toDouble().toBigDecimal().toPlainString()} $symbol",
 		fromAddress,
 		TransactionListModel.formatToAddress(to),
 		hash,
@@ -243,7 +318,6 @@ private fun BitcoinSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDe
 	)
 	arrayListOf(
 		TransactionText.minerFee,
-		TransactionText.memo,
 		CommonText.from,
 		CommonText.to,
 		TransactionText.transactionHash,

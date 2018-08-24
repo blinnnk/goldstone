@@ -11,7 +11,7 @@ data class TokenSearchModel(
 	@SerializedName("address")
 	var contract: String = "",
 	@SerializedName("url")
-	var iconUrl: String = "",
+	var iconUrl: String? = "",
 	@SerializedName("symbol")
 	var symbol: String = "",
 	@SerializedName("price")

@@ -3,14 +3,12 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.TinyNumber
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.LoadingText
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -30,11 +28,11 @@ import org.jetbrains.anko.runOnUiThread
 class TokenSearchPresenter(
 	override val fragment: TokenSearchFragment
 ) : BaseRecyclerPresenter<TokenSearchFragment, DefaultTokenTable>() {
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-	
+
 	private var canSearch = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
@@ -43,12 +41,9 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (
-							Config.getCurrentWalletType().equals(WalletType.BTCTestOnly.content, true) ||
-							Config.getCurrentWalletType().equals(WalletType.BTCOnly.content, true)
-						) {
+						canSearch = if (WalletType.isBTCSeriesType(Config.getCurrentWalletType())) {
 							fragment.context.alert(
-								"This is a single bitcoin chain wallet so you canot add other crypot currency"
+								"This is a single block chain wallet so you canot add other crypot currency"
 							)
 							false
 						} else {
@@ -56,11 +51,18 @@ class TokenSearchPresenter(
 						}
 					}
 				}
-			) {
+			) { defaultTokens ->
 				canSearch isTrue {
-					searchTokenByContractOrSymbol(it) {
+					searchTokenByContractOrSymbol(defaultTokens) { result ->
 						context?.runOnUiThread {
-							diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(it)
+							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
+								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot {
+									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
+								}.toArrayList())
+							} else {
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result)
+							}
 							fragment.removeLoadingView()
 						}
 					}
@@ -68,13 +70,13 @@ class TokenSearchPresenter(
 			}
 		}
 	}
-	
+
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
 			model?.let { searchToken ->
 				DefaultTokenTable.getCurrentChainToken(searchToken.contract) { localToken ->
 					localToken.isNotNull {
-						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候更新名字顺便
+						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
 						DefaultTokenTable.updateTokenDefaultStatus(
 							localToken?.contract.orEmpty(),
 							switch.isChecked,
@@ -96,29 +98,24 @@ class TokenSearchPresenter(
 			switch.preventDuplicateClicks()
 		}
 	}
-	
+
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(
-					switch,
-					it,
-					ChainID.getChainIDBySymbol(it.symbol)
-				)
+				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
 			}
 		}
 	}
-	
+
 	private fun searchTokenByContractOrSymbol(
 		content: String,
 		hold: (ArrayList<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-		
 		fragment.showLoadingView(LoadingText.searchingToken)
-		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(
+		GoldStoneAPI.getTokenInfoBySymbolFromServer(
 			content,
-			{
+			{ it ->
 				// Usually this kinds of Exception will be connect to the service Timeout
 				fragment.context?.alert(
 					it.toString().trimStart {
@@ -130,17 +127,19 @@ class TokenSearchPresenter(
 			MyTokenTable.getMyTokens { localTokens ->
 				if (!result.isNullOrEmpty()) {
 					// 从服务器请求目标结果
-					result.map { serverToken ->
-						// 更新使用中的按钮状态
-						DefaultTokenTable(serverToken).apply {
-							val status = localTokens.any {
-								it.contract.equals(serverToken.contract, true)
+					try {
+						hold(result.map { serverToken ->
+							// 更新使用中的按钮状态
+							DefaultTokenTable(serverToken).apply {
+								val status = localTokens.any {
+									it.contract.equals(serverToken.contract, true)
+								}
+								isDefault = status
+								isUsed = status
 							}
-							isDefault = status
-							isUsed = status
-						}
-					}.let {
-						hold(it.toArrayList())
+						}.toArrayList())
+					} catch (error: Exception) {
+						LogUtil.error("getTokenInfoBySymbolFromServer", error)
 					}
 				} else {
 					if (isSearchingSymbol) {
