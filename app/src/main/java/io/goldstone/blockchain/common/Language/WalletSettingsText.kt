@@ -24,7 +24,7 @@ object WalletSettingsText {
 		HoneyLanguage.Chinese.code -> "(包含测试链地址)"
 		HoneyLanguage.Japanese.code -> "(テストチェーンアドレスが含まれています)"
 		HoneyLanguage.Korean.code -> "(테스트 체인 주소가 들어 있습니다)"
-		HoneyLanguage.Russian.code -> "(Contains Test Address)"
+		HoneyLanguage.Russian.code -> "(Содержит тестовый адрес)"
 		HoneyLanguage.TraditionalChinese.code -> "(包含測試鏈地址)"
 		else -> ""
 	}
@@ -36,9 +36,9 @@ object WalletSettingsText {
 
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> if (count > 1) {
-				"there are $count addresses in this wallet $description"
+				"There are $count addresses in this wallet $description"
 			} else {
-				"there is $count address in this wallet $description"
+				"There is $count address in this wallet $description"
 			}
 			HoneyLanguage.Russian.code -> if (count > 1) {
 				"В текущем кошельке есть $count адреса $description"

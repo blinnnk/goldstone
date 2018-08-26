@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
+import android.app.Notification
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -22,7 +23,9 @@ import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.matchParent
@@ -273,8 +276,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				is ContactFragment, is AddressSelectionFragment -> setStyle(EmptyType.Contact)
 				is TokenSearchFragment -> setStyle(EmptyType.Search)
 				is QuotationSearchFragment -> setStyle(EmptyType.QuotationSearch)
+				is QuotationManagementFragment -> setStyle(EmptyType.QuotationManagement)
 				is QuotationFragment -> setStyle(EmptyType.Quotation)
 				is WalletDetailFragment -> setStyle(EmptyType.WalletDetail)
+				is NotificationListFragment -> setStyle(EmptyType.NotificationList)
+
 				else -> setStyle(EmptyType.TransactionDetail)
 			}
 		}

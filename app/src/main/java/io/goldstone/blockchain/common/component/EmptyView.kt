@@ -29,8 +29,10 @@ enum class EmptyType {
 	Contact,
 	Search,
 	QuotationSearch,
+	QuotationManagement,
 	Quotation,
-	WalletDetail
+	WalletDetail,
+	NotificationList
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -72,7 +74,8 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
 			}
-			
+
+
 			EmptyType.WalletDetail -> {
 				val viewSize = 300.uiPX()
 				val hasEnoughSpace =
@@ -109,7 +112,13 @@ class EmptyView(context: Context) : LinearLayout(context) {
 					y += 45.uiPX()
 				}
 			}
-			
+
+			EmptyType.NotificationList -> {
+				icon.imageResource = R.drawable.notification_list_empty_icon
+				introTitles.title.text = EmptyText.notificationListTitle
+				introTitles.subtitle.text = EmptyText.notificationListSubtitle
+			}
+
 			EmptyType.TransactionDetail -> {
 				icon.imageResource = R.drawable.transaction_empty_icon
 				introTitles.title.text = EmptyText.tokenDetailTitle
@@ -128,12 +137,16 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				introTitles.subtitle.text = EmptyText.searchSubtitle
 			}
 			
+			EmptyType.QuotationManagement -> {
+				icon.imageResource = R.drawable.pair_selection_empty_icon
+				introTitles.title.text = EmptyText.quotationManagementTitle
+				introTitles.subtitle.text = EmptyText.quotationManagementSubtitle
+			}
 			EmptyType.QuotationSearch -> {
 				icon.imageResource = R.drawable.nopair_icon
 				introTitles.title.text = EmptyText.searchTitle
 				introTitles.subtitle.text = EmptyText.searchSubtitle
 			}
-			
 			EmptyType.Quotation -> {
 				y = 100.uiPX().toFloat()
 				removeView(introTitles)

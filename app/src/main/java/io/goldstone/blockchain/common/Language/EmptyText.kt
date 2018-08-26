@@ -47,6 +47,26 @@ object EmptyText {
 		else -> ""
 	}
 	@JvmField
+	val notificationListTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Empty Here"
+		HoneyLanguage.Chinese.code -> "没有新消息"
+		HoneyLanguage.Japanese.code -> "もありません"
+		HoneyLanguage.Korean.code -> "새 알림 메시지가 없습니다"
+		HoneyLanguage.Russian.code -> "Нет нового уведомления"
+		HoneyLanguage.TraditionalChinese.code -> "還沒有任何交易記錄"
+		else -> ""
+	}
+	@JvmField
+	val notificationListSubtitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "We will remind you when there are new transfers or other notifications."
+		HoneyLanguage.Chinese.code -> "当有新的转账或其他通知消息时我们会在这里提醒您"
+		HoneyLanguage.Japanese.code -> "新しい転送やその他の通知があった場合にお知らせします。"
+		HoneyLanguage.Korean.code -> "새로운 전송이나 기타 알림이있을 때 알려드립니다."
+		HoneyLanguage.Russian.code -> "Напоминаем, когда появляются новые переводы или другие уведомления."
+		HoneyLanguage.TraditionalChinese.code -> "當有新的轉賬或其他通知消息時我們會在這裡提醒您"
+		else -> ""
+	}
+	@JvmField
 	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
 		HoneyLanguage.Chinese.code -> "没有找到这个Token"
@@ -58,12 +78,32 @@ object EmptyText {
 	}
 	@JvmField
 	val searchSubtitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "You have not added any trading pairs yet. Please click on the upper left button to search for and add real-time"
-		HoneyLanguage.Chinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
-		HoneyLanguage.Japanese.code -> "取引ペアを追加していません。インタフェースの左上隅にあるマーケットのTokenをクリックすると、リアルタイム市況が表示されます"
-		HoneyLanguage.Korean.code -> "아직 거래 내역이 없습니다"
-		HoneyLanguage.Russian.code -> "Вы еще не добавили никаких пар операций, пожалуйста, нажмите на верхнюю левую кнопку, чтобы добавить городской token, также можно осуществлять в режиме реального времени"
-		HoneyLanguage.TraditionalChinese.code -> "你还没有添加交易对，点击界面左上角添加市场里的token，可以看实时行情"
+		HoneyLanguage.English.code -> "No result for your search, please change and search again."
+		HoneyLanguage.Chinese.code -> "没有搜索结果，请更改并再次搜索。"
+		HoneyLanguage.Japanese.code -> "検索結果はありません。変更して再度検索してください。"
+		HoneyLanguage.Korean.code -> "검색 결과가 없으므로 다시 변경하고 검색하십시오."
+		HoneyLanguage.Russian.code -> "Нет результатов для вашего поиска, пожалуйста, измените и повторите поиск."
+		HoneyLanguage.TraditionalChinese.code -> "沒有搜索結果，請更改並再次搜索。"
+		else -> ""
+	}
+	@JvmField
+	val quotationManagementTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No Selected Tokens"
+		HoneyLanguage.Chinese.code -> "还没有添加自选"
+		HoneyLanguage.Japanese.code -> "トークンはありません"
+		HoneyLanguage.Korean.code -> "선택을 추가하지 않았습니다"
+		HoneyLanguage.Russian.code -> "Не добавил свой выбор"
+		HoneyLanguage.TraditionalChinese.code -> "還沒有添加自選"
+		else -> ""
+	}
+	@JvmField
+	val quotationManagementSubtitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Search for and add tokens in the market by clicking the search icon"
+		HoneyLanguage.Chinese.code -> "点击界面左上角的图标，搜索并添加市场里的token"
+		HoneyLanguage.Japanese.code -> "左上隅にあるアイコンをクリックして、市場のトークンを検索して追加します"
+		HoneyLanguage.Korean.code -> "인터페이스의 왼쪽 상단 모서리에있는 아이콘을 클릭하여 시장에서 토큰을 검색하고 추가하십시오."
+		HoneyLanguage.Russian.code -> "Найдите и добавьте маркеры на рынок, щелкнув значок в верхнем левом углу интерфейса."
+		HoneyLanguage.TraditionalChinese.code -> "點擊界面左上角的圖標, 搜索並添加市場裡的token"
 		else -> ""
 	}
 	@JvmField
