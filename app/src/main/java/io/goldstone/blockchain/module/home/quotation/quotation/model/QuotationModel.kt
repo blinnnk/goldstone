@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.model
 
-import com.db.chart.model.Point
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.Serializable
 
@@ -22,7 +21,7 @@ data class QuotationModel(
 	val contract: String = "",
 	var isDisconnected: Boolean = false
 ) : Serializable {
-	
+
 	constructor(
 		data: QuotationSelectionTable,
 		price: String,
@@ -47,7 +46,4 @@ data class QuotationModel(
  * important `Serializable` 传参的时候 非继承与 `Serializable` 的会导致
  * 崩溃. Look `https://stackoverflow.com/questions/4670215/`
  */
-class ChartPoint(label: String, value: Float) : Point(
-	label,
-	value
-), Serializable
+data class ChartPoint(val label: String, val value: Float) : Serializable

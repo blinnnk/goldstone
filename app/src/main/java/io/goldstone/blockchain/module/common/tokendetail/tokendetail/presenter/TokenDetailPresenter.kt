@@ -311,7 +311,7 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract!!, walletAddress) {
+				data.prepareTokenHistoryBalance(token?.contract.orEmpty(), walletAddress) {
 					it.updateChartAndHeaderData()
 				}
 			} otherwise {
@@ -323,20 +323,16 @@ class TokenDetailPresenter(
 	private fun updateEmptyCharData(symbol: String) {
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
-		listOf(
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
-		).updateChartAndHeaderData()
+		var emptyData = listOf<TokenBalanceTable>()
+		(0 until 7).forEach {
+			emptyData += TokenBalanceTable(symbol, now)
+		}
+		emptyData.updateChartAndHeaderData()
 	}
 
 	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
-			val maxChartCount = 6
+			val maxChartCount = 7
 			val chartArray = arrayListOf<ChartPoint>()
 			val charCount = if (size > maxChartCount) maxChartCount else size
 			forEach {

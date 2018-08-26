@@ -47,16 +47,16 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				linechart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
+				lineChart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				linechart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
+				lineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
-		
-		linechart.resetData(
+
+		lineChart.resetData(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
 			}.toArrayList()
@@ -92,8 +92,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			y += 52.uiPX()
 		}
 	}
-	
-	private val linechart = object : LineChart(context) {
+
+	private val lineChart = object : LineChart(context) {
 		override val isDrawPoints: Boolean = false
 		override val isPerformBezier: Boolean = true
 		override val dragEnable: Boolean = false
@@ -101,7 +101,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override val animateEnable: Boolean = false
 		override fun lineLabelCount(): Int = 4
 	}
-	
+
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
@@ -117,8 +117,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			addView(exchangeName)
 			
 			tokenPrice.setAlignParentRight()
-			
-			linechart.apply {
+
+			lineChart.apply {
 				id = ElementID.chartView
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
 				setMargins<RelativeLayout.LayoutParams> {
