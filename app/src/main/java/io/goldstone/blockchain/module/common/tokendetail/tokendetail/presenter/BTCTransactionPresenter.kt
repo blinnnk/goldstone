@@ -31,7 +31,7 @@ fun TokenDetailPresenter.loadBTCChainData() {
 			transactionCount,
 			{
 				fragment.removeLoadingView()
-				// TODO ERROR Alert
+				LogUtil.error("loadBTCChainData", it)
 			}
 		) {
 			fragment.context?.runOnUiThread {
@@ -50,6 +50,11 @@ private fun loadTransactionsFromChain(
 	successCallback: (hasData: Boolean) -> Unit
 ) {
 	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
+	// 意味着网络没有更新的数据直接返回
+	if (pageInfo.to == 0) {
+		successCallback(false)
+		return
+	}
 	BitcoinApi.getBTCTransactions(
 		address,
 		pageInfo.from,

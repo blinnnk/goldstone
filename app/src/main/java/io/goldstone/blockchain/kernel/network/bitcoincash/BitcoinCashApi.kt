@@ -43,9 +43,9 @@ object BitcoinCashApi {
 	fun getTransactionCount(
 		address: String,
 		errorCallback: (Throwable) -> Unit,
-		hold: (List<JSONObject>) -> Unit
+		hold: (count: Int) -> Unit
 	) {
-		BTCSeriesApiUtils.getTransactions(
+		BTCSeriesApiUtils.getTransactionCount(
 			BitcoinCashUrl.getTransactions(address, 999999999, 0),
 			errorCallback,
 			hold

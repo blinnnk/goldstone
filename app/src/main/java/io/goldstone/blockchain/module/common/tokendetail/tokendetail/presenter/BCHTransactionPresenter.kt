@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -20,20 +19,28 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadBCHChainData() {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBCHAddress()
-	loadBCHTransactionsFromChain(
+	BitcoinCashApi.getTransactionCount(
 		address,
-		0,
-		0,
 		{
 			fragment.removeLoadingView()
 			LogUtil.error("loadBCHChainData", it)
 		}
-	) {
-		fragment.context?.runOnUiThread {
-			fragment.removeLoadingView()
+	) { transactionCount ->
+		loadBCHTransactionsFromChain(
+			address,
+			0,
+			transactionCount,
+			{
+				fragment.removeLoadingView()
+				LogUtil.error("loadBCHChainData", it)
+			}
+		) {
+			fragment.context?.runOnUiThread {
+				fragment.removeLoadingView()
+			}
+			// TODO 判断数据
+			loadDataFromDatabaseOrElse()
 		}
-		// TODO 判断数据
-		loadDataFromDatabaseOrElse()
 	}
 }
 
@@ -45,6 +52,11 @@ private fun loadBCHTransactionsFromChain(
 	successCallback: (hasData: Boolean) -> Unit
 ) {
 	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
+	// 意味着网络没有更新的数据直接返回
+	if (pageInfo.to == 0) {
+		successCallback(false)
+		return
+	}
 	BitcoinCashApi.getTransactions(
 		address,
 		pageInfo.from,
