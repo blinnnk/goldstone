@@ -31,7 +31,7 @@ fun TokenDetailPresenter.loadBTCChainData() {
 			transactionCount,
 			{
 				fragment.removeLoadingView()
-				// TODO ERROR Alert
+				LogUtil.error("loadBTCChainData", it)
 			}
 		) {
 			fragment.context?.runOnUiThread {
