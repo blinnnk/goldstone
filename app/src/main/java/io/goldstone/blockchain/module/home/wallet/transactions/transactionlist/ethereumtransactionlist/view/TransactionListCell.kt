@@ -22,7 +22,6 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 open class TransactionListCell(context: Context) : BaseValueCell(context) {
-	
 	var model: TransactionListModel? by observing(null) {
 		model?.let {
 			icon.apply {
@@ -53,14 +52,14 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 					}
 				}
 			}
-			
+
 			info.apply {
 				title.text = CryptoUtils.scaleTo16(it.addressName)
 				subtitle.text =
 					if (Config.getCurrentLanguageCode() == 0) it.addressInfo
 					else it.addressInfo.scaleTo(26)
 			}
-			
+
 			count?.apply {
 				title.text =
 					(if (it.isReceived) "+" else "-") +
@@ -77,7 +76,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			}
 		}
 	}
-	
+
 	init {
 		layoutParams.height = 65.uiPX()
 		setGrayStyle()

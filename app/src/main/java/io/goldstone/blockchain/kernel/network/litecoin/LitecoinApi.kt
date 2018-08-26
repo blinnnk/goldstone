@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -29,11 +27,25 @@ object LitecoinApi {
 
 	fun getTransactions(
 		address: String,
+		from: Int,
+		to: Int,
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactions(
-			LitecoinUrl.getTransactions(address),
+			LitecoinUrl.getTransactions(address, from, to),
+			errorCallback,
+			hold
+		)
+	}
+
+	fun getTransactionsCount(
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (count: Int) -> Unit
+	) {
+		BTCSeriesApiUtils.getTransactionCount(
+			LitecoinUrl.getTransactions(address, 999999999, 0),
 			errorCallback,
 			hold
 		)
@@ -55,6 +67,8 @@ object LitecoinApi {
 				if (isNull()) null
 				else BTCSeriesTransactionTable(
 					it!!,
+					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
+					0,
 					address,
 					CryptoSymbol.ltc,
 					false,

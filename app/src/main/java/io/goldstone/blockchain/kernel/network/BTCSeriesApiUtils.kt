@@ -1,6 +1,9 @@
 package io.goldstone.blockchain.kernel.network
 
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -16,9 +19,9 @@ object BTCSeriesApiUtils {
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<String>(
+		RequisitionUtil.requestUnCryptoData<String>(
 			api,
-			"txs",
+			"items",
 			true,
 			{
 				errorCallback(it)
@@ -34,8 +37,26 @@ object BTCSeriesApiUtils {
 		}
 	}
 
+	fun getTransactionCount(
+		api: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (count: Int) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			api,
+			"totalItems",
+			true,
+			{
+				errorCallback(it)
+				LogUtil.error("getTransactionCount", it)
+			}
+		) {
+			hold(this.firstOrNull()?.toIntOrNull().orZero())
+		}
+	}
+
 	fun getBalance(api: String, hold: (Long) -> Unit) {
-		RequisitionUtil.requestUncryptoData<String>(
+		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
@@ -49,7 +70,7 @@ object BTCSeriesApiUtils {
 	}
 
 	fun getDoubleBalance(api: String, hold: (Double) -> Unit) {
-		RequisitionUtil.requestUncryptoData<String>(
+		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
@@ -67,7 +88,7 @@ object BTCSeriesApiUtils {
 		errorCallback: (Throwable) -> Unit,
 		hold: (JSONObject?) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<String>(
+		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
@@ -84,7 +105,7 @@ object BTCSeriesApiUtils {
 		api: String,
 		hold: (List<UnspentModel>) -> Unit
 	) {
-		RequisitionUtil.requestUncryptoData<UnspentModel>(
+		RequisitionUtil.requestUnCryptoData<UnspentModel>(
 			api,
 			"",
 			false,
@@ -95,5 +116,12 @@ object BTCSeriesApiUtils {
 		) {
 			hold(if (isNotEmpty()) this else listOf())
 		}
+	}
+
+	fun getPageInfo(transactionCount: Int, localDataMaxIndex: Int): PageInfo {
+		val willGetDataCount =
+			if (transactionCount - localDataMaxIndex > DataValue.pageCount) DataValue.pageCount
+			else transactionCount - localDataMaxIndex
+		return PageInfo(0, willGetDataCount, transactionCount)
 	}
 }

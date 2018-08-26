@@ -28,11 +28,25 @@ object BitcoinCashApi {
 
 	fun getTransactions(
 		address: String,
+		from: Int,
+		to: Int,
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactions(
-			BitcoinCashUrl.getTransactions(address),
+			BitcoinCashUrl.getTransactions(address, from, to),
+			errorCallback,
+			hold
+		)
+	}
+
+	fun getTransactionCount(
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (List<JSONObject>) -> Unit
+	) {
+		BTCSeriesApiUtils.getTransactions(
+			BitcoinCashUrl.getTransactions(address, 999999999, 0),
 			errorCallback,
 			hold
 		)
@@ -53,6 +67,8 @@ object BitcoinCashApi {
 				if (isNull()) null
 				else BTCSeriesTransactionTable(
 					it!!,
+					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
+					0,
 					address,
 					CryptoSymbol.bch,
 					false,
