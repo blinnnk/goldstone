@@ -248,12 +248,10 @@ class GasSelectionPresenter(
 		taxHash: String
 	) {
 		fragment.getParentFragment<TokenDetailOverlayFragment> {
-			val myAddress =
-				if (Config.isTestEnvironment())
-					Config.getCurrentBTCSeriesTestAddress()
-				else Config.getCurrentBTCAddress()
+			val myAddress = AddressUtils.getCurrentBTCAddress()
 			BTCSeriesTransactionTable(
 				0,
+				0, // TODO 插入 Pending Data 应该是 localMaxDataIndex + 1
 				getToken()?.symbol.orEmpty(),
 				"Waiting",
 				0,
@@ -266,6 +264,7 @@ class GasSelectionPresenter(
 				raw.value.toBTCCount().formatCount(),
 				fee.toBTCCount().formatCount(),
 				size.toString(),
+				0,
 				false,
 				true,
 				ChainType.getChainTypeBySymbol(getToken()?.symbol)

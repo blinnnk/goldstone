@@ -12,7 +12,7 @@ import com.blinnnk.util.ReasonText
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import com.blinnnk.util.replaceFragmentAndSetArgument
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton

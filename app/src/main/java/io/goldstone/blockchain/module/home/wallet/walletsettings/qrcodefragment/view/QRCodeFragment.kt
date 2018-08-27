@@ -54,7 +54,7 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 			hasConvertedBCH = !hasConvertedBCH
 			val default = presenter.addressModel?.address.orEmpty()
 			val net = if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-			val address = if (hasConvertedBCH) BCHWalletUtils.formattedToLegacy(default, net)
+			val address = if (!hasConvertedBCH) BCHWalletUtils.formattedToLegacy(default, net)
 			else {
 				if (BCHWalletUtils.isNewCashAddress(default)) default
 				else BCHUtil.instance.encodeCashAddressByLegacy(default)

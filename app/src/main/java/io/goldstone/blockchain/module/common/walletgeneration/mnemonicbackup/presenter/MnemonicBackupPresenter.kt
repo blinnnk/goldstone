@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.pr
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.jump
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment

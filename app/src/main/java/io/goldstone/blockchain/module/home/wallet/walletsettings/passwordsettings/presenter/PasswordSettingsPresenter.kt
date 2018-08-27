@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettin
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText

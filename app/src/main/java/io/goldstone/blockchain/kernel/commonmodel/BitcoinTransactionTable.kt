@@ -26,6 +26,7 @@ import org.json.JSONObject
 data class BTCSeriesTransactionTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
+	val dataIndex: Int, // 复杂的翻页机制需要和服务器映射的抽象角标
 	var symbol: String,
 	var blockNumber: String,
 	var transactionIndex: Int,
@@ -38,6 +39,7 @@ data class BTCSeriesTransactionTable(
 	val value: String,
 	val fee: String,
 	var size: String,
+	var confirmations: Int,
 	var isFee: Boolean,
 	var isPending: Boolean,
 	var chainType: Int
@@ -45,12 +47,14 @@ data class BTCSeriesTransactionTable(
 
 	constructor(
 		data: JSONObject,
+		dataIndex: Int,
 		myAddress: String,
 		symbol: String,
 		isFee: Boolean,
 		chainType: Int
 	) : this(
 		0,
+		dataIndex,
 		symbol,
 		data.safeGet("blockheight"),
 		0,
@@ -63,6 +67,7 @@ data class BTCSeriesTransactionTable(
 		getTransactionValue(data, myAddress),
 		data.safeGet("fees"),
 		data.safeGet("size"),
+		data.safeGet("confirmations").toIntOrNull().orZero(),
 		isFee,
 		false,
 		chainType

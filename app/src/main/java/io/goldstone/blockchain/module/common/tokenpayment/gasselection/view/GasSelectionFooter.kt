@@ -33,13 +33,11 @@ class GasSelectionFooter(context: Context) : LinearLayout(context) {
 	private val confirmButton by lazy { RoundButton(context) }
 
 	init {
-
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
-
 		layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
-
 		customButton.apply {
+			setHorizontalPadding()
 			layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 			textView {
 				setGrayStyle()

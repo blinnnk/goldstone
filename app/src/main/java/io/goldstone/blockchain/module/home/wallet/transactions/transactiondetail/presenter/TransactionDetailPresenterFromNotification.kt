@@ -12,8 +12,6 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable

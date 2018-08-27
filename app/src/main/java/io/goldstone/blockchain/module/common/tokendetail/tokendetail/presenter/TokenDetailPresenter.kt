@@ -114,9 +114,17 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
-		loadDataFromDatabaseOrElse {
+		loadDataFromDatabaseOrElse { ethERC20OrETCLocalData, localBTCSeriesData ->
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				fragment.loadDataFromChain()
+				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
+				// `ETHERC20OrETC` 需要使用到 `localData`
+				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
+					// This localDataMaxIndex is BTCSeries Transactions Only
+					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				} else if (!ethERC20OrETCLocalData.isNull() || !ethERC20OrETCLocalData!!.isEmpty()) {
+					fragment.loadDataFromChain(ethERC20OrETCLocalData!!, 0)
+				}
 			}
 		}
 	}
@@ -128,137 +136,126 @@ class TokenDetailPresenter(
 	private var hasUpdateETHData = false
 	private var hasUpdateBCHData = false
 
-	private fun TokenDetailFragment.loadDataFromChain() {
+	private fun TokenDetailFragment.loadDataFromChain(
+		localETHERC20OrETCData: List<TransactionListModel>,
+		localDataMaxIndex: Int
+	) {
 		when {
 			token?.symbol.equals(CryptoSymbol.etc, true) -> {
-				if (!hasUpdateETCData) loadETCChainData()
+				if (!hasUpdateETCData) loadETCChainData(localETHERC20OrETCData)
 				hasUpdateETCData = true
 			}
 
 			token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
-				if (!hasUpdateBTCData) loadBTCChainData()
+				if (!hasUpdateBTCData) loadBTCChainData(localDataMaxIndex)
 				hasUpdateBTCData = true
 			}
 
 			token?.symbol.equals(CryptoSymbol.bch, true) -> {
-				if (!hasUpdateBCHData) loadBCHChainData()
+				if (!hasUpdateBCHData) loadBCHChainData(localDataMaxIndex)
 				hasUpdateBCHData = true
 			}
 
 			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
-				if (!hasUpdateLTCData) loadLTCChainData()
+				if (!hasUpdateLTCData) loadLTCChainData(localDataMaxIndex)
 				hasUpdateLTCData = true
 			}
 
 			token?.symbol.equals(CryptoSymbol.eth, true) -> {
-				if (!hasUpdateETHData) loadETHChainData()
+				if (!hasUpdateETHData) loadETHChainData(localETHERC20OrETCData)
 				hasUpdateETHData = true
 			}
 
 			else -> {
-				if (!hasUpdateERCData) loadERCChainData()
+				if (!hasUpdateERCData) loadERCChainData(localETHERC20OrETCData)
 				hasUpdateERCData = true
 			}
 		}
 	}
 
 	fun loadDataFromDatabaseOrElse(
-		withoutLocalDataCallback: () -> Unit = {}
+		callback: (
+			localETHERC20OrETCData: List<TransactionListModel>?,
+			localBtcSeriesData: List<BTCSeriesTransactionTable>?
+		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
 			WalletType.MultiChain.content -> {
 				when {
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
-						getETHERC20OrETCData(
-							Config.getCurrentETCAddress(),
-							withoutLocalDataCallback
-						)
+						getETHERC20OrETCData(Config.getCurrentETCAddress()) {
+							callback(it, null)
+						}
 
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
-						val address =
-							if (Config.isTestEnvironment())
-								Config.getCurrentBTCSeriesTestAddress()
-							else Config.getCurrentBTCAddress()
 						getBTCSeriesData(
-							address,
-							ChainType.BTC.id,
-							withoutLocalDataCallback
-						)
+							AddressUtils.getCurrentBTCAddress(),
+							ChainType.BTC.id
+						) {
+							callback(null, it)
+						}
 					}
 
 					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
-						if (Config.isTestEnvironment()) {
-							getBTCSeriesData(
-								Config.getCurrentBTCSeriesTestAddress(),
-								ChainType.LTC.id,
-								withoutLocalDataCallback
-							)
-						} else {
-							getBTCSeriesData(
-								Config.getCurrentLTCAddress(),
-								ChainType.LTC.id,
-								withoutLocalDataCallback
-							)
+						getBTCSeriesData(
+							AddressUtils.getCurrentLTCAddress(),
+							ChainType.LTC.id
+						) {
+							callback(null, it)
 						}
 					}
 
 					token?.symbol.equals(CryptoSymbol.bch, true) -> {
-						if (Config.isTestEnvironment()) {
-							getBTCSeriesData(
-								Config.getCurrentBTCSeriesTestAddress(),
-								ChainType.BCH.id,
-								withoutLocalDataCallback
-							)
-						} else {
-							getBTCSeriesData(
-								Config.getCurrentBCHAddress(),
-								ChainType.BCH.id,
-								withoutLocalDataCallback
-							)
+						getBTCSeriesData(
+							AddressUtils.getCurrentBCHAddress(),
+							ChainType.BCH.id
+						) {
+							callback(null, it)
 						}
 					}
 
-					else -> getETHERC20OrETCData(
-						Config.getCurrentEthereumAddress(),
-						withoutLocalDataCallback
-					)
+					else -> getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
+						callback(it, null)
+					}
 				}
 			}
 
 			WalletType.BCHOnly.content ->
 				getBTCSeriesData(
 					Config.getCurrentBCHAddress(),
-					ChainType.BTC.id,
-					withoutLocalDataCallback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 
 			WalletType.ETHERCAndETCOnly.content ->
-				getETHERC20OrETCData(
-					Config.getCurrentEthereumAddress(),
-					withoutLocalDataCallback
-				)
+				getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
+					callback(it, null)
+				}
 
 			WalletType.BTCTestOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCSeriesTestAddress(),
-					ChainType.BTC.id,
-					withoutLocalDataCallback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 			}
 
 			WalletType.BTCOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCAddress(),
-					ChainType.BTC.id,
-					withoutLocalDataCallback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 			}
 		}
 	}
 
 	private fun getETHERC20OrETCData(
 		address: String,
-		callback: () -> Unit
+		callback: (List<TransactionListModel>) -> Unit
 	) {
 		TransactionTable.getCurrentChainByAddressAndContract(
 			address,
@@ -268,17 +265,15 @@ class TokenDetailPresenter(
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(transactions, address)
 				fragment.removeLoadingView()
-			} otherwise {
-				callback()
-				LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
 			}
+			callback(transactions)
 		}
 	}
 
 	private fun getBTCSeriesData(
 		address: String,
 		chainType: Int,
-		withoutDataCallback: () -> Unit
+		callback: (List<BTCSeriesTransactionTable>) -> Unit
 	) {
 		BTCSeriesTransactionTable
 			.getTransactionsByAddressAndChainType(
@@ -295,10 +290,8 @@ class TokenDetailPresenter(
 						address
 					)
 					fragment.removeLoadingView()
-				} otherwise {
-					withoutDataCallback()
-					LogUtil.debug(this.javaClass.simpleName, "There isn't BTCSeries Local Data")
 				}
+				callback(transactions)
 			}
 	}
 
@@ -311,7 +304,7 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract!!, walletAddress) {
+				data.prepareTokenHistoryBalance(token?.contract.orEmpty(), walletAddress) {
 					it.updateChartAndHeaderData()
 				}
 			} otherwise {
@@ -323,20 +316,16 @@ class TokenDetailPresenter(
 	private fun updateEmptyCharData(symbol: String) {
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
-		listOf(
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, ""),
-			TokenBalanceTable(0, symbol, now, 0, 0.0, "")
-		).updateChartAndHeaderData()
+		var emptyData = listOf<TokenBalanceTable>()
+		(0 until 7).forEach {
+			emptyData += TokenBalanceTable(symbol, now)
+		}
+		emptyData.updateChartAndHeaderData()
 	}
 
 	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
-			val maxChartCount = 6
+			val maxChartCount = 7
 			val chartArray = arrayListOf<ChartPoint>()
 			val charCount = if (size > maxChartCount) maxChartCount else size
 			forEach {

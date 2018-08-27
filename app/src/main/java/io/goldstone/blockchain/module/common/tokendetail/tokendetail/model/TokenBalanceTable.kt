@@ -24,6 +24,15 @@ data class TokenBalanceTable(
 	var balance: Double,
 	var address: String
 ) {
+
+	constructor(symbol: String, time: Long) : this(
+		0,
+		symbol,
+		time,
+		0L,
+		0.0,
+		""
+	)
 	
 	companion object {
 		

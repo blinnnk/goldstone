@@ -30,7 +30,7 @@ object QuotationText {
 	val management = when (currentLanguage) {
 		HoneyLanguage.English.code -> "My Markets"
 		HoneyLanguage.Chinese.code -> "自选管理"
-		HoneyLanguage.Japanese.code -> "マーケットの自動選択"
+		HoneyLanguage.Japanese.code -> "マーケット"
 		HoneyLanguage.Korean.code -> "셀프관리"
 		HoneyLanguage.Russian.code -> "Самостоятельное управление"
 		HoneyLanguage.TraditionalChinese.code -> "自選管理"
@@ -245,7 +245,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势"
 		HoneyLanguage.Japanese.code -> "各マーケットの取引の中から\nを検索して、お客様の注目している\nTokenを追加します。"
 		HoneyLanguage.Korean.code -> "주요 시장의 거래 쌍에서 관심있는\n 토큰을 검색하고 추가하면 실시간\n 가격 동향을 볼 수 있습니다."
-		HoneyLanguage.Russian.code -> "Поиск и добавление графика цен на \n токены в режиме реального времени, с \n конъюнктурой."
+		HoneyLanguage.Russian.code -> "Найдите и добавьте диаграмму\n цен на токены в\n реальном времени из бирж."
 		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢"
 		else -> ""
 	}

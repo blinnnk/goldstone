@@ -24,19 +24,20 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadETHChainData() {
-	val blockNumber = arrayListOf<TransactionListModel>().maxBy {
+fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>) {
+	val blockNumber = localData.maxBy {
 		it.blockNumber
 	}?.blockNumber ?: "0"
 	fragment.showLoadingView(LoadingText.transactionData)
 	getTokenTransactions(
 		blockNumber,
 		{
-
+			fragment.removeLoadingView()
+			LogUtil.error("getTokenTransactions", it)
 		}
 	) {
 		fragment.removeLoadingView()
-		loadDataFromDatabaseOrElse()
+		loadDataFromDatabaseOrElse { _, _ -> }
 	}
 }
 

@@ -18062,7 +18062,7 @@ io.goldstone.blockchain.common.component.button.CircleButton -> d.a.a.a.c.a.h:
     int access$getIconSize$p(io.goldstone.blockchain.common.component.button.CircleButton) -> for
     void setStyleParameter$default(io.goldstone.blockchain.common.component.button.CircleButton,com.blinnnk.uikit.Size,int,int,int,int,java.lang.Object) -> do
     void setTitleStyle$default(io.goldstone.blockchain.common.component.button.CircleButton,float,int,android.graphics.Typeface,int,java.lang.Object) -> do
-    void removeRedot() -> a
+    void removeRedDot() -> a
     void setDefaultStyle() -> c
     void setStyleParameter(com.blinnnk.uikit.Size,int,int,int) -> do
     void setTitleStyle(float,int,android.graphics.Typeface) -> do
@@ -21964,7 +21964,7 @@ io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod -> d.a.a.c.c.
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod EstimatesmartFee -> a
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod GetRawTransaction -> f
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod Getblockcount -> e
-    io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod SendRawtTansaction -> d
+    io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod SendRawTansaction -> d
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod[] $VALUES -> g
     java.lang.String getMethod() -> a
 io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi -> d.a.a.c.c.b.b:

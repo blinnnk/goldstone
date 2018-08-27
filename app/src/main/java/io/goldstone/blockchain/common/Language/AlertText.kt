@@ -137,33 +137,12 @@ object AlertText {
 	}
 	@JvmField
 	val wrongKeyStorePassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Invaild keystore format or password"
+		HoneyLanguage.English.code -> "Invalid keystore format or password"
 		HoneyLanguage.Chinese.code -> "出错啦，请检查keystore或密码的格式是否正确"
 		HoneyLanguage.Japanese.code -> "ミスが有りました。Keystoreやパスワードの形式が正しいかどうかとチェックして下さい"
 		HoneyLanguage.Korean.code -> "잘못된 키 저장소 형식 또는 암호"
 		HoneyLanguage.Russian.code -> "Возникала ошибка, пожалуйста, проверьте keystore или формат пароля"
 		HoneyLanguage.TraditionalChinese.code -> "出錯啦，請檢查keystore或密碼的格式是否正確"
-		else -> ""
-	}
-
-	@JvmField
-	val getTransactionErrorPrefix = when (currentLanguage) {
-		HoneyLanguage.English.code -> "An error occurred getting transaction records from Ethereum"
-		HoneyLanguage.Chinese.code -> "从以太坊"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
-	}
-	@JvmField
-	val getTransactionErrorSuffix = when (currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
 }

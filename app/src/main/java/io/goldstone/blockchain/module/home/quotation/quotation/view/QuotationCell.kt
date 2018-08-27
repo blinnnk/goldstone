@@ -10,7 +10,6 @@ import com.blinnnk.util.observing
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.component.chart.line.LineChart
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -47,16 +46,16 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			
 			model.percent.toDouble() < 0 -> {
 				tokenPrice.setColorStyle(Spectrum.red)
-				linechart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
+				lineChart.setChartColorAndShadowResource(Spectrum.red, R.drawable.fade_red)
 			}
 			
 			else -> {
 				tokenPrice.setColorStyle(Spectrum.green)
-				linechart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
+				lineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
-		
-		linechart.resetData(
+
+		lineChart.resetData(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
 			}.toArrayList()
@@ -92,8 +91,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			y += 52.uiPX()
 		}
 	}
-	
-	private val linechart = object : QuotationLineChart(context) {
+	private val lineChart = object : QuotationLineChart(context) {
 		override val isDrawPoints: Boolean = false
 		override val isPerformBezier: Boolean = true
 		override val dragEnable: Boolean = false
@@ -117,8 +115,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			addView(exchangeName)
 			
 			tokenPrice.setAlignParentRight()
-			
-			linechart.apply {
+
+			lineChart.apply {
 				id = ElementID.chartView
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
 				setMargins<RelativeLayout.LayoutParams> {

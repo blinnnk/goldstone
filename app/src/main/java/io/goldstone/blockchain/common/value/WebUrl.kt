@@ -46,6 +46,8 @@ object WebUrl {
 	// BTC Transaction Data API From `blockChain.info`
 	const val btcMain = "https://insight.bitpay.com"
 	const val btcTest = "https://test-insight.bitpay.com"
+	const val backupBtcTest = "https://testnet.blockchain.info"
+	const val backUpBtcMain = "https://www.blockchain.info"
 	// LTC Transaction Data API From `insight`
 	const val ltcMain = "https://insight.litecore.io"
 	const val ltcTest = "https://testnet.litecore.io"

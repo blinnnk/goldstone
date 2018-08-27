@@ -35,10 +35,10 @@ object ChainURL {
 	}
 	val currentETCChain: (currentChainName: String) -> String = {
 		when (it) {
-			ChainText.etcMorden -> ChainURL.etcMorderTest
+			ChainText.etcMorden -> ChainURL.etcMordenTest
 			ChainText.etcMainGasTracker -> ChainURL.etcMain
 			ChainText.goldStoneEtcMain -> ChainURL.etcGoldStoneMain
-			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMorderTest
+			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMordenTest
 			else -> ChainURL.etcMain
 		}
 	}
@@ -121,9 +121,9 @@ object ChainURL {
 	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
-	private const val etcMorderTest = "https://web3.gastracker.io/morden"
+	private const val etcMordenTest = "https://web3.gastracker.io/morden"
 	private const val etcGoldStoneMain = "https://etc-node-mainnet.goldstone.io/eth"
-	private const val etcGoldStoneMorderTest = "https://etc-node-testnet.goldstone.io/eth"
+	private const val etcGoldStoneMordenTest = "https://etc-node-testnet.goldstone.io/eth"
 	/** Infura Chain Address */
 	private val infuraMain = "https://mainnet.infura.io/${infuraKey()}"
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"

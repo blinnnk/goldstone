@@ -69,9 +69,9 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 		info.apply {
 			setCenterInVertical()
 		}
+		setHorizontalPadding()
 		setGrayStyle()
 		hasArrow = false
-
 		layoutParams.height = 60.uiPX()
 	}
 

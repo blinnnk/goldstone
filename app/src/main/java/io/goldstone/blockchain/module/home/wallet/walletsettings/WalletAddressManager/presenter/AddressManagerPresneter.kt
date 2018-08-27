@@ -282,7 +282,12 @@ class AddressManagerPresenter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(address, ChainType.ETH.id, 1)
+							AddressCommissionModel(
+								address,
+								ChainType.ETH.id,
+								1,
+								wallet.id
+							)
 						)
 						WalletTable.updateETHAndERCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
@@ -315,7 +320,12 @@ class AddressManagerPresenter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(address, ChainType.ETC.id, 1)
+							AddressCommissionModel(
+								address,
+								ChainType.ETC.id,
+								1,
+								wallet.id
+							)
 						)
 						WalletTable.updateETCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
@@ -363,7 +373,12 @@ class AddressManagerPresenter(
 								)
 								// 注册新增的子地址
 								XinGePushReceiver.registerSingleAddress(
-									AddressCommissionModel(address, ChainType.BTC.id, 1)
+									AddressCommissionModel(
+										address,
+										ChainType.BTC.id,
+										1,
+										wallet.id
+									)
 								)
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
@@ -430,7 +445,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(address, ChainType.AllTest.id, 1)
+								AddressCommissionModel(
+									address,
+									ChainType.AllTest.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -479,7 +499,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(bchKeyPair.address, ChainType.BCH.id, 1)
+								AddressCommissionModel(
+									bchKeyPair.address,
+									ChainType.BCH.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -527,7 +552,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(ltcKeyPair.address, ChainType.LTC.id, 1)
+								AddressCommissionModel(
+									ltcKeyPair.address,
+									ChainType.LTC.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())

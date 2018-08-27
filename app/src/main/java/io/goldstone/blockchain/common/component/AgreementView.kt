@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -12,11 +11,10 @@ import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 
