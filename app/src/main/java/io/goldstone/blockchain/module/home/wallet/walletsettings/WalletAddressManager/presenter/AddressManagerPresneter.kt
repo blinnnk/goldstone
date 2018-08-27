@@ -618,9 +618,7 @@ class AddressManagerPresenter(
 					address.split(",").find {
 						it.contains(targetAddress)
 					}?.substringAfterLast("|").orEmpty()
-				} else {
-					address.substringAfterLast("|")
-				}
+				} else address.substringAfterLast("|")
 			}
 			WalletTable.getCurrentWallet {
 				when (chainType) {
@@ -628,18 +626,10 @@ class AddressManagerPresenter(
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
 					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
 					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC.id -> {
-						if (Config.isTestEnvironment()) {
-							hold(
-								getTargetAddressIndex(
-									btcSeriesTestAddresses,
-									currentBTCSeriesTestAddress
-								)
-							)
-						} else {
-							hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-						}
-					}
+					ChainType.BTC.id ->
+						if (Config.isTestEnvironment())
+							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
+						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
 				}
 			}
 		}

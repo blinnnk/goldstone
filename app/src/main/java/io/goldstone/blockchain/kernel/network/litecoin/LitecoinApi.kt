@@ -20,7 +20,6 @@ object LitecoinApi {
 			LitecoinUrl.getBalance(address),
 			{
 				// 当 Insight 接口挂掉的时候向其他备份 Litecoin 接口发起请求
-				// TODO
 				LogUtil.error("getBalance Litecoin", it)
 			},
 			hold

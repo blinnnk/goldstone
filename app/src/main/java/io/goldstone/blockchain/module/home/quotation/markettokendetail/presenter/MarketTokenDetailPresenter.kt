@@ -233,11 +233,16 @@ class MarketTokenDetailPresenter(
 	) {
 		val size = 100 // 请求的数据条目数量
 		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, size, {
-			// Show the error exception to user
-			fragment.context.alert(it.toString().showAfterColonContent())
-			updateCandleChartUI(arrayListOf(), dateType)
-		}) {
+		GoldStoneAPI.getQuotationCurrencyCandleChart(
+			pair,
+			period,
+			size,
+			{
+				// Show the error exception to user
+				fragment.context.alert(it.toString().showAfterColonContent())
+				updateCandleChartUI(arrayListOf(), dateType)
+			}
+		) {
 			// 把数据更新到数据库
 			it.updateCandleChartDataInDatabaseBy(period, pair)
 			// 更新 `UI` 界面
@@ -274,7 +279,7 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenCandleChart.updateCandleChartUI(
-		data: ArrayList<CandleChartModel>,
+		data: List<CandleChartModel>,
 		dateType: Int
 	) {
 		LogUtil.error("$dateType")
@@ -288,13 +293,14 @@ class MarketTokenDetailPresenter(
 							data.sortedBy {
 								it.time.toLongOrNull().orElse(0)
 							}.mapIndexed { index, entry ->
-								CandleEntry(index.toFloat(),
+								CandleEntry(
+									index.toFloat(),
 									entry.high.toFloat(),
 									entry.low.toFloat(),
 									entry.open.toFloat(),
 									entry.close.toFloat(),
 									entry.time)
-							}.toArrayList()
+							}
 						)
 
 					} catch (error: Exception) {

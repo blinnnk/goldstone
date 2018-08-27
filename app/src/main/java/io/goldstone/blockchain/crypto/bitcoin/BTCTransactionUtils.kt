@@ -143,16 +143,15 @@ object BTCSeriesTransactionUtils {
 			)
 		}
 		// 输入未消费列表项
-		utxos.forEach {
-
-			val outPoint = TransactionOutPoint(network, it.index, it.hash)
+		utxos.forEach { utxo ->
+			val outPoint = TransactionOutPoint(network, utxo.index, utxo.hash)
 			if (isBCH) {
 				// `BCH` 的签名需要 `ForkID` 控件里的方法有 `BUG` 这里重新自定义了有方法
 				transaction.addBCHSignedInput(
 					outPoint,
-					it.script,
+					utxo.script,
 					ecKey,
-					it.value,
+					utxo.value,
 					Transaction.SigHash.ALL,
 					true,
 					true
@@ -160,7 +159,7 @@ object BTCSeriesTransactionUtils {
 			} else {
 				transaction.addSignedInput(
 					outPoint,
-					it.script,
+					utxo.script,
 					ecKey,
 					Transaction.SigHash.ALL,
 					true

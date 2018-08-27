@@ -127,9 +127,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				unregisterGoldStoneID(Config.getGoldStoneID())
 			} else {
 				val needUnregister =
-					!Config.getneedUnregisterGoldStoneID().equals("Default", true)
+					!Config.getNeedUnregisterGoldStoneID().equals("Default", true)
 				if (needUnregister) {
-					unregisterGoldStoneID(Config.getneedUnregisterGoldStoneID())
+					unregisterGoldStoneID(Config.getNeedUnregisterGoldStoneID())
 				}
 			}
 			callback()
@@ -178,7 +178,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentBCHAddress(currentBCHAddress)
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				Config.updateCurrentID(id)
+				Config.updateCurrentWalletID(id)
 				Config.updateCurrentBalance(balance.orElse(0.0))
 				Config.updateCurrentName(name)
 				uiThread {

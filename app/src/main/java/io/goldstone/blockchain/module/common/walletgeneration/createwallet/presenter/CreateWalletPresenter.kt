@@ -171,7 +171,7 @@ class CreateWalletPresenter(
 						hint = hint,
 						isUsing = true
 					)
-				) {
+				) { wallet ->
 					generateMyTokenInfo(
 						multiChainAddresses,
 						{
@@ -190,7 +190,7 @@ class CreateWalletPresenter(
 						}
 					}
 
-					XinGePushReceiver.registerAddressesForPush()
+					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
 			}
 		}

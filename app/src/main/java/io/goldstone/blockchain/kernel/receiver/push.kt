@@ -150,10 +150,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			notificationManager.cancelAll()
 		}
 
-		fun registerAddressesForPush(isRemove: Boolean = false) {
-			val option = if (isRemove) 0 else 1
-			WalletTable.getCurrentWallet {
-				WalletTable.getWalletType { type ->
+		fun registerAddressesForPush(wallet: WalletTable?, isRemove: Boolean = false) {
+			wallet?.apply {
+				val option = if (isRemove) 0 else 1
+				WalletTable.getTargetWalletType(this).let { type ->
 					when (type) {
 						WalletType.MultiChain -> {
 							val ethSeries =
@@ -329,7 +329,9 @@ fun Context.registerDeviceForPush() {
 					if (it == token) return@registerDevice
 				}
 				// 在本地数据库记录 `Push Token`
-				XinGePushReceiver.registerAddressesForPush()
+				WalletTable.getCurrentWallet {
+					XinGePushReceiver.registerAddressesForPush(this)
+				}
 			}
 		}
 

@@ -28,7 +28,7 @@ data class QuotationModel(
 		percent: String,
 		chartData: ArrayList<ChartPoint>
 	) : this(
-		data.baseSymnbol.toUpperCase(),
+		data.baseSymbol.toUpperCase(),
 		data.name.toLowerCase(),
 		price,
 		percent,

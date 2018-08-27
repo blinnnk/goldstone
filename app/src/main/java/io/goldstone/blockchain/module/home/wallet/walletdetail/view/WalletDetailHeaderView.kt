@@ -33,7 +33,7 @@ import org.jetbrains.anko.*
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	
-	private val avatarBitmap = UnlimitedAvatar(Config.getCurrentID(), context).getBitmap()
+	private val avatarBitmap = UnlimitedAvatar(Config.getCurrentWalletID(), context).getBitmap()
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull())

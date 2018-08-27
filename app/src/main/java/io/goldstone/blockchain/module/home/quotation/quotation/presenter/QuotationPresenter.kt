@@ -144,7 +144,7 @@ class QuotationPresenter(
 				currentSocket = it
 				callback(it)
 			}) { model, isDisconnected ->
-			fragment.updateAdapterDataset(model, isDisconnected)
+			fragment.updateAdapterDataSet(model, isDisconnected)
 		}
 	}
 
@@ -156,7 +156,7 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun QuotationFragment.updateAdapterDataset(
+	private fun QuotationFragment.updateAdapterDataSet(
 		data: CurrencyPriceInfoModel,
 		isDisconnected: Boolean
 	) {
@@ -189,16 +189,19 @@ class QuotationPresenter(
 	}
 
 	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
-		val jsonarray = JSONArray(data)
-		(0 until jsonarray.length()).map {
-			val timeStamp = jsonarray.getJSONObject(it).safeGet("time").toLong()
+		val jsonArray = JSONArray(data)
+		val maxIndexOfData = if ( jsonArray.length() > 8) 8 else  jsonArray.length()
+		(0 until maxIndexOfData).map {
+			val timeStamp = jsonArray.getJSONObject(it).safeGet("time").toLong()
 			ChartPoint(
 				timeStamp.toString(),
-				if (jsonarray.getJSONObject(it).safeGet("close").isEmpty())
-					jsonarray.getJSONObject(it).safeGet("price").toFloat()
-				else jsonarray.getJSONObject(it).safeGet("close").toFloat() // close值是当天的收盘值
+				if (jsonArray.getJSONObject(it).safeGet("close").isEmpty())
+					jsonArray.getJSONObject(it).safeGet("price").toFloat()
+				else jsonArray.getJSONObject(it).safeGet("close").toFloat() // close值是当天的收盘值
 			)
-		}.reversed().let {
+		}.sortedBy {
+			it.label.toLong()
+		}.let {
 			return it.toArrayList()
 		}
 	}
