@@ -61,7 +61,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
 	init {
 		hasArrow = false
-
+		setHorizontalPadding()
 		this.addView(icon.apply {
 			setGrayStyle()
 			y += 10.uiPX()

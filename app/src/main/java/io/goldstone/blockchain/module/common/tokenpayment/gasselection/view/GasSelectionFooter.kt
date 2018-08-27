@@ -40,6 +40,7 @@ class GasSelectionFooter(context: Context) : LinearLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 120.uiPX())
 
 		customButton.apply {
+			setHorizontalPadding()
 			layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 			textView {
 				setGrayStyle()

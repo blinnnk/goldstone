@@ -31,7 +31,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	init {
 		hasArrow = false
 		setGrayStyle()
-		
+		setHorizontalPadding()
 		this.addView(title.apply {
 			textSize = fontSize(15)
 			textColor = GrayScale.black

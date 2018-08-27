@@ -26,7 +26,7 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 	init {
 		setIconColor()
 		this.addView(icon)
-
+		setHorizontalPadding()
 		this.addView(info.apply {
 			setBlackTitles()
 			x += 60.uiPX()

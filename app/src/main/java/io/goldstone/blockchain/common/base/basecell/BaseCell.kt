@@ -28,7 +28,7 @@ import org.jetbrains.anko.rightPadding
  * @author KaySaith
  */
 open class BaseCell(context: Context) : RelativeLayout(context) {
-	
+
 	var hasArrow: Boolean by observing(true) {
 		if (hasArrow) arrowIcon.visibility = View.VISIBLE
 		else arrowIcon.visibility = View.GONE
@@ -39,58 +39,62 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 		color = Spectrum.opacity2White
 	}
 	private val arrowIcon by lazy { ArrowIconView(context) }
-	
+
 	init {
 		this.setWillNotDraw(false)
-		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX()).apply {
-			leftPadding = PaddingSize.device
-			rightPadding = PaddingSize.device
-		}
-		
+		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
 		this.addView(arrowIcon)
 		arrowIcon.x += 3.uiPX()
 		arrowIcon.setAlignParentRight()
 		arrowIcon.setCenterInVertical()
 	}
-	
+
+	private var paddingSize = 0
+	fun setHorizontalPadding(paddingSize: Int = PaddingSize.device) {
+		this.paddingSize = paddingSize
+		leftPadding = paddingSize
+		rightPadding = paddingSize
+		invalidate()
+	}
+
 	private var hasTopLine = false
 	private var hasBottomLine = true
-	
+
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		
+
 		if (hasTopLine) {
 			canvas?.drawLine(
-				PaddingSize.device.toFloat(),
+				paddingSize.toFloat(),
 				0f,
-				(width - PaddingSize.device).toFloat(),
+				(width - paddingSize).toFloat(),
 				BorderSize.bold,
 				paint
 			)
 		}
-		
+
 		if (hasBottomLine) {
 			canvas?.drawLine(
-				PaddingSize.device.toFloat(),
+				paddingSize.toFloat(),
 				height - BorderSize.default,
-				(width - PaddingSize.device).toFloat(),
+				(width - paddingSize).toFloat(),
 				height - BorderSize.default,
 				paint
 			)
 		}
 	}
-	
+
 	fun hasTopLine() {
 		hasTopLine = true
 		invalidate()
 	}
-	
+
 	fun removeBottomLine() {
 		hasBottomLine = false
 		invalidate()
 	}
-	
+
 	fun setGrayStyle() {
 		arrowIcon.setGrayStyle()
 		paint.color = GrayScale.Opacity1Black
