@@ -25,7 +25,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Cha
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AddAlarmClockModel
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.DeleteAlarmClockModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -548,7 +548,7 @@ object GoldStoneAPI {
 		) {
 			val addAlarmClockList = this
 			GoldStoneAPI.context.runOnUiThread {
-				hold(addAlarmClockList[0])
+				hold(addAlarmClockList.firstOrNull())
 			}
 		}
 	}
@@ -563,7 +563,10 @@ object GoldStoneAPI {
 			requestContentType,
 			ParameterUtil.prepare(
 				true,
-				Pair("pair_list", pair_list)
+				Pair(
+					"pair_list",
+					pair_list
+				)
 			)
 		).let {
 			postRequest(
@@ -579,7 +582,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun addAlarmClock(
-		priceAlarmClockTable: PriceAlarmClockTable,
+		priceAlarmTable: PriceAlarmTable,
 		errorCallback: (Exception) -> Unit = {},
 		hold: (AddAlarmClockModel?) -> Unit
 	) {
@@ -587,21 +590,20 @@ object GoldStoneAPI {
 			requestContentType,
 			ParameterUtil.prepare(
 				true,
-				Pair("pair", priceAlarmClockTable.pair),
-				Pair("type", priceAlarmClockTable.priceType),
-				Pair("price", priceAlarmClockTable.price.toString())
+				Pair(
+					"pair",
+					priceAlarmTable.pair
+				),
+				Pair(
+					"type",
+					priceAlarmTable.priceType
+				),
+				Pair(
+					"price",
+					priceAlarmTable.price
+				)
 			)
 		).let {
-			postRequest(
-				it,
-				APIPath.addAlarmClock(APIPath.currentUrl),
-				errorCallback,
-				true
-			) {
-				val gson = Gson()
-				val addAlarmClock = gson.fromJson(it, AddAlarmClockModel::class.java)
-				hold(addAlarmClock)
-			}
 			postRequestGetJsonObject<AddAlarmClockModel>(
 				it,
 				"data_list",
@@ -609,14 +611,14 @@ object GoldStoneAPI {
 				errorCallback = errorCallback,
 				isEncrypt = true
 			) {
-				hold(it[0])
+				hold(it.firstOrNull())
 			}
 		}
 	}
 
 	@JvmStatic
 	fun deleteAlarmClock(
-		priceAlarmClockTable: PriceAlarmClockTable,
+		priceAlarmTable: PriceAlarmTable,
 		errorCallback: (Exception) -> Unit = {},
 		hold: (DeleteAlarmClockModel?) -> Unit
 	) {
@@ -624,7 +626,10 @@ object GoldStoneAPI {
 			requestContentType,
 			ParameterUtil.prepare(
 				true,
-				Pair("id", priceAlarmClockTable.addId.toString())
+				Pair(
+					"id",
+					priceAlarmTable.addId
+				)
 			)
 		).let {
 			postRequestGetJsonObject<DeleteAlarmClockModel>(
@@ -634,7 +639,7 @@ object GoldStoneAPI {
 				errorCallback = errorCallback,
 				isEncrypt = true
 			) {
-				hold(it[0])
+				hold(it.firstOrNull())
 			}
 		}
 	}

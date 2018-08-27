@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter.QuotationOverlayPresenter
 
@@ -12,12 +13,12 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter.
  * @author KaySaith
  * @rewriteDate 16/08/2018 16:33 PM
  * @rewriter wcx
- * @description 添加viewAlarmIndicator查看闹铃列表标示
+ * @description 添加viewAlarmIndicator查看闹铃列表标示,添加闹铃列表添加按钮
  */
 class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>() {
 
 	private val title by lazy { arguments?.getString(ArgumentKey.quotationOverlayTitle) }
-	private val viewAlarmIndicator by lazy { arguments?.getString(ArgumentKey.priceAlarmClockTitle) }
+	private val isFromAlarmAlert by lazy { arguments?.getBoolean(ArgumentKey.priceAlarmTitle) }
 	private val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationOverlayInfo) as? QuotationModel
 	}
@@ -31,10 +32,18 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 				}
 			}
 
-			else -> presenter.showMarketTokenCenter(
-				currencyInfo,
-				viewAlarmIndicator
-			)
+			else -> {
+				presenter.showMarketTokenCenter(
+					currencyInfo,
+					isFromAlarmAlert ?: false
+				)
+
+				overlayView.header.showAddButton(true) {
+					currencyInfo?.let {
+						PriceAlarmListFragment.showAddAlarmClockDashboard(overlayView, it)
+					}
+				}
+			}
 		}
 
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()

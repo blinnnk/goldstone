@@ -1,12 +1,16 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.model
 
 import com.db.chart.model.Point
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.Serializable
 
 /**
  * @date 26/03/2018 8:57 PM
  * @author KaySaith
+ * @rewriteDate 24/08/2018 17:43 PM
+ * @rewriter wcx
+ * @description 添加解析PriceAlarmTable构造函数
  */
 data class QuotationModel(
 	val symbol: String = "",
@@ -22,7 +26,7 @@ data class QuotationModel(
 	val contract: String = "",
 	var isDisconnected: Boolean = false
 ) : Serializable {
-	
+
 	constructor(
 		data: QuotationSelectionTable,
 		price: String,
@@ -40,6 +44,21 @@ data class QuotationModel(
 		data.pair,
 		data.quoteSymbol,
 		data.contract
+	)
+
+	constructor(priceAlarmTable: PriceAlarmTable) : this(
+		priceAlarmTable.symbol,
+		priceAlarmTable.name.toString(),
+		priceAlarmTable.price,
+		"",
+		ArrayList(),
+		priceAlarmTable.marketName,
+		0.0,
+		priceAlarmTable.pairDisplay,
+		priceAlarmTable.pair,
+		priceAlarmTable.currencyName,
+		"",
+		false
 	)
 }
 

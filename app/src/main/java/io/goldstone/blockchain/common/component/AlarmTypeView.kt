@@ -8,10 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.AlarmClockText
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.textColor
@@ -27,18 +24,16 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 	private val titleLayout by lazy {
 		LinearLayout(context).apply {
 			layoutParams = LinearLayout.LayoutParams(
-				matchParent,
+				ScreenSize.widthWithPadding,
 				wrapContent
 			).apply {
 				bottomMargin = 5.uiPX()
-				leftMargin = PaddingSize.device
-				rightMargin = PaddingSize.device
 			}
 		}
 	}
 	private val repeatingCell = BaseRadioCell(context)
 	private val oneTimeCell = BaseRadioCell(context)
-	private var alarmType = 0
+	private var alarmType = ArgumentKey.repeatingForAlarm
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(
@@ -53,11 +48,11 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 		// 永久闹铃
 		repeatingCell.apply {
 			setTitle(AlarmClockText.alarmRepeatingType)
-			if (alarmType == 0) {
+			if (alarmType == ArgumentKey.repeatingForAlarm) {
 				setSwitchStatusBy(true)
 			}
 			onClick {
-				alarmType = 0
+				alarmType = ArgumentKey.repeatingForAlarm
 				repeatingCell.setSwitchStatusBy(true)
 				oneTimeCell.setSwitchStatusBy(false)
 			}
@@ -67,11 +62,11 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 		// 一次闹铃
 		oneTimeCell.apply {
 			setTitle(AlarmClockText.alarmOnlyOneTimeType)
-			if (alarmType == 1) {
+			if (alarmType == ArgumentKey.oneTimeForAlram) {
 				setSwitchStatusBy(true)
 			}
 			onClick {
-				alarmType = 1
+				alarmType =  ArgumentKey.oneTimeForAlram
 				oneTimeCell.setSwitchStatusBy(true)
 				repeatingCell.setSwitchStatusBy(false)
 			}

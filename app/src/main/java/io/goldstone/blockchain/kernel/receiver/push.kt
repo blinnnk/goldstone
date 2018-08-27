@@ -3,7 +3,6 @@
 package io.goldstone.blockchain.kernel.receiver
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
@@ -22,7 +21,7 @@ import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
+import io.goldstone.blockchain.common.utils.PriceAlarmUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.ChainType
@@ -88,8 +87,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	) {
 		if (context == null || notifiShowedRlt == null) return
 		if (notifiShowedRlt.title == AlarmClockText.priceWarning) {
-			if (!backgroundFlag) {
-				PriceAlarmClockUtils.sendAlarmReceiver(
+			if (backgroundFlag) {
+				PriceAlarmUtils.sendAlarmReceiver(
 					0,
 					context,
 					1
@@ -141,8 +140,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
 				ClassURI.priceAlarmView -> {
-					if (!backgroundFlag) {
-						alarmClockNotification(
+					if (backgroundFlag) {
+						alarmNotification(
 							context,
 							result
 						)
@@ -153,7 +152,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		clearAppIconRedot()
 	}
 
-	private fun alarmClockNotification(
+	private fun alarmNotification(
 		context: Context?,
 		result: XGPushClickedResult?
 	) {

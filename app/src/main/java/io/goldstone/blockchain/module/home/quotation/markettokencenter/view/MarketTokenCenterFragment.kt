@@ -9,6 +9,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
+import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -32,7 +33,7 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  */
 
 class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
-
+	private val isFromAlarmAlert by lazy { arguments?.getBoolean(ArgumentKey.priceAlarmTitle) }
 	// 这个 `Model` 是服务 `ViewPager` 中的 `MarketTokenDetailFragment`
 	val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
@@ -73,6 +74,10 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 					}
 				}
+			}
+
+			if (isFromAlarmAlert == true) {
+				viewPager.currentItem = 1
 			}
 		}
 	}

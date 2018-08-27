@@ -8,7 +8,7 @@ package io.goldstone.blockchain.common.value
  * @description 添加价格闹钟相关文本priceAlarmClockTitle,priceAlarmClockEditorInfo
  */
 object ArgumentKey {
-	
+
 	const val walletSettingsTitle = "walletSettingsTitle"
 	const val profileTitle = "profileTitle"
 	const val mnemonicCode = "mnemonicCode"
@@ -35,9 +35,14 @@ object ArgumentKey {
 	const val address = "address"
 	const val chainType = "chainType"
 	const val coinType = "coinType"
-	const val priceAlarmClockTitle = "priceAlarmClock"
-	const val priceAlarmClockEditorInfo = "priceAlarmClockEditor"
-	const val priceAlarmClockListHandler = "priceAlarmClockListHandler"
+	const val priceAlarmTitle = "priceAlarmClock"
+	const val priceAlarmEditorInfo = "priceAlarmClockEditor"
+	const val priceAlarmListHandler = "priceAlarmClockListHandler"
+	const val turnOffPriceAlarmReceiverMessageFlag = "priceAlarmReceiverMessageFlag"
+	const val greaterThanForPriceType = 0
+	const val lessThanForPriceType = 1
+	const val repeatingForAlarm = 0
+	const val oneTimeForAlram = 1
 }
 
 object IntentKey {

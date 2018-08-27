@@ -32,6 +32,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 
 	private val titleHeight = 40.uiPX()
 	private val title = TextView(context).apply {
+		id = ElementID.topBottomLineCellTitle
 		typeface = GoldStoneFont.medium(context)
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, titleHeight)
 		setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
@@ -111,7 +112,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 
 	fun addCustomizeView(view: View) {
 		titleLayout.apply {
-			layoutParams = LinearLayout.LayoutParams(
+			layoutParams = RelativeLayout.LayoutParams(
 				matchParent,
 				wrapContent
 			)

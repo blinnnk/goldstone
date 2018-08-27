@@ -3,13 +3,14 @@ package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarm
 import android.arch.persistence.room.*
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.coroutinesTask
+import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 import java.util.*
@@ -20,7 +21,7 @@ import java.util.*
  * @description 价格闹钟提醒bean类
  */
 @Entity(tableName = "price_alarm_clock")
-data class PriceAlarmClockTable(
+data class PriceAlarmTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var addId: String,
@@ -32,9 +33,8 @@ data class PriceAlarmClockTable(
 	var status: Boolean,
 	var pair: String,
 	var priceType: Int,
-	var alarmType: Int = 0, // 0为永久
+	var alarmType: Int = ArgumentKey.repeatingForAlarm, // 0为永久
 	var pairDisplay: String,
-	var position: Int = -1,
 	var symbol: String = "",
 	var name: String?
 ) : Serializable {
@@ -52,7 +52,6 @@ data class PriceAlarmClockTable(
 		0,
 		0,
 		"",
-		-1,
 		"",
 		null
 	)
@@ -64,25 +63,24 @@ data class PriceAlarmClockTable(
 		quotationModel.exchangeName,
 		quotationModel.quoteSymbol.toUpperCase(),
 		if (quotationModel.price == ValueTag.emptyPrice) "0" else quotationModel.price,
-		quotationModel.price,
+		if (quotationModel.price == ValueTag.emptyPrice) "0" else quotationModel.price,
 		false,
 		quotationModel.pair,
 		0,
 		0,
 		quotationModel.pairDisplay,
-		-1,
 		quotationModel.symbol,
 		quotationModel.name
 	)
 
 	companion object {
 		fun insertPriceAlarm(
-			priceAlarmClockTable: PriceAlarmClockTable,
+			priceAlarmTable: PriceAlarmTable,
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmClockDao().apply {
-					insertPriceAlarmClock(priceAlarmClockTable)
+				GoldStoneDataBase.database.priceAlarmDao().apply {
+					insertPriceAlarmClock(priceAlarmTable)
 				}
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
@@ -92,12 +90,12 @@ data class PriceAlarmClockTable(
 		}
 
 		fun updatePriceAlarm(
-			priceAlarmClockTable: PriceAlarmClockTable,
+			priceAlarmTable: PriceAlarmTable,
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmClockDao().apply {
-					updatePriceAlarmClock(priceAlarmClockTable)
+				GoldStoneDataBase.database.priceAlarmDao().apply {
+					updatePriceAlarmClock(priceAlarmTable)
 				}
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
@@ -108,7 +106,7 @@ data class PriceAlarmClockTable(
 
 		fun deleteAllAlarm(callback: () -> Unit) {
 			load {
-				GoldStoneDataBase.database.priceAlarmClockDao().apply {
+				GoldStoneDataBase.database.priceAlarmDao().apply {
 					deleteAllPriceAlarmClock()
 				}
 			} then {
@@ -119,12 +117,12 @@ data class PriceAlarmClockTable(
 		}
 
 		fun deleteAlarm(
-			priceAlarmClockTable: PriceAlarmClockTable,
+			priceAlarmTable: PriceAlarmTable,
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmClockDao().apply {
-					deletePriceAlarmClock(priceAlarmClockTable)
+				GoldStoneDataBase.database.priceAlarmDao().apply {
+					deletePriceAlarmClock(priceAlarmTable)
 				}
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
@@ -133,15 +131,11 @@ data class PriceAlarmClockTable(
 			}
 		}
 
-		fun getAllPriceAlarm(hold: (ArrayList<PriceAlarmClockTable>) -> Unit) {
+		fun getAllPriceAlarm(hold: (ArrayList<PriceAlarmTable>) -> Unit) {
 			coroutinesTask(
 				{
-					GoldStoneDataBase.database.priceAlarmClockDao().selectPriceAlarmClocks()
+					GoldStoneDataBase.database.priceAlarmDao().selectPriceAlarmClocks()
 				}) {
-				val size = it.size
-				for (index: Int in 0 until size) {
-					it[index].position = index
-				}
 				hold(it.toArrayList())
 			}
 		}
@@ -154,51 +148,65 @@ data class PriceAlarmClockTable(
  * @description 价格闹钟提醒数据库操作接口
  */
 @Dao
-interface PriceAlarmClockDao {
+interface PriceAlarmDao {
 
 	@Insert
-	fun insertPriceAlarmClock(user: PriceAlarmClockTable)
+	fun insertPriceAlarmClock(user: PriceAlarmTable)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insertPriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
+	fun insertPriceAlarmClocks(arrayList: ArrayList<PriceAlarmTable>)
 
 	@Delete
-	fun deletePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
+	fun deletePriceAlarmClock(priceAlarmTable: PriceAlarmTable)
 
 	@Query("DELETE FROM price_alarm_clock")
 	fun deleteAllPriceAlarmClock()
 
 	@Query("select * from price_alarm_clock")
-	fun selectPriceAlarmClocks(): List<PriceAlarmClockTable>
+	fun selectPriceAlarmClocks(): List<PriceAlarmTable>
 
 	@Update
-	fun updatePriceAlarmClock(priceAlarmClockTable: PriceAlarmClockTable)
+	fun updatePriceAlarmClock(priceAlarmTable: PriceAlarmTable)
 
 	@Update
-	fun updatePriceAlarmClocks(arrayList: ArrayList<PriceAlarmClockTable>)
+	fun updatePriceAlarmClocks(arrayList: ArrayList<PriceAlarmTable>)
 }
 
 data class AlarmConfigListModel(
+	@SerializedName("code")
 	val code: Int,
-	val list: List<ListBean>
+	@SerializedName("list")
+	val list: List<ListModel>
 ) {
-	data class ListBean(
+	data class ListModel(
+		@SerializedName("on_off")
 		val onOff: String,
+		@SerializedName("name")
 		val name: String,
+		@SerializedName("value")
 		val value: String
 	)
 }
 
 data class AddAlarmClockModel(
+	@SerializedName("code")
 	val code: Int,
+	@SerializedName("id")
 	val id: String
 )
 
-data class DeleteAlarmClockModel(val code: Int)
+data class DeleteAlarmClockModel(
+	@SerializedName("code")
+	val code: Int
+)
 
 data class PricePairModel(
+	@SerializedName("pair")
 	var pair: String,
+	@SerializedName("price")
 	var price: String,
+	@SerializedName("marketName")
 	var marketName: String = "",
+	@SerializedName("pairDisplay")
 	var pairDisplay: String = ""
 )

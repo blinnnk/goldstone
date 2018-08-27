@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.home.view
 
-import android.app.Activity
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -21,12 +20,12 @@ import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
-import io.goldstone.blockchain.common.utils.PriceAlarmClockUtils
+import io.goldstone.blockchain.common.utils.PriceAlarmUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmClockReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmReceiver
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
-	private lateinit var priceAlarmStatusObserver: PriceAlarmStatusObserver
+	private var priceAlarmStatusObserver: PriceAlarmStatusObserver? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
 
-		XinGePushReceiver.backgroundFlag = true
+		XinGePushReceiver.backgroundFlag = false
 		// 轮询价格闹铃监听
 		priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
 
@@ -80,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onResume() {
 		super.onResume()
-		XinGePushReceiver.backgroundFlag = true
+		XinGePushReceiver.backgroundFlag = false
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
 		showNotificationAlarmPopUps(currentIntent ?: intent)
@@ -88,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onStop() {
 		super.onStop()
-		XinGePushReceiver.backgroundFlag = false
+		XinGePushReceiver.backgroundFlag = true
 	}
 
 	fun sendAnalyticsData(className: String) {
@@ -119,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onDestroy() {
 		super.onDestroy()
 		unregisterReceiver(netWorkReceiver)
-		priceAlarmStatusObserver.removeObserver()
+		priceAlarmStatusObserver?.removeObserver()
 	}
 
 	override fun onBackPressed() {
@@ -209,50 +208,41 @@ class MainActivity : AppCompatActivity() {
 	private fun showNotificationAlarmPopUps(intent: Intent?) {
 		val alarmInfo = intent?.getSerializableExtra(IntentKey.alarmInfoFromNotify)
 		if (alarmInfo.isNull()) {
-			PriceAlarmClockUtils.stopAlarmReceiver(
+			PriceAlarmUtils.stopAlarmReceiver(
 				this,
 				1
 			)
-			PriceAlarmClockReceiver.stopAlarmClock()
+			PriceAlarmReceiver.stopAlarmClock()
 			return
 		}
-		val goldStoneDialogFlag = findViewById<GoldStoneDialog>(ElementID.dialog).isNull {}
-		if (goldStoneDialogFlag) {
-			GoldStoneDialog.show(this) {
-				showButtons(AlarmClockText.viewAlarm) {
-					confirmButtonClickEvent()
-				}
-				setGoldStoneDialog(
-					this,
-					alarmInfo as XGPushClickedResult
-				)
+
+		GoldStoneDialog.remove(this)
+		GoldStoneDialog.show(this) {
+			showButtons(AlarmClockText.viewAlarm) {
+				confirmButtonClickEvent()
 			}
-		} else {
-			val goldStoneDialog = findViewById<GoldStoneDialog>(ElementID.dialog)
-			if (priceAlarmStatusObserver.isNull()) {
-				priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
-			} else {
-				priceAlarmStatusObserver.removeDialog(goldStoneDialog)
-			}
-			goldStoneDialog.into(findViewById<RelativeLayout>(ContainerID.main))
+			setGoldStoneDialog(
+				this,
+				alarmInfo as XGPushClickedResult
+			)
 		}
 	}
 
 	private fun cancelButtonClickEvent() {
-		PriceAlarmClockUtils.stopAlarmReceiver(
+		PriceAlarmUtils.stopAlarmReceiver(
 			this,
 			1
 		)
-		PriceAlarmClockReceiver.stopAlarmClock()
+		PriceAlarmReceiver.stopAlarmClock()
 		GoldStoneDialog.remove(this)
 		this.findViewById<RelativeLayout>(ContainerID.main).removeView(findViewById<GoldStoneDialog>(ElementID.dialog))
 	}
 
 	private fun confirmButtonClickEvent() {
 		addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-			putString(
-				ArgumentKey.priceAlarmClockTitle,
-				AlarmClockText.viewAlarm
+			putBoolean(
+				ArgumentKey.priceAlarmTitle,
+				true
 			)
 			putSerializable(
 				ArgumentKey.quotationOverlayInfo, QuotationModel(

@@ -35,7 +35,7 @@ object ElementID {
 	const val mask = 20017
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
-	const val deleteButton = 20020
+	const val trashButton = 20020
 	const val topBottomLineCellTitle = 20021
 }
 

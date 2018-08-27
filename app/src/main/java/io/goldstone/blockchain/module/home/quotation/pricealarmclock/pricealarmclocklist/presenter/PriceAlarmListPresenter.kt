@@ -8,18 +8,37 @@ import android.os.Parcelable
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListAdapter
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmClockListFragment
-import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListAdapter
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListFragment
 
 /**
  * @data 07/23/2018 16/32
  * @author wcx
  * @description 价格闹钟Presenter实现类
  */
-class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFragment)
-	: BaseRecyclerPresenter<PriceAlarmClockListFragment, PriceAlarmClockTable>() {
+class PriceAlarmListPresenter(override val fragment: PriceAlarmListFragment)
+	: BaseRecyclerPresenter<PriceAlarmListFragment, PriceAlarmTable>() {
+
+	companion object {
+		fun insertAlarmClockToDatabase(
+			priceAlarmTable: PriceAlarmTable,
+			callback: () -> Unit
+		) {
+			// 临时替代属性
+			priceAlarmTable.addId
+			callback()
+		}
+
+		fun getDatabaseDataRefreshList(callback: ArrayList<PriceAlarmTable>. () -> Unit) {
+			// 临时替代属性
+			callback(ArrayList<PriceAlarmTable>())
+		}
+
+		fun updateData() {
+
+		}
+	}
 
 	private val handler: Handler = @SuppressLint("HandlerLeak")
 	object : Handler(), Parcelable {
@@ -32,7 +51,7 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
 
 		override fun handleMessage(msg: Message?) {
 			super.handleMessage(msg)
-			fragment.asyncData?.let { fragment.presenter.diffAndUpdateSingleCellAdapterData<PriceAlarmClockListAdapter>(it) }
+			fragment.asyncData?.let { fragment.presenter.diffAndUpdateAdapterData<PriceAlarmListAdapter>(it) }
 			updateData()
 			getExistingAlarmAmount {
 				fragment.setNowAlarmSize(this)
@@ -43,29 +62,21 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
 	override fun updateData() {
 	}
 
-	fun getDatabaseDataRefreshList(callback: ArrayList<PriceAlarmClockTable>. () -> Unit) {
-		callback(ArrayList<PriceAlarmClockTable>())
-	}
-
-	fun insertAlarmClockToDatabase(
-		priceAlarmClockBean: PriceAlarmClockTable,
-		callback: () -> Unit
-	) {
-		priceAlarmClockBean.addId
-		callback()
-	}
-
 	// 修改闹钟属性
-	fun showPriceAlarmModifierFragment(model: PriceAlarmClockTable) {
+	fun showPriceAlarmModifierFragment(model: PriceAlarmTable) {
+		// 临时替代属性
 		model.addId
 	}
 
 	// 获取闹铃配置清单
 	fun getAlarmConfigList(callback: Int.() -> Unit) {
-		val alarmConfigListModel = AlarmConfigListModel(0, ArrayList<AlarmConfigListModel.ListBean>())
+		val alarmConfigListModel = AlarmConfigListModel(
+			0,
+			ArrayList<AlarmConfigListModel.ListModel>()
+		)
 		val alarmConfigArrayList = alarmConfigListModel.list
-		val size = alarmConfigArrayList.size - 1
-		for (index: Int in 0..size) {
+		val size = alarmConfigArrayList.size
+		for (index: Int in 0 until size) {
 			if (alarmConfigArrayList[index].name == "alertMaxCount") {
 				callback(alarmConfigArrayList[index].value.toInt())
 			}
@@ -74,15 +85,17 @@ class PriceAlarmClockListPresenter(override val fragment: PriceAlarmClockListFra
 
 	// 修改闹铃提醒开关状态
 	fun modifyOpenStatus(
-		model: PriceAlarmClockTable,
+		model: PriceAlarmTable,
 		checked: Boolean
 	) {
+		// 临时替代属性
 		model.addId
 		checked.isTrue { }
 	}
 
 	// 获取当前闹铃个数
 	fun getExistingAlarmAmount(callback: Int.() -> Unit) {
+		// 临时替代属性
 		callback(1)
 	}
 

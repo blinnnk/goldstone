@@ -30,13 +30,13 @@ class QuotationOverlayPresenter(
 
 	fun showMarketTokenCenter(
 		model: QuotationModel?,
-		viewAlarmIndicator: String?
+		isFromAlarmAlert: Boolean
 	) {
 		fragment.addFragmentAndSetArgument<MarketTokenCenterFragment>(ContainerID.content) {
-			if (viewAlarmIndicator == AlarmClockText.viewAlarm) {
-				putString(
-					ArgumentKey.priceAlarmClockTitle,
-					AlarmClockText.viewAlarm
+			if (isFromAlarmAlert) {
+				putBoolean(
+					ArgumentKey.priceAlarmTitle,
+					isFromAlarmAlert
 				)
 			}
 			putSerializable(ArgumentKey.quotationCurrencyDetail, model)

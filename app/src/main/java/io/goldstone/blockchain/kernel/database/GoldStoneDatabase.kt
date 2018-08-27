@@ -11,8 +11,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockDao
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmDao
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
@@ -28,7 +28,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
 		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
 		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
-		(SupportCurrencyTable::class), (BTCSeriesTransactionTable::class), (PriceAlarmClockTable::class)],
+		(SupportCurrencyTable::class), (BTCSeriesTransactionTable::class), (PriceAlarmTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )
@@ -45,7 +45,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
 	abstract fun btcSeriesTransactionDao(): BTCSeriesTransactionDao
-	abstract fun priceAlarmClockDao(): PriceAlarmClockDao
+	abstract fun priceAlarmDao(): PriceAlarmDao
 
 	companion object {
 		const val databaseVersion = 5

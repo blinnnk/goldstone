@@ -20,49 +20,46 @@ import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.AlarmClockText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
 import org.jetbrains.anko.*
 
 /**
  * @date 02/08/2018 21:12 PM
  * @author wcx
  */
-class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
+class PriceAlarmCreaterView(context: Context) : LinearLayout(context) {
 
-	private var title: String = AlarmClockText.createNewAlarm
 	private val titleCell = TopBottomLineCell(context)
 	private val targetPriceEditText = EditText(context)
 	private val currencyTextView = TextView(context)
-	private var priceType = 0
+	private var priceType = ArgumentKey.greaterThanForPriceType
 	private var priceTypeView = AlarmTypeView(context)
 	private var alarmTypeView = AlarmTypeView(context)
 	private var automaticChoosePriceTypeFlag = false
 
 	init {
 		orientation = LinearLayout.VERTICAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
+			leftMargin = PaddingSize.device
+			rightMargin = PaddingSize.device
+		}
 
 		titleCell.apply {
 			layoutParams = LinearLayout.LayoutParams(
 				matchParent,
 				wrapContent
 			).apply {
-				leftMargin = 20.uiPX()
-				rightMargin = 20.uiPX()
 			}
-			setTitle(title)
+			setTitle(AlarmClockText.createNewAlarm)
 		}.into(this)
 
 		RelativeLayout(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(
 				matchParent,
-				matchParent
+				wrapContent
 			).apply {
-				leftMargin = 17.uiPX()
-				rightMargin = 17.uiPX()
 				bottomMargin = 5.uiPX()
 			}
 
@@ -106,7 +103,6 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 	}
 
 	fun setTitle(title: String) {
-		this.title = title
 		titleCell.setTitle(
 			title,
 			fontSize(14),
@@ -120,9 +116,9 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 	}
 
 	fun setTargetPriceEditTextListener(
-		priceAlarmClockTable: PriceAlarmClockTable
+		priceAlarmTable: PriceAlarmTable
 	) {
-		val editTextString = priceAlarmClockTable.price
+		val editTextString = priceAlarmTable.price
 		targetPriceEditText.setText(
 			editTextString.toCharArray(),
 			0,
@@ -148,8 +144,8 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 				p3: Int
 			) {
 				if (charSequence.toString().isEmpty()) {
-					priceTypeView.setRepeatingCellTitle("1 ${priceAlarmClockTable.symbol} > 0 ${priceAlarmClockTable.currencyName}")
-					priceTypeView.setOneTimeCellTitle("1 ${priceAlarmClockTable.symbol} < 0 ${priceAlarmClockTable.currencyName}")
+					priceTypeView.setRepeatingCellTitle("1 ${priceAlarmTable.symbol} > 0 ${priceAlarmTable.currencyName}")
+					priceTypeView.setOneTimeCellTitle("1 ${priceAlarmTable.symbol} < 0 ${priceAlarmTable.currencyName}")
 					changePriceType(true)
 				} else {
 					val inputPrice = (charSequence.toString()).toDouble()
@@ -164,27 +160,31 @@ class PriceAlarmClockCreaterView(context: Context) : LinearLayout(context) {
 						changePriceType(false)
 					} else if (inputPrice < 0) {
 						setPriceTypeContent(
-							priceAlarmClockTable.symbol,
+							priceAlarmTable.symbol,
 							"0",
-							priceAlarmClockTable.currencyName
+							priceAlarmTable.currencyName
 						)
 						changePriceType(true)
 					} else {
 						setPriceTypeContent(
-							priceAlarmClockTable.symbol,
+							priceAlarmTable.symbol,
 							inputPrice.toString(),
-							priceAlarmClockTable.currencyName
+							priceAlarmTable.currencyName
 						)
-						changePriceType(inputPrice > priceAlarmClockTable.marketPrice.toDouble())
+						changePriceType(inputPrice > priceAlarmTable.marketPrice.toDouble())
 					}
 				}
 			}
 		})
 	}
 
-	fun setPriceChooseContent(priceAlarmClockTable: PriceAlarmClockTable) {
-		setPriceTypeContent(priceAlarmClockTable.symbol, priceAlarmClockTable.price, priceAlarmClockTable.currencyName)
-		changePriceType(priceType == 0)
+	fun setPriceChooseContent(priceAlarmTable: PriceAlarmTable) {
+		setPriceTypeContent(
+			priceAlarmTable.symbol,
+			priceAlarmTable.price,
+			priceAlarmTable.currencyName
+		)
+		changePriceType(priceType == ArgumentKey.greaterThanForPriceType)
 	}
 
 	fun setAlarmChooseContent(alarmType: Int) {

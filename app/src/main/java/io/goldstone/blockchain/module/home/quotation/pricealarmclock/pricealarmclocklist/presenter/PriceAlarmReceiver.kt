@@ -9,6 +9,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Vibrator
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.value.ArgumentKey
 import java.io.IOException
 
 @Suppress("DEPRECATION")
@@ -16,7 +17,7 @@ import java.io.IOException
  * @date 16/08/2018 5:02 PM
  * @author wcx
  */
-class PriceAlarmClockReceiver : BroadcastReceiver() {
+class PriceAlarmReceiver : BroadcastReceiver() {
 	object PriceAlarmClockProperty {
 		var mediaPlayer: MediaPlayer? = null
 		var vibrator: Vibrator? = null
@@ -46,7 +47,7 @@ class PriceAlarmClockReceiver : BroadcastReceiver() {
 	) {
 		intent?.let {
 			val bundle = it.extras
-			val flag = bundle.getBoolean("msg")
+			val flag = bundle.getBoolean(ArgumentKey.turnOffPriceAlarmReceiverMessageFlag)
 			if (flag) {
 				context?.let {
 					startMediaPlayer(it)

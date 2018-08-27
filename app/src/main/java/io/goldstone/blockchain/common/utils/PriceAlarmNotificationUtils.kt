@@ -20,7 +20,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
  * @author wcx
  * @description 唤醒闹钟通知工具类
  */
-object PriceAlarmClockNotificationUtils {
+object PriceAlarmNotificationUtils {
 
   @SuppressLint("WrongConstant")
   fun sendPriceAlarmClockNotification(

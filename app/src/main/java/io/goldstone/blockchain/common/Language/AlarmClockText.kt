@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmClockTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PricePairModel
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
 
 /**
  * @date 10/08/2018 14:19 PM
@@ -240,36 +240,36 @@ object AlarmClockText {
 		else -> ""
 	}
 
-	val priceAlarmContent: (priceAlarmClockTable: PriceAlarmClockTable) -> String = { priceAlarmClockTable ->
+	val priceAlarmContent: (priceAlarmTable: PriceAlarmTable) -> String = { priceAlarmTable ->
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.English.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.Russian.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Russian.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
-				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice},高于于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+			HoneyLanguage.Chinese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
+				"${priceAlarmTable.marketName}市场的${priceAlarmTable.pairDisplay}达到${priceAlarmTable.marketPrice},高于于你设置的预警值${priceAlarmTable.price}。\n\n" +
 					"你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
 			} else {
-				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice},低于你设置的预警值${priceAlarmClockTable.price}。\n\n" +
+				"${priceAlarmTable.marketName}市场的${priceAlarmTable.pairDisplay}达到${priceAlarmTable.marketPrice},低于你设置的预警值${priceAlarmTable.price}。\n\n" +
 					"你可以在市场模块已经添加的卡片详情中管理您设置好的闹铃。"
 			}
-			HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Japanese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.Korean.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Korean.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.TraditionalChinese.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.TraditionalChinese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
@@ -278,34 +278,34 @@ object AlarmClockText {
 		}
 	}
 
-	val priceAlarmNotificationContent: (priceAlarmClockTable: PriceAlarmClockTable) -> String = { priceAlarmClockTable ->
+	val priceAlarmNotificationContent: (priceAlarmTable: PriceAlarmTable) -> String = { priceAlarmTable ->
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.English.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.Russian.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Russian.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.Chinese.code -> if (priceAlarmClockTable.priceType == 0) {
-				"${priceAlarmClockTable.marketName}市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice}，已高于您设定的目标${priceAlarmClockTable.price}"
+			HoneyLanguage.Chinese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
+				"${priceAlarmTable.marketName}市场的${priceAlarmTable.pairDisplay}达到${priceAlarmTable.marketPrice}，已高于您设定的目标${priceAlarmTable.price}"
 			} else {
-				"${priceAlarmClockTable.marketName} 市场的${priceAlarmClockTable.pairDisplay}达到${priceAlarmClockTable.marketPrice}，已低于您设定的目标${priceAlarmClockTable.price}"
+				"${priceAlarmTable.marketName} 市场的${priceAlarmTable.pairDisplay}达到${priceAlarmTable.marketPrice}，已低于您设定的目标${priceAlarmTable.price}"
 			}
-			HoneyLanguage.Japanese.code -> if (priceAlarmClockTable.priceType == 0) {
-				""
-			} else {
-				""
-			}
-			HoneyLanguage.Korean.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Japanese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""
 			}
-			HoneyLanguage.TraditionalChinese.code -> if (priceAlarmClockTable.priceType == 0) {
+			HoneyLanguage.Korean.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
+				""
+			} else {
+				""
+			}
+			HoneyLanguage.TraditionalChinese.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {
 				""
 			} else {
 				""

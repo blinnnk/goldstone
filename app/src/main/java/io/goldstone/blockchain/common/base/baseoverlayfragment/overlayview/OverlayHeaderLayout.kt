@@ -23,7 +23,6 @@ import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ElementID.deleteButton
 import org.jetbrains.anko.*
 
 /**
@@ -57,10 +56,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
-	val deleteButton by lazy {
+	private val trashButton by lazy {
 		HeaderIcon(context).apply {
-			id = ElementID.deleteButton
-			imageResource = R.drawable.price_alarm_delete
+			id = ElementID.trashButton
+			imageResource = R.drawable.price_alarm_trash
 			setLeftPosition()
 		}
 	}
@@ -174,18 +173,18 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showDeleteButton(
+	fun showTrashButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
 	) {
-		findViewById<ImageView>(ElementID.deleteButton).let {
+		findViewById<ImageView>(ElementID.trashButton).let {
 			it.isNull() isTrue {
 				isShow isTrue {
-					deleteButton.click { setClickEvent(deleteButton) }.into(this)
+					trashButton.click { setClickEvent(trashButton) }.into(this)
 				}
 			} otherwise {
 				isShow isTrue {
-					deleteButton.click { setClickEvent(deleteButton) }
+					trashButton.click { setClickEvent(trashButton) }
 				} otherwise {
 					removeView(it)
 				}

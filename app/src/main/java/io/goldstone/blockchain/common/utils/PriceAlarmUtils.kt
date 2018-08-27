@@ -5,7 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmClockReceiver
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmReceiver
 import kotlinx.coroutines.experimental.async
 
 /**
@@ -13,7 +14,7 @@ import kotlinx.coroutines.experimental.async
  * @author wcx
  * @description 唤醒闹钟工具类
  */
-object PriceAlarmClockUtils {
+object PriceAlarmUtils {
 
 	private var intervalTime = false
 
@@ -33,14 +34,14 @@ object PriceAlarmClockUtils {
 				Thread.sleep(1000)
 				intervalTime = false
 			}
-			PriceAlarmClockReceiver.stopAlarmClock()
+			PriceAlarmReceiver.stopAlarmClock()
 			val intent = Intent(
 				context,
-				PriceAlarmClockReceiver::class.java
+				PriceAlarmReceiver::class.java
 			)
 			val bundle = Bundle()
 			bundle.putBoolean(
-				"msg",
+				ArgumentKey.turnOffPriceAlarmReceiverMessageFlag,
 				true
 			)
 			intent.putExtras(bundle)
@@ -72,7 +73,7 @@ object PriceAlarmClockUtils {
 	) {
 		val intent = Intent(
 			context,
-			PriceAlarmClockReceiver::class.java
+			PriceAlarmReceiver::class.java
 		)
 		val bundle = Bundle()
 		bundle.putBoolean(
