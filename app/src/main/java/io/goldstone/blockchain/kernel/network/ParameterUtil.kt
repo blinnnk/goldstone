@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.value.Config
  * @author KaySaith
  */
 object ParameterUtil {
-	
+
 	fun <T> prepare(
 		isEncrypt: Boolean = true,
 		vararg parameters: Pair<String, T>
@@ -23,13 +23,10 @@ object ParameterUtil {
 			} else it.second
 			content += "\"${it.first}\":$value,"
 		}
-		return if (isEncrypt) {
-			AesCrypto.encrypt("{${content.substringBeforeLast(",")}}").orEmpty()
-		} else {
-			"{${content.substringBeforeLast(",")}}"
-		}
+		val finalContent = "{${content.substringBeforeLast(",")}}"
+		return if (isEncrypt) AesCrypto.encrypt(finalContent).orEmpty() else finalContent
 	}
-	
+
 	fun <T> prepareJsonRPC(
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,
@@ -54,7 +51,7 @@ object ParameterUtil {
 			"{\"jsonrpc\":\"$rpcVersion\", \"method\":\"$method\", \"params\":[$finalParameter]$rpcID}"
 		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
-	
+
 	fun <T> preparePairJsonRPC(
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		method: String,

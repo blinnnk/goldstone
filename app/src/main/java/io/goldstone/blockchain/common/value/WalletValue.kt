@@ -26,7 +26,7 @@ enum class WalletType(val content: String) {
 }
 
 object DataValue {
-	const val pageCount = 30
+	const val pageCount = 50
 
 }
 

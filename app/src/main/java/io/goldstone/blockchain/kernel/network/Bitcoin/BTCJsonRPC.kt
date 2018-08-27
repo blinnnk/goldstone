@@ -18,7 +18,7 @@ import org.json.JSONObject
 object BTCSeriesJsonRPC {
 
 	/**
-	 * 估算交易在 `nblocks` 个区块开始确认的每千字节的大致费用,
+	 * 估算交易在 `n blocks` 个区块开始确认的每千字节的大致费用,
 	 * 如果没有足够的交易和区块用来估算则会返回一个负值，-1 表示交易费为 0
 	 */
 	fun estimatesmartFee(
@@ -67,7 +67,7 @@ object BTCSeriesJsonRPC {
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
 				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
-				BitcoinMethod.SendRawtTansaction.method,
+				BitcoinMethod.SendRawTansaction.method,
 				1,
 				false,
 				false,
@@ -78,7 +78,7 @@ object BTCSeriesJsonRPC {
 			RequisitionUtil.callChainBy(
 				it,
 				{ error, reason ->
-					LogUtil.error("SendRawtTansaction $reason", error)
+					LogUtil.error("SendRawTansaction $reason", error)
 				},
 				chainName
 			) {

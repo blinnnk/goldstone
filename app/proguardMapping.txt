@@ -21964,7 +21964,7 @@ io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod -> d.a.a.c.c.
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod EstimatesmartFee -> a
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod GetRawTransaction -> f
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod Getblockcount -> e
-    io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod SendRawtTansaction -> d
+    io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod SendRawTansaction -> d
     io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod[] $VALUES -> g
     java.lang.String getMethod() -> a
 io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi -> d.a.a.c.c.b.b:

@@ -39,7 +39,7 @@ fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 				fragment.removeLoadingView()
 			}
 			// TODO 判断数据
-			loadDataFromDatabaseOrElse()
+			loadDataFromDatabaseOrElse { _, _ -> }
 		}
 	}
 }
