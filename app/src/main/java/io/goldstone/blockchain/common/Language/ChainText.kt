@@ -216,7 +216,7 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "BCH (GoldStone)"
 		else -> ""
 	}
-	// ChainName 有判断节点的用处不要改这里
+	// ChainName 有判断节点的用处不要在这里改动
 	@JvmField
 	val btcTest = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BTC Testnet (GoldStone)"
