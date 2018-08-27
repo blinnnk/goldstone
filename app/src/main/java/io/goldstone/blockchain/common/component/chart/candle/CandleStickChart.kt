@@ -10,8 +10,6 @@ import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
-import com.github.mikephil.charting.components.*
-import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
@@ -21,8 +19,6 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.*
 import java.math.BigDecimal
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
@@ -123,7 +119,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		val xAxisSpace = 1f // 蜡烛图内部的左右 `Offset` 值
 		// 为了防止方法执行到此，以下数据还没有被初始化，所以在这里重新赋值
 		xRangeVisibleCount = 30
-		minOffset = 0f
+		minOffset = 0.5f
 		labelTextSize = fontSize(10)
 		isScaleXEnabled = false
 		isScaleYEnabled = false
