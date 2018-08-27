@@ -62,7 +62,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
-	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3) { feePerByte ->
+	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			// TODO Alert
 			return@estimatesmartFee

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -25,13 +24,17 @@ object BTCSeriesJsonRPC {
 	fun estimatesmartFee(
 		chainName: String,
 		blocks: Int,
+		isSmartFee: Boolean,
 		hold: (Double?) -> Unit
 	) {
+		val method =
+			if (isSmartFee) BitcoinMethod.EstimatesmartFee.method
+			else BitcoinMethod.EstimateFee.method
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
 				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
-				BitcoinMethod.EstimatesmartFee.method,
+				method,
 				1,
 				false,
 				false,
@@ -46,7 +49,8 @@ object BTCSeriesJsonRPC {
 				chainName
 			) {
 				if (it.isNotEmpty()) {
-					val fee = JSONObject(it).safeGet("feerate").toDoubleOrNull()
+					val fee = if (isSmartFee) JSONObject(it).safeGet("feerate").toDoubleOrNull()
+					else it.toDoubleOrNull()
 					hold(fee)
 				} else hold(null)
 			}
