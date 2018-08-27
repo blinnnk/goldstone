@@ -62,7 +62,7 @@ class QuotationManagementPresenter(
 				) {
 					// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
 					fragment.asyncData?.find {
-						it.baseSymnbol == data[toPosition].baseSymnbol
+						it.baseSymbol == data[toPosition].baseSymbol
 					}?.orderID = newOrderID
 				}
 			}

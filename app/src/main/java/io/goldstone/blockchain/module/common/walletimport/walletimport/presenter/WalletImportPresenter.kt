@@ -119,7 +119,7 @@ class WalletImportPresenter(
 							ltcPath = multiChainPath.ltcPath,
 							bchPath = multiChainPath.bchPath
 						)
-					) {
+					) { wallet ->
 						// 创建钱包并获取默认的 `token` 信息
 						CreateWalletPresenter.generateMyTokenInfo(
 							multiChainAddresses,
@@ -131,7 +131,7 @@ class WalletImportPresenter(
 						)
 
 						// 注册钱包地址用于发送 `Push`
-						XinGePushReceiver.registerAddressesForPush()
+						XinGePushReceiver.registerAddressesForPush(wallet)
 					}
 				} otherwise {
 					context?.alert(ImportWalletText.existAddress)

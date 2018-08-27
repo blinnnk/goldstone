@@ -36,7 +36,7 @@ data class BlockInfoUnspentModel(
 	val scriptPubKey: String,
 	@SerializedName("value")
 	val value: Long,
-	@SerializedName("tx_hash")
+	@SerializedName("tx_hash_big_endian")
 	val txid: String,
 	@SerializedName("confirmations")
 	val confirmations: Int

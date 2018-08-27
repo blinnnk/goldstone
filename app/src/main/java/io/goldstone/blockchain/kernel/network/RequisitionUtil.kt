@@ -322,7 +322,7 @@ object RequisitionUtil {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(error, "Call Ethereum Failured")
+						errorCallback(error, "Call Ethereum Failed")
 					}
 				}
 

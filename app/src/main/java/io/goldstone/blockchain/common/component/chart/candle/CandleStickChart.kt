@@ -8,9 +8,9 @@ import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
@@ -35,7 +35,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 
 	private var xRangeVisibleCount = 30
 	private var leftLabelCount = 10
-	private var realData = arrayListOf<CandleEntry>()
+	private var realData = listOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
 
@@ -55,20 +55,17 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		post { setEmptyData() }
 	}
 
-	open fun resetData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
+	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
 		postCalculate()
 		notifyData(dateType, dataRows)
 	}
 
-	private fun notifyData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
+	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {
 		this.dateType = dateType
 		realData = dataRows
-		isScaleXEnabled = false
-		isScaleYEnabled = false
 		val candleDecreasingColor = Spectrum.lightRed
 		val candleIncreasingColor = Spectrum.green
 		val candleNeutralColor = GrayScale.lightGray
-		val candleBarSpace = 0.15f
 		val candleShadowWidth = 1f // 蜡烛柄宽度
 		resetTracking()
 		clear()
@@ -89,16 +86,12 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		val dataSet = CandleDataSet(dataRows, "Candle Set")
 		dataSet.apply {
 			setDrawIcons(false)
-			axisDependency = YAxis.AxisDependency.LEFT
 			shadowWidth = candleShadowWidth
 			decreasingColor = candleDecreasingColor
-			decreasingPaintStyle = Paint.Style.FILL
 			increasingColor = candleIncreasingColor
 			increasingPaintStyle = Paint.Style.FILL
 			neutralColor = candleNeutralColor
 			setDrawValues(false)
-			barSpace = candleBarSpace
-			showCandleBar = true
 			shadowColorSameAsCandle = true
 		}
 		val data = CandleData(dataSet)
@@ -116,15 +109,13 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		// 初始化一些属性
 		val labelColor = GrayScale.midGray
 		val gridLineColor = GrayScale.lightGray
-		val xAxisSpace = 0f
+		val xAxisSpace = 1f // 蜡烛图内部的左右 `Offset` 值
 		// 为了防止方法执行到此，以下数据还没有被初始化，所以在这里重新赋值
-		leftLabelCount = 10
 		xRangeVisibleCount = 30
 		minOffset = 0f
 		labelTextSize = fontSize(10)
 		isScaleXEnabled = false
 		isScaleYEnabled = false
-		isDragEnabled = true
 		legend.isEnabled = false
 		description.isEnabled = false
 		with(xAxis) {
@@ -145,7 +136,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			}
 			textColor = labelColor
 			position = XAxis.XAxisPosition.BOTTOM
-			setDrawGridLines(true)
 			gridColor = gridLineColor
 			axisLineColor = gridLineColor
 			spaceMin = xAxisSpace
@@ -155,33 +145,18 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		}
 
 		with(axisLeft) {
-			setDrawAxisLine(true)
-			setDrawLabels(true)
-			setDrawGridLines(true)
 			gridColor = gridLineColor
 			axisLineColor = gridLineColor
 			textColor = labelColor
 			setLabelCount(leftLabelCount, true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
-
 		}
 		with(axisRight) {
-			setDrawAxisLine(true)
 			setDrawLabels(false)
 			setDrawGridLines(false)
 			axisLineColor = gridLineColor
 			textColor = labelColor
-		}
-
-		marker = object : CandleMarkerView(context) {
-			override fun getChartWidth(): Int {
-				return width
-			}
-
-			override fun getChartHeight(): Int {
-				return height
-			}
 		}
 	}
 
@@ -193,8 +168,15 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		if (realData.isEmpty()) {
 			val candleEntrySet = arrayListOf<CandleEntry>()
 			(0 until xRangeVisibleCount).forEach { index ->
-				candleEntrySet.add(CandleEntry(index.toFloat(),
-					0f, 0f, 0f, 0f, System.currentTimeMillis())
+				candleEntrySet.add(
+					CandleEntry(
+						index.toFloat(),
+						0f,
+						0f,
+						0f,
+						0f,
+						System.currentTimeMillis()
+					)
 				)
 			}
 			resetData(dateType, candleEntrySet)
@@ -209,16 +191,9 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	private fun resetMaxMin(firstVisibleIndex: Int) {
 		val endIndex: Int = firstVisibleIndex + xRangeVisibleCount
 		val max = if (endIndex > realData.size) realData.size else endIndex
-		var high = realData[firstVisibleIndex].high
-		var low = realData[firstVisibleIndex].low
-		(firstVisibleIndex until max).forEachIndexed { index, _ ->
-			if (realData[firstVisibleIndex + index].low < low) {
-				low = realData[firstVisibleIndex + index].low
-			}
-			if (realData[firstVisibleIndex + index].high > high) {
-				high = realData[firstVisibleIndex + index].high
-			}
-		}
+		val targetDataRange = realData.subList(firstVisibleIndex, max)
+		val high = targetDataRange.maxBy { it.high }?.high.orZero()
+		val low = targetDataRange.minBy { it.low }?.low.orZero()
 		val distance = (high - low) / 20 // 距离上下的间距
 		context.runOnUiThread {
 			if (high * low != 0f) {

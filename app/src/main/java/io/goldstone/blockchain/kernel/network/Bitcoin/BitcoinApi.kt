@@ -78,7 +78,6 @@ object BitcoinApi {
 				BTCSeriesApiUtils.getUnspentListByAddressFromBlockInfo(
 					BitcoinUrl.getUnspentInfoFromBlockInfo(address),
 					{ blockInfoError ->
-						// TODO 当 `BlockInfo` 出现问题的时候向 `GoldStone` 服务器发起请求
 						LogUtil.error("getUnspentListByAddressFromBlockInfo", blockInfoError)
 					}
 				) { blockInfoUnspentModels ->

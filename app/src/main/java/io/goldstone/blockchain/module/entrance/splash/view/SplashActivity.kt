@@ -198,7 +198,9 @@ class SplashActivity : AppCompatActivity() {
 					 * 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里
 					 * 检测并重新注册
 					 */
-					XinGePushReceiver.registerAddressesForPush()
+					WalletTable.getCurrentWallet {
+						XinGePushReceiver.registerAddressesForPush(this)
+					}
 				}
 				config?.let(callback)
 			}

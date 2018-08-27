@@ -166,7 +166,7 @@ class WalletSettingsPresenter(
 				}
 			}
 			avatarImage.glideImage(
-				UnlimitedAvatar(Config.getCurrentID(), context).getBitmap()
+				UnlimitedAvatar(Config.getCurrentWalletID(), context).getBitmap()
 			)
 		}
 	}

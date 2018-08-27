@@ -26,7 +26,7 @@ data class QuotationSelectionTable(
 	@SerializedName("pair_display")
 	var pairDisplay: String,
 	@SerializedName("base")
-	var baseSymnbol: String,
+	var baseSymbol: String,
 	@SerializedName("quote")
 	var quoteSymbol: String,
 	@SerializedName("pair")
@@ -57,7 +57,7 @@ data class QuotationSelectionTable(
 		0,
 		data.marketID,
 		data.pairDisplay,
-		data.baseSymnbol,
+		data.baseSymbol,
 		data.quoteSymbol,
 		data.pair,
 		data.market,
@@ -81,7 +81,7 @@ data class QuotationSelectionTable(
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().apply {
 					// 添加的时候赋予新的最大的 `orderID`
-					getQuotationSelfSelections().let {
+					getQuotationSelfSelections().let { it ->
 						val currentID = it.maxBy { it.orderID }?.orderID
 						val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
 						insert(table.apply {
