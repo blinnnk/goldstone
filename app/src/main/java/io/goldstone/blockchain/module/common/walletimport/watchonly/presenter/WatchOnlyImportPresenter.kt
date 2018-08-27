@@ -122,7 +122,8 @@ class WatchOnlyImportPresenter(
 						btcSeriesTestAddresses = "",
 						ltcAddresses = ""
 					)
-				) {
+				) { thisWallet ->
+					if (thisWallet.isNull()) return@insert
 					CreateWalletPresenter.generateMyTokenInfo(
 						MultiChainAddresses(
 							currentETHAndERCAddress,
@@ -149,7 +150,13 @@ class WatchOnlyImportPresenter(
 								Pair(currentETHAndERCAddress, ChainType.ETH.id)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
-						XinGePushReceiver.registerSingleAddress(AddressCommissionModel(current.first, current.second, 1))
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
+								current.first,
+								current.second,
+								1,
+								thisWallet!!.id
+							))
 						fragment.activity?.jump<SplashActivity>()
 					}
 				}

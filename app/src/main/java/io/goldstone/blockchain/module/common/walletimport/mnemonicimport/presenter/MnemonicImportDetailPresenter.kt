@@ -3,12 +3,14 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presen
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
@@ -100,28 +102,40 @@ class MnemonicImportDetailPresenter(
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
-		GenerateMultiChainWallet.import(
-			fragment.context!!,
-			mnemonic,
-			password,
-			multiChainPath
-		) { multiChainAddresses ->
-			// 如果地址已经存在则会返回空的多链地址 `Model`
-			if (multiChainAddresses.ethAddress.isEmpty()) {
+		WalletTable.getAll {
+			val isExistent = any {
+				try {
+					JavaKeystoreUtil()
+						.decryptData(it.encryptMnemonic.orEmpty())
+						.equals(mnemonic, true)
+				} catch (error: Exception) {
+					LogUtil.error("decrypt Data", error)
+					false
+				}
+			}
+			if (isExistent) {
 				fragment.context.alert(ImportWalletText.existAddress)
 				callback(false)
-				return@import
+				return@getAll
+			} else {
+				GenerateMultiChainWallet.import(
+					fragment.context!!,
+					mnemonic,
+					password,
+					multiChainPath
+				) { multiChainAddresses ->
+					// 如果地址已经存在则会返回空的多链地址 `Model`
+					WalletImportPresenter.insertWalletToDatabase(
+						fragment.context,
+						multiChainAddresses,
+						name,
+						encryptMnemonic,
+						multiChainPath,
+						hint = hint,
+						callback = callback
+					)
+				}
 			}
-
-			WalletImportPresenter.insertWalletToDatabase(
-				fragment.context,
-				multiChainAddresses,
-				name,
-				encryptMnemonic,
-				multiChainPath,
-				hint = hint,
-				callback = callback
-			)
 		}
 	}
 

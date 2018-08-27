@@ -301,7 +301,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	override fun clear() {
 		var tempHighlight: Array<Highlight>? = null
 		mIndicesToHighlight?.apply {
-			tempHighlight = arrayOf(this[0])
+			tempHighlight = arrayOf(first())
 		}
 		super.clear()
 		tempHighlight?.apply {

@@ -182,7 +182,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 									.plus(ltcSeries)
 									.plus(bchSeries)
 									.map {
-										AddressCommissionModel(it.first, it.second, option)
+										AddressCommissionModel(it.first, it.second, option, id)
 									}.map { prepareAddressData(it) }
 							GoldStoneAPI.registerWalletAddresses(
 								AesCrypto.encrypt("$all").orEmpty(),
@@ -195,18 +195,51 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 						}
 
 						WalletType.BTCOnly -> {
-							registerSingleAddress(AddressCommissionModel(currentBTCAddress, ChainType.BTC.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentBTCAddress,
+									ChainType.BTC.id,
+									option,
+									id
+								)
+							)
 						}
 						WalletType.BCHOnly ->
-							registerSingleAddress(AddressCommissionModel(currentBCHAddress, ChainType.BCH.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentBCHAddress,
+									ChainType.BCH.id,
+									option,
+									id
+								)
+							)
 						WalletType.LTCOnly ->
-							registerSingleAddress(AddressCommissionModel(currentLTCAddress, ChainType.LTC.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentLTCAddress,
+									ChainType.LTC.id,
+									option,
+									id
+								)
+							)
 						WalletType.BTCTestOnly ->
 							registerSingleAddress(
-								AddressCommissionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
+								AddressCommissionModel(
+									currentBTCSeriesTestAddress,
+									ChainType.AllTest.id,
+									option,
+									id
+								)
 							)
 						WalletType.ETHERCAndETCOnly ->
-							registerSingleAddress(AddressCommissionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentETHAndERCAddress,
+									ChainType.ETH.id,
+									option,
+									id
+								)
+							)
 					}
 				}
 			}
@@ -243,6 +276,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),
+					Pair("wallet", model.walletID),
 					Pair("option", model.option),
 					Pair("extra", "bchtest:$bchTestAddress")
 				)
@@ -250,6 +284,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),
+					Pair("wallet", model.walletID),
 					Pair("option", model.option)
 				)
 			}

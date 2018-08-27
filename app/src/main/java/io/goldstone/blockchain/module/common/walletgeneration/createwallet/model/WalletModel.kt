@@ -108,7 +108,7 @@ data class WalletTable(
 
 		fun insert(
 			model: WalletTable,
-			callback: () -> Unit
+			callback: (wallet: WalletTable?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.walletDao().apply {
@@ -119,7 +119,7 @@ data class WalletTable(
 				}.findWhichIsUsing(true)
 			} then {
 				Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
-				callback()
+				callback(it)
 			}
 		}
 
@@ -138,7 +138,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getAll(callback: ArrayList<WalletTable>.() -> Unit = {}) {
+		fun getAll(callback: ArrayList<WalletTable>.() -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
 			} then {
