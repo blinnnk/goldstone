@@ -58,7 +58,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		icon.into(this)
 		tokenInfo.into(this)
 		valueInfo.into(this)
-
+		setHorizontalPadding()
 		tokenInfo.apply {
 			setBoldTiltes()
 			setCenterInVertical()

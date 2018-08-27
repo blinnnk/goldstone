@@ -19,7 +19,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class WalletSettingsListCell(context: Context) : BaseCell(context) {
-	
+
 	var model: WalletSettingsListModel by observing(WalletSettingsListModel()) {
 		title.text = model.title
 		when {
@@ -27,37 +27,35 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
 				description.textColor = Spectrum.red
 				description.text = model.description.setBold().setItalic()
 			}
-			
+
 			else -> description.text = model.description
 		}
 	}
 	private val title = TextView(context)
 	private val description by lazy { TextView(context) }
 	private var titleColor = GrayScale.black
-	
+
 	init {
 		title.apply {
 			textColor = titleColor
 			textSize = fontSize(14)
 			typeface = GoldStoneFont.medium(context)
 		}.into(this)
-		
+
 		description.apply {
 			textSize = fontSize(14)
 			typeface = GoldStoneFont.medium(context)
 			textColor = GrayScale.gray
 			x -= 30.uiPX()
 		}.into(this)
-		
+		setHorizontalPadding()
 		setGrayStyle()
-		
 		title.setCenterInVertical()
-		
 		description.apply {
 			setAlignParentRight()
 			setCenterInVertical()
 		}
-		
+
 		layoutParams.height = 50.uiPX()
 	}
 }

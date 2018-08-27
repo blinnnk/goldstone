@@ -68,6 +68,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 	private val info by lazy { TextView(context) }
 	
 	init {
+		setHorizontalPadding()
 		icon.into(this)
 		title.apply {
 			textColor = Spectrum.white

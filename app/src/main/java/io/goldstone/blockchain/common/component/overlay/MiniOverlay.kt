@@ -40,6 +40,7 @@ class MiniOverlay(
 				addCorner(CornerSize.small, Spectrum.white)
 				elevation = ShadowSize.Overlay
 				BaseCell(context).apply {
+					setHorizontalPadding()
 					layoutParams.height = 40.uiPX()
 					setGrayStyle()
 					imageView {

@@ -30,7 +30,7 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class ChainSelectionCell(context: Context) : BaseCell(context) {
-	
+
 	var model: ChainSelectionModel by observing(ChainSelectionModel()) {
 		icon.imageResource = model.icon
 		titles.title.text = model.title
@@ -55,12 +55,13 @@ class ChainSelectionCell(context: Context) : BaseCell(context) {
 		) 10.uiPX() else 0
 		y += 19.uiPX() + adapting
 	}
-	
+
 	init {
+		setHorizontalPadding()
 		setGrayStyle()
 		hasArrow = true
 		layoutParams.height = cellHeight
-		
+
 		icon
 			.apply {
 				setColorFilter(GrayScale.black)
@@ -68,7 +69,7 @@ class ChainSelectionCell(context: Context) : BaseCell(context) {
 				layoutParams = RelativeLayout.LayoutParams(60.uiPX(), cellHeight)
 			}
 			.into(this)
-		
+
 		titles
 			.apply {
 				setBoldTiltes(GrayScale.black, GrayScale.midGray)
@@ -76,7 +77,7 @@ class ChainSelectionCell(context: Context) : BaseCell(context) {
 				layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 			}
 			.into(this)
-		
+
 		titles.setCenterInVertical()
 	}
 }
