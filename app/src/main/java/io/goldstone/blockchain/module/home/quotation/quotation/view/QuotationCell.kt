@@ -10,7 +10,6 @@ import com.blinnnk.util.observing
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
-import io.goldstone.blockchain.common.component.chart.line.LineChart
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -92,8 +91,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			y += 52.uiPX()
 		}
 	}
-
-	private val lineChart = object : LineChart(context) {
+	private val lineChart = object : QuotationLineChart(context) {
 		override val isDrawPoints: Boolean = false
 		override val isPerformBezier: Boolean = true
 		override val dragEnable: Boolean = false
@@ -101,7 +99,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override val animateEnable: Boolean = false
 		override fun lineLabelCount(): Int = 4
 	}
-
+	
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
