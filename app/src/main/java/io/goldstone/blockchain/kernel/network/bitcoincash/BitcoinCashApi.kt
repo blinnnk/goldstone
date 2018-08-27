@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.bitcoincash
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -23,7 +24,13 @@ object BitcoinCashApi {
 		address: String,
 		hold: (List<UnspentModel>) -> Unit
 	) {
-		BTCSeriesApiUtils.getUnspentListByAddress(BitcoinCashUrl.getUnspentInfo(address), hold)
+		BTCSeriesApiUtils.getUnspentListByAddress(
+			BitcoinCashUrl.getUnspentInfo(address),
+			{
+				LogUtil.error("getUnspentListByAddress", it)
+			},
+			hold
+		)
 	}
 
 	fun getTransactions(
