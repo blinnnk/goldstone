@@ -503,7 +503,7 @@ object GoldStoneAPI {
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(JSONObject(this[0]))
+			hold(JSONObject(first()))
 		}
 	}
 

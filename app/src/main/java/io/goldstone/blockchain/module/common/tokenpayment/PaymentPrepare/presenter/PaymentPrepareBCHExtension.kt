@@ -57,8 +57,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
-		3,
-		false
+		3
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			// TODO Alert

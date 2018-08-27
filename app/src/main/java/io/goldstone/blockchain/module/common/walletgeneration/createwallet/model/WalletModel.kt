@@ -7,6 +7,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -83,22 +84,12 @@ data class WalletTable(
 
 		fun getAddressBySymbol(symbol: String?): String {
 			return when {
-				symbol.equals(CryptoSymbol.btc(), true) -> {
-					if (Config.isTestEnvironment()) {
-						Config.getCurrentBTCSeriesTestAddress()
-					} else {
-						Config.getCurrentBTCAddress()
-					}
-				}
-				symbol.equals(CryptoSymbol.ltc, true) -> {
-					if (Config.isTestEnvironment())
-						Config.getCurrentBTCSeriesTestAddress()
-					else Config.getCurrentLTCAddress()
-				}
-				symbol.equals(CryptoSymbol.bch, true) -> {
-					if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-					else Config.getCurrentBCHAddress()
-				}
+				symbol.equals(CryptoSymbol.btc(), true) ->
+					AddressUtils.getCurrentBTCAddress()
+				symbol.equals(CryptoSymbol.ltc, true) ->
+					AddressUtils.getCurrentLTCAddress()
+				symbol.equals(CryptoSymbol.bch, true) ->
+					AddressUtils.getCurrentBCHAddress()
 				symbol.equals(CryptoSymbol.etc, true) ->
 					Config.getCurrentETCAddress()
 				else ->
@@ -262,7 +253,7 @@ data class WalletTable(
 		fun getTargetWalletType(walletTable: WalletTable): WalletType {
 			val types = listOf(
 				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
-				Pair(WalletType.BTCTestOnly, walletTable.currentBTCAddress),
+				Pair(WalletType.BTCTestOnly, walletTable.currentBTCSeriesTestAddress),
 				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentETHAndERCAddress),
 				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress),
 				Pair(WalletType.BCHOnly, walletTable.currentBCHAddress)
@@ -660,17 +651,18 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteCurrentWallet(callback: () -> Unit) {
+		fun deleteCurrentWallet(callback: (WalletTable?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let { delete(it) }
+					val willDeleteWallet = findWhichIsUsing(true)
+					willDeleteWallet?.let { delete(it) }
 					getAllWallets().let { wallets ->
 						wallets.isEmpty() isTrue {
-							callback()
+							callback(willDeleteWallet)
 						} otherwise {
 							update(wallets.first().apply { isUsing = true })
 							Config.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
-							callback()
+							callback(willDeleteWallet)
 						}
 					}
 				}

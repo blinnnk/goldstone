@@ -19111,7 +19111,7 @@ io.goldstone.blockchain.common.value.Config -> d.a.a.a.f.h:
     boolean isTestEnvironment() -> b
     double getCurrentBalance() -> n
     double getCurrentRate() -> A
-    int getCurrentID() -> l
+    int getCurrentWalletID() -> l
     int getCurrentLanguageCode() -> o
     int getMaxWalletID() -> B
     java.lang.String getBCHCurrentChain() -> t
@@ -19134,7 +19134,7 @@ io.goldstone.blockchain.common.value.Config -> d.a.a.a.f.h:
     java.lang.String getGoldStoneID() -> D
     java.lang.String getLTCCurrentChain() -> r
     java.lang.String getLTCCurrentChainName() -> s
-    java.lang.String getneedUnregisterGoldStoneID() -> E
+    java.lang.String getNeedUnregisterGoldStoneID() -> E
     void updateBCHCurrentChain(java.lang.String) -> l
     void updateBCHCurrentChainName(java.lang.String) -> m
     void updateBTCCurrentChain(java.lang.String) -> p
@@ -19148,7 +19148,7 @@ io.goldstone.blockchain.common.value.Config -> d.a.a.a.f.h:
     void updateCurrentChainName(java.lang.String) -> i
     void updateCurrentETCAddress(java.lang.String) -> b
     void updateCurrentEthereumAddress(java.lang.String) -> a
-    void updateCurrentID(int) -> a
+    void updateCurrentWalletID(int) -> a
     void updateCurrentIsWatchOnlyOrNot(boolean) -> e
     void updateCurrentLTCAddress(java.lang.String) -> e
     void updateCurrentLanguageCode(int) -> b

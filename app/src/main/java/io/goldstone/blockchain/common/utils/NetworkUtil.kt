@@ -15,13 +15,14 @@ import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
  * @date 2018/5/3 3:33 PM
  * @author KaySaith
  */
 object NetworkUtil {
-	
+
 	fun hasNetworkWithAlert(
 		context: Context? = null,
 		alertText: String = DialogText.networkDescription
@@ -32,7 +33,7 @@ object NetworkUtil {
 		if (!status) context?.alert(alertText)
 		return status
 	}
-	
+
 	fun hasNetwork(context: Context? = null): Boolean {
 		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 		val activeNetwork = cm?.activeNetworkInfo
@@ -42,7 +43,7 @@ object NetworkUtil {
 
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
-	
+
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(
 		context: Context,
@@ -51,7 +52,9 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 		NetworkUtil.hasNetwork(context) isTrue {
 			AppConfigTable.getAppConfig {
 				it?.isRegisteredAddresses?.isFalse {
-					XinGePushReceiver.registerAddressesForPush()
+					WalletTable.getCurrentWallet {
+						XinGePushReceiver.registerAddressesForPush(this)
+					}
 				}
 			}
 		} otherwise {

@@ -99,10 +99,10 @@ object Config {
 	fun updateCurrentName(name: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentName, name)
 
-	fun getCurrentID(): Int =
+	fun getCurrentWalletID(): Int =
 		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentID)
 
-	fun updateCurrentID(id: Int) =
+	fun updateCurrentWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentID, id)
 
 	fun getCurrentIsWatchOnlyOrNot(): Boolean =
@@ -310,7 +310,7 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.goldStoneID, goldStoneID)
 
 	// Configs For Review Or UpdateDatabase ETC.
-	fun getneedUnregisterGoldStoneID(): String =
+	fun getNeedUnregisterGoldStoneID(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.unregisterGoldStoneID)
 
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =
