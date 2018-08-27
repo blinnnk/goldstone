@@ -81,11 +81,11 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 
 		marker = object : LineMarkerView(context) {
 			override fun getChartWidth(): Int {
-				return width
+				return this@LineChart.width
 			}
 
 			override fun getChartHeight(): Int {
-				return height
+				return this@LineChart.height
 			}
 		}
 
