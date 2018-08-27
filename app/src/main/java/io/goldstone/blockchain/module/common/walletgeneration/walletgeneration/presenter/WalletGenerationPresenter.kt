@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.presenter
 
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
