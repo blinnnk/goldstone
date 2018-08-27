@@ -27,6 +27,8 @@ data class UnspentModel(
 	)
 }
 
+// 当 `Insight` 数据出问题会重新从 BlockInfo 拉取数据, 配合 `GSON`
+// 这里有需要额外的 `Model`
 data class BlockInfoUnspentModel(
 	@SerializedName("tx_output_n")
 	val outputNumber: Long,

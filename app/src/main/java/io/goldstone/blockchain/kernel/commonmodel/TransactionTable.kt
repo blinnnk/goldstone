@@ -302,7 +302,7 @@ data class TransactionTable(
 			walletAddress: String,
 			contract: String,
 			chainID: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
+			hold: (List<TransactionListModel>) -> Unit
 		) {
 			doAsync {
 				var transactions = GoldStoneDataBase

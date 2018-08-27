@@ -37,7 +37,7 @@ fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse()
+			loadDataFromDatabaseOrElse { _, _ -> }
 		}
 	}
 }

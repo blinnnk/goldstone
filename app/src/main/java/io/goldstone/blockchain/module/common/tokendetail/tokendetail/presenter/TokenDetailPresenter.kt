@@ -114,11 +114,17 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
-		loadDataFromDatabaseOrElse { localData ->
+		loadDataFromDatabaseOrElse { ethERC20OrETCLocalData, localBTCSeriesData ->
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				// This localDataMaxIndex is BTCSeries Transactions Only
-				val localDataMaxIndex = localData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-				fragment.loadDataFromChain(localDataMaxIndex)
+				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
+				// `ETHERC20OrETC` 需要使用到 `localData`
+				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
+					// This localDataMaxIndex is BTCSeries Transactions Only
+					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				} else if (!ethERC20OrETCLocalData.isNull() || !ethERC20OrETCLocalData!!.isEmpty()) {
+					fragment.loadDataFromChain(ethERC20OrETCLocalData!!, 0)
+				}
 			}
 		}
 	}
@@ -130,10 +136,13 @@ class TokenDetailPresenter(
 	private var hasUpdateETHData = false
 	private var hasUpdateBCHData = false
 
-	private fun TokenDetailFragment.loadDataFromChain(localDataMaxIndex: Int) {
+	private fun TokenDetailFragment.loadDataFromChain(
+		localETHERC20OrETCData: List<TransactionListModel>,
+		localDataMaxIndex: Int
+	) {
 		when {
 			token?.symbol.equals(CryptoSymbol.etc, true) -> {
-				if (!hasUpdateETCData) loadETCChainData()
+				if (!hasUpdateETCData) loadETCChainData(localETHERC20OrETCData)
 				hasUpdateETCData = true
 			}
 
@@ -153,54 +162,60 @@ class TokenDetailPresenter(
 			}
 
 			token?.symbol.equals(CryptoSymbol.eth, true) -> {
-				if (!hasUpdateETHData) loadETHChainData()
+				if (!hasUpdateETHData) loadETHChainData(localETHERC20OrETCData)
 				hasUpdateETHData = true
 			}
 
 			else -> {
-				if (!hasUpdateERCData) loadERCChainData()
+				if (!hasUpdateERCData) loadERCChainData(localETHERC20OrETCData)
 				hasUpdateERCData = true
 			}
 		}
 	}
 
 	fun loadDataFromDatabaseOrElse(
-		callback: (localData: List<BTCSeriesTransactionTable>?) -> Unit = {}
+		callback: (
+			localETHERC20OrETCData: List<TransactionListModel>?,
+			localBtcSeriesData: List<BTCSeriesTransactionTable>?
+		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
 			WalletType.MultiChain.content -> {
 				when {
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
 						getETHERC20OrETCData(Config.getCurrentETCAddress()) {
-							callback(null)
+							callback(it, null)
 						}
 
 					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBTCAddress(),
-							ChainType.BTC.id,
-							callback
-						)
+							ChainType.BTC.id
+						) {
+							callback(null, it)
+						}
 					}
 
 					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentLTCAddress(),
-							ChainType.LTC.id,
-							callback
-						)
+							ChainType.LTC.id
+						) {
+							callback(null, it)
+						}
 					}
 
 					token?.symbol.equals(CryptoSymbol.bch, true) -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBCHAddress(),
-							ChainType.BCH.id,
-							callback
-						)
+							ChainType.BCH.id
+						) {
+							callback(null, it)
+						}
 					}
 
 					else -> getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
-						callback(null)
+						callback(it, null)
 					}
 				}
 			}
@@ -208,36 +223,39 @@ class TokenDetailPresenter(
 			WalletType.BCHOnly.content ->
 				getBTCSeriesData(
 					Config.getCurrentBCHAddress(),
-					ChainType.BTC.id,
-					callback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 
 			WalletType.ETHERCAndETCOnly.content ->
 				getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
-					callback(null)
+					callback(it, null)
 				}
 
 			WalletType.BTCTestOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCSeriesTestAddress(),
-					ChainType.BTC.id,
-					callback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 			}
 
 			WalletType.BTCOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCAddress(),
-					ChainType.BTC.id,
-					callback
-				)
+					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
 			}
 		}
 	}
 
 	private fun getETHERC20OrETCData(
 		address: String,
-		callback: () -> Unit
+		callback: (List<TransactionListModel>) -> Unit
 	) {
 		TransactionTable.getCurrentChainByAddressAndContract(
 			address,
@@ -247,10 +265,8 @@ class TokenDetailPresenter(
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(transactions, address)
 				fragment.removeLoadingView()
-			} otherwise {
-				callback()
-				LogUtil.debug(this.javaClass.simpleName, "There isn't Local Transaction Data")
 			}
+			callback(transactions)
 		}
 	}
 

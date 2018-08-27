@@ -16,16 +16,16 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadETCChainData() {
+fun TokenDetailPresenter.loadETCChainData(localData: List<TransactionListModel>) {
 	fragment.showLoadingView(LoadingText.transactionData)
-	getETCTransactionsFromChain(arrayListOf()) {
+	getETCTransactionsFromChain(localData) {
 		fragment.removeLoadingView()
-		loadDataFromDatabaseOrElse()
+		loadDataFromDatabaseOrElse { _, _ -> }
 	}
 }
 
 fun TokenDetailPresenter.getETCTransactionsFromChain(
-	localData: ArrayList<TransactionListModel>,
+	localData: List<TransactionListModel>,
 	callback: () -> Unit
 ) {
 	doAsync {
@@ -38,7 +38,7 @@ fun TokenDetailPresenter.getETCTransactionsFromChain(
 
 private fun loadDataFromChain(
 	blockNumber: String,
-	localData: ArrayList<TransactionListModel>,
+	localData: List<TransactionListModel>,
 	callback: () -> Unit
 ) {
 	GoldStoneAPI.getETCTransactions(

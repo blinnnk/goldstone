@@ -16,6 +16,8 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
+// 因为翻页机制利用了 Insight 的特殊接口 `from/to` 所以没有额外增加
+// `BlockInfo` 的备份接口
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentLTCAddress()
@@ -38,7 +40,7 @@ fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse()
+			loadDataFromDatabaseOrElse { _, _ -> }
 		}
 	}
 }
