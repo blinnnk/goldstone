@@ -107,8 +107,7 @@ object BTCSeriesApiUtils {
 				LogUtil.error("getDoubleBalance", it)
 			}
 		) {
-			val count = first().toDoubleOrNull() ?: 0.0
-			hold(count)
+			hold(firstOrNull()?.toDoubleOrNull() ?: 0.0)
 		}
 	}
 

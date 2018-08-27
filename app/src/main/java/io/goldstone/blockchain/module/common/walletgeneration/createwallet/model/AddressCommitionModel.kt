@@ -7,5 +7,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 data class AddressCommissionModel(
 	val address: String,
 	val chainType: Int,
-	val option: Int
+	val option: Int,
+	val walletID: Int
 )

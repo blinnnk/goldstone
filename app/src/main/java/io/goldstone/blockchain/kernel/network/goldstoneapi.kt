@@ -473,24 +473,6 @@ object GoldStoneAPI {
 			}
 		}
 	}
-
-	fun getQuotationCurrencyChart(
-		pair: String,
-		period: String,
-		size: Int,
-		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<ChartModel>) -> Unit
-	) {
-		requestData<ChartModel>(
-			APIPath.getQuotationCurrencyChart(APIPath.currentUrl, pair, period, size),
-			"point_list",
-			false,
-			errorCallback,
-			isEncrypt = true
-		) {
-			hold(this.toArrayList())
-		}
-	}
 	
 	fun getQuotationCurrencyCandleChart(
 		pair: String,
