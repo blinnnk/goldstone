@@ -4,7 +4,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil

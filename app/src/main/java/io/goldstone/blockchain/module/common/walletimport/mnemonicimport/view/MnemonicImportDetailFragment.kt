@@ -2,15 +2,11 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View.OVER_SCROLL_ALWAYS
 import android.widget.LinearLayout
-import android.widget.OverScroller
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton

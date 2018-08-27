@@ -18062,7 +18062,7 @@ io.goldstone.blockchain.common.component.button.CircleButton -> d.a.a.a.c.a.h:
     int access$getIconSize$p(io.goldstone.blockchain.common.component.button.CircleButton) -> for
     void setStyleParameter$default(io.goldstone.blockchain.common.component.button.CircleButton,com.blinnnk.uikit.Size,int,int,int,int,java.lang.Object) -> do
     void setTitleStyle$default(io.goldstone.blockchain.common.component.button.CircleButton,float,int,android.graphics.Typeface,int,java.lang.Object) -> do
-    void removeRedot() -> a
+    void removeRedDot() -> a
     void setDefaultStyle() -> c
     void setStyleParameter(com.blinnnk.uikit.Size,int,int,int) -> do
     void setTitleStyle(float,int,android.graphics.Typeface) -> do

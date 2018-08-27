@@ -101,7 +101,7 @@ class WalletDetailFragment :
 	}
 
 	fun recoveryNotifyButtonStyle() {
-		slideHeader.notifyButton.removeRedot()
+		slideHeader.notifyButton.removeRedDot()
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {

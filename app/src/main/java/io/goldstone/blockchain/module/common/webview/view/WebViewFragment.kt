@@ -16,7 +16,7 @@ import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.common.language.SplashText

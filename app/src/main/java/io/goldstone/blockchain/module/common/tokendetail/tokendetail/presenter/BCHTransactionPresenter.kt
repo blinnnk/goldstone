@@ -16,7 +16,7 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadBCHChainData() {
+fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactionCount(
@@ -28,7 +28,7 @@ fun TokenDetailPresenter.loadBCHChainData() {
 	) { transactionCount ->
 		loadBCHTransactionsFromChain(
 			address,
-			0,
+			localDataMaxIndex,
 			transactionCount,
 			{
 				fragment.removeLoadingView()
