@@ -93,7 +93,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		}
 	}
 	
-	private val linechart = object : LineChart(context) {
+	private val linechart = object : QuotationLineChart(context) {
 		override val isDrawPoints: Boolean = false
 		override val isPerformBezier: Boolean = true
 		override val dragEnable: Boolean = false

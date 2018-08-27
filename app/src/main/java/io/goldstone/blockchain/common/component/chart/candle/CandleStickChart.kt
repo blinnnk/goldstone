@@ -8,18 +8,16 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.charts.BarLineChartBase
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.*
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.*
+import java.math.BigDecimal
 
 /**
  * @date: 2018/8/1.
@@ -33,7 +31,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	private var realData = arrayListOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
-	
   constructor(context: Context) : super(context)
   
   constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -54,12 +51,16 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	
 	open fun resetData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
 		postCalculate()
+		calculateHandler.postDelayed(disCalculateRunnable, 2000)
 		notifyData(dateType, dataRows)
 	}
 	
 	private fun notifyData(dateType: Int, dataRows: ArrayList<CandleEntry>) {
 		this.dateType = dateType
-		realData = dataRows
+		if (realData != dataRows){
+			realData = dataRows
+			resetFormatLimit()
+		}
 		isScaleXEnabled = false
 		isScaleYEnabled = false
 		val candleDecreasingColor = Spectrum.red
@@ -171,6 +172,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			setLabelCount(leftLabelCount, true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
+			valueFormatter = CandleLeftLabelFormatter(6)
 	
 		}
     with(axisRight) {
@@ -240,6 +242,28 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		}
 	}
 	
+	fun resetFormatLimit() {
+		val valueString = BigDecimal(realData[0].high.toString()).toPlainString()
+		if (!valueString.contains(".")){
+			axisLeft.valueFormatter = CandleLeftLabelFormatter(0)
+		}else {
+			var pointIndex = 0
+			valueString.forEachIndexed { index, c ->
+				if (c == '.') {
+					pointIndex = index
+				}else if (pointIndex > 0){
+					if (c != '0') {
+						val formatLimit = index + 2 - pointIndex
+						axisLeft.valueFormatter = CandleLeftLabelFormatter(formatLimit)
+						return
+					}
+				}
+			}
+		}
+		
+		
+	}
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -260,7 +284,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			measurePaint.textSize = axisLeft.textSize
 			val rect = Rect()
 			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
-			if (buffers[0] > rect.width() + 20) {
+			if (buffers[0] > rect.width()) {
 				resetMaxMin(index)
 				return
 			}
@@ -317,4 +341,8 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	}
 	
 	abstract fun formateDateByType(date: Long) : String
+	
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
+	}
 }
