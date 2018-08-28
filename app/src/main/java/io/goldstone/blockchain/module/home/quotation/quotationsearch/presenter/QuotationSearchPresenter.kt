@@ -106,9 +106,14 @@ class QuotationSearchPresenter(
 	companion object {
 		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(parameter) {
+			GoldStoneAPI.getCurrencyLineChartData(
+				parameter,
+				{
+					LogUtil.error("getCurrencyLineChartData", it)
+				}
+			) {
 				it.isNotEmpty() isTrue {
-					hold(it[0].pointList.toString())
+					hold(it.first().pointList.toString())
 				} otherwise {
 					LogUtil.error("Empty pair data from server")
 				}

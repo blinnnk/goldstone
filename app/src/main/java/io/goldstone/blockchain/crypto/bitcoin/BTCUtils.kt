@@ -81,10 +81,10 @@ object BTCUtils {
 	}
 }
 
-enum class AddressType(val value: String) {
-	ETHERCOrETC("ethERCOrETC"),
-	BTC("btc"),
-	BCH("bch"),
-	BTCSeriesTest("btcTest"),
-	LTC("ltc")
+enum class AddressType(val value: String, val symbol: String) {
+	ETHERCOrETC("ethERCOrETC", CryptoSymbol.eth),
+	BTC("btc", CryptoSymbol.pureBTCSymbol),
+	BCH("bch", CryptoSymbol.bch),
+	BTCSeriesTest("btcTest", CryptoSymbol.pureBTCSymbol),
+	LTC("ltc", CryptoSymbol.ltc)
 }

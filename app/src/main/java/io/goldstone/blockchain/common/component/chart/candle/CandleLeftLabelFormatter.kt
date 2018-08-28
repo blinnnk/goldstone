@@ -7,24 +7,21 @@ import java.text.DecimalFormat
 /**
  * @date: 2018/8/27.
  * @author: yanglihai
- * @description: 左侧label的显示转换器
+ * @description: 左侧label的显示转换器 小数点后边保留几位
  */
-class CandleLeftLabelFormatter : IAxisValueFormatter {
-	
+class CandleLeftLabelFormatter(digits: Int) : IAxisValueFormatter {
+
 	private var mFormat: DecimalFormat
-	
-	/**
-	 * [digits] 小数点后边保留几位
-	 */
-	constructor(digits: Int) {
-		val b = StringBuffer()
-		for (i in 0 until digits) {
-			if (i == 0) b.append(".")
-			b.append("0")
+
+	init {
+		val stringBuffer = StringBuffer()
+		for (index in 0 until digits) {
+			if (index == 0) stringBuffer.append(".")
+			stringBuffer.append("0")
 		}
-		mFormat = DecimalFormat("###,###,###,##0" + b.toString())
+		mFormat = DecimalFormat("###,###,###,##0" + stringBuffer.toString())
 	}
-	
+
 	override fun getFormattedValue(
 		value: Float,
 		axis: AxisBase?

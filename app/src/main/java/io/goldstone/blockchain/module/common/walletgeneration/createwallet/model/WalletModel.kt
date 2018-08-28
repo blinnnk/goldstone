@@ -263,7 +263,7 @@ data class WalletTable(
 			return when (types.size) {
 				5 -> WalletType.MultiChain
 				else -> try {
-					types[0].first
+					types.first().first
 				} catch (error: Exception) {
 					// 解析出错的时候显示默认值
 					WalletType.MultiChain
@@ -645,7 +645,7 @@ data class WalletTable(
 					}
 					getWalletByAddress(walletAddress)?.let { wallet ->
 						update(wallet.apply { wallet.isUsing = true })
-						callback(wallet)
+						GoldStoneAPI.context.runOnUiThread { callback(wallet) }
 					}
 				}
 			}

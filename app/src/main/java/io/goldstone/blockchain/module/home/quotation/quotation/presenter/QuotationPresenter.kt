@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
@@ -55,7 +56,7 @@ class QuotationPresenter(
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 
 			selections.map { selection ->
-				var linechart = arrayListOf<ChartPoint>()
+				var linechart = listOf<ChartPoint>()
 				if (!selection.lineChartDay.isBlank()) {
 					linechart = convertDataToChartData(selection.lineChartDay)
 				}
@@ -113,20 +114,17 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
+	private fun List<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
 		if (isEmpty()) return
-		sortedByDescending {
-			it.label.toLong()
-		}.let {
-			/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
-			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
-				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
-					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
-						/** 防止服务器数据出错或不足, 可能导致的死循环 */
-						if (updateChartTimes.orZero() > 0) {
-							updateData()
-							updateChartTimes = updateChartTimes.orZero() - 1
-						}
+		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
+		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
+		if (maxDate + 1L < 0.daysAgoInMills()) {
+			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
+				QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
+					/** 防止服务器数据出错或不足, 可能导致的死循环 */
+					if (updateChartTimes.orZero() > 0) {
+						updateData()
+						updateChartTimes = updateChartTimes.orZero() - 1
 					}
 				}
 			}
@@ -188,9 +186,11 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
+	private fun convertDataToChartData(data: String): List<ChartPoint> {
 		val jsonArray = JSONArray(data)
-		val maxIndexOfData = if ( jsonArray.length() > 8) 8 else  jsonArray.length()
+		val maxIndexOfData =
+			if (jsonArray.length() > DataValue.quotationDataCount) DataValue.quotationDataCount
+			else jsonArray.length()
 		(0 until maxIndexOfData).map {
 			val timeStamp = jsonArray.getJSONObject(it).safeGet("time").toLong()
 			ChartPoint(
@@ -202,7 +202,7 @@ class QuotationPresenter(
 		}.sortedBy {
 			it.label.toLong()
 		}.let {
-			return it.toArrayList()
+			return it
 		}
 	}
 

@@ -159,7 +159,10 @@ data class MyTokenTable(
 			}
 		}
 
-		fun deleteByAddress(address: String, callback: () -> Unit) {
+		fun deleteByAddress(
+			address: String,
+			callback: () -> Unit
+		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					val allTokens = getAllTokensBy(address)
