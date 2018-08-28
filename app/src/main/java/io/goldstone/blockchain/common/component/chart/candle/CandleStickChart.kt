@@ -19,13 +19,13 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import java.math.BigDecimal
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import java.math.BigDecimal
 
 /**
  * @date: 2018/8/1.
@@ -64,7 +64,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 
 	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {
 		this.dateType = dateType
-		if (realData != dataRows){
+		if (realData != dataRows) {
 			realData = dataRows
 			resetFormatLimit()
 		}
@@ -224,17 +224,17 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			notifyData(dateType, realData)
 		}
 	}
-	
+
 	private fun resetFormatLimit() {
 		val valueString = BigDecimal(realData[0].high.toString()).toPlainString()
-		if (!valueString.contains(".")){
+		if (!valueString.contains(".")) {
 			axisLeft.valueFormatter = CandleLeftLabelFormatter(0)
-		}else {
+		} else {
 			var pointIndex = 0
 			valueString.forEachIndexed { index, c ->
 				if (c == '.') {
 					pointIndex = index
-				}else if (pointIndex > 0){
+				} else if (pointIndex > 0) {
 					if (c != '0') {
 						val formatLimit = index + 2 - pointIndex
 						axisLeft.valueFormatter = CandleLeftLabelFormatter(formatLimit)
@@ -243,9 +243,10 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 				}
 			}
 		}
-		
-		
+
+
 	}
+
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -320,5 +321,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			mIndicesToHighlight = this
 		}
 	}
+
 	abstract fun formattedDateByType(date: Long): String
 }

@@ -49,8 +49,11 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setCharData(data: ArrayList<ChartPoint>) {
-		lineChart.resetData(data.mapIndexed { index, chartPoint ->
-			Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-		}.toArrayList(), true)
+		lineChart.resetDataWithTargetLabelCount(
+			data.mapIndexed { index, chartPoint ->
+				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
+			},
+			true
+		)
 	}
 }

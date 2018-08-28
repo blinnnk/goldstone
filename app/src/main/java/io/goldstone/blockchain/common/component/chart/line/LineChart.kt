@@ -20,6 +20,7 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -93,11 +94,17 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			valueFormatter = IAxisValueFormatter { value, _ ->
 				val valueData = (data?.getDataSetByIndex(0) as? LineDataSet)?.values
 				val position = value.toInt()
-				val entry = valueData?.get(position)
+				val entry = try {
+					valueData?.get(position)
+				} catch (error: Exception) {
+					LogUtil.error("LineChart getFormattedValue", error)
+					return@IAxisValueFormatter ""
+				}
+				val label = entry?.data.toString().toLongOrNull()
 				when {
 					position > valueData?.lastIndex.orZero() -> ""
-					entry?.data.toString().toLongOrNull().isNull() -> entry?.data?.toString().orEmpty()
-					else -> TimeUtils.formatMdDate(entry?.data?.toString()?.toLongOrNull().orElse(0L))
+					label.isNull() -> entry?.data?.toString().orEmpty()
+					else -> TimeUtils.formatMdDate(label.orElse(0L))
 				}
 			}
 			position = XAxis.XAxisPosition.BOTTOM
@@ -130,16 +137,16 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		}
 	}
 
-	fun resetData(dataRows: List<Entry>, fitLabelCount: Boolean) {
+	fun resetDataWithTargetLabelCount(dataRows: List<Entry>, fitLabelCount: Boolean) {
 		if (fitLabelCount) {
-			mXAxis.labelCount = dataRows.lastIndex
+			xAxis.setLabelCount(dataRows.lastIndex, true)
 		}
 		resetData(dataRows)
 	}
 
 	open fun resetData(dataRows: List<Entry>) {
 		val pointColor = Spectrum.deepBlue
-		val chartWidth = 3f
+		val chartWidth = 3.5f
 		val dataSet: LineDataSet?
 		if (!mData.isNull() && mData.dataSetCount > 0) {
 			dataSet = mData.getDataSetByIndex(0) as? LineDataSet
@@ -155,13 +162,11 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 					val entryBean = entry.data as? Entry
 					entryBean?.y.toString()
 				}
-
-				// 平划的曲线
+				// 平滑的曲线
 				if (isPerformBezier) {
-					mode = LineDataSet.Mode.CUBIC_BEZIER
-					cubicIntensity = 0.3f
+					mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+					cubicIntensity = 0.5f
 				}
-
 				setDrawIcons(false) // 显示图标
 				setDrawValues(false) // 展示每个点的值
 				color = chartColor

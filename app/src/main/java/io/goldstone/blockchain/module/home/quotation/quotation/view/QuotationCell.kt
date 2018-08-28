@@ -55,10 +55,11 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			}
 		}
 
-		lineChart.resetData(
+		lineChart.resetDataWithTargetLabelCount(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-			}.toArrayList()
+			}.toArrayList(),
+			true
 		)
 		
 		exchangeName.text = model.exchangeName
@@ -97,7 +98,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override val dragEnable: Boolean = false
 		override val touchEnable: Boolean = false
 		override val animateEnable: Boolean = false
-		override fun lineLabelCount(): Int = 4
+		override fun lineLabelCount(): Int = 5
 	}
 	
 	init {

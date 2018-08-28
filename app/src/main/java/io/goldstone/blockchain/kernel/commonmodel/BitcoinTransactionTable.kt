@@ -127,9 +127,10 @@ data class BTCSeriesTransactionTable(
 				toAddresses += JSONArray(JSONObject(JSONObject(out[it].toString()).safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 			}
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
-			return toAddresses.filterNot {
+			val finalToAddress = toAddresses.filterNot {
 				it.equals(getFromAddress(data), true)
 			}
+			return if (finalToAddress.isEmpty()) toAddresses.subList(0, 1) else finalToAddress
 		}
 
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {

@@ -12,7 +12,7 @@ data class QuotationModel(
 	val name: String = "",
 	var price: String = "",
 	var percent: String = "",
-	val chartData: ArrayList<ChartPoint> = arrayListOf(),
+	val chartData: List<ChartPoint> = listOf(),
 	val exchangeName: String = "",
 	val orderID: Double = 0.0,
 	val pairDisplay: String = "",
@@ -26,7 +26,7 @@ data class QuotationModel(
 		data: QuotationSelectionTable,
 		price: String,
 		percent: String,
-		chartData: ArrayList<ChartPoint>
+		chartData: List<ChartPoint>
 	) : this(
 		data.baseSymbol.toUpperCase(),
 		data.name.toLowerCase(),

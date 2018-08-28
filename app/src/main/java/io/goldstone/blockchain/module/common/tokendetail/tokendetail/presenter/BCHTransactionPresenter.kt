@@ -38,7 +38,6 @@ fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			// TODO 判断数据
 			loadDataFromDatabaseOrElse { _, _ -> }
 		}
 	}
@@ -68,7 +67,7 @@ private fun loadBCHTransactionsFromChain(
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
-				pageInfo.maxDataIndex - index,
+				pageInfo.maxDataIndex + index + 1,
 				address,
 				CryptoSymbol.bch,
 				false,

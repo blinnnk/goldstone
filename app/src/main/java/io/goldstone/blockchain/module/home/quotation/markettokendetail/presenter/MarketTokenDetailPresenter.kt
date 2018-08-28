@@ -231,7 +231,8 @@ class MarketTokenDetailPresenter(
 		period: String,
 		dateType: Int
 	) {
-		val size = 100 // 请求的数据条目数量
+		// 请求的数据条目数量
+		val size = DataValue.candleChartCount
 		fragment.getMainActivity()?.showLoadingView()
 		GoldStoneAPI.getQuotationCurrencyCandleChart(
 			pair,

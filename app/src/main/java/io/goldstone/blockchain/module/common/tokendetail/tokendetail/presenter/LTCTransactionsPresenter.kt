@@ -69,7 +69,7 @@ private fun loadLitecoinTransactionsFromChain(
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
-				pageInfo.maxDataIndex - index,
+				pageInfo.maxDataIndex + index + 1,
 				address,
 				CryptoSymbol.ltc,
 				false,

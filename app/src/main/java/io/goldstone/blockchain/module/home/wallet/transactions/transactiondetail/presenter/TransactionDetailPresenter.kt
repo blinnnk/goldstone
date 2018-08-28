@@ -248,7 +248,7 @@ class TransactionDetailPresenter(
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let { models ->
-			return if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol)) {
+			return if (CryptoSymbol.isBTCSeriesSymbol(getUnitSymbol())) {
 				// 如果是 `比特币` 账单不显示 `Memo`
 				models.filterNot {
 					it.description.equals(TransactionText.memo, true)
