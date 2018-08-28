@@ -27,7 +27,8 @@ enum class WalletType(val content: String) {
 
 object DataValue {
 	const val pageCount = 50
-
+	const val quotationDataCount = 10
+	const val candleChartCount = 100
 }
 
 data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int) : Serializable

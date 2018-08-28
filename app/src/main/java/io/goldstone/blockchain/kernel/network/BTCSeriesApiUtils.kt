@@ -170,6 +170,6 @@ object BTCSeriesApiUtils {
 		val willGetDataCount =
 			if (transactionCount - localDataMaxIndex > DataValue.pageCount) DataValue.pageCount
 			else transactionCount - localDataMaxIndex
-		return PageInfo(0, willGetDataCount, transactionCount)
+		return PageInfo(0, willGetDataCount, localDataMaxIndex)
 	}
 }

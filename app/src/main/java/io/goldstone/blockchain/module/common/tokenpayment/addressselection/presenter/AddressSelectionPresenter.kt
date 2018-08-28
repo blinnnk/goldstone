@@ -78,7 +78,13 @@ class AddressSelectionPresenter(
 				}
 			}
 		} else {
-			fragment.context.alert(QRText.invalidQRCodeAlert)
+			// 如果不是 `681` 格式的 `QRCode` 那么当作纯地址进行检测
+			val addressType = isValidMultiChainAddress(result, token?.symbol.orEmpty())
+			if (
+				addressType.isNull() ||
+				!addressType?.symbol.equals(token?.symbol, true)
+			) fragment.context.alert(QRText.invalidQRCodeAlert)
+			else showPaymentPrepareFragment(result, 0.0)
 		}
 	}
 

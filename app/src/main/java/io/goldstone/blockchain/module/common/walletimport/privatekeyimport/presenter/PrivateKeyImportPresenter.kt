@@ -149,6 +149,7 @@ class PrivateKeyImportPresenter(
 			// 检查比特币私钥地址格式是否是对应的网络
 			if (!LTCWalletUtils.isValidWIFKey(wifPrivateKey, ChainPrefix.Litecoin)) {
 				context?.alert(ImportWalletText.invalidLTCPrivateKey)
+				callback(false)
 				return
 			}
 			LTCWalletUtils.generateBase58AddressByWIFKey(wifPrivateKey, ChainPrefix.Litecoin).let { address ->

@@ -22,7 +22,6 @@ import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoDat
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -361,7 +360,7 @@ object GoldStoneAPI {
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		errorCallback: (Exception) -> Unit = {},
+		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
 	) {
 		postRequestGetJsonObject<QuotationSelectionLineChartModel>(
@@ -473,7 +472,7 @@ object GoldStoneAPI {
 			}
 		}
 	}
-	
+
 	fun getQuotationCurrencyCandleChart(
 		pair: String,
 		period: String,
