@@ -122,7 +122,7 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 							priceAlarmTable.createTime = formatDate
 							priceAlarmTable.status = true
 							PriceAlarmListPresenter.insertAlarmToDatabase(priceAlarmTable) {
-								PriceAlarmListPresenter.getLocalData() {
+								PriceAlarmListPresenter.getLocalDataRefreshList() {
 									PriceAlarmListPresenter.updateData()
 									currentAlarmSize = this.size
 								}
