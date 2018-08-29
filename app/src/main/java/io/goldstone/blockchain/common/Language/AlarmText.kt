@@ -240,6 +240,17 @@ object AlarmText {
 		else -> ""
 	}
 
+	@JvmField
+	val alarmNumberMaximumPrompt = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Confirm Delete?"
+		HoneyLanguage.Chinese.code -> "已达到闹铃设置最大个数"
+		HoneyLanguage.Japanese.code -> "アラームエディタ"
+		HoneyLanguage.Korean.code -> "알람 편집기"
+		HoneyLanguage.Russian.code -> "Редактор сигналов тревоги"
+		HoneyLanguage.TraditionalChinese.code -> "報警編輯器"
+		else -> ""
+	}
+
 	val priceAlarmContent: (priceAlarmTable: PriceAlarmTable) -> String = { priceAlarmTable ->
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> if (priceAlarmTable.priceType == ArgumentKey.greaterThanForPriceType) {

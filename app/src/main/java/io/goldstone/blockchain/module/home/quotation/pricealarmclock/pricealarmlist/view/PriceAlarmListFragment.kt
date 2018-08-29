@@ -133,7 +133,7 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 					}.into(this)
 				}
 			} else {
-				overlayView.context?.toast("已达到闹铃设置最大个数")
+				overlayView.context?.toast(AlarmText.alarmNumberMaximumPrompt)
 			}
 		}
 	}
