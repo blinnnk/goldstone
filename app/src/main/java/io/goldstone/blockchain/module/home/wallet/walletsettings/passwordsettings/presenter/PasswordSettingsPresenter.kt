@@ -1,13 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getDeviceBrand
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.Address
@@ -97,9 +99,7 @@ class PasswordSettingsPresenter(
 							}
 						}
 
-						override fun mergeCallBack() {
-							autoBack()
-						}
+						override fun mergeCallBack() = autoBack()
 					}.start()
 				}
 				// 删除 `BTCTest` 包下的所有地址对应的数据
@@ -200,10 +200,12 @@ class PasswordSettingsPresenter(
 		}
 	}
 
+	@UiThread
 	private fun autoBack() {
 		fragment.getParentFragment<WalletSettingsFragment> {
+			// `VIVO` 手机显示 `toast` 会出错
+			if (!getDeviceBrand().contains("vivo", true)) activity?.toast(CommonText.succeed)
 			presenter.showTargetFragmentByTitle(WalletSettingsText.walletSettings)
-			fragment.activity?.toast(CommonText.succeed)
 		}
 	}
 }

@@ -19464,8 +19464,8 @@ io.goldstone.blockchain.common.language.TransactionText -> d.a.a.a.c.C:
     java.lang.String url -> f
 io.goldstone.blockchain.common.language.WalletNameText -> d.a.a.a.c.D:
     io.goldstone.blockchain.common.language.WalletNameText INSTANCE -> r
-    java.lang.String Bear -> b
     java.lang.String Bull -> l
+    java.lang.String Cat -> b
     java.lang.String Deer -> n
     java.lang.String Elephant -> c
     java.lang.String Fox -> g
@@ -19626,6 +19626,7 @@ io.goldstone.blockchain.common.utils.ExtensionKt -> d.a.a.a.d.y:
     android.view.View click(android.view.View,kotlin.jvm.functions.Function1) -> if
     io.goldstone.blockchain.module.home.home.view.MainActivity getMainActivity(android.support.v4.app.Fragment) -> throws
     java.lang.Integer getDecimalCount(java.lang.String) -> a
+    java.lang.String getDeviceBrand() -> a
     java.lang.String showAfterColonContent(java.lang.String) -> b
     void alert(android.content.Context,java.lang.String) -> throw
     void showAlertView$default(android.content.Context,java.lang.String,java.lang.String,boolean,kotlin.jvm.functions.Function0,kotlin.jvm.functions.Function1,int,java.lang.Object) -> do
@@ -20308,7 +20309,7 @@ io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1 -> d.a.a.b.V:
     io.goldstone.blockchain.crypto.bitcoin.MultiChainPath $path -> b
     java.lang.String $password -> c
     kotlin.jvm.functions.Function2 $hold -> d
-    void invoke(java.lang.String,java.lang.String) -> finally
+    void invoke(java.lang.String,java.lang.String) -> package
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1 -> d.a.a.b.U:
     io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1 this$0 -> a
     java.lang.String $ethAddress -> c
@@ -20316,11 +20317,11 @@ io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1 -> d.a.a.b.U:
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1$1 -> d.a.a.b.T:
     io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1 this$0 -> a
     java.lang.String $etcAddress -> b
-    void invoke(java.lang.String,java.lang.String) -> extends
+    void invoke(java.lang.String,java.lang.String) -> finally
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1$1$1 -> d.a.a.b.S:
     io.goldstone.blockchain.crypto.GenerateMultiChainWallet$create$1$1$1 this$0 -> a
     java.lang.String $btcAddress -> b
-    void invoke(java.lang.String,java.lang.String) -> default
+    void invoke(java.lang.String,java.lang.String) -> extends
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1 -> d.a.a.b.Z:
     android.content.Context $context -> b
     io.goldstone.blockchain.crypto.bitcoin.MultiChainPath $path -> d
@@ -20333,11 +20334,11 @@ io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1$1 -> d.a.a.b.Y:
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1$1$1 -> d.a.a.b.X:
     io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1$1 this$0 -> a
     java.lang.String $etcAddress -> b
-    void invoke(java.lang.String,java.lang.String) -> private
+    void invoke(java.lang.String,java.lang.String) -> abstract
 io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1$1$1$1 -> d.a.a.b.W:
     io.goldstone.blockchain.crypto.GenerateMultiChainWallet$import$1$1$1 this$0 -> a
     java.lang.String $btcAddress -> b
-    void invoke(java.lang.String,java.lang.String) -> package
+    void invoke(java.lang.String,java.lang.String) -> private
 io.goldstone.blockchain.crypto.KeystoreModel -> d.a.a.b.ba:
     int dklen -> f
     int n -> g
@@ -20656,10 +20657,12 @@ io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils -> d.a.a.b.h.h:
     io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils INSTANCE -> a
     boolean isValidAddress(java.lang.String) -> a
     boolean isValidWIFKey(java.lang.String,io.goldstone.blockchain.crypto.litecoin.ChainPrefix) -> int
-    io.goldstone.blockchain.crypto.litecoin.BaseKeyPair generateBase58Keypair(java.lang.String,java.lang.String,io.goldstone.blockchain.crypto.litecoin.ChainPrefix,boolean) -> do
+    io.goldstone.blockchain.crypto.litecoin.BaseKeyPair generateBase58Keypair(java.lang.String,java.lang.String) -> return
+    java.lang.String generateBase58Address(java.math.BigInteger) -> long
     java.lang.String generateBase58Address(java.math.BigInteger,io.goldstone.blockchain.crypto.litecoin.ChainPrefix,boolean) -> if
     java.lang.String generateBase58AddressByWIFKey(java.lang.String,io.goldstone.blockchain.crypto.litecoin.ChainPrefix) -> if
     java.lang.String generateWIFPrivatekey(java.math.BigInteger,io.goldstone.blockchain.crypto.litecoin.ChainPrefix,boolean) -> do
+    java.lang.String generateWIFSecret(java.math.BigInteger) -> goto
     java.lang.String getPrivateKeyFromWIFKey(java.lang.String,io.goldstone.blockchain.crypto.litecoin.ChainPrefix) -> for
 io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams -> d.a.a.b.h.i:
 io.goldstone.blockchain.crypto.utils.CryptoUtils -> d.a.a.b.i.c:
@@ -20702,7 +20705,7 @@ io.goldstone.blockchain.crypto.utils.CryptoUtilsKt -> d.a.a.b.i.d:
     java.lang.String getObjectMD5HexString(java.util.List) -> default
     java.lang.String toAddressCode(java.lang.String) -> c
     java.lang.String toAddressFromCode(java.lang.String) -> d
-    java.lang.String toDataString(java.math.BigInteger) -> goto
+    java.lang.String toDataString(java.math.BigInteger) -> this
     java.lang.String toDataStringFromAddress(java.lang.String) -> a
     java.lang.String toGWeiValue(double) -> catch
     java.lang.String toGasValue(double) -> break
@@ -21164,8 +21167,8 @@ io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable$Companion -
     java.lang.String access$getTransactionValue(io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable$Companion,org.json.JSONObject,java.lang.String) -> do
     java.util.List access$getToAddresses(io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable$Companion,org.json.JSONObject) -> if
     void deleteByAddress$default(io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable$Companion,java.lang.String,int,kotlin.jvm.functions.Function0,int,java.lang.Object) -> do
-    boolean isReceive(java.lang.String,java.lang.String) -> return
-    java.lang.String convertToBCHOrDefaultAddress(java.lang.String,java.lang.String) -> static
+    boolean isReceive(java.lang.String,java.lang.String) -> static
+    java.lang.String convertToBCHOrDefaultAddress(java.lang.String,java.lang.String) -> switch
     java.lang.String getChangeValue(java.lang.String,org.json.JSONObject) -> do
     java.lang.String getFromAddress(org.json.JSONObject) -> do
     java.lang.String getTransactionValue(org.json.JSONObject,java.lang.String) -> if
@@ -21740,7 +21743,7 @@ io.goldstone.blockchain.kernel.network.APIPath -> d.a.a.c.c.t:
     void updateServerUrl(java.lang.String) -> a
 io.goldstone.blockchain.kernel.network.APIPath$defaultTokenList$1 -> d.a.a.c.c.a:
     io.goldstone.blockchain.kernel.network.APIPath$defaultTokenList$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> abstract
+    java.lang.String invoke(java.lang.String,java.lang.String) -> continue
 io.goldstone.blockchain.kernel.network.APIPath$getCoinInfo$1 -> d.a.a.c.c.b:
     io.goldstone.blockchain.kernel.network.APIPath$getCoinInfo$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.APIPath$getConfigList$1 -> d.a.a.c.c.c:
@@ -21763,7 +21766,7 @@ io.goldstone.blockchain.kernel.network.APIPath$getQuotationCurrencyCandleChart$1
     java.lang.String invoke(java.lang.String,java.lang.String,java.lang.String,int) -> do
 io.goldstone.blockchain.kernel.network.APIPath$getQuotationCurrencyInfo$1 -> d.a.a.c.c.k:
     io.goldstone.blockchain.kernel.network.APIPath$getQuotationCurrencyInfo$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> continue
+    java.lang.String invoke(java.lang.String,java.lang.String) -> strictfp
 io.goldstone.blockchain.kernel.network.APIPath$getShareContent$1 -> d.a.a.c.c.l:
     io.goldstone.blockchain.kernel.network.APIPath$getShareContent$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.APIPath$getTokenInfo$1 -> d.a.a.c.c.m:
@@ -22053,7 +22056,7 @@ io.goldstone.blockchain.kernel.network.EtherScanApi$gasTrackerHeader$1 -> d.a.a.
     io.goldstone.blockchain.kernel.network.EtherScanApi$gasTrackerHeader$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.EtherScanApi$getTokenIncomingTransaction$1 -> d.a.a.c.c.Ba:
     io.goldstone.blockchain.kernel.network.EtherScanApi$getTokenIncomingTransaction$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> strictfp
+    java.lang.String invoke(java.lang.String,java.lang.String) -> volatile
 io.goldstone.blockchain.kernel.network.EtherScanApi$litcoinTransactionDetail$1 -> d.a.a.c.c.Ca:
     io.goldstone.blockchain.kernel.network.EtherScanApi$litcoinTransactionDetail$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.EtherScanApi$transactionDetail$1 -> d.a.a.c.c.Da:
@@ -22062,7 +22065,7 @@ io.goldstone.blockchain.kernel.network.EtherScanApi$transactionDetailHeader$1 ->
     io.goldstone.blockchain.kernel.network.EtherScanApi$transactionDetailHeader$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.EtherScanApi$transactions$1 -> d.a.a.c.c.Fa:
     io.goldstone.blockchain.kernel.network.EtherScanApi$transactions$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> volatile
+    java.lang.String invoke(java.lang.String,java.lang.String) -> interface
 io.goldstone.blockchain.kernel.network.GoldStoneAPI -> d.a.a.c.c.Yc:
     android.content.Context context -> a
     io.goldstone.blockchain.kernel.network.GoldStoneAPI INSTANCE -> c
@@ -22610,7 +22613,7 @@ io.goldstone.blockchain.kernel.network.GoldStoneEthCall -> d.a.a.c.c.Hd:
     okhttp3.MediaType contentType -> b
     boolean getCurrentEncryptStatusByChainType(io.goldstone.blockchain.crypto.ChainType) -> if
     java.lang.String checkAddressInRules(java.lang.String) -> a
-    java.lang.String withAddress(java.lang.String,java.lang.String) -> switch
+    java.lang.String withAddress(java.lang.String,java.lang.String) -> throws
     okhttp3.MediaType getContentType() -> a
     void getBlockNumber(kotlin.jvm.functions.Function2,java.lang.String,kotlin.jvm.functions.Function1) -> do
     void getInputCodeByHash(java.lang.String,kotlin.jvm.functions.Function2,java.lang.String,kotlin.jvm.functions.Function1) -> do
@@ -22864,7 +22867,7 @@ io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getBalanceFromBlockInf
     io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getBalanceFromBlockInfo$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getTransactionByHash$1 -> d.a.a.c.c.a.r:
     io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getTransactionByHash$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> interface
+    java.lang.String invoke(java.lang.String,java.lang.String) -> protected
 io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getTransactions$1 -> d.a.a.c.c.a.s:
     io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl$getTransactions$1 INSTANCE -> a
     java.lang.String invoke(java.lang.String,int,int) -> for
@@ -22932,7 +22935,7 @@ io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getBalance$1 -
     io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getBalance$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getTransactionByHash$1 -> d.a.a.c.c.b.f:
     io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getTransactionByHash$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> protected
+    java.lang.String invoke(java.lang.String,java.lang.String) -> transient
 io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getTransactions$1 -> d.a.a.c.c.b.g:
     io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashUrl$getTransactions$1 INSTANCE -> a
     java.lang.String invoke(java.lang.String,int,int) -> int
@@ -22973,7 +22976,7 @@ io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getBalance$1 -> d.a.
     io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getBalance$1 INSTANCE -> a
 io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getTransactionByHash$1 -> d.a.a.c.c.c.g:
     io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getTransactionByHash$1 INSTANCE -> a
-    java.lang.String invoke(java.lang.String,java.lang.String) -> transient
+    java.lang.String invoke(java.lang.String,java.lang.String) -> implements
 io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getTransactions$1 -> d.a.a.c.c.c.h:
     io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl$getTransactions$1 INSTANCE -> a
     java.lang.String invoke(java.lang.String,int,int) -> new
@@ -24575,7 +24578,7 @@ io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentP
     java.math.BigInteger getGasLimit() -> c
     java.math.BigInteger getGasPrice() -> j
     java.math.BigInteger getNonce() -> b
-    void setGasPrice(java.math.BigInteger) -> long
+    void setGasPrice(java.math.BigInteger) -> void
 io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPrepareBCHExtensionKt -> d.a.a.d.a.c.e.b.g:
     void generateBCHPaymentModel(io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter,double,java.lang.String,kotlin.jvm.functions.Function1) -> if
     void prepareBCHPaymentModel(io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter,double,java.lang.String,kotlin.jvm.functions.Function1) -> do
@@ -24653,7 +24656,7 @@ io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.Paym
     java.lang.String $memo -> c
     kotlin.jvm.functions.Function0 $callback -> d
     kotlin.jvm.functions.Function1 $hold -> e
-    void invoke(java.math.BigInteger) -> this
+    void invoke(java.math.BigInteger) -> break
 io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPrepareETHERC20AndETCExtensionKt$generateTransaction$1 -> d.a.a.d.a.c.e.b.q:
     io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter receiver$0 -> a
     kotlin.jvm.functions.Function0 $callback -> b
@@ -24666,7 +24669,7 @@ io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.Paym
     java.math.BigInteger $countWithDecimal -> e
     java.math.BigInteger $nonce -> c
     kotlin.jvm.functions.Function1 $hold -> b
-    void invoke(java.math.BigInteger) -> void
+    void invoke(java.math.BigInteger) -> catch
 io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPrepareETHERC20AndETCExtensionKt$prepareETHERC20ETCPaymentModel$1 -> d.a.a.d.a.c.e.b.t:
     io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter receiver$0 -> a
     kotlin.jvm.functions.Function0 $callback -> b
@@ -25323,7 +25326,7 @@ io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.Cr
     android.widget.EditText $hintInput -> b
     io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter this$0 -> a
     kotlin.jvm.functions.Function0 $callback -> c
-    void invoke(java.lang.String,java.lang.String) -> implements
+    void invoke(java.lang.String,java.lang.String) -> instanceof
 io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter$generateWalletWith$2 -> d.a.a.d.a.d.a.b.p:
     android.content.Context receiver$0 -> b
     io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter this$0 -> a
@@ -25642,7 +25645,7 @@ io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.Keys
     void invoke(org.jetbrains.anko.AnkoAsyncContext) -> a
 io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter$importKeystoreWallet$$inlined$isTrue$lambda$1$1 -> d.a.a.d.a.e.a.a.c:
     io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter$importKeystoreWallet$$inlined$isTrue$lambda$1 this$0 -> a
-    void invoke(java.math.BigInteger) -> break
+    void invoke(java.math.BigInteger) -> class
 io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment -> d.a.a.d.a.e.a.b.q:
     io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter presenter -> l
     java.lang.String currentType -> k
@@ -25755,7 +25758,7 @@ io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.Mnem
     java.lang.String $mnemonic -> b
     java.lang.String $passwordHint -> e
     kotlin.jvm.functions.Function1 $callback -> c
-    void invoke(java.lang.String,java.lang.String) -> instanceof
+    void invoke(java.lang.String,java.lang.String) -> synchronized
 io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment -> d.a.a.d.a.e.b.b.s:
     io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter presenter -> k
     java.util.ArrayList defaultPath -> l
@@ -25913,7 +25916,7 @@ io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.Pr
     io.goldstone.blockchain.crypto.CryptoValue$PrivateKeyType $type -> b
     io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter this$0 -> a
     kotlin.jvm.functions.Function1 $callback -> e
-    void invoke(java.lang.String,java.lang.String) -> synchronized
+    void invoke(java.lang.String,java.lang.String) -> a
 io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter$importWalletByPrivateKey$3$1 -> d.a.a.d.a.e.c.a.n:
     io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter$importWalletByPrivateKey$3 this$0 -> a
     void invoke(boolean) -> a
@@ -28944,7 +28947,7 @@ io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.m
     void insertToken(io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable,kotlin.jvm.functions.Function0) -> do
     void updateOrInsertCoinInfo(io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel,kotlin.jvm.functions.Function0) -> do
     void updateTokenDefaultStatus(java.lang.String,boolean,java.lang.String,kotlin.jvm.functions.Function0) -> do
-    void updateTokenName(java.lang.String,java.lang.String) -> throws
+    void updateTokenName(java.lang.String,java.lang.String) -> boolean
     void updateTokenPrice(java.lang.String,double,kotlin.jvm.functions.Function0) -> if
 io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable$Companion$getAllTokens$1 -> d.a.a.d.c.d.b.c.a.g:
     io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable$Companion$getAllTokens$1 INSTANCE -> a
@@ -29802,7 +29805,7 @@ io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereum
 io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel$Companion -> d.a.a.d.c.d.d.b.a.a.b$a:
     java.lang.String access$getUnitSymbol(io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel$Companion,java.lang.String) -> do
     java.lang.String formatToAddress(java.lang.String) -> b
-    java.lang.String generateTransactionURL(java.lang.String,java.lang.String) -> boolean
+    java.lang.String generateTransactionURL(java.lang.String,java.lang.String) -> default
     java.lang.String getContractBySymbol(java.lang.String) -> a
     java.lang.String getUnitSymbol(java.lang.String) -> d
     java.util.List convertMultiToOrFromAddresses(java.lang.String) -> c
@@ -35314,12 +35317,12 @@ org.bitcoinj.core.ECKey -> j.b.a.p:
     org.spongycastle.asn1.x9.X9ECParameters CURVE_PARAMS -> d
     org.spongycastle.crypto.params.ECDomainParameters CURVE -> e
     org.bitcoinj.core.ECKey fromPrivate(byte[]) -> finally
-    org.bitcoinj.core.ECKey fromPrivate(java.math.BigInteger) -> catch
+    org.bitcoinj.core.ECKey fromPrivate(java.math.BigInteger) -> const
     org.bitcoinj.core.ECKey fromPrivate(java.math.BigInteger,boolean) -> if
     org.bitcoinj.core.ECKey fromPublicOnly(byte[]) -> package
     org.spongycastle.math.ec.ECPoint decompressPoint(org.spongycastle.math.ec.ECPoint) -> if
     org.spongycastle.math.ec.ECPoint getPointWithCompression(org.spongycastle.math.ec.ECPoint,boolean) -> do
-    org.spongycastle.math.ec.ECPoint publicPointFromPrivate(java.math.BigInteger) -> class
+    org.spongycastle.math.ec.ECPoint publicPointFromPrivate(java.math.BigInteger) -> final
     boolean isCompressed() -> f
     boolean isEncrypted() -> h
     boolean isPubKeyOnly() -> b
@@ -39731,24 +39734,24 @@ org.spongycastle.x509.extension.X509ExtensionUtil -> org.spongycastle.x509.exten
 org.spongycastle.x509.util.LDAPStoreHelper -> org.spongycastle.x509.util.LDAPStoreHelper:
 org.spongycastle.x509.util.StreamParser -> org.spongycastle.x509.util.StreamParser:
 org.spongycastle.x509.util.StreamParsingException -> org.spongycastle.x509.util.StreamParsingException:
-android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
-com.google.zxing.client.android.R -> c.d.c.b.a.k:
-com.google.android.gms.common.api.GoogleApiClient -> c.d.a.a.d.a.e:
-android.support.compat.R -> a.b.a.a:
-com.github.mmin18.realtimeblurview.R -> c.c.b.a.a:
-android.support.v7.recyclerview.R -> a.b.d.e.a:
-com.google.android.gms.common.api.internal.ListenerHolder -> c.d.a.a.d.a.a.c:
 android.support.v4.content.Loader -> a.b.c.b.b:
-android.support.v4.util.Pools -> a.b.c.i.l:
-com.blinnnk.honey.R -> c.a.e.a:
+me.itangqi.library.R -> g.a.a.a:
 com.google.android.gms.analytics.HitBuilders -> c.d.a.a.b.e:
+com.blinnnk.honey.R -> c.a.e.a:
+android.support.v4.util.Pools -> a.b.c.i.l:
+android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
+android.support.v7.app.ActionBarDrawerToggle -> a.b.d.a.b:
 android.support.v4.media.session.MediaControllerCompat -> android.support.v4.media.session.MediaControllerCompat:
 com.google.android.gms.common.R -> c.d.a.a.d.n:
-android.support.v7.widget.ActivityChooserView -> android.support.v7.widget.ActivityChooserView:
-me.itangqi.library.R -> g.a.a.a:
-com.google.android.gms.common.internal.GmsClientEventManager -> c.d.a.a.d.c.e:
-com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:
-com.google.android.gms.base.R -> c.d.a.a.c.a:
-android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
+com.google.android.gms.common.api.internal.ListenerHolder -> c.d.a.a.d.a.a.c:
 android.support.v7.appcompat.R -> a.b.d.b.a:
+com.google.android.gms.common.api.GoogleApiClient -> c.d.a.a.d.a.e:
+android.support.v4.media.session.MediaSessionCompat -> android.support.v4.media.session.MediaSessionCompat:
+com.google.android.gms.base.R -> c.d.a.a.c.a:
+com.github.mmin18.realtimeblurview.R -> c.c.b.a.a:
+com.google.android.gms.common.internal.GmsClientEventManager -> c.d.a.a.d.c.e:
 org.bitcoinj.net.discovery.HttpDiscovery -> j.b.c.a.a:
+android.support.v7.recyclerview.R -> a.b.d.e.a:
+android.support.compat.R -> a.b.a.a:
+com.google.zxing.client.android.R -> c.d.c.b.a.k:
+com.google.android.gms.dynamite.DynamiteModule -> com.google.android.gms.dynamite.DynamiteModule:

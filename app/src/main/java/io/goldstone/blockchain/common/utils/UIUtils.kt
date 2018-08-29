@@ -50,7 +50,7 @@ object UIUtils {
 
 	fun generateDefaultName(): String {
 		val name = arrayListOf(
-			WalletNameText.Bear,
+			WalletNameText.Cat,
 			WalletNameText.Bull,
 			WalletNameText.Elephant,
 			WalletNameText.Deer,
@@ -96,32 +96,33 @@ object TimeUtils {
 			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
-	
+
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
 	 * @description: 把日期转换成月日，例如 8/15
 	 */
-	fun formatMdDate(date: Long) : String {
+	fun formatMdDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M/d")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
-	
+
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
 	 * @description: 把日期转换成时分，例如12:00
 	 */
-	fun formatHmDate(date: Long) : String {
+	fun formatHmDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
+
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
 	 * @description: 把日期转换成日期+时间，例如8-25 12:00
 	 */
-	fun formatMdHmDate(date: Long) : String {
+	fun formatMdHmDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
@@ -143,7 +144,12 @@ fun Long.toMillisecond(): Long {
 
 fun Activity.transparentStatus() {
 	TinyNumberUtils.allFalse(
-		packageManager.hasSystemFeature("com.oppo.feature.screen.heteromorphism"),
+		try {
+			packageManager.hasSystemFeature("com.oppo.feature.screen.heteromorphism")
+		} catch (error: Exception) {
+			LogUtil.error("hasSystemFeature", error)
+			false
+		},
 		hasNotchInScreen(),
 		isTargetDevice(DeviceName.nokiaX6).orFalse(),
 		isTargetDevice(DeviceName.xiaomi8).orFalse(),

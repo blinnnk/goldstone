@@ -18,7 +18,6 @@ import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -348,8 +347,8 @@ class AddressManagerPresenter(
 			) { isCorrect ->
 				if (isCorrect) {
 					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-						wallet.encryptMnemonic?.let { encryptoMnemonic ->
-							val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+						wallet.encryptMnemonic?.let { encryptMnemonic ->
+							val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
 							BTCWalletUtils.getBitcoinWalletByMnemonic(
@@ -538,9 +537,7 @@ class AddressManagerPresenter(
 						val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
 						LTCWalletUtils.generateBase58Keypair(
 							mnemonic,
-							newChildPath,
-							ChainPrefix.Litecoin,
-							true
+							newChildPath
 						).let { ltcKeyPair ->
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,

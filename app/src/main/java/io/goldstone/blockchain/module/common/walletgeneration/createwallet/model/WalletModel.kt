@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 
 import android.arch.persistence.room.*
 import android.content.Context
+import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
@@ -117,7 +118,7 @@ data class WalletTable(
 		fun saveEncryptMnemonicIfUserSkip(
 			encryptMnemonic: String,
 			address: String,
-			callback: () -> Unit
+			@UiThread callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
@@ -197,7 +198,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getCurrentWallet(hold: WalletTable.() -> Unit) {
+		fun getCurrentWallet(@UiThread hold: WalletTable.() -> Unit) {
 			load {
 				GoldStoneDataBase
 					.database
