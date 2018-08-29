@@ -18,11 +18,10 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 import org.jetbrains.anko.*
 
 /**
@@ -52,7 +51,7 @@ class PriceAlarmCreaterView(context: Context) : LinearLayout(context) {
 				wrapContent
 			).apply {
 			}
-			setTitle(AlarmClockText.createNewAlarm)
+			setTitle(AlarmText.createNewAlarm)
 		}.into(this)
 
 		RelativeLayout(context).apply {
@@ -68,7 +67,7 @@ class PriceAlarmCreaterView(context: Context) : LinearLayout(context) {
 					matchParent,
 					56.uiPX()
 				)
-				hint = AlarmClockText.targetPrice
+				hint = AlarmText.targetPrice
 				hintTextColor = GrayScale.midGray
 				maxLines = 1
 				inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -95,11 +94,11 @@ class PriceAlarmCreaterView(context: Context) : LinearLayout(context) {
 		}.into(this)
 
 		priceTypeView.apply {
-			showAlarmTypeTitleCell(AlarmClockText.priceTypeTitle)
+			showAlarmTypeTitleCell(AlarmText.priceTypeTitle)
 			setRepeatingCellSwitchStatusBy(true)
 		}.into(this)
 
-		alarmTypeView.apply { showAlarmTypeTitleCell(AlarmClockText.alarmTypeTitle) }.into(this)
+		alarmTypeView.apply { showAlarmTypeTitleCell(AlarmText.alarmTypeTitle) }.into(this)
 	}
 
 	fun setTitle(title: String) {
@@ -108,7 +107,7 @@ class PriceAlarmCreaterView(context: Context) : LinearLayout(context) {
 			fontSize(14),
 			Spectrum.blue
 		)
-		if (AlarmClockText.createNewAlarm == title) {
+		if (AlarmText.createNewAlarm == title) {
 			alarmTypeView.visibility = View.VISIBLE
 		} else {
 			alarmTypeView.visibility = View.GONE

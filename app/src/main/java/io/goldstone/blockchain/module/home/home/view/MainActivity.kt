@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
@@ -18,15 +19,15 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.PriceAlarmUtils
 import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmReceiver
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmStatusObserver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter.PriceAlarmReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter.PriceAlarmStatusObserver
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -54,10 +55,10 @@ class MainActivity : AppCompatActivity() {
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
 
-		XinGePushReceiver.backgroundFlag = false
+		XinGePushReceiver.appIsBackground = false
 		// 轮询价格闹铃监听
 		priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
-
+		0.uiPX()
 		transparentStatus()
 
 		setContentView(relativeLayout {
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onResume() {
 		super.onResume()
-		XinGePushReceiver.backgroundFlag = false
+		XinGePushReceiver.appIsBackground = false
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
 		showNotificationAlarmPopUps(currentIntent ?: intent)
@@ -87,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onStop() {
 		super.onStop()
-		XinGePushReceiver.backgroundFlag = true
+		XinGePushReceiver.appIsBackground = true
 	}
 
 	fun sendAnalyticsData(className: String) {
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
 		GoldStoneDialog.remove(this)
 		GoldStoneDialog.show(this) {
-			showButtons(AlarmClockText.viewAlarm) {
+			showButtons(AlarmText.viewAlarm) {
 				confirmButtonClickEvent()
 			}
 			setGoldStoneDialog(
@@ -271,7 +272,7 @@ class MainActivity : AppCompatActivity() {
 	) {
 		goldStoneDialog.apply {
 			getCancelButton().apply {
-				text = AlarmClockText.gotIt
+				text = AlarmText.gotIt
 				onClick {
 					cancelButtonClickEvent()
 				}

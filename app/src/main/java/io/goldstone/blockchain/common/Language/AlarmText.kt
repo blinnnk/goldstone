@@ -1,15 +1,15 @@
 package io.goldstone.blockchain.common.language
 
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 
 /**
  * @date 10/08/2018 14:19 PM
  * @author wcx
  */
-object AlarmClockText {
+object AlarmText {
 	@JvmField
-	val priceAlarmClockList = when (currentLanguage) {
+	val priceAlarmList = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Price Alarm"
 		HoneyLanguage.Chinese.code -> "价格闹铃"
 		HoneyLanguage.Japanese.code -> "価格アラーム"

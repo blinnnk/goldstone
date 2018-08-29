@@ -7,7 +7,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -47,7 +47,7 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 
 		// 永久闹铃
 		repeatingCell.apply {
-			setTitle(AlarmClockText.alarmRepeatingType)
+			setTitle(AlarmText.alarmRepeatingType)
 			if (alarmType == ArgumentKey.repeatingForAlarm) {
 				setSwitchStatusBy(true)
 			}
@@ -61,7 +61,7 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 
 		// 一次闹铃
 		oneTimeCell.apply {
-			setTitle(AlarmClockText.alarmOnlyOneTimeType)
+			setTitle(AlarmText.alarmOnlyOneTimeType)
 			if (alarmType == ArgumentKey.oneTimeForAlram) {
 				setSwitchStatusBy(true)
 			}
@@ -99,7 +99,7 @@ class AlarmTypeView(context: Context) : LinearLayout(context) {
 
 	fun showAlarmTypeTitleTextView() {
 		alarmTypeTitleTextView.apply {
-			text = AlarmClockText.alarmTypeTitle
+			text = AlarmText.alarmTypeTitle
 			textSize = fontSize(14)
 			textColor = GrayScale.midGray
 		}.into(titleLayout)

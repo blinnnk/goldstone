@@ -8,7 +8,7 @@ import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListFragment
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view.PriceAlarmListFragment
 import java.util.*
 
 @SuppressLint("ViewConstructor")

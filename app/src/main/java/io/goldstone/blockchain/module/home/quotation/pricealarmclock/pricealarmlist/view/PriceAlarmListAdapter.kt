@@ -1,10 +1,10 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view
 
 import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 
 /**
  * @data 08/08/2018 11:49 AM

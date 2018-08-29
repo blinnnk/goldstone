@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.toArrayList
@@ -79,9 +79,7 @@ data class PriceAlarmTable(
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmDao().apply {
-					insertPriceAlarmClock(priceAlarmTable)
-				}
+				GoldStoneDataBase.database.priceAlarmDao().insertPriceAlarm(priceAlarmTable)
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
@@ -94,9 +92,7 @@ data class PriceAlarmTable(
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmDao().apply {
-					updatePriceAlarmClock(priceAlarmTable)
-				}
+				GoldStoneDataBase.database.priceAlarmDao().updatePriceAlarm(priceAlarmTable)
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
@@ -106,9 +102,7 @@ data class PriceAlarmTable(
 
 		fun deleteAllAlarm(callback: () -> Unit) {
 			load {
-				GoldStoneDataBase.database.priceAlarmDao().apply {
-					deleteAllPriceAlarmClock()
-				}
+				GoldStoneDataBase.database.priceAlarmDao().deleteAllPriceAlarm()
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
@@ -121,9 +115,7 @@ data class PriceAlarmTable(
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.priceAlarmDao().apply {
-					deletePriceAlarmClock(priceAlarmTable)
-				}
+				GoldStoneDataBase.database.priceAlarmDao().deletePriceAlarm(priceAlarmTable)
 			} then {
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
@@ -131,11 +123,10 @@ data class PriceAlarmTable(
 			}
 		}
 
-		fun getAllPriceAlarm(hold: (ArrayList<PriceAlarmTable>) -> Unit) {
-			coroutinesTask(
-				{
-					GoldStoneDataBase.database.priceAlarmDao().selectPriceAlarmClocks()
-				}) {
+		fun getAll(hold: (ArrayList<PriceAlarmTable>) -> Unit) {
+			load {
+				GoldStoneDataBase.database.priceAlarmDao().selectPriceAlarms()
+			} then {
 				hold(it.toArrayList())
 			}
 		}
@@ -151,25 +142,25 @@ data class PriceAlarmTable(
 interface PriceAlarmDao {
 
 	@Insert
-	fun insertPriceAlarmClock(user: PriceAlarmTable)
+	fun insertPriceAlarm(user: PriceAlarmTable)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insertPriceAlarmClocks(arrayList: ArrayList<PriceAlarmTable>)
+	fun insertPriceAlarms(arrayList: ArrayList<PriceAlarmTable>)
 
 	@Delete
-	fun deletePriceAlarmClock(priceAlarmTable: PriceAlarmTable)
+	fun deletePriceAlarm(priceAlarmTable: PriceAlarmTable)
 
 	@Query("DELETE FROM price_alarm_clock")
-	fun deleteAllPriceAlarmClock()
+	fun deleteAllPriceAlarm()
 
 	@Query("select * from price_alarm_clock")
-	fun selectPriceAlarmClocks(): List<PriceAlarmTable>
+	fun selectPriceAlarms(): List<PriceAlarmTable>
 
 	@Update
-	fun updatePriceAlarmClock(priceAlarmTable: PriceAlarmTable)
+	fun updatePriceAlarm(priceAlarmTable: PriceAlarmTable)
 
 	@Update
-	fun updatePriceAlarmClocks(arrayList: ArrayList<PriceAlarmTable>)
+	fun updatePriceAlarms(arrayList: ArrayList<PriceAlarmTable>)
 }
 
 data class AlarmConfigListModel(
@@ -188,14 +179,14 @@ data class AlarmConfigListModel(
 	)
 }
 
-data class AddAlarmClockModel(
+data class AddAlarmModel(
 	@SerializedName("code")
 	val code: Int,
 	@SerializedName("id")
 	val id: String
 )
 
-data class DeleteAlarmClockModel(
+data class DeleteAlarmModel(
 	@SerializedName("code")
 	val code: Int
 )

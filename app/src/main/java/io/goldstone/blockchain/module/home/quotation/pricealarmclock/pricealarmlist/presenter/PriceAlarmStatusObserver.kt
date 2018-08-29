@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter
 
 import android.app.Activity
 import android.content.Context
@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.utils.PriceAlarmNotificationUtils
 import io.goldstone.blockchain.common.utils.PriceAlarmUtils
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -19,8 +19,8 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PricePairModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PricePairModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import org.jetbrains.anko.runOnUiThread
@@ -36,18 +36,18 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 	private val retryTime = 900000L
 
 	private fun checkStatusByPrice() {
-		if (!XinGePushReceiver.backgroundFlag) {
-			PriceAlarmTable.getAllPriceAlarm {
-				val priceAlarmTableArrayList = it
-				val parameters = removeDuplicationData(priceAlarmTableArrayList)
+		if (!XinGePushReceiver.appIsBackground) {
+			PriceAlarmTable.getAll {
+				val priceAlarmList = it
+				val parameters = removeDuplicateData(priceAlarmList)
 				GoldStoneAPI.getPricePairs(
 					parameters,
 					{}
 				) {
 					val pricePairArrayList = resolveJsonData(it)
-					val compareNetDataAndLocalData = compareNetDataAndLocalData(
+					val compareNetDataAndLocalData = compareServerDataAndLocalData(
 						pricePairArrayList,
-						priceAlarmTableArrayList
+						priceAlarmList
 					)
 					showPriceAlarmDialog(
 						context,
@@ -63,16 +63,14 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 	}
 
 	// 去除重复数据
-	private fun removeDuplicationData(priceAlarmTableArrayList: ArrayList<PriceAlarmTable>): JsonArray {
-		val localSize = priceAlarmTableArrayList.size
+	private fun removeDuplicateData(priceAlarmTableArrayList: ArrayList<PriceAlarmTable>): JsonArray {
 		val pairArrayList = ArrayList<String>()
 		val parameters = JsonArray()
-		for (index: Int in 0 until localSize) {
+		for (index: Int in 0 until priceAlarmTableArrayList.size) {
 			pairArrayList.add(priceAlarmTableArrayList[index].pair)
 		}
 		pairArrayList.distinct()
-		val pairSize = pairArrayList.size
-		for (index: Int in 0 until pairSize) {
+		for (index: Int in 0 until pairArrayList.size) {
 			parameters.add(pairArrayList[index])
 		}
 		return parameters
@@ -94,7 +92,7 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 	}
 
 	// 对比网络市场价格和本地设置价格获得响铃列表
-	private fun compareNetDataAndLocalData(
+	private fun compareServerDataAndLocalData(
 		newData: ArrayList<PricePairModel>,
 		localData: ArrayList<PriceAlarmTable>
 	): ArrayList<PriceAlarmTable> {
@@ -146,6 +144,7 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 	) {
 		if (priceAlarmTableArrayList.isEmpty()) return
 		GoldStoneAPI.context.runOnUiThread {
+			// 多个弹窗请求时,每次取第一个数据进行处理并弹窗。
 			val priceAlarmTable = priceAlarmTableArrayList[0]
 			turnOffOnceAlarm(priceAlarmTable)
 			priceAlarmTableArrayList.remove(priceAlarmTable)
@@ -154,10 +153,10 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 				context,
 				1
 			)
-			val priceAlarmContent = AlarmClockText.priceAlarmNotificationContent(priceAlarmTable)
+			val priceAlarmContent = AlarmText.priceAlarmNotificationContent(priceAlarmTable)
 			PriceAlarmNotificationUtils.sendPriceAlarmClockNotification(
 				context,
-				AlarmClockText.priceWarning,
+				AlarmText.priceWarning,
 				priceAlarmContent,
 				priceAlarmTable.price
 			)
@@ -228,18 +227,18 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 		priceAlarmTable: PriceAlarmTable,
 		priceAlarmTableArrayList: ArrayList<PriceAlarmTable>
 	) {
-		val priceAlarmContent = AlarmClockText.priceAlarmContent(priceAlarmTable)
+		val priceAlarmContent = AlarmText.priceAlarmContent(priceAlarmTable)
 		goldStoneDialog.apply {
 
 			getCancelButton().apply {
-				text = AlarmClockText.gotIt
+				text = AlarmText.gotIt
 				onClick {
 					gotItButtonClickEvent(priceAlarmTableArrayList)
 				}
 			}
 
 			getConfirmButton().apply {
-				text = AlarmClockText.viewAlarm
+				text = AlarmText.viewAlarm
 				onClick {
 					viewAlarmButtonClickEvent(
 						priceAlarmTableArrayList,
@@ -251,7 +250,7 @@ abstract class PriceAlarmStatusObserver(private val context: Context) {
 			setImage(R.drawable.price_alarm_banner)
 
 			setContent(
-				"${priceAlarmTable.marketName} ${priceAlarmTable.pairDisplay}${AlarmClockText.achieve}${priceAlarmTable.marketPrice}",
+				"${priceAlarmTable.marketName} ${priceAlarmTable.pairDisplay}${AlarmText.achieve}${priceAlarmTable.marketPrice}",
 				priceAlarmContent
 			)
 		}

@@ -22,10 +22,10 @@ import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUncryptoDat
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.ChartModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AddAlarmClockModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.DeleteAlarmClockModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.AddAlarmModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.AlarmConfigListModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.DeleteAlarmModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -581,10 +581,10 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun addAlarmClock(
+	fun addAlarm(
 		priceAlarmTable: PriceAlarmTable,
 		errorCallback: (Exception) -> Unit = {},
-		hold: (AddAlarmClockModel?) -> Unit
+		hold: (AddAlarmModel?) -> Unit
 	) {
 		RequestBody.create(
 			requestContentType,
@@ -604,10 +604,10 @@ object GoldStoneAPI {
 				)
 			)
 		).let {
-			postRequestGetJsonObject<AddAlarmClockModel>(
+			postRequestGetJsonObject<AddAlarmModel>(
 				it,
 				"data_list",
-				APIPath.addAlarmClock(APIPath.currentUrl),
+				APIPath.addAlarm(APIPath.currentUrl),
 				errorCallback = errorCallback,
 				isEncrypt = true
 			) {
@@ -617,10 +617,10 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun deleteAlarmClock(
+	fun deleteAlarm(
 		priceAlarmTable: PriceAlarmTable,
 		errorCallback: (Exception) -> Unit = {},
-		hold: (DeleteAlarmClockModel?) -> Unit
+		hold: (DeleteAlarmModel?) -> Unit
 	) {
 		RequestBody.create(
 			requestContentType,
@@ -632,10 +632,10 @@ object GoldStoneAPI {
 				)
 			)
 		).let {
-			postRequestGetJsonObject<DeleteAlarmClockModel>(
+			postRequestGetJsonObject<DeleteAlarmModel>(
 				it,
 				"data_list",
-				APIPath.deleteAlarmClock(APIPath.currentUrl),
+				APIPath.deleteAlarm(APIPath.currentUrl),
 				errorCallback = errorCallback,
 				isEncrypt = true
 			) {

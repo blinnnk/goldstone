@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.model
 
 import com.db.chart.model.Point
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.Serializable
 

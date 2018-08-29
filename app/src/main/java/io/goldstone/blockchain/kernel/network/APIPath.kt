@@ -43,8 +43,8 @@ object APIPath {
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getAlarmConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getPricePairs: (header: String) -> String = { "$it/alert/pairPrice" }
-	val addAlarmClock: (header: String) -> String = { "$it/alert/add" }
-	val deleteAlarmClock: (header: String) -> String = { "$it/alert/remove" }
+	val addAlarm: (header: String) -> String = { "$it/alert/add" }
+	val deleteAlarm: (header: String) -> String = { "$it/alert/remove" }
 	val defaultTokenList: (
 		header: String,
 		md5: String

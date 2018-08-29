@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmReceiver
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter.PriceAlarmReceiver
 import kotlinx.coroutines.experimental.async
 
 /**

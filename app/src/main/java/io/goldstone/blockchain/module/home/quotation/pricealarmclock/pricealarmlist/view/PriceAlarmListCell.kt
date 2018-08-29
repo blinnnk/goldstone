@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view
 
 import android.content.Context
 import android.widget.RelativeLayout
@@ -6,7 +6,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.AlarmCell
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
 import org.jetbrains.anko.matchParent
 
 /**
@@ -26,9 +26,7 @@ class PriceAlarmListCell(context: Context) : AlarmCell(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 112.uiPX()).apply {
-			leftMargin = 10.uiPX()
 			topMargin = 5.uiPX()
-			rightMargin = 10.uiPX()
 		}
 		showSwitchBVutton()
 	}

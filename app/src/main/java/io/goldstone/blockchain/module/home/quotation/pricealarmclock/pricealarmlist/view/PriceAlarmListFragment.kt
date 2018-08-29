@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -13,13 +13,13 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.PriceAlarmCreaterView
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ValueTag
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmListPresenter
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter.PriceAlarmListPresenter
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.toast
@@ -38,6 +38,7 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<PriceAlarmTable>?
 	) {
+		wrapper.layoutParams.width = ScreenSize.widthWithPadding
 		presenter.getAlarmConfigList {
 			maxAlarmSize = this
 		}
@@ -48,17 +49,10 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 			getSwitch().isChecked = model.status
 			getSwitch().onClick {
 				val checked = getSwitch().isChecked
-				if (checked) {
-					// 打开
-					presenter.modifyOpenStatus(
-						model,
-						checked)
-				} else {
-					// 关闭
-					presenter.modifyOpenStatus(
-						model,
-						checked)
-				}
+				presenter.modifyOpenStatus(
+					model,
+					checked
+				)
 				preventDuplicateClicks()
 			}
 			onClick {
@@ -90,11 +84,11 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 		) {
 			if (currentAlarmSize < maxAlarmSize) {
 				val priceAlarmTable = PriceAlarmTable(quotationModel)
-				var priceAlarmClockCreatorView: PriceAlarmCreaterView? = null
+				var priceAlarmCreaterView: PriceAlarmCreaterView? = null
 				overlayView.apply {
 					DashboardOverlay(context) {
-						priceAlarmClockCreatorView = PriceAlarmCreaterView(context).apply {
-							setTitle(AlarmClockText.createNewAlarm)
+						priceAlarmCreaterView = PriceAlarmCreaterView(context).apply {
+							setTitle(AlarmText.createNewAlarm)
 							priceAlarmTable.priceType.let {
 								setPriceType(it)
 							}
@@ -117,18 +111,18 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 								setAutomaticChoosePriceType(true)
 							}
 						}
-						(priceAlarmClockCreatorView as LinearLayout).into(this)
+						(priceAlarmCreaterView as LinearLayout).into(this)
 					}.apply {
 						confirmEvent = Runnable {
 							// 点击事件
 							val formatDate = TimeUtils.formatDate(System.currentTimeMillis())
-							priceAlarmTable.price = priceAlarmClockCreatorView?.getTargetPriceEditTextContent() ?: ""
-							priceAlarmTable.priceType = priceAlarmClockCreatorView?.getPriceType() ?: ArgumentKey.greaterThanForPriceType
-							priceAlarmTable.alarmType = priceAlarmClockCreatorView?.getAlarmTypeView()?.getAlarmType() ?: ArgumentKey.repeatingForAlarm
+							priceAlarmTable.price = priceAlarmCreaterView?.getTargetPriceEditTextContent() ?: ""
+							priceAlarmTable.priceType = priceAlarmCreaterView?.getPriceType() ?: ArgumentKey.greaterThanForPriceType
+							priceAlarmTable.alarmType = priceAlarmCreaterView?.getAlarmTypeView()?.getAlarmType() ?: ArgumentKey.repeatingForAlarm
 							priceAlarmTable.createTime = formatDate
 							priceAlarmTable.status = true
-							PriceAlarmListPresenter.insertAlarmClockToDatabase(priceAlarmTable) {
-								PriceAlarmListPresenter.getDatabaseDataRefreshList {
+							PriceAlarmListPresenter.insertAlarmToDatabase(priceAlarmTable) {
+								PriceAlarmListPresenter.getLocalData() {
 									PriceAlarmListPresenter.updateData()
 									currentAlarmSize = this.size
 								}

@@ -87,7 +87,7 @@
 			android:name="android.notch_support"
 			android:value="true"/>
 
-		<receiver android:name="io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter.PriceAlarmReceiver">
+		<receiver android:name="io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter.PriceAlarmReceiver">
 			<intent-filter>
 				<action android:name="Alarm_clock" />
 			</intent-filter>

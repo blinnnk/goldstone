@@ -17,7 +17,7 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.language.AlarmClockText
+import io.goldstone.blockchain.common.language.AlarmText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -86,8 +86,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		notifiShowedRlt: XGPushShowedResult?
 	) {
 		if (context == null || notifiShowedRlt == null) return
-		if (notifiShowedRlt.title == AlarmClockText.priceWarning) {
-			if (backgroundFlag) {
+		if (notifiShowedRlt.title == AlarmText.priceWarning) {
+			if (appIsBackground) {
 				PriceAlarmUtils.sendAlarmReceiver(
 					0,
 					context,
@@ -140,7 +140,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					handlTransactionNotification(context, JSONObject(it).safeGet("hash"))
 				}
 				ClassURI.priceAlarmView -> {
-					if (backgroundFlag) {
+					if (appIsBackground) {
 						alarmNotification(
 							context,
 							result
@@ -179,7 +179,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 	}
 
 	companion object {
-		var backgroundFlag = false
+		var appIsBackground = false
 		fun clearAppIconRedot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =

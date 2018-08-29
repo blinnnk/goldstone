@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.presenter
+package io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.presenter
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -7,10 +7,10 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.blinnnk.extension.isTrue
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.AlarmConfigListModel
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.model.PriceAlarmTable
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListAdapter
-import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmclocklist.view.PriceAlarmListFragment
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.AlarmConfigListModel
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.model.PriceAlarmTable
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view.PriceAlarmListAdapter
+import io.goldstone.blockchain.module.home.quotation.pricealarmclock.pricealarmlist.view.PriceAlarmListFragment
 
 /**
  * @data 07/23/2018 16/32
@@ -21,7 +21,7 @@ class PriceAlarmListPresenter(override val fragment: PriceAlarmListFragment)
 	: BaseRecyclerPresenter<PriceAlarmListFragment, PriceAlarmTable>() {
 
 	companion object {
-		fun insertAlarmClockToDatabase(
+		fun insertAlarmToDatabase(
 			priceAlarmTable: PriceAlarmTable,
 			callback: () -> Unit
 		) {
@@ -30,7 +30,7 @@ class PriceAlarmListPresenter(override val fragment: PriceAlarmListFragment)
 			callback()
 		}
 
-		fun getDatabaseDataRefreshList(callback: ArrayList<PriceAlarmTable>. () -> Unit) {
+		fun getLocalData(callback: ArrayList<PriceAlarmTable>. () -> Unit) {
 			// 临时替代属性
 			callback(ArrayList<PriceAlarmTable>())
 		}
@@ -74,11 +74,10 @@ class PriceAlarmListPresenter(override val fragment: PriceAlarmListFragment)
 			0,
 			ArrayList<AlarmConfigListModel.ListModel>()
 		)
-		val alarmConfigArrayList = alarmConfigListModel.list
-		val size = alarmConfigArrayList.size
-		for (index: Int in 0 until size) {
-			if (alarmConfigArrayList[index].name == "alertMaxCount") {
-				callback(alarmConfigArrayList[index].value.toInt())
+		val alarmConfigList = alarmConfigListModel.list
+		alarmConfigList.forEach {
+			if (it.name == "alertMaxCount") {
+				callback(it.value.toInt())
 			}
 		}
 	}
