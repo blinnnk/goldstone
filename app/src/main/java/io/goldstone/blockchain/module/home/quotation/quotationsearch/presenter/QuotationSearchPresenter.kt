@@ -1,19 +1,25 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.MarketSetTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchAdapter
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.topPadding
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -40,6 +46,17 @@ class QuotationSearchPresenter(
 				}
 			) {
 				hasNetWork isTrue { searchTokenBy(it) }
+			}
+			
+			overlayView.header.setSearchFilterClick {
+				val data = arrayListOf<MarketSetTable>()
+				(1 until  100).forEachIndexed { _,_ ->
+					data.add(MarketSetTable(0,
+						"http://img3.duitang.com/uploads/item/201409/25/20140925100559_RviGZ.jpeg",
+						"货币",
+						1))
+				}
+				fragment.showSelectionListOverlayView(data)
 			}
 		}
 	}
@@ -102,6 +119,29 @@ class QuotationSearchPresenter(
 			}.toArrayList())
 		}
 	}
+	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<MarketSetTable>) {
+		getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
+				overlay.into(this)
+				overlay.apply {
+					setTitle(TransactionText.tokenSelection)
+					addContent {
+						topPadding = 10.uiPX()
+						val marketSetRecyclerView = MarketSetRecyclerView(context)
+						marketSetRecyclerView.into(this)
+						val marketSetAdapter = MarketSetAdapter(data) {
+							click {}
+						}
+						marketSetRecyclerView.adapter = marketSetAdapter
+					}
+				}
+			}
+			// 重置回退栈首先关闭悬浮层
+			recoveryBackEvent()
+		}
+	}
+	
 
 	companion object {
 		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {

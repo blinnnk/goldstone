@@ -193,6 +193,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		})
 	}
 	
+	fun setSearchFilterClick(callback: () -> Unit) {
+		searchInput.setFilterClick(callback)
+	}
+	
 	fun showSearchButton(
 		isShow: Boolean,
 		setClickEvent: () -> Unit = {}
