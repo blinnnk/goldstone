@@ -222,7 +222,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getConfigList(
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<ServerConfigModel>) -> Unit
+		@UiThread hold: (List<ServerConfigModel>) -> Unit
 	) {
 		requestData<ServerConfigModel>(
 			APIPath.getConfigList(APIPath.currentUrl),
@@ -232,7 +232,7 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			GoldStoneAPI.context.runOnUiThread {
-				hold(toArrayList())
+				hold(this@requestData)
 			}
 		}
 	}

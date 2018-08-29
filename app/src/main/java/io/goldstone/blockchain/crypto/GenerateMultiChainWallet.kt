@@ -63,9 +63,7 @@ object GenerateMultiChainWallet {
 						)
 						LTCWalletUtils.generateBase58Keypair(
 							mnemonic,
-							path.ltcPath,
-							ChainPrefix.Litecoin,
-							true
+							path.ltcPath
 						).let { ltcKeyPair ->
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,
@@ -145,9 +143,7 @@ object GenerateMultiChainWallet {
 						)
 						LTCWalletUtils.generateBase58Keypair(
 							mnemonic,
-							path.ltcPath,
-							ChainPrefix.Litecoin,
-							true
+							path.ltcPath
 						).let { ltcKeyPair ->
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,

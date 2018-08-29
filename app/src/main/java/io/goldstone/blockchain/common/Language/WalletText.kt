@@ -211,13 +211,13 @@ object WalletNameText {
 		else -> ""
 	}
 	@JvmField
-	val Bear = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Bear"
-		HoneyLanguage.Chinese.code -> "熊老大"
-		HoneyLanguage.Japanese.code -> "くま"
-		HoneyLanguage.Korean.code -> "곰"
-		HoneyLanguage.Russian.code -> "медведь"
-		HoneyLanguage.TraditionalChinese.code -> "熊老大"
+	val Cat = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Cat"
+		HoneyLanguage.Chinese.code -> "招财猫"
+		HoneyLanguage.Japanese.code -> "ラッキーな猫"
+		HoneyLanguage.Korean.code -> "럭키 고양이"
+		HoneyLanguage.Russian.code -> "Счастливая кошка"
+		HoneyLanguage.TraditionalChinese.code -> "招財貓"
 		else -> ""
 	}
 	@JvmField

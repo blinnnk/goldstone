@@ -96,3 +96,12 @@ fun String.showAfterColonContent(): String {
 	return if (contains(":")) toString().substringAfter(":")
 	else this
 }
+
+// 获取手机厂商信息
+fun getDeviceBrand(): String {
+	return android.os.Build.BRAND
+}
+// 获取手机型号
+fun getSystemModel(): String {
+	return android.os.Build.MODEL
+}
