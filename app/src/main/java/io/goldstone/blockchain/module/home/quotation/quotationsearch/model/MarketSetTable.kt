@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
+import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -14,10 +15,13 @@ import org.jetbrains.anko.runOnUiThread
 @Entity(tableName = "marketSet")
 data class MarketSetTable (
 	@PrimaryKey(autoGenerate = true)
+	@SerializedName("market_id")
 	var id: Int,
+	@SerializedName("icon")
 	var url: String,
+	@SerializedName("market")
 	var name: String,
-	var status: Int // 1 选中，0 未选中
+	var status: Int = 0  // 1 选中，0 未选中
 ) {
 	
 	companion object {

@@ -26,6 +26,7 @@ object APIPath {
 	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
 	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
+	val marketList: (header: String) -> String = { "$it/index/marketList"}
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }

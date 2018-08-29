@@ -29,7 +29,7 @@ class MarketSetCell(context: Context) : BaseCell(context) {
 			subtitle.visibility = View.GONE
 		}
 	}
-	protected val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
+	val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 	
 	init {
 		hasArrow = false

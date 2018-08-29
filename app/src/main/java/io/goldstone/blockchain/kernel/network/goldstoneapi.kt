@@ -22,8 +22,7 @@ import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoDat
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -262,6 +261,21 @@ object GoldStoneAPI {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl) + pair,
 			"pair_list",
+			false,
+			errorCallback,
+			isEncrypt = true
+		) {
+			hold(toArrayList())
+		}
+	}
+	
+	@JvmStatic
+	fun getMarketList(
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<MarketSetTable>) -> Unit) {
+		requestData<MarketSetTable>(
+			APIPath.marketList(APIPath.currentUrl),
+			"list",
 			false,
 			errorCallback,
 			isEncrypt = true
