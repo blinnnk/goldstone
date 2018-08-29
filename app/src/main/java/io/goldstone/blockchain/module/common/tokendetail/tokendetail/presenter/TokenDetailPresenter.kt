@@ -176,7 +176,7 @@ class TokenDetailPresenter(
 	fun loadDataFromDatabaseOrElse(
 		callback: (
 			localETHERC20OrETCData: List<TransactionListModel>?,
-			localBtcSeriesData: List<BTCSeriesTransactionTable>?
+			localBTCSeriesData: List<BTCSeriesTransactionTable>?
 		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
@@ -223,7 +223,7 @@ class TokenDetailPresenter(
 			WalletType.BCHOnly.content ->
 				getBTCSeriesData(
 					Config.getCurrentBCHAddress(),
-					ChainType.BTC.id
+					ChainType.BCH.id
 				) {
 					callback(null, it)
 				}
@@ -246,6 +246,15 @@ class TokenDetailPresenter(
 				getBTCSeriesData(
 					Config.getCurrentBTCAddress(),
 					ChainType.BTC.id
+				) {
+					callback(null, it)
+				}
+			}
+
+			WalletType.LTCOnly.content -> {
+				getBTCSeriesData(
+					Config.getCurrentLTCAddress(),
+					ChainType.LTC.id
 				) {
 					callback(null, it)
 				}
