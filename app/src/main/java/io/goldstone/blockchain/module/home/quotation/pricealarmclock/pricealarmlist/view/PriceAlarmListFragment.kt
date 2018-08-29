@@ -116,11 +116,13 @@ class PriceAlarmListFragment : BaseRecyclerFragment<PriceAlarmListPresenter, Pri
 						confirmEvent = Runnable {
 							// 点击事件
 							val formatDate = TimeUtils.formatDate(System.currentTimeMillis())
-							priceAlarmTable.price = priceAlarmCreaterView?.getTargetPriceEditTextContent() ?: ""
-							priceAlarmTable.priceType = priceAlarmCreaterView?.getPriceType() ?: ArgumentKey.greaterThanForPriceType
-							priceAlarmTable.alarmType = priceAlarmCreaterView?.getAlarmTypeView()?.getAlarmType() ?: ArgumentKey.repeatingForAlarm
-							priceAlarmTable.createTime = formatDate
-							priceAlarmTable.status = true
+							priceAlarmTable.apply {
+								price = priceAlarmCreaterView?.getTargetPriceEditTextContent() ?: ""
+								priceType = priceAlarmCreaterView?.getPriceType() ?: ArgumentKey.greaterThanForPriceType
+								alarmType = priceAlarmCreaterView?.getAlarmTypeView()?.getAlarmType() ?: ArgumentKey.repeatingForAlarm
+								createTime = formatDate
+								status = true
+							}
 							PriceAlarmListPresenter.insertAlarmToDatabase(priceAlarmTable) {
 								PriceAlarmListPresenter.getLocalDataRefreshList() {
 									PriceAlarmListPresenter.updateData()
