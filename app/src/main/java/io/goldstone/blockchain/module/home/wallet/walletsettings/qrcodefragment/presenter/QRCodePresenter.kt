@@ -10,6 +10,7 @@ import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
+import com.blinnnk.util.SoftKeyboard
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -88,6 +89,8 @@ open class QRCodePresenter(
 		}
 
 		fun scanQRCode(fragment: Fragment) {
+			// 扫描检查键盘并关闭键盘
+			fragment.activity?.let { SoftKeyboard.hide(it) }
 			val integrator = IntentIntegrator.forSupportFragment(fragment)
 			integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
 			integrator.setOrientationLocked(false)

@@ -2,6 +2,8 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.annotation.UiThread
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -361,20 +363,22 @@ object GoldStoneAPI {
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
+		hold: (List<QuotationSelectionLineChartModel>) -> Unit
 	) {
-		postRequestGetJsonObject<QuotationSelectionLineChartModel>(
+		postRequestGetJsonObject(
 			RequestBody.create(
 				requestContentType,
-				ParameterUtil.prepare(true, Pair("pair_list", pairList))
+				ParameterUtil.prepare(
+					true,
+					Pair("pair_list", pairList)
+				)
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
 			errorCallback = errorCallback,
-			isEncrypt = true
-		) {
-			hold(it.toArrayList())
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	fun registerWalletAddresses(
@@ -389,10 +393,9 @@ object GoldStoneAPI {
 			),
 			APIPath.updateAddresses(APIPath.currentUrl),
 			errorCallback,
-			true
-		) {
-			hold(it)
-		}
+			true,
+			hold
+		)
 	}
 
 	fun getUnreadCount(
@@ -441,11 +444,9 @@ object GoldStoneAPI {
 				if (jsonArray.length() == 0) {
 					hold(arrayListOf())
 				} else {
-					(0 until jsonArray.length()).forEach {
+					(0 until jsonArray.length()).forEachOrEnd { it, isEnd ->
 						notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
-						if (it == jsonArray.length() - 1) {
-							hold(notificationData)
-						}
+						if (isEnd) hold(notificationData)
 					}
 				}
 			}
@@ -455,7 +456,7 @@ object GoldStoneAPI {
 	fun getPriceByContractAddress(
 		addressList: JsonArray,
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<TokenPriceModel>) -> Unit
+		@UiThread hold: (List<TokenPriceModel>) -> Unit
 	) {
 		postRequestGetJsonObject<TokenPriceModel>(
 			RequestBody.create(
@@ -468,7 +469,7 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			GoldStoneAPI.context.runOnUiThread {
-				hold(it.toArrayList())
+				hold(it)
 			}
 		}
 	}

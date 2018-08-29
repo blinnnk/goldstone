@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.model
 
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -27,6 +28,20 @@ class CandleChartModel (
 		data.safeGet("close"),
 		data.safeGet("open"),
 		data.safeGet("time")
-	
 	)
+
+	companion object {
+	    fun convertData(jsonString: String): List<CandleChartModel> {
+				val jsonArray = JSONArray(jsonString)
+				var finalData = listOf<CandleChartModel>()
+				// 把数据转换成需要的格式
+				(0 until jsonArray.length()).forEach {
+					val jsonModel = JSONObject(jsonArray[it]?.toString())
+					if (jsonModel.toString().contains("open")) {
+						finalData += CandleChartModel(jsonModel)
+					}
+				}
+				return finalData
+			}
+	}
 }

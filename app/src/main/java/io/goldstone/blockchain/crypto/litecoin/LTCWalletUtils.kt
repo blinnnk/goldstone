@@ -75,11 +75,11 @@ object LTCWalletUtils {
 	): String {
 		val versionPrivateKey =
 			version.privateKey + privateKey.toString(16) + if (isCompress) ChainPrefix.compressSuffix else ""
-		val sha256PrivateKey = Sha256Hash.hash(Hex.decode(versionPrivateKey))
+		val sha256PrivateKey = Sha256Hash.hash(versionPrivateKey.toByteArray())
 		val doubleSha256 = Sha256Hash.hash(sha256PrivateKey)
 		val first4bytes = doubleSha256.toNoPrefixHexString().substring(0, 8)
 		val finalKey = versionPrivateKey + first4bytes
-		return Base58.encode(Hex.decode(finalKey))
+		return Base58.encode(finalKey.toByteArray())
 	}
 
 	@Throws
@@ -121,7 +121,7 @@ object LTCWalletUtils {
 	fun isValidAddress(address: String): Boolean {
 		return when {
 			address.isEmpty() -> false
-			address.length != CryptoValue.bitcoinAddressLength -> false
+			!CryptoValue.isBitcoinAddressLength(address) -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			!address.substring(0, 1).equals("L", true) -> false
 			else -> true

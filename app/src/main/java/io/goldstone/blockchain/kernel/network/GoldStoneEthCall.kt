@@ -34,7 +34,7 @@ object GoldStoneEthCall {
 	val contentType = MediaType.parse("application/json; charset=utf-8")
 
 	/**
-	 * @description 通过 [contractAddress] 和 [walletAddress] 从节点获取全部的 `Token` 信息
+	 * @description 通过 [contractAddress] 从节点获取全部的 `Token` 信息
 	 */
 	@JvmStatic
 	fun getTokenInfoByContractAddress(

@@ -532,11 +532,16 @@ class AddressManagerPresenter(
 				}
 
 				WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptoMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
-						LTCWalletUtils.generateBase58Keypair(mnemonic, newChildPath, ChainPrefix.Litecoin, true).let { ltcKeyPair ->
+						LTCWalletUtils.generateBase58Keypair(
+							mnemonic,
+							newChildPath,
+							ChainPrefix.Litecoin,
+							true
+						).let { ltcKeyPair ->
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,
 								ltcKeyPair.address,

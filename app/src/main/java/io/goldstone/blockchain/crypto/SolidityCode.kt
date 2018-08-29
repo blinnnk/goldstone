@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto
 
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 
 /**
@@ -24,7 +24,8 @@ object SolidityCode {
 
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
-	const val bitcoinAddressLength = 34
+	private const val bitcoinAddressLength = 34
+	const val bitcoinAddressClassicLength = 33
 	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
@@ -45,6 +46,12 @@ object CryptoValue {
 	const val ethDecimal = 18.0
 	val singleChainFile: (btcAddress: String) -> String = {
 		singleChainFilename + it
+	}
+	val isBitcoinAddressLength: (address: String) -> Boolean = {
+		TinyNumberUtils.hasTrue(
+			it.length == bitcoinAddressLength,
+			it.length == bitcoinAddressClassicLength
+		)
 	}
 	val filename: (
 		walletAddress: String,
@@ -76,10 +83,10 @@ object CryptoValue {
 	}
 
 	val isBTCSeriesAddress: (address: String) -> Boolean = {
-		it.length == CryptoValue.bitcoinAddressLength || it.contains(":")
+		CryptoValue.isBitcoinAddressLength(it) || it.contains(":")
 	}
 	// 比特的 `Bip44` 的比特币测试地址的  `CoinType` 为 `1`
-	val isBTCTest: (pathCointType: Int) -> Boolean = {
+	val isBTCTest: (pathCoinType: Int) -> Boolean = {
 		it == 1
 	}
 
@@ -160,7 +167,7 @@ object CryptoName {
 		}?.second
 	}
 
-	fun getBTCSeriesContractByChainName(name: String) : String? {
+	fun getBTCSeriesContractByChainName(name: String): String? {
 		return listOf(
 			Pair(ltc, CryptoValue.ltcContract),
 			Pair(bch, CryptoValue.bchContract),

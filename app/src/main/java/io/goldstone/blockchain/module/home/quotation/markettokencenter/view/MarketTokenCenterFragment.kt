@@ -40,7 +40,7 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 		MarketTokeCenterViewPager(this)
 	}
 	private val menuTitles =
-		arrayListOf(QuotationText.quotationInfo, QuotationText.alarm)
+		arrayListOf(QuotationText.quotationInfo)
 
 	override val presenter = MarketTokenCenterPresenter(this)
 
