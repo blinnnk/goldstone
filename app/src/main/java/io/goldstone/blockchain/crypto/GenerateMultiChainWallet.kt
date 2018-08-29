@@ -78,8 +78,8 @@ object GenerateMultiChainWallet {
 								path.bchPath
 							).let { bchKeyPair ->
 								context.storeBase58PrivateKey(
-									ltcKeyPair.privateKey,
-									ltcKeyPair.address,
+									bchKeyPair.privateKey,
+									bchKeyPair.address,
 									password,
 									false,
 									false

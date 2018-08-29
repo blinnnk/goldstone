@@ -54,7 +54,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			}
 
 			info.apply {
-				title.text = CryptoUtils.scaleTo16(it.addressName)
+				title.text = it.addressName.scaleTo(14)
 				subtitle.text =
 					if (Config.getCurrentLanguageCode() == 0) it.addressInfo
 					else it.addressInfo.scaleTo(26)

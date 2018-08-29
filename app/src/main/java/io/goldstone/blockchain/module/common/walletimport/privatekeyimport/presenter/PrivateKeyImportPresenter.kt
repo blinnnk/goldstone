@@ -72,29 +72,29 @@ class PrivateKeyImportPresenter(
 					)
 
 				CryptoValue.PrivateKeyType.BTC -> {
-					setAllMainnet {
-						PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
-							privateKeyInput.text.toString(),
-							passwordValue,
-							walletName,
-							fragment.context,
-							hintInput.text?.toString(),
-							false,
-							callback
-						)
+					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment.context,
+						hintInput.text?.toString(),
+						false
+					) {
+						if (it) setAllMainnet { callback(true) }
+						else callback(false)
 					}
 				}
 
 				CryptoValue.PrivateKeyType.LTC -> {
-					setAllMainnet {
-						PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
-							privateKeyInput.text.toString(),
-							passwordValue,
-							walletName,
-							fragment.context,
-							hintInput.text?.toString(),
-							callback
-						)
+					PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment.context,
+						hintInput.text?.toString()
+					) {
+						if (it) setAllMainnet { callback(true) }
+						else callback(false)
 					}
 				}
 
@@ -104,23 +104,25 @@ class PrivateKeyImportPresenter(
 						passwordValue,
 						walletName,
 						fragment.context,
-						hintInput.text?.toString(),
-						callback
-					)
+						hintInput.text?.toString()
+					) {
+						if (it) setAllMainnet { callback(true) }
+						else callback(false)
+					}
 				}
 
 				CryptoValue.PrivateKeyType.BTCTest -> {
 					// 跟随导入的测试网私钥切换全局测试网络状态
-					setAllTestnet {
-						PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
-							privateKeyInput.text.toString(),
-							passwordValue,
-							walletName,
-							fragment.context,
-							hintInput.text?.toString(),
-							true,
-							callback
-						)
+					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment.context,
+						hintInput.text?.toString(),
+						true
+					) {
+						if (it) setAllTestnet { callback(true) }
+						else callback(false)
 					}
 				}
 			}
@@ -142,7 +144,7 @@ class PrivateKeyImportPresenter(
 			callback: (Boolean) -> Unit
 		) {
 			if (wifPrivateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
-				context?.alert(ImportWalletText.unvalidPrivateKey)
+				context?.alert(ImportWalletText.invalidPrivateKey)
 				callback(false)
 				return
 			}
@@ -187,7 +189,7 @@ class PrivateKeyImportPresenter(
 			callback: (Boolean) -> Unit
 		) {
 			if (privateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
-				context?.alert(ImportWalletText.unvalidPrivateKey)
+				context?.alert(ImportWalletText.invalidPrivateKey)
 				callback(false)
 				return
 			}
@@ -241,7 +243,7 @@ class PrivateKeyImportPresenter(
 			callback: (Boolean) -> Unit
 		) {
 			if (privateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
-				context?.alert(ImportWalletText.unvalidPrivateKey)
+				context?.alert(ImportWalletText.invalidPrivateKey)
 				callback(false)
 				return
 			}
@@ -323,7 +325,7 @@ class PrivateKeyImportPresenter(
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtil.isValidPrivateKey(currentPrivateKey)) {
-				context?.alert(ImportWalletText.unvalidPrivateKey)
+				context?.alert(ImportWalletText.invalidPrivateKey)
 				callback(false)
 				return
 			}

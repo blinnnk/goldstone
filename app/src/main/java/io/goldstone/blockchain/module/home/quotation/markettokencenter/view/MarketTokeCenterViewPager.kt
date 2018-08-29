@@ -22,13 +22,11 @@ class MarketTokeCenterViewPager(val fragment: Fragment) : ViewPager(fragment.con
 	private val marketDetail by lazy {
 		MarketTokenDetailFragment()
 	}
-	private val alarmDetail by lazy { Fragment() }
 
 	init {
 		id = ViewPagerID.transactions
 		fragmentList.apply {
 			add(SubFragment(marketDetail, FragmentTag.tokenMarketDetail))
-			add(SubFragment(alarmDetail, FragmentTag.alarmDetail))
 		}
 		adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
 	}

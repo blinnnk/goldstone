@@ -26,11 +26,11 @@ import java.math.BigInteger
  * @author KaySaith
  */
 fun GasSelectionPresenter.updateBTCGasSettings(symbol: String, container: LinearLayout) {
-	defaultSatoshiValue.forEachIndexed { index, minner ->
+	defaultSatoshiValue.forEachIndexed { index, miner ->
 		container.findViewById<GasSelectionCell>(index)?.let { cell ->
 			cell.model = GasSelectionModel(
 				index,
-				minner.toString().toLong(),
+				miner.toString().toLong(),
 				prepareBTCSeriesModel?.signedMessageSize ?: 226,
 				currentMinerType,
 				symbol

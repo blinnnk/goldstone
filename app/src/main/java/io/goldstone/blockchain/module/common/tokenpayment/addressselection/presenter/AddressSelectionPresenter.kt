@@ -193,7 +193,7 @@ class AddressSelectionPresenter(
 			CryptoName.allChainName.none {
 				content.contains(it.toLowerCase())
 			} -> false
-			content.length < CryptoValue.bitcoinAddressLength -> false
+			content.length < CryptoValue.bitcoinAddressClassicLength -> false
 			else -> true
 		}
 	}

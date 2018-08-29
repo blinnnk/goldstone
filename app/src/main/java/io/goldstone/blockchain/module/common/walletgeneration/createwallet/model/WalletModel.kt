@@ -137,7 +137,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getAllETHAndERCAddresses(callback: ArrayList<String>.() -> Unit) {
+		fun getAllETHAndERCAddresses(callback: List<String>.() -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
 			} then { it ->

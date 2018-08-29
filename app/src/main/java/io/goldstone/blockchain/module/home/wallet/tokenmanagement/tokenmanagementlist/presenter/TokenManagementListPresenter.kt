@@ -44,7 +44,7 @@ class TokenManagementListPresenter(
 		updateData()
 	}
 
-	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
+	private fun checkWalletType(callback: (isETHERCAndETCWallet: Boolean) -> Unit) {
 		when (Config.getCurrentWalletType()) {
 			WalletType.BTCTestOnly.content,
 			WalletType.BTCOnly.content,

@@ -86,7 +86,9 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 		BitcoinApi.getUnspentListByAddress(myAddress) { unspents ->
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
-				hold(null)
+				GoldStoneAPI.context.runOnUiThread {
+					hold(null)
+				}
 				return@getUnspentListByAddress
 			}
 			val size = BTCSeriesTransactionUtils.generateBTCSignedRawTransaction(

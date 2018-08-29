@@ -161,7 +161,7 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val unvalidPrivateKey = when (currentLanguage) {
+	val invalidPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid private key"
 		HoneyLanguage.Chinese.code -> "这不是正确格式的私钥"
 		HoneyLanguage.Japanese.code -> "これは正確な形式のプライベートキーではありません"
