@@ -22,7 +22,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.SearchInputWithFilterLayout
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.FilterSearchInput
 import org.jetbrains.anko.*
 
 /**
@@ -68,7 +68,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 	private val searchInput by lazy {
-		SearchInputWithFilterLayout(context)
+		FilterSearchInput(context)
 	}
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
@@ -168,10 +168,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun searchInputLinstener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
-		searchInput.editTextInput.setOnFocusChangeListener { _, isChanged ->
+		searchInput.editText.setOnFocusChangeListener { _, isChanged ->
 			isFocus(isChanged)
 		}
-		searchInput.editTextInput.addTextChangedListener(object : TextWatcher {
+		searchInput.editText.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(content: Editable?) {
 				if (!content.isNullOrBlank()) {
 					action(content.toString())
@@ -226,20 +226,20 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 		// 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
 		title.visibility = View.GONE
-		findViewById<SearchInputWithFilterLayout>(ElementID.searchInput).let {
+		findViewById<FilterSearchInput>(ElementID.searchInput).let {
 			it.isNull() isTrue {
 				searchInput.apply {
 					setCancelClick {
 						// 取消搜索后自动清空搜索框里面的内容
-						searchInput.editTextInput.text.clear()
+						searchInput.editText.text.clear()
 						SoftKeyboard.hide(context as Activity)
 						// 等待键盘完全收起后在执行动作防止页面抖动
 						cancelEvent()
 						showSearchInput(false)
 					}
 					AnimationDuration.Default timeUpThen {
-						editTextInput.requestFocus()
-						SoftKeyboard.show(context as Activity, editTextInput)
+						editText.requestFocus()
+						SoftKeyboard.show(context as Activity, editText)
 					}
 				}.into(this)
 			} otherwise {

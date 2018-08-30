@@ -20,8 +20,8 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
-	private val imageViewFilter by lazy {
+class FilterSearchInput(context: Context) : LinearLayout(context) {
+	private val filterIcon by lazy {
 		ImageView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(38.uiPX(), matchParent)
 			imageResource = R.drawable.search_icon
@@ -29,9 +29,10 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 		}
 	}
 	
-	val editTextInput by lazy {
+	val editText by lazy {
 		EditText(context).apply {
 			hint = EmptyText.searchInput
+			backgroundTintMode = PorterDuff.Mode.CLEAR
 			textSize = fontSize(12)
 			textColor = GrayScale.black
 			hintTextColor = GrayScale.midGray
@@ -55,22 +56,19 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 	
 	init {
 		id = ElementID.searchInput
-		orientation = LinearLayout.HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		leftPadding = 20.uiPX()
 		rightPadding = 20.uiPX()
 		
 		linearLayout {
 			gravity = Gravity.CENTER_VERTICAL
-			orientation = LinearLayout.HORIZONTAL
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
 			leftPadding = 10.uiPX()
 			
-			backgroundTintMode = PorterDuff.Mode.CLEAR
-			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
+			addCorner(CornerSize.default.toInt(), Spectrum.white)
 			
-			addView(imageViewFilter)
-			addView(editTextInput)
+			addView(filterIcon)
+			addView(editText)
 		}
 		addView(cancelTextView)
 		
@@ -81,14 +79,14 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 	}
 	
 	fun setFilterClickEvent(callback: () -> Unit) {
-		imageViewFilter.click { callback() }
+		filterIcon.click { callback() }
 	}
 	
-	fun setFiltered(filtered: Boolean) {
-		if (filtered) {
-			imageViewFilter.clearColorFilter()
+	fun setFiltered(hasFiltered: Boolean) {
+		if (hasFiltered) {
+			filterIcon.clearColorFilter()
 		} else {
-			imageViewFilter.setColorFilter(GrayScale.lightGray)
+			filterIcon.setColorFilter(GrayScale.lightGray)
 		}
 	}
 	
