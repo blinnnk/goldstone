@@ -20,7 +20,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class SearchInputWithFilterLayout(context: Context): LinearLayout(context) {
+class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 	private val imageViewFilter by lazy {
 		ImageView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(38.uiPX(), matchParent)
@@ -98,7 +98,7 @@ class SearchInputWithFilterLayout(context: Context): LinearLayout(context) {
 		
 	}
 	
-	fun setCancelClick(callback: () -> Unit){
+	fun setCancelClick(callback: () -> Unit) {
 		cancelTextView.click { callback() }
 	}
 	
@@ -111,7 +111,7 @@ class SearchInputWithFilterLayout(context: Context): LinearLayout(context) {
 		if (filtered) {
 			imageViewFilter.visibility = View.VISIBLE
 			textViewFilter.visibility = View.GONE
-		}else {
+		} else {
 			imageViewFilter.visibility = View.GONE
 			textViewFilter.visibility = View.VISIBLE
 		}

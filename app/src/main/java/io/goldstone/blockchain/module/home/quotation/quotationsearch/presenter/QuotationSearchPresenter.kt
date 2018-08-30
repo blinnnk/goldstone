@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.MarketSetTable
@@ -23,23 +24,22 @@ class QuotationSearchPresenter(
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
 	
 	private var filterMarketIds = ""
-
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-
+	
 	private var hasNetWork = true
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.searchInputLinstener(
-				{
-					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-					if (it) {
-						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
-					}
+			overlayView.header.searchInputLinstener({
+				// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+				if (it) {
+					hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
 				}
-			) {
+			}) {
 				hasNetWork isTrue { searchTokenBy(it) }
 			}
 			
@@ -56,14 +56,27 @@ class QuotationSearchPresenter(
 	
 	private fun getSearchFilters() {
 		MarketSetTable.getMarketsByStatus(1) {
-			filterMarketIds = ""
-			it.forEach { marketSetTable ->
+			calculateFilter(it)
+		}
+	}
+	
+	private fun calculateFilter(data: List<MarketSetTable>) {
+		filterMarketIds = ""
+		data.forEach { marketSetTable ->
+			if (marketSetTable.status == 1) {
 				filterMarketIds += (marketSetTable.id)
 				filterMarketIds += ','
 			}
 		}
+		if (filterMarketIds.length > 1) {
+			filterMarketIds = filterMarketIds.substring(0, filterMarketIds.length - 1)
+		}
+		fragment.getParentFragment<QuotationOverlayFragment> {
+			overlayView.header.resetFilterStatus(filterMarketIds.isNotEmpty())
+		}
+		
 	}
-
+	
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
 		isSelect: Boolean = true,
@@ -81,18 +94,14 @@ class QuotationSearchPresenter(
 			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
 		}
 	}
-
+	
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(
-			symbol,
-			filterMarketIds,
-			{
-				// Show error information to user
-				fragment.context?.alert(it.toString().showAfterColonContent())
-			}
-		) { searchList ->
+		GoldStoneAPI.getMarketSearchList(symbol, filterMarketIds, {
+			// Show error information to user
+			fragment.context?.alert(it.toString().showAfterColonContent())
+		}) { searchList ->
 			if (searchList.isEmpty()) {
 				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
 				return@getMarketSearchList
@@ -114,7 +123,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-
+	
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
@@ -123,6 +132,7 @@ class QuotationSearchPresenter(
 			}.toArrayList())
 		}
 	}
+	
 	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<MarketSetTable>) {
 		getMainActivity()?.getMainContainer()?.apply {
 			if (findViewById<MarketSearchFilterOverlyView>(ElementID.contentScrollview).isNull()) {
@@ -144,13 +154,7 @@ class QuotationSearchPresenter(
 						
 						confirmButton.click {
 							MarketSetTable.insert(data) {
-								filterMarketIds = ""
-								data.forEach { marketSetTable ->
-									if (marketSetTable.status == 1) {
-										filterMarketIds += (marketSetTable.id)
-										filterMarketIds += ','
-									}
-								}
+								calculateFilter(data)
 								overlay.remove()
 							}
 						}
@@ -162,16 +166,16 @@ class QuotationSearchPresenter(
 		}
 	}
 	
-
+	
 	companion object {
-		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+		fun getLineChartDataByPair(
+			pair: String,
+			hold: (String) -> Unit
+		) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(
-				parameter,
-				{
-					LogUtil.error("getCurrencyLineChartData", it)
-				}
-			) {
+			GoldStoneAPI.getCurrencyLineChartData(parameter, {
+				LogUtil.error("getCurrencyLineChartData", it)
+			}) {
 				it.isNotEmpty() isTrue {
 					hold(it.first().pointList.toString())
 				} otherwise {
@@ -181,15 +185,24 @@ class QuotationSearchPresenter(
 		}
 		
 		fun getMarketList(callback: (ArrayList<MarketSetTable>) -> Unit) {
-			GoldStoneAPI.getMarketList ({
-				GoldStoneAPI.context.runOnUiThread {
-					LogUtil.error(it.toString())
-				}
-			}) {
-				GoldStoneAPI.context.runOnUiThread {
-					callback(it)
+			MarketSetTable.getAllMarkets {
+				if (it.isEmpty()) {
+					//数据库没有数据，从网络获取
+					GoldStoneAPI.getMarketList({
+						GoldStoneAPI.context.runOnUiThread {
+							LogUtil.error(it.toString())
+						}
+					}) {
+						GoldStoneAPI.context.runOnUiThread {
+							callback(it)
+						}
+					}
+				} else {
+					//数据库有数据
+					callback(it.toArrayList())
 				}
 			}
+			
 		}
 	}
 }

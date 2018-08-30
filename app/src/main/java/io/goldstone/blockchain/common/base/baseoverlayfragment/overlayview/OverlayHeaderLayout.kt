@@ -119,6 +119,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 	
+	fun resetFilterStatus(filtered: Boolean){
+		searchInput.setFiltered(filtered)
+	}
+	
 	fun showBackButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}

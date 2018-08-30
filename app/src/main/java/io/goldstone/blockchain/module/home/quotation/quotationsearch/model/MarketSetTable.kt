@@ -13,20 +13,18 @@ import org.jetbrains.anko.runOnUiThread
  * @author: yanglihai
  * @description:
  */
-@Entity(tableName = "marketSet")
-data class MarketSetTable (
-	@PrimaryKey
-	@SerializedName("market_id")
-	var id: Int,
-	@SerializedName("icon")
-	var url: String,
-	@SerializedName("market")
-	var name: String,
+@Entity(tableName = "marketSet") data class MarketSetTable(
+	@PrimaryKey @SerializedName("market_id") var id: Int,
+	@SerializedName("icon") var url: String,
+	@SerializedName("market") var name: String,
 	var status: Int = 0  // 1 选中，0 未选中
-) {
+	) {
 	
 	companion object {
-	  fun insert (marketSetTable: List<MarketSetTable>, callback: () -> Unit) {
+		fun insert(
+			marketSetTable: List<MarketSetTable>,
+			callback: () -> Unit
+		) {
 			doAsync {
 				GoldStoneDataBase.database.marketSetTableDao().insertMarkets(marketSetTable)
 				GoldStoneAPI.context.runOnUiThread { callback() }
@@ -40,14 +38,20 @@ data class MarketSetTable (
 			}
 		}
 		
-		fun getMarketsByStatus(status: Int, callback: (List<MarketSetTable>) -> Unit) {
+		fun getMarketsByStatus(
+			status: Int,
+			callback: (List<MarketSetTable>) -> Unit
+		) {
 			doAsync {
 				val marketList = GoldStoneDataBase.database.marketSetTableDao().queryByStatus(status)
 				GoldStoneAPI.context.runOnUiThread { callback(marketList) }
 			}
 		}
 		
-		fun updateStatusById(id: Int, status: Int) {
+		fun updateStatusById(
+			id: Int,
+			status: Int
+		) {
 			doAsync {
 				GoldStoneDataBase.database.marketSetTableDao().updateStatusById(id, status)
 			}
@@ -62,11 +66,10 @@ data class MarketSetTable (
 		}
 		
 	}
-
+	
 }
 
-@Dao
-interface MarketSetDao {
+@Dao interface MarketSetDao {
 	@Query("select * from marketSet")
 	fun queryAll(): List<MarketSetTable>
 	
@@ -77,7 +80,10 @@ interface MarketSetDao {
 	fun insertMarkets(marketSet: List<MarketSetTable>)
 	
 	@Query("UPDATE marketSet SET status = :newStatus WHERE id = :rowId ")
-	fun updateStatusById(rowId: Int, newStatus: Int)
+	fun updateStatusById(
+		rowId: Int,
+		newStatus: Int
+	)
 	
 	@Update
 	fun update(marketSetTable: MarketSetTable)
