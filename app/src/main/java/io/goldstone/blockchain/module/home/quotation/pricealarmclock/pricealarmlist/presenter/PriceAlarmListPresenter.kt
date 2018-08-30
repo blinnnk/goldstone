@@ -30,7 +30,7 @@ class PriceAlarmListPresenter(override val fragment: PriceAlarmListFragment)
 			callback()
 		}
 
-		fun getLocalDataRefreshList(callback: ArrayList<PriceAlarmTable>. () -> Unit) {
+		fun getLocalDataAndRefreshList(callback: ArrayList<PriceAlarmTable>. () -> Unit) {
 			// 临时替代属性
 			callback(ArrayList<PriceAlarmTable>())
 		}

@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 		XinGePushReceiver.appIsBackground = false
 		// 轮询价格闹铃监听
 		priceAlarmStatusObserver = object : PriceAlarmStatusObserver(this) {}.apply { start() }
-		0.uiPX()
+
 		transparentStatus()
 
 		setContentView(relativeLayout {

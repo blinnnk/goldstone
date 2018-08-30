@@ -81,9 +81,7 @@ data class PriceAlarmTable(
 			load {
 				GoldStoneDataBase.database.priceAlarmDao().insertPriceAlarm(priceAlarmTable)
 			} then {
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
+				callback()
 			}
 		}
 
@@ -94,9 +92,7 @@ data class PriceAlarmTable(
 			load {
 				GoldStoneDataBase.database.priceAlarmDao().updatePriceAlarm(priceAlarmTable)
 			} then {
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
+				callback()
 			}
 		}
 
@@ -104,9 +100,7 @@ data class PriceAlarmTable(
 			load {
 				GoldStoneDataBase.database.priceAlarmDao().deleteAllPriceAlarm()
 			} then {
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
+				callback()
 			}
 		}
 
@@ -117,9 +111,7 @@ data class PriceAlarmTable(
 			load {
 				GoldStoneDataBase.database.priceAlarmDao().deletePriceAlarm(priceAlarmTable)
 			} then {
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
+				callback()
 			}
 		}
 
