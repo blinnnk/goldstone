@@ -35,19 +35,19 @@ class QuotationSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.searchInputLinstener({
-				// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-				if (it) {
-					hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+			overlayView.header.searchInputLinstener(
+				{
+					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+					if (it) {
+						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+					}
 				}
-			}) {
+			) {
 				hasNetWork isTrue { searchTokenBy(it) }
 			}
 			
 			overlayView.header.setSearchFilterClickEvent {
-				getMarketList {
-					fragment.showSelectionListOverlayView(it)
-				}
+				showExchangeDashboard()
 			}
 		}
 		
@@ -55,22 +55,28 @@ class QuotationSearchPresenter(
 		
 	}
 	
-	private fun getSearchFilters() {
-		ExchangeTable.getMarketsBySelectedStatus(true) {
-			calculateFilter(it)
+	private fun showExchangeDashboard() {
+		getMarketList {
+			fragment.showSelectionListOverlayView(it)
 		}
 	}
 	
-	private fun calculateFilter(data: List<ExchangeTable>) {
+	private fun getSearchFilters() {
+		ExchangeTable.getMarketsBySelectedStatus(true) {
+			initSelectedIds(it)
+		}
+	}
+	
+	private fun initSelectedIds(data: List<ExchangeTable>) {
 		selectedIds = ""
-		data.forEach { marketSetTable ->
-			if (marketSetTable.isSelected) {
-				selectedIds += (marketSetTable.id)
+		data.forEach { exchangeTable ->
+			if (exchangeTable.isSelected) {
+				selectedIds += (exchangeTable.id)
 				selectedIds += ','
 			}
 		}
 		if (selectedIds.length > 1) {
-			selectedIds = selectedIds.substring(0, selectedIds.length - 1)
+			selectedIds = selectedIds.substring(0, selectedIds.lastIndex)
 		}
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
@@ -158,7 +164,7 @@ class QuotationSearchPresenter(
 							selectedStatusChangedList.forEach {
 								ExchangeTable.updateSelectedStatusById(it.first, it.second)
 							}
-							calculateFilter(data)
+							initSelectedIds(data)
 							selectedStatusChangedList.clear()
 							overlay.remove()
 						}
@@ -189,8 +195,9 @@ class QuotationSearchPresenter(
 		) {
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(parameter, {
-				LogUtil.error("getCurrencyLineChartData", it)
-			}) {
+					LogUtil.error("getCurrencyLineChartData", it)
+				}
+			) {
 				it.isNotEmpty() isTrue {
 					hold(it.first().pointList.toString())
 				} otherwise {
@@ -204,9 +211,7 @@ class QuotationSearchPresenter(
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
 					GoldStoneAPI.getMarketList({
-						GoldStoneAPI.context.runOnUiThread {
-							LogUtil.error(it.toString())
-						}
+						LogUtil.error(it.toString())
 					}) {
 						ExchangeTable.insertOrReplace(it) {}
 						callback(it)

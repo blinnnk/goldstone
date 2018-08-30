@@ -9,8 +9,7 @@ import com.blinnnk.util.observing
 import com.bumptech.glide.Glide
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.button.SquareIcon
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import org.jetbrains.anko.*
@@ -31,14 +30,17 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 			x += 10.uiPX()
 		}
 	}
-	val exchangeIcon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
+	val exchangeIcon by lazy {
+		ImageView(context).apply {
+			layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+		}
+	}
 	
 	init {
 		hasArrow = false
 		setHorizontalPadding()
-		this.addView(exchangeIcon.apply {
+		addView(exchangeIcon.apply {
 			setGrayStyle()
-			y += 10.uiPX()
 		})
 		
 		addView(textView)
@@ -47,6 +49,9 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
 		})
 		
+		exchangeIcon.apply {
+			setCenterInVertical()
+		}
 		textView.apply {
 			setCenterInVertical()
 			x += 40.uiPX()
@@ -62,7 +67,7 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 	
 	var model: ExchangeTable? by observing(null) {
 		model?.apply {
-			exchangeIcon.image.glideImage(iconUrl)
+			exchangeIcon.glideRoundImage(iconUrl)
 			textView.text = exchangeName
 			checkBox.isChecked = isSelected
 		}

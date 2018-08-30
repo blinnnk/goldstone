@@ -26,26 +26,6 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(38.uiPX(), matchParent)
 			imageResource = R.drawable.search_icon
 			gravity = Gravity.CENTER_VERTICAL
-			visibility = View.GONE
-		}
-	}
-	
-	private val textViewFilter by lazy {
-		TextView(context).apply {
-			textSize = fontSize(18)
-			textColor = GrayScale.black
-			text = "EX"
-			typeface = GoldStoneFont.book(context)
-			layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
-			gravity = Gravity.CENTER_VERTICAL
-			setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.arrow_icon, 0)
-		}
-	}
-	
-	private val viewDivider by lazy {
-		View(context).apply {
-			layoutParams = LinearLayout.LayoutParams(1.uiPX(), 30.uiPX())
-			backgroundColor = Spectrum.darkBlue
 		}
 	}
 	
@@ -89,9 +69,7 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 			backgroundTintMode = PorterDuff.Mode.CLEAR
 			addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
 			
-			addView(textViewFilter)
 			addView(imageViewFilter)
-			addView(viewDivider)
 			addView(editTextInput)
 		}
 		addView(cancelTextView)
@@ -104,16 +82,13 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 	
 	fun setFilterClickEvent(callback: () -> Unit) {
 		imageViewFilter.click { callback() }
-		textViewFilter.click { callback() }
 	}
 	
 	fun setFiltered(filtered: Boolean) {
 		if (filtered) {
-			imageViewFilter.visibility = View.VISIBLE
-			textViewFilter.visibility = View.GONE
+			imageViewFilter.clearColorFilter()
 		} else {
-			imageViewFilter.visibility = View.GONE
-			textViewFilter.visibility = View.VISIBLE
+			imageViewFilter.setColorFilter(GrayScale.lightGray)
 		}
 	}
 	
