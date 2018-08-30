@@ -1,12 +1,11 @@
-@file:Suppress("DEPRECATION")
-
 package io.goldstone.blockchain
 
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.crypto.DefaultPath
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +17,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class BitcoinUnitTest {
+class EOSUnitTest {
 
 	@Rule
 	@JvmField
@@ -26,10 +25,10 @@ class BitcoinUnitTest {
 	private val position = this.javaClass.simpleName
 
 	@Test
-	fun getBitcoinBalance() {
-		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
-		BitcoinApi.getBalance(address) {
-			LogUtil.debug("$position getBitcoinBalance", "$it")
-		}
+	fun generateEOSPublicKey() {
+		val mnemonic = "card eager cotton tag rally include order cheap soda october giggle easy"
+		val path = DefaultPath.eosPath
+		val keyPair = EOSWalletUtils.generateKeyPair(mnemonic, path)
+		LogUtil.debug("$position generateEOSPublicKey", "$keyPair")
 	}
 }

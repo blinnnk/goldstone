@@ -81,6 +81,16 @@ class KeystoreImportPresenter(
 								)
 							}
 
+							currentType.equals(EOS.content, true) -> {
+								importEOSWallet(
+									walletName,
+									password,
+									hintInput,
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(MainNetParams.get()),
+									callback
+								)
+							}
+
 							currentType.equals(BTCTest.content, true) -> {
 								importBitcoinWallet(
 									walletName,
@@ -161,6 +171,23 @@ class KeystoreImportPresenter(
 		callback: (Boolean) -> Unit
 	) {
 		PrivateKeyImportPresenter.importWalletByBCHPrivateKey(
+			privateKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
+	private fun importEOSWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: String,
+		callback: (Boolean) -> Unit
+	) {
+		PrivateKeyImportPresenter.importWalletByEOSPrivateKey(
 			privateKey,
 			password.text.toString(),
 			walletName,

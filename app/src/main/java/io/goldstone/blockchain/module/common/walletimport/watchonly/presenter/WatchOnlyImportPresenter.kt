@@ -16,6 +16,7 @@ import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -40,6 +41,7 @@ class WatchOnlyImportPresenter(
 	private var currentETCAddress = ""
 	private var currentLTCAddress = ""
 	private var currentBCHAddress = ""
+	private var currentEOSAddress = ""
 
 	fun importWatchOnlyWallet(
 		addressType: String,
@@ -68,6 +70,14 @@ class WatchOnlyImportPresenter(
 
 			CryptoValue.PrivateKeyType.LTC.content -> {
 				if (!LTCWalletUtils.isValidAddress(address)) {
+					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					callback()
+					return
+				}
+			}
+
+			CryptoValue.PrivateKeyType.EOS.content -> {
+				if (!EOSWalletUtils.isValidAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
 					return
@@ -109,18 +119,21 @@ class WatchOnlyImportPresenter(
 						currentETCAddress = currentETCAddress,
 						currentLTCAddress = currentLTCAddress,
 						currentBCHAddress = currentBCHAddress,
+						currentEOSAddress = currentEOSAddress,
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
 						bchPath = "",
 						btcTestPath = "",
 						ltcPath = "",
+						eosPath = "",
 						ethAddresses = "",
 						etcAddresses = "",
 						btcAddresses = "",
 						bchAddresses = "",
 						btcSeriesTestAddresses = "",
-						ltcAddresses = ""
+						ltcAddresses = "",
+						eosAddresses = ""
 					)
 				) { thisWallet ->
 					if (thisWallet.isNull()) return@insert
@@ -131,7 +144,8 @@ class WatchOnlyImportPresenter(
 							currentBTCAddress,
 							currentBTCTestAddress,
 							currentLTCAddress,
-							currentBCHAddress
+							currentBCHAddress,
+							currentEOSAddress
 						),
 						{
 							LogUtil.error(this.javaClass.simpleName)
@@ -147,7 +161,8 @@ class WatchOnlyImportPresenter(
 								Pair(currentBCHAddress, ChainType.BCH.id),
 								Pair(currentBTCTestAddress, ChainType.AllTest.id),
 								Pair(currentETCAddress, ChainType.ETC.id),
-								Pair(currentETHAndERCAddress, ChainType.ETH.id)
+								Pair(currentETHAndERCAddress, ChainType.ETH.id),
+								Pair(currentEOSAddress, ChainType.EOS.id)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
 						XinGePushReceiver.registerSingleAddress(
@@ -184,6 +199,10 @@ class WatchOnlyImportPresenter(
 
 			CryptoValue.PrivateKeyType.BCH.content -> {
 				currentBCHAddress = address
+			}
+
+			CryptoValue.PrivateKeyType.EOS.content -> {
+				currentEOSAddress = address
 			}
 
 			else -> {

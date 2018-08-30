@@ -52,6 +52,7 @@ object BitcoinCashApi {
 		errorCallback: (Throwable) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
+		// `From` 值传巨大的目的是获取 `Count` 而不是拉取数据
 		BTCSeriesApiUtils.getTransactionCount(
 			BitcoinCashUrl.getTransactions(address, 999999999, 0),
 			errorCallback,

@@ -308,7 +308,7 @@ object RequisitionUtil {
 		chainName: String = Config.getCurrentChainName(),
 		hold: (String) -> Unit
 	) {
-		val isEncrypt = ChainURL.uncryptChainName.none { it.equals(chainName, true) }
+		val isEncrypt = ChainURL.unencryptedChainName.none { it.equals(chainName, true) }
 		val client = OkHttpClient
 			.Builder()
 			.connectTimeout(40, TimeUnit.SECONDS)

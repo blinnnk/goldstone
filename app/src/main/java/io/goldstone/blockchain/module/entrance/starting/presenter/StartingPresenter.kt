@@ -42,8 +42,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.splash)
 	}
 	
-	fun updateWalletInfoForUserInfo(arrayList: ArrayList<WalletTable>) {
-		arrayList.apply {
+	fun updateWalletInfoForUserInfo(walletList: List<WalletTable>) {
+		walletList.apply {
 			// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
 			Config.updateMaxWalletID(maxBy { it.id }?.id.orZero())
 			Config.updateWalletCount(size)

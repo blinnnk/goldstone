@@ -75,6 +75,13 @@ class NodeSelectionSectionCell(context: Context) : LinearLayout(context) {
 		return this
 	}
 
+	fun eosType(): NodeSelectionSectionCell {
+		icon.imageResource = R.drawable.eos_icon
+		titles.title.text = CryptoSymbol.eos
+		titles.subtitle.text = CryptoName.eos
+		return this
+	}
+
 	fun etcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.etc_icon
 		titles.title.text = CryptoSymbol.etc

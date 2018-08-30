@@ -46,6 +46,11 @@ class SplashPresenter(val activity: SplashActivity) {
 							Config.updateCurrentWalletType(WalletType.LTCOnly.content)
 						}
 
+						WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
+							cacheWalletData()
+							Config.updateCurrentWalletType(WalletType.EOSOnly.content)
+						}
+
 						WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
 							cacheWalletData()
 							Config.updateCurrentWalletType(WalletType.BCHOnly.content)
@@ -177,6 +182,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentETCAddress(currentETCAddress)
 				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentBCHAddress(currentBCHAddress)
+				Config.updateCurrentEOSAddress(currentEOSAddress)
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
 				Config.updateCurrentWalletID(id)
 				Config.updateCurrentBalance(balance.orElse(0.0))

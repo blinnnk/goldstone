@@ -44,15 +44,8 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private val currentMultiChainAddressesView by lazy {
-		AddressesListView(context!!, 6) { moreButton, address, isDefault, title ->
-			val chainType = when (title) {
-				CryptoSymbol.eth -> ChainType.ETH.id
-				CryptoSymbol.etc -> ChainType.ETC.id
-				CryptoSymbol.erc -> ChainType.ETH.id
-				CryptoSymbol.ltc -> ChainType.LTC.id
-				CryptoSymbol.bch -> ChainType.BCH.id
-				else -> ChainType.BTC.id
-			}
+		AddressesListView(context!!, 7) { moreButton, address, isDefault, title ->
+			val chainType = ChainType.getChainTypeBySymbol(title)
 			moreButton.onClick {
 				showCellMoreDashboard(
 					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
@@ -124,6 +117,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
+	private val eosAddressesView by lazy {
+		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
+			moreButton.onClick {
+				showCellMoreDashboard(
+					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					address,
+					ChainType.EOS.id,
+					!isDefault
+				)
+				moreButton.preventDuplicateClicks()
+			}
+		}
+	}
+
 	private val bchAddressesView by lazy {
 		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
@@ -157,8 +164,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						ethAndERCAddressesView.into(this@parent)
 						etcAddressesView.into(this@parent)
 						btcAddressesView.into(this@parent)
+						eosAddressesView.into(this@parent)
 						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
+						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 						if (!Config.isTestEnvironment()) {
 							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
 							bchAddressesView.into(this@parent)
@@ -169,6 +178,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 						presenter.getEthereumAddresses()
 						presenter.getEthereumClassicAddresses()
+						presenter.getEOSAddresses()
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
 						else presenter.getBitcoinAddresses()
@@ -202,7 +212,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setBitcoinCashAddressesModel(model: List<Pair<String, String>>) {
-		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashcoinAddress)
+		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
 		bchAddressesView.model = model
 	}
 
@@ -225,6 +235,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setLitecoinAddressesModel(model: List<Pair<String, String>>) {
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.model = model
+	}
+
+	fun setEOSAddressesModel(model: List<Pair<String, String>>) {
+		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
+		eosAddressesView.model = model
 	}
 
 	fun showCreatorDashboard() {
@@ -263,6 +278,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				WalletSettingsText.newETCAddress ->
 					AddressManagerPresenter.createETCAddress(this, password) {
 						etcAddressesView.model = it
+					}
+
+				WalletSettingsText.newEOSAddress ->
+					AddressManagerPresenter.createEOSAddress(this, password) {
+						eosAddressesView.model = it
 					}
 
 				WalletSettingsText.newLTCAddress -> {
@@ -322,6 +342,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					when (coinType) {
 						ChainType.ETH.id -> presenter.getEthereumAddresses()
 						ChainType.ETC.id -> presenter.getEthereumClassicAddresses()
+						ChainType.EOS.id -> presenter.getEOSAddresses()
 						ChainType.LTC.id -> {
 							if (Config.isTestEnvironment())
 								presenter.getLitecoinTestAddresses()

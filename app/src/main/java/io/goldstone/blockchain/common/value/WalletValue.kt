@@ -13,6 +13,7 @@ enum class WalletType(val content: String) {
 	BTCTestOnly("btctestOnly"),
 	LTCOnly("ltcOnly"),
 	BCHOnly("bchOnly"),
+	EOSOnly("eosOnly"),
 	MultiChain("multiChain");
 
 	companion object {

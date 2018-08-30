@@ -30,7 +30,7 @@ class GoldStoneEthereumUnitTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 	
 	@Test
 	fun getTokenInfoByContract() {
@@ -39,12 +39,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
 			{ error, reason ->
-				LogUtil.error("$positon getTokenInfoByContract $reason", error)
+				LogUtil.error("$position getTokenInfoByContract $reason", error)
 			},
 			chainName
 		) { symbol, name, decimal ->
 			val result = "symbol - $symbol name - $name decimal - $decimal"
-			LogUtil.debug("$positon getTokenInfoByContract)", result)
+			LogUtil.debug("$position getTokenInfoByContract)", result)
 			assertTrue("Symbol is empty", symbol.isNotEmpty())
 			assertTrue("Name is empty", name.isNotEmpty())
 			assertTrue("Decimal is nan or wrong value", decimal != 0.0)
@@ -60,13 +60,13 @@ class GoldStoneEthereumUnitTest {
 			chainName,
 			errorCallback = { error, reason ->
 				LogUtil.error(
-					positon + "getTransactionByHash" + reason,
+					position + "getTransactionByHash" + reason,
 					error
 				)
 			}
 		) {
 			// The ring result of blocknumber is 3396621
-			LogUtil.debug(positon + "getTransactionByHash", it.toString())
+			LogUtil.debug(position + "getTransactionByHash", it.toString())
 			assertTrue("Blocknumber is wrong", it.blockNumber.toIntOrNull() == 396958)
 		}
 	}
@@ -79,14 +79,14 @@ class GoldStoneEthereumUnitTest {
 			transactionHash,
 			{ error, reason ->
 				LogUtil.error(
-					positon + "getTransactionByHash" + reason,
+					position + "getTransactionByHash" + reason,
 					error
 				)
 			},
 			chainName
 		) {
 			// Result is False means isFailed == false
-			LogUtil.debug(positon + "getTransactionByHash", "$it")
+			LogUtil.debug(position + "getTransactionByHash", "$it")
 			assertTrue("Get Transaction status failed", !it)
 		}
 	}
@@ -99,14 +99,14 @@ class GoldStoneEthereumUnitTest {
 			blockHash,
 			{ error, reason ->
 				LogUtil.error(
-					positon + "getBlockTimeStampByBlockHash" + reason,
+					position + "getBlockTimeStampByBlockHash" + reason,
 					error
 				)
 			},
 			chainName
 		) {
 			// Result should be 1485158072
-			LogUtil.debug(positon + "getBlockTimeStampByBlockHash", "$it")
+			LogUtil.debug(position + "getBlockTimeStampByBlockHash", "$it")
 			assertTrue("Get Wrong Timestamp", it == 1485158072L)
 		}
 	}
@@ -117,7 +117,7 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getBlockNumber(
 			{ error, reason ->
 				LogUtil.error(
-					positon + "getBlockNumber" + reason,
+					position + "getBlockNumber" + reason,
 					error
 				)
 			},
@@ -125,7 +125,7 @@ class GoldStoneEthereumUnitTest {
 		) {
 			// Get Current Block number, it will always different than
 			// before but it must bigger than before
-			LogUtil.debug(positon + "getBlockNumber", "$it")
+			LogUtil.debug(position + "getBlockNumber", "$it")
 			assertTrue("Get Wrong Block Number Value", it > 3454242)
 		}
 	}
@@ -139,12 +139,12 @@ class GoldStoneEthereumUnitTest {
 			contract,
 			address,
 			{ error, reason ->
-				LogUtil.error(positon + "getTokenBalanceByContract" + reason, error)
+				LogUtil.error(position + "getTokenBalanceByContract" + reason, error)
 			},
 			chainName
 		) {
 			// The balance in June 16/2018 is 1.882099E13
-			LogUtil.debug(positon + "getTokenBalanceByContract", "$it")
+			LogUtil.debug(position + "getTokenBalanceByContract", "$it")
 			assertTrue("Get wrong balance", it > 0)
 		}
 	}
@@ -156,12 +156,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTokenSymbolByContract(
 			contract,
 			{ error, reason ->
-				LogUtil.error(positon + "getTokenBalanceByContract" + reason, error)
+				LogUtil.error(position + "getTokenBalanceByContract" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be GSC
-			LogUtil.debug(positon + "getTokenSymbolByContract", it)
+			LogUtil.debug(position + "getTokenSymbolByContract", it)
 			assertTrue("Get wrong Symbol", it == "GSC")
 		}
 	}
@@ -173,12 +173,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTokenDecimal(
 			contract,
 			{ error, reason ->
-				LogUtil.error(positon + "getTokenDecimal" + reason, error)
+				LogUtil.error(position + "getTokenDecimal" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be 9.0
-			LogUtil.debug(positon + "getTokenDecimal", it.toString())
+			LogUtil.debug(position + "getTokenDecimal", it.toString())
 			assertTrue("Get wrong decimal", it == 9.0)
 		}
 	}
@@ -190,12 +190,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTokenName(
 			contract,
 			{ error, reason ->
-				LogUtil.error(positon + "getTokenName" + reason, error)
+				LogUtil.error(position + "getTokenName" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be GoldstoneCoin
-			LogUtil.debug(positon + "getTokenName", it)
+			LogUtil.debug(position + "getTokenName", it)
 			assertTrue("Get wrong getTokenName", it.equals("GoldstoneCoin", true))
 		}
 	}
@@ -207,12 +207,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getEthBalance(
 			contract,
 			{ error, reason ->
-				LogUtil.error(positon + "getEthBalance" + reason, error)
+				LogUtil.error(position + "getEthBalance" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be greater than 0
-			LogUtil.debug(positon + "getEthBalance", it.toString())
+			LogUtil.debug(position + "getEthBalance", it.toString())
 			assertTrue("Get wrong eth balance", it > 0)
 		}
 	}
@@ -224,12 +224,12 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getTokenTotalSupply(
 			contract,
 			{ error, reason ->
-				LogUtil.error(positon + "getTokenTotalSupply" + reason, error)
+				LogUtil.error(position + "getTokenTotalSupply" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be 1000000000000000000
-			LogUtil.debug(positon + "getTokenTotalSupply", it.toString())
+			LogUtil.debug(position + "getTokenTotalSupply", it.toString())
 			assertTrue(
 				"Get wrong total supply",
 				it.toBigDecimal().toBigInteger() == BigInteger.valueOf(1000000000000000000)
@@ -248,12 +248,12 @@ class GoldStoneEthereumUnitTest {
 			from,
 			data,
 			{ error, reason ->
-				LogUtil.error(positon + "getTransactionExecutedValue" + reason, error)
+				LogUtil.error(position + "getTransactionExecutedValue" + reason, error)
 			},
 			chainName
 		) {
 			// Result should be 21000
-			LogUtil.debug(positon + "getTransactionExecutedValue", it.toString())
+			LogUtil.debug(position + "getTransactionExecutedValue", it.toString())
 			assertTrue("Get wrong Executed value", it == BigInteger.valueOf(21000))
 		}
 	}
@@ -268,7 +268,7 @@ class GoldStoneEthereumUnitTest {
 			true,
 			"hello"
 		).let {
-			LogUtil.debug(positon + "prepareJsonRPCParam", it)
+			LogUtil.debug(position + "prepareJsonRPCParam", it)
 		}
 	}
 	
@@ -279,13 +279,13 @@ class GoldStoneEthereumUnitTest {
 		GoldStoneEthCall.getInputCodeByHash(
 			hash,
 			{ error, reason ->
-				LogUtil.error(positon + reason, error)
+				LogUtil.error(position + reason, error)
 			},
 			chainName
 		) {
 			val expectedValue =
 				"0xa9059cbb000000000000000000000000ca6655dc28c4ecea148033bf6fac60b1398482e000000000000000000000000000000000000000000000000000000000002c252c4e69636520746f206d65657420796f752062616279"
-			LogUtil.debug("$positon + getInputCodeByTaxHash", it)
+			LogUtil.debug("$position + getInputCodeByTaxHash", it)
 			assertTrue("Got Wrong Input Code", it.equals(expectedValue, true))
 		}
 	}

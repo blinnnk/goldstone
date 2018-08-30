@@ -19297,7 +19297,7 @@ io.goldstone.blockchain.common.language.ImportWalletText -> d.a.a.a.c.p:
     java.lang.String pathAlert -> A
     java.lang.String privateKeyAlert -> y
     java.lang.String privateKeyHint -> n
-    java.lang.String unvalidMainnetBTCPrivateKey -> s
+    java.lang.String invalidMainnetBTCPrivateKey -> s
     java.lang.String unvalidTestnetBTCPrivateKey -> q
     java.lang.String walletType -> b
     kotlin.jvm.functions.Function1 customBTCTestPath -> e
@@ -19492,7 +19492,7 @@ io.goldstone.blockchain.common.language.WalletSettingsText -> d.a.a.a.c.H:
     java.lang.String backUpMnemonic -> y
     java.lang.String backUpMnemonicGotBefore -> G
     java.lang.String balance -> p
-    java.lang.String bitcoinCashcoinAddress -> E
+    java.lang.String bitcoinCashAddress -> E
     java.lang.String containsBTCTest -> b
     java.lang.String copy -> a
     java.lang.String createSubAccount -> L
@@ -21975,7 +21975,7 @@ io.goldstone.blockchain.kernel.network.ChainURL -> d.a.a.c.c.ta:
     java.lang.String infuraRinkeby -> i
     java.lang.String infuraRopsten -> g
     java.util.ArrayList etcChainName -> d
-    java.util.List uncryptChainName -> c
+    java.util.List unencryptedChainName -> c
     kotlin.jvm.functions.Function0 bchWebHeader -> k
     kotlin.jvm.functions.Function0 btcWebHeader -> m
     kotlin.jvm.functions.Function0 etcWebHeader -> j
@@ -21993,7 +21993,7 @@ io.goldstone.blockchain.kernel.network.ChainURL -> d.a.a.c.c.ta:
     java.lang.String getChainNameBySymbol(java.lang.String) -> b
     java.lang.String getContractByTransaction(io.goldstone.blockchain.kernel.commonmodel.TransactionTable,java.lang.String) -> do
     java.util.ArrayList getEtcChainName() -> d
-    java.util.List getUncryptChainName() -> c
+    java.util.List unencryptedChainName() -> c
     kotlin.jvm.functions.Function0 getBchWebHeader() -> f
     kotlin.jvm.functions.Function0 getBtcWebHeader() -> h
     kotlin.jvm.functions.Function0 getEtcWebHeader() -> e

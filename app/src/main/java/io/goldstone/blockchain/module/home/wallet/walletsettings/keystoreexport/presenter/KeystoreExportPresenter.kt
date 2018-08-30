@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58KeyStoreFile
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.getKeystoreFile
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
@@ -44,12 +45,11 @@ class KeystoreExportPresenter(
 		address: String,
 		hold: String?.() -> Unit
 	) {
-		// `BCH` 的地址包含 `:` 所以作为判断条件之一
 		doAsync {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (CryptoValue.isBTCSeriesAddress(address)) {
-				getBTCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
+			if (CryptoValue.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
+				getBTCSeriesKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
 			} else {
@@ -60,7 +60,7 @@ class KeystoreExportPresenter(
 		}
 	}
 
-	private fun getBTCKeystoreFile(
+	private fun getBTCSeriesKeystoreFile(
 		walletAddress: String,
 		password: String,
 		isSingleChainWallet: Boolean,

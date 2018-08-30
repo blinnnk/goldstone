@@ -247,4 +247,25 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "BCH 測試網（GoldStone）"
 		else -> ""
 	}
+
+	@JvmField
+	val eosMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS  Mainnet"
+		HoneyLanguage.Chinese.code -> "EOS  Mainnet"
+		HoneyLanguage.Japanese.code -> "EOS  Mainnet"
+		HoneyLanguage.Korean.code -> "EOS  Mainnet"
+		HoneyLanguage.Russian.code -> "EOS  Mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "EOS  Mainnet"
+		else -> ""
+	}
+	@JvmField
+	val eosTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS  Jungle"
+		HoneyLanguage.Chinese.code -> "EOS  Jungle"
+		HoneyLanguage.Japanese.code -> "EOS  Jungle"
+		HoneyLanguage.Korean.code -> "EOS  Jungle"
+		HoneyLanguage.Russian.code -> "EOS  Jungle"
+		HoneyLanguage.TraditionalChinese.code -> "EOS  Jungle"
+		else -> ""
+	}
 }
