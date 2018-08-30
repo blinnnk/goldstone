@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.value
 
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
 
 /**
  * @date 2018/5/25 8:14 PM
@@ -21,7 +20,9 @@ enum class ChainID(val id: String) {
 	BCHMain("00000000000000000019f112ec0a9982926f1258cdcc558dd7c3b7e5dc7fa148"),
 	BCHTest("00000000000e38fef93ed9582a7df43815d5c2ba9fd37ef70c9a0ea4a285b8f5"),
 	LTCMain("12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2"),
-	LTCTest("4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0");
+	LTCTest("4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"),
+	EOSMain("aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"),
+	EOSTest("038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca"); // Jungle Testnet
 
 	companion object {
 
@@ -54,8 +55,8 @@ enum class ChainID(val id: String) {
 			}
 		}
 
-		fun getTestChains(): ArrayList<String> {
-			return arrayListOf(
+		fun getTestChains(): List<String> {
+			return listOf(
 				ChainID.ETCTest.id,
 				ChainID.BTCTest.id,
 				ChainID.Ropsten.id,
@@ -66,8 +67,8 @@ enum class ChainID(val id: String) {
 			)
 		}
 
-		fun getAllChainID(): ArrayList<String> {
-			return arrayListOf(
+		fun getAllChainID(): List<String> {
+			return listOf(
 				ChainID.Main.id,
 				ChainID.Ropsten.id,
 				ChainID.Kovan.id,
@@ -81,10 +82,17 @@ enum class ChainID(val id: String) {
 			)
 		}
 
-		fun getAllETCChainID(): ArrayList<String> {
-			return arrayListOf(
+		fun getAllETCChainID(): List<String> {
+			return listOf(
 				ChainID.ETCTest.id,
 				ChainID.ETCMain.id
+			)
+		}
+
+		fun getAllEOSChainID(): List<String> {
+			return listOf(
+				ChainID.EOSTest.id,
+				ChainID.EOSMain.id
 			)
 		}
 
@@ -149,6 +157,9 @@ enum class ChainID(val id: String) {
 				// BCH Node
 				ChainText.bchMain -> BCHMain.id
 				ChainText.bchTest -> BCHTest.id
+				// EOS Node
+				ChainText.eosMain -> EOSMain.id
+				ChainText.eosTest -> EOSTest.id
 				else -> Main.id
 			}
 		}
@@ -174,7 +185,9 @@ enum class ChainNameID(val id: Int) {
 	GoldStoneLTC(14),
 	GoldStoneLTCTest(15),
 	GoldStoneBCHMain(16),
-	GoldStoneBCHTest(17);
+	GoldStoneBCHTest(17),
+	GoldStoneEOSMain(18),
+	GoldStoneEOSTest(19);
 
 	companion object {
 		fun getChainNameByID(chainNameID: Int): String {
@@ -197,7 +210,9 @@ enum class ChainNameID(val id: Int) {
 				15 -> ChainText.ltcTest
 				16 -> ChainText.bchMain
 				17 -> ChainText.bchTest
-				else -> ChainText.bchTest
+				18 -> ChainText.eosMain
+				19 -> ChainText.eosTest
+				else -> ChainText.eosTest
 			}
 		}
 
@@ -221,7 +236,9 @@ enum class ChainNameID(val id: Int) {
 				ChainText.ltcTest -> 15
 				ChainText.bchMain -> 16
 				ChainText.bchTest -> 17
-				else -> 17
+				ChainText.eosMain -> 18
+				ChainText.eosTest -> 19
+				else -> 19
 			}
 		}
 	}

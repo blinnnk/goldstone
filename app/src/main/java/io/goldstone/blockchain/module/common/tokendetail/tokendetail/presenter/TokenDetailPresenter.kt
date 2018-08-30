@@ -317,7 +317,7 @@ class TokenDetailPresenter(
 					it.updateChartAndHeaderData()
 				}
 			} otherwise {
-				updateEmptyCharData(token?.symbol!!)
+				updateEmptyCharData(token?.symbol.orEmpty())
 			}
 		}
 	}

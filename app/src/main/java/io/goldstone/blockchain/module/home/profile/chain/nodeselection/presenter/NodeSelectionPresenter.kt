@@ -50,6 +50,11 @@ class NodeSelectionPresenter(
 		Config.updateLTCCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 
+	fun updateEOSChainID(nodeName: String) {
+		Config.updateEOSCurrentChainName(nodeName)
+		Config.updateEOSCurrentChain(ChainID.getChainIDByName(nodeName))
+	}
+
 	fun getDefaultOrCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) {
 			when (type) {
@@ -107,6 +112,7 @@ class NodeSelectionPresenter(
 						Config.updateLTCCurrentChain(ChainID.LTCTest.id)
 						Config.updateBCHCurrentChain(ChainID.BCHTest.id)
 						Config.updateETCCurrentChain(ChainID.ETCTest.id)
+						Config.updateEOSCurrentChain(ChainID.EOSTest.id)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
@@ -114,6 +120,9 @@ class NodeSelectionPresenter(
 						)
 						Config.updateETCCurrentChainName(
 							ChainNameID.getChainNameByID(currentETCTestChainNameID)
+						)
+						Config.updateEOSCurrentChainName(
+							ChainNameID.getChainNameByID(currentEOSChainNameID)
 						)
 						Config.updateCurrentChainName(
 							ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
@@ -143,6 +152,7 @@ class NodeSelectionPresenter(
 						Config.updateLTCCurrentChain(ChainID.LTCMain.id)
 						Config.updateBCHCurrentChain(ChainID.BCHMain.id)
 						Config.updateETCCurrentChain(ChainID.ETCMain.id)
+						Config.updateEOSCurrentChain(ChainID.EOSMain.id)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCChainNameID)
@@ -150,6 +160,9 @@ class NodeSelectionPresenter(
 						)
 						Config.updateETCCurrentChainName(
 							ChainNameID.getChainNameByID(currentETCChainNameID)
+						)
+						Config.updateEOSCurrentChainName(
+							ChainNameID.getChainNameByID(currentEOSChainNameID)
 						)
 						Config.updateCurrentChainName(ChainNameID.getChainNameByID(
 							currentETHERC20AndETCChainNameID)

@@ -1,13 +1,14 @@
 package io.goldstone.blockchain.crypto
 
 import android.content.Context
-import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 
@@ -31,72 +32,12 @@ object GenerateMultiChainWallet {
 			DefaultPath.btcPath,
 			DefaultPath.testPath,
 			DefaultPath.ltcPath,
-			DefaultPath.bchPath
+			DefaultPath.bchPath,
+			DefaultPath.eosPath
 		)
-		context.generateWallet(password, path.ethPath) { mnemonic, ethAddress ->
-			context.getEthereumWalletByMnemonic(
-				mnemonic,
-				path.etcPath,
-				password
-			) { etcAddress ->
-				BTCWalletUtils.getBitcoinWalletByMnemonic(
-					mnemonic,
-					path.btcPath
-				) { btcAddress, secret ->
-					context.storeBase58PrivateKey(
-						secret,
-						btcAddress,
-						password,
-						false,
-						false
-					)
-					BTCWalletUtils.getBitcoinWalletByMnemonic(
-						mnemonic,
-						path.testPath
-					) { btcTestAddress, testSecret ->
-						context.storeBase58PrivateKey(
-							testSecret,
-							btcTestAddress,
-							password,
-							true,
-							false
-						)
-						LTCWalletUtils.generateBase58Keypair(
-							mnemonic,
-							path.ltcPath
-						).let { ltcKeyPair ->
-							context.storeLTCBase58PrivateKey(
-								ltcKeyPair.privateKey,
-								ltcKeyPair.address,
-								password,
-								false
-							)
-							BCHWalletUtils.generateBCHKeyPair(
-								mnemonic,
-								path.bchPath
-							).let { bchKeyPair ->
-								context.storeBase58PrivateKey(
-									bchKeyPair.privateKey,
-									bchKeyPair.address,
-									password,
-									false,
-									false
-								)
-								hold(MultiChainAddresses(
-									ethAddress,
-									etcAddress,
-									btcAddress,
-									btcTestAddress,
-									ltcKeyPair.address,
-									bchKeyPair.address
-								),
-									mnemonic
-								)
-							}
-						}
-					}
-				}
-			}
+		val mnemonic = Mnemonic.generateMnemonic()
+		import(context, mnemonic, password, path) {
+			hold(it, mnemonic)
 		}
 	}
 
@@ -107,74 +48,107 @@ object GenerateMultiChainWallet {
 		path: MultiChainPath,
 		hold: (multiChainAddresses: MultiChainAddresses) -> Unit
 	) {
-		context.getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
-			if (ethAddress.equals(ImportWalletText.existAddress, true)) {
-				hold(MultiChainAddresses())
-				return@getEthereumWalletByMnemonic
-			}
-			context.getEthereumWalletByMnemonic(
-				mnemonic,
-				path.etcPath,
-				password
-			) { etcAddress ->
-				BTCWalletUtils.getBitcoinWalletByMnemonic(
-					mnemonic,
-					path.btcPath
-				) { btcAddress, base58Privatekey ->
-					// 存入 `Btc PrivateKey` 到 `KeyStore`
-					context.storeBase58PrivateKey(
-						base58Privatekey,
-						btcAddress,
-						password,
-						false,
-						false
-					)
+		val addresses = MultiChainAddresses()
+		object : ConcurrentAsyncCombine() {
+			override var asyncCount: Int = DefaultPath.allPaths().size
+			override fun concurrentJobs() {
+				context.apply {
+					// Ethereum
+					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
+						addresses.ethAddress = ethAddress
+						completeMark()
+					}
+					// Ethereum Classic
+					getEthereumWalletByMnemonic(
+						mnemonic,
+						path.etcPath,
+						password
+					) { etcAddress ->
+						addresses.etcAddress = etcAddress
+						completeMark()
+					}
+					// Bitcoin
+					BTCWalletUtils.getBitcoinWalletByMnemonic(
+						mnemonic,
+						path.btcPath
+					) { btcAddress, base58Privatekey ->
+						// 存入 `Btc PrivateKey` 到 `KeyStore`
+						context.storeBase58PrivateKey(
+							base58Privatekey,
+							btcAddress,
+							password,
+							false,
+							false
+						)
+						addresses.btcAddress = btcAddress
+						completeMark()
+					}
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
 						mnemonic,
 						path.testPath
-					) { btcTestAddress, btcTestBase58Privatekey ->
+					) { btcSeriesTestAddress, btcTestBase58Privatekey ->
 						// 存入 `BtcTest PrivateKey` 到 `KeyStore`
 						context.storeBase58PrivateKey(
 							btcTestBase58Privatekey,
-							btcTestAddress,
+							btcSeriesTestAddress,
 							password,
 							true,
 							false
 						)
-						LTCWalletUtils.generateBase58Keypair(
-							mnemonic,
-							path.ltcPath
-						).let { ltcKeyPair ->
-							context.storeLTCBase58PrivateKey(
-								ltcKeyPair.privateKey,
-								ltcKeyPair.address,
-								password,
-								false
-							)
-							BCHWalletUtils.generateBCHKeyPair(
-								mnemonic,
-								path.bchPath
-							).let { bchKeyPair ->
-								context.storeBase58PrivateKey(
-									bchKeyPair.privateKey,
-									bchKeyPair.address,
-									password,
-									false,
-									false
-								)
-								hold(MultiChainAddresses(
-									ethAddress,
-									etcAddress,
-									btcAddress,
-									btcTestAddress,
-									ltcKeyPair.address,
-									bchKeyPair.address
-								))
-							}
-						}
+						addresses.btcSeriesTestAddress = btcSeriesTestAddress
+						completeMark()
+					}
+					// Litecoin
+					LTCWalletUtils.generateBase58Keypair(
+						mnemonic,
+						path.ltcPath
+					).let { ltcKeyPair ->
+						context.storeLTCBase58PrivateKey(
+							ltcKeyPair.privateKey,
+							ltcKeyPair.address,
+							password,
+							false
+						)
+						addresses.ltcAddress = ltcKeyPair.address
+						completeMark()
+					}
+					// Bitcoin Cash
+					BCHWalletUtils.generateBCHKeyPair(
+						mnemonic,
+						path.bchPath
+					).let { bchKeyPair ->
+						context.storeBase58PrivateKey(
+							bchKeyPair.privateKey,
+							bchKeyPair.address,
+							password,
+							false,
+							false
+						)
+						addresses.bchAddress = bchKeyPair.address
+						completeMark()
+					}
+					// Bitcoin Cash
+					EOSWalletUtils.generateKeyPair(
+						mnemonic,
+						path.bchPath
+					).let { eosKeyPair ->
+						// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
+						context.storeBase58PrivateKey(
+							eosKeyPair.privateKey,
+							eosKeyPair.address,
+							password,
+							false,
+							false
+						)
+						addresses.eosAddress = eosKeyPair.address
+						completeMark()
 					}
 				}
 			}
-		}
+
+			override fun mergeCallBack() {
+				hold(addresses)
+			}
+		}.start()
 	}
 }

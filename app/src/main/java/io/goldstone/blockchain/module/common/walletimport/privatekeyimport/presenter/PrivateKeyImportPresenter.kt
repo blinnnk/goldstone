@@ -8,9 +8,11 @@ import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.*
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
@@ -111,6 +113,19 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
+				CryptoValue.PrivateKeyType.EOS -> {
+					importWalletByEOSPrivateKey(
+						privateKeyInput.text.toString(),
+						passwordValue,
+						walletName,
+						fragment.context,
+						hintInput.text?.toString()
+					) {
+						if (it) setAllMainnet { callback(true) }
+						else callback(false)
+					}
+				}
+
 				CryptoValue.PrivateKeyType.BTCTest -> {
 					// 跟随导入的测试网私钥切换全局测试网络状态
 					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
@@ -160,14 +175,46 @@ class PrivateKeyImportPresenter(
 					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
 						this,
-						MultiChainAddresses(
-							"",
-							"",
-							"",
-							"",
-							address,
-							""
-						),
+						MultiChainAddresses(address, CryptoSymbol.ltc),
+						name,
+						"",
+						MultiChainPath(),
+						hint
+					) {
+						if (it) setAllTestnet { callback(true) }
+						else callback(false)
+					}
+				}
+			}
+		}
+
+		fun importWalletByEOSPrivateKey(
+			wifPrivateKey: String,
+			password: String,
+			name: String,
+			context: Context?,
+			hint: String?,
+			callback: (Boolean) -> Unit
+		) {
+			if (wifPrivateKey.length != CryptoValue.bitcoinPrivateKeyLength) {
+				context?.alert(ImportWalletText.invalidPrivateKey)
+				callback(false)
+				return
+			}
+			// 检查比特币私钥地址格式是否是对应的网络
+			if (!EOSWalletUtils.isValidPrivateKey(wifPrivateKey)) {
+				context?.alert(ImportWalletText.invalidEOSPrivateKey)
+				callback(false)
+				return
+			}
+			EOSWalletUtils.generateBase58AddressByWIFKey(wifPrivateKey).let { address ->
+				context?.apply {
+					// `EOS` 的 `ChainPrefix` 使用的是 `BTC` 的 `Mainnet Prefix` 所以这里无论是否是测试状态都是标记为 `False`
+					storeBase58PrivateKey(wifPrivateKey, address, password, false, true)
+					// 存储可读信息到数据库
+					WalletImportPresenter.insertWalletToDatabase(
+						this,
+						MultiChainAddresses(address, CryptoSymbol.eos),
 						name,
 						"",
 						MultiChainPath(),
@@ -195,7 +242,7 @@ class PrivateKeyImportPresenter(
 			}
 			// 检查比特币私钥地址格式是否是对应的网络
 			if (!BTCUtils.isValidMainnetPrivateKey(privateKey)) {
-				context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
+				context?.alert(ImportWalletText.invalidMainnetBTCPrivateKey)
 				callback(false)
 				return
 			}
@@ -213,14 +260,7 @@ class PrivateKeyImportPresenter(
 					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
 						this,
-						MultiChainAddresses(
-							"",
-							"",
-							"",
-							"",
-							"",
-							address
-						),
+						MultiChainAddresses(address, CryptoSymbol.bch),
 						name,
 						"",
 						MultiChainPath(),
@@ -256,7 +296,7 @@ class PrivateKeyImportPresenter(
 				}
 			} else {
 				if (!BTCUtils.isValidMainnetPrivateKey(privateKey)) {
-					context?.alert(ImportWalletText.unvalidMainnetBTCPrivateKey)
+					context?.alert(ImportWalletText.invalidMainnetBTCPrivateKey)
 					callback(false)
 					return
 				}
@@ -274,27 +314,15 @@ class PrivateKeyImportPresenter(
 					// 存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
 						this,
-						MultiChainAddresses(
-							"",
-							"",
-							if (isTest) "" else address,
-							if (isTest) address else "",
-							"",
-							""
-						),
+						MultiChainAddresses(address, CryptoSymbol.pureBTCSymbol),
 						name,
 						"",
 						MultiChainPath(),
 						hint
 					) {
 						if (it) {
-							if (isTest) setAllTestnet {
-								callback(true)
-							}
-							else
-								setAllMainnet {
-									callback(true)
-								}
+							if (isTest) setAllTestnet { callback(true) }
+							else setAllMainnet { callback(true) }
 						} else {
 							callback(false)
 						}
@@ -317,7 +345,7 @@ class PrivateKeyImportPresenter(
 		) {
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
 			val formatPrivateKey = privateKey.removePrefix("0x")
-			// `Metamask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
+			// `MetaMask` 的私钥有的时候回是 63 位的导致判断有效性的时候回出错这里弥补上
 			val currentPrivateKey =
 				(if (formatPrivateKey.length == 63) "0$formatPrivateKey" else formatPrivateKey)
 					.replaceWithPattern()
@@ -334,7 +362,7 @@ class PrivateKeyImportPresenter(
 			 * 所以所有单链钱包全部用额外的 `Keystore` 规则进行存储
 			 * [CryptoValue.singleChainFile] + `Wallet Address`
 			 */
-			val filname =
+			val filename =
 				if (isSingleChainWallet)
 					CryptoValue.singleChainFile(CryptoUtils.getAddressFromPrivateKey(currentPrivateKey))
 				else CryptoValue.keystoreFilename
@@ -342,7 +370,7 @@ class PrivateKeyImportPresenter(
 			context?.getWalletByPrivateKey(
 				currentPrivateKey,
 				password,
-				filname
+				filename
 			) { address ->
 				if (address.equals(ImportWalletText.existAddress, true)) {
 					context.runOnUiThread {
@@ -353,14 +381,7 @@ class PrivateKeyImportPresenter(
 					address?.let {
 						WalletImportPresenter.insertWalletToDatabase(
 							context,
-							MultiChainAddresses(
-								it,
-								it,
-								"",
-								"",
-								"",
-								""
-							),
+							MultiChainAddresses(it),
 							name,
 							"",
 							MultiChainPath(),

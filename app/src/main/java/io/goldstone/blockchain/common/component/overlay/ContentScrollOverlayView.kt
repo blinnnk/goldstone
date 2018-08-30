@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX

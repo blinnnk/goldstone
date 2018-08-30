@@ -35,6 +35,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 			model.type.equals(WalletType.BCHOnly.content, true) -> WalletText.bchMainnet
 			model.type.equals(WalletType.BTCOnly.content, true) -> WalletText.btcMainnet
 			model.type.equals(WalletType.BTCTestOnly.content, true) -> WalletText.bitcoinTestnet
+			model.type.equals(WalletType.EOSOnly.content, true) -> WalletText.eosWallet
 			else -> WalletText.multiChain
 		}
 		nameInfo.title.text = model.addressName

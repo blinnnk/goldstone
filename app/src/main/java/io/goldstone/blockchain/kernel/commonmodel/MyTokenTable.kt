@@ -300,7 +300,7 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :eosChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
@@ -308,7 +308,8 @@ interface MyTokenDao {
 		etcChain: String = Config.getETCCurrentChain(),
 		btcChain: String = Config.getBTCCurrentChain(),
 		ltcChain: String = Config.getLTCCurrentChain(),
-		bchChain: String = Config.getBCHCurrentChain()
+		bchChain: String = Config.getBCHCurrentChain(),
+		eosChain: String = Config.getEOSCurrentChain()
 	): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
@@ -318,14 +319,15 @@ interface MyTokenDao {
 		chainID: String
 	): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :bchChain OR chainID Like :ltcChain  OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :bchChain OR chainID Like :eosChain OR chainID Like :ltcChain  OR chainID Like :etcChain OR chainID Like :btcChain) ORDER BY balance DESC ")
 	fun getCurrentChainTokensBy(
 		walletAddress: String,
 		ercChain: String = Config.getCurrentChain(),
 		etcChain: String = Config.getETCCurrentChain(),
 		btcChain: String = Config.getBTCCurrentChain(),
 		ltcChain: String = Config.getLTCCurrentChain(),
-		bchChain: String = Config.getBCHCurrentChain()
+		bchChain: String = Config.getBCHCurrentChain(),
+		eosChain: String = Config.getEOSCurrentChain()
 	): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

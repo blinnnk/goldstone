@@ -8,8 +8,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -66,7 +64,8 @@ class WalletImportPresenter(
 					multiChainAddresses.btcAddress,
 					multiChainAddresses.btcSeriesTestAddress,
 					multiChainAddresses.ltcAddress,
-					multiChainAddresses.bchAddress
+					multiChainAddresses.bchAddress,
+					multiChainAddresses.eosAddress
 				).firstOrNull { it.isNotEmpty() }.orEmpty()
 
 			WalletTable.getWalletByAddress(currentAddress) { it ->
@@ -82,6 +81,7 @@ class WalletImportPresenter(
 							currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTestAddress,
 							currentLTCAddress = multiChainAddresses.ltcAddress,
 							currentBCHAddress = multiChainAddresses.bchAddress,
+							currentEOSAddress = multiChainAddresses.eosAddress,
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -112,12 +112,17 @@ class WalletImportPresenter(
 								multiChainAddresses.bchAddress,
 								getAddressIndexFromPath(multiChainPath.bchPath)
 							),
+							eosAddresses = childAddressValue(
+								multiChainAddresses.eosAddress,
+								getAddressIndexFromPath(multiChainPath.eosPath)
+							),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,
 							btcTestPath = multiChainPath.testPath,
 							ltcPath = multiChainPath.ltcPath,
-							bchPath = multiChainPath.bchPath
+							bchPath = multiChainPath.bchPath,
+							eosPath = multiChainPath.eosPath
 						)
 					) { wallet ->
 						// 创建钱包并获取默认的 `token` 信息

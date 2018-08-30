@@ -8,11 +8,11 @@ import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
