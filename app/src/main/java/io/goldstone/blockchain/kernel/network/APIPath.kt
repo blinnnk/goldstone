@@ -25,7 +25,12 @@ object APIPath {
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
 	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
-	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
+	val marketSearch: (header: String,
+		pair: String,
+		marketIds: String) -> String = { header, pair, marketIds ->
+		"$header/account/searchPair?pair=$pair" +
+			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
+	}
 	val marketList: (header: String) -> String = { "$it/index/marketList"}
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }

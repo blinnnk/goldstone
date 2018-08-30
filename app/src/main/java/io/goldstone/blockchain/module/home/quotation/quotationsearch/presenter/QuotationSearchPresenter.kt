@@ -21,6 +21,8 @@ import org.jetbrains.anko.runOnUiThread
 class QuotationSearchPresenter(
 	override val fragment: QuotationSearchFragment
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
+	
+	private var filterMarketIds = ""
 
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
@@ -43,11 +45,21 @@ class QuotationSearchPresenter(
 			
 			overlayView.header.setSearchFilterClick {
 				getMarketList {
-					val data = arrayListOf<MarketSetTable>()
-					data.addAll(it)
-					data.addAll(it)
-					fragment.showSelectionListOverlayView(data)
+					fragment.showSelectionListOverlayView(it)
 				}
+			}
+		}
+		
+		getSearchFilters()
+		
+	}
+	
+	private fun getSearchFilters() {
+		MarketSetTable.getMarketsByStatus(1) {
+			filterMarketIds = ""
+			it.forEach { marketSetTable ->
+				filterMarketIds += (marketSetTable.id)
+				filterMarketIds += ','
 			}
 		}
 	}
@@ -75,6 +87,7 @@ class QuotationSearchPresenter(
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(
 			symbol,
+			filterMarketIds,
 			{
 				// Show error information to user
 				fragment.context?.alert(it.toString().showAfterColonContent())
@@ -128,6 +141,19 @@ class QuotationSearchPresenter(
 							}
 						}
 						marketSetRecyclerView.adapter = marketSetAdapter
+						
+						confirmButton.click {
+							MarketSetTable.insert(data) {
+								filterMarketIds = ""
+								data.forEach { marketSetTable ->
+									if (marketSetTable.status == 1) {
+										filterMarketIds += (marketSetTable.id)
+										filterMarketIds += ','
+									}
+								}
+								overlay.remove()
+							}
+						}
 					}
 				}
 			}

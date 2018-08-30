@@ -255,11 +255,12 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
+		marketIds: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
-			APIPath.marketSearch(APIPath.currentUrl) + pair,
+			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
 			errorCallback,

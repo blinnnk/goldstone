@@ -12,6 +12,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
@@ -30,7 +31,7 @@ class MarketSearchFilterOverlyView(context: Context) : RelativeLayout(context){
 	private lateinit var contentLayout: RelativeLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
-	private lateinit var confirmButton: Button
+	lateinit var confirmButton: Button
 	private val maxWidth = 300.uiPX()
 	private val headerHeight = 50.uiPX()
 	

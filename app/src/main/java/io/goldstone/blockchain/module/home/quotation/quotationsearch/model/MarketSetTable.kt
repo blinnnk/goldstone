@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
+import android.widget.ImageView
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -14,7 +15,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "marketSet")
 data class MarketSetTable (
-	@PrimaryKey(autoGenerate = true)
+	@PrimaryKey
 	@SerializedName("market_id")
 	var id: Int,
 	@SerializedName("icon")
@@ -39,11 +40,19 @@ data class MarketSetTable (
 			}
 		}
 		
+		fun getMarketsByStatus(status: Int, callback: (List<MarketSetTable>) -> Unit) {
+			doAsync {
+				val marketList = GoldStoneDataBase.database.marketSetTableDao().queryByStatus(status)
+				GoldStoneAPI.context.runOnUiThread { callback(marketList) }
+			}
+		}
+		
 		fun updateStatusById(id: Int, status: Int) {
 			doAsync {
 				GoldStoneDataBase.database.marketSetTableDao().updateStatusById(id, status)
 			}
 		}
+		
 		
 		fun clearData(callback: () -> Unit) {
 			doAsync {
@@ -61,7 +70,10 @@ interface MarketSetDao {
 	@Query("select * from marketSet")
 	fun queryAll(): List<MarketSetTable>
 	
-	@Insert()
+	@Query("select * from marketSet where status = :status")
+	fun queryByStatus(status: Int): List<MarketSetTable>
+	
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertMarkets(marketSet: List<MarketSetTable>)
 	
 	@Query("UPDATE marketSet SET status = :newStatus WHERE id = :rowId ")
