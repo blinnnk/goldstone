@@ -19,7 +19,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -197,8 +196,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		})
 	}
 	
-	fun setSearchFilterClick(callback: () -> Unit) {
-		searchInput.setFilterClick(callback)
+	fun setSearchFilterClickEvent(callback: () -> Unit) {
+		searchInput.setFilterClickEvent(callback)
 	}
 	
 	fun showSearchButton(

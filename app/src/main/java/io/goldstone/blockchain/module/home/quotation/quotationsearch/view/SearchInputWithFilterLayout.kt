@@ -102,7 +102,7 @@ class SearchInputWithFilterLayout(context: Context) : LinearLayout(context) {
 		cancelTextView.click { callback() }
 	}
 	
-	fun setFilterClick(callback: () -> Unit) {
+	fun setFilterClickEvent(callback: () -> Unit) {
 		imageViewFilter.click { callback() }
 		textViewFilter.click { callback() }
 	}

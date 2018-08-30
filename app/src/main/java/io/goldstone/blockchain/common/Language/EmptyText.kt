@@ -98,7 +98,7 @@ object EmptyText {
 	}
 	@JvmField
 	val quotationManagementSubtitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Search for and add tokens in the market by clicking the search icon"
+		HoneyLanguage.English.code -> "Search for and add tokens in the market by clicking the search exchangeIcon"
 		HoneyLanguage.Chinese.code -> "点击界面左上角的图标，搜索并添加市场里的token"
 		HoneyLanguage.Japanese.code -> "左上隅にあるアイコンをクリックして、市場のトークンを検索して追加します"
 		HoneyLanguage.Korean.code -> "인터페이스의 왼쪽 상단 모서리에있는 아이콘을 클릭하여 시장에서 토큰을 검색하고 추가하십시오."

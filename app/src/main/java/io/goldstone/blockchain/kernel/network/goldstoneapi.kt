@@ -273,8 +273,8 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketList(
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<MarketSetTable>) -> Unit) {
-		requestData<MarketSetTable>(
+		hold: (ArrayList<ExchangeTable>) -> Unit) {
+		requestData<ExchangeTable>(
 			APIPath.marketList(APIPath.currentUrl),
 			"list",
 			false,

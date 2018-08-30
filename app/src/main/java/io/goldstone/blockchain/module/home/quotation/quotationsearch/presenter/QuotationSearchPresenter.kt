@@ -3,14 +3,14 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.MarketSetTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
 import org.jetbrains.anko.runOnUiThread
@@ -23,7 +23,8 @@ class QuotationSearchPresenter(
 	override val fragment: QuotationSearchFragment
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
 	
-	private var filterMarketIds = ""
+	private var selectedIds = ""
+	private var selectedStatusChangedList: ArrayList<Pair<Int, Boolean>> = arrayListOf()
 	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
@@ -43,7 +44,7 @@ class QuotationSearchPresenter(
 				hasNetWork isTrue { searchTokenBy(it) }
 			}
 			
-			overlayView.header.setSearchFilterClick {
+			overlayView.header.setSearchFilterClickEvent {
 				getMarketList {
 					fragment.showSelectionListOverlayView(it)
 				}
@@ -55,24 +56,24 @@ class QuotationSearchPresenter(
 	}
 	
 	private fun getSearchFilters() {
-		MarketSetTable.getMarketsByStatus(1) {
+		ExchangeTable.getMarketsBySelectedStatus(true) {
 			calculateFilter(it)
 		}
 	}
 	
-	private fun calculateFilter(data: List<MarketSetTable>) {
-		filterMarketIds = ""
+	private fun calculateFilter(data: List<ExchangeTable>) {
+		selectedIds = ""
 		data.forEach { marketSetTable ->
-			if (marketSetTable.status == 1) {
-				filterMarketIds += (marketSetTable.id)
-				filterMarketIds += ','
+			if (marketSetTable.isSelected) {
+				selectedIds += (marketSetTable.id)
+				selectedIds += ','
 			}
 		}
-		if (filterMarketIds.length > 1) {
-			filterMarketIds = filterMarketIds.substring(0, filterMarketIds.length - 1)
+		if (selectedIds.length > 1) {
+			selectedIds = selectedIds.substring(0, selectedIds.length - 1)
 		}
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.resetFilterStatus(filterMarketIds.isNotEmpty())
+			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
 		}
 		
 	}
@@ -98,7 +99,7 @@ class QuotationSearchPresenter(
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(symbol, filterMarketIds, {
+		GoldStoneAPI.getMarketSearchList(symbol, selectedIds, {
 			// Show error information to user
 			fragment.context?.alert(it.toString().showAfterColonContent())
 		}) { searchList ->
@@ -133,10 +134,10 @@ class QuotationSearchPresenter(
 		}
 	}
 	
-	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<MarketSetTable>) {
+	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<ExchangeTable>) {
 		getMainActivity()?.getMainContainer()?.apply {
-			if (findViewById<MarketSearchFilterOverlyView>(ElementID.contentScrollview).isNull()) {
-				val overlay = MarketSearchFilterOverlyView(context)
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
 				overlay.into(this)
 				overlay.apply {
 					setTitle(TransactionText.tokenSelection)
@@ -144,19 +145,22 @@ class QuotationSearchPresenter(
 						val marketSetRecyclerView = MarketSetRecyclerView(context)
 						addView(marketSetRecyclerView, 0)
 						val marketSetAdapter = MarketSetAdapter(data) { markeSetCell ->
-							markeSetCell.switch.setOnCheckedChangeListener { _, isChecked ->
-								markeSetCell.marketSetTable?.apply {
-									status = if (isChecked) 1 else 0
+							markeSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
+								markeSetCell.model?.apply {
+									isSelected = isChecked
+									updateSelectedChanged(id, isSelected)
 								}
 							}
 						}
 						marketSetRecyclerView.adapter = marketSetAdapter
 						
-						confirmButton.click {
-							MarketSetTable.insert(data) {
-								calculateFilter(data)
-								overlay.remove()
+						showConfirmButton {
+							selectedStatusChangedList.forEach {
+								ExchangeTable.updateSelectedStatusById(it.first, it.second)
 							}
+							calculateFilter(data)
+							selectedStatusChangedList.clear()
+							overlay.remove()
 						}
 					}
 				}
@@ -164,6 +168,17 @@ class QuotationSearchPresenter(
 			// 重置回退栈首先关闭悬浮层
 			recoveryBackEvent()
 		}
+	}
+	
+	private fun updateSelectedChanged(id: Int, isSelected: Boolean) {
+		selectedStatusChangedList.forEach {
+			if (it.first == id) {
+				selectedStatusChangedList.remove(it)
+				selectedStatusChangedList.add(Pair(id, isSelected))
+				return
+			}
+		}
+		selectedStatusChangedList.add(Pair(id, isSelected))
 	}
 	
 	
@@ -184,8 +199,8 @@ class QuotationSearchPresenter(
 			}
 		}
 		
-		fun getMarketList(callback: (ArrayList<MarketSetTable>) -> Unit) {
-			MarketSetTable.getAllMarkets {
+		fun getMarketList(callback: (ArrayList<ExchangeTable>) -> Unit) {
+			ExchangeTable.getAll {
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
 					GoldStoneAPI.getMarketList({
@@ -193,9 +208,8 @@ class QuotationSearchPresenter(
 							LogUtil.error(it.toString())
 						}
 					}) {
-						GoldStoneAPI.context.runOnUiThread {
-							callback(it)
-						}
+						ExchangeTable.insertOrReplace(it) {}
+						callback(it)
 					}
 				} else {
 					//数据库有数据
