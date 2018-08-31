@@ -43,7 +43,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		}
 	}
 	
-	private val cancelTextView by lazy {
+	private val cancelButton by lazy {
 		TextView(context).apply {
 			text = CommonText.cancel
 			textColor = GrayScale.midGray
@@ -70,12 +70,12 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			addView(filterIcon)
 			addView(editText)
 		}
-		addView(cancelTextView)
+		addView(cancelButton)
 		
 	}
 	
 	fun setCancelClick(callback: () -> Unit) {
-		cancelTextView.click { callback() }
+		cancelButton.click { callback() }
 	}
 	
 	fun setFilterClickEvent(callback: () -> Unit) {
