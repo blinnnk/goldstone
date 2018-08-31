@@ -274,16 +274,25 @@ object GoldStoneAPI {
 	
 	@JvmStatic
 	fun getMarketList(
+		md5: String,
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<ExchangeTable>) -> Unit) {
-		requestData<ExchangeTable>(
-			APIPath.marketList(APIPath.currentUrl),
-			"list",
-			false,
+		hold: (ArrayList<ExchangeTable>, String) -> Unit) {
+		requestData<String>(
+			APIPath.marketList(APIPath.currentUrl, md5),
+			"",
+			true,
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(toArrayList())
+			try {
+				val data = JSONObject(this[0])
+				val exchangeTables = data.safeGet("list")
+				val newMd5 = data.safeGet("md5")
+				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
+				hold(Gson().fromJson(exchangeTables, collectionType), newMd5)
+			}catch (error: Exception) {
+				errorCallback(error)
+			}
 		}
 	}
 

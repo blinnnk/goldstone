@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -210,15 +211,18 @@ class QuotationSearchPresenter(
 			ExchangeTable.getAll {
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
-					GoldStoneAPI.getMarketList({
+					StartingPresenter.updateExchangesTable ( {
 						LogUtil.error(it.toString())
-					}) {
-						ExchangeTable.insertOrReplace(it) {}
-						callback(it)
+					}) { exchangeTables ->
+						GoldStoneAPI.context.runOnUiThread {
+							callback(exchangeTables.toArrayList())
+						}
 					}
 				} else {
 					//数据库有数据
-					callback(it.toArrayList())
+					GoldStoneAPI.context.runOnUiThread {
+						callback(it.toArrayList())
+					}
 				}
 			}
 			

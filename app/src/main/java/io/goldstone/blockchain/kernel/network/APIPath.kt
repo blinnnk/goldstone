@@ -31,7 +31,10 @@ object APIPath {
 		"$header/account/searchPair?pair=$pair" +
 			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
 	}
-	val marketList: (header: String) -> String = { "$it/index/marketList"}
+	val marketList: (header: String,
+		md5: String) -> String = { header, md5 ->
+		"$header/index/marketList?md5=$md5"
+	}
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }

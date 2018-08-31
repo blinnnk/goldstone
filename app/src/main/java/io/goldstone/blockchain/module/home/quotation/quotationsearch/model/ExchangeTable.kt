@@ -41,7 +41,7 @@ data class ExchangeTable(
 		fun getAll(hold: (List<ExchangeTable>) -> Unit) {
 			doAsync {
 				val marketSet = GoldStoneDataBase.database.marketSetTableDao().getAll()
-				GoldStoneAPI.context.runOnUiThread { hold(marketSet) }
+				hold(marketSet)
 			}
 		}
 		
@@ -61,6 +61,12 @@ data class ExchangeTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.marketSetTableDao().updateSelectedStatusById(id, isSelected)
+			}
+		}
+		
+		fun delete( exchangeTable: ExchangeTable) {
+			doAsync {
+				GoldStoneDataBase.database.marketSetTableDao().delete(exchangeTable)
 			}
 		}
 		

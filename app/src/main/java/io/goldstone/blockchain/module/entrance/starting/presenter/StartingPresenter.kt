@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -22,6 +19,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -126,6 +125,51 @@ class StartingPresenter(override val fragment: StartingFragment) :
 							forEach {
 								GoldStoneDataBase.database.defaultTokenDao().insert(it)
 							}
+						}
+					}
+				}
+			}
+		}
+		
+		private var exchangeTableMd5: String = ""
+		fun updateExchangesTable(errorCallback: (Exception) -> Unit,
+			callback: (List<ExchangeTable>) -> Unit) {
+			doAsync {
+				GoldStoneAPI.getMarketList(exchangeTableMd5,
+					{ error ->
+						errorCallback(error)
+					}
+				) { serverExchangeTables, md5 ->
+					serverExchangeTables.isNotEmpty() isTrue {
+						if (exchangeTableMd5 != md5 && serverExchangeTables.isNotEmpty()) {
+							ExchangeTable.getAll {localExchangeTables ->
+								localExchangeTables.filterNot { local ->
+									serverExchangeTables.any { server ->
+										local.id == server.id
+									}
+								}.apply {
+									// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
+									forEach {
+										ExchangeTable.delete(it)
+									}
+								}
+								
+								val selectedIds = arrayListOf<Int>()
+								localExchangeTables.forEach {
+									if (it.isSelected) {
+										selectedIds.add(it.id)
+									}
+								}.apply {
+									serverExchangeTables.forEach {
+										if (selectedIds.contains(it.id)) {
+											it.isSelected = true
+										}
+									}
+								}
+								ExchangeTable.insertOrReplace(serverExchangeTables) {}
+								callback(serverExchangeTables)
+							}
+							exchangeTableMd5 = md5
 						}
 					}
 				}
