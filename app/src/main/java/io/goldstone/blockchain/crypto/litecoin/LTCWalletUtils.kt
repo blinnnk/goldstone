@@ -27,14 +27,12 @@ object LTCWalletUtils {
 
 	fun generateBase58Keypair(
 		mnemonic: String,
-		path: String,
-		netVersion: ChainPrefix,
-		isCompress: Boolean
+		path: String
 	): BaseKeyPair {
 		val seed = Mnemonic.mnemonicToSeed(mnemonic, "")
 		val keyPair = generateKey(seed, path)
-		val base58PrivateKey = generateWIFPrivatekey(keyPair.keyPair.privateKey, netVersion, isCompress)
-		val address = generateBase58Address(keyPair.keyPair.privateKey, netVersion, isCompress)
+		val base58PrivateKey = generateWIFSecret(keyPair.keyPair.privateKey)
+		val address = generateBase58Address(keyPair.keyPair.privateKey)
 		return BaseKeyPair(address, base58PrivateKey)
 	}
 
@@ -51,6 +49,12 @@ object LTCWalletUtils {
 		val double256Hash = Sha256Hash.hash(versionWithSHA256)
 		val binary = (mainnetPublicHash + double256Hash.toNoPrefixHexString().substring(0, 8)).toUpperCase()
 		return Base58.encode(Hex.decode(binary))
+	}
+
+	private fun generateBase58Address(
+		privateKey: BigInteger
+	): String {
+		return ECKey.fromPrivate(privateKey).toAddress(LitecoinNetParams()).toBase58()
 	}
 
 	fun generateBase58AddressByWIFKey(
@@ -80,6 +84,10 @@ object LTCWalletUtils {
 		val first4bytes = doubleSha256.toNoPrefixHexString().substring(0, 8)
 		val finalKey = versionPrivateKey + first4bytes
 		return Base58.encode(Hex.decode(finalKey))
+	}
+
+	fun generateWIFSecret(privateKey: BigInteger): String {
+		return ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(LitecoinNetParams())
 	}
 
 	@Throws
@@ -121,7 +129,7 @@ object LTCWalletUtils {
 	fun isValidAddress(address: String): Boolean {
 		return when {
 			address.isEmpty() -> false
-			address.length != CryptoValue.bitcoinAddressLength -> false
+			!CryptoValue.isBitcoinAddressLength(address) -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			!address.substring(0, 1).equals("L", true) -> false
 			else -> true

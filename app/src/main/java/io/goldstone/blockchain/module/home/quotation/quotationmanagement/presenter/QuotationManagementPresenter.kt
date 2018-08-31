@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -29,10 +30,12 @@ class QuotationManagementPresenter(
 		QuotationSelectionTable.getMySelections { selections ->
 			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
 				fragment.apply {
-					asyncData.isNull() isTrue {
-						asyncData = orderedData
-					} otherwise {
-						diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+					context?.runOnUiThread {
+						asyncData.isNull() isTrue {
+							asyncData = orderedData
+						} otherwise {
+							diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+						}
 					}
 				}
 			}

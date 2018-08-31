@@ -28,7 +28,7 @@ data class PriceHistoryModel(
 	val totalLow: String,
 	var baseSymbol: String
 ) {
-	
+
 	constructor(
 		data: JSONObject,
 		symbol: String
@@ -39,7 +39,7 @@ data class PriceHistoryModel(
 		data.safeGet("low_total"),
 		symbol
 	)
-	
+
 	constructor(
 		data: QuotationSelectionTable,
 		symbol: String
@@ -50,7 +50,7 @@ data class PriceHistoryModel(
 		data.lowTotal,
 		symbol
 	)
-	
+
 	constructor(symbol: String) : this(
 		"",
 		"",
@@ -61,7 +61,7 @@ data class PriceHistoryModel(
 }
 
 class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
-	
+
 	var model: PriceHistoryModel? by observing(null) {
 		model?.apply {
 			dayPrice.setPricesubtitle("$dayHighest / $dayLow", baseSymbol)
@@ -70,14 +70,14 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 	}
 	private val dayPrice = GraySqualCell(context)
 	private val totalPrice = GraySqualCell(context)
-	
+
 	init {
 		setTitle(QuotationText.priceHistory)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		setHorizontalPadding(PaddingSize.device.toFloat())
 		dayPrice.setPriceTitle(DateAndTimeText.hours)
 		totalPrice.setPriceTitle(DateAndTimeText.total)
-		
+
 		verticalLayout {
 			dayPrice.into(this)
 			totalPrice.into(this)

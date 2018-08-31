@@ -39,7 +39,7 @@ object BTCUtils {
 	fun isValidMainnetAddress(address: String): Boolean {
 		return when {
 			address.isEmpty() -> false
-			address.length != CryptoValue.bitcoinAddressLength -> false
+			!CryptoValue.isBitcoinAddressLength(address) -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			address.substring(0, 1).toIntOrNull().isNull() -> false
 			else -> true
@@ -49,7 +49,7 @@ object BTCUtils {
 	fun isValidTestnetAddress(address: String): Boolean {
 		return when {
 			address.isEmpty() -> false
-			address.length != CryptoValue.bitcoinAddressLength -> false
+			!CryptoValue.isBitcoinAddressLength(address)  -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			address.substring(0, 1) != "m" && address.substring(0, 1) != "n" -> false
 			else -> true

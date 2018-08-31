@@ -174,6 +174,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							val etcSeries =
 								AddressManagerPresenter.convertToChildAddresses(etcAddresses)
 									.map { Pair(it.first, ChainType.ETC.id) }
+							val eosSeries =
+								AddressManagerPresenter.convertToChildAddresses(eosAddresses)
+									.map { Pair(it.first, ChainType.EOS.id) }
 							val all =
 								ethSeries
 									.plus(btcSeries)
@@ -181,6 +184,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 									.plus(etcSeries)
 									.plus(ltcSeries)
 									.plus(bchSeries)
+									.plus(eosSeries)
 									.map {
 										AddressCommissionModel(it.first, it.second, option, id)
 									}.map { prepareAddressData(it) }
@@ -209,6 +213,15 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								AddressCommissionModel(
 									currentBCHAddress,
 									ChainType.BCH.id,
+									option,
+									id
+								)
+							)
+						WalletType.EOSOnly ->
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentEOSAddress,
+									ChainType.EOS.id,
 									option,
 									id
 								)

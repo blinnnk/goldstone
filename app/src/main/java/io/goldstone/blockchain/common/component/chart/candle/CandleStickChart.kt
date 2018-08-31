@@ -128,7 +128,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		with(xAxis) {
 			valueFormatter = IAxisValueFormatter { value, _ ->
 				val valueData = (data.getDataSetByIndex(0) as CandleDataSet).values
-				val position = value.toInt()
+				val position = if (value.toInt() > valueData.lastIndex) valueData.lastIndex else value.toInt()
 				val entry = try {
 					valueData[position]
 				} catch (error: Exception) {

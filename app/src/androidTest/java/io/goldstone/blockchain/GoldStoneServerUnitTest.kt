@@ -30,16 +30,16 @@ class GoldStoneServerUnitTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 
 	@Test
 	fun searchTokenBySymbolOrContract() {
-		// Change any symbo or contract value to test the result
+		// Change any symbol or contract value to test the result
 		val symbolOrContract = "t"
-		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(symbolOrContract, {
-			LogUtil.error("$positon GetSearchToken", it)
+		GoldStoneAPI.getTokenInfoBySymbolFromServer(symbolOrContract, {
+			LogUtil.error("$position GetSearchToken", it)
 		}) {
-			LogUtil.debug("$positon GetSearchToken", it.toString())
+			LogUtil.debug("$position GetSearchToken", it.toString())
 			// it must has result with `t` value by contract, if result is empty will be failed
 			assertTrue("Search token with `tr` by symbol or contract is empty", it.isNotEmpty())
 		}
@@ -47,12 +47,12 @@ class GoldStoneServerUnitTest {
 
 	@Test
 	fun searchQuotationByPair() {
-		// Change any symbo value to test the result
+		// Change any symbol value to test the result
 		val symbol = "tr"
 		GoldStoneAPI.getMarketSearchList(symbol, {
-			LogUtil.error("$positon SearchQuotation", it)
+			LogUtil.error("$position SearchQuotation", it)
 		}) {
-			LogUtil.debug("$positon SearchQuotation", it.toString())
+			LogUtil.debug("$position SearchQuotation", it.toString())
 			// it must has result with `t` value, if result is empty will be failed
 			assertTrue("Search pair quotation with `tr` is empty", it.isNotEmpty())
 		}
@@ -62,9 +62,9 @@ class GoldStoneServerUnitTest {
 	fun getShareContent() {
 		GoldStoneAPI.getShareContent(
 			{
-				LogUtil.error("$positon getShareContent", it)
+				LogUtil.error("$position getShareContent", it)
 			}) {
-			LogUtil.debug("$positon getShareContent", it.toString())
+			LogUtil.debug("$position getShareContent", it.toString())
 			// Share content title, content, url must not be empty
 			assertTrue("Share title is empty", it.title.isNotEmpty())
 			assertTrue("Share content is empty", it.content.isNotEmpty())
@@ -80,10 +80,10 @@ class GoldStoneServerUnitTest {
 			GoldStoneAPI.getNotificationList(
 				requestTime,
 				{
-					LogUtil.error("$positon getNotificationList", it)
+					LogUtil.error("$position getNotificationList", it)
 				}
 			) {
-				Log.d("$positon + getNotificationList", it.toString())
+				Log.d("$position + getNotificationList", it.toString())
 			}
 		}
 	}
@@ -93,10 +93,10 @@ class GoldStoneServerUnitTest {
 		GoldStoneAPI.getTerms(
 			"hello",
 			{
-				LogUtil.error("$positon GetTermsFromServer", it)
+				LogUtil.error("$position GetTermsFromServer", it)
 			}
 		) {
-			LogUtil.debug(positon, it)
+			LogUtil.debug(position, it)
 			assertTrue("Terms is empty", it.isNotEmpty())
 		}
 	}
@@ -105,10 +105,10 @@ class GoldStoneServerUnitTest {
 	fun getConfigList() {
 		GoldStoneAPI.getConfigList(
 			{
-				LogUtil.error("$positon GetConfigList", it)
+				LogUtil.error("$position GetConfigList", it)
 			}
 		) {
-			LogUtil.debug(positon, it.toString())
+			LogUtil.debug(position, it.toString())
 		}
 	}
 
@@ -121,14 +121,14 @@ class GoldStoneServerUnitTest {
 
 	@Test
 	fun getUnreadCount() {
-		AppConfigTable.getAppConfig {
-			it?.apply {
+		AppConfigTable.getAppConfig { config ->
+			config?.apply {
 				GoldStoneAPI.getUnreadCount(
-					it.goldStoneID,
+					config.goldStoneID,
 					System.currentTimeMillis(),
-					{ LogUtil.error(positon, it) }
+					{ LogUtil.error(position, it) }
 				) {
-					LogUtil.debug(positon + "getUnreadCount", it)
+					LogUtil.debug(position + "getUnreadCount", it)
 				}
 			}
 		}

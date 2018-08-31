@@ -45,7 +45,7 @@ class UnlimitedAvatar(
 	}
 
 	private val avatarList = listOf(
-		R.drawable.avatar_brown_bear,
+		R.drawable.avatar_cat,
 		R.drawable.avatar_cattle,
 		R.drawable.avatar_elephant,
 		R.drawable.avatar_elk,

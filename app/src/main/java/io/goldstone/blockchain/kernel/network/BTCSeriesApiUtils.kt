@@ -170,6 +170,8 @@ object BTCSeriesApiUtils {
 		val willGetDataCount =
 			if (transactionCount - localDataMaxIndex > DataValue.pageCount) DataValue.pageCount
 			else transactionCount - localDataMaxIndex
+		// 网络接口数据默认都是从 `0` 开始拉取最新的
+		// TODO 这里需要增加复杂的补充翻页逻辑
 		return PageInfo(0, willGetDataCount, localDataMaxIndex)
 	}
 }

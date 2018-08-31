@@ -21,6 +21,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -44,13 +45,11 @@ class QuotationPresenter(
 		memoryData?.let {
 			diffAndUpdateAdapterData<QuotationAdapter>(it)
 		}
-
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
 			if (selectionMD5 == selections.getObjectMD5HexString()) {
 				return@getMySelections
 			}
-
 			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
@@ -73,17 +72,19 @@ class QuotationPresenter(
 				// 把数据存在内存里面方便下次打开使用
 				memoryData = it
 				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(it)
-				// 设定 `Socket` 并执行
-				currentSocket.isNull() isTrue {
-					// 初始化 `Socket`
-					setSocket {
-						hasInitSocket = true
-						currentSocket?.runSocket()
+				fragment.context?.runOnUiThread {
+					diffAndUpdateAdapterData<QuotationAdapter>(it)
+					// 设定 `Socket` 并执行
+					currentSocket.isNull() isTrue {
+						// 初始化 `Socket`
+						setSocket {
+							hasInitSocket = true
+							currentSocket?.runSocket()
+						}
+					} otherwise {
+						// 更新 `Socket`
+						subscribeSocket()
 					}
-				} otherwise {
-					// 更新 `Socket`
-					subscribeSocket()
 				}
 			}
 		}
@@ -137,7 +138,7 @@ class QuotationPresenter(
 	) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(
-			fragment.asyncData?.map { it.pair }?.toArrayList(),
+			fragment.asyncData?.map { it.pair },
 			{
 				currentSocket = it
 				callback(it)
@@ -191,24 +192,16 @@ class QuotationPresenter(
 		val maxIndexOfData =
 			if (jsonArray.length() > DataValue.quotationDataCount) DataValue.quotationDataCount
 			else jsonArray.length()
-		(0 until maxIndexOfData).map {
-			val timeStamp = jsonArray.getJSONObject(it).safeGet("time").toLong()
-			ChartPoint(
-				timeStamp.toString(),
-				if (jsonArray.getJSONObject(it).safeGet("close").isEmpty())
-					jsonArray.getJSONObject(it).safeGet("price").toFloat()
-				else jsonArray.getJSONObject(it).safeGet("close").toFloat() // close值是当天的收盘值
-			)
+		return (0 until maxIndexOfData).map {
+			ChartPoint(jsonArray.getJSONObject(it))
 		}.sortedBy {
 			it.label.toLong()
-		}.let {
-			return it
 		}
 	}
 
 	companion object {
 		fun getPriceInfoBySocket(
-			pairList: ArrayList<String>?,
+			pairList: List<String>?,
 			holdSocket: (GoldStoneWebSocket) -> Unit,
 			hold: (model: CurrencyPriceInfoModel, isDisconnected: Boolean) -> Unit
 		) {

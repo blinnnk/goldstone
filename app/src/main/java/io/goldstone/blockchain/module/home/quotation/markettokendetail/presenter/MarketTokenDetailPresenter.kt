@@ -34,9 +34,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.*
-import org.json.JSONArray
 import org.json.JSONObject
-import java.util.*
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -75,38 +73,29 @@ class MarketTokenDetailPresenter(
 
 		fragment.currencyInfo?.apply {
 			QuotationSelectionTable.getSelectionByPair(pair) { selectionTable ->
-				selectionTable?.apply {
-					val data: String? = when (period) {
-						MarketTokenDetailChartType.WEEK.info -> lineChartWeek
-						MarketTokenDetailChartType.DAY.info -> lineChartDay
-						MarketTokenDetailChartType.MONTH.info -> lineChartMonth
-						else -> lineChartHour
-					}
-					if (data.isNullOrBlank()) {
-						// 更新网络数据
-						chartView.updateCandleChartDataBy(pair, period, dateType)
-						// 本地数据库如果没有数据就跳出逻辑
-						return@getSelectionByPair
-					} else {
-						// 本地数据库有数据的话判断是否是有效的数据
-						val jsonArray = JSONArray(data)
-						// 把数据转换成需要的格式
-						(0 until jsonArray.length()).map {
-							CandleChartModel(JSONObject(jsonArray[it]?.toString()))
-						}.toArrayList().let { it ->
-							val databaseTime = it.maxBy {
-								it.time
-							}?.time?.toLongOrNull().orElse(0)
-							// 校验数据库的数据时间是否有效，是否需要更新
-							checkDatabaseTimeIsValidBy(period, databaseTime) {
-								isTrue {
-									// 合规就更新本地数据库的数据
-									chartView.updateCandleChartUI(it, dateType)
-								} otherwise {
-									// 不合规就更新网络数据
-									chartView.updateCandleChartDataBy(pair, period, dateType)
-								}
-							}
+				val data: String? = when (period) {
+					MarketTokenDetailChartType.WEEK.info -> selectionTable.lineChartWeek
+					MarketTokenDetailChartType.DAY.info -> selectionTable.lineChartDay
+					MarketTokenDetailChartType.MONTH.info -> selectionTable.lineChartMonth
+					else -> selectionTable.lineChartHour
+				}
+				if (data.isNullOrBlank()) {
+					// 更新网络数据
+					chartView.updateCandleChartDataBy(pair, period, dateType)
+					// 本地数据库如果没有数据就跳出逻辑
+					return@getSelectionByPair
+				} else {
+					// 本地数据库有数据的话判断是否是有效的数据
+					val candleData = CandleChartModel.convertData(data!!)
+					val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
+					// 校验数据库的数据时间是否有效，是否需要更新
+					checkDatabaseTimeIsValidBy(period, databaseTime) {
+						isTrue {
+							// 合规就更新本地数据库的数据
+							chartView.updateCandleChartUI(candleData, dateType)
+						} otherwise {
+							// 不合规就更新网络数据
+							chartView.updateCandleChartDataBy(pair, period, dateType)
 						}
 					}
 				}
@@ -123,13 +112,13 @@ class MarketTokenDetailPresenter(
 				setContentPadding()
 				addContent {
 					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-						fragment.currencyInfo?.symbol!!,
-						fragment.currencyInfo?.contract!!
+						fragment.currencyInfo?.symbol.orEmpty(),
+						fragment.currencyInfo?.contract.orEmpty()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
 						val content =
-							if (it?.description.isNullOrBlank() || it?.description?.count() == 0) QuotationText
-								.emptyDescription
+							if (it?.description.isNullOrBlank() || it?.description.isNullOrEmpty())
+								QuotationText.emptyDescription
 							else it?.description?.substring(1)
 						textView(content) {
 							textColor = GrayScale.gray
@@ -209,17 +198,8 @@ class MarketTokenDetailPresenter(
 				priceHistory.model = priceData
 				QuotationSelectionTable.getSelectionByPair(info.pair) { selectionTable ->
 					doAsync {
-						if (selectionTable.isNull()) return@doAsync
-						else
-							GoldStoneDataBase.database.quotationSelectionDao()
-								.update(selectionTable!!.apply {
-									priceData?.apply {
-										high24 = dayHighest
-										low24 = dayLow
-										highTotal = totalHighest
-										lowTotal = totalLow
-									}
-								})
+						GoldStoneDataBase.database.quotationSelectionDao()
+							.update(QuotationSelectionTable.updatePrice(selectionTable, priceData))
 					}
 				}
 			}
@@ -257,25 +237,17 @@ class MarketTokenDetailPresenter(
 		callback: Boolean.() -> Unit
 	) {
 		when (period) {
-			MarketTokenDetailChartType.WEEK.info -> {
-				// 如果本地数据库的时间周的最大时间小当前于自然周一的时间
+			// 如果本地数据库的时间周的最大时间小当前于自然周一的时间
+			MarketTokenDetailChartType.WEEK.info ->
 				callback(databaseTime > TimeUtils.getNatureSundayTimeInMill() - TimeUtils.ondDayInMills)
-			}
-
-			MarketTokenDetailChartType.DAY.info -> {
-				// 如果本地数据库的时间是1小时之前的那么更新网络数据
+			// 如果本地数据库的时间是1小时之前的那么更新网络数据
+			MarketTokenDetailChartType.DAY.info ->
 				callback(databaseTime > 0.daysAgoInMills() - TimeUtils.oneHourInMills)
-			}
-
-			MarketTokenDetailChartType.MONTH.info -> {
-				// 如果本地数据库的时间是1小时之前的那么更新网络数据
+			// 如果本地数据库的时间是1小时之前的那么更新网络数据
+			MarketTokenDetailChartType.MONTH.info ->
 				callback(databaseTime > TimeUtils.getNatureMonthFirstTimeInMill() - TimeUtils.ondDayInMills)
-			}
-
-			else -> {
-				// 如果本地数据库的时间是1小时之前的那么更新网络数据
-				callback(databaseTime > System.currentTimeMillis() - TimeUtils.oneHourInMills)
-			}
+			// 如果本地数据库的时间是1小时之前的那么更新网络数据
+			else -> callback(databaseTime > System.currentTimeMillis() - TimeUtils.oneHourInMills)
 		}
 	}
 
@@ -283,17 +255,15 @@ class MarketTokenDetailPresenter(
 		data: List<CandleChartModel>,
 		dateType: Int
 	) {
-		LogUtil.error("$dateType")
 		fragment.context?.apply {
 			runOnUiThread {
 				fragment.getMainActivity()?.removeLoadingView()
 				// 服务器抓取的数据返回有一定概率返回错误格式数据
 				data.isEmpty() isFalse {
 					try {
-						resetData(dateType,
-							data.sortedBy {
-								it.time.toLongOrNull().orElse(0)
-							}.mapIndexed { index, entry ->
+						resetData(
+							dateType,
+							data.sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
@@ -303,7 +273,6 @@ class MarketTokenDetailPresenter(
 									entry.time)
 							}
 						)
-
 					} catch (error: Exception) {
 						LogUtil.error("updateChartUI", error)
 						return@runOnUiThread
@@ -314,7 +283,7 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun ArrayList<CandleChartModel>.updateCandleChartDataInDatabaseBy(
+	private fun List<CandleChartModel>.updateCandleChartDataInDatabaseBy(
 		period: String,
 		pair: String
 	) {
@@ -372,16 +341,9 @@ class MarketTokenDetailPresenter(
 		) { default ->
 			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
 				val tokenData =
-					if (default.isNull()) {
-						TokenInformationModel()
-					} else {
-						TokenInformationModel(default!!, info.symbol)
-					}
-				val priceData = if (quotation.isNull()) {
-					PriceHistoryModel(info.symbol)
-				} else {
-					PriceHistoryModel(quotation!!, info.symbol)
-				}
+					if (default.isNull()) TokenInformationModel()
+					else TokenInformationModel(default!!, info.symbol)
+				val priceData = PriceHistoryModel(quotation, info.symbol)
 				hold(tokenData, priceData)
 			}
 		}
