@@ -56,12 +56,7 @@ fun Context.exportLTCBase58PrivateKey(
 			}
 		) {
 			hold(
-				LTCWalletUtils.generateWIFPrivatekey(
-					ECKey.fromPrivate(it.toBigInteger(16)).privKey,
-					ChainPrefix.Litecoin,
-					true
-				).apply {
-				}
+				LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(it.toBigInteger(16)).privKey)
 			)
 		}
 	}

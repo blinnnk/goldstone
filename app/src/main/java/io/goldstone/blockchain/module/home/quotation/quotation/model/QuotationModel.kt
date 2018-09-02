@@ -1,7 +1,8 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.model
 
-import com.db.chart.model.Point
+import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.json.JSONObject
 import java.io.Serializable
 
 /**
@@ -13,7 +14,7 @@ data class QuotationModel(
 	val name: String = "",
 	var price: String = "",
 	var percent: String = "",
-	val chartData: ArrayList<ChartPoint> = arrayListOf(),
+	val chartData: List<ChartPoint> = listOf(),
 	val exchangeName: String = "",
 	val orderID: Double = 0.0,
 	val pairDisplay: String = "",
@@ -22,14 +23,14 @@ data class QuotationModel(
 	val contract: String = "",
 	var isDisconnected: Boolean = false
 ) : Serializable {
-	
+
 	constructor(
 		data: QuotationSelectionTable,
 		price: String,
 		percent: String,
-		chartData: ArrayList<ChartPoint>
+		chartData: List<ChartPoint>
 	) : this(
-		data.baseSymnbol.toUpperCase(),
+		data.baseSymbol.toUpperCase(),
 		data.name.toLowerCase(),
 		price,
 		percent,
@@ -47,7 +48,11 @@ data class QuotationModel(
  * important `Serializable` 传参的时候 非继承与 `Serializable` 的会导致
  * 崩溃. Look `https://stackoverflow.com/questions/4670215/`
  */
-class ChartPoint(label: String, value: Float) : Point(
-	label,
-	value
-), Serializable
+data class ChartPoint(val label: String, val value: Float) : Serializable {
+	// 没有 `Price` 的时候用 `Close` 当天的收盘值作为 `Price` 记录
+	constructor(data: JSONObject) : this(
+		data.safeGet("time"),
+		if (!data.toString().contains("close")) data.safeGet("price").toFloat()
+		else data.safeGet("close").toFloat()
+	)
+}

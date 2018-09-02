@@ -18,7 +18,7 @@ import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -96,6 +96,10 @@ class AddressManagerPresenter(
 						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
 						add(Pair(currentETCAddress, CryptoSymbol.etc))
 					}
+					// EOS.io Mainnet and Testnet Addresses
+					if (currentEOSAddress.isNotEmpty()) {
+						add(Pair(currentEOSAddress, CryptoSymbol.eos))
+					}
 				}
 			fragment.setMultiChainAddresses(addresses)
 		}
@@ -149,13 +153,20 @@ class AddressManagerPresenter(
 		}
 	}
 
+	fun getEOSAddresses() {
+		WalletTable.getCurrentWallet {
+			fragment.setEOSAddressesModel(convertToChildAddresses(eosAddresses))
+		}
+	}
+
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
 		return listOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
 			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress),
-			Pair(R.drawable.bch_creator_icon, WalletSettingsText.newBCHAddress)
+			Pair(R.drawable.bch_creator_icon, WalletSettingsText.newBCHAddress),
+			Pair(R.drawable.eos_creater_icon, WalletSettingsText.newEOSAddress)
 		)
 	}
 
@@ -175,6 +186,16 @@ class AddressManagerPresenter(
 				WalletSettingsText.allETCAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
+			)
+		}
+	}
+
+	fun showAllEOSAddresses(): Runnable {
+		return Runnable {
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
+				WalletSettingsText.allEOSAddresses,
+				WalletSettingsText.viewAddresses,
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
 			)
 		}
 	}
@@ -245,8 +266,8 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun showKeystoreExportFragment(address: String, walltSettingsFragment: WalletSettingsFragment) {
-			walltSettingsFragment.apply {
+		fun showKeystoreExportFragment(address: String, walletSettingsFragment: WalletSettingsFragment) {
+			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
 				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
@@ -282,7 +303,12 @@ class AddressManagerPresenter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(address, ChainType.ETH.id, 1)
+							AddressCommissionModel(
+								address,
+								ChainType.ETH.id,
+								1,
+								wallet.id
+							)
 						)
 						WalletTable.updateETHAndERCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
@@ -315,10 +341,70 @@ class AddressManagerPresenter(
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(address, ChainType.ETC.id, 1)
+							AddressCommissionModel(
+								address,
+								ChainType.ETC.id,
+								1,
+								wallet.id
+							)
 						)
 						WalletTable.updateETCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
+						}
+					}
+				}
+			}
+		}
+
+		fun createEOSAddress(
+			context: Context,
+			password: String,
+			hold: (ArrayList<Pair<String, String>>) -> Unit
+		) {
+			context.verifyKeystorePassword(
+				password,
+				Config.getCurrentEOSAddress(),
+				true,
+				false
+			) { isCorrect ->
+				if (!isCorrect) {
+					context.alert(CommonText.wrongPassword)
+					return@verifyKeystorePassword
+				}
+				WalletTable.getEOSWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.eosPath.substringBeforeLast("/") + "/" + newAddressIndex
+						EOSWalletUtils.generateKeyPair(mnemonic, newChildPath).let { eosKeyPair ->
+							context.storeBase58PrivateKey(
+								eosKeyPair.privateKey,
+								eosKeyPair.address,
+								password,
+								false,
+								false
+							)
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							ChainID.getAllEOSChainID().forEach {
+								insertNewAddressToMyToken(
+									CryptoSymbol.eos,
+									CryptoValue.eosContract,
+									eosKeyPair.address,
+									it
+								)
+							}
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommissionModel(
+									eosKeyPair.address,
+									ChainType.EOS.id,
+									1,
+									wallet.id
+								)
+							)
+							WalletTable.updateEOSAddresses(eosKeyPair.address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
+							}
 						}
 					}
 				}
@@ -338,8 +424,8 @@ class AddressManagerPresenter(
 			) { isCorrect ->
 				if (isCorrect) {
 					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-						wallet.encryptMnemonic?.let { encryptoMnemonic ->
-							val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+						wallet.encryptMnemonic?.let { encryptMnemonic ->
+							val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 							val newAddressIndex = childAddressIndex + 1
 							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
 							BTCWalletUtils.getBitcoinWalletByMnemonic(
@@ -363,7 +449,12 @@ class AddressManagerPresenter(
 								)
 								// 注册新增的子地址
 								XinGePushReceiver.registerSingleAddress(
-									AddressCommissionModel(address, ChainType.BTC.id, 1)
+									AddressCommissionModel(
+										address,
+										ChainType.BTC.id,
+										1,
+										wallet.id
+									)
 								)
 								WalletTable.updateBTCAddresses(address, newAddressIndex) {
 									hold(convertToChildAddresses(it).toArrayList())
@@ -394,8 +485,8 @@ class AddressManagerPresenter(
 				}
 
 				WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptoMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
 						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, secret ->
@@ -430,7 +521,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(address, ChainType.AllTest.id, 1)
+								AddressCommissionModel(
+									address,
+									ChainType.AllTest.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -458,8 +554,8 @@ class AddressManagerPresenter(
 				}
 
 				WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptoMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
 						BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
@@ -479,7 +575,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(bchKeyPair.address, ChainType.BCH.id, 1)
+								AddressCommissionModel(
+									bchKeyPair.address,
+									ChainType.BCH.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -507,11 +608,14 @@ class AddressManagerPresenter(
 				}
 
 				WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptoMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptoMnemonic)
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
 						val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
-						LTCWalletUtils.generateBase58Keypair(mnemonic, newChildPath, ChainPrefix.Litecoin, true).let { ltcKeyPair ->
+						LTCWalletUtils.generateBase58Keypair(
+							mnemonic,
+							newChildPath
+						).let { ltcKeyPair ->
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,
 								ltcKeyPair.address,
@@ -527,7 +631,12 @@ class AddressManagerPresenter(
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(ltcKeyPair.address, ChainType.LTC.id, 1)
+								AddressCommissionModel(
+									ltcKeyPair.address,
+									ChainType.LTC.id,
+									1,
+									wallet.id
+								)
 							)
 							WalletTable.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
@@ -588,9 +697,7 @@ class AddressManagerPresenter(
 					address.split(",").find {
 						it.contains(targetAddress)
 					}?.substringAfterLast("|").orEmpty()
-				} else {
-					address.substringAfterLast("|")
-				}
+				} else address.substringAfterLast("|")
 			}
 			WalletTable.getCurrentWallet {
 				when (chainType) {
@@ -598,18 +705,10 @@ class AddressManagerPresenter(
 					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
 					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
 					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC.id -> {
-						if (Config.isTestEnvironment()) {
-							hold(
-								getTargetAddressIndex(
-									btcSeriesTestAddresses,
-									currentBTCSeriesTestAddress
-								)
-							)
-						} else {
-							hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-						}
-					}
+					ChainType.BTC.id ->
+						if (Config.isTestEnvironment())
+							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
+						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
 				}
 			}
 		}

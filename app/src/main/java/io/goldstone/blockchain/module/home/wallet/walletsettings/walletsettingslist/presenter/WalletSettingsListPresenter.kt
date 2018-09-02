@@ -143,9 +143,9 @@ class WalletSettingsListPresenter(
 
 						override fun mergeCallBack() {
 							// delete wallet record in `walletTable`
-							WalletTable.deleteCurrentWallet {
+							WalletTable.deleteCurrentWallet { wallet ->
 								// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-								XinGePushReceiver.registerAddressesForPush(true)
+								XinGePushReceiver.registerAddressesForPush(wallet, true)
 								activity?.jump<SplashActivity>()
 							}
 						}
@@ -241,9 +241,9 @@ class WalletSettingsListPresenter(
 							callback()
 						} else {
 							// delete wallet record in `walletTable`
-							WalletTable.deleteCurrentWallet {
+							WalletTable.deleteCurrentWallet { wallet ->
 								// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-								XinGePushReceiver.registerAddressesForPush(true)
+								XinGePushReceiver.registerAddressesForPush(wallet, true)
 								callback()
 							}
 						}
@@ -257,9 +257,9 @@ class WalletSettingsListPresenter(
 		MyTokenTable.deleteByAddress(address) {
 			TransactionTable.deleteByAddress(address) {
 				TokenBalanceTable.deleteByAddress(address) {
-					WalletTable.deleteCurrentWallet {
+					WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-						XinGePushReceiver.registerAddressesForPush(true)
+						XinGePushReceiver.registerAddressesForPush(wallet, true)
 						GoldStoneAPI.context.runOnUiThread {
 							fragment.getMainActivity()?.removeLoadingView()
 							fragment.activity?.jump<SplashActivity>()

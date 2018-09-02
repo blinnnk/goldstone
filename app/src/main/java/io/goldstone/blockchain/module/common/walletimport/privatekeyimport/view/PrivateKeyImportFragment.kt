@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.ExplanationTitle
@@ -193,7 +193,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTC.content),
 						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTCTest.content, true),
 						CryptoValue.PrivateKeyType.LTC.content,
-						CryptoValue.PrivateKeyType.BCH.content
+						CryptoValue.PrivateKeyType.BCH.content,
+						CryptoValue.PrivateKeyType.EOS.content
 					)
 				override var defaultRadio = type
 

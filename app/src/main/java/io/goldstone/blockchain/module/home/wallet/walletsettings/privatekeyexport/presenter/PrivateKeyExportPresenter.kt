@@ -51,6 +51,7 @@ class PrivateKeyExportPresenter(
 			when (chainType) {
 				ChainType.BTC.id,
 				ChainType.BCH.id,
+				ChainType.EOS.id,
 				ChainType.AllTest.id -> getBTCPrivateKeyByAddress(
 					it,
 					password,

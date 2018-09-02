@@ -42,6 +42,7 @@ data class WalletListModel(
 				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
 				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses
 				WalletType.BTCOnly -> wallet.btcAddresses
+				WalletType.EOSOnly -> wallet.eosAddresses
 			}
 		}
 	}

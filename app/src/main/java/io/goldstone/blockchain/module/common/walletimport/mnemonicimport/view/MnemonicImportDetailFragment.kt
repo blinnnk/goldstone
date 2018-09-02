@@ -2,25 +2,17 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View.OVER_SCROLL_ALWAYS
 import android.widget.LinearLayout
-import android.widget.OverScroller
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.QAText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
@@ -60,7 +52,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.btcPath,
 		DefaultPath.testPath,
 		DefaultPath.ltcPath,
-		DefaultPath.bchPath
+		DefaultPath.bchPath,
+		DefaultPath.eosPath
 	)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -134,7 +127,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							defaultPath[2],
 							defaultPath[3],
 							defaultPath[4],
-							defaultPath[5]
+							defaultPath[5],
+							defaultPath[6]
 						),
 						mnemonicInput.text.toString(),
 						passwordInput.text.toString(),
@@ -175,6 +169,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		DefaultPath.default,
 		DefaultPath.default,
 		DefaultPath.default,
+		DefaultPath.default,
 		DefaultPath.default
 	)
 
@@ -190,7 +185,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 			DefaultPath.testPathHeader
 		),
 		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader),
-		Pair(ImportWalletText.customBCHPath, DefaultPath.bchPathHeader)
+		Pair(ImportWalletText.customBCHPath, DefaultPath.bchPathHeader),
+		Pair(ImportWalletText.customEOSPath, DefaultPath.eosPathHeader)
 	)
 
 	private fun showPatSettingsDashboard() {

@@ -2,6 +2,8 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.annotation.UiThread
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -18,7 +20,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequest
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequestGetJsonObject
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestData
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUncryptoData
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoData
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -27,6 +29,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankHeaderModel
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -223,7 +226,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getConfigList(
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<ServerConfigModel>) -> Unit
+		@UiThread hold: (List<ServerConfigModel>) -> Unit
 	) {
 		requestData<ServerConfigModel>(
 			APIPath.getConfigList(APIPath.currentUrl),
@@ -233,7 +236,7 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			GoldStoneAPI.context.runOnUiThread {
-				hold(toArrayList())
+				hold(this@requestData)
 			}
 		}
 	}
@@ -259,17 +262,42 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
+		marketIds: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
-			APIPath.marketSearch(APIPath.currentUrl) + pair,
+			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
 			errorCallback,
 			isEncrypt = true
 		) {
 			hold(toArrayList())
+		}
+	}
+	
+	@JvmStatic
+	fun getMarketList(
+		md5: String,
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<ExchangeTable>, String) -> Unit) {
+		requestData<String>(
+			APIPath.marketList(APIPath.currentUrl, md5),
+			"",
+			true,
+			errorCallback,
+			isEncrypt = true
+		) {
+			try {
+				val data = JSONObject(this[0])
+				val exchangeTables = data.safeGet("list")
+				val newMd5 = data.safeGet("md5")
+				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
+				hold(Gson().fromJson(exchangeTables, collectionType), newMd5)
+			}catch (error: Exception) {
+				errorCallback(error)
+			}
 		}
 	}
 
@@ -279,7 +307,7 @@ object GoldStoneAPI {
 		address: String = Config.getCurrentEthereumAddress(),
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
-		requestUncryptoData<ERC20TransactionModel>(
+		requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
 			"result",
 			false,
@@ -299,7 +327,7 @@ object GoldStoneAPI {
 		errorCallback: (Throwable) -> Unit,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
-		requestUncryptoData<TransactionTable>(
+		requestUnCryptoData<TransactionTable>(
 			EtherScanApi.transactions(address, startBlock),
 			"result",
 			false,
@@ -363,21 +391,23 @@ object GoldStoneAPI {
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		errorCallback: (Exception) -> Unit = {},
-		hold: (ArrayList<QuotationSelectionLineChartModel>) -> Unit
+		errorCallback: (Exception) -> Unit,
+		hold: (List<QuotationSelectionLineChartModel>) -> Unit
 	) {
-		postRequestGetJsonObject<QuotationSelectionLineChartModel>(
+		postRequestGetJsonObject(
 			RequestBody.create(
 				requestContentType,
-				ParameterUtil.prepare(true, Pair("pair_list", pairList))
+				ParameterUtil.prepare(
+					true,
+					Pair("pair_list", pairList)
+				)
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
 			errorCallback = errorCallback,
-			isEncrypt = true
-		) {
-			hold(it.toArrayList())
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	fun registerWalletAddresses(
@@ -392,10 +422,9 @@ object GoldStoneAPI {
 			),
 			APIPath.updateAddresses(APIPath.currentUrl),
 			errorCallback,
-			true
-		) {
-			hold(it)
-		}
+			true,
+			hold
+		)
 	}
 
 	fun getUnreadCount(
@@ -444,11 +473,9 @@ object GoldStoneAPI {
 				if (jsonArray.length() == 0) {
 					hold(arrayListOf())
 				} else {
-					(0 until jsonArray.length()).forEach {
+					(0 until jsonArray.length()).forEachOrEnd { it, isEnd ->
 						notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
-						if (it == jsonArray.length() - 1) {
-							hold(notificationData)
-						}
+						if (isEnd) hold(notificationData)
 					}
 				}
 			}
@@ -458,7 +485,7 @@ object GoldStoneAPI {
 	fun getPriceByContractAddress(
 		addressList: JsonArray,
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<TokenPriceModel>) -> Unit
+		@UiThread hold: (List<TokenPriceModel>) -> Unit
 	) {
 		postRequestGetJsonObject<TokenPriceModel>(
 			RequestBody.create(
@@ -471,29 +498,11 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			GoldStoneAPI.context.runOnUiThread {
-				hold(it.toArrayList())
+				hold(it)
 			}
 		}
 	}
 
-	fun getQuotationCurrencyChart(
-		pair: String,
-		period: String,
-		size: Int,
-		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<ChartModel>) -> Unit
-	) {
-		requestData<ChartModel>(
-			APIPath.getQuotationCurrencyChart(APIPath.currentUrl, pair, period, size),
-			"point_list",
-			false,
-			errorCallback,
-			isEncrypt = true
-		) {
-			hold(this.toArrayList())
-		}
-	}
-	
 	fun getQuotationCurrencyCandleChart(
 		pair: String,
 		period: String,
@@ -558,8 +567,7 @@ object GoldStoneAPI {
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(JSONObject(this[0]))
-			
+			hold(JSONObject(first()))
 		}
 	}
 

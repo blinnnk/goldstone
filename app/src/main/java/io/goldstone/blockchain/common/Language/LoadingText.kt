@@ -8,12 +8,12 @@ package io.goldstone.blockchain.common.language
 object LoadingText {
 	@JvmField
 	val getTokenInformation = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Getting Token information from Ethereum..."
-		HoneyLanguage.Chinese.code -> "正在从以太坊获取Token信息，马上就好"
-		HoneyLanguage.Japanese.code -> "現在EthereumからToken情報を取得しています。すぐに終わります"
-		HoneyLanguage.Korean.code -> "Ethereum에서 토큰 정보 얻기..."
-		HoneyLanguage.Russian.code -> "Получение информации о токенах от Ethereum..."
-		HoneyLanguage.TraditionalChinese.code -> "正在從以太坊獲取Token信息，馬上就好"
+		HoneyLanguage.English.code -> "Getting Token information from Blockchain..."
+		HoneyLanguage.Chinese.code -> "正在从区块链获取Token信息，马上就好..."
+		HoneyLanguage.Japanese.code -> "現在ブロックチェーンからToken情報を取得しています..."
+		HoneyLanguage.Korean.code -> "블록 체인에서 토큰 정보 얻기..."
+		HoneyLanguage.Russian.code -> "Получение информации о токенах от Блок цепь..."
+		HoneyLanguage.TraditionalChinese.code -> "正在從區塊鏈獲取Token信息，馬上就好..."
 		else -> ""
 	}
 	@JvmField

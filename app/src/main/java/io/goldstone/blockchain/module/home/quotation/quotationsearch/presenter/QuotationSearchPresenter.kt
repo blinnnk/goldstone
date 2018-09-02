@@ -3,16 +3,17 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchAdapter
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -22,12 +23,16 @@ import org.jetbrains.anko.runOnUiThread
 class QuotationSearchPresenter(
 	override val fragment: QuotationSearchFragment
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
-
+	
+	private var selectedIds = ""
+	private var selectedStatusChangedList: ArrayList<Pair<Int, Boolean>> = arrayListOf()
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-
+	
 	private var hasNetWork = true
+	
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
@@ -41,9 +46,45 @@ class QuotationSearchPresenter(
 			) {
 				hasNetWork isTrue { searchTokenBy(it) }
 			}
+			
+			overlayView.header.setSearchFilterClickEvent {
+				showExchangeDashboard()
+			}
+		}
+		
+		getSearchFilters()
+		
+	}
+	
+	private fun showExchangeDashboard() {
+		getMarketList {
+			fragment.showSelectionListOverlayView(it)
 		}
 	}
-
+	
+	private fun getSearchFilters() {
+		ExchangeTable.getMarketsBySelectedStatus(true) {
+			initSelectedIds(it)
+		}
+	}
+	
+	private fun initSelectedIds(data: List<ExchangeTable>) {
+		selectedIds = ""
+		data.forEach { exchangeTable ->
+			if (exchangeTable.isSelected) {
+				selectedIds += (exchangeTable.id)
+				selectedIds += ','
+			}
+		}
+		if (selectedIds.length > 1) {
+			selectedIds = selectedIds.substring(0, selectedIds.lastIndex)
+		}
+		fragment.getParentFragment<QuotationOverlayFragment> {
+			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
+		}
+		
+	}
+	
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
 		isSelect: Boolean = true,
@@ -61,17 +102,14 @@ class QuotationSearchPresenter(
 			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
 		}
 	}
-
+	
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(
-			symbol,
-			{
-				// Show error information to user
-				fragment.context?.alert(it.toString().showAfterColonContent())
-			}
-		) { searchList ->
+		GoldStoneAPI.getMarketSearchList(symbol, selectedIds, {
+			// Show error information to user
+			fragment.context?.alert(it.toString().showAfterColonContent())
+		}) { searchList ->
 			if (searchList.isEmpty()) {
 				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
 				return@getMarketSearchList
@@ -93,7 +131,7 @@ class QuotationSearchPresenter(
 			}
 		}
 	}
-
+	
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
@@ -102,17 +140,92 @@ class QuotationSearchPresenter(
 			}.toArrayList())
 		}
 	}
-
+	
+	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<ExchangeTable>) {
+		getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
+				val overlay = ContentScrollOverlayView(context)
+				overlay.into(this)
+				overlay.apply {
+					setTitle(TransactionText.tokenSelection)
+					addContent {
+						val marketSetRecyclerView = MarketSetRecyclerView(context)
+						addView(marketSetRecyclerView, 0)
+						val marketSetAdapter = MarketSetAdapter(data) { markeSetCell ->
+							markeSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
+								markeSetCell.model?.apply {
+									isSelected = isChecked
+									updateSelectedChanged(id, isSelected)
+								}
+							}
+						}
+						marketSetRecyclerView.adapter = marketSetAdapter
+						
+						showConfirmButton {
+							selectedStatusChangedList.forEach {
+								ExchangeTable.updateSelectedStatusById(it.first, it.second)
+							}
+							initSelectedIds(data)
+							selectedStatusChangedList.clear()
+							overlay.remove()
+						}
+					}
+				}
+			}
+			// 重置回退栈首先关闭悬浮层
+			recoveryBackEvent()
+		}
+	}
+	
+	private fun updateSelectedChanged(id: Int, isSelected: Boolean) {
+		selectedStatusChangedList.forEach {
+			if (it.first == id) {
+				selectedStatusChangedList.remove(it)
+				selectedStatusChangedList.add(Pair(id, isSelected))
+				return
+			}
+		}
+		selectedStatusChangedList.add(Pair(id, isSelected))
+	}
+	
+	
 	companion object {
-		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+		fun getLineChartDataByPair(
+			pair: String,
+			hold: (String) -> Unit
+		) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(parameter) {
+			GoldStoneAPI.getCurrencyLineChartData(parameter, {
+					LogUtil.error("getCurrencyLineChartData", it)
+				}
+			) {
 				it.isNotEmpty() isTrue {
-					hold(it[0].pointList.toString())
+					hold(it.first().pointList.toString())
 				} otherwise {
 					LogUtil.error("Empty pair data from server")
 				}
 			}
+		}
+		
+		fun getMarketList(callback: (ArrayList<ExchangeTable>) -> Unit) {
+			ExchangeTable.getAll {
+				if (it.isEmpty()) {
+					//数据库没有数据，从网络获取
+					StartingPresenter.updateExchangesTable ( {
+						LogUtil.error(it.toString())
+					}) { exchangeTables ->
+						GoldStoneAPI.context.runOnUiThread {
+							callback(exchangeTables.toArrayList())
+						}
+					}
+				} else {
+					//数据库有数据
+					GoldStoneAPI.context.runOnUiThread {
+						callback(it.toArrayList())
+					}
+				}
+			}
+			
 		}
 	}
 }

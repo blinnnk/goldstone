@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.bitcoincash
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -23,16 +24,37 @@ object BitcoinCashApi {
 		address: String,
 		hold: (List<UnspentModel>) -> Unit
 	) {
-		BTCSeriesApiUtils.getUnspentListByAddress(BitcoinCashUrl.getUnspentInfo(address), hold)
+		BTCSeriesApiUtils.getUnspentListByAddress(
+			BitcoinCashUrl.getUnspentInfo(address),
+			{
+				LogUtil.error("getUnspentListByAddress", it)
+			},
+			hold
+		)
 	}
 
 	fun getTransactions(
 		address: String,
+		from: Int,
+		to: Int,
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactions(
-			BitcoinCashUrl.getTransactions(address),
+			BitcoinCashUrl.getTransactions(address, from, to),
+			errorCallback,
+			hold
+		)
+	}
+
+	fun getTransactionCount(
+		address: String,
+		errorCallback: (Throwable) -> Unit,
+		hold: (count: Int) -> Unit
+	) {
+		// `From` 值传巨大的目的是获取 `Count` 而不是拉取数据
+		BTCSeriesApiUtils.getTransactionCount(
+			BitcoinCashUrl.getTransactions(address, 999999999, 0),
 			errorCallback,
 			hold
 		)
@@ -53,6 +75,8 @@ object BitcoinCashApi {
 				if (isNull()) null
 				else BTCSeriesTransactionTable(
 					it!!,
+					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
+					0,
 					address,
 					CryptoSymbol.bch,
 					false,

@@ -24,7 +24,7 @@ object WalletSettingsText {
 		HoneyLanguage.Chinese.code -> "(包含测试链地址)"
 		HoneyLanguage.Japanese.code -> "(テストチェーンアドレスが含まれています)"
 		HoneyLanguage.Korean.code -> "(테스트 체인 주소가 들어 있습니다)"
-		HoneyLanguage.Russian.code -> "(Contains Test Address)"
+		HoneyLanguage.Russian.code -> "(Содержит тестовый адрес)"
 		HoneyLanguage.TraditionalChinese.code -> "(包含測試鏈地址)"
 		else -> ""
 	}
@@ -36,9 +36,9 @@ object WalletSettingsText {
 
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> if (count > 1) {
-				"there are $count addresses in this wallet $description"
+				"There are $count addresses in this wallet $description"
 			} else {
-				"there is $count address in this wallet $description"
+				"There is $count address in this wallet $description"
 			}
 			HoneyLanguage.Russian.code -> if (count > 1) {
 				"В текущем кошельке есть $count адреса $description"
@@ -71,6 +71,16 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "새 ETC 주소"
 		HoneyLanguage.Russian.code -> "Новый адрес ETC"
 		HoneyLanguage.TraditionalChinese.code -> "新的ETC地址"
+		else -> ""
+	}
+	@JvmField
+	val newEOSAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "New EOS Address"
+		HoneyLanguage.Chinese.code -> "新的EOS地址"
+		HoneyLanguage.Japanese.code -> "新しいEOSアドレス"
+		HoneyLanguage.Korean.code -> "새 EOS 주소"
+		HoneyLanguage.Russian.code -> "Новый адрес EOS"
+		HoneyLanguage.TraditionalChinese.code -> "新的EOS地址"
 		else -> ""
 	}
 	@JvmField
@@ -131,6 +141,16 @@ object WalletSettingsText {
 		HoneyLanguage.Korean.code -> "모든 기타 주소"
 		HoneyLanguage.Russian.code -> "Все адреса ETC"
 		HoneyLanguage.TraditionalChinese.code -> "所有ETC地址"
+		else -> ""
+	}
+	@JvmField
+	val allEOSAddresses = when (currentLanguage) {
+		HoneyLanguage.English.code -> "All EOS Addresses"
+		HoneyLanguage.Chinese.code -> "所有EOS地址"
+		HoneyLanguage.Japanese.code -> "All EOS Addresses"
+		HoneyLanguage.Korean.code -> "All EOS Addresses"
+		HoneyLanguage.Russian.code -> "Все адреса EOS"
+		HoneyLanguage.TraditionalChinese.code -> "所有EOS地址"
 		else -> ""
 	}
 	@JvmField
@@ -324,7 +344,17 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinCashcoinAddress = when (currentLanguage) {
+	val eosAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS Address"
+		HoneyLanguage.Chinese.code -> "EOS Address"
+		HoneyLanguage.Japanese.code -> "EOS Address"
+		HoneyLanguage.Korean.code -> "EOS Address"
+		HoneyLanguage.Russian.code -> "EOS Address"
+		HoneyLanguage.TraditionalChinese.code -> "EOS Address"
+		else -> ""
+	}
+	@JvmField
+	val bitcoinCashAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bitcoin Cash Address"
 		HoneyLanguage.Chinese.code -> "Bitcoin Cash Address"
 		HoneyLanguage.Japanese.code -> "Bitcoin Cash Address"

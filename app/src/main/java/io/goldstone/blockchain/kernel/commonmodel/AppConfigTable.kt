@@ -48,12 +48,15 @@ data class AppConfigTable(
 	var currentBTCTestChainNameID: Int,
 	var currentLTCTestChainNameID: Int,
 	var currentBCHTestChainNameID: Int,
+	var currentEOSTestChainNameID: Int,
 	var currentETCChainNameID: Int,
 	var currentBTCChainNameID: Int,
 	var currentETHERC20AndETCChainNameID: Int,
 	var currentBCHChainNameID: Int,
 	var currentLTCChainNameID: Int,
-	var defaultCoinListMD5: String
+	var currentEOSChainNameID: Int,
+	var defaultCoinListMD5: String,
+	var exchangeListMD5: String
 ) {
 
 	companion object {
@@ -218,6 +221,7 @@ data class AppConfigTable(
 			btcChainNameID: Int,
 			bchChainNameID: Int,
 			ltcChainNameID: Int,
+			eosChainNameID: Int,
 			callback: () -> Unit
 		) {
 			doAsync {
@@ -231,12 +235,14 @@ data class AppConfigTable(
 								currentETCChainNameID = etcChainNameID
 								currentETHERC20AndETCChainNameID = ethERC20AndETCChainNameID
 								currentBCHChainNameID = bchChainNameID
+								currentEOSChainNameID = eosChainNameID
 							} else {
 								currentBTCTestChainNameID = btcChainNameID
 								currentLTCTestChainNameID = ltcChainNameID
 								currentETCTestChainNameID = etcChainNameID
 								currentETHERC20AndETCTestChainNameID = ethERC20AndETCChainNameID
 								currentBCHTestChainNameID = bchChainNameID
+								currentEOSTestChainNameID = eosChainNameID
 							}
 						})
 						GoldStoneAPI.context.runOnUiThread {
@@ -305,7 +311,10 @@ data class AppConfigTable(
 							currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
 							currentBCHChainNameID = ChainNameID.GoldStoneBCHMain.id,
 							currentBCHTestChainNameID = ChainNameID.GoldStoneBCHTest.id,
-							defaultCoinListMD5 = ""
+							currentEOSChainNameID = ChainNameID.GoldStoneEOSMain.id,
+							currentEOSTestChainNameID = ChainNameID.GoldStoneEOSTest.id,
+							defaultCoinListMD5 = "",
+							exchangeListMD5 = ""
 						)
 					)
 				GoldStoneAPI.context.runOnUiThread { callback() }

@@ -26,7 +26,7 @@ class ButtonMenu(context: Context) : LinearLayout(context) {
 
   private val menuHeight = 35.uiPX()
 
-  var titles: ArrayList<String> by observing(arrayListOf()) {
+  var titles: List<String> by observing(arrayListOf()) {
     val buttonWidth = layoutParams.width / titles.size
     titles.forEachIndexed { index, title ->
       textView {

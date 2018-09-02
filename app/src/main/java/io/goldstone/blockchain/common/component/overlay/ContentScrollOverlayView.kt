@@ -10,12 +10,17 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
+import com.blinnnk.extension.*
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
@@ -48,6 +53,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			minimumHeight = 400.uiPX()
 			updateAlphaAnimation(1f)
 			verticalLayout {
+				id = ElementID.container
 				// Header
 				linearLayout {
 					backgroundColor = GrayScale.whiteGray
@@ -111,5 +117,26 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
+	}
+	
+	fun showConfirmButton(callback: () -> Unit) {
+		contentLayout.bottomPadding = 60.uiPX()
+		container.apply {
+			val confirmButton = RoundButton(context).apply {
+				text = CommonText.confirm
+				setBlueStyle(0, maxWidth - 40.uiPX())
+				click {
+					callback()
+				}
+			}
+			relativeLayout {
+				gravity = Gravity.CENTER
+				lparams(matchParent, 60.uiPX()){
+					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.container)
+				}
+				addView(confirmButton)
+			}
+		}
+		
 	}
 }

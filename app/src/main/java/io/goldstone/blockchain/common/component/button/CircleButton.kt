@@ -79,7 +79,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		redotView?.text = count
 	}
 
-	fun removeRedot() {
+	fun removeRedDot() {
 		if (!redotView.isNull()) {
 			iconView.removeView(redotView)
 			redotView = null

@@ -44,7 +44,7 @@ class TokenManagementListPresenter(
 		updateData()
 	}
 
-	private fun checkWalletType(callback: (isETHERCAndETCWasllet: Boolean) -> Unit) {
+	private fun checkWalletType(callback: (isETHERCAndETCWallet: Boolean) -> Unit) {
 		when (Config.getCurrentWalletType()) {
 			WalletType.BTCTestOnly.content,
 			WalletType.BTCOnly.content,
@@ -106,7 +106,7 @@ class TokenManagementListPresenter(
 		) {
 			switch.isClickable = false
 			if (switch.isChecked) {
-				// once it is checked then insert this symbol into `MyTokenTable` database
+				// once it is checked then insertOrReplace this symbol into `MyTokenTable` database
 				MyTokenTable.insertBySymbolAndContract(token.symbol, token.contract) {
 					switch.isClickable = true
 				}

@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -33,29 +35,27 @@ var memoryData: ArrayList<QuotationModel>? = null
 class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
-	
+
 	private var updateChartTimes: Int? = null
 	private var hasInitSocket = false
-	
+
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
 		// 如果内存有数据直接更新内存的数据
 		memoryData?.let {
 			diffAndUpdateAdapterData<QuotationAdapter>(it)
 		}
-		
 		QuotationSelectionTable.getMySelections { selections ->
 			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
 			if (selectionMD5 == selections.getObjectMD5HexString()) {
 				return@getMySelections
 			}
-			
 			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
-			
+
 			selections.map { selection ->
-				var linechart = arrayListOf<ChartPoint>()
+				var linechart = listOf<ChartPoint>()
 				if (!selection.lineChartDay.isBlank()) {
 					linechart = convertDataToChartData(selection.lineChartDay)
 				}
@@ -68,30 +68,32 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toArrayList().let {
+			}.toArrayList().let { it ->
 				// 把数据存在内存里面方便下次打开使用
 				memoryData = it
 				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(it)
-				// 设定 `Socket` 并执行
-				currentSocket.isNull() isTrue {
-					// 初始化 `Socket`
-					setSocket {
-						hasInitSocket = true
-						currentSocket?.runSocket()
+				fragment.context?.runOnUiThread {
+					diffAndUpdateAdapterData<QuotationAdapter>(it)
+					// 设定 `Socket` 并执行
+					currentSocket.isNull() isTrue {
+						// 初始化 `Socket`
+						setSocket {
+							hasInitSocket = true
+							currentSocket?.runSocket()
+						}
+					} otherwise {
+						// 更新 `Socket`
+						subscribeSocket()
 					}
-				} otherwise {
-					// 更新 `Sockert`
-					subscribeSocket()
 				}
 			}
 		}
 	}
-	
+
 	override fun onFragmentResume() {
 		resetSocket()
 	}
-	
+
 	fun resetSocket() {
 		currentSocket?.let {
 			if (!it.isSocketConnected()) {
@@ -105,62 +107,55 @@ class QuotationPresenter(
 			}
 		}
 	}
-	
+
 	private fun subscribeSocket() {
-		// 更新 `Sockert`
+		// 更新 `Socket`
 		fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
 			currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 		}
 	}
-	
-	private fun ArrayList<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
+
+	private fun List<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
 		if (isEmpty()) return
-		sortedByDescending {
-			it.label.toLong()
-		}.let {
-			/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
-			if (it.first().label.toLong() + 1L < 0.daysAgoInMills()) {
-				QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
-					QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
-						/** 防止服务器数据出错或不足, 可能导致的死循环 */
-						if (updateChartTimes!! > 0) {
-							updateData()
-							updateChartTimes = updateChartTimes!! - 1
-						}
+		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
+		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
+		if (maxDate + 1L < 0.daysAgoInMills()) {
+			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
+				QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
+					/** 防止服务器数据出错或不足, 可能导致的死循环 */
+					if (updateChartTimes.orZero() > 0) {
+						updateData()
+						updateChartTimes = updateChartTimes.orZero() - 1
 					}
 				}
 			}
 		}
 	}
-	
+
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(
 		callback: (GoldStoneWebSocket?) -> Unit
 	) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(
-			fragment.asyncData?.map { it.pair }?.toArrayList(),
+			fragment.asyncData?.map { it.pair },
 			{
 				currentSocket = it
 				callback(it)
 			}) { model, isDisconnected ->
-			fragment.updateAdapterDataset(model, isDisconnected)
+			fragment.updateAdapterDataSet(model, isDisconnected)
 		}
 	}
-	
+
 	override fun onFragmentHiddenChanged(isHidden: Boolean) {
-		if (isHidden) {
-			currentSocket?.isSocketConnected()?.isTrue {
-				currentSocket?.closeSocket()
-			}
-		} else {
-			currentSocket?.isSocketConnected()?.isFalse {
-				currentSocket?.runSocket()
-			}
+		if (isHidden) currentSocket?.isSocketConnected()?.isTrue {
+			currentSocket?.closeSocket()
+		} else currentSocket?.isSocketConnected()?.isFalse {
+			currentSocket?.runSocket()
 		}
 	}
-	
-	private fun QuotationFragment.updateAdapterDataset(
+
+	private fun QuotationFragment.updateAdapterDataSet(
 		data: CurrencyPriceInfoModel,
 		isDisconnected: Boolean
 	) {
@@ -173,12 +168,10 @@ class QuotationPresenter(
 				this.isDisconnected = isDisconnected
 			}
 		} then {
-			it?.let {
-				recyclerView.adapter?.notifyDataSetChanged()
-			}
+			if (!it.isNull()) recyclerView.adapter?.notifyDataSetChanged()
 		}
 	}
-	
+
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putString(
@@ -187,31 +180,28 @@ class QuotationPresenter(
 			)
 		}
 	}
-	
+
 	fun showMarketTokenDetailFragment(model: QuotationModel) {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putSerializable(ArgumentKey.quotationOverlayInfo, model)
 		}
 	}
-	
-	private fun convertDataToChartData(data: String): ArrayList<ChartPoint> {
-		val jsonarray = JSONArray(data)
-		(0 until jsonarray.length()).map {
-			val timeStamp = jsonarray.getJSONObject(it).safeGet("time").toLong()
-			ChartPoint(
-				timeStamp.toString(),
-				if (jsonarray.getJSONObject(it).safeGet("close").isEmpty())
-					jsonarray.getJSONObject(it).safeGet("price").toFloat()
-				else jsonarray.getJSONObject(it).safeGet("close").toFloat() // close值是当天的收盘值
-			)
-		}.reversed().let {
-			return it.toArrayList()
+
+	private fun convertDataToChartData(data: String): List<ChartPoint> {
+		val jsonArray = JSONArray(data)
+		val maxIndexOfData =
+			if (jsonArray.length() > DataValue.quotationDataCount) DataValue.quotationDataCount
+			else jsonArray.length()
+		return (0 until maxIndexOfData).map {
+			ChartPoint(jsonArray.getJSONObject(it))
+		}.sortedBy {
+			it.label.toLong()
 		}
 	}
-	
+
 	companion object {
 		fun getPriceInfoBySocket(
-			pairList: ArrayList<String>?,
+			pairList: List<String>?,
 			holdSocket: (GoldStoneWebSocket) -> Unit,
 			hold: (model: CurrencyPriceInfoModel, isDisconnected: Boolean) -> Unit
 		) {
@@ -224,7 +214,7 @@ class QuotationPresenter(
 						sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
 					}
 				}
-				
+
 				override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}

@@ -12,7 +12,7 @@ import com.blinnnk.util.ReasonText
 import com.blinnnk.util.UnsafeReasons
 import com.blinnnk.util.checkPasswordInRules
 import com.blinnnk.util.replaceFragmentAndSetArgument
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -138,6 +138,7 @@ class CreateWalletPresenter(
 						multiChainAddresses.btcSeriesTestAddress,
 						multiChainAddresses.ltcAddress,
 						multiChainAddresses.bchAddress,
+						multiChainAddresses.eosAddress,
 						ethAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ethAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
@@ -162,16 +163,21 @@ class CreateWalletPresenter(
 							multiChainAddresses.bchAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
 						),
+						eosAddresses = WalletImportPresenter.childAddressValue(
+							multiChainAddresses.eosAddress,
+							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
+						),
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
 						btcTestPath = DefaultPath.testPath,
 						bchPath = DefaultPath.bchPath,
 						ltcPath = DefaultPath.ltcPath,
+						eosPath = DefaultPath.eosPath,
 						hint = hint,
 						isUsing = true
 					)
-				) {
+				) { wallet ->
 					generateMyTokenInfo(
 						multiChainAddresses,
 						{
@@ -190,7 +196,7 @@ class CreateWalletPresenter(
 						}
 					}
 
-					XinGePushReceiver.registerAddressesForPush()
+					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
 			}
 		}
@@ -251,7 +257,7 @@ class CreateWalletPresenter(
 			// 首先从本地查找数据
 			DefaultTokenTable.getAllTokens { localTokens ->
 				localTokens.isEmpty() isTrue {
-					errorCallback(Exception())
+					errorCallback(Exception("empty default token"))
 					// 本地没有数据从服务器获取数据
 					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 						serverTokens.completeAddressInfo(addresses, callback)
@@ -355,6 +361,12 @@ class CreateWalletPresenter(
 							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
 									MyTokenTable.insert(MyTokenTable(it, currentAddresses.etcAddress))
+								}
+							}
+
+							ChainID.EOSMain.id, ChainID.EOSTest.id -> {
+								if (currentAddresses.eosAddress.isNotEmpty()) {
+									MyTokenTable.insert(MyTokenTable(it, currentAddresses.eosAddress))
 								}
 							}
 

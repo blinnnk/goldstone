@@ -65,6 +65,12 @@ object Config {
 	fun updateCurrentETCAddress(address: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentETCAddress, address)
 
+	fun getCurrentEOSAddress(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSAddress)
+
+	fun updateCurrentEOSAddress(address: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSAddress, address)
+
 	fun getCurrentBTCAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCAddress)
 
@@ -99,10 +105,10 @@ object Config {
 	fun updateCurrentName(name: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentName, name)
 
-	fun getCurrentID(): Int =
+	fun getCurrentWalletID(): Int =
 		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentID)
 
-	fun updateCurrentID(id: Int) =
+	fun updateCurrentWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentID, id)
 
 	fun getCurrentIsWatchOnlyOrNot(): Boolean =
@@ -216,6 +222,36 @@ object Config {
 			chainName
 		)
 
+	/** EOS ChainID And ChainName In Shared Preference*/
+	fun getEOSCurrentChain(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
+				.equals("Default", true)
+		) {
+			ChainID.EOSMain.id
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
+		}
+
+	fun getEOSCurrentChainName(): String =
+		if (GoldStoneAPI.context
+				.getStringFromSharedPreferences(SharesPreference.eosCurrentChainName)
+				.equals("Default", true)
+		) {
+			ChainText.eosMain
+		} else {
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChainName)
+		}
+
+	fun updateEOSCurrentChain(chainID: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainID)
+
+	fun updateEOSCurrentChainName(chainName: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.eosCurrentChainName,
+			chainName
+		)
+
 	/** ETC ChainID And Chain Name in Shared Preference*/
 	fun getETCCurrentChain(): String =
 		if (GoldStoneAPI.context
@@ -310,7 +346,7 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.goldStoneID, goldStoneID)
 
 	// Configs For Review Or UpdateDatabase ETC.
-	fun getneedUnregisterGoldStoneID(): String =
+	fun getNeedUnregisterGoldStoneID(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.unregisterGoldStoneID)
 
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =

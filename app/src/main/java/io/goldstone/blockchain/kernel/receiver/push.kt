@@ -150,10 +150,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			notificationManager.cancelAll()
 		}
 
-		fun registerAddressesForPush(isRemove: Boolean = false) {
-			val option = if (isRemove) 0 else 1
-			WalletTable.getCurrentWallet {
-				WalletTable.getWalletType { type ->
+		fun registerAddressesForPush(wallet: WalletTable?, isRemove: Boolean = false) {
+			wallet?.apply {
+				val option = if (isRemove) 0 else 1
+				WalletTable.getTargetWalletType(this).let { type ->
 					when (type) {
 						WalletType.MultiChain -> {
 							val ethSeries =
@@ -174,6 +174,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 							val etcSeries =
 								AddressManagerPresenter.convertToChildAddresses(etcAddresses)
 									.map { Pair(it.first, ChainType.ETC.id) }
+							val eosSeries =
+								AddressManagerPresenter.convertToChildAddresses(eosAddresses)
+									.map { Pair(it.first, ChainType.EOS.id) }
 							val all =
 								ethSeries
 									.plus(btcSeries)
@@ -181,8 +184,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 									.plus(etcSeries)
 									.plus(ltcSeries)
 									.plus(bchSeries)
+									.plus(eosSeries)
 									.map {
-										AddressCommissionModel(it.first, it.second, option)
+										AddressCommissionModel(it.first, it.second, option, id)
 									}.map { prepareAddressData(it) }
 							GoldStoneAPI.registerWalletAddresses(
 								AesCrypto.encrypt("$all").orEmpty(),
@@ -195,18 +199,60 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 						}
 
 						WalletType.BTCOnly -> {
-							registerSingleAddress(AddressCommissionModel(currentBTCAddress, ChainType.BTC.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentBTCAddress,
+									ChainType.BTC.id,
+									option,
+									id
+								)
+							)
 						}
 						WalletType.BCHOnly ->
-							registerSingleAddress(AddressCommissionModel(currentBCHAddress, ChainType.BCH.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentBCHAddress,
+									ChainType.BCH.id,
+									option,
+									id
+								)
+							)
+						WalletType.EOSOnly ->
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentEOSAddress,
+									ChainType.EOS.id,
+									option,
+									id
+								)
+							)
 						WalletType.LTCOnly ->
-							registerSingleAddress(AddressCommissionModel(currentLTCAddress, ChainType.LTC.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentLTCAddress,
+									ChainType.LTC.id,
+									option,
+									id
+								)
+							)
 						WalletType.BTCTestOnly ->
 							registerSingleAddress(
-								AddressCommissionModel(currentBTCSeriesTestAddress, ChainType.AllTest.id, option)
+								AddressCommissionModel(
+									currentBTCSeriesTestAddress,
+									ChainType.AllTest.id,
+									option,
+									id
+								)
 							)
 						WalletType.ETHERCAndETCOnly ->
-							registerSingleAddress(AddressCommissionModel(currentETHAndERCAddress, ChainType.ETH.id, option))
+							registerSingleAddress(
+								AddressCommissionModel(
+									currentETHAndERCAddress,
+									ChainType.ETH.id,
+									option,
+									id
+								)
+							)
 					}
 				}
 			}
@@ -243,6 +289,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),
+					Pair("wallet", model.walletID),
 					Pair("option", model.option),
 					Pair("extra", "bchtest:$bchTestAddress")
 				)
@@ -250,6 +297,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				generateJSONObject(
 					Pair("address", model.address),
 					Pair("chain_type", model.chainType),
+					Pair("wallet", model.walletID),
 					Pair("option", model.option)
 				)
 			}
@@ -294,7 +342,9 @@ fun Context.registerDeviceForPush() {
 					if (it == token) return@registerDevice
 				}
 				// 在本地数据库记录 `Push Token`
-				XinGePushReceiver.registerAddressesForPush()
+				WalletTable.getCurrentWallet {
+					XinGePushReceiver.registerAddressesForPush(this)
+				}
 			}
 		}
 

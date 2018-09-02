@@ -14,12 +14,25 @@ object BitcoinUrl {
 		else WebUrl.btcMain
 	}
 
+	val backUpUrl: () -> String = {
+		if (Config.isTestEnvironment()) WebUrl.backupBtcTest
+		else WebUrl.backUpBtcMain
+	}
+
+	val getBalanceFromBlockInfo: (address: String) -> String = {
+		"${backUpUrl()}/balance?active=$it"
+	}
+
+	val getUnspentInfoFromBlockInfo: (address: String) -> String = {
+		"${backUpUrl()}/unspent?active=$it"
+	}
+
 	val getBalance: (address: String) -> String = { address ->
 		"${currentUrl()}/api/addr/$address/balance"
 	}
 
-	val getTransactionList: (address: String) -> String = {
-		"${currentUrl()}/api/txs/?address=$it"
+	val getTransactions: (address: String, from: Int, to: Int) -> String = { address, from, to ->
+		"${currentUrl()}/api/addrs/$address/txs?from=$from&to=$to"
 	}
 
 	val getUnspentInfo: (address: String) -> String = { address ->

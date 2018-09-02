@@ -46,6 +46,11 @@ class SplashPresenter(val activity: SplashActivity) {
 							Config.updateCurrentWalletType(WalletType.LTCOnly.content)
 						}
 
+						WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
+							cacheWalletData()
+							Config.updateCurrentWalletType(WalletType.EOSOnly.content)
+						}
+
 						WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
 							cacheWalletData()
 							Config.updateCurrentWalletType(WalletType.BCHOnly.content)
@@ -127,9 +132,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				unregisterGoldStoneID(Config.getGoldStoneID())
 			} else {
 				val needUnregister =
-					!Config.getneedUnregisterGoldStoneID().equals("Default", true)
+					!Config.getNeedUnregisterGoldStoneID().equals("Default", true)
 				if (needUnregister) {
-					unregisterGoldStoneID(Config.getneedUnregisterGoldStoneID())
+					unregisterGoldStoneID(Config.getNeedUnregisterGoldStoneID())
 				}
 			}
 			callback()
@@ -177,8 +182,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentETCAddress(currentETCAddress)
 				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentBCHAddress(currentBCHAddress)
+				Config.updateCurrentEOSAddress(currentEOSAddress)
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				Config.updateCurrentID(id)
+				Config.updateCurrentWalletID(id)
 				Config.updateCurrentBalance(balance.orElse(0.0))
 				Config.updateCurrentName(name)
 				uiThread {
@@ -195,6 +201,11 @@ class SplashPresenter(val activity: SplashActivity) {
 			StartingPresenter.updateLocalDefaultTokens {
 				LogUtil.error(activity::javaClass.name)
 			}
+			
+			// update local exchangeTable info list
+			StartingPresenter.updateExchangesTable ( {
+				LogUtil.error(activity::javaClass.name)
+			}) {}
 		}
 	}
 }

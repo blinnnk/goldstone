@@ -4,7 +4,7 @@ import android.widget.EditText
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.common.Language.CreateWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -73,6 +73,16 @@ class KeystoreImportPresenter(
 
 							currentType.equals(BCH.content, true) -> {
 								importBCHWallet(
+									walletName,
+									password,
+									hintInput,
+									ECKey.fromPrivate(privateKey).getPrivateKeyAsWiF(MainNetParams.get()),
+									callback
+								)
+							}
+
+							currentType.equals(EOS.content, true) -> {
+								importEOSWallet(
 									walletName,
 									password,
 									hintInput,
@@ -161,6 +171,23 @@ class KeystoreImportPresenter(
 		callback: (Boolean) -> Unit
 	) {
 		PrivateKeyImportPresenter.importWalletByBCHPrivateKey(
+			privateKey,
+			password.text.toString(),
+			walletName,
+			fragment.context,
+			hintInput.text?.toString(),
+			callback
+		)
+	}
+
+	private fun importEOSWallet(
+		walletName: String,
+		password: EditText,
+		hintInput: EditText,
+		privateKey: String,
+		callback: (Boolean) -> Unit
+	) {
+		PrivateKeyImportPresenter.importWalletByEOSPrivateKey(
 			privateKey,
 			password.text.toString(),
 			walletName,

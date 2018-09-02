@@ -25,7 +25,16 @@ object APIPath {
 	val registerDevice: (header: String) -> String = { "$it/account/registerDevice" }
 	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
-	val marketSearch: (header: String) -> String = { "$it/account/searchPair?pair=" }
+	val marketSearch: (header: String,
+		pair: String,
+		marketIds: String) -> String = { header, pair, marketIds ->
+		"$header/account/searchPair?pair=$pair" +
+			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
+	}
+	val marketList: (header: String,
+		md5: String) -> String = { header, md5 ->
+		"$header/index/marketList?md5=$md5"
+	}
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
@@ -56,14 +65,7 @@ object APIPath {
 	) -> String = { header, chainID, address, startBlock ->
 		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
 	}
-	val getQuotationCurrencyChart: (
-		header: String,
-		pair: String,
-		period: String,
-		size: Int
-	) -> String = { header, pair, period, size ->
-		"$header/market/lineData?pair=$pair&period=$period&size=$size"
-	}
+
 	val getQuotationCurrencyCandleChart: (
 		header: String,
 		pair: String,
@@ -98,29 +100,29 @@ object EtherScanApi {
 
 	private val apikey: () -> String = { etherScanKeys.getRandom() }
 	private const val mainHeader = "https://api.etherscan.io"
-	private const val ropstanHeader = "https://api-ropsten.etherscan.io"
+	private const val ropstenHeader = "https://api-ropsten.etherscan.io"
 	private const val kovanHeader = "https://api-kovan.etherscan.io"
 	private const val rinkebyHeader = "https://api-rinkeby.etherscan.io"
 	private const val mainLogHeader = "https://api.etherscan.io"
 	private const val kovanLogHeader = "https://kovan.etherscan.io"
-	private const val ropstanLogHeader = "https://ropsten.etherscan.io"
+	private const val ropstenLogHeader = "https://ropsten.etherscan.io"
 	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
 	private val etherScanHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainHeader
-			ChainID.Ropsten.id -> ropstanHeader
+			ChainID.Ropsten.id -> ropstenHeader
 			ChainID.Kovan.id -> kovanHeader
 			ChainID.Rinkeby.id -> rinkebyHeader
-			else -> ropstanHeader
+			else -> ropstenHeader
 		}
 	}
 	private val etherScanLogHeader: (chainID: String) -> String = {
 		when (it) {
 			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropsten.id -> ropstanLogHeader
+			ChainID.Ropsten.id -> ropstenLogHeader
 			ChainID.Kovan.id -> kovanLogHeader
 			ChainID.Rinkeby.id -> rinkebyLogHeader
-			else -> ropstanLogHeader
+			else -> ropstenLogHeader
 		}
 	}
 	private val transactionDetailHeader: (currentChain: String) -> String = {

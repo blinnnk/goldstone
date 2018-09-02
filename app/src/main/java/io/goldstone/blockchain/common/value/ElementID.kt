@@ -32,6 +32,7 @@ object ElementID {
 	const val mask = 20017
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
+	const val container = 20020
 }
 
 object ViewPagerID {

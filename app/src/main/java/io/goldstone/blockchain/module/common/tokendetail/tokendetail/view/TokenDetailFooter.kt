@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.button.RoundBorderButton
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.backgroundColor
@@ -17,52 +17,48 @@ import org.jetbrains.anko.matchParent
  * @author KaySaith
  */
 class TokenDetailFooter(context: Context) : LinearLayout(context) {
-	
-	val sendButton = RoundBorderButton(context)
-	val receivedButton = RoundBorderButton(context)
-	
+
+	val sendButton = RoundButton(context)
+	val receivedButton = RoundButton(context)
+
 	init {
 		isClickable = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
 		backgroundColor = Spectrum.white
 		val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
-		
+		val buttonHeight = 40.uiPX()
+		val marginSize = 15.uiPX()
 		sendButton
 			.apply {
+				setGreenStyle()
 				text = CommonText.send
-				setBoldTitle()
-				themeColor = Spectrum.green
-				layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
+				layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
 					leftMargin = PaddingSize.device
-					topMargin = 15.uiPX()
+					topMargin = marginSize
 				}
-				setBorderWidth(BorderSize.bold)
 			}
 			.into(this)
-		
+
 		receivedButton
 			.apply {
 				text = CommonText.deposit
-				setBoldTitle()
-				themeColor = Spectrum.blue
-				layoutParams = LinearLayout.LayoutParams(buttonWidth, 40.uiPX()).apply {
-					topMargin = 15.uiPX()
+				setBlueStyle()
+				layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
+					topMargin = marginSize
 					leftMargin = 10.uiPX()
 				}
-				setBorderWidth(BorderSize.bold)
 			}
 			.into(this)
 	}
-	
+
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		color = GrayScale.Opacity1Black
 		style = Paint.Style.FILL
 	}
-	
+
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		
 		canvas?.drawLine(
 			PaddingSize.device.toFloat(),
 			BorderSize.default,

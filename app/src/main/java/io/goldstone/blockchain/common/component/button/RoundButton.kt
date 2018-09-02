@@ -171,4 +171,24 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.color = Spectrum.white
 		invalidate()
 	}
+
+	fun setGreenStyle(top: Int? = null) {
+		textSize = 14.uiPX().toFloat()
+		layoutParams = LinearLayout.LayoutParams(
+			ScreenSize.widthWithPadding,
+			buttonHeight
+		).apply {
+			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
+		}
+
+		addTouchRippleAnimation(
+			Spectrum.green,
+			Spectrum.yellow,
+			RippleMode.Square,
+			layoutParams.height / 2f
+		)
+		textPaint.color = Spectrum.white
+		invalidate()
+	}
 }

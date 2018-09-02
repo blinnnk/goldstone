@@ -23,8 +23,8 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 11
-    versionName "1.2.1"
+    versionCode 12
+    versionName "1.3.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -80,7 +80,7 @@ dependencies {
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.2.1'
+  implementation 'com.blinnnk:honeyui:0.3.2.2'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
@@ -92,8 +92,6 @@ dependencies {
   implementation 'org.slf4j:slf4j-api:1.8.0-beta2'
   // BlurView
   implementation 'com.github.mmin18:realtimeblurview:1.1.2'
-  // Chart
-  implementation 'com.diogobernardino:williamchart:2.5.0'
   // Room Database
   implementation 'android.arch.persistence.room:runtime:1.1.1'
   kapt 'android.arch.persistence.room:compiler:1.1.1'
@@ -111,7 +109,7 @@ dependencies {
   implementation 'com.google.android.gms:play-services-analytics:16.0.1'
   // Wave Animation
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
-  //MPAndroidChart
+  // MPAndroidChart
   implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }
 

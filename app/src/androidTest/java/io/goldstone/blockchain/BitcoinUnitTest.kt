@@ -23,13 +23,13 @@ class BitcoinUnitTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 
 	@Test
 	fun getBitcoinBalance() {
 		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
 		BitcoinApi.getBalance(address) {
-			LogUtil.debug("$positon getBitcoinBalance", "$it")
+			LogUtil.debug("$position getBitcoinBalance", "$it")
 		}
 	}
 }

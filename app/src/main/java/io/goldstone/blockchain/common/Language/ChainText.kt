@@ -39,11 +39,11 @@ object ChainText {
 	@JvmField
 	val mainnetDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The formal production environment \nwhere the assets are of real value"
-		HoneyLanguage.Chinese.code -> "正式环境\n资产具有真正价值"
+		HoneyLanguage.Chinese.code -> "正式环境资产具有真正价值"
 		HoneyLanguage.Japanese.code -> "正式な環境\n資産は本当の価値がある"
 		HoneyLanguage.Korean.code -> "공식 생산 환경 \n자산이 실제 가치를 지닌 곳"
 		HoneyLanguage.Russian.code -> "Формальная среда \nактивы имеют реальную ценность"
-		HoneyLanguage.TraditionalChinese.code -> "正式生產環境 \n資產具有真正價值"
+		HoneyLanguage.TraditionalChinese.code -> "正式生產環境資產具有真正價值"
 		else -> ""
 	}
 	@JvmField
@@ -216,34 +216,56 @@ object ChainText {
 		HoneyLanguage.TraditionalChinese.code -> "BCH (GoldStone)"
 		else -> ""
 	}
+	// ChainName 有判断节点的用处不要在这里改动
 	@JvmField
 	val btcTest = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Testnet (GoldStone)"
-		HoneyLanguage.Chinese.code -> "测试网（GoldStone）"
-		HoneyLanguage.Japanese.code -> "テスト（GoldStone）"
-		HoneyLanguage.Korean.code -> "테스트 (GoldStone)"
-		HoneyLanguage.Russian.code -> "Тест (GoldStone)"
-		HoneyLanguage.TraditionalChinese.code -> "測試網（GoldStone）"
+		HoneyLanguage.English.code -> "BTC Testnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "BTC 测试网（GoldStone）"
+		HoneyLanguage.Japanese.code -> "BTC テスト（GoldStone）"
+		HoneyLanguage.Korean.code -> "BTC 테스트 (GoldStone)"
+		HoneyLanguage.Russian.code -> "BTC Тест (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "BTC 測試網（GoldStone）"
 		else -> ""
 	}
 	@JvmField
 	val ltcTest = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Testnet (GoldStone)"
-		HoneyLanguage.Chinese.code -> "测试网（GoldStone）"
-		HoneyLanguage.Japanese.code -> "テスト（GoldStone）"
-		HoneyLanguage.Korean.code -> "테스트 (GoldStone)"
-		HoneyLanguage.Russian.code -> "Тест (GoldStone)"
-		HoneyLanguage.TraditionalChinese.code -> "測試網（GoldStone）"
+		HoneyLanguage.English.code -> "LTC Testnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "LTC 测试网（GoldStone）"
+		HoneyLanguage.Japanese.code -> "LTC テスト（GoldStone）"
+		HoneyLanguage.Korean.code -> "LTC 테스트 (GoldStone)"
+		HoneyLanguage.Russian.code -> "LTC Тест (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "LTC 測試網（GoldStone）"
 		else -> ""
 	}
 	@JvmField
 	val bchTest = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Testnet (GoldStone)"
-		HoneyLanguage.Chinese.code -> "测试网（GoldStone）"
-		HoneyLanguage.Japanese.code -> "テスト（GoldStone）"
-		HoneyLanguage.Korean.code -> "테스트 (GoldStone)"
-		HoneyLanguage.Russian.code -> "Тест (GoldStone)"
-		HoneyLanguage.TraditionalChinese.code -> "測試網（GoldStone）"
+		HoneyLanguage.English.code -> "BCH Testnet (GoldStone)"
+		HoneyLanguage.Chinese.code -> "BCH 测试网（GoldStone）"
+		HoneyLanguage.Japanese.code -> "BCH テスト（GoldStone）"
+		HoneyLanguage.Korean.code -> "BCH 테스트 (GoldStone)"
+		HoneyLanguage.Russian.code -> "BCH Тест (GoldStone)"
+		HoneyLanguage.TraditionalChinese.code -> "BCH 測試網（GoldStone）"
+		else -> ""
+	}
+
+	@JvmField
+	val eosMain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS  Mainnet"
+		HoneyLanguage.Chinese.code -> "EOS  Mainnet"
+		HoneyLanguage.Japanese.code -> "EOS  Mainnet"
+		HoneyLanguage.Korean.code -> "EOS  Mainnet"
+		HoneyLanguage.Russian.code -> "EOS  Mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "EOS  Mainnet"
+		else -> ""
+	}
+	@JvmField
+	val eosTest = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS  Jungle"
+		HoneyLanguage.Chinese.code -> "EOS  Jungle"
+		HoneyLanguage.Japanese.code -> "EOS  Jungle"
+		HoneyLanguage.Korean.code -> "EOS  Jungle"
+		HoneyLanguage.Russian.code -> "EOS  Jungle"
+		HoneyLanguage.TraditionalChinese.code -> "EOS  Jungle"
 		else -> ""
 	}
 }

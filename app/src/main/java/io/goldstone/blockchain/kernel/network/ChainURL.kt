@@ -18,7 +18,7 @@ object ChainURL {
 		when (it) {
 			ChainText.goldStoneMain -> ChainURL.main
 			ChainText.ropsten -> ChainURL.ropsten
-			ChainText.rinkeby -> ChainURL.rinkeyb
+			ChainText.rinkeby -> ChainURL.rinkeby
 			ChainText.kovan -> ChainURL.kovan
 			ChainText.infuraRopsten -> ChainURL.infuraRopsten
 			ChainText.infuraKovan -> ChainURL.infuraKovan
@@ -30,34 +30,43 @@ object ChainURL {
 			ChainText.ltcTest -> ChainURL.ltcTest
 			ChainText.bchMain -> ChainURL.bchMain
 			ChainText.bchTest -> ChainURL.bchTest
+			ChainText.eosMain -> ChainURL.eosMain
+			ChainText.eosTest -> ChainURL.eosTest
 			else -> ChainURL.main
 		}
 	}
 	val currentETCChain: (currentChainName: String) -> String = {
 		when (it) {
-			ChainText.etcMorden -> ChainURL.etcMorderTest
+			ChainText.etcMorden -> ChainURL.etcMordenTest
 			ChainText.etcMainGasTracker -> ChainURL.etcMain
 			ChainText.goldStoneEtcMain -> ChainURL.etcGoldStoneMain
-			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMorderTest
+			ChainText.goldStoneEtcMordenTest -> ChainURL.etcGoldStoneMordenTest
 			else -> ChainURL.etcMain
 		}
 	}
 
-	val uncryptChainName = listOf(
+	val unencryptedChainName = listOf(
 		ChainText.etcMorden,
 		ChainText.etcMainGasTracker,
 		ChainText.infuraKovan,
 		ChainText.infuraMain,
 		ChainText.infuraRinkeby,
-		ChainText.infuraRopsten
+		ChainText.infuraRopsten,
+		ChainText.eosMain,
+		ChainText.eosTest
 	)
 	val etcChainName =
-		arrayListOf(
+		listOf(
 			ChainText.etcMorden,
 			ChainText.etcMainGasTracker,
 			ChainText.goldStoneEtcMain,
 			ChainText.goldStoneEtcMordenTest
 		)
+
+	val eosChainName = listOf(
+		ChainText.eosMain,
+		ChainText.eosTest
+	)
 
 	fun getChainNameByChainType(type: ChainType): String {
 		return when (type) {
@@ -66,6 +75,7 @@ object ChainURL {
 			ChainType.BTC -> Config.getBTCCurrentChainName()
 			ChainType.LTC -> Config.getLTCCurrentChainName()
 			ChainType.BCH -> Config.getBCHCurrentChainName()
+			ChainType.EOS -> Config.getEOSCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -77,6 +87,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
 			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
 			symbol.equals(CryptoSymbol.bch, true) -> Config.getBCHCurrentChainName()
+			symbol.equals(CryptoSymbol.eos, true) -> Config.getEOSCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -88,6 +99,7 @@ object ChainURL {
 			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
 			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
 			symbol.equals(CryptoSymbol.bch, true) -> ChainType.BCH
+			symbol.equals(CryptoSymbol.eos, true) -> ChainType.EOS
 			else -> ChainType.ETH
 		}
 	}
@@ -109,7 +121,7 @@ object ChainURL {
 	const val main = "https://eth-node-mainnet.goldstone.io/eth"
 	private const val ropsten = "https://eth-node-ropsten.goldstone.io/eth"
 	private const val kovan = "https://eth-node-kovan.goldstone.io/eth"
-	private const val rinkeyb = "https://eth-node-rinkeby.goldstone.io/eth"
+	private const val rinkeby = "https://eth-node-rinkeby.goldstone.io/eth"
 	/** BTC Chain Address */
 	private const val btcMain = "https://btc-node-mainnet.goldstone.io/btc"
 	private const val btcTest = "https://btc-node-testnet.goldstone.io/btc"
@@ -119,11 +131,14 @@ object ChainURL {
 	/** BCH Chain Address */
 	private const val bchMain = "https://btc-node-mainnet.goldstone.io/bch"
 	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
+	/** EOS Chain Address */
+	private const val eosMain = "https://api1.eosasia.one"
+	private const val eosTest = "https://api.jungle.alohaeos.com"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
-	private const val etcMorderTest = "https://web3.gastracker.io/morden"
+	private const val etcMordenTest = "https://web3.gastracker.io/morden"
 	private const val etcGoldStoneMain = "https://etc-node-mainnet.goldstone.io/eth"
-	private const val etcGoldStoneMorderTest = "https://etc-node-testnet.goldstone.io/eth"
+	private const val etcGoldStoneMordenTest = "https://etc-node-testnet.goldstone.io/eth"
 	/** Infura Chain Address */
 	private val infuraMain = "https://mainnet.infura.io/${infuraKey()}"
 	private val infuraRopsten = "https://ropsten.infura.io/${infuraKey()}"
@@ -131,17 +146,22 @@ object ChainURL {
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
 
 	/** Transaction Html View */
+	// BCH
 	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC/tx/"
 	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC/tx/"
-
+	// BTC
 	private const val btcMainnetWeb = "https://www.blocktrail.com/BTC/tx/"
 	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC/tx/"
-
+	// LTC
 	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc/tx/"
 	private const val ltcTestnetWeb = "https://chain.so/tx/LTCTEST/"
-
+	// ETC
 	private const val etcMainnetWeb = "https://gastracker.io/tx/"
 	private const val etcTestnetWeb = "http://mordenexplorer.ethernode.io/tx/"
+	// EOS
+	private const val eosMainnetWeb = "https://eosmonitor.io/txn/"
+	// TODO 这里还没找到第三方的测试查账
+	private const val eosTestnetWeb = "https://eosmonitor.io/txn/"
 
 	val etcWebHeader: () -> String = {
 		if (Config.isTestEnvironment()) etcTestnetWeb
@@ -165,7 +185,7 @@ object ChainURL {
 
 	@JvmStatic
 	fun getCurrentEncryptStatusByNodeName(name: String): Boolean {
-		return !ChainURL.uncryptChainName.any { it.equals(name, true) }
+		return !ChainURL.unencryptedChainName.any { it.equals(name, true) }
 	}
 }
 

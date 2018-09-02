@@ -1,12 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
 import android.content.Context
-import android.content.res.Resources
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.resetViewHeightByText
-import com.blinnnk.extension.updateHeightByText
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -29,8 +26,7 @@ class TransactionDetailAdapter(
 	override fun generateFooter(context: Context) =
 		View(context)
 
-	override fun generateHeader(context: Context) =
-		TransactionDetailHeaderView(context)
+	override fun generateHeader(context: Context) = TransactionDetailHeaderView(context)
 
 	override fun TransactionDetailCell.bindCell(
 		data: TransactionDetailModel,

@@ -91,6 +91,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val customEOSPath = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom EOS Path"
+		HoneyLanguage.Chinese.code -> "Custom EOS Path"
+		HoneyLanguage.Japanese.code -> "Custom EOS Path"
+		HoneyLanguage.Korean.code -> "Custom EOS Path"
+		HoneyLanguage.Russian.code -> "Custom EOS Path"
+		HoneyLanguage.TraditionalChinese.code -> "Custom EOS Path"
+		else -> ""
+	}
+	@JvmField
 	val defaultPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Default Path"
 		HoneyLanguage.Chinese.code -> "默认路径"
@@ -161,7 +171,7 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val unvalidPrivateKey = when (currentLanguage) {
+	val invalidPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid private key"
 		HoneyLanguage.Chinese.code -> "这不是正确格式的私钥"
 		HoneyLanguage.Japanese.code -> "これは正確な形式のプライベートキーではありません"
@@ -191,7 +201,17 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val unvalidMainnetBTCPrivateKey = when (currentLanguage) {
+	val invalidEOSPrivateKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Incorrect EOS private key address format"
+		HoneyLanguage.Chinese.code -> "Incorrect EOS private key address format"
+		HoneyLanguage.Japanese.code -> "Incorrect EOS private key address format"
+		HoneyLanguage.Korean.code -> "Incorrect EOS private key address format"
+		HoneyLanguage.Russian.code -> "Incorrect EOS private key address format"
+		HoneyLanguage.TraditionalChinese.code -> "Incorrect EOS private key address format"
+		else -> ""
+	}
+	@JvmField
+	val invalidMainnetBTCPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect Bitcoin main network private key address format"
 		HoneyLanguage.Chinese.code -> "不是正确的比特币私钥或地址格式"
 		HoneyLanguage.Japanese.code -> "正しいbitcoin秘密鍵またはアドレス形式ではありません。"

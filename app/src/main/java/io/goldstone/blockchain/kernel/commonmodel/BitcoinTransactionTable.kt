@@ -26,6 +26,7 @@ import org.json.JSONObject
 data class BTCSeriesTransactionTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
+	val dataIndex: Int, // 复杂的翻页机制需要和服务器映射的抽象角标
 	var symbol: String,
 	var blockNumber: String,
 	var transactionIndex: Int,
@@ -38,6 +39,7 @@ data class BTCSeriesTransactionTable(
 	val value: String,
 	val fee: String,
 	var size: String,
+	var confirmations: Int,
 	var isFee: Boolean,
 	var isPending: Boolean,
 	var chainType: Int
@@ -45,12 +47,14 @@ data class BTCSeriesTransactionTable(
 
 	constructor(
 		data: JSONObject,
+		dataIndex: Int,
 		myAddress: String,
 		symbol: String,
 		isFee: Boolean,
 		chainType: Int
 	) : this(
 		0,
+		dataIndex,
 		symbol,
 		data.safeGet("blockheight"),
 		0,
@@ -63,6 +67,7 @@ data class BTCSeriesTransactionTable(
 		getTransactionValue(data, myAddress),
 		data.safeGet("fees"),
 		data.safeGet("size"),
+		data.safeGet("confirmations").toIntOrNull().orZero(),
 		isFee,
 		false,
 		chainType
@@ -122,9 +127,10 @@ data class BTCSeriesTransactionTable(
 				toAddresses += JSONArray(JSONObject(JSONObject(out[it].toString()).safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 			}
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
-			return toAddresses.filterNot {
+			val finalToAddress = toAddresses.filterNot {
 				it.equals(getFromAddress(data), true)
 			}
+			return if (finalToAddress.isEmpty()) toAddresses.subList(0, 1) else finalToAddress
 		}
 
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
@@ -146,12 +152,19 @@ data class BTCSeriesTransactionTable(
 			var changeValue = 0.0
 			val formatToAddress = convertToBCHOrDefaultAddress(toAddress, getFromAddress(data))
 			val mineIsTo = getFromAddress(data).equals(formatToAddress, true)
-			(0 until out.length()).forEach {
+			val outCount = out.length()
+			var countForCalculateTransferToMySelf = out.length()
+			(0 until outCount).forEach {
 				val child = JSONObject(out[it].toString())
 				val childAddress = JSONArray(JSONObject(child.safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
 				changeValue +=
 					if (childAddress.equals(formatToAddress, true) == mineIsTo) {
-						child.safeGet("value").toDoubleOrNull().orZero()
+						countForCalculateTransferToMySelf -= 1
+						// 如果 `countForCalculateTransferToMySelf` 的值是 `0` 那么意味着是自己转给自己
+						//  这种情况留一个值作为 `TransferValue`
+						if (countForCalculateTransferToMySelf != 0) {
+							child.safeGet("value").toDoubleOrNull().orZero()
+						} else 0.0
 					} else {
 						0.0
 					}
@@ -195,7 +208,7 @@ data class BTCSeriesTransactionTable(
 				.database
 				.btcSeriesTransactionDao()
 				.apply {
-					getTransactionByHash(hash, isFee)
+					getTransactionByHash(hash, isFee, newData.recordAddress)
 						?.let {
 							update(it.apply {
 								blockNumber = newData.blockNumber
@@ -214,7 +227,7 @@ data class BTCSeriesTransactionTable(
 			transaction: BTCSeriesTransactionTable
 		) {
 			GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
-				if (getTransactionByHash(hash, isFee).isNull()) {
+				if (getTransactionByHash(hash, isFee, transaction.recordAddress).isNull()) {
 					insert(transaction)
 				}
 			}
@@ -223,9 +236,9 @@ data class BTCSeriesTransactionTable(
 		fun deleteByAddress(address: String, chainType: Int, callback: () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
-					// `BCH` 的 `nnsight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
+					// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
 					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
-					val formatedAddress =
+					val formattedAddress =
 						if (
 							chainType == ChainType.BCH.id &&
 							(
@@ -236,7 +249,7 @@ data class BTCSeriesTransactionTable(
 						else address
 
 					val data =
-						getDataByAddressAndChainType(formatedAddress, chainType)
+						getDataByAddressAndChainType(formattedAddress, chainType)
 					if (data.isEmpty()) {
 						callback()
 						return@doAsync
@@ -272,8 +285,8 @@ interface BTCSeriesTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
 	fun getDataByHash(hash: String, isReceive: Boolean): BTCSeriesTransactionTable?
 
-	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isFee LIKE :isFee")
-	fun getTransactionByHash(hash: String, isFee: Boolean): BTCSeriesTransactionTable?
+	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND recordAddress LIKE :recordAddress AND isFee LIKE :isFee")
+	fun getTransactionByHash(hash: String, isFee: Boolean, recordAddress: String): BTCSeriesTransactionTable?
 
 	@Insert
 	fun insert(table: BTCSeriesTransactionTable)

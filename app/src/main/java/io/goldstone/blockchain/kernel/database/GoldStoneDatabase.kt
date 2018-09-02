@@ -15,6 +15,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankDao
 import io.goldstone.blockchain.module.home.quotation.rank.model.RankTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
@@ -28,7 +29,8 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	entities = [(WalletTable::class), (MyTokenTable::class), (DefaultTokenTable::class),
 		(TransactionTable::class), (TokenBalanceTable::class), (ContactTable::class),
 		(AppConfigTable::class), (NotificationTable::class), (QuotationSelectionTable::class),
-		(SupportCurrencyTable::class), (BTCSeriesTransactionTable::class), (RankTable::class)],
+		(SupportCurrencyTable::class), (BTCSeriesTransactionTable::class), (ExchangeTable::class)
+		,(RankTable::class)],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
 )
@@ -46,6 +48,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun currencyDao(): SupportCurrencyDao
 	abstract fun rankDao(): RankDao
 	abstract fun btcSeriesTransactionDao(): BTCSeriesTransactionDao
+	abstract fun marketSetTableDao(): MarketSetDao
 	
 	companion object {
 		const val databaseVersion = 6
