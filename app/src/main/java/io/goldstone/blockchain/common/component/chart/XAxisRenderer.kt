@@ -18,9 +18,11 @@ class XAxisRenderer(
 ) : XAxisRenderer(viewPortHandler, xAxis, trans) {
 	
   override fun renderAxisLine(canvas: Canvas) {
+		
     super.renderAxisLine(canvas)
 		
 		val topLinePaint = Paint()
+		
 		topLinePaint.color = Color.rgb(236, 236, 236)
 		
     canvas.drawLine(mViewPortHandler.contentLeft(),

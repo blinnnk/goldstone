@@ -1,16 +1,18 @@
 package io.goldstone.blockchain.common.component.chart.candle
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Handler
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
@@ -23,6 +25,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketCandleYaxisRenderer
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigDecimal
@@ -52,6 +55,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		super.init()
 		mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
 		mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
+		mAxisRendererLeft = MarketCandleYaxisRenderer(mViewPortHandler, mAxisLeft, mLeftAxisTransformer)
 		resetAxisStyle()
 		post { setEmptyData() }
 	}
@@ -119,7 +123,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		val xAxisSpace = 1f // 蜡烛图内部的左右 `Offset` 值
 		// 为了防止方法执行到此，以下数据还没有被初始化，所以在这里重新赋值
 		xRangeVisibleCount = 30
-		minOffset = 0.5f
+//		minOffset = 0.5f
 		labelTextSize = fontSize(10)
 		isScaleXEnabled = false
 		isScaleYEnabled = false
@@ -158,6 +162,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			setLabelCount(leftLabelCount, true)
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
+			setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART)
 		}
 		with(axisRight) {
 			setDrawLabels(false)
@@ -323,4 +328,5 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	}
 
 	abstract fun formattedDateByType(date: Long): String
+	
 }
