@@ -13,9 +13,9 @@ class TokenSelectionAdapter(
 	private val hold: TokenSelectionCell.() -> Unit
 ) : HoneyBaseAdapter<DefaultTokenTable,
 	TokenSelectionCell>() {
-	
+
 	override fun generateCell(context: Context) = TokenSelectionCell(context)
-	
+
 	override fun TokenSelectionCell.bindCell(data: DefaultTokenTable, position: Int) {
 		model = data
 		hold(this)

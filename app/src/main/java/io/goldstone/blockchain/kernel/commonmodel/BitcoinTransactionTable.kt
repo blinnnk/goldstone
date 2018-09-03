@@ -4,10 +4,10 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toIntOrZero
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.utils.toIntOrZero
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil

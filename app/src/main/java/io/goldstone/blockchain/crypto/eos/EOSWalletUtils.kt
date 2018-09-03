@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.eos
 
+import com.blinnnk.util.TinyNumberUtils
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey

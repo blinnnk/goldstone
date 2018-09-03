@@ -31,7 +31,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
  * @date 25/03/2018 6:30 PM
  * @author KaySaith
  * @rewriteDate 26/07/2018 3:30 PM
- * @rewriter wcx
+ * @reWriter wcx
  * @description 修改获取头像方法 UnlimitedAvatar
  */
 class WalletSettingsPresenter(

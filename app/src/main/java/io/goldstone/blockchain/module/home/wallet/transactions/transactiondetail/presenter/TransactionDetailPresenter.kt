@@ -262,8 +262,8 @@ class TransactionDetailPresenter(
 	private fun formattedMinerFee(): String? {
 		val dataMinerFee =
 			if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol))
-				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
-			else data?.minnerFee
+				data?.minerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toPlainString()
+			else data?.minerFee
 		return if (data.isNull()) dataFromList?.minerFee
 		else "$dataMinerFee ${getUnitSymbol()}"
 	}

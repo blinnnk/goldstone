@@ -89,6 +89,7 @@ class WalletListPresenter(
 								}
 							}
 						}
+						// `EOS` 以及以太坊都不需要额外判断是否是测试网络
 						else -> fragment.activity?.jump<SplashActivity>()
 					}
 				}

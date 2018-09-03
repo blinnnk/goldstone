@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
+import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.SolidityCode

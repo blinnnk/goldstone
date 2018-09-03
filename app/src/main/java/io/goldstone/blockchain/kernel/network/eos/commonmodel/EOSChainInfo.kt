@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.kernel.network.eos.commonmodel
 
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.toIntOrZero
+import com.blinnnk.extension.toIntOrZero
 import org.json.JSONObject
 import java.io.Serializable
 

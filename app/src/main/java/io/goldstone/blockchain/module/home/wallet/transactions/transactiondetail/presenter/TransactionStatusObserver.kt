@@ -4,7 +4,12 @@ import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
-import io.goldstone.blockchain.common.utils.*
+import com.blinnnk.util.TinyNumber
+import com.blinnnk.util.TinyNumberUtils
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -22,7 +27,7 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 abstract class TransactionStatusObserver {
-	
+
 	private val handler = Handler(Looper.getMainLooper())
 	private val targetIntervla = 6
 	abstract val transactionHash: String
@@ -30,7 +35,7 @@ abstract class TransactionStatusObserver {
 	private var isFailed: Boolean? = null
 	private val retryTime = 6000L
 	private var transaction: TransactionTable? = null
-	
+
 	open fun checkStatusByTransaction() {
 		doAsync {
 			if (transaction.isNull()) {
@@ -114,22 +119,22 @@ abstract class TransactionStatusObserver {
 			}
 		}
 	}
-	
+
 	abstract fun getStatus(
 		confirmed: Boolean,
 		blockInterval: Int,
 		hasError: Boolean,
 		isFailed: Boolean
 	)
-	
+
 	private fun removeObserver() {
 		handler.removeCallbacks(reDo)
 	}
-	
+
 	fun start() {
 		checkStatusByTransaction()
 	}
-	
+
 	private val reDo: Runnable = Runnable {
 		checkStatusByTransaction()
 	}
@@ -178,7 +183,7 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 	if (isFailed) {
 		updateDataWhenFailed()
 	}
-	
+
 	data?.apply {
 		updateHeaderValue(
 			TransactionHeaderModel(
@@ -192,7 +197,7 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 		)
 		getTransactionFromChain()
 	}
-	
+
 	dataFromList?.apply {
 		updateHeaderValue(
 			TransactionHeaderModel(

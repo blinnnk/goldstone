@@ -1,10 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
@@ -299,6 +294,7 @@ class WalletDetailPresenter(
 				WalletType.BTCTestOnly.content -> currentBTCSeriesTestAddress
 				WalletType.LTCOnly.content -> currentLTCAddress
 				WalletType.BCHOnly.content -> currentBCHAddress
+				WalletType.EOSOnly.content -> currentEOSAddress
 				else -> WalletText.multiChainWallet
 			}
 			WalletDetailHeaderModel(

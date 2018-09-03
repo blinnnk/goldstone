@@ -17,10 +17,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 
 /**
  * @date 21/03/2018 11:00 PM
@@ -46,6 +43,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.style = Paint.Style.FILL
 		textPaint.typeface = GoldStoneFont.black(context)
 		elevation = shadowSize
+		textSize = 14.uiPX().toFloat()
 	}
 	
 	@SuppressLint("DrawAllocation")
@@ -96,7 +94,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setWhiteStyle() {
-		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
@@ -116,7 +113,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setGrayStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
@@ -136,7 +132,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
-		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(width, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
@@ -153,7 +148,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setDarkStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
@@ -173,7 +167,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGreenStyle(top: Int? = null) {
-		textSize = 14.uiPX().toFloat()
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight

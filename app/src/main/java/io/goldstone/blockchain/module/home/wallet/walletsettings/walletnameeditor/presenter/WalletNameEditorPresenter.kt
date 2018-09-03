@@ -31,7 +31,7 @@ class WalletNameEditorPresenter(
 		}
 	}
 	
-	fun shouCurrentNameHint(nameInput: EditText) {
+	fun showCurrentNameHint(nameInput: EditText) {
 		WalletTable.getCurrentWallet {
 			nameInput.hint = name
 		}

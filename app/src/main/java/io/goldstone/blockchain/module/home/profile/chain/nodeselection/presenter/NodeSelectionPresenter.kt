@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter
 
+import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.Config
@@ -55,7 +55,7 @@ class NodeSelectionPresenter(
 		Config.updateEOSCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 
-	fun getDefaultOrCurrentChainName(isMainnet: Boolean, type: ChainType): String {
+	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) {
 			when (type) {
 				ChainType.ETH -> {
@@ -78,7 +78,6 @@ class NodeSelectionPresenter(
 					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.infuraRopsten
 					else Config.getCurrentChainName()
 				}
-
 				ChainType.BTC -> ChainText.btcTest
 				ChainType.LTC -> ChainText.ltcTest
 				ChainType.BCH -> ChainText.bchTest

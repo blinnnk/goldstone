@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.eos
 
 import android.annotation.SuppressLint
-import io.goldstone.blockchain.common.utils.isEvenCount
+import com.blinnnk.extension.isEvenCount
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import java.text.SimpleDateFormat
@@ -83,12 +83,6 @@ object EOSUtils {
 			completeZero += "0"
 		}
 		return littleEndianAmountHex + completeZero
-	}
-
-	fun getDecimalHex(amount: String): String {
-		return if (amount.contains("."))
-			amount.substringAfter(".").length.toString(16).completeToEvent()
-		else "00"
 	}
 
 	fun getEvenHexOfDecimal(decimal: Int): String {

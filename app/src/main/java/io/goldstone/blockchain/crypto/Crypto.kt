@@ -189,32 +189,6 @@ private fun decompressKey(xBN: BigInteger, yBit: Boolean): ECPoint {
 }
 
 /**
- * Given an arbitrary piece of text and an Ethereum message signature encoded in bytes,
- * returns the public key that was used to sign it. This can then be compared to the expected
- * public key to determine if the signature was correct.
- *
- * @param message RLP encoded message.
- * @param signatureData The message signature components
- * @return the public key used to sign the message
- * @throws SignatureException If the public key could not be recovered or if there was a
- * signature format error.
- */
-@Throws(SignatureException::class)
-fun signedMessageToKey(message: ByteArray, signatureData: SignatureData): BigInteger {
-	val header = signatureData.v and 0xFF.toByte()
-	// The header byte: 0x1B = first key with even y, 0x1C = first key with odd y,
-	//                  0x1D = second key with even y, 0x1E = second key with odd y
-	if (header < 27 || header > 34) {
-		throw SignatureException("Header byte out of range: $header")
-	}
-	val sig = ECDSASignature(signatureData.r, signatureData.s)
-	val messageHash = message.keccak()
-	val recId = header - 27
-	return recoverFromSignature(recId, sig, messageHash)
-	       ?: throw SignatureException("Could not recover public key from signature")
-}
-
-/**
  * Returns public key from the given private key.
  *
  * @param privateKey the private key to derive the public key from

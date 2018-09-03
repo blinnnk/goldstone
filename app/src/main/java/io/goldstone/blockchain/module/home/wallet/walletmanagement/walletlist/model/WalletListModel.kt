@@ -8,7 +8,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
  * @rewriteDate 26/07/2018 3:30 PM
- * @rewriter wcx
+ * @reWriter wcx
  * @description 修改avatar通过id获取
  */
 data class WalletListModel(
