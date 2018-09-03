@@ -33,6 +33,8 @@ object ElementID {
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
 	const val container = 20020
+	const val checkBox = 20021
+	const val recycleriew = 20022
 }
 
 object ViewPagerID {

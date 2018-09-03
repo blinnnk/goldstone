@@ -1,11 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
+import android.support.v7.widget.RecyclerView
+import android.widget.CheckBox
+import android.widget.CompoundButton
 import com.blinnnk.extension.*
+import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
-import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -26,6 +30,7 @@ class QuotationSearchPresenter(
 	
 	private var selectedIds = ""
 	private var selectedStatusChangedList: ArrayList<Pair<Int, Boolean>> = arrayListOf()
+	private var overlayViewData: ArrayList<ExchangeTable> = arrayListOf()
 	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
@@ -58,8 +63,13 @@ class QuotationSearchPresenter(
 	
 	private fun showExchangeDashboard() {
 		getMarketList {
-			fragment.showSelectionListOverlayView(it)
+			selectedStatusChangedList.clear()
+			overlayViewData.clear()
+			overlayViewData.addAll(it)
+			fragment.showSelectionListOverlayView(overlayViewData)
 		}
+		
+		
 	}
 	
 	private fun getSearchFilters() {
@@ -149,31 +159,61 @@ class QuotationSearchPresenter(
 				overlay.apply {
 					setTitle(TransactionText.tokenSelection)
 					addContent {
+						var singleCheckClick = false
 						val marketSetRecyclerView = MarketSetRecyclerView(context)
 						addView(marketSetRecyclerView, 0)
 						val marketSetAdapter = MarketSetAdapter(data) { markeSetCell ->
 							markeSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
+								singleCheckClick = true
 								markeSetCell.model?.apply {
 									isSelected = isChecked
 									updateSelectedChanged(id, isSelected)
+									updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
+									singleCheckClick = false
 								}
 							}
 						}
 						marketSetRecyclerView.adapter = marketSetAdapter
-						
-						showConfirmButton {
-							selectedStatusChangedList.forEach {
-								ExchangeTable.updateSelectedStatusById(it.first, it.second)
+						val allCheckBox = CompoundButton.OnCheckedChangeListener {
+								_, isChecked ->
+							if (!singleCheckClick) {
+								data.forEach {
+									it.isSelected = isChecked
+									updateSelectedChanged(it.id, it.isSelected)
+								}
+								marketSetAdapter.notifyDataSetChanged()
 							}
-							initSelectedIds(data)
-							selectedStatusChangedList.clear()
-							overlay.remove()
 						}
+						
+						showConfirmButton (
+							SearchConfirm(maxWidth, context).apply {
+								setEvents(allCheckBox) {
+									selectedStatusChangedList.forEach {
+										ExchangeTable.updateSelectedStatusById(it.first, it.second)
+									}
+									initSelectedIds(data)
+									selectedStatusChangedList.clear()
+									overlay.remove()
+								}
+							}
+						)
+						
 					}
+					
+					updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
 				}
+				
 			}
 			// 重置回退栈首先关闭悬浮层
 			recoveryBackEvent()
+		}
+	}
+	
+	private fun updateSelectAllStatus(checkBox: CheckBox) {
+		overlayViewData.filterNot {
+			it.isSelected
+		}.apply {
+			checkBox.isChecked = isEmpty()
 		}
 	}
 	

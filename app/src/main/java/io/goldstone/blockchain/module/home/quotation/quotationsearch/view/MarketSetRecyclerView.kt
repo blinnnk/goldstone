@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 import android.content.Context
 import android.widget.LinearLayout
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.value.ElementID
 import org.jetbrains.anko.*
 
 /**
@@ -12,6 +13,7 @@ import org.jetbrains.anko.*
  */
 class MarketSetRecyclerView(context: Context) : BaseRecyclerView(context) {
 	init {
+		id = ElementID.recycleriew
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 	}
 }

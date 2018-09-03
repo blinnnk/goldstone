@@ -2,8 +2,7 @@ package io.goldstone.blockchain.common.component.overlay
 
 import android.content.Context
 import android.graphics.Color
-import android.view.Gravity
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -26,6 +25,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
+import javax.security.auth.callback.Callback
 
 /**
  * @date 2018/6/5 1:50 AM
@@ -38,7 +38,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
-	private val maxWidth = 300.uiPX()
+	val maxWidth = 300.uiPX()
 	private val headerHeight = 50.uiPX()
 	
 	init {
@@ -119,24 +119,16 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 		hold(contentLayout)
 	}
 	
-	fun showConfirmButton(callback: () -> Unit) {
+	fun showConfirmButton(view: View) {
 		contentLayout.bottomPadding = 60.uiPX()
 		container.apply {
-			val confirmButton = RoundButton(context).apply {
-				text = CommonText.confirm
-				setBlueStyle(0, maxWidth - 40.uiPX())
-				click {
-					callback()
-				}
-			}
 			relativeLayout {
 				gravity = Gravity.CENTER
 				lparams(matchParent, 60.uiPX()){
 					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.container)
 				}
-				addView(confirmButton)
+				addView(view)
 			}
 		}
-		
 	}
 }
