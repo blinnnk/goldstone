@@ -11,7 +11,7 @@ import java.math.BigInteger
 data class ReceiptModel(
 	val fromAddress: String,
 	val toAddress: String,
-	val minnerFee: String,
+	val minerFee: String,
 	val value: BigInteger,
 	val token: WalletDetailCellModel,
 	val taxHash: String,

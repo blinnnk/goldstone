@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto
 
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
+import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 
 /**
@@ -74,6 +74,7 @@ object CryptoValue {
 			it.equals(CryptoValue.ltcContract, true) -> Config.getLTCCurrentChain()
 			it.equals(CryptoValue.btcContract, true) -> Config.getBTCCurrentChain()
 			it.equals(CryptoValue.bchContract, true) -> Config.getBCHCurrentChain()
+			it.equals(CryptoValue.eosContract, true) -> Config.getEOSCurrentChain()
 			else -> Config.getCurrentChain()
 		}
 	}
@@ -138,7 +139,7 @@ object CryptoSymbol {
 
 	fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
 		return if (
-			symbol.contains("BTC", true) &&
+			symbol.contains(CryptoSymbol.pureBTCSymbol, true) &&
 			Config.getYingYongBaoInReviewStatus()
 		) "B.C." + if (isTest) " Test" else ""
 		else symbol

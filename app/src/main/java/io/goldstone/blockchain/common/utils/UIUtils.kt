@@ -12,11 +12,12 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.toMillisecond
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
@@ -97,44 +98,26 @@ object TimeUtils {
 		)
 	}
 
-	/**
-	 * @date: 2018/8/22
-	 * @author: yanglihai
-	 * @description: 把日期转换成月日，例如 8/15
-	 */
+	@SuppressLint("SimpleDateFormat")
+		/**
+		 * @date: 2018/8/22
+		 * @author: yanglihai
+		 * @description: 把日期转换成月日，例如 8/15
+		 */
 	fun formatMdDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M/d")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
 
-	/**
-	 * @date: 2018/8/22
-	 * @author: yanglihai
-	 * @description: 把日期转换成时分，例如12:00
-	 */
-	fun formatHmDate(date: Long): String {
-		val simpleDateFormat = SimpleDateFormat("HH:mm")
-		return simpleDateFormat.format(java.util.Date(date))
-	}
-
-	/**
-	 * @date: 2018/8/22
-	 * @author: yanglihai
-	 * @description: 把日期转换成日期+时间，例如8-25 12:00
-	 */
+	@SuppressLint("SimpleDateFormat")
+		/**
+		 * @date: 2018/8/22
+		 * @author: yanglihai
+		 * @description: 把日期转换成日期+时间，例如8-25 12:00
+		 */
 	fun formatMdHmDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
-	}
-}
-
-fun String.toMillisecond(): Long {
-	val timestamp = toBigDecimal().toString().toLong().orElse(0L)
-	return when {
-		count() == 10 -> timestamp * 1000
-		count() < 13 -> timestamp * Math.pow(10.0, (13 - count()).toDouble()).toLong()
-		count() > 13 -> timestamp / Math.pow(10.0, (count() - 13).toDouble()).toLong()
-		else -> timestamp
 	}
 }
 
@@ -153,7 +136,7 @@ fun Activity.transparentStatus() {
 		hasNotchInScreen(),
 		isTargetDevice(DeviceName.nokiaX6).orFalse(),
 		isTargetDevice(DeviceName.xiaomi8).orFalse(),
-		detectnochScreenInAndroidP().orFalse()
+		detectNotchScreenInAndroidP().orFalse()
 	) isTrue {
 		Config.updateNotchScreenStatus(false)
 		setTransparentStatusBar()
@@ -189,12 +172,12 @@ private fun isTargetDevice(name: String): Boolean? {
 	}
 }
 
-private fun Activity.detectnochScreenInAndroidP(): Boolean? {
+private fun Activity.detectNotchScreenInAndroidP(): Boolean? {
 	return if (Build.VERSION.SDK_INT >= 28) {
 		try {
 			View(this).rootWindowInsets.displayCutout?.safeInsetTop ?: 0 > 30.uiPX()
 		} catch (error: Exception) {
-			LogUtil.error("detectnochScreenInAndroidP", error)
+			LogUtil.error("detectNotchScreenInAndroidP", error)
 			null
 		}
 	} else {
@@ -222,7 +205,7 @@ fun Activity.hasNotchInScreen(): Boolean {
 }
 
 fun View.getViewAbsolutelyPositionInScreen(): IntArray {
-	val coords = intArrayOf(0, 0)
-	getLocationOnScreen(coords)
-	return coords
+	val cords = intArrayOf(0, 0)
+	getLocationOnScreen(cords)
+	return cords
 }

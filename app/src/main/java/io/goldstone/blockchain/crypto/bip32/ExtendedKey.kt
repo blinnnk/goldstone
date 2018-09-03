@@ -55,7 +55,7 @@ data class ExtendedKey(
 			}
 			val lr = mac.doFinal(extended)
 			val l = Arrays.copyOfRange(lr, 0, PRIVATE_KEY_SIZE)
-			val r = Arrays.copyOfRange(lr, PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
+			val r = Arrays.copyOfRange(lr, PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + chainNodeSize)
 			val m = BigInteger(1, l)
 			if (m >= CURVE.n) {
 				throw KeyException("Child key derivation resulted in a key with higher modulus. Suggest deriving the next increment.")
@@ -122,7 +122,7 @@ data class ExtendedKey(
 	}
 
 	fun serialize(publicKeyOnly: Boolean = false): String {
-		val out = ByteBuffer.allocate(Companion.EXTENDED_KEY_SIZE)
+		val out = ByteBuffer.allocate(EXTENDED_KEY_SIZE)
 		try {
 			if (publicKeyOnly || keyPair.privateKey == BigInteger.ZERO) {
 				out.put(xpub)
@@ -148,7 +148,7 @@ data class ExtendedKey(
 	companion object {
 
 		private val BITCOIN_SEED = "Bitcoin seed".toByteArray()
-		private const val CHAINCODE_SIZE = PRIVATE_KEY_SIZE
+		private const val chainNodeSize = PRIVATE_KEY_SIZE
 		private const val COMPRESSED_PUBLIC_KEY_SIZE = PRIVATE_KEY_SIZE + 1
 		private const val EXTENDED_KEY_SIZE: Int = 78
 		internal val xprv = byteArrayOf(0x04, 0x88.toByte(), 0xAD.toByte(), 0xE4.toByte())
@@ -161,7 +161,7 @@ data class ExtendedKey(
 				mac.init(seedKey)
 				val lr = mac.doFinal(seed)
 				val privateKey = Arrays.copyOfRange(lr, 0, PRIVATE_KEY_SIZE)
-				val r = Arrays.copyOfRange(lr, PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + CHAINCODE_SIZE)
+				val r = Arrays.copyOfRange(lr, PRIVATE_KEY_SIZE, PRIVATE_KEY_SIZE + chainNodeSize)
 				val m = BigInteger(1, privateKey)
 				if (m >= CURVE.n) {
 					throw KeyException("Master key creation resulted in a key with higher modulus. Suggest deriving the next increment.")

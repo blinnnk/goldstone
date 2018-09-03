@@ -7,7 +7,6 @@ package io.goldstone.blockchain.crypto
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import java.math.BigInteger
 
-private val ETH_IN_WEI = BigInteger("1000000000000000000")
 private var DEFAULT_GAS_PRICE = BigInteger("20000000000")
 private var DEFAULT_GAS_LIMIT = BigInteger("21000")
 
@@ -45,32 +44,6 @@ data class Transaction(
 		value = BigInteger.ZERO
 	)
 }
-
-// we cannot use default values in the data class when we want to use it with room
-fun createTransactionWithDefaults(
-	chain: ChainDefinition? = null,
-	creationEpochSecond: Long? = null,
-	from: Address,
-	gasLimit: BigInteger = DEFAULT_GAS_LIMIT,
-	gasPrice: BigInteger = DEFAULT_GAS_PRICE,
-	input: List<Byte> = emptyList(),
-	nonce: BigInteger? = null,
-	to: Address?,
-	txHash: String? = null,
-	value: BigInteger
-) =
-	Transaction(
-		chain,
-		creationEpochSecond,
-		from,
-		gasLimit,
-		gasPrice,
-		input,
-		nonce,
-		to,
-		txHash,
-		value
-	)
 
 fun Transaction.signViaEIP155(key: ECKeyPair, chainDefinition: ChainDefinition): SignatureData {
 	val signatureData =

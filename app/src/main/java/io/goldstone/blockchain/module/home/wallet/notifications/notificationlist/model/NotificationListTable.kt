@@ -4,11 +4,11 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -20,7 +20,7 @@ import java.io.Serializable
  * @author KaySaith
  */
 enum class NotificationType(val code: Int) {
-	
+
 	Transaction(0), System(1)
 }
 
@@ -36,7 +36,7 @@ data class NotificationTable(
 	val type: Int = 0,
 	val extra: String? = ""
 ) {
-	
+
 	constructor(data: NotificationTable) : this(
 		0,
 		data.content,
@@ -47,7 +47,7 @@ data class NotificationTable(
 		data.type,
 		data.extra
 	)
-	
+
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("content"),
@@ -58,7 +58,7 @@ data class NotificationTable(
 		data.safeGet("type").toInt(),
 		data.safeGet("extra")
 	)
-	
+
 	companion object {
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
 			load {
@@ -67,19 +67,19 @@ data class NotificationTable(
 				hold(it.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}
-		
+
 		fun getChianID(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("chainid")
 			} else ""
 		}
-		
+
 		fun getFromAddress(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("from")
 			} else ""
 		}
-		
+
 		fun getBTCTransactionData(extra: String, isFrom: Boolean): List<ExtraTransactionModel> {
 			val option = if (isFrom) "from" else "to"
 			return if (extra.isNotEmpty()) {
@@ -89,31 +89,31 @@ data class NotificationTable(
 				gson.fromJson(jsonData, collectionType)
 			} else listOf()
 		}
-		
+
 		fun getToAddress(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("to")
 			} else ""
 		}
-		
+
 		fun getSymbol(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("symbol")
 			} else ""
 		}
-		
+
 		fun getValue(extra: String): Double {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("value").toDoubleOrNull().orElse(0.0)
 			} else 0.0
 		}
-		
+
 		fun getReceiveStatus(extra: String): Boolean? {
 			return if (extra.isNotEmpty()) {
 				TinyNumberUtils.isTrue(JSONObject(extra).safeGet("from_or_to"))
 			} else null
 		}
-		
+
 		fun insertData(tables: ArrayList<NotificationTable>, callback: () -> Unit) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = tables.size
@@ -123,7 +123,7 @@ data class NotificationTable(
 						completeMark()
 					}
 				}
-				
+
 				override fun mergeCallBack() = callback()
 			}.start()
 		}
@@ -132,16 +132,16 @@ data class NotificationTable(
 
 @Dao
 interface NotificationDao {
-	
+
 	@Query("SELECT * FROM notification")
 	fun getAllNotifications(): List<NotificationTable>
-	
+
 	@Insert
 	fun insert(notification: NotificationTable)
-	
+
 	@Delete
 	fun delete(notification: NotificationTable)
-	
+
 	@Update
 	fun update(notification: NotificationTable)
 }

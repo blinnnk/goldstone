@@ -19704,9 +19704,9 @@ io.goldstone.blockchain.common.utils.GoldStoneWebSocket -> d.a.a.a.d.F:
     long minInterval -> k
     long timeout -> c
     okhttp3.WebSocket webSocket -> l
-    java.lang.String sockerUrl -> a
+    java.lang.String socketUrl -> a
     okhttp3.WebSocket access$getWebSocket$p(io.goldstone.blockchain.common.utils.GoldStoneWebSocket) -> new
-    void access$setSockerUrl$cp(java.lang.String) -> a
+    void access$socketUrl$cp(java.lang.String) -> a
     boolean isSocketConnected() -> b
     void closeSocket() -> d
     void getServerBack(org.json.JSONObject,boolean) -> for
@@ -26632,7 +26632,7 @@ io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSe
     boolean checkIsEncryptETCNode(java.lang.String) -> g
     io.goldstone.blockchain.common.base.basefragment.BaseFragment getFragment() -> a
     io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment getFragment() -> i
-    java.lang.String getDefaultOrCurrentChainName(boolean,io.goldstone.blockchain.crypto.ChainType) -> do
+    java.lang.String getCurrentChainName(boolean,io.goldstone.blockchain.crypto.ChainType) -> do
     void updateBCHChainID(java.lang.String) -> d
     void updateBTCChainID(java.lang.String) -> c
     void updateERC20ChainID(java.lang.String) -> a
@@ -31433,12 +31433,12 @@ io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.prese
     io.goldstone.blockchain.common.base.basefragment.BaseFragment getFragment() -> a
     io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment getFragment() -> i
     void changeWalletName(android.widget.EditText) -> if
-    void shouCurrentNameHint(android.widget.EditText) -> for
+    void showCurrentNameHint(android.widget.EditText) -> for
     void updateConfirmButtonStyle(android.widget.EditText) -> int
 io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter$changeWalletName$$inlined$let$lambda$1 -> d.a.a.d.c.d.g.h.a.a:
     android.widget.EditText $nameInput$inlined -> b
     io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter this$0 -> a
-io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter$shouCurrentNameHint$1 -> d.a.a.d.c.d.g.h.a.b:
+io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter$showCurrentNameHint$1 -> d.a.a.d.c.d.g.h.a.b:
     android.widget.EditText $nameInput -> a
     void invoke(io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable) -> a
 io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.view.WalletNameEditorFragment -> d.a.a.d.c.d.g.h.b.e:

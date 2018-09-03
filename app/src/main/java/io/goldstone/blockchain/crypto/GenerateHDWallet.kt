@@ -4,10 +4,10 @@ package io.goldstone.blockchain.crypto
 
 import android.content.Context
 import com.blinnnk.extension.*
+import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType

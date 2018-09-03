@@ -146,9 +146,7 @@ object GenerateMultiChainWallet {
 				}
 			}
 
-			override fun mergeCallBack() {
-				hold(addresses)
-			}
+			override fun mergeCallBack() = hold(addresses)
 		}.start()
 	}
 }

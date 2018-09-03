@@ -4,8 +4,8 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ChainID

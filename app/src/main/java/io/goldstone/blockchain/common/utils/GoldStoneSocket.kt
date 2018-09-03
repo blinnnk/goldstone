@@ -25,7 +25,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	private val tag: String = "GoldStoneWebSocket"
 	private val timeout = 30000L
 	private val normalCloseCode = 1000
-	private var serverURL = sockerUrl
+	private var serverURL = socketUrl
 	private var isConnected = false
 	private val handler = Handler(Looper.getMainLooper())
 	private val handlerPing = Handler(Looper.getMainLooper())
@@ -148,9 +148,9 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	}
 
 	companion object {
-		private var sockerUrl = WebUrl.normalSocket
+		private var socketUrl = WebUrl.normalSocket
 		fun updateSocketUrl(newUrl: String) {
-			sockerUrl = newUrl
+			socketUrl = newUrl
 		}
 	}
 }

@@ -97,18 +97,3 @@ fun String.showAfterColonContent(): String {
 	return if (contains(":")) toString().substringAfter(":")
 	else this
 }
-
-// 获取手机厂商信息
-fun getDeviceBrand(): String {
-	return android.os.Build.BRAND
-}
-// 获取手机型号
-fun getSystemModel(): String {
-	return android.os.Build.MODEL
-}
-
-fun String.isEvenCount(): Boolean = this.length % 2 == 0
-
-fun String.toIntOrZero(): Int = toIntOrNull().orZero()
-fun String.toLongOrZero(): Long = toLongOrNull() ?: 0L
-fun String.toDoubleOrZero(): Double = toDoubleOrNull().orZero()

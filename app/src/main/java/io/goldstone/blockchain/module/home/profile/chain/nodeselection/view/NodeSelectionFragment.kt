@@ -93,7 +93,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					// Generate cell with chain and node data
 					chainChild.forEachIndexed { index, pair ->
 						var isSelected = false
-						if (pair.second == presenter.getDefaultOrCurrentChainName(
+						if (pair.second == presenter.getCurrentChainName(
 								fromMainnetSetting.orTrue(),
 								getChainTypeByName(chain.first)
 							)

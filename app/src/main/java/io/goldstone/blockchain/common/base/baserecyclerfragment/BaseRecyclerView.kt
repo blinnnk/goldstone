@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
 import android.widget.LinearLayout
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -35,7 +37,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 
 	inline fun <T> addDragEventAndReordering(
 		adapterDataSet: ArrayList<T>,
-		crossinline hold: (fromPosition: Int?, toPosition: Int?) -> Unit
+		crossinline hold: (fromPosition: Int, toPosition: Int) -> Unit
 	) {
 		var fromPosition: Int? = null
 		var toPosition: Int? = null
@@ -61,7 +63,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 					viewHolder.adapterPosition.orZero(),
 					target.adapterPosition.orZero()
 				)
-				// and notify the adapter that its dataset has changed
+				// and notify the adapter that its dataSet has changed
 				recyclerView.adapter?.notifyItemMoved(
 					viewHolder.adapterPosition.orZero(), target.adapterPosition.orZero()
 				)
@@ -80,7 +82,9 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 			) {
 				super.onSelectedChanged(viewHolder, actionState)
 				if (actionState == 0) {
-					hold(fromPosition, toPosition)
+					if (TinyNumberUtils.allFalse(fromPosition.isNull(), toPosition.isNull())) {
+						hold(fromPosition!!, toPosition!!)
+					}
 				}
 			}
 

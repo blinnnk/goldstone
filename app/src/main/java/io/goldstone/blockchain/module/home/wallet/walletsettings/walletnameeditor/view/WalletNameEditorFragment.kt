@@ -66,7 +66,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 				})
 			}.into(this)
 			
-			presenter.shouCurrentNameHint(nameInput)
+			presenter.showCurrentNameHint(nameInput)
 			
 			confirmButton.apply {
 				text = CommonText.confirm

@@ -136,9 +136,9 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			localTokens: ArrayList<DefaultTokenTable>
 		) {
 			doAsync {
-				val unmanuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+				val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
 				filter { server ->
-					unmanuallyData.find {
+					unManuallyData.find {
 						it.serverTokenID.equals(server.serverTokenID, true)
 					}?.let {
 						// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
