@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
@@ -107,3 +108,7 @@ fun getSystemModel(): String {
 }
 
 fun String.isEvenCount(): Boolean = this.length % 2 == 0
+
+fun String.toIntOrZero(): Int = toIntOrNull().orZero()
+fun String.toLongOrZero(): Long = toLongOrNull() ?: 0L
+fun String.toDoubleOrZero(): Double = toDoubleOrNull().orZero()

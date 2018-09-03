@@ -1,5 +1,6 @@
-package io.goldstone.blockchain.crypto.eos
+package io.goldstone.blockchain.crypto.eos.transaction
 
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import java.io.Serializable
 
 data class UnSignedTransaction(

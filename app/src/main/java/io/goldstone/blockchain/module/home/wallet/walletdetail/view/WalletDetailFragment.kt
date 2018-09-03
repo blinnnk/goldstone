@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EosApi
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -52,6 +53,10 @@ class WalletDetailFragment :
 			depositButton.onClick {
 				presenter.setQuickTransferEvent(false)
 			}
+		}
+
+		EosApi.getTransactionHeaderFromChain {
+			System.out.println("transactionHeader: $it")
 		}
 	}
 
