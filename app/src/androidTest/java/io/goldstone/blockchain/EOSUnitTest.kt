@@ -8,10 +8,11 @@ import android.support.test.runner.AndroidJUnit4
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.eos.*
+import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EosPrivateKey
-import io.goldstone.blockchain.crypto.eos.ecc.EcDsa
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
+import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -153,12 +154,7 @@ class EOSUnitTest {
 		val data = "302933372dcaa683205c9cce4fe3bae6020000000000000004454f53000000000a74657374207472616e73"
 		val authorization = EOSAuthorization("kingofdragon", "active")
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
-		val action = EOSAction(
-			"eosio.token",
-			data,
-			"transfer",
-			authorizationObjects
-		)
+		val action = EOSAction("eosio.token", data, "transfer", authorizationObjects)
 		val serializedExpirationDate = EOSUtils.getExpirationCode(1535958970)
 		val serializedRefBlockNumber = EOSUtils.getRefBlockNumberCode(12873742)
 		val serializeRefBlockPrefix = EOSUtils.getRefBlockPrefixCode(1738495360)
@@ -203,14 +199,38 @@ class EOSUnitTest {
 
 	@Test
 	fun digestForSignature() {
+		val expectResult = "SIG_K1_KiKNEc71CkZpunpcrNa31kV9cg5JPrpAPp7SfSoweu7XbKMCwEoFrkLqysunhJc8kYPEW94UNnQ5SEuLeFKKfAoRRrUVLZ"
 		val hash = Sha256.from(Hex.decode("038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dcabadf8c5b0e7080559f67000000000100a6823403ea3055000000572d3ccdcd01302933372dcaa68300000000a8ed32322b302933372dcaa683205c9cce4fe3bae6020000000000000004454f53000000000a74657374207472616e73000000000000000000000000000000000000000000000000000000000000000000"))
-		val eosAddress = EOSWalletUtils.generateBase58AddressByWIFKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv")
-		System.out.println("eosPrivateKey: $eosAddress")
 		val eosPrivateKey = EosPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv")
-		System.out.println("address: ${eosPrivateKey.publicKey}")
-		System.out.println(eosPrivateKey.sign(hash))
-		System.out.println(EcDsa.sign(hash, eosPrivateKey))
-		System.out.println(EosPrivateKey("L1wrgSBkNx1WLD2ZKEJF3rmaXt7XkXtopPe79qh5jRAVWu8HELdb").publicKey)
+		val result = eosPrivateKey.sign(hash).toString()
+		val compareResult = result == expectResult
+		Assert.assertTrue("Get Wrong Signed Result", compareResult)
+	}
+
+	@Test
+	fun serializedTransaction() {
+		val transactionInfo = EOSTransactionInfo(
+			"kingofdragon",
+			"wuxianyinli2",
+			2,
+			"test trans"
+		)
+		val transactionInfoCode = EOSTransactionInfo.encryptTransactionInfo(transactionInfo)
+		val header = TransactionHeader(12873742, 1738495360)
+		val authorization = EOSAuthorization("kingofdragon", "active")
+		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
+		val action = EOSAction("eosio.token", transactionInfoCode, "transfer", authorizationObjects)
+		EOSTransactionUtils.serialize(
+			EOSChain.Test,
+			ExpirationType.HalfAnHour,
+			header,
+			0,
+			listOf(action),
+			listOf(authorization),
+			transactionInfoCode
+		).let {
+			LogUtil.debug("$position serializedTransaction", "serialization: $it")
+		}
 	}
 }
 

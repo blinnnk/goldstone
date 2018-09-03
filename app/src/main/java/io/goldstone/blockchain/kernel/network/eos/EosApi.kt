@@ -1,15 +1,18 @@
 package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.eos.transaction.TransactionHeader
 import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -43,6 +46,29 @@ object EosApi {
 
 	fun getAccountEOSBalance(accountName: String, hold: (balance: String) -> Unit) {
 		getAccountBalanceBySymbol(accountName, CryptoSymbol.eos, hold)
+	}
+
+	fun getChainInfo(@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			EosUrl.getInfo,
+			"",
+			true,
+			{
+				LogUtil.error("getChainInfo", it)
+			}
+		) {
+			isNotEmpty() isTrue {
+				hold(EOSChainInfo(JSONObject(first())))
+			}
+		}
+	}
+
+	fun getTransactionHeaderFromChain(
+		@WorkerThread hold: (header: TransactionHeader) -> Unit
+	) {
+		getChainInfo {
+			hold(TransactionHeader(it))
+		}
 	}
 
 	fun getAccountBalanceBySymbol(accountName: String, symbol: String, hold: (balance: String) -> Unit) {

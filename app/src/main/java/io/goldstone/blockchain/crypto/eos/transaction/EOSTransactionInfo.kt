@@ -1,7 +1,8 @@
-package io.goldstone.blockchain.crypto.eos
+package io.goldstone.blockchain.crypto.eos.transaction
 
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil

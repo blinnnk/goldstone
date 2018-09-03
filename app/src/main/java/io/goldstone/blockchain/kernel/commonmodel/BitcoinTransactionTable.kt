@@ -7,6 +7,7 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.utils.toIntOrZero
 import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
@@ -67,9 +68,9 @@ data class BTCSeriesTransactionTable(
 		getTransactionValue(data, myAddress),
 		data.safeGet("fees"),
 		data.safeGet("size"),
-		data.safeGet("confirmations").toIntOrNull().orZero(),
+		data.safeGet("confirmations").toIntOrZero(),
 		isFee,
-		false,
+		data.safeGet("confirmations").toIntOrZero() > 0,
 		chainType
 	)
 

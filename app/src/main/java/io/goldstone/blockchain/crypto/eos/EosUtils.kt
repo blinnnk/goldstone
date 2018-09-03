@@ -38,8 +38,9 @@ object EOSUtils {
 	}
 
 	fun getLittleEndianName(content: String): String {
-		val string16 = EOSUtils.nameToLong(content).toString(16)
-		return EOSUtils.toLittleEndian(string16)
+		val writer = EosByteWriter(255)
+		writer.putLongLE(EOSUtils.nameToLong(content))
+		return writer.toBytes().toNoPrefixHexString()
 	}
 
 	fun getRefBlockNumberCode(refBlockNumber: Int): String {

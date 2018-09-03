@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto.eos
+package io.goldstone.blockchain.crypto.eos.transaction
 
 data class EOSAuthorization(
 	val actor: String,

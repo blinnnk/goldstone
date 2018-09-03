@@ -10,4 +10,5 @@ object EosUrl {
 	val getKeyAccount = "${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"
 	val getAccountEOSBalance = "${currentURL()}/v1/chain/${EOSMethod.GetCurrencyBalance.method}"
 	val getTransactionHistory = "${currentURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
+	val getInfo = "${currentURL()}/v1/chain/${EOSMethod.GetInfo.method}"
 }
