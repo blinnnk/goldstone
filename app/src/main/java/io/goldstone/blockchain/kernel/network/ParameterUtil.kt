@@ -73,4 +73,15 @@ object ParameterUtil {
 				.substringBeforeLast(",")}}$latest],\"id\":1}"
 		return if (isEncrypt) AesCrypto.encrypt(rpcContent).orEmpty() else rpcContent
 	}
+
+	fun <T> prepareObjectContent(vararg parameters: Pair<String, T>): String {
+		var content = ""
+		parameters.forEach {
+			val value = if (it.second is String) {
+				"\"${it.second}\""
+			} else it.second
+			content += "\"${it.first}\":$value,"
+		}
+		return "{${content.substringBeforeLast(",")}}"
+	}
 }

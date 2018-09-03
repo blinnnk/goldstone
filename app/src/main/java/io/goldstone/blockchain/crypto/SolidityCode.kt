@@ -27,7 +27,6 @@ object CryptoValue {
 	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
 	const val eosAddressLength = 53
-	const val eosPrivateKeyLength = 50
 	const val bitcoinPrivateKeyLength = 52
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
@@ -47,6 +46,7 @@ object CryptoValue {
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18.0
+	const val eosDecimal = 4
 	val singleChainFile: (btcAddress: String) -> String = {
 		singleChainFilename + it
 	}
@@ -217,6 +217,7 @@ enum class ChainType(val id: Int) {
 			CryptoSymbol.eth -> ETH.id
 			CryptoSymbol.etc -> ETC.id
 			CryptoSymbol.bch -> BCH.id
+			CryptoSymbol.eos -> EOS.id
 			else -> ETH.id
 		}
 	}

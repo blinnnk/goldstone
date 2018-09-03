@@ -132,8 +132,8 @@ object ChainURL {
 	private const val bchMain = "https://btc-node-mainnet.goldstone.io/bch"
 	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** EOS Chain Address */
-	private const val eosMain = "https://api1.eosasia.one"
-	private const val eosTest = "https://api.jungle.alohaeos.com"
+	const val eosMain = "https://api1.eosasia.one"
+	const val eosTest = "https://api.jungle.alohaeos.com"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMordenTest = "https://web3.gastracker.io/morden"
