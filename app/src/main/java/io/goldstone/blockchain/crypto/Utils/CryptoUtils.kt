@@ -52,6 +52,10 @@ object CryptoUtils {
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
 		return value / Math.pow(10.0, decimal)
 	}
+
+	fun toCountByDecimal(value: Long, decimal: Int = 18): Double {
+		return value / Math.pow(10.0, decimal.toDouble())
+	}
 	
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {

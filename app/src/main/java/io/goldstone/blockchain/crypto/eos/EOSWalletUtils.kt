@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.eos
 
 import com.subgraph.orchid.encoders.Hex
+import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
@@ -46,6 +47,7 @@ object EOSWalletUtils {
 	}
 
 	fun isValidPrivateKey(privateKey: String): Boolean {
+		// `EOS` 的私钥与 `BTC` 的主网私钥是同一个格式
 		return BTCUtils.isValidMainnetPrivateKey(privateKey)
 	}
 
@@ -55,5 +57,19 @@ object EOSWalletUtils {
 			!address.substring(0, 3).equals(CryptoSymbol.eos, true) -> false
 			else -> true
 		}
+	}
+
+	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> String): Boolean {
+		val illegalChars = Regex(".*[!@#\$%¥^&*()_=+?].*")
+		val isIllegalLength = accountName.length != 12
+		val containsIllegalCharacter = accountName.matches(illegalChars) || accountName.contains(" ")
+		val containsIllegalNumber = accountName.matches(Regex(".*[6-9].*")) || accountName.contains("0")
+		when {
+			isIllegalLength -> hold("Wrong Length")
+			containsIllegalCharacter -> hold("contains illegal character")
+			containsIllegalNumber -> hold("contains illegal number")
+			else -> hold("")
+		}
+		return TinyNumberUtils.allFalse(isIllegalLength, containsIllegalCharacter, containsIllegalNumber)
 	}
 }

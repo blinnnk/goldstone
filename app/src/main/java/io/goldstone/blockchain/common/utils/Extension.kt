@@ -105,3 +105,5 @@ fun getDeviceBrand(): String {
 fun getSystemModel(): String {
 	return android.os.Build.MODEL
 }
+
+fun String.isEvenCount(): Boolean = this.length % 2 == 0
