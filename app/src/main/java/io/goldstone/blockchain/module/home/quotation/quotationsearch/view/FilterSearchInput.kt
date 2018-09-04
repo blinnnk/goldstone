@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.view.*
 import android.widget.*
@@ -84,7 +85,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 	
 	fun setFiltered(hasFiltered: Boolean) {
 		if (hasFiltered) {
-			filterIcon.clearColorFilter()
+			filterIcon.setColorFilter(Color.TRANSPARENT)
 		} else {
 			filterIcon.setColorFilter(GrayScale.lightGray)
 		}

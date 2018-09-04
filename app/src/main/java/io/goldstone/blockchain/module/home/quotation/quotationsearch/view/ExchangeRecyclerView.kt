@@ -11,7 +11,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class MarketSetRecyclerView(context: Context) : BaseRecyclerView(context) {
+class ExchangeRecyclerView(context: Context) : BaseRecyclerView(context) {
 	init {
 		id = ElementID.recycleriew
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)

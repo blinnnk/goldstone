@@ -1,14 +1,11 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
-import android.support.v7.widget.RecyclerView
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
@@ -186,9 +183,9 @@ class QuotationSearchPresenter(
 					setTitle(TransactionText.tokenSelection)
 					addContent {
 						var singleCheckClick = false
-						val marketSetRecyclerView = MarketSetRecyclerView(context)
-						addView(marketSetRecyclerView, 0)
-						val marketSetAdapter = MarketSetAdapter(data) { markeSetCell ->
+						val exchangeRecyclerView = ExchangeRecyclerView(context)
+						addView(exchangeRecyclerView, 0)
+						val exchangeAdater = ExchangeAdapter(data) { markeSetCell ->
 							markeSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
 								singleCheckClick = true
 								markeSetCell.model?.apply {
@@ -199,7 +196,7 @@ class QuotationSearchPresenter(
 								}
 							}
 						}
-						marketSetRecyclerView.adapter = marketSetAdapter
+						exchangeRecyclerView.adapter = exchangeAdater
 						val allCheckBox = CompoundButton.OnCheckedChangeListener {
 								_, isChecked ->
 							if (!singleCheckClick) {
@@ -207,7 +204,7 @@ class QuotationSearchPresenter(
 									it.isSelected = isChecked
 									updateSelectedChanged(it.id, it.isSelected)
 								}
-								marketSetAdapter.notifyDataSetChanged()
+								exchangeAdater.notifyDataSetChanged()
 							}
 						}
 						

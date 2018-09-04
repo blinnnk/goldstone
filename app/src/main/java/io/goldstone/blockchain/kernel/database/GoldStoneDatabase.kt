@@ -42,7 +42,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
 	abstract fun btcSeriesTransactionDao(): BTCSeriesTransactionDao
-	abstract fun marketSetTableDao(): MarketSetDao
+	abstract fun exchangeTableDao(): ExchangeDao
 	
 	companion object {
 		const val databaseVersion = 6

@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Excha
  * @author: yanglihai
  * @description:
  */
-class MarketSetAdapter(
+class ExchangeAdapter(
 	override val dataSet: ArrayList<ExchangeTable>,
 	private val  hold: (ExchangeCell)-> Unit
 	) : HoneyBaseAdapter<ExchangeTable, ExchangeCell>() {

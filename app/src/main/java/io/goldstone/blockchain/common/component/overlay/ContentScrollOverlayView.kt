@@ -53,7 +53,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			minimumHeight = 400.uiPX()
 			updateAlphaAnimation(1f)
 			verticalLayout {
-				id = ElementID.container
+				id = ElementID.overlayContainer
 				// Header
 				linearLayout {
 					backgroundColor = GrayScale.whiteGray
@@ -125,7 +125,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			relativeLayout {
 				gravity = Gravity.CENTER
 				lparams(matchParent, 60.uiPX()){
-					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.container)
+					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.overlayContainer)
 				}
 				addView(view, LayoutParams(matchParent, matchParent))
 			}

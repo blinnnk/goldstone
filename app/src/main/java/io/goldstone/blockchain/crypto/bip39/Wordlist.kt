@@ -96,7 +96,7 @@ val MnemonicWordList = listOf(
 	"hero", "hidden", "high", "hill", "hint", "hip", "hire", "history", "hobby", "hockey", "hold",
 	"hole", "holiday", "hollow", "home", "honey", "hood", "hope", "horn", "horror", "horse",
 	"hospital", "host", "hotel", "hour", "hover", "hub", "huge", "human", "humble", "humor",
-	"hundred", "hungry", "hunt", "hurdle", "hurry", "hurt", "husband", "hybrid", "ice", "exchangeIcon",
+	"hundred", "hungry", "hunt", "hurdle", "hurry", "hurt", "husband", "hybrid", "ice", "icon",
 	"idea", "identify", "idle", "ignore", "ill", "illegal", "illness", "image", "imitate", "immense",
 	"immune", "impact", "impose", "improve", "impulse", "inch", "include", "income", "increase",
 	"index", "indicate", "indoor", "industry", "infant", "inflict", "inform", "inhale", "inherit",

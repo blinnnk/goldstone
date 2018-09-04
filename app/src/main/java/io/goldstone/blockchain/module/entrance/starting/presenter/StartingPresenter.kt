@@ -135,10 +135,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fun updateExchangesTable(errorCallback: (Exception) -> Unit,
 			callback: (List<ExchangeTable>) -> Unit) {
 			doAsync {
-				GoldStoneAPI.getMarketList(exchangeTableMd5,
-					{ error ->
-						errorCallback(error)
-					}
+				GoldStoneAPI.getMarketList(exchangeTableMd5, errorCallback
 				) { serverExchangeTables, md5 ->
 					serverExchangeTables.isNotEmpty() isTrue {
 						if (exchangeTableMd5 != md5 && serverExchangeTables.isNotEmpty()) {

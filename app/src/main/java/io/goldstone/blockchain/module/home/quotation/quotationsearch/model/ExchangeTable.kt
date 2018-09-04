@@ -32,7 +32,7 @@ data class ExchangeTable(
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.marketSetTableDao().insertOrReplace(exchangeTables)
+				GoldStoneDataBase.database.exchangeTableDao().insertOrReplace(exchangeTables)
 			} then {
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
@@ -40,8 +40,8 @@ data class ExchangeTable(
 		
 		fun getAll(hold: (List<ExchangeTable>) -> Unit) {
 			doAsync {
-				val marketSet = GoldStoneDataBase.database.marketSetTableDao().getAll()
-				hold(marketSet)
+				val exchangeSet = GoldStoneDataBase.database.exchangeTableDao().getAll()
+				hold(exchangeSet)
 			}
 		}
 		
@@ -50,7 +50,7 @@ data class ExchangeTable(
 			hold: (List<ExchangeTable>) -> Unit
 		) {
 			doAsync {
-				val marketList = GoldStoneDataBase.database.marketSetTableDao().queryByStatus(isSelected)
+				val marketList = GoldStoneDataBase.database.exchangeTableDao().queryByStatus(isSelected)
 				GoldStoneAPI.context.runOnUiThread { hold(marketList) }
 			}
 		}
@@ -60,13 +60,13 @@ data class ExchangeTable(
 			isSelected: Boolean
 		) {
 			doAsync {
-				GoldStoneDataBase.database.marketSetTableDao().updateSelectedStatusById(id, isSelected)
+				GoldStoneDataBase.database.exchangeTableDao().updateSelectedStatusById(id, isSelected)
 			}
 		}
 		
 		fun delete( exchangeTable: ExchangeTable) {
 			doAsync {
-				GoldStoneDataBase.database.marketSetTableDao().delete(exchangeTable)
+				GoldStoneDataBase.database.exchangeTableDao().delete(exchangeTable)
 			}
 		}
 		
@@ -74,7 +74,7 @@ data class ExchangeTable(
 	
 }
 
-@Dao interface MarketSetDao {
+@Dao interface ExchangeDao {
 	@Query("select * from exchangeTable")
 	fun getAll(): List<ExchangeTable>
 	

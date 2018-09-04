@@ -290,7 +290,7 @@ object GoldStoneAPI {
 				val newMd5 = data.safeGet("md5")
 				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
 				hold(Gson().fromJson(exchangeTables, collectionType), newMd5)
-			}catch (error: Exception) {
+			} catch (error: Exception) {
 				errorCallback(error)
 			}
 		}
