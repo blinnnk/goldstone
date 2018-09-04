@@ -84,10 +84,13 @@ class QuotationSearchPresenter(
 	
 	private fun initSelectedIds(data: List<ExchangeTable>) {
 		selectedIds = ""
+		var selectedNames = arrayListOf<String>()
 		data.forEach { exchangeTable ->
 			if (exchangeTable.isSelected) {
-				selectedIds += (exchangeTable.id)
+				selectedIds += exchangeTable.id
 				selectedIds += ','
+				
+				selectedNames.add(exchangeTable.exchangeName)
 			}
 		}
 		if (selectedIds.length > 1) {
@@ -95,6 +98,25 @@ class QuotationSearchPresenter(
 		}
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
+		}
+		
+		(fragment.recyclerView.adapter as? QuotationSearchAdapter)?.apply {
+			var filterText = ""
+			if (selectedNames.isNotEmpty()) {
+				if (selectedNames.size > 2) {
+					filterText += selectedNames[0]
+					filterText += ','
+					filterText += selectedNames[1]
+					filterText += "..."
+				}else {
+					selectedNames.forEach {
+						filterText += it
+						filterText += ','
+					}
+					filterText = filterText.substring(0, filterText.lastIndex)
+				}
+			}
+			updateHeaderView(QuotationText.searchFilterTextDescription(filterText))
 		}
 		
 	}
@@ -149,7 +171,7 @@ class QuotationSearchPresenter(
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
-			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(searchList.map {
+			diffAndUpdateAdapterData<QuotationSearchAdapter>(searchList.map {
 				QuotationSelectionTable(it, "")
 			}.toArrayList())
 		}
