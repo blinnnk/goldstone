@@ -28,33 +28,38 @@ class QuotationSearchAdapter(
 	}
 	
 	lateinit var headerView: View
+	lateinit var headerContainer: FrameLayout
 	
 	override fun generateHeader(context: Context): View =
-		RelativeLayout(context).apply {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
-			backgroundColor = GrayScale.lightGray
-			visibility = View.GONE
-			leftPadding = 10.uiPX()
-			
-			textView {
-				id = ElementID.attentionText
-				layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-				textColor = GrayScale.black
-				gravity = Gravity.CENTER_VERTICAL
-				singleLine = true
-			}
-			
-			imageView {
-				layoutParams = RelativeLayout.LayoutParams(40.uiPX(), matchParent)
-				setAlignParentRight()
-				padding = 15.uiPX()
-				imageResource = R.drawable.close_icon
-				click {
-					(parent as? RelativeLayout)?.apply { visibility = View.GONE }
+		FrameLayout(context).apply {
+			headerView = RelativeLayout(context).apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
+				backgroundColor = GrayScale.lightGray
+				leftPadding = 10.uiPX()
+				
+				textView {
+					id = ElementID.attentionText
+					layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
+					textColor = GrayScale.black
+					gravity = Gravity.CENTER_VERTICAL
+					singleLine = true
 				}
+				
+				imageView {
+					layoutParams = RelativeLayout.LayoutParams(40.uiPX(), matchParent)
+					setAlignParentRight()
+					padding = 15.uiPX()
+					imageResource = R.drawable.close_icon
+					click {
+						(parent as? RelativeLayout)?.apply { visibility = View.GONE }
+					}
+				}
+				headerView = this
 			}
-			headerView = this
+			headerContainer = this
 		}
+	
+		
 		
 	
 	override fun onBindViewHolder(
@@ -77,10 +82,12 @@ class QuotationSearchAdapter(
 	
 	fun updateHeaderView(text: String) {
 		text.isEmpty() isTrue {
-			headerView.visibility = View.GONE
+			(headerView.parent as? FrameLayout)?.removeView(headerView)
 		} otherwise {
-			headerView.visibility = View.VISIBLE
 			headerView.findViewById<TextView>(ElementID.attentionText).text = text
+			headerView.parent.isNull {
+				headerContainer.addView(headerView)
+			}
 		}
 	}
 

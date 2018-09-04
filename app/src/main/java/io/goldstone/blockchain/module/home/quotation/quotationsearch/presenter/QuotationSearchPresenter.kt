@@ -116,7 +116,7 @@ class QuotationSearchPresenter(
 					filterText = filterText.substring(0, filterText.lastIndex)
 				}
 			}
-			updateHeaderView(QuotationText.searchFilterTextDescription(filterText))
+			updateHeaderView(if (filterText.isEmpty())  "" else QuotationText.searchFilterTextDescription(filterText))
 		}
 		
 	}
