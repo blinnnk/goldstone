@@ -127,7 +127,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 				lparams(matchParent, 60.uiPX()){
 					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.container)
 				}
-				addView(view)
+				addView(view, LayoutParams(matchParent, matchParent))
 			}
 		}
 	}

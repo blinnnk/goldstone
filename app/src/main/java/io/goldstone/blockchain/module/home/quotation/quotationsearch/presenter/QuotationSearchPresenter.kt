@@ -5,6 +5,7 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -62,6 +63,9 @@ class QuotationSearchPresenter(
 	}
 	
 	private fun showExchangeDashboard() {
+		fragment.activity?.apply {
+			 SoftKeyboard.hide(this)
+		}
 		getMarketList {
 			selectedStatusChangedList.clear()
 			overlayViewData.clear()
