@@ -7,6 +7,7 @@ import android.widget.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -24,27 +25,43 @@ class SearchConfirm(val maxWidth: Int, context: Context): LinearLayout(context) 
 			setBlueStyle()
 			val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
 			val buttonHeight = 40.uiPX()
-//			val marginSize = 15.uiPX()
-			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
-				leftMargin = PaddingSize.device
-//				topMargin = marginSize
-			}
+			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight)
 		}
 		
 		
+	}
+	
+	val textView by lazy {
+		TextView(context).apply {
+			text = QuotationText.selectAll
+		}
 	}
 	val checkBox by lazy {
 		CheckBox(context).apply {
 			id = ElementID.checkBox
 			layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
-			text = "全选"
 		}
 	}
+	
+	val linearLayout by lazy {
+		LinearLayout(context).apply {
+			gravity = Gravity.RIGHT
+			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+		}
+	}
+	
 	init {
 		gravity = Gravity.CENTER
 		backgroundColor = Color.WHITE
-		addView(checkBox)
+		
+		leftPadding = PaddingSize.device
+		rightPadding = PaddingSize.device
+		
 		addView(confirmButton)
+		addView(linearLayout.apply {
+			addView(textView)
+			addView(checkBox)
+		})
 	}
 	
 	fun setEvents(onCheckedChangeListener: CompoundButton.OnCheckedChangeListener,

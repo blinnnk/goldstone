@@ -46,7 +46,7 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 		addView(textView)
 		
 		addView(checkBox.apply {
-			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
 		})
 		
 		exchangeIcon.apply {

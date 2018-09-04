@@ -261,4 +261,14 @@ object QuotationText {
 			else -> ""
 		}
 	}
+	@JvmField
+	val selectAll = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "全选"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "全选"
+		else -> ""
+	}
 }
