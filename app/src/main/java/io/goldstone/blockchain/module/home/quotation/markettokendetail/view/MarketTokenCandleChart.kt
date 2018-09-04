@@ -35,10 +35,6 @@ class MarketTokenCandleChart(context: Context) : CandleStickChart(context) {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width - 20.uiPX(), 260.uiPX())
 	}
 	
-	override fun init() {
-		super.init()
-		
-	}
 	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
 		requestDisallowInterceptTouchEvent(true)
 		return super.dispatchTouchEvent(ev)

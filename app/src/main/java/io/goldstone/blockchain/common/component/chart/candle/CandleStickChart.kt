@@ -38,7 +38,7 @@ import java.math.BigDecimal
 abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 
 	private var xRangeVisibleCount = 30
-	private var leftLabelCount = 10
+	private var leftLabelCount = 4
 	private var realData = listOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
@@ -118,7 +118,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 
 	private fun resetAxisStyle() {
 		// 初始化一些属性
-		val labelColor = GrayScale.midGray
+		val labelColor = GrayScale.black
 		val gridLineColor = GrayScale.lightGray
 		val xAxisSpace = 1f // 蜡烛图内部的左右 `Offset` 值
 		// 为了防止方法执行到此，以下数据还没有被初始化，所以在这里重新赋值
@@ -269,9 +269,9 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			// 最左侧的label也会被遮挡 所以要计算出左侧label的宽度，得到精确地第一个显示的蜡烛
 			val measurePaint = Paint()
 			measurePaint.textSize = axisLeft.textSize
-			val rect = Rect()
-			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
-			if (buffers[0] > rect.width()) {
+//			val rect = Rect()
+//			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
+			if (buffers[0] > 0) {
 				resetMaxMin(index)
 				return
 			}
