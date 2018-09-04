@@ -67,7 +67,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setRightPosition()
 		}
 	}
-	private val searchInput by lazy {
+	val searchInput by lazy {
 		FilterSearchInput(context)
 	}
 	private val headerHeight = HomeSize.headerHeight

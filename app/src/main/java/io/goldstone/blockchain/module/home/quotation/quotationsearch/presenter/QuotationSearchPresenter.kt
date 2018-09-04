@@ -81,7 +81,7 @@ class QuotationSearchPresenter(
 	
 	private fun initSelectedIds(data: List<ExchangeTable>) {
 		selectedIds = ""
-		var selectedNames = arrayListOf<String>()
+		val selectedNames = arrayListOf<String>()
 		data.forEach { exchangeTable ->
 			if (exchangeTable.isSelected) {
 				selectedIds += exchangeTable.id
@@ -217,6 +217,7 @@ class QuotationSearchPresenter(
 									initSelectedIds(data)
 									selectedStatusChangedList.clear()
 									overlay.remove()
+									researchAfterFilterReselected()
 								}
 							}
 						)
@@ -229,6 +230,16 @@ class QuotationSearchPresenter(
 			}
 			// 重置回退栈首先关闭悬浮层
 			recoveryBackEvent()
+		}
+	}
+	
+	private fun researchAfterFilterReselected() {
+		fragment.getParentFragment<QuotationOverlayFragment> {
+			val textForSearch = overlayView.header.searchInput.editText.text.toString().trim()
+			if (hasNetWork &&
+				!textForSearch.isBlank()) {
+				searchTokenBy(textForSearch)
+			}
 		}
 	}
 	
@@ -271,7 +282,7 @@ class QuotationSearchPresenter(
 		}
 		
 		fun getMarketList(callback: (ArrayList<ExchangeTable>) -> Unit) {
-			ExchangeTable.getAll {
+			ExchangeTable.getAll { it ->
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
 					StartingPresenter.updateExchangesTable ( {

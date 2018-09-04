@@ -24,7 +24,7 @@ import org.jetbrains.anko.*
 class FilterSearchInput(context: Context) : LinearLayout(context) {
 	private val filterIcon by lazy {
 		ImageView(context).apply {
-			layoutParams = LinearLayout.LayoutParams(38.uiPX(), matchParent)
+			layoutParams = LinearLayout.LayoutParams(30.uiPX(), matchParent)
 			imageResource = R.drawable.icon_filtrate
 			gravity = Gravity.CENTER_VERTICAL
 		}
