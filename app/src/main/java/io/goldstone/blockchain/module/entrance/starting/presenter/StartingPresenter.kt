@@ -131,42 +131,47 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 		
-		private var exchangeTableMd5: String = ""
 		fun updateExchangesTable(errorCallback: (Exception) -> Unit,
 			callback: (List<ExchangeTable>) -> Unit) {
 			doAsync {
-				GoldStoneAPI.getMarketList(exchangeTableMd5, errorCallback
-				) { serverExchangeTables, md5 ->
-					serverExchangeTables.isNotEmpty() isTrue {
-						if (exchangeTableMd5 != md5 && serverExchangeTables.isNotEmpty()) {
-							ExchangeTable.getAll {localExchangeTables ->
-								localExchangeTables.filterNot { local ->
-									serverExchangeTables.any { server ->
-										local.id == server.id
-									}
-								}.apply {
-									// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
-									forEach {
-										ExchangeTable.delete(it)
-									}
-								}
+				AppConfigTable.getAppConfig {
+					
+					GoldStoneAPI.getMarketList(it?.exchangeListMD5.orEmpty(), errorCallback
+					) { serverExchangeTables, md5 ->
+						serverExchangeTables.isNotEmpty() isTrue {
+							if (it?.exchangeListMD5.isNullOrBlank() ||
+								it?.exchangeListMD5.orEmpty() != md5
+							) {
 								
-								val selectedIds = arrayListOf<Int>()
-								localExchangeTables.forEach {
-									if (it.isSelected) {
-										selectedIds.add(it.id)
-									}
-								}.apply {
-									serverExchangeTables.forEach {
-										if (selectedIds.contains(it.id)) {
-											it.isSelected = true
+								AppConfigTable.updateExchangeListMD5(md5)
+								ExchangeTable.getAll {localExchangeTables ->
+									localExchangeTables.filterNot { local ->
+										serverExchangeTables.any { server ->
+											local.id == server.id
+										}
+									}.apply {
+										// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
+										forEach {
+											ExchangeTable.delete(it)
 										}
 									}
+									
+									val selectedIds = arrayListOf<Int>()
+									localExchangeTables.forEach {
+										if (it.isSelected) {
+											selectedIds.add(it.id)
+										}
+									}.apply {
+										serverExchangeTables.forEach {
+											if (selectedIds.contains(it.id)) {
+												it.isSelected = true
+											}
+										}
+									}
+									ExchangeTable.insertOrReplace(serverExchangeTables) {}
+									callback(serverExchangeTables)
 								}
-								ExchangeTable.insertOrReplace(serverExchangeTables) {}
-								callback(serverExchangeTables)
 							}
-							exchangeTableMd5 = md5
 						}
 					}
 				}

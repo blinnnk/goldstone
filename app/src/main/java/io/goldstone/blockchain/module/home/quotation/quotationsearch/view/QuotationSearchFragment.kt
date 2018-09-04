@@ -1,11 +1,13 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.orEmptyArray
+import android.view.ViewGroup
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -37,6 +39,19 @@ class QuotationSearchFragment :
 			}
 		}
 	}
+	
+	override fun recoveryBackEvent() {
+		getMainActivity()?.apply {
+			backEvent = Runnable {
+				val overlayView = findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+				if (overlayView.isNull()) {
+					setBackEvent(this)
+				}else {
+					overlayView.remove()
+				}
+			}
+		}
+	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<QuotationOverlayFragment> {
@@ -45,4 +60,5 @@ class QuotationSearchFragment :
 			overlayView.header.showSearchInput(false)
 		}
 	}
+	
 }
