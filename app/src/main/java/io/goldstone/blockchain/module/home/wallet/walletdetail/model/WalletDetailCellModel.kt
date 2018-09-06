@@ -186,27 +186,25 @@ data class WalletDetailCellModel(
 			errorCallback: (Exception) -> Unit,
 			callback: () -> Unit
 		) {
-			map { it.contract }.toJsonArray { it ->
-				GoldStoneAPI.getPriceByContractAddress(
-					it,
-					{
-						errorCallback(it)
-						LogUtil.error("updateMyTokensPrices", it)
-					}
-				) { newPrices ->
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount: Int = newPrices.size
-						override fun concurrentJobs() {
-							newPrices.forEach {
-								// 同时更新缓存里面的数据
-								DefaultTokenTable.updateTokenPrice(it.contract, it.price)
-								completeMark()
-							}
-						}
-
-						override fun mergeCallBack() = callback()
-					}.start()
+			GoldStoneAPI.getPriceByContractAddress(
+				map { it.contract }.toJsonArray(),
+				{
+					errorCallback(it)
+					LogUtil.error("updateMyTokensPrices", it)
 				}
+			) { newPrices ->
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = newPrices.size
+					override fun concurrentJobs() {
+						newPrices.forEach {
+							// 同时更新缓存里面的数据
+							DefaultTokenTable.updateTokenPrice(it.contract, it.price)
+							completeMark()
+						}
+					}
+
+					override fun mergeCallBack() = callback()
+				}.start()
 			}
 		}
 	}

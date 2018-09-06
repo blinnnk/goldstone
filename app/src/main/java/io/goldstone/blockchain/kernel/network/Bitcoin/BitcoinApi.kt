@@ -59,6 +59,7 @@ object BitcoinApi {
 		errorCallback: (Throwable) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
+		// `from` 传入一个特大值, `to` 传入 `0` 确保返回的数据只有 `count` 参数而不包含子集
 		BTCSeriesApiUtils.getTransactionCount(
 			BitcoinUrl.getTransactions(address, 999999999, 0),
 			errorCallback,
@@ -105,7 +106,7 @@ object BitcoinApi {
 				if (isNull()) null
 				else BTCSeriesTransactionTable(
 					it!!,
-					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
+					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 `DataIndex` 随便设置即可
 					0,
 					address,
 					CryptoSymbol.pureBTCSymbol,

@@ -2,11 +2,19 @@ package io.goldstone.blockchain.crypto.eos
 
 import android.annotation.SuppressLint
 import com.blinnnk.extension.isEvenCount
+import com.subgraph.orchid.encoders.Hex
+import io.goldstone.blockchain.common.utils.getDecimalCount
+import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
 
 object EOSUtils {
 	private const val charMap = ".12345abcdefghijklmnopqrstuvwxyz"
@@ -37,7 +45,7 @@ object EOSUtils {
 		return endianValue
 	}
 
-	fun getLittleEndianName(content: String): String {
+	fun getLittleEndianCode(content: String): String {
 		val writer = EosByteWriter(255)
 		writer.putLongLE(EOSUtils.nameToLong(content))
 		return writer.toBytes().toNoPrefixHexString()
@@ -52,12 +60,6 @@ object EOSUtils {
 	fun getRefBlockPrefixCode(refBlockPrefix: Int): String {
 		val writer = EosByteWriter(255)
 		writer.putIntLE(refBlockPrefix and -0x1)
-		return writer.toBytes().toNoPrefixHexString()
-	}
-
-	fun getLittleEndianCode(content: String): String {
-		val writer = EosByteWriter(255)
-		writer.putLongLE(EOSUtils.nameToLong(content))
 		return writer.toBytes().toNoPrefixHexString()
 	}
 
@@ -172,6 +174,29 @@ object EOSUtils {
 		val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 		dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 		val utcDate = dateFormat.format(date)
-		return dateFormat.parse(utcDate).time
+		return dateFormat.parse(utcDate).time / 1000
+	}
+
+	fun convertAmountToValidFormat(amount: Long): String {
+		val count = CryptoUtils.toCountByDecimal(amount, CryptoValue.eosDecimal)
+		val decimalCount = count.getDecimalCount()
+		return when (decimalCount) {
+			null -> "$count 0000"
+			CryptoValue.eosDecimal -> "$count"
+			else -> "$count${completeZero(CryptoValue.eosDecimal - decimalCount)}"
+		}
+	}
+
+	fun completeZero(count: Int): String {
+		var completeZero = ""
+		(0 until count).forEach {
+			completeZero += "0"
+		}
+		return completeZero
+	}
+
+	fun getHexDataByteLengthCode(hexData: String): String {
+		val formattedHexData = if (hexData.isEvenCount()) hexData else hexData + "0"
+		return EOSUtils.getVariableUInt(Hex.decode(formattedHexData).size)
 	}
 }

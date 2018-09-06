@@ -1,5 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.eccutils
 
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
+
 class RefValue<T> {
 	@JvmField var data: T? = null
 	constructor() {

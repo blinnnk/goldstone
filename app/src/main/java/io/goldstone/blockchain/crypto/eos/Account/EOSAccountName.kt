@@ -1,5 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.account
 
+/**
+ * @author KaySaith
+ * @date 2018/09/05
+ */
+
 class EOSAccountName(name: String) {
 	init {
 		if (!name.isEmpty()) {

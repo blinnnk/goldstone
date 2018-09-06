@@ -66,6 +66,18 @@ data class WalletTable(
 
 	companion object {
 
+		fun getAllCurrentAddresses(wallet: WalletTable): List<Pair<String, Int>> {
+			return listOf(
+				Pair(wallet.currentEOSAddress, ChainType.EOS.id),
+				Pair(wallet.currentBTCSeriesTestAddress, ChainType.AllTest.id),
+				Pair(wallet.currentBTCAddress, ChainType.BTC.id),
+				Pair(wallet.currentBCHAddress, ChainType.BCH.id),
+				Pair(wallet.currentLTCAddress, ChainType.LTC.id),
+				Pair(wallet.currentETHAndERCAddress, ChainType.ETH.id),
+				Pair(wallet.currentETCAddress, ChainType.ETC.id)
+			).filter { it.first.isNotEmpty() }
+		}
+
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
 				when (Config.getCurrentWalletType()) {

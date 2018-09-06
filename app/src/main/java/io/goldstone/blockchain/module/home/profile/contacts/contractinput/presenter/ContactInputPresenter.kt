@@ -72,9 +72,14 @@ class ContactInputPresenter(
 						btcSeriesTestnetInput.setText(it.address)
 						btcTestnetAddressText = it.address
 					}
+
 					AddressType.LTC -> {
 						ltcInput.setText(it.address)
 						ltcAddressText = it.address
+					}
+
+					AddressType.EOS -> {
+						// TODO
 					}
 				}
 			}

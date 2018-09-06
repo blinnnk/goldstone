@@ -29,7 +29,7 @@ import org.jetbrains.anko.runOnUiThread
 abstract class TransactionStatusObserver {
 
 	private val handler = Handler(Looper.getMainLooper())
-	private val targetIntervla = 6
+	private val targetInterval = 6
 	abstract val transactionHash: String
 	abstract val chainID: String
 	private var isFailed: Boolean? = null
@@ -63,7 +63,7 @@ abstract class TransactionStatusObserver {
 					ChainID.getChainNameByID(chainID)
 				) { blockNumber ->
 					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
-					val hasConfirmed = blockInterval > targetIntervla
+					val hasConfirmed = blockInterval > targetInterval
 					val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
 					if (!isFailed.isNull() || hasConfirmed) {
 						GoldStoneAPI.context.runOnUiThread {

@@ -7,4 +7,5 @@ package io.goldstone.blockchain.common.utils
 object DeviceName {
 	const val nokiaX6 = "Nokia X6"
 	const val xiaomi8 = "Xiaomi MI 8"
+	const val vivo = "vivo"
 }

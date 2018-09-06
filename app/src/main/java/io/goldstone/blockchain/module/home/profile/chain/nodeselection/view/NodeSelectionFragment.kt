@@ -86,7 +86,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						CryptoName.eos -> NodeSelectionSectionCell(context).eosType().into(this)
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
-					// Nodes of One Chain
+					// Nodes of Main or Test Chain
 					val chainChild = nodes.filter {
 						it.first.equals(chain.first, true)
 					}

@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
@@ -76,12 +75,16 @@ fun Context.showAlertView(
 	}.show()
 }
 
-fun <T : Iterable<String>> T.toJsonArray(callback: (JsonArray) -> Unit) {
+fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 	val stringArray = JsonArray()
-	forEachOrEnd { item, isEnd ->
-		stringArray.add(item)
-		if (isEnd) callback(stringArray)
+	forEach {
+		stringArray.add(it)
 	}
+	return stringArray
+}
+
+fun <T> Collection<T>.mergeAndDistinct(other: Collection<T>): Collection<T> {
+	return this.plus(other).distinct()
 }
 
 fun String.getDecimalCount(): Int? {
@@ -91,6 +94,10 @@ fun String.getDecimalCount(): Int? {
 	} else {
 		null
 	}
+}
+
+fun Double.getDecimalCount(): Int? {
+	return toString().getDecimalCount()
 }
 
 fun String.showAfterColonContent(): String {

@@ -130,11 +130,8 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 			}
 		}
 		presenter.onFragmentViewCreated()
-		// 让出动画时间
-		150L timeUpThen {
-			showHomeFragment(false)
-			hideTabBarToAvoidOverdraw()
-		}
+		showHomeFragment(false)
+		hideTabBarToAvoidOverdraw()
 	}
 
 	fun showAddButton(

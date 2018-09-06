@@ -1,6 +1,6 @@
 package io.goldstone.blockchain
 
-import org.junit.Assert.assertEquals
+import io.goldstone.blockchain.common.utils.LogUtil
 import org.junit.Test
 
 @Suppress("DEPRECATION")
@@ -10,9 +10,11 @@ import org.junit.Test
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
-	
+
 	@Test
-	fun addition_isCorrect() {
-		assertEquals(4, 2 + 2)
+	fun mergeListAndDistinct() {
+		val list1 = listOf(1, 2, 3, 4, 5, 6)
+		val list2 = listOf(10, 20, 30, 4, 5, 6)
+		LogUtil.debug("mergeListAndDistinct", "${list1.plus(list2).distinct()}")
 	}
 }

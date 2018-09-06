@@ -66,6 +66,7 @@ class NodeSelectionPresenter(
 				ChainType.BTC -> ChainText.btcMain
 				ChainType.LTC -> ChainText.ltcMain
 				ChainType.BCH -> ChainText.bchMain
+				ChainType.EOS -> ChainText.eosMain
 
 				else -> {
 					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) ChainText.etcMainGasTracker
@@ -81,6 +82,7 @@ class NodeSelectionPresenter(
 				ChainType.BTC -> ChainText.btcTest
 				ChainType.LTC -> ChainText.ltcTest
 				ChainType.BCH -> ChainText.bchTest
+				ChainType.EOS -> ChainText.eosTest
 				else -> {
 					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) ChainText.etcMorden
 					else Config.getETCCurrentChainName()
@@ -121,7 +123,7 @@ class NodeSelectionPresenter(
 							ChainNameID.getChainNameByID(currentETCTestChainNameID)
 						)
 						Config.updateEOSCurrentChainName(
-							ChainNameID.getChainNameByID(currentEOSChainNameID)
+							ChainNameID.getChainNameByID(currentEOSTestChainNameID)
 						)
 						Config.updateCurrentChainName(
 							ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)

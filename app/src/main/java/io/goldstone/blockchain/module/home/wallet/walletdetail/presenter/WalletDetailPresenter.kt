@@ -187,7 +187,7 @@ class WalletDetailPresenter(
 						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
 						GoldStoneAPI.getUnreadCount(goldStoneID, time) { unreadCount ->
 							uiThread {
-								if (unreadCount.isNotEmpty() && unreadCount.toIntOrNull().orZero() > 0) {
+								if (unreadCount.isNotEmpty() && unreadCount.toIntOrZero() > 0) {
 									fragment.setNotificationUnreadCount(unreadCount)
 								} else {
 									fragment.recoveryNotifyButtonStyle()

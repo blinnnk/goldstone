@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat
  * @date 21/03/2018 9:07 PM
  * @author KaySaith
  * @rewriteDate 26/07/2018 5:47 PM
- * @rewriter wcx
+ * @reWriter wcx
  * @description 調整头像对应名称的顺序 , 删除generateAvatar方法
  */
 object UIUtils {

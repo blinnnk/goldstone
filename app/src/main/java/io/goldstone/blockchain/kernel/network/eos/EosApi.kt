@@ -4,10 +4,13 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.eos.transaction.TransactionHeader
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSrResponse
+import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
+import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -17,7 +20,7 @@ import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
-object EosApi {
+object EOSAPI {
 	fun getAccountNameByPublicKey(
 		publicKey: String,
 		@WorkerThread hold: (accountNames: List<String>) -> Unit
@@ -28,7 +31,7 @@ object EosApi {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EosUrl.getKeyAccount,
+				EOSUrl.getKeyAccount,
 				{
 					LogUtil.error("getAccountNameByPublicKey", it)
 				},
@@ -48,9 +51,9 @@ object EosApi {
 		getAccountBalanceBySymbol(accountName, CryptoSymbol.eos, hold)
 	}
 
-	fun getChainInfo(@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit) {
+	private fun getChainInfo(@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit) {
 		RequisitionUtil.requestUnCryptoData<String>(
-			EosUrl.getInfo,
+			EOSUrl.getInfo,
 			"",
 			true,
 			{
@@ -63,11 +66,43 @@ object EosApi {
 		}
 	}
 
+	fun pushTransaction(
+		signatures: List<String>,
+		packedTrxCode: String,
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (EOSrResponse) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("signatures", signatures.toJsonArray()),
+				Pair("packed_trx", packedTrxCode),
+				Pair("compression", "none"),
+				Pair("packed_context_free_data", "00")
+			)
+		).let { it ->
+			RequisitionUtil.postRequest(
+				it,
+				EOSUrl.pushTransaction,
+				errorCallBack,
+				false
+			) {
+				if (it.contains("processed")) {
+					val result = JSONObject(JSONObject(it).safeGet("processed"))
+					val transactionID = result.safeGet("transaction_id")
+					val receipt = JSONObject(result.safeGet("receipt"))
+					hold(EOSrResponse(transactionID, receipt))
+				} else errorCallBack(Exception("Empty Result Response"))
+			}
+		}
+	}
+
 	fun getTransactionHeaderFromChain(
+		expirationType: ExpirationType,
 		@WorkerThread hold: (header: TransactionHeader) -> Unit
 	) {
 		getChainInfo {
-			hold(TransactionHeader(it))
+			hold(TransactionHeader(it, expirationType))
 		}
 	}
 
@@ -82,7 +117,7 @@ object EosApi {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EosUrl.getAccountEOSBalance,
+				EOSUrl.getAccountEOSBalance,
 				{
 					LogUtil.error("getAccountEOSBalance", it)
 				},
@@ -130,7 +165,7 @@ object EosApi {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EosUrl.getTransactionHistory,
+				EOSUrl.getTransactionHistory,
 				{
 					LogUtil.error("getAccountTransactionHistory", it)
 				},

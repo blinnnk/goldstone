@@ -10,6 +10,10 @@ import org.bitcoinj.core.Base58
 import java.util.*
 import java.util.regex.PatternSyntaxException
 
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
 
 object EosEcUtil {
 
