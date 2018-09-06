@@ -21,9 +21,9 @@ class AttentionTextView(context: Context) : TextView(context) {
 	
 	init {
 		id = ElementID.attentionText
-		textSize = fontSize(13)
+		textSize = fontSize(14)
 		textColor = GrayScale.midGray
-		typeface = GoldStoneFont.medium(context)
+		typeface = GoldStoneFont.heavy(context)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 30.uiPX() * 2, wrapContent).apply {
 			topMargin = 50.uiPX()
 		}

@@ -18,7 +18,7 @@ import org.jetbrains.anko.textView
  * @author KaySaith
  */
 class TwoLineTitles(context: Context) : LinearLayout(context) {
-	
+
 	val title = textView {
 		textSize = fontSize(14)
 		textColor = Spectrum.white
@@ -43,11 +43,11 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			title.gravity = Gravity.START
 		}
 	}
-	
+
 	init {
 		orientation = VERTICAL
 	}
-	
+
 	fun setBlackTitles(titleSize: Float = fontSize(14)) {
 		title.apply {
 			typeface = GoldStoneFont.heavy(context)
@@ -56,8 +56,8 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		}
 		subtitle.textColor = GrayScale.midGray
 	}
-	
-	fun setBoldTiltes(
+
+	fun setBoldTitles(
 		color: Int = Spectrum.white,
 		subtitleColor: Int = Spectrum.opacity5White
 	) {
@@ -68,18 +68,18 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		}
 		subtitle.textColor = subtitleColor
 	}
-	
+
 	fun setDialogStyle() {
 		setBlackTitles()
 		title.textSize = fontSize(16)
 		subtitle.y += 5.uiPX()
 	}
-	
+
 	fun setColorStyle(color: Int) {
 		title.textColor = color
 		subtitle.textColor = color
 	}
-	
+
 	fun setGrayTitles() {
 		title.apply {
 			typeface = GoldStoneFont.book(context)
@@ -89,17 +89,17 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.y += 3.uiPX()
 		subtitle.textColor = GrayScale.midGray
 	}
-	
+
 	fun setSmallStyle() {
 		title.textSize = fontSize(12)
 		subtitle.textSize = fontSize(10)
 	}
-	
+
 	fun setWildStyle() {
 		title.typeface = GoldStoneFont.heavy(context)
 		subtitle.y += 5.uiPX()
 	}
-	
+
 	fun setBigWhiteStyle(titleSize: Int = 24, subtitleSize: Int = 12, lineSpace: Int = 0) {
 		title.apply {
 			textSize = fontSize(titleSize)
@@ -113,7 +113,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			typeface = GoldStoneFont.medium(context)
 		}
 	}
-	
+
 	fun setQuotationStyle() {
 		y += 10.uiPX()
 		title.apply {
@@ -128,7 +128,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			y -= 5.uiPX()
 		}
 	}
-	
+
 	fun setOpacityWhiteStyle() {
 		title.typeface = GoldStoneFont.heavy(context)
 		title.textColor = Spectrum.opacity3White

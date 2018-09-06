@@ -61,7 +61,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		valueInfo.into(this)
 		setHorizontalPadding()
 		tokenInfo.apply {
-			setBoldTiltes()
+			setBoldTitles()
 			setCenterInVertical()
 			x += 50.uiPX()
 			y += 2.uiPX()
@@ -70,7 +70,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		icon.setCenterInVertical()
 
 		valueInfo.apply {
-			setBoldTiltes()
+			setBoldTitles()
 			setAlignParentRight()
 			setCenterInVertical()
 			x -= 30.uiPX()

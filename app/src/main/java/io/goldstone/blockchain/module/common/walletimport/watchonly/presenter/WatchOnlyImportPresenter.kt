@@ -10,14 +10,11 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
@@ -52,7 +49,7 @@ class WatchOnlyImportPresenter(
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		when (addressType) {
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHERCAndETC.content -> {
 				if (!Address(address).isValid()) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
@@ -60,7 +57,7 @@ class WatchOnlyImportPresenter(
 				}
 			}
 
-			CryptoValue.PrivateKeyType.BTC.content -> {
+			PrivateKeyType.BTC.content -> {
 				if (!BTCUtils.isValidMainnetAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
@@ -68,7 +65,7 @@ class WatchOnlyImportPresenter(
 				}
 			}
 
-			CryptoValue.PrivateKeyType.LTC.content -> {
+			PrivateKeyType.LTC.content -> {
 				if (!LTCWalletUtils.isValidAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
@@ -76,7 +73,7 @@ class WatchOnlyImportPresenter(
 				}
 			}
 
-			CryptoValue.PrivateKeyType.EOS.content -> {
+			PrivateKeyType.EOS.content -> {
 				if (!EOSWalletUtils.isValidAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
@@ -84,7 +81,7 @@ class WatchOnlyImportPresenter(
 				}
 			}
 
-			CryptoValue.PrivateKeyType.BCH.content -> {
+			PrivateKeyType.BCH.content -> {
 				if (!BCHWalletUtils.isValidAddress(address)) {
 					fragment.context?.alert(ImportWalletText.addressFromatAlert)
 					callback()
@@ -184,24 +181,24 @@ class WatchOnlyImportPresenter(
 
 	private fun setAddressByChainType(address: String, addressType: String) {
 		when (addressType) {
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHERCAndETC.content -> {
 				currentETHAndERCAddress = address
 				currentETCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.BTC.content -> {
+			PrivateKeyType.BTC.content -> {
 				currentBTCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.LTC.content -> {
+			PrivateKeyType.LTC.content -> {
 				currentLTCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.BCH.content -> {
+			PrivateKeyType.BCH.content -> {
 				currentBCHAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.EOS.content -> {
+			PrivateKeyType.EOS.content -> {
 				currentEOSAddress = address
 			}
 

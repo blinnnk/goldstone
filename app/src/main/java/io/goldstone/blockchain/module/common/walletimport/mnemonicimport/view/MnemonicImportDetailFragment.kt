@@ -63,7 +63,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				lparams(matchParent, matchParent)
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
-					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
 
 				pathSettings
@@ -141,7 +141,6 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
-
 
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsMnemonic.setUnderline()

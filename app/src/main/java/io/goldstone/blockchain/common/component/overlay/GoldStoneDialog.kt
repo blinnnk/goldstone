@@ -54,7 +54,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 		backgroundColor = GrayScale.Opacity5Black
 		updateAlphaAnimation(1f)
 		verticalLayout {
-			addCorner(CornerSize.small, Spectrum.white)
+			addCorner(CornerSize.small.toInt(), Spectrum.white)
 			elevation = 40.uiPX().toFloat()
 			lparams(300.uiPX(), wrapContent)
 			image.apply {

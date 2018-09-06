@@ -47,9 +47,10 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 			(WalletText.totalAssets + " (${Config.getCurrencyCode()})").toUpperCase()
 		avatar.glideImage("")
 		avatar.glideImage(UnlimitedAvatar(model.id, context).getBitmap())
+		val colorSize = WalletColor.getAll().size
 		container.addCorner(
-			CornerSize.default.toInt(),
-			WalletColor.getALl()[model.id % WalletColor.getALl().size]
+			CornerSize.normal.toInt(),
+			WalletColor.getAll()[model.id % colorSize]
 		)
 		container.elevation = 5.uiPX().toFloat()
 	}
@@ -75,8 +76,10 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 				width = ScreenSize.widthWithPadding
 				height = 160.uiPX()
 				setMargins(
-					ShadowSize.default.toInt(), 5.uiPX(), ShadowSize.default.toInt(), ShadowSize.default
-					.toInt()
+					ShadowSize.default.toInt(),
+					5.uiPX(),
+					ShadowSize.default.toInt(),
+					ShadowSize.default.toInt()
 				)
 				centerHorizontally()
 			}

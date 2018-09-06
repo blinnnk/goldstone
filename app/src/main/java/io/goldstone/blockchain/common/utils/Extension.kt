@@ -83,23 +83,6 @@ fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 	return stringArray
 }
 
-fun <T> Collection<T>.mergeAndDistinct(other: Collection<T>): Collection<T> {
-	return this.plus(other).distinct()
-}
-
-fun String.getDecimalCount(): Int? {
-	return if (contains('.')) {
-		val integerPlaces = indexOf('.')
-		length - integerPlaces - 1
-	} else {
-		null
-	}
-}
-
-fun Double.getDecimalCount(): Int? {
-	return toString().getDecimalCount()
-}
-
 fun String.showAfterColonContent(): String {
 	return if (contains(":")) toString().substringAfter(":")
 	else this

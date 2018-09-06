@@ -77,12 +77,14 @@ object WalletColor {
 	private val darkPurple = Color.parseColor("#FF603361")
 	private val grayYellow = Color.parseColor("#FF717335")
 	private val blueGray = Color.parseColor("#FF4B5C6E")
-	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPurple, grayYellow, blueGray)
+	fun getAll(): List<Int> = listOf(purple, blue, cyan, darkPurple, grayYellow, blueGray)
 }
 
 object ShadowSize {
 	@JvmField
 	val Header = 3.uiPX().toFloat()
+	@JvmField
+	val Cell = 5.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
 	@JvmField
@@ -100,7 +102,9 @@ object CornerSize {
 	@JvmField
 	val cell = 3.uiPX()
 	@JvmField
-	val small = 5.uiPX()
+	val small = 5.uiPX().toFloat()
+	@JvmField
+	val normal = 7.uiPX().toFloat()
 	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField

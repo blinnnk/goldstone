@@ -14,6 +14,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
@@ -113,6 +114,11 @@ class WalletListPresenter(
 			overlayView.header.showBackButton(true) {
 				headerTitle = WalletSettingsText.walletSettings
 				presenter.showWalletSettingListFragment()
+			}
+		}
+		fragment.getParentFragment<ProfileOverlayFragment> {
+			overlayView.header.showAddButton(true) {
+				presenter.showWalletAddingMethodDashboard()
 			}
 		}
 	}
