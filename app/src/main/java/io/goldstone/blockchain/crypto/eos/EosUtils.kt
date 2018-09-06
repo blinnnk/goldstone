@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.crypto.eos
 
 import android.annotation.SuppressLint
+import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isEvenCount
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.common.utils.getDecimalCount
 import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
 import io.goldstone.blockchain.crypto.utils.CryptoUtils

@@ -18613,10 +18613,10 @@ io.goldstone.blockchain.common.component.TwoLineTitles -> d.a.a.a.b.P:
     kotlin.reflect.KProperty[] $$delegatedProperties -> a
     void setBigWhiteStyle$default(io.goldstone.blockchain.common.component.TwoLineTitles,int,int,int,int,java.lang.Object) -> do
     void setBlackTitles$default(io.goldstone.blockchain.common.component.TwoLineTitles,float,int,java.lang.Object) -> do
-    void setBoldTiltes$default(io.goldstone.blockchain.common.component.TwoLineTitles,int,int,int,java.lang.Object) -> do
+    void setBoldTitles$default(io.goldstone.blockchain.common.component.TwoLineTitles,int,int,int,java.lang.Object) -> do
     boolean isCenter() -> a
     void setBigWhiteStyle(int,int,int) -> goto
-    void setBoldTiltes(int,int) -> a
+    void setBoldTitles(int,int) -> a
     void setDialogStyle() -> b
     void setGrayTitles() -> c
     void setOpacityWhiteStyle() -> g

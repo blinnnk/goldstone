@@ -32,7 +32,7 @@ open class DashboardOverlay(
 	var confirmEvent: Runnable? = null
 	private val confirmButton = RoundButton(context)
 	private val container = scrollView {
-		addCorner(CornerSize.small, Spectrum.white)
+		addCorner(CornerSize.small.toInt(), Spectrum.white)
 		elevation = ShadowSize.Overlay
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 		minimumHeight = 200.uiPX()

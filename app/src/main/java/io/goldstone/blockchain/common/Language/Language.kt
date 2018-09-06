@@ -375,7 +375,7 @@ object QAText {
 	}
 }
 
-object ImportMenubar {
+object ImportMethodText {
 	@JvmField
 	val mnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic"

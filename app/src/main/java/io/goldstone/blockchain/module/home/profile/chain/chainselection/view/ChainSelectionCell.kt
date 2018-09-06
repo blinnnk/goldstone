@@ -72,7 +72,7 @@ class ChainSelectionCell(context: Context) : BaseCell(context) {
 
 		titles
 			.apply {
-				setBoldTiltes(GrayScale.black, GrayScale.midGray)
+				setBoldTitles(GrayScale.black, GrayScale.midGray)
 				x += 70.uiPX()
 				layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 			}

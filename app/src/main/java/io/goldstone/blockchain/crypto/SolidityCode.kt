@@ -93,25 +93,25 @@ object CryptoValue {
 	val isBTCTest: (pathCoinType: Int) -> Boolean = {
 		it == 1
 	}
+}
 
-	enum class PrivateKeyType(val content: String) {
-		ETHERCAndETC("ETH, ERC20 And ETC"),
-		BTC("BTC"),
-		BCH("BCH"),
-		BTCTest("BTC Test"),
-		EOS("EOS"),
-		LTC("LTC");
+enum class PrivateKeyType(val content: String) {
+	ETHERCAndETC("ETH, ERC20 And ETC"),
+	BTC("BTC"),
+	BCH("BCH"),
+	BTCTest("BTC Test"),
+	EOS("EOS"),
+	LTC("LTC");
 
-		companion object {
-			fun getTypeByContent(content: String): PrivateKeyType {
-				return when (content) {
-					ETHERCAndETC.content -> ETHERCAndETC
-					LTC.content -> LTC
-					BCH.content -> BCH
-					BTC.content -> BTC
-					EOS.content -> EOS
-					else -> BTCTest
-				}
+	companion object {
+		fun getTypeByContent(content: String): PrivateKeyType {
+			return when (content) {
+				ETHERCAndETC.content -> ETHERCAndETC
+				LTC.content -> LTC
+				BCH.content -> BCH
+				BTC.content -> BTC
+				EOS.content -> EOS
+				else -> BTCTest
 			}
 		}
 	}

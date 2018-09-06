@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.PrivateKeyType
 import io.goldstone.blockchain.crypto.bitcoin.*
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -36,7 +37,7 @@ class PrivateKeyImportPresenter(
 ) : BasePresenter<PrivateKeyImportFragment>() {
 
 	fun importWalletByPrivateKey(
-		type: CryptoValue.PrivateKeyType,
+		type: PrivateKeyType,
 		privateKeyInput: EditText,
 		passwordInput: EditText,
 		repeatPasswordInput: EditText,
@@ -62,7 +63,7 @@ class PrivateKeyImportPresenter(
 			}
 		) { passwordValue, walletName ->
 			when (type) {
-				CryptoValue.PrivateKeyType.ETHERCAndETC ->
+				PrivateKeyType.ETHERCAndETC ->
 					PrivateKeyImportPresenter.importWallet(
 						privateKeyInput.text.toString(),
 						passwordValue,
@@ -73,7 +74,7 @@ class PrivateKeyImportPresenter(
 						callback
 					)
 
-				CryptoValue.PrivateKeyType.BTC -> {
+				PrivateKeyType.BTC -> {
 					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
 						privateKeyInput.text.toString(),
 						passwordValue,
@@ -87,7 +88,7 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
-				CryptoValue.PrivateKeyType.LTC -> {
+				PrivateKeyType.LTC -> {
 					PrivateKeyImportPresenter.importWalletByLTCPrivateKey(
 						privateKeyInput.text.toString(),
 						passwordValue,
@@ -100,7 +101,7 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
-				CryptoValue.PrivateKeyType.BCH -> {
+				PrivateKeyType.BCH -> {
 					importWalletByBCHPrivateKey(
 						privateKeyInput.text.toString(),
 						passwordValue,
@@ -113,7 +114,7 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
-				CryptoValue.PrivateKeyType.EOS -> {
+				PrivateKeyType.EOS -> {
 					importWalletByEOSPrivateKey(
 						privateKeyInput.text.toString(),
 						passwordValue,
@@ -126,7 +127,7 @@ class PrivateKeyImportPresenter(
 					}
 				}
 
-				CryptoValue.PrivateKeyType.BTCTest -> {
+				PrivateKeyType.BTCTest -> {
 					// 跟随导入的测试网私钥切换全局测试网络状态
 					PrivateKeyImportPresenter.importWalletByBTCPrivateKey(
 						privateKeyInput.text.toString(),

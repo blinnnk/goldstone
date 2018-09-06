@@ -23,19 +23,7 @@ class WalletImportPresenter(
 	override val fragment: WalletImportFragment
 ) : BaseOverlayPresenter<WalletImportFragment>() {
 
-	fun onClickMenuBarItem() {
-		fragment.apply {
-			menuBar.clickEvent = Runnable {
-				menuBar.onClickItem {
-					viewPager.setSelectedStyle(id, menuBar)
-					viewPager.setCurrentItem(id, true)
-				}
-			}
-		}
-	}
-
 	companion object {
-
 		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
 			return if (index == -1) ""

@@ -6,20 +6,12 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AgreementView
-import io.goldstone.blockchain.common.component.ExplanationTitle
-import io.goldstone.blockchain.common.component.RoundInput
-import io.goldstone.blockchain.common.component.WalletEditText
+import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.overlay.RadioDashboard
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.QAText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
@@ -27,17 +19,15 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 2:13 AM
@@ -45,15 +35,16 @@ import org.jetbrains.anko.verticalLayout
  */
 class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
+	private val attentionText by lazy { AttentionTextView(context!!) }
+	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	private val privateKeyInput by lazy { WalletEditText(context!!) }
 	private val passwordHintInput by lazy { RoundInput(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
-	private val typeSettings by lazy { RoundCell(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var currentType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
+	private var currentType = PrivateKeyType.ETHERCAndETC.content
 	override val presenter = PrivateKeyImportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -61,30 +52,17 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-
+				attentionText.apply {
+					isCenter()
+					topPadding = 30.uiPX()
+					bottomPadding = 20.uiPX()
+					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+					text = ImportWalletText.importWalletDescription
+				}.into(this)
+				supportedChainMenu.into(this)
 				privateKeyInput.apply {
 					hint = ImportWalletText.privateKeyHint
-					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				}.into(this)
-
-				typeSettings
-					.apply {
-						setMargins<LinearLayout.LayoutParams> {
-							topMargin = 20.uiPX()
-							bottomMargin = 10.uiPX()
-						}
-						setTitles(ImportWalletText.walletType, currentType)
-					}
-					.click { _ ->
-						showWalletTypeDashboard(
-							this@PrivateKeyImportFragment,
-							currentType
-						) {
-							currentType = it
-							typeSettings.setTitles(ImportWalletText.walletType, it)
-						}
-					}
-					.into(this)
 
 				nameInput.apply {
 					hint = UIUtils.generateDefaultName()
@@ -132,7 +110,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
-						CryptoValue.PrivateKeyType.getTypeByContent(currentType),
+						PrivateKeyType.getTypeByContent(currentType),
 						privateKeyInput,
 						passwordInput,
 						repeatPassword,
@@ -189,12 +167,12 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 			object : RadioDashboard() {
 				override val cellContent =
 					arrayListOf(
-						CryptoValue.PrivateKeyType.ETHERCAndETC.content,
-						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTC.content),
-						CryptoSymbol.updateSymbolIfInReview(CryptoValue.PrivateKeyType.BTCTest.content, true),
-						CryptoValue.PrivateKeyType.LTC.content,
-						CryptoValue.PrivateKeyType.BCH.content,
-						CryptoValue.PrivateKeyType.EOS.content
+						PrivateKeyType.ETHERCAndETC.content,
+						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.BTC.content),
+						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.BTCTest.content, true),
+						PrivateKeyType.LTC.content,
+						PrivateKeyType.BCH.content,
+						PrivateKeyType.EOS.content
 					)
 				override var defaultRadio = type
 
