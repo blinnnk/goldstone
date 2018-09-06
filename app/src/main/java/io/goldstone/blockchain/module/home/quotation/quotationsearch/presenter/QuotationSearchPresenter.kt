@@ -108,7 +108,7 @@ class QuotationSearchPresenter(
 				filterNames.forEachIndexed { index, item ->
 					filterText += "$item,"
 					if (index >= 1 || index == filterNames.lastIndex) {
-						filterText  = filterText.substringBeforeLast(",") + (if (index >= 1) "..." else "")
+						filterText  = filterText.substringBeforeLast(",") + (if (filterNames.size > 2) "..." else "")
 						return@onlyTwoFilters
 					}
 				}
