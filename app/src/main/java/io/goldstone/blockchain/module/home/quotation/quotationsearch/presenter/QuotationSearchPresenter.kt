@@ -86,7 +86,7 @@ class QuotationSearchPresenter(
 		val selectedNames = arrayListOf<String>()
 		data.forEach { exchangeTable ->
 			if (exchangeTable.isSelected) {
-				selectedIds += "$exchangeTable.id,"
+				selectedIds += "${exchangeTable.exchangeId},"
 				selectedNames.add(exchangeTable.exchangeName)
 			}
 		}
