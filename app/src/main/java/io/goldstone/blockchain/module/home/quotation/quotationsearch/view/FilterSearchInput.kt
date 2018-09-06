@@ -26,7 +26,8 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		ImageView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(30.uiPX(), matchParent)
 			imageResource = R.drawable.icon_filtrate
-			gravity = Gravity.CENTER_VERTICAL
+			scaleType = ImageView.ScaleType.CENTER_INSIDE
+			visibility = View.GONE
 		}
 	}
 	
@@ -63,7 +64,9 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		
 		linearLayout {
 			gravity = Gravity.CENTER_VERTICAL
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX()).apply {
+				gravity = Gravity.CENTER_VERTICAL
+			}
 			leftPadding = 10.uiPX()
 			
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
@@ -73,6 +76,10 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		}
 		addView(cancelButton)
 		
+	}
+	
+	fun showFilterImage(visible: Boolean) {
+		filterIcon.visibility = if(visible) View.VISIBLE else View.GONE
 	}
 	
 	fun setCancelClick(callback: () -> Unit) {
@@ -85,7 +92,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 	
 	fun setFiltered(hasFiltered: Boolean) {
 		if (hasFiltered) {
-			filterIcon.setColorFilter(Color.TRANSPARENT)
+			filterIcon.setColorFilter(GrayScale.black)
 		} else {
 			filterIcon.setColorFilter(GrayScale.lightGray)
 		}

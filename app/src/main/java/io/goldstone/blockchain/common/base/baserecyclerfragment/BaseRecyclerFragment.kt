@@ -266,6 +266,8 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		loadingView.visibility = View.GONE
 		recyclerView.y = 0f
 	}
+	
+	fun getLoadingView(): View = loadingView
 
 	open fun showEmptyView() {
 		// 如果已经存在 `emptyLayout` 跳出

@@ -18,7 +18,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class SearchConfirm(val maxWidth: Int, context: Context): LinearLayout(context) {
+class ExchangeFilterDashboardBottomBar(val maxWidth: Int, context: Context): LinearLayout(context) {
 	val confirmButton by lazy {
 		RoundButton(context).apply {
 			text = CommonText.confirm
@@ -31,19 +31,19 @@ class SearchConfirm(val maxWidth: Int, context: Context): LinearLayout(context) 
 		
 	}
 	
-	val textView by lazy {
+	private val textView by lazy {
 		TextView(context).apply {
 			text = QuotationText.selectAll
 		}
 	}
-	val checkBox by lazy {
+	private val checkBox by lazy {
 		CheckBox(context).apply {
 			id = ElementID.checkBox
 			layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
 		}
 	}
 	
-	val linearLayout by lazy {
+	private val selectedAllContainer by lazy {
 		LinearLayout(context).apply {
 			gravity = Gravity.RIGHT
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -52,13 +52,11 @@ class SearchConfirm(val maxWidth: Int, context: Context): LinearLayout(context) 
 	
 	init {
 		gravity = Gravity.CENTER
-		backgroundColor = Color.WHITE
-		
 		leftPadding = PaddingSize.device
 		rightPadding = PaddingSize.device
 		
 		addView(confirmButton)
-		addView(linearLayout.apply {
+		addView(selectedAllContainer.apply {
 			addView(textView)
 			addView(checkBox)
 		})

@@ -203,7 +203,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 			
 			// update local exchangeTable info list
-			StartingPresenter.updateExchangesTable ( {
+			StartingPresenter.updateExchangesTables ( {
 				LogUtil.error(activity::javaClass.name)
 			}) {}
 		}

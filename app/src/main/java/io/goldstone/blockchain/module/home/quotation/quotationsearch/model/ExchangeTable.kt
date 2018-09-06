@@ -16,9 +16,10 @@ import org.jetbrains.anko.runOnUiThread
  */
 @Entity(tableName = "exchangeTable")
 data class ExchangeTable(
-	@PrimaryKey
-	@SerializedName("market_id")
+	@PrimaryKey(autoGenerate = true)
 	var id: Int,
+	@SerializedName("market_id")
+	var exchangeId: Int,
 	@SerializedName("icon")
 	var iconUrl: String,
 	@SerializedName("market")
@@ -27,15 +28,19 @@ data class ExchangeTable(
 	) {
 	
 	companion object {
-		fun insertOrReplace(
+		fun insertAll(
 			exchangeTables: List<ExchangeTable>,
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.exchangeTableDao().insertOrReplace(exchangeTables)
+				GoldStoneDataBase.database.exchangeTableDao().insertAll(exchangeTables)
 			} then {
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
+		}
+		
+		fun insert(exchangeTable: ExchangeTable) {
+			doAsync { GoldStoneDataBase.database.exchangeTableDao().insert(exchangeTable) }
 		}
 		
 		fun getAll(hold: (List<ExchangeTable>) -> Unit) {
@@ -45,13 +50,25 @@ data class ExchangeTable(
 			}
 		}
 		
+		fun getExchangeTableByExchangeId(exchangeId: Int, hold: (ExchangeTable) -> Unit) {
+			doAsync {
+				hold(GoldStoneDataBase.database.exchangeTableDao().getExchangeTableByExchangeId(exchangeId))
+			}
+		}
+		
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
 			hold: (List<ExchangeTable>) -> Unit
 		) {
 			doAsync {
-				val marketList = GoldStoneDataBase.database.exchangeTableDao().queryByStatus(isSelected)
+				val marketList = GoldStoneDataBase.database.exchangeTableDao().getByStatus(isSelected)
 				GoldStoneAPI.context.runOnUiThread { hold(marketList) }
+			}
+		}
+		
+		fun update(exchangeTable: ExchangeTable) {
+			doAsync {
+				GoldStoneDataBase.database.exchangeTableDao().update(exchangeTable)
 			}
 		}
 		
@@ -60,7 +77,7 @@ data class ExchangeTable(
 			isSelected: Boolean
 		) {
 			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().updateSelectedStatusById(id, isSelected)
+				GoldStoneDataBase.database.exchangeTableDao().updateSelectedStatusByExchangeId(id, isSelected)
 			}
 		}
 		
@@ -79,13 +96,19 @@ data class ExchangeTable(
 	fun getAll(): List<ExchangeTable>
 	
 	@Query("select * from exchangeTable where isSelected = :isSelected")
-	fun queryByStatus(isSelected: Boolean): List<ExchangeTable>
+	fun getByStatus(isSelected: Boolean): List<ExchangeTable>
 	
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insertOrReplace(exchange: List<ExchangeTable>)
+	@Query("select * from exchangeTable where exchangeId = :exchangeId")
+	fun getExchangeTableByExchangeId(exchangeId: Int): ExchangeTable
 	
-	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE id = :id ")
-	fun updateSelectedStatusById(
+	@Insert
+	fun insertAll(exchange: List<ExchangeTable>)
+	
+	@Insert
+	fun insert(exchangeTable: ExchangeTable)
+	
+	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE exchangeId = :id ")
+	fun updateSelectedStatusByExchangeId(
 		id: Int,
 		isSelected: Boolean
 	)

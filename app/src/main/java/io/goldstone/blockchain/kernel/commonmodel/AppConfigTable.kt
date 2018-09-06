@@ -117,10 +117,9 @@ data class AppConfigTable(
 		fun updateExchangeListMD5(md5: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.exchangeListMD5 = md5 })
-						}
+					getAppConfig().firstOrNull()?.let {
+						update(it.apply { this.exchangeListMD5 = md5 })
+						
 					}
 				}
 			}

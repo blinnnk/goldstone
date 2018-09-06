@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
-import android.widget.CheckBox
-import android.widget.CompoundButton
+import android.widget.*
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.google.gson.JsonArray
@@ -16,7 +15,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.*
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -30,6 +29,8 @@ class QuotationSearchPresenter(
 	private var selectedStatusChangedList: ArrayList<Pair<Int, Boolean>> = arrayListOf()
 	private var overlayViewData: ArrayList<ExchangeTable> = arrayListOf()
 	
+	
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
@@ -39,6 +40,7 @@ class QuotationSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
+			overlayView.header.getFilterSearchInput().showFilterImage(true)
 			overlayView.header.searchInputLinstener(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
@@ -75,47 +77,49 @@ class QuotationSearchPresenter(
 	
 	private fun getSearchFilters() {
 		ExchangeTable.getMarketsBySelectedStatus(true) {
-			initSelectedIds(it)
+			getSelectedIdsAndExchangeName(it)
 		}
 	}
 	
-	private fun initSelectedIds(data: List<ExchangeTable>) {
+	private fun getSelectedIdsAndExchangeName(data: List<ExchangeTable>) {
 		selectedIds = ""
 		val selectedNames = arrayListOf<String>()
 		data.forEach { exchangeTable ->
 			if (exchangeTable.isSelected) {
-				selectedIds += exchangeTable.id
-				selectedIds += ','
-				
+				selectedIds += "$exchangeTable.id,"
 				selectedNames.add(exchangeTable.exchangeName)
 			}
 		}
-		if (selectedIds.length > 1) {
-			selectedIds = selectedIds.substring(0, selectedIds.lastIndex)
+		if (selectedIds.isNotEmpty()) {
+			selectedIds = selectedIds.substringBeforeLast(',')
 		}
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
 		}
 		
-		(fragment.recyclerView.adapter as? QuotationSearchAdapter)?.apply {
+		showExchangeFilterDescriptionBy(selectedNames)
+		
+	}
+	
+	private fun showExchangeFilterDescriptionBy(filterNames: List<String>) {
+		fragment.apply {
 			var filterText = ""
-			if (selectedNames.isNotEmpty()) {
-				if (selectedNames.size > 2) {
-					filterText += selectedNames[0]
-					filterText += ','
-					filterText += selectedNames[1]
-					filterText += "..."
-				}else {
-					selectedNames.forEach {
-						filterText += it
-						filterText += ','
+			run onlyTwoFilters@ {
+				filterNames.forEachIndexed { index, item ->
+					filterText += "$item,"
+					if (index >= 1 || index == filterNames.lastIndex) {
+						filterText  = filterText.substringBeforeLast(",") + (if (index >= 1) "..." else "")
+						return@onlyTwoFilters
 					}
-					filterText = filterText.substring(0, filterText.lastIndex)
 				}
 			}
-			updateHeaderView(if (filterText.isEmpty())  "" else QuotationText.searchFilterTextDescription(filterText))
+			
+			if (filterText.isEmpty()) {
+				fragment.removeExchangeFilterDescriptionView()
+			} else {
+				fragment.showExchangeFilterDescriptionView(QuotationText.searchFilterTextDescription(filterText))
+			}
 		}
-		
 	}
 	
 	fun setQuotationSelfSelection(
@@ -141,7 +145,7 @@ class QuotationSearchPresenter(
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds, {
 			// Show error information to user
-			fragment.context?.alert(it.toString().showAfterColonContent())
+			fragment.context.alert(it.toString().showAfterColonContent())
 		}) { searchList ->
 			if (searchList.isEmpty()) {
 				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
@@ -168,7 +172,7 @@ class QuotationSearchPresenter(
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
-			diffAndUpdateAdapterData<QuotationSearchAdapter>(searchList.map {
+			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(searchList.map {
 				QuotationSelectionTable(it, "")
 			}.toArrayList())
 		}
@@ -190,7 +194,7 @@ class QuotationSearchPresenter(
 								singleCheckClick = true
 								markeSetCell.model?.apply {
 									isSelected = isChecked
-									updateSelectedChanged(id, isSelected)
+									updateSelectedChanged(exchangeId, isSelected)
 									updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
 									singleCheckClick = false
 								}
@@ -202,26 +206,24 @@ class QuotationSearchPresenter(
 							if (!singleCheckClick) {
 								data.forEach {
 									it.isSelected = isChecked
-									updateSelectedChanged(it.id, it.isSelected)
+									updateSelectedChanged(it.exchangeId, it.isSelected)
 								}
 								exchangeAdater.notifyDataSetChanged()
 							}
 						}
 						
-						showConfirmButton (
-							SearchConfirm(maxWidth, context).apply {
-								setEvents(allCheckBox) {
-									selectedStatusChangedList.forEach {
-										ExchangeTable.updateSelectedStatusById(it.first, it.second)
-									}
-									initSelectedIds(data)
-									selectedStatusChangedList.clear()
-									overlay.remove()
-									researchAfterFilterReselected()
+						val exchangeFilterBottomBar = ExchangeFilterDashboardBottomBar(maxWidth, context).apply {
+							setEvents(allCheckBox) {
+								selectedStatusChangedList.forEach {
+									ExchangeTable.updateSelectedStatusById(it.first, it.second)
 								}
+								getSelectedIdsAndExchangeName(data)
+								selectedStatusChangedList.clear()
+								overlay.remove()
+								updateResultAfterConditionChanged()
 							}
-						)
-						
+						}
+						showConfirmButton (exchangeFilterBottomBar)
 					}
 					
 					updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
@@ -233,11 +235,12 @@ class QuotationSearchPresenter(
 		}
 	}
 	
-	private fun researchAfterFilterReselected() {
+	private fun updateResultAfterConditionChanged() {
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			val textForSearch = overlayView.header.searchInput.editText.text.toString().trim()
+			val textForSearch = overlayView.header.getFilterSearchInput().editText.text.toString()
 			if (hasNetWork &&
-				!textForSearch.isBlank()) {
+				!textForSearch.isBlank()
+			) {
 				searchTokenBy(textForSearch)
 			}
 		}
@@ -285,12 +288,10 @@ class QuotationSearchPresenter(
 			ExchangeTable.getAll { it ->
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
-					StartingPresenter.updateExchangesTable ( {
+					StartingPresenter.updateExchangesTables ( {
 						LogUtil.error(it.toString())
-					}) { exchangeTables ->
-						GoldStoneAPI.context.runOnUiThread {
-							callback(exchangeTables.toArrayList())
-						}
+					}) {
+						getMarketList(callback)
 					}
 				} else {
 					//数据库有数据

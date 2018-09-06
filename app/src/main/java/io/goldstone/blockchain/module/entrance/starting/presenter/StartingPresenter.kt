@@ -131,48 +131,52 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 		
-		fun updateExchangesTable(errorCallback: (Exception) -> Unit,
-			callback: (List<ExchangeTable>) -> Unit) {
+		fun updateExchangesTables(
+			errorCallback: (Exception) -> Unit,
+			callback: () -> Unit
+		) {
 			doAsync {
 				AppConfigTable.getAppConfig {
-					
-					GoldStoneAPI.getMarketList(it?.exchangeListMD5.orEmpty(), errorCallback
+					GoldStoneAPI.getMarketList(
+						it?.exchangeListMD5.orEmpty(),
+						errorCallback
 					) { serverExchangeTables, md5 ->
 						serverExchangeTables.isNotEmpty() isTrue {
-							if (it?.exchangeListMD5.isNullOrBlank() ||
-								it?.exchangeListMD5.orEmpty() != md5
-							) {
-								
+							if (it?.exchangeListMD5.orEmpty() != md5) {
 								AppConfigTable.updateExchangeListMD5(md5)
-								ExchangeTable.getAll {localExchangeTables ->
-									localExchangeTables.filterNot { local ->
-										serverExchangeTables.any { server ->
-											local.id == server.id
+								ExchangeTable.getAll { localExchangeTables ->
+									localExchangeTables.isEmpty() isTrue {
+										ExchangeTable.insertAll(serverExchangeTables) {}
+									} otherwise {
+										localExchangeTables.filterNot { local ->
+											serverExchangeTables.any { server ->
+												local.id == server.id
+											}
+										}.apply {
+											// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
+											forEach {
+												ExchangeTable.delete(it)
+											}
 										}
-									}.apply {
-										// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
-										forEach {
-											ExchangeTable.delete(it)
+										
+										serverExchangeTables.forEach { serverTable ->
+											ExchangeTable.getExchangeTableByExchangeId(serverTable.exchangeId) { localTable ->
+												localTable.isNull() isTrue {
+													ExchangeTable.insert(serverTable)
+												} otherwise {
+													serverTable.isSelected = localTable.isSelected
+													serverTable.id = localTable.id
+													ExchangeTable.update(serverTable)
+												}
+											}
+											
 										}
 									}
 									
-									val selectedIds = arrayListOf<Int>()
-									localExchangeTables.forEach {
-										if (it.isSelected) {
-											selectedIds.add(it.id)
-										}
-									}.apply {
-										serverExchangeTables.forEach {
-											if (selectedIds.contains(it.id)) {
-												it.isSelected = true
-											}
-										}
-									}
-									ExchangeTable.insertOrReplace(serverExchangeTables) {}
-									callback(serverExchangeTables)
 								}
 							}
 						}
+						callback()
 					}
 				}
 			}

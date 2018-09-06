@@ -3,10 +3,7 @@ package io.goldstone.blockchain.common.component.overlay
 import android.content.Context
 import android.graphics.Color
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
@@ -38,6 +35,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
+	private lateinit var scrollViewContent: ScrollView
 	val maxWidth = 300.uiPX()
 	private val headerHeight = 50.uiPX()
 	
@@ -76,7 +74,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 						}
 					}
 				}
-				scrollView {
+				scrollViewContent = scrollView {
 					lparams(matchParent, wrapContent)
 					contentLayout = verticalLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
@@ -120,11 +118,11 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun showConfirmButton(view: View) {
-		contentLayout.bottomPadding = 60.uiPX()
+		scrollViewContent.bottomPadding = 60.uiPX()
 		container.apply {
 			relativeLayout {
 				gravity = Gravity.CENTER
-				lparams(matchParent, 60.uiPX()){
+				lparams(matchParent, 60.uiPX()) {
 					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.overlayContainer)
 				}
 				addView(view, LayoutParams(matchParent, matchParent))
