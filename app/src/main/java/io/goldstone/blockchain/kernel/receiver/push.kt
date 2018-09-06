@@ -197,62 +197,11 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								if (!isRemove) updateRegisterAddressesStatus(it)
 							}
 						}
-
-						WalletType.BTCOnly -> {
+						else -> WalletTable.getAllCurrentAddresses(this).forEach {
 							registerSingleAddress(
-								AddressCommissionModel(
-									currentBTCAddress,
-									ChainType.BTC.id,
-									option,
-									id
-								)
+								AddressCommissionModel(it.first, it.second, option, id)
 							)
 						}
-						WalletType.BCHOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentBCHAddress,
-									ChainType.BCH.id,
-									option,
-									id
-								)
-							)
-						WalletType.EOSOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentEOSAddress,
-									ChainType.EOS.id,
-									option,
-									id
-								)
-							)
-						WalletType.LTCOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentLTCAddress,
-									ChainType.LTC.id,
-									option,
-									id
-								)
-							)
-						WalletType.BTCTestOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentBTCSeriesTestAddress,
-									ChainType.AllTest.id,
-									option,
-									id
-								)
-							)
-						WalletType.ETHERCAndETCOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentETHAndERCAddress,
-									ChainType.ETH.id,
-									option,
-									id
-								)
-							)
 					}
 				}
 			}

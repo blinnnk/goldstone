@@ -28,52 +28,49 @@ import java.io.File
 class SplashPresenter(val activity: SplashActivity) {
 
 	fun hasAccountThenLogin() {
-		WalletTable.getAll {
-			isNotEmpty() isTrue {
-				WalletTable.getWalletType {
-					when (it) {
-						WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
-						}
-						WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BTCOnly.content)
-						}
+		WalletTable.getCurrentWallet {
+			val type = WalletTable.getTargetWalletType(this)
+			when (type) {
+				WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
+					cacheWalletData()
+					Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
+				}
+				WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData()
+					Config.updateCurrentWalletType(WalletType.BTCOnly.content)
+				}
 
-						WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.LTCOnly.content)
-						}
+				WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData()
+					Config.updateCurrentWalletType(WalletType.LTCOnly.content)
+				}
 
-						WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.EOSOnly.content)
-						}
+				WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData()
+					Config.updateCurrentWalletType(WalletType.EOSOnly.content)
+				}
 
-						WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BCHOnly.content)
-						}
+				WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData()
+					Config.updateCurrentWalletType(WalletType.BCHOnly.content)
+				}
 
-						WalletType.ETHERCAndETCOnly -> {
-							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-								cacheWalletData()
-							} else NodeSelectionPresenter.setAllMainnet {
-								cacheWalletData()
-							}
-							Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
-						}
-
-						WalletType.MultiChain -> {
-							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-								cacheWalletData()
-							} else NodeSelectionPresenter.setAllMainnet {
-								cacheWalletData()
-							}
-							Config.updateCurrentWalletType(WalletType.MultiChain.content)
-						}
+				WalletType.ETHERCAndETCOnly -> {
+					if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+						cacheWalletData()
+					} else NodeSelectionPresenter.setAllMainnet {
+						cacheWalletData()
 					}
+					Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
+				}
+
+				WalletType.MultiChain -> {
+					if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+						cacheWalletData()
+					} else NodeSelectionPresenter.setAllMainnet {
+						cacheWalletData()
+					}
+					Config.updateCurrentWalletType(WalletType.MultiChain.content)
 				}
 			}
 		}

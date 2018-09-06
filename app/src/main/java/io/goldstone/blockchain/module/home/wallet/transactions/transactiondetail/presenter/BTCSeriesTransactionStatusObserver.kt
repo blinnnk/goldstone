@@ -17,7 +17,7 @@ abstract class BTCSeriesTransactionStatusObserver {
 	abstract val hash: String
 	abstract val chainName: String
 	private val handler = Handler(Looper.getMainLooper())
-	private val targetIntervla = 6
+	private val targetInterval = 6
 	private val retryTime = 20000L
 	private var maxRetryTimes = 6
 
@@ -31,14 +31,14 @@ abstract class BTCSeriesTransactionStatusObserver {
 					if (maxRetryTimes <= 0) removeObserver()
 					else maxRetryTimes -= 1
 					// TODO ERROR Alert
-					LogUtil.error("Observering getConfirmations $reason", error)
+					LogUtil.error("Observing getConfirmations $reason", error)
 				}
 			) {
 				if (it.isNull()) {
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				} else {
-					val hasConfirmed = it!! > targetIntervla
+					val hasConfirmed = it!! > targetInterval
 					if (hasConfirmed) {
 						removeObserver()
 					} else {

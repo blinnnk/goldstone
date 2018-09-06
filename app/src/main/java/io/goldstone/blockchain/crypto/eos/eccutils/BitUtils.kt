@@ -1,5 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.eccutils
 
+/**
+ * @author KaySaith
+ * @date 2018/09/04
+ */
+
 object BitUtils {
 
 	@JvmStatic fun unit32ToLong(buf: ByteArray, offset: Int): Long {

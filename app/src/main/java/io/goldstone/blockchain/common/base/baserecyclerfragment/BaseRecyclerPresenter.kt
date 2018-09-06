@@ -11,16 +11,16 @@ import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
  * @author KaySaith
  */
 abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPresenter<T, D>, D>, D> {
-	
+
 	abstract val fragment: T
-	
+
 	open fun updateData() {
 		// Do Something
 	}
-	
-	open fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+
+	open fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {
 	}
-	
+
 	/**
 	 * @description
 	 * 在依赖的 `Fragment` 的对应的生命周期提供的依赖方法
@@ -30,42 +30,42 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	open fun onFragmentAttach() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentCreate() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentCreateView() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentDetach() {
 	}
-	
+
 	open fun onFragmentDestroy() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentViewCreated() {
 		updateData()
 	}
-	
+
 	open fun onFragmentStart() {
 		// 当 `ViewCreated`后执行更新数据函数
 	}
-	
+
 	open fun onFragmentShowFromHidden() {
 		// Do Something
 	}
-	
+
 	open fun onFragmentResume() {}
-	
+
 	open fun onFragmentHiddenChanged(isHidden: Boolean) {}
-	
+
 	/** 获取依赖的 `Adapter` */
 	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
 		fragment.recyclerView.adapter as? T
-	
+
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(
 		newData: ArrayList<D>
@@ -88,7 +88,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-	
+
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapter<D, *>> diffAndUpdateSingleCellAdapterData(newData: ArrayList<D>) {
 		getAdapter<T>()?.apply {
@@ -109,7 +109,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			}
 		}
 	}
-	
+
 	inline fun diffDataSetChanged(
 		oldData: ArrayList<D>,
 		newData: ArrayList<D>,

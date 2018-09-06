@@ -43,7 +43,7 @@ class QuotationManagementPresenter(
 		}
 	}
 
-	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+	override fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {
 		fragment.updateSelectionOrderID()
 	}
 

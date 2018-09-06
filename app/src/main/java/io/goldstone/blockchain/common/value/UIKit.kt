@@ -13,7 +13,6 @@ import org.jetbrains.anko.px2sp
  * Common interface parameters, including color, original size, etc.
  */
 object GrayScale {
-	
 	@JvmField
 	val black = Color.parseColor("#FF000000")
 	@JvmField
@@ -75,10 +74,10 @@ object WalletColor {
 	private val purple = Color.parseColor("#FF3F4E92")
 	private val blue = Color.parseColor("#FF2A7EDA")
 	private val cyan = Color.parseColor("#FF1BA2A9")
-	private val darkPuple = Color.parseColor("#FF603361")
+	private val darkPurple = Color.parseColor("#FF603361")
 	private val grayYellow = Color.parseColor("#FF717335")
 	private val blueGray = Color.parseColor("#FF4B5C6E")
-	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPuple, grayYellow, blueGray)
+	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPurple, grayYellow, blueGray)
 }
 
 object ShadowSize {
@@ -92,7 +91,7 @@ object ShadowSize {
 
 object PaddingSize {
 	@JvmField
-	val device = 20.uiPX()
+	val device = 15.uiPX()
 	@JvmField
 	val content = 10.uiPX()
 }

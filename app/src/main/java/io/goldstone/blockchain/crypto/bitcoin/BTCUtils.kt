@@ -86,5 +86,6 @@ enum class AddressType(val value: String, val symbol: String) {
 	BTC("btc", CryptoSymbol.pureBTCSymbol),
 	BCH("bch", CryptoSymbol.bch),
 	BTCSeriesTest("btcTest", CryptoSymbol.pureBTCSymbol),
-	LTC("ltc", CryptoSymbol.ltc)
+	LTC("ltc", CryptoSymbol.ltc),
+	EOS("eos", CryptoSymbol.eos)
 }

@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.profile.model
 
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toIntOrZero
 import org.json.JSONObject
 
 /**
@@ -16,7 +16,7 @@ data class VersionModel(
 ) {
 	
 	constructor(data: JSONObject) : this(
-		data.safeGet("version").toIntOrNull().orZero(),
+		data.safeGet("version").toIntOrZero(),
 		data.safeGet("version_name"),
 		data.safeGet("description"),
 		data.safeGet("download_url")

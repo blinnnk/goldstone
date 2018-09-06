@@ -1,22 +1,32 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
+import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import java.io.Serializable
+
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
 
 data class EOSAction(
 	val account: String,
 	val cryptoData: String,
 	val methodName: String,
 	val authorizationObjects: String
-): Serializable {
-	companion object {
-		private fun createObject(action: EOSAction): String {
-			return "{\"account\":\"${action.account}\",\"authorization\":${action.authorizationObjects},\"data\":\"${action.cryptoData}\",\"name\":\"${action.methodName}\"}"
-		}
+) : Serializable, EOSModel {
+	override fun createObject(): String {
+		return "{\"account\":\"$account\",\"authorization\":$authorizationObjects,\"data\":\"$cryptoData\",\"name\":\"$methodName\"}"
+	}
 
+	override fun serialize(): String {
+		return ""
+	}
+
+	companion object {
 		fun createMultiActionObjects(vararg actions: EOSAction): String {
 			var actionObjects = ""
 			actions.forEach {
-				actionObjects += createObject(it) + ","
+				actionObjects += it.createObject() + ","
 			}
 			return "[${actionObjects.substringBeforeLast(",")}]"
 		}

@@ -4,6 +4,10 @@ import io.goldstone.blockchain.crypto.eos.ecc.CurveParam
 import io.goldstone.blockchain.crypto.eos.ecc.EcPoint
 import java.math.BigInteger
 
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
 
 object EcTools {
 

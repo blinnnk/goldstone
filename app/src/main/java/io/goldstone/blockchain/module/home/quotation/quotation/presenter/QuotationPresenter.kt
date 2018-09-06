@@ -110,9 +110,8 @@ class QuotationPresenter(
 
 	private fun subscribeSocket() {
 		// 更新 `Socket`
-		fragment.asyncData?.map { it.pair }?.toArrayList()?.toJsonArray {
-			currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
-		}
+		val jsonArray = fragment.asyncData?.map { it.pair }?.toJsonArray()
+		currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$jsonArray}")
 	}
 
 	private fun List<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
@@ -210,11 +209,8 @@ class QuotationPresenter(
 			 */
 			object : GoldStoneWebSocket() {
 				override fun onOpened() {
-					pairList?.toJsonArray {
-						sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$it}")
-					}
+					sendMessage("{\"t\":\"sub_tick\", \"pair_list\":${pairList?.toJsonArray()}}")
 				}
-
 				override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}

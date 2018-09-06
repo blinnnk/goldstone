@@ -70,7 +70,9 @@ data class BTCSeriesTransactionTable(
 		data.safeGet("size"),
 		data.safeGet("confirmations").toIntOrZero(),
 		isFee,
-		data.safeGet("confirmations").toIntOrZero() > 0,
+		// 因为 `BTC Series` 的账单会收录但是又不一定成功. 与 `以太坊` 收录即有状态不同
+		// 所以 `Pending` 状态还是会根据是否拥有 `BlockHeight` 来做判断
+		data.safeGet("blockheight").toIntOrZero() <= 0,
 		chainType
 	)
 

@@ -120,6 +120,17 @@ class AddressSelectionPresenter(
 				}
 			}
 
+			AddressType.EOS -> {
+				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
+					fragment.context.alert("this is not a valid bitcoin address")
+					return
+				}
+
+				WalletTable.getAllEOSAddresses {
+					showAlertIfLocalExistThisAddress(this)
+				}
+			}
+
 			AddressType.LTC -> {
 				if (!token?.symbol.equals(CryptoSymbol.ltc, true)) {
 					fragment.context.alert(

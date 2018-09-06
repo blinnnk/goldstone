@@ -1,7 +1,13 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import java.io.Serializable
+
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
 
 data class UnSignedTransaction(
 	val availableKeys: String,
@@ -15,7 +21,15 @@ data class UnSignedTransaction(
 	val refBlockNum: Int,
 	val refBlockPrefix: Int,
 	val signatures: String
-) : Serializable {
+) : Serializable, EOSModel {
+	override fun createObject(): String {
+		return "{\"available_keys\": $availableKeys,\"transaction\":{\"actions\":$actionObjects,\"context_free_actions\":[],\"context_free_data\":[],\"delay_sec\":$delaySec,\"expiration\":\"$expiration\",\"max_kcpu_usage\":$maxKCpuUsage,\"max_net_usage_words\":$maxNetUsageWords,\"ref_block_num\":$refBlockNum,\"ref_block_prefix\":$refBlockPrefix,\"signatures\":[]}}"
+	}
+
+	override fun serialize(): String {
+		return ""
+	}
+
 	companion object {
 		@Throws
 		fun prepareAvailableKeys(vararg eosPublicKeys: String): String {
@@ -25,10 +39,6 @@ data class UnSignedTransaction(
 				keys += "\"$it\","
 			}
 			return "[${keys.substringBeforeLast(",")}]"
-		}
-
-		fun createObject(transaction: UnSignedTransaction): String {
-			return "{\"available_keys\": ${transaction.availableKeys},\"transaction\":{\"actions\":${transaction.actionObjects},\"context_free_actions\":[],\"context_free_data\":[],\"delay_sec\":${transaction.delaySec},\"expiration\":\"${transaction.expiration}\",\"max_kcpu_usage\":${transaction.maxKCpuUsage},\"max_net_usage_words\":${transaction.maxNetUsageWords},\"ref_block_num\":${transaction.refBlockNum},\"ref_block_prefix\":${transaction.refBlockPrefix},\"signatures\":[]}}"
 		}
 	}
 }

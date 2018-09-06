@@ -4984,6 +4984,28 @@
 		"market_cap": ""
 	},
 	{
+		"name": "Bitcoin Cash",
+		"weight": 9996,
+		"total_supply": 21000000,
+		"type": 145,
+		"symbol": "BCH",
+		"decimals": 8,
+		"address": "0x145",
+		"url": "null",
+		"price": "517.8",
+		"force_show": 1,
+		"is_default": 1,
+		"chain_id": "00000000000e38fef93ed9582a7df43815d5c2ba9fd37ef70c9a0ea4a285b8f5",
+		"website": "",
+		"description": "",
+		"white_paper": "",
+		"social_media": "",
+		"start_date": "",
+		"exchange": "",
+		"rank": "4",
+		"market_cap": ""
+	},
+	{
 		"name": "EOS.io",
 		"weight": 9996,
 		"total_supply": 1006245120,

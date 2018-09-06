@@ -7,7 +7,6 @@ import java.io.Serializable
  * @author KaySaith
  */
 enum class WalletType(val content: String) {
-
 	BTCOnly("btcOnly"),
 	ETHERCAndETCOnly("ethERCAndEtc"),
 	BTCTestOnly("btctestOnly"),

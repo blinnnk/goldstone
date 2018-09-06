@@ -21,22 +21,22 @@ import java.util.*
 data class InputCodeData(val type: String, val address: String, val count: Double)
 
 object CryptoUtils {
-	
+
 	fun scaleTo16(address: String): String {
 		return if (address.length < 16) address
 		else address.substring(0, 16) + "..."
 	}
-	
+
 	fun scaleTo22(address: String): String {
 		return if (address.length < 22) address
 		else address.substring(0, 22) + "..."
 	}
-	
+
 	fun scaleTo32(address: String): String {
 		return if (address.length < 32) address
 		else address.substring(0, 32) + "..."
 	}
-	
+
 	fun scaleMiddleAddress(address: String, halfSize: Int = 12): String {
 		return if (address.length > halfSize) address.substring(0, halfSize) + " ... " + address.substring(
 			address.length - halfSize,
@@ -44,11 +44,11 @@ object CryptoUtils {
 		)
 		else "wrong address"
 	}
-	
+
 	fun formatDouble(value: Double): Double {
 		return DecimalFormat("0.000000000").format(value).toDouble()
 	}
-	
+
 	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
 		return value / Math.pow(10.0, decimal)
 	}
@@ -56,7 +56,7 @@ object CryptoUtils {
 	fun toCountByDecimal(value: Long, decimal: Int = 18): Double {
 		return value / Math.pow(10.0, decimal.toDouble())
 	}
-	
+
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
@@ -68,11 +68,11 @@ object CryptoUtils {
 				.toDouble().toEthCount().toBigDecimal().toString()
 		}
 	}
-	
+
 	fun toValueWithDecimal(count: Double, decimal: Double = 18.0): BigInteger {
 		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
 	}
-	
+
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
 		var count: Double
@@ -91,7 +91,7 @@ object CryptoUtils {
 			return null
 		}
 	}
-	
+
 	fun isERC20Transfer(transactionTable: TransactionTable, hold: () -> Unit): Boolean {
 		return if (
 			transactionTable.input.length >= 138 && isTransferInputCode(transactionTable.input)
@@ -104,7 +104,7 @@ object CryptoUtils {
 			false
 		}
 	}
-	
+
 	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
 		return if (inputCode.length >= 138 && isTransferInputCode(
 				inputCode
@@ -116,7 +116,7 @@ object CryptoUtils {
 			false
 		}
 	}
-	
+
 	fun getTargetDayInMills(distanceSinceToday: Int = 0): Long {
 		val calendar = Calendar.getInstance()
 		val year = calendar.get(Calendar.YEAR)
@@ -126,19 +126,19 @@ object CryptoUtils {
 		calendar.set(year, month, date)
 		return calendar.timeInMillis
 	}
-	
+
 	val dateInDay: (Long) -> String = {
 		DateUtils.formatDateTime(GoldStoneAPI.context, it, DateUtils.FORMAT_NO_YEAR)
 	}
-	
+
 	private fun toHexValue(value: String): String {
 		return "0x$value"
 	}
-	
+
 	private fun isTransferInputCode(inputCode: String) = inputCode.length > 10 && inputCode.substring(
 		0, SolidityCode.contractTransfer.length
 	) == SolidityCode.contractTransfer
-	
+
 	fun getAddressFromPrivateKey(privateKey: String): String {
 		/** Convert PrivateKey To BigInteger */
 		val currentPrivateKey = privateKey.toBigInteger(16)
@@ -214,30 +214,26 @@ fun Long.scaleToGwei() = this * 1000000000
  */
 fun BigInteger.toDataString() = this.toHexStringZeroPadded(64, false)
 
-fun String.toDataStringFromAddress(): String {
-	if (length < 42) {
-		LogUtil.error("Wrong Address")
-	}
-	return "000000000000000000000000" + substring(2, length)
-}
-
 fun String.isValidTaxHash() = length == CryptoValue.taxHashLength
 
 // 这个是返回 `EventLog` 中需要的地址格式
-fun String.toAddressCode(): String {
-	return if (length == CryptoValue.bip39AddressLength) {
-		"0x000000000000000000000000" + substring(2, length)
+@Throws
+fun String.toAddressCode(hasPrefix: Boolean = true): String {
+	return if (!Address(this).isValid()) {
+		(if (hasPrefix) "0x" else "") + "000000000000000000000000" + substring(2, length)
 	} else {
-		"it is not address format"
+		throw Exception("It is a wrong address code format")
 	}
 }
-
+@Throws
 fun String.toAddressFromCode(): String {
-	return if (length == 66) {
-		"0x" + substring(26, length)
+	val address = if (length == 66) {
+	"0x" + substring(26, length)
 	} else {
-		"it is not address format"
+		""
 	}
+	if (!Address(address).isValid())  throw Exception("It is a wrong address code format")
+	return address
 }
 
 fun <T : List<*>> T.getObjectMD5HexString(): String {

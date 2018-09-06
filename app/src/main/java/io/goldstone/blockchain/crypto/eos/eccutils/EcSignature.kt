@@ -4,6 +4,11 @@ import io.goldstone.blockchain.crypto.eos.ecc.CurveParam
 import org.spongycastle.util.encoders.Hex
 import java.math.BigInteger
 
+/**
+ * @author KaySaith
+ * @date 2018/09/04
+ */
+
 class EcSignature internal constructor(
 	@JvmField val r: BigInteger,
 	@JvmField val s: BigInteger,

@@ -45,7 +45,6 @@ data class TransactionListModel(
 	var isFailed: Boolean,
 	var isFee: Boolean = false
 ) : Serializable {
-
 	constructor(data: TransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else data.tokenReceiveAddress.orEmpty(),

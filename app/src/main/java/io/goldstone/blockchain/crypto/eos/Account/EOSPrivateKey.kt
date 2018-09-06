@@ -1,5 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.account
 
+/**
+ * @author KaySaith
+ * @date 2018/09/05
+ */
+
 import io.goldstone.blockchain.crypto.eos.ecc.CurveParam
 import io.goldstone.blockchain.crypto.eos.ecc.EcDsa
 import io.goldstone.blockchain.crypto.eos.ecc.EcPoint

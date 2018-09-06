@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.DeviceName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
@@ -204,7 +205,7 @@ class PasswordSettingsPresenter(
 	private fun autoBack() {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			// `VIVO` 手机显示 `toast` 会出错
-			if (!getDeviceBrand().contains("vivo", true)) activity?.toast(CommonText.succeed)
+			if (!getDeviceBrand().contains(DeviceName.vivo, true)) activity?.toast(CommonText.succeed)
 			presenter.showTargetFragmentByTitle(WalletSettingsText.walletSettings)
 		}
 	}

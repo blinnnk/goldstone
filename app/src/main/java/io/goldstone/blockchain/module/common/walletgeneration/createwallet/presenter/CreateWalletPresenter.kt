@@ -105,7 +105,7 @@ class CreateWalletPresenter(
 	}
 
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
-		if (passwordText.count() * repeatPasswordText.count() != 0) {
+		if (passwordText.length * repeatPasswordText.length != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
 		} else {
 			confirmButton.setGrayStyle(20.uiPX())
@@ -177,7 +177,7 @@ class CreateWalletPresenter(
 					generateMyTokenInfo(
 						multiChainAddresses,
 						{
-							LogUtil.error("generateWalletWith")
+							LogUtil.error("generateWalletWith", it)
 						}) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
@@ -191,7 +191,6 @@ class CreateWalletPresenter(
 							}
 						}
 					}
-
 					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
 			}
@@ -393,6 +392,7 @@ class CreateWalletPresenter(
 									MyTokenTable.insert(MyTokenTable(it, currentAddresses.bchAddress))
 								}
 							}
+
 							ChainID.BCHTest.id -> {
 								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
 									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))

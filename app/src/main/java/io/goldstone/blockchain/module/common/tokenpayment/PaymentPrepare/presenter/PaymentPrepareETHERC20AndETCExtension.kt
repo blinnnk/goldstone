@@ -12,7 +12,7 @@ import io.goldstone.blockchain.crypto.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.crypto.utils.toDataStringFromAddress
+import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
@@ -88,7 +88,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 			to = getToken()?.contract.orEmpty()
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
 			data = SolidityCode.contractTransfer + // 方法
-				toAddress.toDataStringFromAddress() + // 地址
+				toAddress.toAddressCode(false) + // 地址
 				countWithDecimal.toDataString() + // 数量
 				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 		}
