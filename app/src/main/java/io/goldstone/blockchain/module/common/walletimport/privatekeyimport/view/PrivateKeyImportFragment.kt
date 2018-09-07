@@ -18,8 +18,8 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.PrivateKeyType
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -44,7 +44,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var currentType = PrivateKeyType.ETHERCAndETC.content
 	override val presenter = PrivateKeyImportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -110,7 +109,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
-						PrivateKeyType.getTypeByContent(currentType),
 						privateKeyInput,
 						passwordInput,
 						repeatPassword,
@@ -169,7 +167,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					arrayListOf(
 						PrivateKeyType.ETHERCAndETC.content,
 						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.BTC.content),
-						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.BTCTest.content, true),
+						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.AllBTCSeriesTest.content, true),
 						PrivateKeyType.LTC.content,
 						PrivateKeyType.BCH.content,
 						PrivateKeyType.EOS.content

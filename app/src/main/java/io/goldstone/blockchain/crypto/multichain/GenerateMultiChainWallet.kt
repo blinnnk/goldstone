@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.multichain
 
 import android.content.Context
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -9,6 +9,7 @@ import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 

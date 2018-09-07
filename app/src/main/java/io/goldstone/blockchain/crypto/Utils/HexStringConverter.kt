@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.utils
 
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import java.io.ByteArrayOutputStream
 
 /**

@@ -13,10 +13,10 @@ import io.goldstone.blockchain.common.utils.DeviceName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.isValid
-import io.goldstone.blockchain.crypto.updatePassword
-import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.isValid
+import io.goldstone.blockchain.crypto.keystore.updatePassword
+import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment

@@ -1,6 +1,6 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
-import io.goldstone.blockchain.crypto.SecureRandomUtils.secureRandom
+import io.goldstone.blockchain.crypto.ethereum.SecureRandomUtils.secureRandom
 import io.goldstone.blockchain.crypto.extensions.toBytesPadded
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.kecca.keccak

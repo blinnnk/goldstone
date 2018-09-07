@@ -3,9 +3,9 @@ package io.goldstone.blockchain.kernel.network
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
 /**

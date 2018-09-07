@@ -2,18 +2,19 @@
 
 package io.goldstone.blockchain.crypto.bitcoincash
 
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Utils
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
+import java.math.BigInteger
 
 /**
  * @date 2018/8/15 11:21 AM
@@ -34,7 +35,13 @@ object BCHWalletUtils {
 		return BaseKeyPair(address, ecKey.getPrivateKeyAsWiF(net))
 	}
 
-	fun getBCHAddressByWIFKey(privatekey: String): String {
+	fun getAddressByPrivateKey(privatekey: BigInteger): String {
+		return BCHUtil.instance.encodeCashAddressByLegacy(
+			ECKey.fromPrivate(privatekey).toAddress(MainNetParams.get()).toBase58()
+		)
+	}
+
+	fun getAddressByWIFKey(privatekey: String): String {
 		return BCHUtil.instance.encodeCashAddressByLegacy(
 			BTCWalletUtils.getPublicKeyFromBase58PrivateKey(privatekey, false)
 		)

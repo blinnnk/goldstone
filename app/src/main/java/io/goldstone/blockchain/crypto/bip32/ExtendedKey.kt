@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.bip32
 
-import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bip44.BIP44.Companion.isHardened
+import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.ripemd160
 import io.goldstone.blockchain.crypto.extensions.sha256
 import io.goldstone.blockchain.crypto.extensions.toBytesPadded

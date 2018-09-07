@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 import java.math.BigInteger
 import java.math.BigInteger.ZERO

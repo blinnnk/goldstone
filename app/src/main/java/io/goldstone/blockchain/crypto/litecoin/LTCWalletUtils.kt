@@ -1,11 +1,12 @@
 package io.goldstone.blockchain.crypto.litecoin
 
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
+import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Sha256Hash
 import org.bitcoinj.params.MainNetParams
@@ -113,6 +114,15 @@ object LTCWalletUtils {
 		val doubleSha256 = Sha256Hash.hash(sha256Decode)
 		val first4Bytes = doubleSha256.toNoPrefixHexString().substring(0, 8)
 		return end4Bytes.equals(first4Bytes, true) && versionCode.equals(version.privateKey, true)
+	}
+
+	fun isValidPrivateKey(privateKey: String): Boolean {
+		val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
+		val key = dpk.key
+		// checking our key object
+		val ltcTest = LitecoinNetParams()
+		val check = key.getPrivateKeyAsWiF(ltcTest)
+		return privateKey == check
 	}
 
 	/**

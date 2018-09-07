@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 /**
  * @date 2018/6/17 6:17 PM
@@ -21,11 +21,10 @@ enum class EthereumMethod(
 	GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall, "GetTransactionByHash"),
 	GetTransactionReceiptByHash(
 		                           "eth_getTransactionReceipt",
-		                           SolidityCode.ethCall,
+		SolidityCode.ethCall,
 		                           "GetTransactionReceiptByHash"
 	                           ),
 	GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
-	PendingFitler("eth_newFilter", SolidityCode.ethCall, "PendingFitler"),
 	GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
 	GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),
 	GetTransactionCount("eth_getTransactionCount", SolidityCode.ethCall, "GetTransactionCount"),

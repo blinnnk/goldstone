@@ -10,8 +10,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.CryptoName
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoName
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent

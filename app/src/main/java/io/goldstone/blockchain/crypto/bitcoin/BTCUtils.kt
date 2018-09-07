@@ -1,13 +1,8 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.isValid
-import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -53,30 +48,6 @@ object BTCUtils {
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			address.substring(0, 1) != "m" && address.substring(0, 1) != "n" -> false
 			else -> true
-		}
-	}
-
-	fun isValidMultiChainAddress(address: String, symbol: String): AddressType? {
-		return when {
-			Address(address).isValid() -> AddressType.ETHERCOrETC
-			isValidMainnetAddress(address)
-				&& symbol.equals(CryptoSymbol.btc(), true) -> AddressType.BTC
-			isValidTestnetAddress(address) -> {
-				when {
-					symbol.equals(CryptoSymbol.bch, true) -> {
-						if (Config.isTestEnvironment()) AddressType.BCH
-						else null
-					}
-					symbol.equals(CryptoSymbol.ltc, true) -> {
-						if (Config.isTestEnvironment()) AddressType.LTC
-						else null
-					}
-					else -> AddressType.BTCSeriesTest
-				}
-			}
-			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
-			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
-			else -> null
 		}
 	}
 }

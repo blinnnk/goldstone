@@ -2,8 +2,8 @@ package io.goldstone.blockchain.crypto.eos
 
 import com.blinnnk.util.TinyNumberUtils
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -29,7 +29,7 @@ object EOSWalletUtils {
 		return BaseKeyPair(keyPair.address, keyPair.privateKey)
 	}
 
-	private fun generateKeyPairByPrivateKey(privateKey: BigInteger): BaseKeyPair {
+	fun generateKeyPairByPrivateKey(privateKey: BigInteger): BaseKeyPair {
 		val eckey = ECKey.fromPrivate(privateKey, true)
 		val compressPublicKey = eckey.publicKeyAsHex
 		val wifPrivateKey = eckey.getPrivateKeyAsWiF(MainNetParams.get())

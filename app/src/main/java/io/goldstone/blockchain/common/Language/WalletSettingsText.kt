@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 
 /**
  * @date 2018/8/8 2:16 AM

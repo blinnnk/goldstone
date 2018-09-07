@@ -12,11 +12,11 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.CryptoName
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CryptoName
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils.isValidMultiChainAddress
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -79,7 +79,7 @@ class AddressSelectionPresenter(
 			}
 		} else {
 			// 如果不是 `681` 格式的 `QRCode` 那么当作纯地址进行检测
-			val addressType = isValidMultiChainAddress(result, token?.symbol.orEmpty())
+			val addressType = MultiChainUtils.isValidMultiChainAddress(result, token?.symbol.orEmpty())
 			if (
 				addressType.isNull() ||
 				!addressType?.symbol.equals(token?.symbol, true)
@@ -103,7 +103,7 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
+		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
 			null -> {
 				fragment.context?.alert(ImportWalletText.addressFromatAlert)
 				return
