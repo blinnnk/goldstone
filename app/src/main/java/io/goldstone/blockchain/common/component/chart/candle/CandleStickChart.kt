@@ -6,11 +6,13 @@ import android.graphics.Rect
 import android.os.Handler
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
@@ -33,13 +35,13 @@ import java.math.BigDecimal
  * @description: 蜡烛统计图view
  */
 abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
-
+	
 	private var xRangeVisibleCount = 30
 	private var leftLabelCount = 10
 	private var realData = listOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
-
+	private var lastStartIndex = 0 // 第一个蜡烛的角标
 	constructor(context: Context) : super(context)
 	constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 	constructor(
@@ -47,7 +49,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		attrs: AttributeSet,
 		defStyle: Int
 	) : super(context, attrs, defStyle)
-
+	
 	override fun init() {
 		super.init()
 		mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
@@ -55,13 +57,15 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		resetAxisStyle()
 		post { setEmptyData() }
 	}
-
+	
 	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
+		lastStartIndex = 0
 		postCalculate()
 		calculateHandler.postDelayed(disCalculateRunnable, 2000)
+		mAxisLeft.resetAxisMaximum() // data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在屏幕之外
 		notifyData(dateType, dataRows)
 	}
-
+	
 	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {
 		this.dateType = dateType
 		if (realData != dataRows) {
@@ -111,7 +115,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			calculateHandler.postDelayed(calculateRunnable, 15)
 		}
 	}
-
+	
 	private fun resetAxisStyle() {
 		// 初始化一些属性
 		val labelColor = GrayScale.midGray
@@ -150,7 +154,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
 		}
-
+		
 		with(axisLeft) {
 			gridColor = gridLineColor
 			axisLineColor = gridLineColor
@@ -169,17 +173,17 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			override fun getChartWidth(): Int {
 				return this@CandleStickChart.width
 			}
-
+			
 			override fun getChartHeight(): Int {
 				return this@CandleStickChart.height
 			}
 		}
 	}
-
+	
 	override fun getCandleData(): CandleData {
 		return mData
 	}
-
+	
 	private fun setEmptyData() {
 		if (realData.isEmpty()) {
 			val candleEntrySet = arrayListOf<CandleEntry>()
@@ -198,7 +202,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			resetData(dateType, candleEntrySet)
 		}
 	}
-
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -224,7 +228,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			notifyData(dateType, realData)
 		}
 	}
-
+	
 	private fun resetFormatLimit() {
 		val valueString = BigDecimal(realData[0].high.toString()).toPlainString()
 		if (!valueString.contains(".")) {
@@ -243,10 +247,10 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 				}
 			}
 		}
-
-
+		
+		
 	}
-
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -265,14 +269,24 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			val measurePaint = Paint()
 			measurePaint.textSize = axisLeft.textSize
 			val rect = Rect()
-			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
+			var measureStr = ""
+			axisLeft.longestLabel.forEach {
+				measureStr += if (it == '.') it else '0'
+			}
+			measurePaint.getTextBounds(measureStr, 0, measureStr.length, rect)
 			if (buffers[0] > rect.width()) {
-				resetMaxMin(index)
+				if (Math.abs(lastStartIndex - index) > 1 || index == 0) {
+					// 防止频繁刷新造成抖动，所以要间隔>1, 如果是第一个item，那么直接进入这里，执行计算
+					lastStartIndex = index
+					resetMaxMin(index)
+				} else {
+					if (needCalculate) calculateHandler.postDelayed(calculateRunnable, 15)
+				}
 				return
 			}
 		}
 	}
-
+	
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		if (event.action == MotionEvent.ACTION_DOWN) {
 			postCalculate()
@@ -281,31 +295,31 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		}
 		return super.onTouchEvent(event)
 	}
-
+	
 	private fun postCalculate() {
 		calculateHandler.removeCallbacks(disCalculateRunnable)
 		needCalculate = true
 		calculateHandler.removeCallbacks(calculateRunnable)
 		calculateHandler.post(calculateRunnable)
 	}
-
+	
 	private val calculateHandler = Handler()
-
+	
 	private val calculateRunnable = Runnable {
-		doAsync { calculateVisibleIndex() }
+		calculateVisibleIndex()
 	}
-
+	
 	private val disCalculateRunnable = Runnable {
 		needCalculate = false
 	}
 	private var needCalculate = false
-
+	
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
 		calculateHandler.removeCallbacks(calculateRunnable)
 	}
-
-
+	
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -321,6 +335,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			mIndicesToHighlight = this
 		}
 	}
-
+	
 	abstract fun formattedDateByType(date: Long): String
 }
