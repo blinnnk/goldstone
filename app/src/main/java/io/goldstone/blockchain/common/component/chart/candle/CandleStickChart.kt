@@ -12,6 +12,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
@@ -61,6 +62,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		lastStartIndex = 0
 		postCalculate()
 		calculateHandler.postDelayed(disCalculateRunnable, 2000)
+		mAxisLeft.resetAxisMaximum() // data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在屏幕之外
 		notifyData(dateType, dataRows)
 	}
 	
