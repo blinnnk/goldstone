@@ -108,7 +108,7 @@ class QuotationSearchPresenter(
 				filterNames.forEachIndexed { index, item ->
 					filterText += "$item,"
 					if (index >= 1 || index == filterNames.lastIndex) {
-						filterText  = filterText.substringBeforeLast(",") + (if (filterNames.size > 2) "..." else "")
+						filterText  = filterText.substringBeforeLast(",")
 						return@onlyTwoFilters
 					}
 				}
@@ -117,7 +117,14 @@ class QuotationSearchPresenter(
 			if (filterText.isEmpty()) {
 				fragment.removeExchangeFilterDescriptionView()
 			} else {
-				fragment.showExchangeFilterDescriptionView(QuotationText.searchFilterTextDescription(filterText))
+				fragment.showExchangeFilterDescriptionView(
+					QuotationText.searchFilterTextDescription(
+						if (filterNames.size > 2)
+							QuotationText.searchExchangesNames(filterText)
+						else
+							filterText
+					)
+				)
 			}
 		}
 	}
