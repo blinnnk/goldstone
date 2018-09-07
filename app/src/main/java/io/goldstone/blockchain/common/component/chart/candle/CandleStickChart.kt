@@ -18,8 +18,6 @@ import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
-import com.github.mikephil.charting.listener.ChartTouchListener
-import com.github.mikephil.charting.listener.OnChartGestureListener
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -36,15 +34,13 @@ import java.math.BigDecimal
  * @description: 蜡烛统计图view
  */
 abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
-
+	
 	private var xRangeVisibleCount = 30
 	private var leftLabelCount = 10
 	private var realData = listOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
 	
-	private var longgestLabelWidth = 0 // 左侧最label最宽的宽度，只计算一次，以第一次计算为准
-
 	constructor(context: Context) : super(context)
 	constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 	constructor(
@@ -52,21 +48,21 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		attrs: AttributeSet,
 		defStyle: Int
 	) : super(context, attrs, defStyle)
-
+	
 	override fun init() {
 		super.init()
 		mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
 		mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
 		resetAxisStyle()
-		initGestureListener()
 		post { setEmptyData() }
 	}
-
+	
 	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
+		postCalculate()
+		calculateHandler.postDelayed(disCalculateRunnable, 2000)
 		notifyData(dateType, dataRows)
-		calculateHandler.postDelayed(calculateRunnable, 20)
 	}
-
+	
 	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {
 		this.dateType = dateType
 		if (realData != dataRows) {
@@ -111,16 +107,18 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		setVisibleXRangeMaximum(xRangeVisibleCount.toFloat())
 		setVisibleXRangeMinimum(xRangeVisibleCount.toFloat())
 		invalidate()
-		
+		calculateHandler.removeCallbacks(calculateRunnable)
+		if (needCalculate) {
+			calculateHandler.postDelayed(calculateRunnable, 15)
+		}
 	}
-
+	
 	private fun resetAxisStyle() {
 		// 初始化一些属性
 		val labelColor = GrayScale.midGray
 		val gridLineColor = GrayScale.lightGray
 		val xAxisSpace = 1f // 蜡烛图内部的左右 `Offset` 值
 		// 为了防止方法执行到此，以下数据还没有被初始化，所以在这里重新赋值
-		leftLabelCount = 10
 		xRangeVisibleCount = 30
 		minOffset = 0.5f
 		labelTextSize = fontSize(10)
@@ -153,7 +151,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			textSize = labelTextSize
 			typeface = GoldStoneFont.heavy(context)
 		}
-
+		
 		with(axisLeft) {
 			gridColor = gridLineColor
 			axisLineColor = gridLineColor
@@ -172,17 +170,17 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			override fun getChartWidth(): Int {
 				return this@CandleStickChart.width
 			}
-
+			
 			override fun getChartHeight(): Int {
 				return this@CandleStickChart.height
 			}
 		}
 	}
-
+	
 	override fun getCandleData(): CandleData {
 		return mData
 	}
-
+	
 	private fun setEmptyData() {
 		if (realData.isEmpty()) {
 			val candleEntrySet = arrayListOf<CandleEntry>()
@@ -201,7 +199,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			resetData(dateType, candleEntrySet)
 		}
 	}
-
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -227,7 +225,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			notifyData(dateType, realData)
 		}
 	}
-
+	
 	private fun resetFormatLimit() {
 		val valueString = BigDecimal(realData[0].high.toString()).toPlainString()
 		if (!valueString.contains(".")) {
@@ -246,10 +244,10 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 				}
 			}
 		}
-
-
+		
+		
 	}
-
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -267,39 +265,60 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			// 最左侧的label也会被遮挡 所以要计算出左侧label的宽度，得到精确地第一个显示的蜡烛
 			val measurePaint = Paint()
 			measurePaint.textSize = axisLeft.textSize
-			
 			val rect = Rect()
-			measurePaint.getTextBounds(axisLeft.longestLabel, 0, axisLeft.longestLabel.length, rect)
-			longgestLabelWidth = rect.width()
-			
-			if (buffers[0] > longgestLabelWidth ) {
-				if (buffers[0] > longgestLabelWidth * 2 && index != 0) {
-					calculateHandler.postDelayed(calculateRunnable, 100)
-					return
+			var measureStr = ""
+			axisLeft.longestLabel.forEach {
+				measureStr += if (it == '.') it else '0'
+			}
+			measurePaint.getTextBounds(measureStr, 0, measureStr.length, rect)
+			if (buffers[0] > rect.width()) {
+				if (Math.abs(lastStartIndex - index) > 1 || index == 0) {
+					// 防止频繁刷新造成抖动，所以要间隔>1, 如果是第一个item，那么直接进入这里，执行计算
+					lastStartIndex = index
+					resetMaxMin(index)
+				} else {
+					if (needCalculate) calculateHandler.postDelayed(calculateRunnable, 15)
 				}
-				Log.e("CandleStickChart", "index=$index, buffer[0]=${buffers[0]},longgestLabel=${axisLeft.longestLabel},rectwidth=$longgestLabelWidth")
-				resetMaxMin(index)
 				return
 			}
 		}
 	}
-
 	
-
+	private var lastStartIndex = 0
 	
-	private val calculateHandler = Handler()
-
-	private val calculateRunnable = Runnable {
-		doAsync { calculateVisibleIndex() }
+	override fun onTouchEvent(event: MotionEvent): Boolean {
+		if (event.action == MotionEvent.ACTION_DOWN) {
+			postCalculate()
+		} else if (event.action == MotionEvent.ACTION_UP) {
+			calculateHandler.postDelayed(disCalculateRunnable, 2000)
+		}
+		return super.onTouchEvent(event)
 	}
 	
-
+	private fun postCalculate() {
+		calculateHandler.removeCallbacks(disCalculateRunnable)
+		needCalculate = true
+		calculateHandler.removeCallbacks(calculateRunnable)
+		calculateHandler.post(calculateRunnable)
+	}
+	
+	private val calculateHandler = Handler()
+	
+	private val calculateRunnable = Runnable {
+		 calculateVisibleIndex()
+	}
+	
+	private val disCalculateRunnable = Runnable {
+		needCalculate = false
+	}
+	private var needCalculate = false
+	
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
 		calculateHandler.removeCallbacks(calculateRunnable)
 	}
-
-
+	
+	
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
@@ -315,66 +334,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			mIndicesToHighlight = this
 		}
 	}
-
-	abstract fun formattedDateByType(date: Long): String
 	
-	fun initGestureListener() {
-		
-		onChartGestureListener = object : OnChartGestureListener {
-			override fun onChartGestureStart(
-				me: MotionEvent?,
-				lastPerformedGesture: ChartTouchListener.ChartGesture?
-			) {
-			}
-			
-			override fun onChartGestureEnd(
-				me: MotionEvent?,
-				lastPerformedGesture: ChartTouchListener.ChartGesture?
-			) {
-			}
-			
-			override fun onChartLongPressed(me: MotionEvent?) {
-			}
-			
-			override fun onChartDoubleTapped(me: MotionEvent?) {
-			}
-			
-			override fun onChartSingleTapped(me: MotionEvent?) {
-			}
-			
-			override fun onChartFling(
-				me1: MotionEvent?,
-				me2: MotionEvent?,
-				velocityX: Float,
-				velocityY: Float
-			) {
-			}
-			
-			override fun onChartScale(
-				me: MotionEvent?,
-				scaleX: Float,
-				scaleY: Float
-			) {
-			}
-			
-			override fun onChartTranslate(
-				me: MotionEvent?,
-				dX: Float,
-				dY: Float
-			) {
-				
-				calculateHandler.post(calculateRunnable)
-			}
-		}
-
-//    val touchListener = object : ChartTouchListener<BlinnnkCandleStickChart>(this@BlinnnkCandleStickChart) {
-//      override fun onTouch(
-//        v: View?,
-//        event: MotionEvent?
-//      ): Boolean {
-//        return false
-//      }
-//    }
-//    onTouchListener = touchListener
-	}
+	abstract fun formattedDateByType(date: Long): String
 }
