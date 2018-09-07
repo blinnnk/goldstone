@@ -40,7 +40,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	private var realData = listOf<CandleEntry>()
 	private var labelTextSize = fontSize(8)
 	protected var dateType = DateUtils.FORMAT_SHOW_TIME
-	
+	private var lastStartIndex = 0 // 第一个蜡烛的角标
 	constructor(context: Context) : super(context)
 	constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 	constructor(
@@ -58,6 +58,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	}
 	
 	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
+		lastStartIndex = 0
 		postCalculate()
 		calculateHandler.postDelayed(disCalculateRunnable, 2000)
 		notifyData(dateType, dataRows)
@@ -283,8 +284,6 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 			}
 		}
 	}
-	
-	private var lastStartIndex = 0
 	
 	override fun onTouchEvent(event: MotionEvent): Boolean {
 		if (event.action == MotionEvent.ACTION_DOWN) {
