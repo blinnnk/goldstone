@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.example.wangchenxing.myapplication
+package io.goldstone.blockchain.common.utils
 
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
@@ -17,7 +17,7 @@ import android.widget.Toast
 class FingerprintHelper(private val context: Context) : FingerprintManager.AuthenticationCallback() {
   private var fingerprintManager: FingerprintManager = context.getSystemService(FingerprintManager::class.java)
   private var authenticationCallback: AuthenticationCallback? = null
-  private var mCancellationSignal: CancellationSignal? = null
+  private var cancellationSignal: CancellationSignal? = null
 
   fun setAuthenticationCallback(authenticationCallback: AuthenticationCallback) {
     this.authenticationCallback = authenticationCallback
@@ -35,12 +35,12 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
   }
 
   private fun authenticate() {
-    if (mCancellationSignal == null) {
-      mCancellationSignal = CancellationSignal()
+    if (cancellationSignal == null) {
+			cancellationSignal = CancellationSignal()
     }
     fingerprintManager.authenticate(
       null,
-      mCancellationSignal,
+			cancellationSignal,
       0,
       this,
       null
@@ -60,8 +60,8 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
   }
 
   fun stopAuthenticate() {
-    mCancellationSignal?.cancel()
-    mCancellationSignal = null
+		cancellationSignal?.cancel()
+		cancellationSignal = null
     authenticationCallback = null
   }
 
