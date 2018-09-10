@@ -1,6 +1,6 @@
 @file:JvmName("Base58")
 
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 import io.goldstone.blockchain.crypto.extensions.sha256
 import java.util.*

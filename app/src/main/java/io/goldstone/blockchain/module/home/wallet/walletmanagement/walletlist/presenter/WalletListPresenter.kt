@@ -79,7 +79,7 @@ class WalletListPresenter(
 							} else fragment.activity?.jump<SplashActivity>()
 						}
 
-						WalletType.MultiChain -> {
+						WalletType.Bip44MultiChain -> {
 							if (Config.isTestEnvironment()) {
 								NodeSelectionPresenter.setAllTestnet {
 									fragment.activity?.jump<SplashActivity>()

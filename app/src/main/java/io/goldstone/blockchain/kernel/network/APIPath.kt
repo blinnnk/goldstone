@@ -4,7 +4,7 @@ import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 
 /**

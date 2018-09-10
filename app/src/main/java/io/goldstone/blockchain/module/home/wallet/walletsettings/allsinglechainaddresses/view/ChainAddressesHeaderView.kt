@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick

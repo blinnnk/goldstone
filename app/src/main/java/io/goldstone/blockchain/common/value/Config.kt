@@ -327,8 +327,10 @@ object Config {
 	fun updateWalletCount(count: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)
 
-	fun getMaxWalletID(): Int =
-		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+	fun getMaxWalletID(): Int {
+		val default = GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+		return if (default == -1) 0 else default
+	}
 
 	fun updateMaxWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)

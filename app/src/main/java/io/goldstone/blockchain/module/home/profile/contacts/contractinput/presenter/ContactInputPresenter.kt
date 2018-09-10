@@ -15,13 +15,14 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -52,7 +53,7 @@ class ContactInputPresenter(
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddressModel?.let {
-				when (BTCUtils.isValidMultiChainAddress(it.address, it.symbol)) {
+				when (MultiChainUtils.isValidMultiChainAddress(it.address, it.symbol)) {
 					AddressType.ETHERCOrETC -> {
 						ethERCAndETCInput.setText(it.address)
 						ethERCAndETCAddressText = it.address

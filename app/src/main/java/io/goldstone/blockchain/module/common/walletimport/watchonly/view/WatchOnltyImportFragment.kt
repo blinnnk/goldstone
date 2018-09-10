@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletimport.watchonly.view
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -26,8 +25,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.PrivateKeyType
+import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter

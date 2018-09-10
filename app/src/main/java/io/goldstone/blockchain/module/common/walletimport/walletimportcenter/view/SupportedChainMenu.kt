@@ -12,10 +12,8 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.PrivateKeyType
+import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.leftPadding
 
@@ -35,7 +33,7 @@ class SupportedChainMenu(context: Context) : LinearLayout(context) {
 		Pair(R.drawable.etc_creator_icon, PrivateKeyType.ETHERCAndETC),
 		Pair(R.drawable.eos_creater_icon, PrivateKeyType.EOS)
 	)
-	private val iconSize = 60.uiPX()
+	private val iconSize = 55.uiPX()
 
 	init {
 		setWillNotDraw(false)

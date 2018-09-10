@@ -2,8 +2,8 @@ package io.goldstone.blockchain.crypto.litecoin
 
 import android.content.Context
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
 import org.bitcoinj.core.ECKey
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore

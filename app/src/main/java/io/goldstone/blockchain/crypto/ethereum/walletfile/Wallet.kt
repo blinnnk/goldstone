@@ -1,17 +1,12 @@
-package io.goldstone.blockchain.crypto.walletfile
+package io.goldstone.blockchain.crypto.ethereum.walletfile
 
 /**
  * @date 2018/6/17 9:15 PM
  * @author KaySaith
  */
-import io.goldstone.blockchain.crypto.ECKeyPair
-import io.goldstone.blockchain.crypto.PRIVATE_KEY_SIZE
-import io.goldstone.blockchain.crypto.SecureRandomUtils.secureRandom
-import io.goldstone.blockchain.crypto.extensions.toBytesPadded
-import io.goldstone.blockchain.crypto.getAddress
+import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.kecca.keccak
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
-import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.spongycastle.crypto.digests.SHA256Digest
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator
 import org.spongycastle.crypto.generators.SCrypt
@@ -23,59 +18,8 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 private val UTF_8 = Charset.forName("UTF-8")
-private const val R = 8
-private const val DKLEN = 32
 private const val CURRENT_VERSION = 3
 private const val CIPHER = "aes-128-ctr"
-
-class ScryptConfig(val n: Int, val p: Int)
-
-val LIGHT_SCRYPT_CONFIG = ScryptConfig(1 shl 12, 6)
-val STANDARD_SCRYPT_CONFIG = ScryptConfig(1 shl 18, 1)
-
-fun ECKeyPair.createWallet(password: String, config: ScryptConfig): Wallet {
-	val mySalt = generateRandomBytes(32)
-	val derivedKey =
-		generateDerivedScryptKey(
-			password.toByteArray(UTF_8),
-			ScryptKdfParams(n = config.n, r = R, p = config.p).apply {
-				dklen = DKLEN
-				salt = mySalt.toNoPrefixHexString()
-			})
-	val encryptKey = Arrays.copyOfRange(derivedKey, 0, 16)
-	val iv = generateRandomBytes(16)
-	val privateKeyBytes = privateKey.toBytesPadded(PRIVATE_KEY_SIZE)
-	val cipherText = performCipherOperation(Cipher.ENCRYPT_MODE, iv, encryptKey, privateKeyBytes)
-	val mac = generateMac(derivedKey, cipherText)
-	
-	return createWallet(
-		this, cipherText, iv, mac, ScryptKdfParams(
-		n = config.n,
-		p = config.p,
-		r = R,
-		dklen = DKLEN,
-		salt = mySalt.toNoPrefixHexString()
-	)
-	)
-}
-
-private fun createWallet(
-	ecKeyPair: ECKeyPair,
-	cipherText: ByteArray,
-	iv: ByteArray, mac: ByteArray, scryptKdfParams: ScryptKdfParams
-) = Wallet(
-	address = ecKeyPair.getAddress(),
-	crypto = WalletCrypto(
-		cipher = CIPHER,
-		ciphertext = cipherText.toNoPrefixHexString(),
-		kdf = SCRYPT,
-		kdfparams = scryptKdfParams,
-		cipherparams = CipherParams(iv.toNoPrefixHexString()),
-		mac = mac.toNoPrefixHexString()
-	),
-	id = UUID.randomUUID().toString(),
-	version = CURRENT_VERSION
-)
 
 private fun generateDerivedScryptKey(password: ByteArray, kdfParams: ScryptKdfParams) =
 	SCrypt.generate(
@@ -120,10 +64,10 @@ private fun performCipherOperation(
 
 private fun generateMac(derivedKey: ByteArray, cipherText: ByteArray): ByteArray {
 	val result = ByteArray(16 + cipherText.size)
-	
+
 	System.arraycopy(derivedKey, 16, result, 0, 16)
 	System.arraycopy(cipherText, 0, result, 16, cipherText.size)
-	
+
 	return result.keccak()
 }
 
@@ -139,7 +83,7 @@ fun Wallet.decrypt(password: String): ECKeyPair {
 		is Aes128CtrKdfParams -> generateAes128CtrDerivedKey(password.toByteArray(UTF_8), kdfparams)
 	}
 	val derivedMac = generateMac(derivedKey, cipherText)
-	
+
 	if (!Arrays.equals(derivedMac, mac)) {
 		throw CipherException("Invalid password provided")
 	}
@@ -159,25 +103,3 @@ fun Wallet.validate() {
 		-> throw CipherException("KDF type is not supported")
 	}
 }
-
-fun generateRandomBytes(size: Int) = ByteArray(size).apply {
-	secureRandom().nextBytes(this)
-}
-
-fun WalletCryptoForImport.toTypedKdfParamsWalletCrypto() = WalletCrypto(
-	cipher = cipher,
-	ciphertext = ciphertext,
-	cipherparams = cipherparams,
-	kdf = kdf,
-	kdfparams = getTypedKdfParams(),
-	mac = mac
-)
-
-fun WalletForImport.getCrypto() = crypto ?: cryptoFromMEW
-
-fun WalletForImport.toTypedWallet() = Wallet(
-	address = address,
-	crypto = getCrypto()?.toTypedKdfParamsWalletCrypto()!!,
-	id = id!!,
-	version = version
-)

@@ -21,8 +21,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
+import io.goldstone.blockchain.crypto.multichain.DefaultPath
+import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable

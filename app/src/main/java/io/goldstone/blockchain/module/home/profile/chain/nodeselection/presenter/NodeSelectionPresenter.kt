@@ -6,7 +6,7 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 

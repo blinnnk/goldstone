@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import org.jetbrains.anko.doAsync
 import java.io.Serializable
 
 @Entity(tableName = "eosTransactions")
@@ -37,6 +39,17 @@ data class EOSTransactionTable(
 		"",
 		false
 	)
+
+	companion object {
+	    fun deleteByAddress(address: String) {
+				doAsync {
+					GoldStoneDataBase.database.eosTransactionDao().apply {
+						val data = getDataByRecordAccount(address)
+						data.forEach { delete(it) }
+					}
+				}
+			}
+	}
 }
 
 @Dao

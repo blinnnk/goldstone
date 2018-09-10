@@ -9,7 +9,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -18,7 +17,6 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
@@ -41,7 +39,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var currentType = PrivateKeyType.ETHERCAndETC.content
 	override val presenter = KeystoreImportPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -101,7 +98,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				}.click {
 					it.showLoadingStatus()
 					presenter.importKeystoreWallet(
-						currentType,
 						keystoreEditText.text.toString(),
 						passwordInput,
 						nameInput,

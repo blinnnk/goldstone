@@ -5,8 +5,9 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -34,7 +35,7 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onLTCTransactionSucceed()
-				val address = WalletTable.getAddressBySymbol(CryptoSymbol.ltc)
+				val address = MultiChainUtils.getAddressBySymbol(CryptoSymbol.ltc)
 				updateWalletDetailLTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()

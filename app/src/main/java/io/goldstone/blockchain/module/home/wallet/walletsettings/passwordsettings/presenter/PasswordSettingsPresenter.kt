@@ -11,12 +11,12 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.DeviceName
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.isValid
-import io.goldstone.blockchain.crypto.updatePassword
-import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.isValid
+import io.goldstone.blockchain.crypto.keystore.updatePassword
+import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
+import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -52,12 +52,20 @@ class PasswordSettingsPresenter(
 			fragment.context,
 			callback // error callback
 		) { password, _ ->
-			fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword) { isCorrect ->
-				if (isCorrect) updatePassword(oldPassword, password, passwordHint)
-				else {
-					callback()
-					fragment.context?.runOnUiThread {
-						alert(CommonText.wrongPassword)
+			WalletTable.getWalletType { type, wallet ->
+				fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
+					if (isCorrect) updatePassword(
+						oldPassword,
+						password,
+						type,
+						wallet,
+						passwordHint
+					)
+					else {
+						callback()
+						fragment.context?.runOnUiThread {
+							alert(CommonText.wrongPassword)
+						}
 					}
 				}
 			}
@@ -67,107 +75,50 @@ class PasswordSettingsPresenter(
 	private fun updatePassword(
 		oldPassword: String,
 		password: String,
+		type: WalletType,
+		wallet: WalletTable,
 		passwordHint: String
 	) {
-		WalletTable.getCurrentWallet {
-			when (Config.getCurrentWalletType()) {
-				// 删除多链钱包下的所有地址对应的数据
-				WalletType.MultiChain.content -> {
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount = 4
-
-						override fun concurrentJobs() {
-							listOf(
-								ethAddresses,
-								etcAddresses,
-								bchAddresses,
-								ltcAddresses,
-								btcAddresses,
-								btcSeriesTestAddresses
-							).forEach { addresses ->
-								AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
-									updateKeystorePassword(
-										it.first,
-										oldPassword,
-										password,
-										passwordHint,
-										!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-										false
-									) {
-										completeMark()
-									}
+		when (type) {
+			// 删除多链钱包下的所有地址对应的数据
+			WalletType.Bip44MultiChain -> {
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = 4
+					override fun concurrentJobs() {
+						listOf(
+							wallet.ethAddresses,
+							wallet.etcAddresses,
+							wallet.bchAddresses,
+							wallet.ltcAddresses,
+							wallet.btcAddresses,
+							wallet.btcSeriesTestAddresses
+						).forEach { addresses ->
+							AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
+								updateKeystorePassword(
+									it.first,
+									oldPassword,
+									password,
+									passwordHint,
+									!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
+									false
+								) {
+									completeMark()
 								}
 							}
 						}
+					}
 
-						override fun mergeCallBack() = autoBack()
-					}.start()
-				}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
-				WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBTCSeriesTestAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.LTCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentLTCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.BCHOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBCHAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.BTCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBTCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
-				WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentETHAndERCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						false,
-						true
-					) {
-						autoBack()
-					}
-				}
+					override fun mergeCallBack() = autoBack()
+				}.start()
+			}
+			// 新的钱包结构只存在 Bip44 多链和 单私钥多链两种情况
+			else -> updateKeystorePasswordByWalletID(
+				wallet.id,
+				oldPassword,
+				password,
+				passwordHint
+			) {
+				autoBack()
 			}
 		}
 	}
@@ -188,6 +139,30 @@ class PasswordSettingsPresenter(
 			newPassword,
 			isBTCSeriesWallet,
 			isSingleChainWallet,
+			{
+				// error callback
+				callback()
+			}
+		) {
+			// Update User Password Hint
+			passwordHint.isNotEmpty() isTrue {
+				WalletTable.updateHint(passwordHint)
+			}
+			callback()
+		}
+	}
+
+	private fun updateKeystorePasswordByWalletID(
+		walletID: Int,
+		oldPassword: String,
+		newPassword: String,
+		passwordHint: String,
+		callback: () -> Unit
+	) {
+		fragment.context?.updatePasswordByWalletID(
+			walletID,
+			oldPassword,
+			newPassword,
 			{
 				// error callback
 				callback()

@@ -2,9 +2,9 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.CryptoValue.singleChainFilename
-import io.goldstone.blockchain.crypto.getKeystoreFile
-import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoValue.singleChainFilename
+import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams

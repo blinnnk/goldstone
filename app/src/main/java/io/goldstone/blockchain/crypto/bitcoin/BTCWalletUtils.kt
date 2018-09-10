@@ -2,9 +2,9 @@
 
 package io.goldstone.blockchain.crypto.bitcoin
 
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.*
 
 /**

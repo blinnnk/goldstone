@@ -1,10 +1,8 @@
-package io.goldstone.blockchain.crypto.walletfile
+package io.goldstone.blockchain.crypto.ethereum.walletfile
 
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.ECKeyPair
-import io.goldstone.blockchain.crypto.convertKeystoreToModel
+import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
+import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
 import io.goldstone.blockchain.crypto.utils.clean0xPrefix
 
 /**
@@ -50,38 +48,5 @@ object WalletUtil {
 
 	fun isValidPrivateKey(key: String): Boolean {
 		return key.clean0xPrefix().length == 63 || key.clean0xPrefix().length == 64
-	}
-
-	fun getAddressBySymbol(symbol: String): String {
-		return when (symbol) {
-			CryptoSymbol.btc() -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentBTCAddress()
-				}
-			}
-
-			CryptoSymbol.ltc -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentLTCAddress()
-				}
-			}
-
-			CryptoSymbol.bch -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentBCHAddress()
-				}
-			}
-
-			CryptoSymbol.etc ->
-				Config.getCurrentETCAddress()
-			else ->
-				Config.getCurrentEthereumAddress()
-		}
 	}
 }

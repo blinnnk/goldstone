@@ -9,7 +9,12 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
+import io.goldstone.blockchain.crypto.ethereum.Transaction
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -143,7 +148,7 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 ) {
 	doAsync {
 		val isSingleChainWallet =
-			!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+			!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 		// 获取当前账户的私钥
 		fragment.context?.getPrivateKey(
 			getETHERC20OrETCAddress(),

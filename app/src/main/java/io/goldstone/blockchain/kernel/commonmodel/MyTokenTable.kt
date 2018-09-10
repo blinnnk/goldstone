@@ -6,11 +6,8 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toBTCCount
-import io.goldstone.blockchain.crypto.utils.toEthCount
-import io.goldstone.blockchain.crypto.utils.toSatoshi
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -193,7 +190,7 @@ data class MyTokenTable(
 		) {
 			WalletTable.getCurrentWallet {
 				doAsync {
-					val currentAddress = WalletTable.getAddressBySymbol(symbol)
+					val currentAddress = MultiChainUtils.getAddressBySymbol(symbol)
 					GoldStoneDataBase.database.apply {
 						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 						myTokenDao().getCurrentChainTokensBy(currentAddress).find {

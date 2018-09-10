@@ -8,15 +8,15 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -51,7 +51,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	changeAddress: String,
 	hold: (PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
+	val myAddress = MultiChainUtils.getAddressBySymbol(getToken()?.symbol)
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -88,7 +88,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,

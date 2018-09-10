@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 import io.goldstone.blockchain.crypto.kecca.keccak
 import org.spongycastle.asn1.x9.X9IntegerConverter
@@ -13,9 +13,7 @@ import org.spongycastle.math.ec.ECPoint
 import org.spongycastle.math.ec.FixedPointCombMultiplier
 import org.spongycastle.math.ec.custom.sec.SecP256K1Curve
 import java.math.BigInteger
-import java.security.SignatureException
 import java.util.*
-import kotlin.experimental.and
 
 /**
  * Transaction signing logic.

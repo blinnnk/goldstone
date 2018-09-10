@@ -6,12 +6,14 @@ import android.support.test.filters.LargeTest
 import android.support.test.internal.util.LogUtil
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.toHexString
-import io.goldstone.blockchain.crypto.walletfile.*
+import io.goldstone.blockchain.crypto.ethereum.walletfile.*
+import io.goldstone.blockchain.crypto.ethereum.publicKeyFromPrivate
+import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
 import org.junit.Rule

@@ -26,7 +26,7 @@ class WalletImportPresenter(
 	companion object {
 		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
-			return if (index == -1) ""
+			return if (index == -1) address
 			else "$address|$index"
 		}
 
@@ -47,7 +47,7 @@ class WalletImportPresenter(
 			// 不为空的地址进行
 			val currentAddress =
 				arrayListOf(
-					multiChainAddresses.etcAddress,
+					multiChainAddresses.ethAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
 					multiChainAddresses.btcSeriesTestAddress,

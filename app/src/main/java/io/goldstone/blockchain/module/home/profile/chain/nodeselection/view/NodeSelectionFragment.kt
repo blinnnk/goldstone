@@ -15,8 +15,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoName
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto.walletfile
+package io.goldstone.blockchain.crypto.ethereum.walletfile
 
 /**
  * @date 2018/6/17 10:34 PM

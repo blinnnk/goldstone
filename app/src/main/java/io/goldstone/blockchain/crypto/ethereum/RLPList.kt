@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 import java.math.BigInteger
 import java.util.*
@@ -23,13 +23,9 @@ data class RLPElement(val bytes: ByteArray) : RLPType() {
 
 data class RLPList(val element: List<RLPType>) : RLPType()
 
-class IllegalRLPException(msg: String) : IllegalArgumentException(msg)
-
-fun String.toRLP() = RLPElement(toByteArray())
-fun Int.toRLP() = RLPElement(toMinimalByteArray())
 fun BigInteger.toRLP() = RLPElement(toByteArray().removeLeadingZero())
 fun ByteArray.toRLP() = RLPElement(this)
-fun Byte.toRLP() = RLPElement(kotlin.ByteArray(1) { this })
+fun Byte.toRLP() = RLPElement(ByteArray(1) { this })
 
 fun Int.toByteArray() = ByteArray(4) { i -> shr(8 * (3 - i)).toByte() }
 fun Int.toMinimalByteArray() = toByteArray().let { it.copyOfRange(it.minimalStart(), 4) }

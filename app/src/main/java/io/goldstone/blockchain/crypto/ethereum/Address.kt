@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto
+package io.goldstone.blockchain.crypto.ethereum
 
 import io.goldstone.blockchain.crypto.utils.HEX_REGEX
 import io.goldstone.blockchain.crypto.utils.has0xPrefix

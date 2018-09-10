@@ -38,6 +38,7 @@ data class WalletListModel(
 			return when (WalletTable.getTargetWalletType(wallet)) {
 				WalletType.LTCOnly -> wallet.currentLTCAddress
 				WalletType.BCHOnly -> wallet.currentBCHAddress
+				WalletType.Bip44MultiChain -> WalletText.bip44MultiChain
 				WalletType.MultiChain -> WalletText.multiChain
 				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
 				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses

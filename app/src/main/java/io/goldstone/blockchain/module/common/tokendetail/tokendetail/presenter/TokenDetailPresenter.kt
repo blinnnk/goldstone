@@ -13,8 +13,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -180,7 +180,7 @@ class TokenDetailPresenter(
 		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
-			WalletType.MultiChain.content -> {
+			WalletType.Bip44MultiChain.content -> {
 				when {
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
 						getETHERC20OrETCData(Config.getCurrentETCAddress()) {

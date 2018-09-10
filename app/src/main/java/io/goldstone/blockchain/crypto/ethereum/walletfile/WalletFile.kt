@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto.walletfile
+package io.goldstone.blockchain.crypto.ethereum.walletfile
 
 /**
  * @date 2018/6/17 9:13 PM
@@ -45,19 +45,6 @@ data class WalletCryptoForImport(
 	var kdf: String,
 	var kdfparams: Map<String, String>,
 	var mac: String
-)
-
-@Serializable
-data class WalletForImport(
-	@Optional
-	var address: String? = null,
-	@Optional
-	var crypto: WalletCryptoForImport? = null,
-	@Optional
-	@SerialName("Crypto") //for MyEtherWallet json
-	var cryptoFromMEW: WalletCryptoForImport? = null,
-	var id: String? = null,
-	var version: Int = 0
 )
 
 @Serializable
