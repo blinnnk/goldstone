@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.markettokencenter.view
+package io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view
 
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
@@ -7,41 +7,31 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
-import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.markettokencenter.presenter.MarketTokenCenterPresenter
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
-import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.onPageChangeListener
 
+
 /**
- * @date 2018/8/9 5:02 PM
  * @author KaySaith
+ * @date  2018/09/10
  */
+class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
-class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
-
-	// 这个 `Model` 是服务 `ViewPager` 中的 `MarketTokenDetailFragment`
-	val currencyInfo by lazy {
-		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
+	val token by lazy {
+		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
 	}
 
-	private val menuBar by lazy {
-		ViewPagerMenu(context!!)
-	}
-	private val viewPager by lazy {
-		MarketTokeCenterViewPager(this)
-	}
-	private val menuTitles =
-		arrayListOf(QuotationText.quotationInfo)
-
-	override val presenter = MarketTokenCenterPresenter(this)
+	private val menuBar by lazy { ViewPagerMenu(context!!) }
+	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
+	private val menuTitles = arrayListOf("Transaction List", "Token Asset")
+	override val presenter = TokenDetailCenterPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
@@ -70,11 +60,4 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 			}
 		}
 	}
-
-	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		MarketTokenDetailFragment.removeContentOverlayOrElse(this) {
-			super.setBaseBackEvent(activity, parent)
-		}
-	}
-
 }

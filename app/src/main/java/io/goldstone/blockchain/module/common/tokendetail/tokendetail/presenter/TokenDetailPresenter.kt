@@ -24,6 +24,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.Token
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -39,7 +40,7 @@ class TokenDetailPresenter(
 
 	private var allData: List<TransactionListModel>? = null
 	val token by lazy {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
 	}
 
 	override fun onFragmentShowFromHidden() {
@@ -87,29 +88,25 @@ class TokenDetailPresenter(
 	}
 
 	fun showAddressSelectionFragment() {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showAddressSelectionFragment()
-		}
+		fragment.getGrandFather<TokenDetailOverlayFragment>()
+			?.presenter?.showAddressSelectionFragment()
 	}
 
 	fun showDepositFragment() {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.showDepositFragment()
-		}
+		fragment.getGrandFather<TokenDetailOverlayFragment>()?.presenter?.showDepositFragment()
 	}
 
 	fun showTransactionDetailFragment(model: TransactionListModel) {
 		val argument = Bundle().apply {
 			putSerializable(ArgumentKey.transactionFromList, model)
 		}
-		fragment
-			.getParentFragment<TokenDetailOverlayFragment> {
-				presenter.showTargetFragment<TransactionDetailFragment>(
-					TransactionText.detail,
-					TokenDetailText.tokenDetail, argument
-				)
-				recoverHeader()
-			}
+		fragment.getGrandFather<TokenDetailOverlayFragment>()?.apply {
+			presenter.showTargetFragment<TransactionDetailFragment>(
+				TransactionText.detail,
+				TokenDetailText.tokenDetail, argument
+			)
+			recoverHeader()
+		}
 	}
 
 	private fun prepareTokenDetailData() {
@@ -396,7 +393,7 @@ class TokenDetailPresenter(
 					val currentMills =
 						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
 					(balance - filter {
-						it.timeStamp.toMillisecond() in index.daysAgoInMills()..currentMills
+						it.timeStamp.toMillisecond() in index.daysAgoInMills() .. currentMills
 					}.sumByDouble {
 						if (it.isFee) {
 							it.minerFee.substringBefore(" ").toDouble() * -1

@@ -22,8 +22,8 @@ object FragmentTag {
 	const val notification = "notification"
 	const val tokenManagement = "tokenManagement"
 	const val tokenMarketDetail = "tokenMarketDetail"
-	const val alarmDetail = "alarmDetail"
 	const val tokenDetail = "tokenDetail"
+	const val tokenAsset = "tokenAsset"
 }
 
 object LogTag {

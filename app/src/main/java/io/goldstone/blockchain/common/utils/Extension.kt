@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
@@ -86,4 +85,13 @@ fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 fun String.showAfterColonContent(): String {
 	return if (contains(":")) toString().substringAfter(":")
 	else this
+}
+
+fun <T> Fragment.getGrandFather(): T? {
+	return try {
+		parentFragment?.parentFragment as? T
+	} catch (error: Exception) {
+		LogUtil.error("getGrandFather", error)
+		null
+	}
 }

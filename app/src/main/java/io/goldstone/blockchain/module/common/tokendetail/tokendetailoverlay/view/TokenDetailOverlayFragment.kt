@@ -43,7 +43,7 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 		when {
 			isFromQuickTransfer -> presenter.showAddressSelectionFragment(true)
 			isFromQuickDeposit -> presenter.showDepositFragment(true)
-			else -> presenter.showTokenDetailFragment(token)
+			else -> presenter.showTokenDetailCenterFragment(token)
 		}
 	}
 
