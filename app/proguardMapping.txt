@@ -19306,7 +19306,7 @@ io.goldstone.blockchain.common.language.ImportMenubar -> d.a.a.a.c.m:
 io.goldstone.blockchain.common.language.ImportWalletText -> d.a.a.a.c.p:
     io.goldstone.blockchain.common.language.ImportWalletText INSTANCE -> E
     java.lang.String address -> p
-    java.lang.String addressFromatAlert -> D
+    java.lang.String addressFormatAlert -> D
     java.lang.String customBCHPath -> h
     java.lang.String customEOSPath -> i
     java.lang.String customEthereumClassicPath -> f

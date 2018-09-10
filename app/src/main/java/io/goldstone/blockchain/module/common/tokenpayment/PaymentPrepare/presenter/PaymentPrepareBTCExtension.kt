@@ -61,7 +61,7 @@ fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
 		if (isValidAddress) {
 			fragment.updateChangeAddress(CryptoUtils.scaleTo22(address))
 		} else {
-			fragment.context.alert(ImportWalletText.addressFromatAlert)
+			fragment.context.alert(ImportWalletText.addressFormatAlert)
 		}
 		fragment.activity?.let { SoftKeyboard.hide(it) }
 		return isValidAddress
