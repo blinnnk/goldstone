@@ -155,7 +155,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				val option = if (isRemove) 0 else 1
 				WalletTable.getTargetWalletType(this).let { type ->
 					when (type) {
-						WalletType.MultiChain -> {
+						WalletType.Bip44MultiChain -> {
 							val ethSeries =
 								AddressManagerPresenter.convertToChildAddresses(ethAddresses)
 									.map { Pair(it.first, ChainType.ETH.id) }

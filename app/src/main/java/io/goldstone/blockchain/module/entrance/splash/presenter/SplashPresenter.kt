@@ -64,6 +64,15 @@ class SplashPresenter(val activity: SplashActivity) {
 					Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
 				}
 
+				WalletType.Bip44MultiChain -> {
+					if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+						cacheWalletData()
+					} else NodeSelectionPresenter.setAllMainnet {
+						cacheWalletData()
+					}
+					Config.updateCurrentWalletType(WalletType.Bip44MultiChain.content)
+				}
+
 				WalletType.MultiChain -> {
 					if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 						cacheWalletData()

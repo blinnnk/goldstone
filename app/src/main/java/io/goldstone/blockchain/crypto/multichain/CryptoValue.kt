@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import com.blinnnk.extension.isNull
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.value.Config
 

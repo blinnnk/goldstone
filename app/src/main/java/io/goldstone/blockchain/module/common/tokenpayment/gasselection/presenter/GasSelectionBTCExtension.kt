@@ -110,7 +110,7 @@ private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 	hold: (String?) -> Unit
 ) {
 	val isSingleChainWallet =
-		!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+		!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,

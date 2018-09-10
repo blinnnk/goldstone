@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.utils
 
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -95,38 +96,18 @@ object MultiChainUtils {
 		}
 	}
 
-	fun getAddressBySymbol(symbol: String): String {
-		return when (symbol) {
-			CryptoSymbol.btc() -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentBTCAddress()
-				}
-			}
-
-			CryptoSymbol.eos -> {
-				Config.getCurrentEOSAddress()
-			}
-
-			CryptoSymbol.ltc -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentLTCAddress()
-				}
-			}
-
-			CryptoSymbol.bch -> {
-				if (Config.isTestEnvironment()) {
-					Config.getCurrentBTCSeriesTestAddress()
-				} else {
-					Config.getCurrentBCHAddress()
-				}
-			}
-
-			CryptoSymbol.etc ->
+	fun getAddressBySymbol(symbol: String?): String {
+		return when {
+			symbol.equals(CryptoSymbol.btc(), true) ->
+				AddressUtils.getCurrentBTCAddress()
+			symbol.equals(CryptoSymbol.ltc, true) ->
+				AddressUtils.getCurrentLTCAddress()
+			symbol.equals(CryptoSymbol.bch, true) ->
+				AddressUtils.getCurrentBCHAddress()
+			symbol.equals(CryptoSymbol.etc, true) ->
 				Config.getCurrentETCAddress()
+			symbol.equals(CryptoSymbol.eos, true) ->
+				Config.getCurrentEOSAddress()
 			else ->
 				Config.getCurrentEthereumAddress()
 		}

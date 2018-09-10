@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
+import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.CommonText
@@ -158,6 +159,26 @@ fun Context.getKeystoreFile(
 	}
 }
 
+fun Context.getKeystoreFileByWalletID(
+	password: String,
+	walletID: Int,
+	errorCallback: (Throwable) -> Unit,
+	hold: (String) -> Unit
+) {
+	val filename = "$walletID${CryptoValue.keystoreFilename}"
+	val keystoreFile by lazy { File(filesDir!!, filename) }
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	try {
+		hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)))
+	} catch (error: Exception) {
+		runOnUiThread {
+			errorCallback(error)
+			alert(CommonText.wrongPassword)
+		}
+		LogUtil.error("getKeystoreFile", error)
+	}
+}
+
 fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
@@ -180,6 +201,29 @@ fun Context.getPrivateKey(
 		)?.let {
 			runOnUiThread {
 				hold(it.privateKey.toString(16))
+			}
+		}
+	}
+}
+
+fun Context.getPrivateKeyByWalletID(
+	password: String,
+	walletID: Int,
+	errorCallback: (Throwable) -> Unit,
+	@UiThread hold: (BigInteger) -> Unit
+) {
+	getKeystoreFileByWalletID(
+		password,
+		walletID,
+		errorCallback
+	) { it ->
+		WalletUtil.getKeyPairFromWalletFile(
+			it,
+			password,
+			errorCallback
+		)?.let {
+			runOnUiThread {
+				hold(it.privateKey)
 			}
 		}
 	}
@@ -220,68 +264,49 @@ fun Context.deleteAccount(
 	}
 }
 
+fun Context.deleteAccountByWalletID(
+	walletID: Int,
+	password: String,
+	callback: (isSuccessFul: Boolean) -> Unit
+) {
+	val filename = "$walletID${CryptoValue.keystoreFilename}"
+	val keystoreFile by lazy { File(filesDir!!, filename) }
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	// If there is't account found then return
+	if (keyStore.accounts.size() == 0L) {
+		callback(true)
+		return
+	}
+	// `BTC` 的 `Filename` 就是 `Address`
+	try {
+		keyStore.deleteAccount(keyStore.accounts.get(0), password)
+		callback(true)
+	} catch (error: Exception) {
+		callback(false)
+	}
+}
+
 fun Context.verifyCurrentWalletKeyStorePassword(
 	password: String,
+	walletID: Int,
 	hold: (Boolean) -> Unit
 ) {
 	doAsync {
 		when (Config.getCurrentWalletType()) {
-			WalletType.BTCTestOnly.content -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentBTCSeriesTestAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-
-			WalletType.BTCOnly.content -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentBTCAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-
-			WalletType.LTCOnly.content -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentLTCAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-
-			WalletType.BCHOnly.content -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentBCHAddress(),
-					true,
-					true,
-					hold
-				)
-			}
-
-			WalletType.ETHERCAndETCOnly.content -> {
-				verifyKeystorePassword(
-					password,
-					Config.getCurrentEthereumAddress(),
-					false,
-					true,
-					hold
-				)
-			}
 			// 多链钱包随便找一个名下钱包地址进行验证即可
-			WalletType.MultiChain.content -> {
+			WalletType.Bip44MultiChain.content -> {
 				verifyKeystorePassword(
 					password,
 					Config.getCurrentBTCAddress(),
 					true,
 					false,
+					hold
+				)
+			}
+			WalletType.MultiChain.content -> {
+				verifyKeystorePasswordByWalletID(
+					password,
+					walletID,
 					hold
 				)
 			}
@@ -330,6 +355,26 @@ fun Context.verifyKeystorePassword(
 	}
 }
 
+fun Context.verifyKeystorePasswordByWalletID(
+	password: String,
+	walletID: Int,
+	hold: (Boolean) -> Unit
+) {
+	val filename = "$walletID${CryptoValue.keystoreFilename}"
+	val keystoreFile by lazy { File(filesDir!!, filename) }
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
+	try {
+		keyStore.unlock(keyStore.accounts.get(0), password)
+	} catch (error: Exception) {
+		hold(false)
+		LogUtil.error("wrong keystore password", error)
+		return
+	}
+	keyStore.lock(keyStore.accounts.get(0).address)
+	hold(true)
+}
+
 fun Context.updatePassword(
 	walletAddress: String,
 	oldPassword: String,
@@ -371,6 +416,38 @@ fun Context.updatePassword(
 							}
 						}
 					}
+				} else {
+					uiThread { errorCallback(Throwable("private is null")) }
+				}
+			}
+		}
+	}
+}
+
+fun Context.updatePasswordByWalletID(
+	walletID: Int,
+	oldPassword: String,
+	newPassword: String,
+	errorCallback: (Throwable) -> Unit,
+	callback: () -> Unit
+) {
+	doAsync {
+		getPrivateKeyByWalletID(
+			oldPassword,
+			walletID,
+			{ error ->
+				uiThread {
+					errorCallback(error)
+				}
+			}
+		) { privateKey ->
+			deleteAccountByWalletID(
+				walletID,
+				oldPassword
+			) { isSuccessful ->
+				if (isSuccessful) {
+					storeRootKeyByWalletID(walletID, privateKey, newPassword)
+					callback()
 				} else {
 					uiThread { errorCallback(Throwable("private is null")) }
 				}

@@ -6,13 +6,10 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.ethereum.SolidityCode
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toCryptHexString
-import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
@@ -58,7 +55,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
 		},
 		chainType,
-		WalletTable.getAddressBySymbol(getToken()?.symbol)
+		MultiChainUtils.getAddressBySymbol(getToken()?.symbol)
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 	}
@@ -83,7 +80,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count)
 		}
-		
+
 		else -> {
 			to = getToken()?.contract.orEmpty()
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
@@ -95,7 +92,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		WalletTable.getAddressBySymbol(getToken()?.symbol),
+		MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
 		data,
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
@@ -105,7 +102,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
 				nonce,
 				limit,
 				to,

@@ -180,7 +180,7 @@ class TokenDetailPresenter(
 		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
-			WalletType.MultiChain.content -> {
+			WalletType.Bip44MultiChain.content -> {
 				when {
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
 						getETHERC20OrETCData(Config.getCurrentETCAddress()) {

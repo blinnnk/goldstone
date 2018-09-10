@@ -148,7 +148,7 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 ) {
 	doAsync {
 		val isSingleChainWallet =
-			!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+			!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 		// 获取当前账户的私钥
 		fragment.context?.getPrivateKey(
 			getETHERC20OrETCAddress(),

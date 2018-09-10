@@ -203,9 +203,3 @@ fun Activity.hasNotchInScreen(): Boolean {
 		return ret
 	}
 }
-
-fun View.getViewAbsolutelyPositionInScreen(): IntArray {
-	val cords = intArrayOf(0, 0)
-	getLocationOnScreen(cords)
-	return cords
-}

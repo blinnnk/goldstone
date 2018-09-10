@@ -11,14 +11,12 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.DialogText
-import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -81,7 +79,7 @@ data class WalletTable(
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
 				when (Config.getCurrentWalletType()) {
-					WalletType.MultiChain.content -> {
+					WalletType.Bip44MultiChain.content -> {
 						val ethAddressCount = ethAddresses.split(",").size
 						val etcAddressCount = etcAddresses.split(",").size
 						val btcAddressCount = btcAddresses.split(",").size
@@ -106,23 +104,6 @@ data class WalletTable(
 					WalletType.BCHOnly.content -> hold(1)
 					WalletType.EOSOnly.content -> hold(1)
 				}
-			}
-		}
-
-		fun getAddressBySymbol(symbol: String?): String {
-			return when {
-				symbol.equals(CryptoSymbol.btc(), true) ->
-					AddressUtils.getCurrentBTCAddress()
-				symbol.equals(CryptoSymbol.ltc, true) ->
-					AddressUtils.getCurrentLTCAddress()
-				symbol.equals(CryptoSymbol.bch, true) ->
-					AddressUtils.getCurrentBCHAddress()
-				symbol.equals(CryptoSymbol.etc, true) ->
-					Config.getCurrentETCAddress()
-				symbol.equals(CryptoSymbol.eos, true) ->
-					Config.getCurrentEOSAddress()
-				else ->
-					Config.getCurrentEthereumAddress()
 			}
 		}
 
@@ -279,19 +260,19 @@ data class WalletTable(
 				it.second.isNotEmpty()
 			}
 			return when (types.size) {
-				6 -> WalletType.MultiChain
-				else -> try {
-					types.first().first
-				} catch (error: Exception) {
-					// 解析出错的时候显示默认值
-					WalletType.MultiChain
+				6 -> {
+					// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
+					// BIP44 钱包还是单纯的多链钱包
+					if (walletTable.ethPath.isNotEmpty()) WalletType.Bip44MultiChain
+					else WalletType.MultiChain
 				}
+				else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
 			}
 		}
 
-		fun getWalletType(hold: (WalletType) -> Unit) {
+		fun getWalletType(hold: (WalletType, WalletTable) -> Unit) {
 			WalletTable.getCurrentWallet {
-				hold(getTargetWalletType(this))
+				hold(getTargetWalletType(this), this)
 			}
 		}
 

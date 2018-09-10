@@ -66,6 +66,9 @@ enum class ChainType(val id: Int) {
 		fun isBTCSeriesChainType(id: Int): Boolean =
 			getAllBTCSeriesType().any { it == id }
 
+		fun isSamePrivateKeyRule(id: Int): Boolean =
+			listOf(BCH.id, BTC.id, AllTest.id).any {it == id}
+
 		fun getChainTypeBySymbol(symbol: String?): Int = when (symbol) {
 			CryptoSymbol.btc() -> BTC.id
 			CryptoSymbol.ltc -> LTC.id

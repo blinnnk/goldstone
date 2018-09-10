@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -114,7 +115,7 @@ class TokenManagementListPresenter(
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
 				MyTokenTable.deleteByContract(
 					token.contract,
-					WalletTable.getAddressBySymbol(token.symbol)
+					MultiChainUtils.getAddressBySymbol(token.symbol)
 				) {
 					switch.isClickable = true
 				}
