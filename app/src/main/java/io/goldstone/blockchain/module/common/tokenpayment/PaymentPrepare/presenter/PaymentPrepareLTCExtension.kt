@@ -112,7 +112,7 @@ fun PaymentPreparePresenter.isValidLTCAddressOrElse(address: String): Boolean {
 			if (Config.isTestEnvironment()) BTCUtils.isValidTestnetAddress(address)
 			else LTCWalletUtils.isValidAddress(address)
 		if (isValidAddress) fragment.updateChangeAddress(CryptoUtils.scaleTo22(address))
-		else fragment.context.alert(ImportWalletText.addressFromatAlert)
+		else fragment.context.alert(ImportWalletText.addressFormatAlert)
 		fragment.activity?.let { SoftKeyboard.hide(it) }
 		isValidAddress
 	} else {

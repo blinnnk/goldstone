@@ -105,9 +105,8 @@ object GoldStoneAPI {
 						}
 					}
 
-					override fun mergeCallBack() {
-						hold(allDefaultTokens)
-					}
+					override fun mergeCallBack() = hold(allDefaultTokens)
+
 				}.start()
 			}
 		}

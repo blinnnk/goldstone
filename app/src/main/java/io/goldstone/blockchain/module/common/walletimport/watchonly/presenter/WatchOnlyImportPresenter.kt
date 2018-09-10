@@ -54,7 +54,7 @@ class WatchOnlyImportPresenter(
 		when (addressType) {
 			PrivateKeyType.ETHERCAndETC.content -> {
 				if (!Address(address).isValid()) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -62,7 +62,7 @@ class WatchOnlyImportPresenter(
 
 			PrivateKeyType.BTC.content -> {
 				if (!BTCUtils.isValidMainnetAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -70,7 +70,7 @@ class WatchOnlyImportPresenter(
 
 			PrivateKeyType.LTC.content -> {
 				if (!LTCWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -78,7 +78,7 @@ class WatchOnlyImportPresenter(
 
 			PrivateKeyType.EOS.content -> {
 				if (!EOSWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -86,7 +86,7 @@ class WatchOnlyImportPresenter(
 
 			PrivateKeyType.BCH.content -> {
 				if (!BCHWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -94,7 +94,7 @@ class WatchOnlyImportPresenter(
 
 			else -> {
 				if (!BTCUtils.isValidTestnetAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}

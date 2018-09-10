@@ -282,12 +282,12 @@ object ImportWalletText {
 	}
 	@JvmField
 	val importWalletDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "we supported that import multi-chain wallet by any single \nmnemonic, private key or keystore file"
-		HoneyLanguage.Chinese.code -> "we supported that import multi-chain wallet by any a single \nmnemonic, private key or keystore file"
-		HoneyLanguage.Japanese.code -> "we supported that import multi-chain wallet by any a single \nmnemonic, private key or keystore file"
-		HoneyLanguage.Korean.code -> "we supported that import multi-chain wallet by any a single \nmnemonic, private key or keystore file"
-		HoneyLanguage.Russian.code -> "we supported that import multi-chain wallet by any a single \nmnemonic, private key or keystore file"
-		HoneyLanguage.TraditionalChinese.code -> "we supported that import multi-chain wallet by any a single \nmnemonic, private key or keystore file"
+		HoneyLanguage.English.code -> "we supported that import multi-chain wallet by any single mnemonic, private key or keystore file"
+		HoneyLanguage.Chinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Japanese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Korean.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Russian.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.TraditionalChinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
 		else -> ""
 	}
 	@JvmField
@@ -331,7 +331,7 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val addressFromatAlert = when (currentLanguage) {
+	val addressFormatAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid address"
 		HoneyLanguage.Chinese.code -> "地址格式不对"
 		HoneyLanguage.Japanese.code -> "アドレス形式が違っています"
