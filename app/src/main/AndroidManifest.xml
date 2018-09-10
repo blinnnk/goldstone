@@ -8,7 +8,7 @@
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	<!--指纹解锁权限-->
+	<!-- 指纹解锁权限 -->
 	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
 	<!-- 本地读写权限 -->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
