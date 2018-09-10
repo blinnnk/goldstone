@@ -289,7 +289,10 @@ object GoldStoneAPI {
 				val exchangeTables = data.safeGet("list")
 				val newMd5 = data.safeGet("md5")
 				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
-				hold(Gson().fromJson(exchangeTables, collectionType), newMd5)
+				val exchangeTableList =
+					if (exchangeTables.isEmpty()) arrayListOf<ExchangeTable>()
+					else Gson().fromJson(exchangeTables, collectionType)
+				hold(exchangeTableList, newMd5)
 			} catch (error: Exception) {
 				errorCallback(error)
 			}
