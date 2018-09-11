@@ -221,7 +221,7 @@ fun String.isValidTaxHash() = length == CryptoValue.taxHashLength
 // 这个是返回 `EventLog` 中需要的地址格式
 @Throws
 fun String.toAddressCode(hasPrefix: Boolean = true): String {
-	return if (!Address(this).isValid()) {
+	return if (Address(this).isValid()) {
 		(if (hasPrefix) "0x" else "") + "000000000000000000000000" + substring(2, length)
 	} else {
 		throw Exception("It is a wrong address code format")

@@ -24,6 +24,17 @@ object CryptoName {
 		eos
 	)
 
+	fun getChainNameBySymbol(symbol: String?): String {
+		return when (symbol) {
+			CryptoSymbol.eos -> eos
+			CryptoSymbol.ltc -> ltc
+			CryptoSymbol.etc -> etc
+			CryptoSymbol.bch -> bch
+			CryptoSymbol.btc() -> btc
+			else -> eth
+		}
+	}
+
 	fun getBTCSeriesChainIDByName(name: String): String? {
 		return listOf(
 			Pair(ltc, Config.getLTCCurrentChain()),

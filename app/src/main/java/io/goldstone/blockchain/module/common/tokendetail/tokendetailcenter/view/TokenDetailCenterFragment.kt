@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.AnkoContext
@@ -30,7 +31,11 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
 	private val menuBar by lazy { ViewPagerMenu(context!!) }
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
-	private val menuTitles = arrayListOf("Transaction List", "Token Asset")
+	private val menuTitles by lazy {
+		val secondMenuTitle =
+			if (token?.contract.equals(CryptoValue.eosContract, true)) "Asset" else "Information"
+		arrayListOf("Transaction List", secondMenuTitle)
+	}
 	override val presenter = TokenDetailCenterPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {

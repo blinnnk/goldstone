@@ -31,6 +31,8 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	}
 	var isFloatRight by observing(false) {
 		gravity = Gravity.END
+		title.gravity = Gravity.END
+		subtitle.gravity = Gravity.END
 	}
 	var isCenter: Boolean by observing(false) {
 		if (isCenter) {
@@ -48,12 +50,13 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		orientation = VERTICAL
 	}
 
-	fun setBlackTitles(titleSize: Float = fontSize(14)) {
+	fun setBlackTitles(titleSize: Float = fontSize(14), lineSpace: Int = 0) {
 		title.apply {
 			typeface = GoldStoneFont.heavy(context)
 			textColor = GrayScale.black
 			textSize = titleSize
 		}
+		subtitle.y += lineSpace
 		subtitle.textColor = GrayScale.midGray
 	}
 

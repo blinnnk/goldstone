@@ -242,7 +242,7 @@ private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String)
 					this.blockNumber = blockNumber
 					isPending = false
 					hasError = "0"
-					txreceipt_status = "1"
+					txReceiptStatus = "1"
 				})
 			}
 		}

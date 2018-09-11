@@ -133,7 +133,7 @@ data class MyTokenTable(
 					} else {
 						DefaultTokenTable.getCurrentChainToken(contract) {
 							it?.apply {
-								callback(CryptoUtils.toCountByDecimal(token!!.balance, it.decimals))
+								callback(CryptoUtils.toCountByDecimal(token?.balance.orZero(), it.decimals))
 							}
 						}
 					}

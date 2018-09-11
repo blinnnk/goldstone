@@ -53,7 +53,7 @@ object LitecoinApi {
 		)
 	}
 
-	fun getTransactionsCount(
+	fun getTransactionCount(
 		address: String,
 		errorCallback: (Throwable) -> Unit,
 		hold: (count: Int) -> Unit

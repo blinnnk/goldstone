@@ -51,15 +51,15 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		}
 	}
 	private var container: RelativeLayout
-	private val shadowSize = 2.uiPX()
+	private val shadowSize = 3
 
 	init {
 		// 低端机型导致的 SetMargin 不识别, 顾此采用夹层方式实现 `Margin` 的阴影
 		container = relativeLayout {
-			lparams(ScreenSize.widthWithPadding -shadowSize * 2, 45.uiPX())
+			lparams(ScreenSize.widthWithPadding - shadowSize * 2, 45.uiPX())
 			setCenterInParent()
 			addCorner(CornerSize.cell, GrayScale.whiteGray)
-			elevation = shadowSize.toFloat()
+			elevation = 3f
 			addView(View(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
 				backgroundColor = GrayScale.midGray

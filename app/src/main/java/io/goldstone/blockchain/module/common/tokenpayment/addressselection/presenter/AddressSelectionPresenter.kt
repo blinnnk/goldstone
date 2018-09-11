@@ -327,7 +327,6 @@ class AddressSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			if (!isFromQuickTransfer) {
 				overlayView.header.showBackButton(true) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
 			}

@@ -1,19 +1,18 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.view
 
-import android.content.Context
 import android.os.Build
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
+import io.goldstone.blockchain.common.component.SessionTitleView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -79,15 +78,15 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>() {
 				topPadding = 10.uiPX()
 				lparams(matchParent, wrapContent)
 				gravity = Gravity.CENTER_HORIZONTAL
-				TitleView(context).setTitle("ACCOUNT MANAGEMENT").into(this)
+				SessionTitleView(context).setTitle("ACCOUNT MANAGEMENT").into(this)
 				authorizationCell.into(this)
-				TitleView(context).setTitle("RESOURCES").into(this)
+				SessionTitleView(context).setTitle("RESOURCES").into(this)
 				assetCard.apply {
 					addView(ramAssetCell)
 					addView(cpuAssetCell)
 					addView(netAssetCell)
 				}.into(this)
-				TitleView(context).setTitle("ASSET TOOLS").into(this)
+				SessionTitleView(context).setTitle("ASSET TOOLS").into(this)
 				linearLayout {
 					lparams(ScreenSize.widthWithPadding, wrapContent)
 					listOf(
@@ -121,21 +120,6 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>() {
 					}
 				}
 			}
-		}
-	}
-
-	inner class TitleView(context: Context) : TextView(context) {
-		init {
-			textSize = fontSize(12)
-			textColor = GrayScale.midGray
-			typeface = GoldStoneFont.black(context)
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-			setPadding(0, 15.uiPX(), 0, 10.uiPX())
-		}
-
-		fun setTitle(text: String): TitleView {
-			this.text = text
-			return this
 		}
 	}
 }

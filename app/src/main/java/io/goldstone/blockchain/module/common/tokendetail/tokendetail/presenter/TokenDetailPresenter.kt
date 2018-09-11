@@ -43,11 +43,6 @@ class TokenDetailPresenter(
 		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
 	}
 
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.recoveryValueHeader()
-	}
-
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		updateEmptyCharData(fragment.token?.symbol.orEmpty())
@@ -105,7 +100,6 @@ class TokenDetailPresenter(
 				TransactionText.detail,
 				TokenDetailText.tokenDetail, argument
 			)
-			recoverHeader()
 		}
 	}
 

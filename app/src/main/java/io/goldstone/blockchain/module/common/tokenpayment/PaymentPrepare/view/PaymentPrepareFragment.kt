@@ -309,7 +309,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				if (memoInputView.isNull()) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
 				} else {
 					removeMemoInputView()

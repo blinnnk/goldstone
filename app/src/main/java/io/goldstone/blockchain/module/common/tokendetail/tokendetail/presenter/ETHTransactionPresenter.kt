@@ -177,7 +177,7 @@ private fun diffNewDataAndUpdateLocalData(
 					update(it.apply {
 						transactionIndex = new.transactionIndex
 						hasError = new.hasError
-						txreceipt_status = new.txreceipt_status
+						txReceiptStatus = new.txReceiptStatus
 						gasUsed = new.gasUsed
 						blockHash = new.blockHash
 						cumulativeGasUsed = new.cumulativeGasUsed

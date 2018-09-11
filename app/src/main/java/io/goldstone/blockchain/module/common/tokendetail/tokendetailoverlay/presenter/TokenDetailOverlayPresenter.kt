@@ -45,7 +45,6 @@ class TokenDetailOverlayPresenter(
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
-					fragment.setValueHeader(token)
 					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.address
 				}
@@ -68,7 +67,6 @@ class TokenDetailOverlayPresenter(
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
-					setValueHeader(token)
 					addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.deposit
 				}
