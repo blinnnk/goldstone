@@ -1,8 +1,7 @@
 package io.goldstone.blockchain.common.component.chart.candle
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Handler
 import android.text.format.DateUtils
 import android.util.AttributeSet
@@ -10,7 +9,9 @@ import android.util.Log
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.CandleData
@@ -19,6 +20,8 @@ import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
+import com.github.mikephil.charting.listener.BarLineChartTouchListener
+import com.github.mikephil.charting.listener.ChartTouchListener
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -60,10 +63,18 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	
 	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
 		lastStartIndex = 0
-		postCalculate()
-		calculateHandler.postDelayed(disCalculateRunnable, 2000)
-		mAxisLeft.resetAxisMaximum() // data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在屏幕之外
+		calculateHandler.removeCallbacksAndMessages(null)
 		notifyData(dateType, dataRows)
+		postDelayed( {
+			performDrag(-4000f) // 滑动平移至右侧，
+			calculateHandler.postDelayed( {
+				postCalculate()
+				calculateHandler.postDelayed(disCalculateRunnable, 200)
+				mAxisLeft.resetAxisMaximum() // data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在屏幕之外
+			}, 200)
+		}, 200)
+		
+		
 	}
 	
 	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {
@@ -113,6 +124,31 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		calculateHandler.removeCallbacks(calculateRunnable)
 		if (needCalculate) {
 			calculateHandler.postDelayed(calculateRunnable, 15)
+		}
+	}
+	
+	/**
+	 * 模拟手势滑动，滑动到最右侧
+	 */
+	private fun performDrag(distanceX: Float) {
+		(mChartTouchListener as? BarLineChartTouchListener)?.apply {
+			stopDeceleration() // 停止computescroll，防止下面的矩阵计算冲突
+			var touchMode = ChartTouchListener::class.java.getDeclaredField("mTouchMode")
+			touchMode.isAccessible = true
+			touchMode.set(this, 1)
+			
+			var saveMatrix = BarLineChartTouchListener::class.java.getDeclaredField("mSavedMatrix")
+			saveMatrix.isAccessible = true
+			(saveMatrix.get(this) as? Matrix)?.apply { reset() }
+			
+			val event = MotionEvent.obtain(System.currentTimeMillis(),
+				System.currentTimeMillis(),
+				MotionEvent.ACTION_MOVE,
+				distanceX,
+				0f,
+				0)
+			onTouch(this@CandleStickChart, event)
+			event.recycle()
 		}
 	}
 	
@@ -291,7 +327,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		if (event.action == MotionEvent.ACTION_DOWN) {
 			postCalculate()
 		} else if (event.action == MotionEvent.ACTION_UP) {
-			calculateHandler.postDelayed(disCalculateRunnable, 2000)
+			calculateHandler.postDelayed(disCalculateRunnable, 1000)
 		}
 		return super.onTouchEvent(event)
 	}
