@@ -64,13 +64,14 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	open fun resetData(dateType: Int, dataRows: List<CandleEntry>) {
 		lastStartIndex = 0
 		calculateHandler.removeCallbacksAndMessages(null)
+		// data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在错误，所以要释放最大值最小值的强制设置
+		mAxisLeft.resetAxisMaximum()
 		notifyData(dateType, dataRows)
 		postDelayed( {
 			performDrag(-4000f) // 滑动平移至右侧，
 			calculateHandler.postDelayed( {
 				postCalculate()
-				calculateHandler.postDelayed(disCalculateRunnable, 200)
-				mAxisLeft.resetAxisMaximum() // data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在屏幕之外
+				calculateHandler.postDelayed(disCalculateRunnable, 1000)
 			}, 200)
 		}, 200)
 		
