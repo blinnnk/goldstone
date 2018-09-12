@@ -26,6 +26,10 @@ enum class WalletType(val content: String) {
 	}
 }
 
+enum class EOSWalletType {
+	Inactivated, NoDefault, None, Available
+}
+
 object DataValue {
 	const val pageCount = 50
 	const val quotationDataCount = 10

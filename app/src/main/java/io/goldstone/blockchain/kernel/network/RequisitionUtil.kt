@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
-	inline fun <reified T> postRequestGetJsonObject(
+	inline fun <reified T> postRequest(
 		body: RequestBody,
 		keyName: String,
 		path: String,
@@ -68,10 +68,9 @@ object RequisitionUtil {
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
 						LogUtil.error(keyName, error)
-						GoldStoneCode.showErrorCodeReason(data) {
-							GoldStoneAPI.context.runOnUiThread {
-								errorCallback(error)
-							}
+						GoldStoneCode.showErrorCodeReason(data)
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback(error)
 						}
 					}
 				}

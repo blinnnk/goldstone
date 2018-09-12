@@ -18,6 +18,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.json.JSONArray
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -94,4 +95,23 @@ fun <T> Fragment.getGrandFather(): T? {
 		LogUtil.error("getGrandFather", error)
 		null
 	}
+}
+
+
+fun String.toList(): List<String> {
+	return if (contains(",")) split(",")
+	else listOf(this)
+}
+
+fun JSONArray.toList(): List<String> {
+	var result = listOf<String>()
+	(0 until length()).forEach {
+		result += get(it).toString()
+	}
+	return result
+}
+
+// 自己解 `SONObject` 的时候用来可能用 `String` 判断 `Null`
+fun String.isNullValue(): Boolean {
+	return contains("null")
 }

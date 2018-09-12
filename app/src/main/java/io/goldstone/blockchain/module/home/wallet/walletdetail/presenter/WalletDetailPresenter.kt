@@ -161,7 +161,8 @@ class WalletDetailPresenter(
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
 				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-					ContainerID.main, FragmentTag.tokenDetail
+					ContainerID.main,
+					FragmentTag.tokenDetail
 				) {
 					putSerializable(
 						ArgumentKey.tokenDetail,
@@ -201,8 +202,8 @@ class WalletDetailPresenter(
 	}
 
 	private fun WalletDetailFragment.showSelectionListOverlayView(
-		myTokens: ArrayList<MyTokenTable>,
-		defaultTokens: ArrayList<DefaultTokenTable>,
+		myTokens: List<MyTokenTable>,
+		defaultTokens: List<DefaultTokenTable>,
 		isShowAddress: Boolean
 	) {
 		// Prepare token list and show content scroll overlay view
@@ -230,7 +231,7 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
+	private fun updateUIByData(data: List<WalletDetailCellModel>) {
 		if (data.isNotEmpty()) {
 			load {
 				/** 先按照资产情况排序, 资产为零的按照权重排序 */

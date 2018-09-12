@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.addCircleBorder
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
@@ -31,7 +33,7 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
-		addTouchRippleAnimation(Spectrum.blue, Spectrum.white, RippleMode.Square, CornerSize.small)
+		addCircleBorder(CornerSize.small.toInt(), 1, GrayScale.midGray)
 		icon.apply {
 			layoutParams = RelativeLayout.LayoutParams(buttonHeight, buttonHeight)
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -39,9 +41,9 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 		title.apply {
 			textSize = fontSize(12)
 			typeface = GoldStoneFont.heavy(context)
-			textColor = Spectrum.white
+			textColor = Spectrum.blue
 			layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
-			x = icon.layoutParams.width.toFloat() + 5.uiPX()
+			x = icon.layoutParams.width.toFloat() + 10.uiPX()
 		}.into(this)
 		title.setCenterInVertical()
 		arrowIcon.apply {
@@ -49,6 +51,7 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 			imageResource = R.drawable.arrow_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			x += 5.uiPX()
+			setColorFilter(GrayScale.lightGray)
 		}.into(this)
 		arrowIcon.setCenterInVertical()
 		arrowIcon.setAlignParentRight()

@@ -15,7 +15,9 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.EOSWalletType
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -40,6 +42,7 @@ data class WalletTable(
 	var currentLTCAddress: String,
 	var currentBCHAddress: String,
 	var currentEOSAddress: String,
+	var currentEOSAccountName: EOSDefaultAllChainName,
 	var ethAddresses: String, // format - "address|index,0x288832ds23...|0"
 	var btcAddresses: String,
 	var btcSeriesTestAddresses: String,
@@ -47,6 +50,7 @@ data class WalletTable(
 	var ltcAddresses: String,
 	var bchAddresses: String,
 	var eosAddresses: String,
+	var eosAccountNames: List<EOSAccountInfo>,
 	var ethPath: String,
 	var etcPath: String,
 	var btcPath: String,
@@ -267,6 +271,20 @@ data class WalletTable(
 					else WalletType.MultiChain
 				}
 				else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
+			}
+		}
+
+		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
+			WalletTable.getCurrentWallet {
+				val type = when {
+					EOSWalletUtils.isValidAccountName(currentEOSAccountName.getCurrent()) -> EOSWalletType.Available
+					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
+					eosAccountNames.filter {
+						it.chainID.equals(Config.getEOSCurrentChain(), true)
+					}.size > 1 -> EOSWalletType.NoDefault
+					else -> EOSWalletType.Inactivated
+				}
+				hold(type)
 			}
 		}
 
@@ -578,6 +596,28 @@ data class WalletTable(
 			}
 		}
 
+		fun updateEOSAccountNames(accounts: List<EOSAccountInfo>) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().updateCurrentEOSAccountNames(accounts)
+			}
+		}
+
+		fun updateEOSDefaultName(
+			defaultName: String,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().apply {
+					findWhichIsUsing(true)?.let {
+						it.apply {
+							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
+					}
+				}
+			}
+		}
+
 		fun updateCurrentAddressByChainType(
 			chainType: Int,
 			newAddress: String,
@@ -780,4 +820,7 @@ interface WalletDao {
 
 	@Update
 	fun update(wallet: WalletTable)
+
+	@Query("UPDATE wallet SET eosAccountNames = :accounts  WHERE isUsing = :status")
+	fun updateCurrentEOSAccountNames(accounts: List<EOSAccountInfo>, status: Boolean = true)
 }

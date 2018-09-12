@@ -41,7 +41,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		title.setCenterInVertical()
 		
 		this.addView(radioButton.apply {
-			setColorStyle(GrayScale.midGray, Spectrum.green)
+			setColorStyle(GrayScale.midGray, Spectrum.blue)
 		})
 		
 		radioButton.apply {

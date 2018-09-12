@@ -17,9 +17,9 @@ import org.jetbrains.anko.verticalLayout
  * @date  2018/09/10
  */
 
-class GrayCardView(context: Context) : RelativeLayout(context) {
+open class GrayCardView(context: Context) : RelativeLayout(context) {
 
-	private var container = verticalLayout {
+	protected var container = verticalLayout {
 		topPadding = 5.uiPX()
 		addCorner(CornerSize.cell, GrayScale.whiteGray)
 		elevation = 4f

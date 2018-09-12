@@ -35,7 +35,6 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 
 	private val balanceCell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("BALANCE")
 			setSubtitle(CommonText.calculating)
 		}
@@ -43,21 +42,18 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 
 	private val addressCell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("ADDRESS")
 		}
 	}
 
 	private val hash160Cell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("HASH160")
 		}
 	}
 
 	private val transactionCountCell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("TRANSACTION COUNT")
 			setSubtitle(CommonText.calculating)
 		}
@@ -65,7 +61,6 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 
 	private val totalReceiveCell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("TOTAL RECEIVED")
 			setSubtitle(CommonText.calculating)
 		}
@@ -73,7 +68,6 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 
 	private val totalSentCell by lazy {
 		GraySquareCell(context!!).apply {
-			showArrow()
 			setTitle("TOTAL SENT")
 			setSubtitle(CommonText.calculating)
 		}
@@ -82,7 +76,6 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 	private val checkDetailButton by lazy {
 		RadiusButton(context!!).apply {
 			setTitle("CHECK DETAIL")
-			setIcon(R.drawable.bithumb_icon)
 		}
 	}
 

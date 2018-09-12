@@ -99,12 +99,12 @@ class TokenInfoPresenter(
 
 	private fun setCheckDetailButtonInfo() {
 		val icon = when (tokenInfo?.symbol) {
-			CryptoSymbol.btc() -> R.drawable.bithumb_icon
-			CryptoSymbol.ltc -> R.drawable.bithumb_icon
-			CryptoSymbol.bch -> R.drawable.bithumb_icon
-			CryptoSymbol.eos -> R.drawable.bithumb_icon
-			CryptoSymbol.etc -> R.drawable.bithumb_icon
-			else -> R.drawable.bithumb_icon
+			CryptoSymbol.btc() -> R.drawable.blocktrail_icon
+			CryptoSymbol.ltc -> R.drawable.blockcypher_icon
+			CryptoSymbol.bch -> R.drawable.blocktrail_icon
+			CryptoSymbol.eos -> R.drawable.bloks_io_icon
+			CryptoSymbol.etc -> R.drawable.gastracker_icon
+			else -> R.drawable.etherscan_icon
 		}
 		val url = when (tokenInfo?.symbol) {
 			CryptoSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
@@ -232,7 +232,7 @@ class TokenInfoPresenter(
 
 	private fun showCoinInfo(date: String) {
 		val chainName =
-			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + "CHAIN TYPE"
+			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + "CHAIN TYPE"
 		fragment.showCoinInfo(chainName, date)
 	}
 

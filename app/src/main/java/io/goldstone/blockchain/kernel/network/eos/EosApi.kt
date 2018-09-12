@@ -2,39 +2,69 @@ package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSrResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
 object EOSAPI {
+
+	fun getAccountInfoByName(
+		accountName: String,
+		errorCallBack: (Throwable) -> Unit,
+		targetNet: String = "",
+		hold: (EOSAccountTable) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(Pair("account_name", accountName))
+		).let { it ->
+			val api =
+				if (targetNet.isEmpty()) EOSUrl.getAccountInfo
+				else EOSUrl.getAccountInfoInTargetNet(targetNet)
+			RequisitionUtil.postRequest(
+				it,
+				api,
+				errorCallBack,
+				false
+			) { result ->
+				hold(EOSAccountTable(JSONObject(result)))
+			}
+		}
+	}
+
 	fun getAccountNameByPublicKey(
 		publicKey: String,
+		errorCallBack: (Throwable) -> Unit,
+		targetNet: String = "",
 		@WorkerThread hold: (accountNames: List<String>) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey))
 		).let { it ->
+			val api =
+				if (targetNet.isEmpty()) EOSUrl.getKeyAccount
+				else EOSUrl.getKeyAccountInTargetNet(targetNet)
 			RequisitionUtil.postRequest(
 				it,
-				EOSUrl.getKeyAccount,
-				{
-					LogUtil.error("getAccountNameByPublicKey", it)
-				},
+				api,
+				errorCallBack,
 				false
 			) { result ->
 				val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
@@ -47,7 +77,7 @@ object EOSAPI {
 		}
 	}
 
-	fun getAccountEOSBalance(accountName: String, hold: (balance: String) -> Unit) {
+	fun getAccountEOSBalance(accountName: String, hold: (balance: Double) -> Unit) {
 		getAccountBalanceBySymbol(accountName, CryptoSymbol.eos, hold)
 	}
 
@@ -106,7 +136,11 @@ object EOSAPI {
 		}
 	}
 
-	fun getAccountBalanceBySymbol(accountName: String, symbol: String, hold: (balance: String) -> Unit) {
+	fun getAccountBalanceBySymbol(
+		accountName: String,
+		symbol: String,
+		hold: (balance: Double) -> Unit
+	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(
@@ -125,7 +159,7 @@ object EOSAPI {
 			) {
 				val balances = JSONArray(it)
 				val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
-				hold(balance)
+				hold(balance.toDoubleOrNull().orZero())
 			}
 		}
 	}
