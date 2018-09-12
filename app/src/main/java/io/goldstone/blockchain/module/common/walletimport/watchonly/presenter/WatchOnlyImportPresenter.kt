@@ -21,6 +21,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -120,6 +121,7 @@ class WatchOnlyImportPresenter(
 						currentLTCAddress = currentLTCAddress,
 						currentBCHAddress = currentBCHAddress,
 						currentEOSAddress = currentEOSAddress,
+						currentEOSAccountName = EOSDefaultAllChainName(currentEOSAddress, currentEOSAddress),
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
@@ -133,7 +135,8 @@ class WatchOnlyImportPresenter(
 						bchAddresses = "",
 						btcSeriesTestAddresses = "",
 						ltcAddresses = "",
-						eosAddresses = ""
+						eosAddresses = "",
+						eosAccountNames = listOf()
 					)
 				) { thisWallet ->
 					if (thisWallet.isNull()) return@insert

@@ -50,6 +50,13 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 
 	/** Coin Address In SharedPreference */
+	// EOS Account Name
+	fun getCurrentEOSName(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName)
+
+	fun updateCurrentEOSName(name: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSName, name)
+
 	fun getCurrentEthereumAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 

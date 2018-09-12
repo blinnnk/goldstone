@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -70,6 +71,7 @@ class WalletImportPresenter(
 							currentLTCAddress = multiChainAddresses.ltcAddress,
 							currentBCHAddress = multiChainAddresses.bchAddress,
 							currentEOSAddress = multiChainAddresses.eosAddress,
+							currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -104,6 +106,7 @@ class WalletImportPresenter(
 								multiChainAddresses.eosAddress,
 								getAddressIndexFromPath(multiChainPath.eosPath)
 							),
+							eosAccountNames = listOf(),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,

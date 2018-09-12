@@ -5,8 +5,8 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -16,13 +16,13 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class ChainAddressesCell(context: Context) : LinearLayout(context) {
-	
+
 	var model: Pair<String, String> by observing(Pair("", "")) {
 		cell.setTitle("${model.second}.")
 		cell.setSubtitle(CryptoUtils.scaleMiddleAddress(model.first))
 	}
-	val cell = GraySqualCellWithButtons(context)
-	
+	val cell = GraySquareCellWithButtons(context)
+
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL

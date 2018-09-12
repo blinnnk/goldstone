@@ -29,7 +29,7 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		titles.forEachIndexed { index, content ->
 			textView(content) {
 				id = index
-				textSize = fontSize(16)
+				textSize = fontSize(14)
 				typeface = GoldStoneFont.heavy(context)
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER

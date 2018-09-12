@@ -76,7 +76,12 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 	}
 
 	companion object {
-		fun addLoadingCircle(parent: ViewGroup, size: Int = 80.uiPX(), color: Int = HoneyColor.Red,getCircle: ProgressBar.() -> Unit) {
+		fun addLoadingCircle(
+			parent: ViewGroup,
+			size: Int = 80.uiPX(),
+			color: Int = HoneyColor.Red,
+			getCircle: ProgressBar.() -> Unit = {}
+		) {
 			val loading = ProgressBar(
 				parent.context,
 				null,

@@ -116,8 +116,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
-					setBlueStyle()
-					y += 10.uiPX()
+					setBlueStyle(10.uiPX())
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(

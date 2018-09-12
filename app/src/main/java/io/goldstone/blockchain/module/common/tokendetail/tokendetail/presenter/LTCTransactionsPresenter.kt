@@ -21,7 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentLTCAddress()
-	LitecoinApi.getTransactionsCount(
+	LitecoinApi.getTransactionCount(
 		address,
 		{
 			fragment.removeLoadingView()

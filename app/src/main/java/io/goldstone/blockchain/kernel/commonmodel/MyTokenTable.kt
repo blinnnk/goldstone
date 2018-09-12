@@ -1,11 +1,13 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -13,6 +15,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -27,6 +30,7 @@ import org.jetbrains.anko.runOnUiThread
 data class MyTokenTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
+	var ownerName: String, // `EOS` 的 `account name` 会复用这个值作为 `Token` 唯一标识
 	var ownerAddress: String,
 	var symbol: String,
 	var balance: Double,
@@ -34,9 +38,27 @@ data class MyTokenTable(
 	var chainID: String
 ) {
 
-	constructor(data: DefaultTokenTable, address: String) : this(
+	constructor(
+		data: DefaultTokenTable,
+		address: String
+	) : this(
 		0,
 		address,
+		address,
+		data.symbol,
+		0.0,
+		data.contract,
+		data.chain_id
+	)
+
+	constructor(
+		data: DefaultTokenTable,
+		name: String,
+		publicKey: String
+	) : this(
+		0,
+		name,
+		publicKey,
 		data.symbol,
 		0.0,
 		data.contract,
@@ -46,33 +68,31 @@ data class MyTokenTable(
 	companion object {
 
 		fun insert(model: MyTokenTable) {
-			GoldStoneDataBase.database.myTokenDao().apply {
-				// 防止重复添加
-				if (getTargetChainTokenByContractAndAddress(
-						model.contract,
-						model.ownerAddress,
-						model.chainID
-					).isNull()
-				) {
-					insert(model)
+			doAsync {
+				GoldStoneDataBase.database.myTokenDao().apply {
+					// 防止重复添加
+					if (getTargetChainTokenByContractAndAddress(
+							model.contract,
+							model.ownerAddress,
+							model.chainID
+						).isNull()
+					) {
+						insert(model)
+					}
 				}
 			}
 		}
 
-		fun getMyTokens(
-			callback: (ArrayList<MyTokenTable>) -> Unit
-		) {
+		fun getMyTokens(callback: (List<MyTokenTable>) -> Unit) {
 			WalletTable.getCurrentAddresses { addresses ->
 				doAsync {
 					var allTokens = listOf<MyTokenTable>()
 					addresses.forEachOrEnd { item, isEnd ->
-						allTokens += GoldStoneDataBase
-							.database
-							.myTokenDao()
+						allTokens += GoldStoneDataBase.database.myTokenDao()
 							.getCurrentChainTokensBy(item)
 						if (isEnd) {
 							GoldStoneAPI.context.runOnUiThread {
-								callback(allTokens.toArrayList())
+								callback(allTokens)
 							}
 						}
 					}
@@ -82,7 +102,7 @@ data class MyTokenTable(
 
 		fun getMyTokensByAddress(
 			addresses: List<String>,
-			hold: (ArrayList<MyTokenTable>) -> Unit
+			hold: (List<MyTokenTable>) -> Unit
 		) {
 			doAsync {
 				var allTokens = listOf<MyTokenTable>()
@@ -90,7 +110,7 @@ data class MyTokenTable(
 					allTokens += GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(item)
 					if (isEnd) {
 						GoldStoneAPI.context.runOnUiThread {
-							hold(allTokens.toArrayList())
+							hold(allTokens)
 						}
 					}
 				}
@@ -99,8 +119,8 @@ data class MyTokenTable(
 
 		fun getCurrentChainDefaultAndMyTokens(
 			hold: (
-				myTokens: ArrayList<MyTokenTable>,
-				defaultTokens: ArrayList<DefaultTokenTable>
+				myTokens: List<MyTokenTable>,
+				defaultTokens: List<DefaultTokenTable>
 			) -> Unit
 		) {
 			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
@@ -133,11 +153,30 @@ data class MyTokenTable(
 					} else {
 						DefaultTokenTable.getCurrentChainToken(contract) {
 							it?.apply {
-								callback(CryptoUtils.toCountByDecimal(token!!.balance, it.decimals))
+								callback(CryptoUtils.toCountByDecimal(token?.balance.orZero(), it.decimals))
 							}
 						}
 					}
 				}
+			}
+		}
+
+		fun getMyTokenByContractAndWalletAddress(
+			contract: String,
+			walletAddress: String,
+			callback: (MyTokenTable?) -> Unit
+		) {
+			load {
+				GoldStoneDataBase
+					.database
+					.myTokenDao()
+					.getCurrentChainTokenByContractAndAddress(
+						contract,
+						walletAddress
+					)
+			} then { token ->
+				if (token.isNull()) callback(null)
+				else callback(token)
 			}
 		}
 
@@ -162,7 +201,7 @@ data class MyTokenTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					val allTokens = getAllTokensBy(address)
+					val allTokens = getAll(address)
 					if (allTokens.isEmpty()) {
 						callback()
 						return@doAsync
@@ -186,7 +225,7 @@ data class MyTokenTable(
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: String,
-			callback: () -> Unit = {}
+			@UiThread callback: () -> Unit
 		) {
 			WalletTable.getCurrentWallet {
 				doAsync {
@@ -199,6 +238,7 @@ data class MyTokenTable(
 							insert(
 								MyTokenTable(
 									0,
+									currentAddress,
 									currentAddress,
 									symbol,
 									0.0,
@@ -218,7 +258,7 @@ data class MyTokenTable(
 
 		fun getBalanceWithContract(
 			contract: String,
-			ownerAddress: String,
+			ownerName: String,
 			convertByDecimal: Boolean = false,
 			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: (balance: Double) -> Unit
@@ -227,7 +267,7 @@ data class MyTokenTable(
 			when {
 				contract.equals(CryptoValue.ethContract, true) ->
 					GoldStoneEthCall.getEthBalance(
-						ownerAddress,
+						ownerName,
 						errorCallback,
 						Config.getCurrentChainName()
 					) {
@@ -236,7 +276,7 @@ data class MyTokenTable(
 					}
 				contract.equals(CryptoValue.etcContract, true) ->
 					GoldStoneEthCall.getEthBalance(
-						ownerAddress,
+						ownerName,
 						errorCallback,
 						Config.getETCCurrentChainName()
 					) {
@@ -244,26 +284,35 @@ data class MyTokenTable(
 						callback(balance)
 					}
 				contract.equals(CryptoValue.btcContract, true) ->
-					BitcoinApi.getBalance(ownerAddress) {
+					BitcoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
 				contract.equals(CryptoValue.ltcContract, true) ->
-					LitecoinApi.getBalance(ownerAddress) {
+					LitecoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
 
 				contract.equals(CryptoValue.bchContract, true) ->
-					BitcoinCashApi.getBalance(ownerAddress) {
+					BitcoinCashApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it else it.toSatoshi().toDouble()
 						callback(balance)
 					}
 
+				contract.equals(CryptoValue.eosContract, true) -> {
+					if (EOSWalletUtils.isValidAccountName(Config.getCurrentEOSName())) {
+						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSName(), callback)
+					} else {
+						callback(0.0)
+					}
+				}
+
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
-						ownerAddress, errorCallback,
+						ownerName,
+						errorCallback,
 						Config.getCurrentChainName()
 					) {
 						val balance =
@@ -297,7 +346,7 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :eosChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :eosChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
@@ -309,7 +358,7 @@ interface MyTokenDao {
 		eosChain: String = Config.getEOSCurrentChain()
 	): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerAddress LIKE :walletAddress AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :walletAddress AND chainID Like :chainID ")
 	fun getTargetChainTokenByContractAndAddress(
 		contract: String,
 		walletAddress: String,
@@ -327,8 +376,8 @@ interface MyTokenDao {
 		eosChain: String = Config.getEOSCurrentChain()
 	): List<MyTokenTable>
 
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
-	fun getAllTokensBy(walletAddress: String): List<MyTokenTable>
+	@Query("SELECT * FROM myTokens WHERE ownerName LIKE :walletAddress")
+	fun getAll(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>

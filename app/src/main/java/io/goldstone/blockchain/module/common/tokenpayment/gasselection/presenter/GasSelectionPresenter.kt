@@ -342,14 +342,11 @@ class GasSelectionPresenter(
 			overlayView.header.showBackButton(true) {
 				backEvent(this@apply)
 			}
-			// 有可能从 `WebViewFragment` 返回 需要重新恢复 `ValueHeader`
-			setValueHeader(token)
 		}
 	}
 
 	fun backEvent(fragment: TokenDetailOverlayFragment) {
 		fragment.apply {
-			setValueHeader(token)
 			headerTitle = TokenDetailText.paymentValue
 			presenter.popFragmentFrom<GasSelectionFragment>()
 		}

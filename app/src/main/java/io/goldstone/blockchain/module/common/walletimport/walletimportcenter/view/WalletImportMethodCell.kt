@@ -26,7 +26,7 @@ import org.jetbrains.anko.*
 class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
 
 	private val titles = TwoLineTitles(context).apply {
-		setBigWhiteStyle()
+		setBigWhiteStyle(18)
 		title.typeface = GoldStoneFont.heavy(context)
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 	}

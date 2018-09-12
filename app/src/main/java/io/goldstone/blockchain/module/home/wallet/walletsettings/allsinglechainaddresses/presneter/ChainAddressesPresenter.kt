@@ -6,7 +6,7 @@ import com.blinnnk.extension.getViewAbsolutelyPositionInScreen
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.alert
@@ -47,7 +47,7 @@ class ChainAddressesPresenter(
 	}
 
 	fun showMoreDashboard(
-		cell: GraySqualCellWithButtons,
+		cell: GraySquareCellWithButtons,
 		address: String,
 		coinType: Int,
 		hasDefaultCell: Boolean = true

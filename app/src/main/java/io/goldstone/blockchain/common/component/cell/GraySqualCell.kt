@@ -7,24 +7,24 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CornerSize
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 25/04/2018 8:56 AM
  * @author KaySaith
  */
-open class GraySqualCell(context: Context) : RelativeLayout(context) {
-	
+open class GraySquareCell(context: Context) : RelativeLayout(context) {
+
 	protected val title = TextView(context).apply {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.heavy(context)
@@ -50,12 +50,18 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(45.uiPX(), matchParent)
 		}
 	}
+
+	private val radio by lazy {
+		HoneyRadioButton(context)
+	}
+
 	private var container: RelativeLayout
-	
+	private val shadowSize = 3
+
 	init {
 		// 低端机型导致的 SetMargin 不识别, 顾此采用夹层方式实现 `Margin` 的阴影
 		container = relativeLayout {
-			lparams(ScreenSize.widthWithPadding, 45.uiPX())
+			lparams(ScreenSize.widthWithPadding - shadowSize * 2, 45.uiPX())
 			setCenterInParent()
 			addCorner(CornerSize.cell, GrayScale.whiteGray)
 			elevation = 3f
@@ -68,17 +74,38 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		}
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 51.uiPX())
 	}
-	
+
 	fun <T : CharSequence> setTitle(text: T) {
 		title.text = text
 	}
-	
+
 	fun showArrow() {
 		arrow.into(container)
 		arrow.setAlignParentRight()
 		subtitle.x -= 20.uiPX()
 	}
-	
+
+	fun showRadio() {
+		radio.setColorStyle(GrayScale.midGray, Spectrum.blue)
+		radio.scaleX = 0.8f
+		radio.scaleY = 0.8f
+		radio.into(container)
+		radio.setAlignParentRight()
+		radio.setCenterInVertical()
+		radio.x -= 10.uiPX()
+	}
+
+	fun setRadioStatus(
+		status: Boolean,
+		action: () -> Unit = {}
+	) {
+		radio.isChecked = status
+		radio.onClick {
+			radio.preventDuplicateClicks()
+			action()
+		}
+	}
+
 	fun setPriceTitle(text: String) {
 		title.text =
 			CustomTargetTextStyle(
@@ -90,8 +117,8 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 				false
 			)
 	}
-	
-	fun setPricesubtitle(
+
+	fun setPriceSubtitle(
 		text: String,
 		currency: String
 	) {
@@ -99,11 +126,11 @@ open class GraySqualCell(context: Context) : RelativeLayout(context) {
 		subtitle.text =
 			CustomTargetTextStyle(currency, "$text  $currency", GrayScale.black, 8.uiPX(), true, false)
 	}
-	
+
 	fun setTitle(text: String) {
 		title.text = text
 	}
-	
+
 	@SuppressLint("SetTextI18n")
 	fun setSubtitle(content: String) {
 		subtitle.visibility = View.VISIBLE

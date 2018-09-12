@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ValueInputView
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
@@ -51,11 +51,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		getParentFragment<TokenDetailOverlayFragment>()
 	}
 	private val inputView by lazy { ValueInputView(context!!) }
-	private val sendInfo by lazy { GraySqualCell(context!!) }
-	private val from by lazy { GraySqualCell(context!!) }
-	private val memo by lazy { GraySqualCell(context!!) }
-	private val customChangeAddressCell by lazy { GraySqualCell(context!!) }
-	private val price by lazy { GraySqualCell(context!!) }
+	private val sendInfo by lazy { GraySquareCell(context!!) }
+	private val from by lazy { GraySquareCell(context!!) }
+	private val memo by lazy { GraySquareCell(context!!) }
+	private val customChangeAddressCell by lazy { GraySquareCell(context!!) }
+	private val price by lazy { GraySquareCell(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
@@ -67,39 +67,36 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)
-			relativeLayout {
+			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				verticalLayout {
-					gravity = Gravity.CENTER_HORIZONTAL
-					lparams(matchParent, matchParent)
 
-					inputView.into(this)
+				inputView.into(this)
 
-					showAccountInfo()
-					// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
-					if (CryptoSymbol.isBTCSeriesSymbol(rootFragment?.token?.symbol))
-						showCustomChangeAddressCell()
-					else showMemoCell()
+				showAccountInfo()
+				// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
+				if (CryptoSymbol.isBTCSeriesSymbol(rootFragment?.token?.symbol))
+					showCustomChangeAddressCell()
+				else showMemoCell()
 
-					showUnitPrice()
+				showUnitPrice()
 
-					confirmButton.apply {
-						setGrayStyle(20.uiPX())
-						text = CommonText.next.toUpperCase()
-						setMargins<LinearLayout.LayoutParams> {
-							bottomMargin = 30.uiPX()
-						}
-					}.click {
-						it.showLoadingStatus()
-						presenter.goToGasEditorFragment {
-							it.showLoadingStatus(false)
-						}
-					}.into(this)
-					// 扫描二维码进入后的样式判断
-					if (count > 0) {
-						inputView.setInputValue(count)
-						confirmButton.setBlueStyle(20.uiPX())
+				confirmButton.apply {
+					setGrayStyle(20.uiPX())
+					text = CommonText.next.toUpperCase()
+					setMargins<LinearLayout.LayoutParams> {
+						bottomMargin = 30.uiPX()
 					}
+				}.click {
+					it.showLoadingStatus()
+					presenter.goToGasEditorFragment {
+						it.showLoadingStatus(false)
+					}
+				}.into(this)
+				// 扫描二维码进入后的样式判断
+				if (count > 0) {
+					inputView.setInputValue(count)
+					confirmButton.setBlueStyle(20.uiPX())
 				}
 			}
 		}
@@ -312,7 +309,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				if (memoInputView.isNull()) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
 				} else {
 					removeMemoInputView()

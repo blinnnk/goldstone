@@ -55,7 +55,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			lparams(matchParent, matchParent)
 			attentionView.apply {
 				isCenter()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 				text = ImportWalletText.exportKeystore
 			}.into(this)
 			privateKeyTextView.apply {

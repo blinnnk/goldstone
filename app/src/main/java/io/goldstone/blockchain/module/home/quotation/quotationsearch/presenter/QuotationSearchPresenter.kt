@@ -94,7 +94,7 @@ class QuotationSearchPresenter(
 		}
 	}
 
-	private fun QuotationSearchFragment.completeQuotationTable(searchList: ArrayList<QuotationSelectionTable>) {
+	private fun QuotationSearchFragment.completeQuotationTable(searchList: List<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
 			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(searchList.map {

@@ -19,7 +19,7 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBTCAddress()
-	BitcoinApi.getTransactionsCount(
+	BitcoinApi.getTransactionCount(
 		address,
 		{
 			LogUtil.error("loadBTCChainData", it)

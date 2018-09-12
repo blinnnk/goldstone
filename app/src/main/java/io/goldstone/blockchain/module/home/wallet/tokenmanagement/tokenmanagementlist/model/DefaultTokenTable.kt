@@ -175,12 +175,10 @@ data class DefaultTokenTable(
 			}
 		}
 
-		fun getCurrentChainTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+		fun getCurrentChainTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
-			} then {
-				hold(it.toArrayList())
-			}
+			} then(hold)
 		}
 
 		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {

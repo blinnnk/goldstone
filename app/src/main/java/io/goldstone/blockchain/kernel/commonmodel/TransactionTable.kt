@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
+import java.io.Serializable
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -57,7 +59,7 @@ data class TransactionTable(
 	@SerializedName("isError")
 	var hasError: String,
 	@SerializedName("txreceipt_status")
-	var txreceipt_status: String,
+	var txReceiptStatus: String,
 	@SerializedName("input")
 	var input: String,
 	@SerializedName("contractAddress")
@@ -80,7 +82,7 @@ data class TransactionTable(
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
-) {
+) : Serializable {
 
 	/** 默认的 `constructor` */
 	@Ignore
@@ -124,7 +126,7 @@ data class TransactionTable(
 		data.gas,
 		data.gasPrice,
 		data.hasError,
-		data.txreceipt_status,
+		data.txReceiptStatus,
 		data.input,
 		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
 		else CryptoValue.ethContract,
@@ -262,7 +264,7 @@ data class TransactionTable(
 		// `ERC` 类型的 `Transactions` 专用
 		fun getERCTransactionsByAddress(
 			address: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
+			@UiThread hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase

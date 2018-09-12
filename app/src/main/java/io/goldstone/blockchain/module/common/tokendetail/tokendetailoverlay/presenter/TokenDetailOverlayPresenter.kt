@@ -10,7 +10,9 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.activationmode.view.EOSActivationModeFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
@@ -26,15 +28,31 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 class TokenDetailOverlayPresenter(
 	override val fragment: TokenDetailOverlayFragment
 ) : BaseOverlayPresenter<TokenDetailOverlayFragment>() {
-	
-	fun showTokenDetailFragment(token: WalletDetailCellModel?) {
+
+	fun showTokenDetailCenterFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
-			addFragmentAndSetArgument<TokenDetailFragment>(ContainerID.content) {
+			addFragmentAndSetArgument<TokenDetailCenterFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.tokenDetail, token)
 			}
 		}
 	}
-	
+
+	fun showEOSActivationModeFragment(token: WalletDetailCellModel?) {
+		fragment.apply {
+			addFragmentAndSetArgument<EOSActivationModeFragment>(ContainerID.content) {
+				putSerializable(ArgumentKey.tokenDetail, token)
+			}
+		}
+	}
+
+	fun showEOSAccountSelectionFragment(token: WalletDetailCellModel?) {
+		fragment.apply {
+			addFragmentAndSetArgument<EOSAccountSelectionFragment>(ContainerID.content) {
+				putSerializable(ArgumentKey.tokenDetail, token)
+			}
+		}
+	}
+
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
 		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
 			fragment.context!!,
@@ -45,7 +63,6 @@ class TokenDetailOverlayPresenter(
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
-					fragment.setValueHeader(token)
 					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.address
 				}
@@ -57,7 +74,7 @@ class TokenDetailOverlayPresenter(
 			}
 		}
 	}
-	
+
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
 		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
 			fragment.context!!,
@@ -68,7 +85,6 @@ class TokenDetailOverlayPresenter(
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
-					setValueHeader(token)
 					addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
 					headerTitle = TokenDetailText.deposit
 				}
@@ -80,7 +96,7 @@ class TokenDetailOverlayPresenter(
 			}
 		}
 	}
-	
+
 	companion object {
 		fun showMnemonicBackupFragment(fragment: Fragment) {
 			if (fragment is TokenDetailOverlayFragment) {

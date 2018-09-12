@@ -59,8 +59,7 @@ class AddressSelectionPresenter(
 			} else {
 				when {
 					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
-						val qrModel =
-							DepositPresenter.convertBitcoinQRCode(result)
+						val qrModel = DepositPresenter.convertBitcoinQRCode(result)
 						if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
 						else isCorrectCoinOrChainID(qrModel!!) {
 							showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
@@ -328,7 +327,6 @@ class AddressSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			if (!isFromQuickTransfer) {
 				overlayView.header.showBackButton(true) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
 			}

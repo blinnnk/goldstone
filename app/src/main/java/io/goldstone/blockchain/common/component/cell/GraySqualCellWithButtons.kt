@@ -15,8 +15,8 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion.CellType.Default
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion.CellType.Normal
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Default
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -26,7 +26,7 @@ import org.jetbrains.anko.*
  * @date 2018/7/11 1:20 AM
  * @author KaySaith
  */
-open class GraySqualCellWithButtons(context: Context) : RelativeLayout(context) {
+open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context) {
 	
 	private val cellHeight = 45.uiPX()
 	protected val title = TextView(context).apply {

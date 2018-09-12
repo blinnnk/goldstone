@@ -38,10 +38,6 @@ class TransactionDetailFragment :
 			onClick {
 				if (model.description.equals(TransactionText.url, true)) {
 					presenter.showTransactionWebFragment()
-					// 还原 `Header` 样式
-					getParentFragment<TokenDetailOverlayFragment> {
-						recoverHeader()
-					}
 				} else {
 					this@cell.context?.clickToCopy(model.info)
 				}

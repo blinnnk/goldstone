@@ -2,12 +2,12 @@ package io.goldstone.blockchain.crypto.eos
 
 import com.blinnnk.util.TinyNumberUtils
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.DumpedPrivateKey
@@ -59,7 +59,7 @@ object EOSWalletUtils {
 		}
 	}
 
-	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> String): Boolean {
+	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> Unit = {}): Boolean {
 		val illegalChars = Regex(".*[!@#\$%¥^&*()_=+?].*")
 		val isIllegalLength = accountName.length != 12
 		val containsIllegalCharacter = accountName.matches(illegalChars) || accountName.contains(" ")
