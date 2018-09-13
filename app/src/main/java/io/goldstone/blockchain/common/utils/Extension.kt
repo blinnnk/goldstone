@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.safeGet
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
@@ -22,6 +23,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -138,7 +140,7 @@ fun Long.convertToTimeUnit(): String {
 	val diskUnit = when {
 		convertValue == 0 -> EOSUnit.MUS.value
 		convertValue == 1 -> EOSUnit.MS.value
-		sixtyHexadecimal == 1 -> EOSUnit.SEC.value
+		sixtyHexadecimal == 0 -> EOSUnit.SEC.value
 		else -> EOSUnit.MIN.value
 	}
 	val value = if (convertValue > 2) this / 1000 * 1000 else this
@@ -148,6 +150,29 @@ fun Long.convertToTimeUnit(): String {
 	return result suffix diskUnit
 }
 
-enum class HexadecimalType {
-	Time, Disk
+@Throws
+fun JSONObject.getTargetChild(vararg keys: String): String {
+	try {
+		var willGetChildObject = this
+		keys.forEachIndexed { index, content ->
+			if (index == keys.lastIndex) return@forEachIndexed
+			willGetChildObject = JSONObject(willGetChildObject.safeGet(content))
+		}
+		return willGetChildObject.safeGet(keys.last())
+	} catch (error: Exception) {
+		throw Exception("goldstone getTargetChild has error")
+	}
+}
+
+@Throws
+fun JSONObject.getTargetObject(vararg keys: String): JSONObject {
+	try {
+		var willGetChildObject = this
+		keys.forEach {
+			willGetChildObject = JSONObject(willGetChildObject.safeGet(it))
+		}
+		return willGetChildObject
+	} catch (error: Exception) {
+		throw Exception("goldstone getTargetObject has error")
+	}
 }

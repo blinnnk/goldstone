@@ -65,7 +65,7 @@ fun TransactionDetailPresenter.getETHERC20OrETCTransaction(
 		} else {
 			// 本地有数据直接展示本地数据
 			localTransaction?.apply {
-				fragment.asyncData = generateModels(TransactionListModel(this))
+				fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
 				val headerData = TransactionHeaderModel(
 					notificationData?.value ?: value.toDouble(),
 					if (isReceive) fromAddress else tokenReceiveAddress ?: to,
@@ -157,7 +157,7 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 		} else {
 			// 本地有数据直接展示本地数据
 			localTransaction?.apply {
-				fragment.asyncData = generateModels(TransactionListModel(this))
+				fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
 				val headerData = TransactionHeaderModel(
 					notificationData?.value ?: value.toDouble(),
 					if (isReceive) fromAddress else to,

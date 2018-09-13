@@ -22,6 +22,7 @@ import java.math.BigInteger
  */
 
 object EOSWalletUtils {
+	const val maxNameLength = 12
 	fun generateKeyPair(mnemonic: String, path: String): BaseKeyPair {
 		val seed = Mnemonic.mnemonicToSeed(mnemonic, "")
 		val privateKey = generateKey(seed, path).keyPair.privateKey
@@ -61,7 +62,7 @@ object EOSWalletUtils {
 
 	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> Unit = {}): Boolean {
 		val illegalChars = Regex(".*[!@#\$%¥^&*()_=+?].*")
-		val isIllegalLength = accountName.length != 12
+		val isIllegalLength = accountName.length != maxNameLength
 		val containsIllegalCharacter = accountName.matches(illegalChars) || accountName.contains(" ")
 		val containsIllegalNumber = accountName.matches(Regex(".*[6-9].*")) || accountName.contains("0")
 		when {

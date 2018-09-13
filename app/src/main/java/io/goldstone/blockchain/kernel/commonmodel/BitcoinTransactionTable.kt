@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
@@ -178,7 +179,7 @@ data class BTCSeriesTransactionTable(
 		fun getTransactionsByAddressAndChainType(
 			address: String,
 			chainType: Int,
-			hold: (List<BTCSeriesTransactionTable>) -> Unit
+			@UiThread hold: (List<BTCSeriesTransactionTable>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase

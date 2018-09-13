@@ -6,5 +6,6 @@ enum class EOSMethod(val method: String, val disPlay: String) {
 	GetTransactionHistory("get_actions ", "GetTransactionHistory"),
 	GetInfo("get_info ", "GetInfo"),
 	PushTransaction("push_transaction", "PushTransaction"),
-	GetAccount("get_account", "GetAccount")
+	GetAccount("get_account", "GetAccount"),
+	GetTransaction("get_transaction", "GetTransaction")
 }

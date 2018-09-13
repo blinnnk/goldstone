@@ -1,0 +1,124 @@
+package io.goldstone.blockchain.kernel.commonmodel.eos
+
+import android.arch.persistence.room.*
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toIntOrZero
+import io.goldstone.blockchain.common.utils.getTargetChild
+import io.goldstone.blockchain.common.utils.getTargetObject
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import org.jetbrains.anko.doAsync
+import org.json.JSONObject
+import java.io.Serializable
+
+@Entity(tableName = "eosTransactions")
+data class EOSTransactionTable(
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
+	var dataIndex: Int,
+	var txID: String,
+	var cupUsage: Long,
+	var netUsage: Long,
+	var transactionData: EOSTransactionData,
+	var blockNumber: Int,
+	var time: Long,
+	var status: String,
+	var recordAccountName: String,
+	var chainID: String,
+	var isPending: Boolean
+) : Serializable {
+	constructor(data: JSONObject, recordAccountName: String) : this(
+		0,
+		dataIndex = data.safeGet("account_action_seq").toIntOrZero(),
+		txID = data.getTargetChild("action_trace", "trx_id"),
+		cupUsage = 0L,
+		netUsage = 0L,
+		transactionData = EOSTransactionData(data.getTargetObject("action_trace", "act", "data")),
+		blockNumber = data.safeGet("block_num").toIntOrZero(),
+		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
+		status = "",
+		recordAccountName = recordAccountName,
+		chainID = Config.getEOSCurrentChain(),
+		isPending = false
+	)
+
+	companion object {
+
+		fun updateBandWidthAndStatusBy(
+			txID: String,
+			cpuUsage: Long,
+			netUsage: Long,
+			status: String
+		) {
+			doAsync {
+				GoldStoneDataBase.database.eosTransactionDao()
+					.updateBandWidthAndStatusByTxID(
+						txID,
+						cpuUsage,
+						netUsage,
+						status
+					)
+			}
+		}
+
+		fun preventDuplicateInsert(name: String, table: EOSTransactionTable) {
+			doAsync {
+				GoldStoneDataBase.database.eosTransactionDao().apply {
+					if (getDataByTxIDAndRecordName(table.txID, name).isNull()) {
+						insert(table)
+					}
+				}
+			}
+		}
+
+		fun getTransactionByAccountName(
+			name: String,
+			chainID: String,
+			@UiThread hold: (List<EOSTransactionTable>) -> Unit
+		) {
+			load {
+				GoldStoneDataBase.database.eosTransactionDao()
+					.getDataByRecordAccountByTargetChainID(name, chainID)
+			} then (hold)
+		}
+
+		fun deleteByAddress(accountName: String) {
+			doAsync {
+				GoldStoneDataBase.database.eosTransactionDao().apply {
+					val data = getDataByRecordAccount(accountName)
+					data.forEach { delete(it) }
+				}
+			}
+		}
+	}
+}
+
+@Dao
+interface EOSTransactionDao {
+
+	@Query("UPDATE eosTransactions SET cupUsage = :cpuUsage, netUsage = :netUsage, status = :status WHERE txID LIKE :txID")
+	fun updateBandWidthAndStatusByTxID(txID: String, cpuUsage: Long, netUsage: Long, status: String)
+
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")
+	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>
+
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
+	fun getDataByRecordAccountByTargetChainID(recordAccountName: String, chainID: String): List<EOSTransactionTable>
+
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND txID LIKE :txID")
+	fun getDataByTxIDAndRecordName(txID: String, recordAccountName: String): EOSTransactionTable?
+
+	@Insert
+	fun insert(transaction: EOSTransactionTable)
+
+	@Update
+	fun update(transaction: EOSTransactionTable)
+
+	@Delete
+	fun delete(transaction: EOSTransactionTable)
+}

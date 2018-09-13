@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.component
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.blinnnk.extension.addCircleBorder
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
@@ -21,7 +22,7 @@ open class GrayCardView(context: Context) : RelativeLayout(context) {
 
 	protected var container = verticalLayout {
 		topPadding = 5.uiPX()
-		addCorner(CornerSize.cell, GrayScale.whiteGray)
+		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 		elevation = 4f
 	}
 
@@ -38,5 +39,13 @@ open class GrayCardView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun getContainer(): ViewGroup = container
+
+	override fun setBackgroundColor(color: Int) {
+		container.addCorner(CornerSize.small.toInt(), color)
+	}
+
+	fun setBorder(borderColor: Int) {
+		container.addCircleBorder(CornerSize.small.toInt(), 1, borderColor)
+	}
 
 }

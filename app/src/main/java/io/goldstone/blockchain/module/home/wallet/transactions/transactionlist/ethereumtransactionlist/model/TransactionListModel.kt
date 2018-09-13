@@ -1,21 +1,24 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
+import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.convertToDiskUnit
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinCashTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.litcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
 
@@ -45,20 +48,37 @@ data class TransactionListModel(
 	var isFailed: Boolean,
 	var isFee: Boolean = false
 ) : Serializable {
+
+	constructor(data: EOSTransactionTable) : this(
+		if (data.recordAccountName == data.transactionData.fromName)
+			data.transactionData.toName
+		else data.transactionData.fromName,
+		data.transactionData.fromName,
+		generateAddressInfo(data),
+		data.transactionData.quantity.substringBeforeLast(" ").toDoubleOrZero(),
+		data.transactionData.quantity.substringAfterLast(" ").toUpperCase(),
+		data.recordAccountName == data.transactionData.toName,
+		TimeUtils.formatDate(data.time),
+		data.transactionData.toName,
+		data.blockNumber.toString(),
+		data.txID,
+		data.transactionData.memo,
+		if (data.cupUsage * data.netUsage == 0L) "" else generateEOSMinerContent(data.cupUsage, data.netUsage),
+		generateTransactionURL(data.txID, CryptoSymbol.eos),
+		data.isPending,
+		data.time.toString(),
+		data.transactionData.quantity.substringBeforeLast(" "),
+		false,
+		"",
+		false,
+		false
+	)
+
 	constructor(data: TransactionTable) : this(
 		if (data.isReceive) data.fromAddress
 		else data.tokenReceiveAddress.orEmpty(),
 		data.fromAddress,
-		CryptoUtils.scaleTo32(
-			HoneyDateUtil.getSinceTime(
-				data.timeStamp.toMillisecond(),
-				DateAndTimeText.getDateText()
-			) + descriptionText(
-				data.isReceive,
-				data.tokenReceiveAddress.orEmpty(),
-				data.fromAddress
-			)
-		), // 副标题的生成
+		generateAddressInfo(data), // 副标题的生成
 		data.value.toDouble(), // 转账个数
 		data.symbol,
 		data.isReceive,
@@ -112,6 +132,38 @@ data class TransactionListModel(
 	)
 
 	companion object {
+
+		fun generateEOSMinerContent(cpuUsage: Long, netUsage: Long): String {
+			return "cpu usage: ${cpuUsage.convertToDiskUnit()}, net usage: ${netUsage.convertToDiskUnit()}"
+		}
+
+		fun generateAddressInfo(data: TransactionTable): String {
+			return CryptoUtils.scaleTo32(
+				HoneyDateUtil.getSinceTime(
+					data.timeStamp.toMillisecond(),
+					DateAndTimeText.getDateText()
+				) + descriptionText(
+					data.isReceive,
+					data.tokenReceiveAddress.orEmpty(),
+					data.fromAddress
+				)
+			)
+		}
+
+		fun generateAddressInfo(data: EOSTransactionTable): String {
+			val isReceive = data.transactionData.toName == data.recordAccountName
+			return CryptoUtils.scaleTo32(
+				HoneyDateUtil.getSinceTime(
+					data.time,
+					DateAndTimeText.getDateText()
+				) + descriptionText(
+					isReceive,
+					data.transactionData.toName,
+					data.transactionData.fromName
+				)
+			)
+		}
+
 		fun getContractBySymbol(symbol: String): String {
 			return when (symbol) {
 				CryptoSymbol.btc() -> CryptoValue.btcContract
@@ -121,16 +173,16 @@ data class TransactionListModel(
 		}
 
 		fun formatToAddress(toAddress: String): String {
-			var formatedAddresses = ""
+			var formattedAddresses = ""
 			// `toAddress` 可能是数组也可能是单一地址, 根据不同的情况截取字符串的
 			// `Start And End` 的值设定不同
 			val miroSetIndex = if (toAddress.contains("[")) 1 else 0
 			val addresses =
 				toAddress.substring(miroSetIndex, toAddress.count() - miroSetIndex).split(",")
 			addresses.forEachIndexed { index, item ->
-				formatedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
+				formattedAddresses += item + if (index == addresses.lastIndex) "" else "\n"
 			}
-			return formatedAddresses
+			return formattedAddresses
 		}
 
 		fun convertMultiToOrFromAddresses(content: String): List<String> {
@@ -150,9 +202,13 @@ data class TransactionListModel(
 				symbol.equals(CryptoSymbol.btc(), true) ->
 					bitcoinTransactionDetail(taxHash)
 				symbol.equals(CryptoSymbol.ltc, true) ->
-					litcoinTransactionDetail(taxHash)
+					litecoinTransactionDetail(taxHash)
 				symbol.equals(CryptoSymbol.bch, true) ->
 					bitcoinCashTransactionDetail(taxHash)
+				symbol.equals(CryptoSymbol.eos, true) -> {
+					// TODO
+					EtherScanApi.transactionDetail(taxHash)
+				}
 				else -> EtherScanApi.transactionDetail(taxHash)
 			}
 		}

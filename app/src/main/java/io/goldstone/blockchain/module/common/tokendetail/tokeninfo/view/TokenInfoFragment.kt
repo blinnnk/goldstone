@@ -92,7 +92,7 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 		has160?.let { hash160Cell.setSubtitle(it) }
 	}
 
-	fun showTransactionCount(count: Int) {
+	fun<T> showTransactionCount(count: T) {
 		transactionCountCell.setSubtitle("$count")
 	}
 

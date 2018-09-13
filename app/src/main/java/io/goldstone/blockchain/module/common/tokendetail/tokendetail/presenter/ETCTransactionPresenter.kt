@@ -20,7 +20,7 @@ fun TokenDetailPresenter.loadETCChainData(localData: List<TransactionListModel>)
 	fragment.showLoadingView(LoadingText.transactionData)
 	getETCTransactionsFromChain(localData) {
 		fragment.removeLoadingView()
-		loadDataFromDatabaseOrElse { _, _ -> }
+		loadDataFromDatabaseOrElse { _, _, _ -> }
 	}
 }
 

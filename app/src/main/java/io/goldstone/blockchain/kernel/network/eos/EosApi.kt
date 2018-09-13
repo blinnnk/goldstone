@@ -4,15 +4,16 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.toJsonArray
+import com.blinnnk.extension.toLongOrZero
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSrResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
-import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
@@ -164,49 +165,92 @@ object EOSAPI {
 		}
 	}
 
-	fun getTransactionsLastIndex(accountName: String, hold: (count: Int) -> Unit) {
+	fun getTransactionsLastIndex(
+		accountName: String,
+		errorCallBack: (Throwable) -> Unit,
+		hold: (count: Int?) -> Unit
+	) {
 		// 传 `pos -1` 是倒序拉取最近一条, `offset` 是拉取倒序的第一条, 通过这个方法
 		// 拉取下来最近一条获取到 `dataIndex` 即这个 `account` 的账单总数, 并计算映射出
 		// 实际的翻页参数
-		getAccountTransactionHistory(accountName, -1, -1) {
-			hold(it.first().dataIndex)
+		getAccountTransactionHistory(
+			accountName,
+			-1,
+			-1,
+			errorCallBack
+		) {
+			hold(it.firstOrNull()?.dataIndex)
 		}
 	}
 
 	/** 拉取足页的最近的一页数据 */
-	fun getPageInfo(localDataMaxIndex: Int, transactionsLastIndex: Int): PageInfo {
-		val notInLocalDataCount = transactionsLastIndex - localDataMaxIndex
+	fun getPageInfo(localDataMaxIndex: Int, totalCount: Int): PageInfo {
+		// 如果需要获取的数据个数为 `0` 那么直接返回 `0`
+		val notInLocalDataCount = totalCount - localDataMaxIndex
+		if (notInLocalDataCount == 0) return PageInfo(0, 0, 0)
+		// totalCount 的值是最新一条数据的值, from 的值通过这个倒退出来
 		val from =
-			if (notInLocalDataCount > DataValue.pageCount)
-				transactionsLastIndex - DataValue.pageCount
-			else localDataMaxIndex + 1
-		return PageInfo(from, transactionsLastIndex, localDataMaxIndex)
+			when {
+					notInLocalDataCount > DataValue.pageCount -> totalCount - DataValue.pageCount
+					localDataMaxIndex > 0 -> notInLocalDataCount
+					else -> localDataMaxIndex
+			}
+		return PageInfo(from, totalCount, localDataMaxIndex)
 	}
 
 	fun getAccountTransactionHistory(
 		accountName: String,
 		from: Int,
 		to: Int,
+		errorCallBack: (Throwable) -> Unit,
 		hold: (data: List<EOSTransactionTable>) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(
-				Pair("account", accountName),
+				Pair("account_name", accountName),
 				Pair("pos", from),
 				Pair("offset", to)
 			)
 		).let { it ->
+			RequisitionUtil.postRequest<String>(
+				it,
+				"actions",
+				EOSUrl.getTransactionHistory,
+				true,
+				errorCallBack,
+				false
+			) { transactions ->
+				JSONArray(transactions.first()).toList().map {
+					EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName())
+				}.let(hold)
+			}
+		}
+	}
+
+	fun getCPUAndNETUsageByTxID(
+		txID: String,
+		errorCallBack: (Throwable) -> kotlin.Unit,
+		@WorkerThread hold: (cpuUsage: Long, netUsage: Long, status: String) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("id", txID)
+			)
+		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EOSUrl.getTransactionHistory,
-				{
-					LogUtil.error("getAccountTransactionHistory", it)
-				},
+				EOSUrl.getTransaction,
+				errorCallBack,
 				false
-			) {
-				// TODO 解析为 Model
-				hold(listOf(EOSTransactionTable()))
+			) { transaction ->
+				val receipt = JSONObject(transaction).getTargetObject("trx", "receipt")
+				hold(
+					receipt.getTargetChild("cpu_usage_us").toLongOrZero(),
+					receipt.getTargetChild("net_usage_words").toLongOrZero(),
+					receipt.getTargetChild("status")
+				)
 			}
 		}
 	}

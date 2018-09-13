@@ -162,6 +162,17 @@ object EOSUtils {
 		return writer.toBytes().toNoPrefixHexString()
 	}
 
+	@SuppressLint("SimpleDateFormat")
+	fun getUTCTimeStamp(date: String): Long {
+		if (!date.contains("T")) throw Exception("Wrong Date Formatted")
+		val formattedDate = date
+			.replace("T", " ")
+			.replace("-", "/")
+		val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+		// 按照 `UTC` 时间进行解析
+		dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+		return dateFormat.parse(formattedDate).time
+	}
 	fun getExpirationCode(timeStamp: Long): String {
 		val writer = EosByteWriter(255)
 		writer.putIntLE(timeStamp.toInt())
