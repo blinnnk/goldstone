@@ -29,7 +29,7 @@ object EOSAPI {
 		accountName: String,
 		errorCallBack: (Throwable) -> Unit,
 		targetNet: String = "",
-		hold: (EOSAccountTable) -> Unit
+		@WorkerThread hold: (EOSAccountTable) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -191,9 +191,9 @@ object EOSAPI {
 		// totalCount 的值是最新一条数据的值, from 的值通过这个倒退出来
 		val from =
 			when {
-					notInLocalDataCount > DataValue.pageCount -> totalCount - DataValue.pageCount
-					localDataMaxIndex > 0 -> notInLocalDataCount
-					else -> localDataMaxIndex
+				notInLocalDataCount > DataValue.pageCount -> totalCount - DataValue.pageCount
+				localDataMaxIndex > 0 -> notInLocalDataCount
+				else -> localDataMaxIndex
 			}
 		return PageInfo(from, totalCount, localDataMaxIndex)
 	}

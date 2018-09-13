@@ -34,7 +34,10 @@ class SplashPresenter(val activity: SplashActivity) {
 		WalletTable.getCurrentWallet {
 			if (eosAccountNames.isEmpty()) {
 				checkEOSAccountNameByPublicKey(currentEOSAddress) {
-					cacheDataAndSetNetStatusByType(this)
+					// 用更新果的 `Wallet` 进行检查判断
+					WalletTable.getCurrentWallet {
+						cacheDataAndSetNetStatusByType(this)
+					}
 				}
 			} else cacheDataAndSetNetStatusByType(this)
 		}
@@ -236,7 +239,10 @@ class SplashPresenter(val activity: SplashActivity) {
 			val accountInfo =
 				accountNames.map { EOSAccountInfo(it, Config.getEOSCurrentChain()) }
 			WalletTable.updateEOSAccountNames(accountInfo)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+			// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
+			if (accountInfo.size == 1) {
+				WalletTable.updateEOSDefaultName(accountInfo.first().name, callback)
+			} else GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}
 }

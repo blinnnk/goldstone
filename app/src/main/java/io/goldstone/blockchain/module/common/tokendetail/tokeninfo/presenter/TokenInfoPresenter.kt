@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
@@ -25,6 +26,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
@@ -38,6 +40,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -105,6 +108,10 @@ class TokenInfoPresenter(
 					if (transactions.isEmpty()) {
 						getBTCSeriesTransactionCountFromChain {
 							fragment.showTransactionCount(it)
+							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
+							if (it == 0) {
+								setTotalValue(0.0, 0.0)
+							}
 						}
 					} else {
 						// 去除燃气费的部分剩下的计算为交易数量
@@ -193,32 +200,37 @@ class TokenInfoPresenter(
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
 	}
 
-	private fun getBTCSeriesTransactionCountFromChain(hold: (Int) -> Unit) {
+	private fun getBTCSeriesTransactionCountFromChain(
+		@UiThread hold: (Int) -> Unit
+	) {
 		when (tokenInfo?.symbol) {
 			CryptoSymbol.btc() -> BitcoinApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
 					LogUtil.error("bitcoin showTransactionCount", it)
-				},
-				hold
-			)
+				}
+			) {
+				GoldStoneAPI.context.runOnUiThread { hold(it) }
+			}
 			CryptoSymbol.ltc -> LitecoinApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
 					LogUtil.error("litecoin showTransactionCount", it)
-				},
-				hold
-			)
+				}
+			) {
+				GoldStoneAPI.context.runOnUiThread { hold(it) }
+			}
 			CryptoSymbol.bch -> BitcoinCashApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
 					LogUtil.error("bitcoin cash showTransactionCount", it)
-				},
-				hold
-			)
+				}
+			) {
+				GoldStoneAPI.context.runOnUiThread { hold(it) }
+			}
 			else -> hold(0)
 		}
 	}
@@ -237,14 +249,17 @@ class TokenInfoPresenter(
 				CryptoSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
 				CryptoSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
 				CryptoSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
-				CryptoSymbol.eos -> ChainURL.bchAddressDetail(currentAddress) // TODO
+				CryptoSymbol.eos -> ChainURL.eosAddressDetail(currentAddress)
 				CryptoSymbol.etc -> ChainURL.etcAddressDetail(currentAddress)
 				else -> ChainURL.ethAddressDetail(currentAddress)
 			}
 			return Pair(icon, url)
 		}
 
-		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {
+		fun showThirdPartyAddressDetail(
+			fragment: TokenDetailOverlayFragment?,
+			url: String
+		) {
 			fragment?.presenter?.showTargetFragment<WebViewFragment>(
 				TokenDetailText.addressDetail,
 				TokenDetailText.tokenDetail,

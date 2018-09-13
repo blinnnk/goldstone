@@ -59,7 +59,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	EOSTransactionDataConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
-
 	abstract fun walletDao(): WalletDao
 	abstract fun myTokenDao(): MyTokenDao
 	abstract fun defaultTokenDao(): DefaultTokenDao

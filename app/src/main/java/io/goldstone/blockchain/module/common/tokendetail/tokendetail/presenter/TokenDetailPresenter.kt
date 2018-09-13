@@ -181,7 +181,7 @@ class TokenDetailPresenter(
 		) -> Unit
 	) {
 		when (Config.getCurrentWalletType()) {
-			WalletType.Bip44MultiChain.content -> {
+			WalletType.Bip44MultiChain.content, WalletType.MultiChain.content -> {
 				when {
 					token?.symbol.equals(CryptoSymbol.etc, true) ->
 						getETHERC20OrETCData(Config.getCurrentETCAddress()) {
@@ -292,7 +292,10 @@ class TokenDetailPresenter(
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(
-					transactions.map {
+					transactions.filter {
+						// EOS 会存在一些 `FromName` 或 `ToName` 都为空的坏账这里过滤一下
+						it.transactionData.fromName.isNotEmpty()
+					}.map {
 						TransactionListModel(it)
 					}.sortedByDescending {
 						it.timeStamp
