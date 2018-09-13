@@ -36,7 +36,7 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 	protected val subtitle = TextView(context).apply {
 		visibility = View.GONE
 		textSize = fontSize(12)
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.black(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		x -= 20.uiPX()
@@ -136,7 +136,7 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = object : FixTextLength() {
 			override var text = content
-			override val maxWidth = ScreenSize.widthWithPadding * 0.6f
+			override val maxWidth = ScreenSize.widthWithPadding * 0.55f
 			override val textSize: Float = fontSize(12.uiPX())
 		}.getFixString()
 	}

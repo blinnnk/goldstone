@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toLongOrZero

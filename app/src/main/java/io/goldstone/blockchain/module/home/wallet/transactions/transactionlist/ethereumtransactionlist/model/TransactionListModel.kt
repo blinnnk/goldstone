@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.EtherScanApi
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinCashTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.EtherScanApi.eosTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
@@ -206,8 +207,7 @@ data class TransactionListModel(
 				symbol.equals(CryptoSymbol.bch, true) ->
 					bitcoinCashTransactionDetail(taxHash)
 				symbol.equals(CryptoSymbol.eos, true) -> {
-					// TODO
-					EtherScanApi.transactionDetail(taxHash)
+					eosTransactionDetail(taxHash)
 				}
 				else -> EtherScanApi.transactionDetail(taxHash)
 			}

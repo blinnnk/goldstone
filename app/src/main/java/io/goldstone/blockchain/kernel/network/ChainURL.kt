@@ -167,7 +167,8 @@ object ChainURL {
 	private const val ethKovanWeb = "https://kovan.etherscan.io"
 	private const val ethRinkebyWeb = "https://rinkeby.etherscan.io"
 	// EOS
-	private const val eosMainnetWeb = "https://eosmonitor.io/txn/"
+	private const val eosMainnetWeb = "https://bloks.io"
+	private const val eosJungleWeb = "https://jungle.bloks.io"
 	// TODO 这里还没找到第三方的测试查账
 	private const val eosTestnetWeb = "https://eosmonitor.io/txn/"
 
@@ -203,7 +204,18 @@ object ChainURL {
 		else "$ltcMainnetWeb/address/$it"
 	}
 
+	val eosAddressDetail: (address: String) -> String = {
+		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		else eosMainnetWeb
+		"$header/account/$it"
+	}
+
 	/** Transaction Detail URL */
+	val eosTransactionDetail: (txID: String) -> String = {
+		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		else eosMainnetWeb
+		"$header/transaction/$it"
+	}
 	val etcWebHeader: () -> String = {
 		val header = if (Config.isTestEnvironment()) etcTestnetWeb
 		else etcMainnetWeb

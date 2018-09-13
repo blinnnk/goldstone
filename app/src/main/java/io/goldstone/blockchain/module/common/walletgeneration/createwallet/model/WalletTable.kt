@@ -605,7 +605,7 @@ data class WalletTable(
 
 		fun updateEOSDefaultName(
 			defaultName: String,
-			callback: () -> Unit
+			@UiThread callback: () -> Unit
 		) {
 			doAsync {
 				// 更新钱包数据库的 `Default EOS Address`

@@ -123,6 +123,9 @@ object EtherScanApi {
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(Config.getCurrentChain())}$it"
 	}
+	val eosTransactionDetail: (taxHash: String) -> String = {
+		ChainURL.eosTransactionDetail(it)
+	}
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
 		"${etherScanHeader(Config.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
