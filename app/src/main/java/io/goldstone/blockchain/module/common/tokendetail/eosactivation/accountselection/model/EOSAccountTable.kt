@@ -1,16 +1,15 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toLongOrZero
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.isNullValue
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
@@ -33,6 +32,9 @@ data class EOSAccountTable(
 	@Embedded(prefix = "cpuLimit")
 	val cpuLimit: ResourceLimit,
 	val ramUsed: Long,
+	val ramQuota: Long,
+	val cpuWeight: Long,
+	val netWeight: Long,
 	@Embedded(prefix = "totalResource")
 	val totalResource: TotalResources,
 	@Embedded(prefix = "delegateInfo")
@@ -53,6 +55,9 @@ data class EOSAccountTable(
 		ResourceLimit(JSONObject(data.safeGet("net_limit"))),
 		ResourceLimit(JSONObject(data.safeGet("cpu_limit"))),
 		data.safeGet("ram_usage").toLongOrZero(),
+		data.safeGet("ram_quota").toLongOrZero(),
+		data.safeGet("cpu_weight").toLongOrZero(),
+		data.safeGet("net_weight").toLongOrZero(),
 		TotalResources(JSONObject(data.safeGet("total_resources"))),
 		checkDelegateBandWidthDataOrGetObject(data),
 		checkVoterDataOrGetObject(data),
@@ -62,10 +67,16 @@ data class EOSAccountTable(
 
 	companion object {
 
-		fun getAccountByName(name: String, @UiThread hold: (account: EOSAccountTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.eosAccountDao().getAccount(name)
-			} then (hold)
+		fun getAccountByName(
+			name: String,
+			getResultInUIThread: Boolean = true,
+			hold: (account: EOSAccountTable?) -> Unit
+		) {
+			doAsync {
+				val account = GoldStoneDataBase.database.eosAccountDao().getAccount(name)
+				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
+				else hold(account)
+			}
 		}
 
 		fun preventDuplicateInsert(account: EOSAccountTable) {

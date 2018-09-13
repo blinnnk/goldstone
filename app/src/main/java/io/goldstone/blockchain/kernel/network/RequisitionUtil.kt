@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
+import io.goldstone.blockchain.crypto.keystore.keyString
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -91,7 +92,6 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {

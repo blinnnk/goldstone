@@ -12,8 +12,11 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.value.EOSUnit
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
@@ -114,4 +117,37 @@ fun JSONArray.toList(): List<String> {
 // 自己解 `SONObject` 的时候用来可能用 `String` 判断 `Null`
 fun String.isNullValue(): Boolean {
 	return contains("null")
+}
+
+infix fun String.suffix(content: String) = this + " " + content
+
+fun Long.convertToDiskUnit(): String {
+	val convertValue = ("$this".length / 3.0).toInt()
+	val diskUnit = when (convertValue) {
+		0 -> EOSUnit.Byte.value
+		1 -> EOSUnit.KB.value
+		else -> EOSUnit.MB.value
+	}
+	val result = CryptoUtils.toTargetUnit(this, convertValue.toDouble(), 1024.0).formatCount(5)
+	return result suffix diskUnit
+}
+
+fun Long.convertToTimeUnit(): String {
+	val convertValue = ("$this".length / 3.0).toInt()
+	val sixtyHexadecimal = if (convertValue > 2) (this / 1000 * 1000 / 60).toInt() else 0
+	val diskUnit = when {
+		convertValue == 0 -> EOSUnit.MUS.value
+		convertValue == 1 -> EOSUnit.MS.value
+		sixtyHexadecimal == 1 -> EOSUnit.SEC.value
+		else -> EOSUnit.MIN.value
+	}
+	val value = if (convertValue > 2) this / 1000 * 1000 else this
+	val hexadecimal = if (convertValue > 2) 60.0 else 1000.0
+	val decimal = if (convertValue > 2) sixtyHexadecimal else convertValue
+	val result = CryptoUtils.toTargetUnit(value, decimal.toDouble(), hexadecimal).formatCount(5)
+	return result suffix diskUnit
+}
+
+enum class HexadecimalType {
+	Time, Disk
 }

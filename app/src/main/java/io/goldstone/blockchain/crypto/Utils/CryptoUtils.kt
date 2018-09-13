@@ -59,6 +59,14 @@ object CryptoUtils {
 		return value / Math.pow(10.0, decimal.toDouble())
 	}
 
+	fun toTargetUnit(
+		value: Long,
+		decimal: Double,
+		hexadecimal: Double
+	): Double {
+		return value / Math.pow(hexadecimal, decimal)
+	}
+
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
@@ -167,6 +175,10 @@ fun Double.toEOSUnit(): Double {
 	return this * CryptoValue.eosDecimal
 }
 
+fun Long.toEOSCount(): Double {
+	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
+}
+
 fun Double.toBTCCount(): Double {
 	return this / 100000000.0
 }
@@ -231,14 +243,15 @@ fun String.toAddressCode(hasPrefix: Boolean = true): String {
 		throw Exception("It is a wrong address code format")
 	}
 }
+
 @Throws
 fun String.toAddressFromCode(): String {
 	val address = if (length == 66) {
-	"0x" + substring(26, length)
+		"0x" + substring(26, length)
 	} else {
 		""
 	}
-	if (!Address(address).isValid())  throw Exception("It is a wrong address code format")
+	if (!Address(address).isValid()) throw Exception("It is a wrong address code format")
 	return address
 }
 

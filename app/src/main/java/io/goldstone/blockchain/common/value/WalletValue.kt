@@ -30,6 +30,16 @@ enum class EOSWalletType {
 	Inactivated, NoDefault, None, Available
 }
 
+enum class EOSUnit(val value: String) {
+	KB("KB"),
+	MB("MB"),
+	Byte("Byte"),
+	SEC("SEC"),
+	MS("MS"),
+	MUS("MUS"),
+	MIN("MIN")
+}
+
 object DataValue {
 	const val pageCount = 50
 	const val quotationDataCount = 10
