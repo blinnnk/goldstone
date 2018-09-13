@@ -320,6 +320,17 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "貨幣不一致。您所掃描的不是當前Token的二維碼，請您更換token進行轉賬，或者更換掃描的二維碼。"
 		else -> ""
 	}
+	
+	@JvmField
+	val selectQRCodeFromAlbum = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "从相册选择二维码"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> " "
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
 }
 
 object QAText {

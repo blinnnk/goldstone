@@ -2,16 +2,25 @@ package io.goldstone.blockchain.module.common.qrcode.view
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.view.KeyEvent
+import android.view.WindowManager
+import android.widget.*
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.google.zxing.client.android.Intents
 import com.zxing.demo.*
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.QRText
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.qrcode.QRcodeCaptureManager
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -27,15 +36,32 @@ class ScanCaptureActivity: FragmentActivity() {
 	private lateinit var barcodeScannerView: DecoratedQRCodeView
 	
 	val confirmButton by lazy {
-		RoundButton(this).apply {
-			text = "选择图片"
-			setBlueStyle()
+		TextView(this).apply {
+			text = QRText.selectQRCodeFromAlbum
+			textColor = Color.WHITE
+			textSize = fontSize(16)
 			onClick { choosePicture() }
+		}
+	}
+	
+	val close by lazy {
+		ImageView(this).apply {
+			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), 50.uiPX())
+			setAlignParentRight()
+			padding = 13.uiPX()
+			setImageResource(R.drawable.close_icon)
+			setColorFilter(Color.WHITE)
+			click { finish() }
 		}
 	}
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		
+		window.setFlags(
+			WindowManager.LayoutParams.FLAG_FULLSCREEN,
+			WindowManager.LayoutParams.FLAG_FULLSCREEN
+		)
 		
 		relativeLayout {
 			barcodeScannerView = DecoratedQRCodeView(this@ScanCaptureActivity)
@@ -43,15 +69,13 @@ class ScanCaptureActivity: FragmentActivity() {
 			captureManager.initializeFromIntent(intent, savedInstanceState)
 			captureManager.decode ()
 			addView(barcodeScannerView)
+			addView(close)
 			relativeLayout {
-				addView(confirmButton)
-				confirmButton.apply {
-					val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
-					val buttonHeight = 40.uiPX()
-					lparams(buttonWidth, buttonHeight) {
+				addView(confirmButton.apply {
+					lparams {
 						centerInParent()
 					}
-				}
+				})
 			}.lparams(matchParent, 200.uiPX()) {
 				alignParentBottom()
 			}

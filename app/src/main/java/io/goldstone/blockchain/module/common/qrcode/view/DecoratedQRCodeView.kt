@@ -28,7 +28,7 @@ import org.jetbrains.anko.*
  */
 class DecoratedQRCodeView : RelativeLayout {
 	var barcodeView: BarcodeView
-	private var viewFinder: ViewfinderView
+	private var finderView: QRCodeFinderView
 	private var statusView: TextView
 	
 	private inner class WrappedCallback(private val delegate: BarcodeCallback) : BarcodeCallback {
@@ -39,7 +39,7 @@ class DecoratedQRCodeView : RelativeLayout {
 		
 		override fun possibleResultPoints(resultPoints: List<ResultPoint>) {
 			for (point in resultPoints) {
-				viewFinder.addPossibleResultPoint(point)
+				finderView.addPossibleResultPoint(point)
 			}
 			delegate.possibleResultPoints(resultPoints)
 		}
@@ -69,13 +69,13 @@ class DecoratedQRCodeView : RelativeLayout {
 		barcodeView = BarcodeView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		}
-		viewFinder = ViewfinderView(context, null).apply {
+		finderView = QRCodeFinderView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			setCameraPreview(barcodeView)
 		}
 		
 		statusView = TextView(context).apply {
-			setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+			setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
 			textColor = Color.WHITE
 			typeface = GoldStoneFont.light(context)
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -85,7 +85,7 @@ class DecoratedQRCodeView : RelativeLayout {
 		}
 		
 		addView(barcodeView)
-		addView(viewFinder)
+		addView(finderView)
 		addView(statusView)
 	}
 	
