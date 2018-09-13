@@ -136,6 +136,7 @@ class DecoratedQRCodeView : RelativeLayout {
 	 */
 	fun pause() {
 		barcodeView.pause()
+		finderView.onPause()
 	}
 	
 	/**
@@ -150,6 +151,7 @@ class DecoratedQRCodeView : RelativeLayout {
 	 */
 	fun resume() {
 		barcodeView.resume()
+		finderView.onResume()
 	}
 	
 	/**

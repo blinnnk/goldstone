@@ -66,8 +66,6 @@ class QRCodeFinderView(context: Context): View(context) {
 		scannerAlpha = 0
 		possibleResultPoints = ArrayList(maxResultPoints)
 		lastPossibleResultPoints = ArrayList(maxResultPoints)
-		
-		calculateBottomGrilLine()
 	}
 	
 	private fun refreshSizes() {
@@ -277,6 +275,14 @@ class QRCodeFinderView(context: Context): View(context) {
 			}
 		
 		}
+	}
+	
+	fun onPause() {
+		calculateHandler.removeCallbacksAndMessages(null)
+	}
+	
+	fun onResume() {
+		calculateBottomGrilLine()
 	}
 	
 	override fun onDetachedFromWindow() {
