@@ -134,6 +134,7 @@ class QRCodeFinderView(context: Context): View(context) {
 					}
 				}
 			}
+			calculateHandler.removeCallbacksAndMessages(null)
 			calculateHandler.postDelayed({
 				calculateBottomGrilLine()
 			}, 20)
