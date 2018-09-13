@@ -38,7 +38,7 @@ fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse { _, _ -> }
+			loadDataFromDatabaseOrElse { _, _, _ -> }
 		}
 	}
 }

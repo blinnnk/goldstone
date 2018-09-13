@@ -114,7 +114,7 @@ object EtherScanApi {
 	val bitcoinTransactionDetail: (taxHash: String) -> String = {
 		"${ChainURL.btcWebHeader()}$it"
 	}
-	val litcoinTransactionDetail: (taxHash: String) -> String = {
+	val litecoinTransactionDetail: (taxHash: String) -> String = {
 		"${ChainURL.ltcWebHeader()}$it"
 	}
 	val bitcoinCashTransactionDetail: (taxHash: String) -> String = {

@@ -37,7 +37,7 @@ fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>)
 		}
 	) {
 		fragment.removeLoadingView()
-		loadDataFromDatabaseOrElse { _, _ -> }
+		loadDataFromDatabaseOrElse { _, _, _ -> }
 	}
 }
 

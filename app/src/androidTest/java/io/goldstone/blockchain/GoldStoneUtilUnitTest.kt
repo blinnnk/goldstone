@@ -6,11 +6,12 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.getTargetChild
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
+import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import junit.framework.Assert
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -165,5 +167,14 @@ class GoldStoneUtilUnitTest {
 		val status: Boolean,
 		var marketPrice: String
 	)
+
+	@Test
+	fun getMultiChildJSONObject() {
+		val expect = "kaysaith"
+		val data = JSONObject("{data : { value: { name: kaysaith }}}")
+		LogUtil.debug(position, data.getTargetChild("data", "value", "name"))
+		val result = data.getTargetChild("data", "value", "name")
+		Assert.assertTrue("convert to wrong value", expect == result)
+	}
 }
 

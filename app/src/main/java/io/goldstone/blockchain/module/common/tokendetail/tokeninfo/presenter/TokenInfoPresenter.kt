@@ -22,7 +22,6 @@ import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -126,18 +125,6 @@ class TokenInfoPresenter(
 						fragment.updateLatestActivationDate(latestDate)
 					}
 				}
-
-			tokenInfo?.symbol == CryptoSymbol.eos -> {
-				// TODO EOS Transaction
-				EOSTransactionTable.getTransactionByAccountName(Config.getCurrentEOSName()) {
-					if (it.isEmpty()) {
-
-					} else {
-						fragment.showTransactionCount(it.size)
-					}
-				}
-			}
-
 			tokenInfo?.symbol == CryptoSymbol.etc -> {
 				TransactionTable.getETCTransactionsByAddress(currentAddress) { transactions ->
 					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
@@ -168,10 +155,16 @@ class TokenInfoPresenter(
 						ChainType.ETH,
 						currentAddress
 					) {
-						fragment.showTransactionCount(it.toInt())
+						val convertedCount = it.toInt()
+						val count = if (convertedCount > 0) convertedCount + 1 else it.toInt()
+						fragment.showTransactionCount(count)
 					}
 				} else {
-					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
+					fragment.showTransactionCount(
+						transactions.filter {
+							!it.isFee && it.symbol.equals(tokenInfo?.symbol, true)
+						}.size
+					)
 					// 分别查询 `接收的总值` 和 `支出的总值`
 					val totalReceiveValue =
 						transactions.filter {

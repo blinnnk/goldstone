@@ -48,11 +48,18 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		}
 	}
 
+	private val transactionCountCell by lazy {
+		GraySquareCell(context!!).apply {
+			setTitle(TokenDetailText.transactionCount)
+			setSubtitle(CommonText.calculating)
+		}
+	}
+
 	private val authorizationCell by lazy {
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(TokenDetailText.authority)
-			setSubtitle("kaysaith1522")
+			setSubtitle(Config.getCurrentEOSName())
 		}
 	}
 
@@ -138,7 +145,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	) {
 		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)
 		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total)
-		cpuAssetCell.setTitle(cpuWeight)
+		cpuAssetCell.setSubtitle(cpuWeight)
 		cpuAssetCell.setLeftValue(
 			cpuAvailable,
 			TokenDetailText.available,
@@ -149,7 +156,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			TokenDetailText.total,
 			true
 		)
-		netAssetCell.setTitle(netWeight)
+		netAssetCell.setSubtitle(netWeight)
 		netAssetCell.setLeftValue(
 			netAvailable,
 			TokenDetailText.available
@@ -158,6 +165,10 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			netTotal,
 			TokenDetailText.total
 		)
+	}
+
+	fun setTransactionCount(count: String) {
+		transactionCountCell.setSubtitle(count)
 	}
 
 	private fun ViewGroup.showAccountManagementCells() {
@@ -169,6 +180,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	private fun ViewGroup.showTransactionCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
 		balanceCell.into(this)
+		transactionCountCell.into(this)
 	}
 
 	private fun ViewGroup.showAssetDashboard() {

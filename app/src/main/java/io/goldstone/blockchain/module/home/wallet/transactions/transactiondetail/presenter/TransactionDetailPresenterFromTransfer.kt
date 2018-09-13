@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -14,7 +15,7 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 	data?.apply {
 		currentHash = taxHash
 		count = CryptoUtils.toCountByDecimal(value.toBigDecimal().toDouble(), token.decimal)
-		fragment.asyncData = generateModels()
+		fragment.asyncData = generateModels().toArrayList()
 		val headerData = TransactionHeaderModel(
 			count,
 			toAddress,

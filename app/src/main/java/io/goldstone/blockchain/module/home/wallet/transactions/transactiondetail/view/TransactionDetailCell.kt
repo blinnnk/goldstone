@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
@@ -19,7 +18,6 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel.Companion.convertMultiToOrFromAddresses
-import org.jetbrains.anko.firstChild
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 
@@ -36,11 +34,10 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 		) {
 			convertMultiToOrFromAddresses(model.info).let { addresses ->
 				addresses.forEach {
-					TransactionAddressCell(context)
-						.apply {
-							setAddress(it)
-							addressCells += this
-						}
+					TransactionAddressCell(context).apply {
+						setAddress(it)
+						addressCells += this
+					}
 						.into(this)
 				}
 				layoutParams.height = 35.uiPX() * addresses.size + 30.uiPX()
@@ -69,7 +66,7 @@ class TransactionDetailCell(context: Context) : TopBottomLineCell(context) {
 			typeface = GoldStoneFont.medium(context)
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 			x = PaddingSize.device.toFloat()
-			y -= 3.uiPX()
+			y -= 8.uiPX()
 		}
 	}
 

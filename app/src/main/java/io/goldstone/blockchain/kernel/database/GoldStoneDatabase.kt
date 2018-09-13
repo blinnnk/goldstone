@@ -3,6 +3,9 @@ package io.goldstone.blockchain.kernel.database
 import android.arch.persistence.room.*
 import android.content.Context
 import io.goldstone.blockchain.kernel.commonmodel.*
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceDao
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -52,7 +55,8 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	PermissionsInfoConverter::class,
 	RequiredAuthorizationConverter::class,
 	EOSAccountInfoConverter::class,
-	EOSDefaultAllChainNameConverter::class
+	EOSDefaultAllChainNameConverter::class,
+	EOSTransactionDataConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 

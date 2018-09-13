@@ -106,6 +106,7 @@ class TransactionDetailPresenter(
 			symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
 			symbol.equals(CryptoSymbol.ltc, true) -> CryptoSymbol.ltc
 			symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
+			symbol.equals(CryptoSymbol.eos, true) -> CryptoSymbol.eos
 			else -> CryptoSymbol.eth
 		}
 	}
@@ -165,13 +166,13 @@ class TransactionDetailPresenter(
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
 	fun generateModels(
 		receipt: Any? = null
-	): ArrayList<TransactionDetailModel> {
+	): List<TransactionDetailModel> {
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
-		val timstamp =
+		val timStamp =
 			data?.timestamp
 				?: dataFromList?.timeStamp?.toLongOrNull()
 				?: notificationData?.timeStamp.orElse(0L)
-		val date = TimeUtils.formatDate(timstamp.toMillisecond())
+		val date = TimeUtils.formatDate(timStamp.toMillisecond())
 		val memo =
 			if (data?.memo.isNull()) TransactionText.noMemo
 			else data?.memo
@@ -252,10 +253,8 @@ class TransactionDetailPresenter(
 				// 如果是 `比特币` 账单不显示 `Memo`
 				models.filterNot {
 					it.description.equals(TransactionText.memo, true)
-				}.toArrayList()
-			} else {
-				models.toArrayList()
-			}
+				}
+			} else models
 		}
 	}
 

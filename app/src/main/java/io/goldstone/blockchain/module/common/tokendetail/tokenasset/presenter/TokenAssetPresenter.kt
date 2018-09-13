@@ -1,15 +1,19 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
+import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.utils.suffix
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toEOSCount
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
@@ -36,6 +40,7 @@ class TokenAssetPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		checkAndSetAccountValue()
+		getAccountTransactionCount()
 		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName = CryptoSymbol.eos suffix TokenDetailText.chainType
@@ -45,6 +50,30 @@ class TokenAssetPresenter(
 					fragment.getGrandFather<TokenDetailOverlayFragment>(),
 					info.second
 				)
+		}
+	}
+
+	private fun getAccountTransactionCount() {
+		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
+		val accountName = Config.getCurrentEOSName()
+		EOSTransactionTable.getTransactionByAccountName(
+			accountName,
+			Config.getEOSCurrentChain()
+		) { localData ->
+			if (localData.isEmpty()) {
+				EOSAPI.getTransactionsLastIndex(
+					accountName,
+					{
+						fragment.setTransactionCount(CommonText.calculating)
+						LogUtil.error("getTransactionsLastIndex", it)
+					}
+				) {
+					val count = if (it.isNull()) 0 else it!! + 1
+					fragment.setTransactionCount(count.toString())
+				}
+			} else {
+				fragment.setTransactionCount(localData.size.toString())
+			}
 		}
 	}
 

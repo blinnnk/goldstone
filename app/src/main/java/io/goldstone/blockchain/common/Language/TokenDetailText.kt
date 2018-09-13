@@ -329,4 +329,15 @@ object TokenDetailText {
 		else -> ""
 	}
 
+	@JvmField
+	val inactivationAccount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Inactivation Account"
+		HoneyLanguage.Chinese.code -> "Inactivation Account"
+		HoneyLanguage.Japanese.code -> "Inactivation Account"
+		HoneyLanguage.Korean.code -> "Inactivation Account"
+		HoneyLanguage.Russian.code -> "Inactivation Account"
+		HoneyLanguage.TraditionalChinese.code -> "Inactivation Account"
+		else -> ""
+	}
+
 }

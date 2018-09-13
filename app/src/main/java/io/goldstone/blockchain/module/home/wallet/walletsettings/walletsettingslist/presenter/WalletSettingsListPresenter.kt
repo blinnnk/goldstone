@@ -18,7 +18,7 @@ import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePasswo
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
