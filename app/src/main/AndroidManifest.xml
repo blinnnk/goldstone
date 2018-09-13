@@ -83,7 +83,7 @@
 		</provider>
 
 		<activity
-			android:name=".module.home.wallet.walletsettings.qrcodefragment.view.ScanCaptureActivity"
+			android:name=".module.common.qrcode.view.ScanCaptureActivity"
 			android:screenOrientation="fullSensor"
 			tools:replace="screenOrientation"/>
 		<!-- 对Application生效，意味着该应用的所有页面，系统都不会做竖屏场景的特殊下移 -->

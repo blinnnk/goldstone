@@ -1,24 +1,18 @@
-package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view
+package io.goldstone.blockchain.module.common.qrcode.view
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.view.KeyEvent
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.google.zxing.client.android.Intents
-import com.journeyapps.barcodescanner.CaptureManager
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.zxing.demo.*
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.module.common.qrcode.QRcodeCaptureManager
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -29,8 +23,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ScanCaptureActivity: FragmentActivity() {
 	
-	private lateinit var captureManager: CaptureManager
-	private lateinit var barcodeScannerView: DecoratedBarcodeView
+	private lateinit var captureManager: QRcodeCaptureManager
+	private lateinit var barcodeScannerView: DecoratedQRCodeView
 	
 	val confirmButton by lazy {
 		RoundButton(this).apply {
@@ -44,9 +38,9 @@ class ScanCaptureActivity: FragmentActivity() {
 		super.onCreate(savedInstanceState)
 		
 		relativeLayout {
-			barcodeScannerView = DecoratedBarcodeView(this@ScanCaptureActivity)
-			captureManager = CaptureManager(this@ScanCaptureActivity, barcodeScannerView)
-			captureManager.initializeFromIntent(null, savedInstanceState)
+			barcodeScannerView = DecoratedQRCodeView(this@ScanCaptureActivity)
+			captureManager = QRcodeCaptureManager(this@ScanCaptureActivity, barcodeScannerView)
+			captureManager.initializeFromIntent(intent, savedInstanceState)
 			captureManager.decode ()
 			addView(barcodeScannerView)
 			relativeLayout {
