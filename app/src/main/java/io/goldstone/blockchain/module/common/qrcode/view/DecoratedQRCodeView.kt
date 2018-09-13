@@ -28,7 +28,7 @@ import org.jetbrains.anko.*
  */
 class DecoratedQRCodeView : RelativeLayout {
 	var barcodeView: BarcodeView
-	private var finderView: QRCodeFinderView
+	var finderView: QRCodeFinderView
 	private var statusView: TextView
 	
 	private inner class WrappedCallback(private val delegate: BarcodeCallback) : BarcodeCallback {
@@ -136,7 +136,6 @@ class DecoratedQRCodeView : RelativeLayout {
 	 */
 	fun pause() {
 		barcodeView.pause()
-		finderView.onPause()
 	}
 	
 	/**
@@ -151,7 +150,6 @@ class DecoratedQRCodeView : RelativeLayout {
 	 */
 	fun resume() {
 		barcodeView.resume()
-		finderView.onResume()
 	}
 	
 	/**

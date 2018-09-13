@@ -119,11 +119,13 @@ class ScanCaptureActivity: FragmentActivity() {
 	override fun onResume() {
 		super.onResume()
 		captureManager.onResume()
+		barcodeScannerView.finderView.onResume()
 	}
 	
 	override fun onPause() {
 		super.onPause()
 		captureManager.onPause()
+		barcodeScannerView.finderView.onPause()
 	}
 	
 	override fun onDestroy() {

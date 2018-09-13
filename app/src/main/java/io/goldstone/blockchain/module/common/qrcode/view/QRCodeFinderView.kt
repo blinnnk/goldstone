@@ -78,7 +78,6 @@ class QRCodeFinderView(context: Context): View(context) {
 	public override fun onDraw(canvas: Canvas) {
 		refreshSizes()
 		drawMask(canvas)
-//		drawLaser(canvas)
 		drawScanGrid(canvas)
 		drawCorners(canvas)
 		drawResultPoints(canvas)
