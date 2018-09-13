@@ -34,7 +34,6 @@ class QRCodeFinderView(context: Context): View(context) {
 	
 	private var paint = Paint(Paint.ANTI_ALIAS_FLAG)
 	private val maskColor: Int = GrayScale.Opacity2Black // 四周的maskcolor
-	private val laserColor: Int = Color.RED
 	private val resultPointColor: Int = Color.YELLOW
 	private var scannerAlpha: Int = 0
 	private var possibleResultPoints: MutableList<ResultPoint>
@@ -74,7 +73,7 @@ class QRCodeFinderView(context: Context): View(context) {
 	private fun refreshSizes() {
 		cameraPreview?.apply {
 			this@QRCodeFinderView.framingRect = this.framingRect
-			this@QRCodeFinderView.previewFramingRect = cameraPreview!!.previewFramingRect
+			this@QRCodeFinderView.previewFramingRect = this.previewFramingRect
 		}
 	}
 	

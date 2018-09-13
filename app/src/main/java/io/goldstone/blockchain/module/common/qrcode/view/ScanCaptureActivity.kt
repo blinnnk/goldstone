@@ -5,21 +5,18 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import android.view.KeyEvent
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.*
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.google.zxing.client.android.Intents
 import com.zxing.demo.*
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.qrcode.QRcodeCaptureManager
 import org.jetbrains.anko.*
@@ -70,18 +67,20 @@ class ScanCaptureActivity: FragmentActivity() {
 			captureManager.decode ()
 			addView(barcodeScannerView)
 			addView(close)
-			relativeLayout {
-				addView(confirmButton.apply {
-					lparams {
-						centerInParent()
-					}
-				})
-			}.lparams(matchParent, 200.uiPX()) {
-				alignParentBottom()
-			}
+			addView(confirmButton.apply {
+				gravity = Gravity.CENTER_HORIZONTAL
+				val scanRectBottom =
+					ScreenSize.Height - ScreenSize.Width * 0.1f - (ScreenSize.Height - ScreenSize.Width)* 0.9f / 2f
+				lparams(matchParent, wrapContent) {
+					topMargin = (scanRectBottom + ScreenSize.Height * 0.058f).toInt()
+				}
+			})
 		}
 		
+		
+		
 	}
+	
 	
 	private fun choosePicture() {
 		object : CheckPermission(this) {
