@@ -83,6 +83,12 @@ data class MyTokenTable(
 			}
 		}
 
+		fun updateEOSAccountName(name: String, address: String) {
+			doAsync {
+				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address)
+			}
+		}
+
 		fun getMyTokens(callback: (List<MyTokenTable>) -> Unit) {
 			WalletTable.getCurrentAddresses { addresses ->
 				doAsync {
@@ -133,23 +139,18 @@ data class MyTokenTable(
 
 		fun getTokenBalance(
 			contract: String,
-			walletAddress: String,
+			ownerName: String,
 			convertByDecimal: Boolean = true,
 			callback: (Double?) -> Unit
 		) {
 			load {
-				GoldStoneDataBase
-					.database
-					.myTokenDao()
-					.getCurrentChainTokenByContractAndAddress(
-						contract,
-						walletAddress
-					)
+				GoldStoneDataBase.database.myTokenDao()
+					.getCurrentChainTokenByContractAndAddress(contract, ownerName)
 			} then { token ->
 				if (token.isNull()) callback(null)
 				else {
 					if (!convertByDecimal) {
-						callback(token!!.balance)
+						callback(token?.balance.orZero())
 					} else {
 						DefaultTokenTable.getCurrentChainToken(contract) {
 							it?.apply {
@@ -168,12 +169,8 @@ data class MyTokenTable(
 		) {
 			load {
 				GoldStoneDataBase
-					.database
-					.myTokenDao()
-					.getCurrentChainTokenByContractAndAddress(
-						contract,
-						walletAddress
-					)
+					.database.myTokenDao()
+					.getCurrentChainTokenByContractAndAddress(contract, walletAddress)
 			} then { token ->
 				if (token.isNull()) callback(null)
 				else callback(token)
@@ -346,10 +343,10 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :walletAddress AND (chainID Like :ercChain OR chainID Like :eosChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :ownerName AND (chainID Like :ercChain OR chainID Like :eosChain OR chainID Like :bchChain OR chainID Like :ltcChain OR chainID Like :etcChain OR chainID Like :btcChain) ")
 	fun getCurrentChainTokenByContractAndAddress(
 		contract: String,
-		walletAddress: String,
+		ownerName: String,
 		ercChain: String = Config.getCurrentChain(),
 		etcChain: String = Config.getETCCurrentChain(),
 		btcChain: String = Config.getBTCCurrentChain(),
@@ -381,6 +378,9 @@ interface MyTokenDao {
 
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>
+
+	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address")
+	fun updateEOSAccountName(name: String, address: String)
 
 	@Insert
 	fun insert(token: MyTokenTable)

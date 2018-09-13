@@ -11,7 +11,8 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.convertToDiskUnit
+import io.goldstone.blockchain.common.utils.convertToTimeUnit
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -45,14 +46,14 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 	private val leftValueView = TextView(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 		textSize = fontSize(11)
-		typeface = GoldStoneFont.black(context)
+		typeface = GoldStoneFont.heavy(context)
 		textColor = Spectrum.white
 		leftPadding = marginSize
 	}
 	private val rightValueView = TextView(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 		textSize = fontSize(11)
-		typeface = GoldStoneFont.black(context)
+		typeface = GoldStoneFont.heavy(context)
 		textColor = Spectrum.white
 		rightPadding = marginSize
 	}
@@ -90,26 +91,28 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 		this.subtitle.text = subtitle
 	}
 
-	private var leftValue = 0
+	private var leftValue = 0L
 	@SuppressLint("SetTextI18n")
-	fun setLeftValue(value: Int, description: String) {
+	fun setLeftValue(value: Long, description: String, isTime: Boolean = false) {
 		leftValue = value
-		leftValueView.text = "$value $description"
+		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
+		leftValueView.text = "$convertedValue $description"
 		setProgressValue()
 	}
 
-	private var rightValue = 0
+	private var rightValue = 0L
 	@SuppressLint("SetTextI18n")
-	fun setRightValue(value: Int, description: String) {
+	fun setRightValue(value: Long, description: String, isTime: Boolean = false) {
 		rightValue = value
-		rightValueView.text = "$value $description"
+		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
+		rightValueView.text = "$convertedValue $description"
 		setProgressValue()
 	}
 
 	private fun setProgressValue() {
-		val percent: Float = if (rightValue == 0) 0f else leftValue / rightValue.toFloat()
-		measure(0, 0)
-		val width = measuredWidth * 1.uiPX() - marginSize * 4
+		val percent: Double = if (rightValue == 0L) 0.0 else leftValue / rightValue.toDouble()
+		progressValueView.measure(0, 0)
+		val width = measuredWidth - marginSize * 2
 		progressValueView.updateWidthAnimation((width * percent).toInt())
 	}
 }

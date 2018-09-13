@@ -29,6 +29,10 @@ class EOSAccountSelectionPresenter(
 	}
 
 	fun setEOSDefaultName(name: String) {
+		/**
+		 * 1. 更新 `WalletTable` 里面的 `CurrentEOSAccountName`
+		 * 2. 更新 `MyTokenTable` 里面的 `OwnerName` 的名字
+		 */
 		WalletTable.updateEOSDefaultName(name) {
 			fragment.activity?.jump<SplashActivity>()
 		}
@@ -37,14 +41,16 @@ class EOSAccountSelectionPresenter(
 	private fun showAvailableNames() {
 		fragment.showLoadingView(true)
 		WalletTable.getCurrentWallet {
+			val currentChainNames =
+				eosAccountNames.filter {
+					it.chainID.equals(Config.getEOSCurrentChain(), true)
+				}
 			var actors = listOf<AccountActor>()
 			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = eosAccountNames.size
+				override var asyncCount: Int = currentChainNames.size
 				override fun concurrentJobs() {
-					eosAccountNames.filter {
-						it.chainID.equals(Config.getEOSCurrentChain(), true)
-					}.forEach { account ->
-						EOSAccountTable.getAccountByName(account.name) { localAccount ->
+					currentChainNames.forEach { account ->
+						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
 							// 本地为空的话从网络获取数据
 							if (localAccount.isNull()) {
 								EOSAPI.getAccountInfoByName(

@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.value.EOSWalletType
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -607,10 +608,13 @@ data class WalletTable(
 			callback: () -> Unit
 		) {
 			doAsync {
+				// 更新钱包数据库的 `Default EOS Address`
 				GoldStoneDataBase.database.walletDao().apply {
 					findWhichIsUsing(true)?.let {
 						it.apply {
 							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
+							MyTokenTable.updateEOSAccountName(defaultName, currentEOSAddress)
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
 					}

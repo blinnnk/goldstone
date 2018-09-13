@@ -34,6 +34,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
@@ -58,12 +59,16 @@ class TokenInfoPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		generateQRCode()
 		showBalance()
 		showAddress()
 		showTransactionInfo()
-		showCoinInfo(CommonText.calculating)
-		setCheckDetailButtonInfo()
+		val info = getDetailButtonInfo(tokenInfo, currentAddress)
+		val code = QRCodePresenter.generateQRCode(currentAddress)
+		val chainName =
+			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + "CHAIN TYPE"
+		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
+			showThirdPartyAddressDetail(fragment.getGrandFather<TokenDetailOverlayFragment>(), info.second)
+		}
 	}
 
 	fun isBTCSeriesCoin(): Boolean {
@@ -79,11 +84,6 @@ class TokenInfoPresenter(
 		}
 	}
 
-	private fun generateQRCode() {
-		val code = QRCodePresenter.generateQRCode(currentAddress)
-		fragment.showQRCodeImage(code)
-	}
-
 	private fun showAddress() {
 		val net = when (tokenInfo?.symbol) {
 			CryptoSymbol.bch, CryptoSymbol.btc() ->
@@ -95,36 +95,6 @@ class TokenInfoPresenter(
 			if (net.isNull()) null
 			else Address.fromBase58(net, currentAddress).hash160.toNoPrefixHexString()
 		fragment.showAddress(currentAddress, hash160)
-	}
-
-	private fun setCheckDetailButtonInfo() {
-		val icon = when (tokenInfo?.symbol) {
-			CryptoSymbol.btc() -> R.drawable.blocktrail_icon
-			CryptoSymbol.ltc -> R.drawable.blockcypher_icon
-			CryptoSymbol.bch -> R.drawable.blocktrail_icon
-			CryptoSymbol.eos -> R.drawable.bloks_io_icon
-			CryptoSymbol.etc -> R.drawable.gastracker_icon
-			else -> R.drawable.etherscan_icon
-		}
-		val url = when (tokenInfo?.symbol) {
-			CryptoSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
-			CryptoSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
-			CryptoSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
-			CryptoSymbol.eos -> ChainURL.bchAddressDetail(currentAddress)
-			CryptoSymbol.etc -> ChainURL.etcAddressDetail(currentAddress) // TODO
-			else -> ChainURL.ethAddressDetail(currentAddress)
-		}
-		fragment.setCheckDetailButtonIconAndEvent(icon) {
-			fragment
-				.getGrandFather<TokenDetailOverlayFragment>()
-				?.presenter
-				?.showTargetFragment<WebViewFragment>(
-					"Address Detail",
-					TokenDetailText.tokenDetail,
-					Bundle().apply { putString(ArgumentKey.webViewUrl, url) },
-					2
-				)
-		}
 	}
 
 	private fun showTransactionInfo() {
@@ -153,13 +123,13 @@ class TokenInfoPresenter(
 									it.timeStamp.toLongOrNull() ?: 0
 								}?.timeStamp?.toMillisecond().orElse(0L)
 							)
-						showCoinInfo(latestDate)
+						fragment.updateLatestActivationDate(latestDate)
 					}
 				}
 
 			tokenInfo?.symbol == CryptoSymbol.eos -> {
-				// TODO EOS Instead of Account name
-				EOSTransactionTable.getTransactionByAccountName(currentAddress) {
+				// TODO EOS Transaction
+				EOSTransactionTable.getTransactionByAccountName(Config.getCurrentEOSName()) {
 					if (it.isEmpty()) {
 
 					} else {
@@ -184,7 +154,7 @@ class TokenInfoPresenter(
 								it.timeStamp.toLongOrNull() ?: 0
 							}?.timeStamp?.toMillisecond().orElse(0L)
 						)
-					showCoinInfo(latestDate)
+					fragment.updateLatestActivationDate(latestDate)
 				}
 			}
 
@@ -219,7 +189,7 @@ class TokenInfoPresenter(
 								it.timeStamp.toLongOrNull() ?: 0
 							}?.timeStamp?.toMillisecond().orElse(0L)
 						)
-					showCoinInfo(latestDate)
+					fragment.updateLatestActivationDate(latestDate)
 				}
 			}
 		}
@@ -228,12 +198,6 @@ class TokenInfoPresenter(
 	private fun setTotalValue(receivedValue: Double, sentValue: Double) {
 		val content: (value: Double) -> String = { "$it ${tokenInfo?.symbol}" }
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
-	}
-
-	private fun showCoinInfo(date: String) {
-		val chainName =
-			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + "CHAIN TYPE"
-		fragment.showCoinInfo(chainName, date)
 	}
 
 	private fun getBTCSeriesTransactionCountFromChain(hold: (Int) -> Unit) {
@@ -263,6 +227,37 @@ class TokenInfoPresenter(
 				hold
 			)
 			else -> hold(0)
+		}
+	}
+
+	companion object {
+		fun getDetailButtonInfo(tokenInfo: WalletDetailCellModel?, currentAddress: String): Pair<Int, String> {
+			val icon = when (tokenInfo?.symbol) {
+				CryptoSymbol.btc() -> R.drawable.blocktrail_icon
+				CryptoSymbol.ltc -> R.drawable.blockcypher_icon
+				CryptoSymbol.bch -> R.drawable.blocktrail_icon
+				CryptoSymbol.eos -> R.drawable.bloks_io_icon
+				CryptoSymbol.etc -> R.drawable.gastracker_icon
+				else -> R.drawable.etherscan_icon
+			}
+			val url = when (tokenInfo?.symbol) {
+				CryptoSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
+				CryptoSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
+				CryptoSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
+				CryptoSymbol.eos -> ChainURL.bchAddressDetail(currentAddress) // TODO
+				CryptoSymbol.etc -> ChainURL.etcAddressDetail(currentAddress)
+				else -> ChainURL.ethAddressDetail(currentAddress)
+			}
+			return Pair(icon, url)
+		}
+
+		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {
+			fragment?.presenter?.showTargetFragment<WebViewFragment>(
+				TokenDetailText.addressDetail,
+				TokenDetailText.tokenDetail,
+				Bundle().apply { putString(ArgumentKey.webViewUrl, url) },
+				2
+			)
 		}
 	}
 }
