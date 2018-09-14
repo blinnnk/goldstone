@@ -78,17 +78,8 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		isDragEnabled = dragEnable
 		legend.isEnabled = false // 标签是否显示
 		description.isEnabled = false // 描述信息展示
-
-
-		marker = object : LineMarkerView(context) {
-			override fun getChartWidth(): Int {
-				return this@LineChart.width
-			}
-
-			override fun getChartHeight(): Int {
-				return this@LineChart.height
-			}
-		}
+		
+		resetMarkerView()
 
 		xAxis.apply {
 			valueFormatter = IAxisValueFormatter { value, _ ->
@@ -136,11 +127,22 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 			animateY(1000)
 		}
 	}
-
-	fun resetDataWithTargetLabelCount(dataRows: List<Entry>, fitLabelCount: Boolean) {
-		if (fitLabelCount) {
-			xAxis.setLabelCount(dataRows.lastIndex, true)
+	
+	protected fun resetMarkerView() {
+		
+		marker = object : LineMarkerView(context) {
+			override fun getChartWidth(): Int {
+				return this@LineChart.width
+			}
+			
+			override fun getChartHeight(): Int {
+				return this@LineChart.height
+			}
 		}
+	}
+
+	fun resetDataWithTargetLabelCount(dataRows: List<Entry>) {
+		xAxis.setLabelCount(dataRows.lastIndex + 1, true)
 		resetData(dataRows)
 	}
 

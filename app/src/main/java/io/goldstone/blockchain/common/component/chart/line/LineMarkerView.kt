@@ -5,6 +5,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import io.goldstone.blockchain.common.component.chart.BaseMarkerView
+import io.goldstone.blockchain.common.language.WalletSettingsText
 
 /**
  * @date: 2018/8/6.
@@ -15,7 +16,7 @@ abstract class LineMarkerView(context: Context) : BaseMarkerView(context) {
   
   override fun refreshContent(entry: Entry, highlight: Highlight) {
     
-    textViewContent.text =  "收盘：" + entry.y
+    textViewContent.text = WalletSettingsText.balance + ":" + entry.y
     
     super.refreshContent(entry, highlight)
   }

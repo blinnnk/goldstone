@@ -62,8 +62,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		lineChart.resetDataWithTargetLabelCount(
 			model.chartData.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-			}.toArrayList(),
-			true
+			}.toArrayList()
 		)
 
 		exchangeName.text = model.exchangeName
