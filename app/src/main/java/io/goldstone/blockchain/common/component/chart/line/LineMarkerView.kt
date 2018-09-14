@@ -16,7 +16,7 @@ abstract class LineMarkerView(context: Context) : BaseMarkerView(context) {
   
   override fun refreshContent(entry: Entry, highlight: Highlight) {
     
-    textViewContent.text = WalletSettingsText.balance + ":" + entry.y
+    textViewContent.text = "${WalletSettingsText.balance}: ${entry.y}"
     
     super.refreshContent(entry, highlight)
   }

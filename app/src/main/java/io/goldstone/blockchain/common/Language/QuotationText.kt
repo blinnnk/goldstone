@@ -251,6 +251,19 @@ object QuotationText {
 	}
 	
 	@JvmField
+	val candleStickDescription: (high: String, low: String, open: String, close: String) -> String = {high, low, open, close ->
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> ""
+			HoneyLanguage.Chinese.code -> "最高：$high\n最低：$low\n开盘：$open\n收盘：$close"
+			HoneyLanguage.Japanese.code -> ""
+			HoneyLanguage.Korean.code -> ""
+			HoneyLanguage.Russian.code -> ""
+			HoneyLanguage.TraditionalChinese.code -> ""
+			else -> ""
+		}
+	}
+	
+	@JvmField
 	val searchExchangesNames: (exchangeNames: String) -> String = {
 		when(currentLanguage) {
 			HoneyLanguage.English.code -> ""
