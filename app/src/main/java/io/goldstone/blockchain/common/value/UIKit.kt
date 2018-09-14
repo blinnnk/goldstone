@@ -11,6 +11,9 @@ import org.jetbrains.anko.px2sp
  * @author KaySaith
  * @description
  * Common interface parameters, including color, original size, etc.
+ * @rewriteDate 10/09/2018 7:54 PM
+ * @reWriter wcx
+ * @description 添加密码解锁handler标识PasswordRetrievalHandlerMark
  */
 object GrayScale {
 	@JvmField
@@ -157,6 +160,11 @@ object AvatarSize {
 object TokenDetailSize {
 	@JvmField
 	val headerHeight = 300.uiPX()
+}
+
+object PasswordRetrievalHandlerMark {
+	const val setNewPassword = 1
+	const val incompletePassword = 2
 }
 
 object Count {

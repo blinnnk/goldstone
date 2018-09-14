@@ -46,6 +46,9 @@ import java.util.concurrent.Executors
 /**
  * @date 25/03/2018 10:52 PM
  * @author KaySaith
+ * @rewriteDate 14/09/2018 11:35 PM
+ * @reWriter wcx
+ * @description pinCode相关逻辑修改为walletLock
  */
 class ProfilePresenter(
 	override val fragment: ProfileFragment
@@ -122,7 +125,7 @@ class ProfilePresenter(
 						override val textSize: Float = fragment.view?.fontSize(14).orZero()
 					}.getFixString()
 				),
-				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
+				ProfileModel(R.drawable.pin_code_icon, ProfileText.walletLock, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.contact_us_icon, ProfileText.support, ""),
