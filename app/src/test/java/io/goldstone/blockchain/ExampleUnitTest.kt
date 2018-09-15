@@ -15,6 +15,6 @@ class ExampleUnitTest {
 	fun mergeListAndDistinct() {
 		val list1 = listOf(1, 2, 3, 4, 5, 6)
 		val list2 = listOf(10, 20, 30, 4, 5, 6)
-		LogUtil.debug("mergeListAndDistinct", "${list1.plus(list2).distinct()}")
+		LogUtil.debug("mergeListAndDistinct", "${list1.asSequence().plus(list2).distinct().toList()}")
 	}
 }

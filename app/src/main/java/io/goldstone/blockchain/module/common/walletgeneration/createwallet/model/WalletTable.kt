@@ -15,8 +15,8 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.EOSWalletType
 import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -182,6 +182,14 @@ data class WalletTable(
 			}
 		}
 
+		fun getAllEOSAccountNames(hold: List<String>.() -> Unit) {
+			load {
+				GoldStoneDataBase.database.walletDao().getAllWallets()
+			} then { it ->
+				hold(it.map { it.currentEOSAccountName.getCurrent() })
+			}
+		}
+
 		fun getAllBCHAddresses(hold: List<String>.() -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
@@ -278,7 +286,9 @@ data class WalletTable(
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				val type = when {
-					EOSWalletUtils.isValidAccountName(currentEOSAccountName.getCurrent()) -> EOSWalletType.Available
+					EOSWalletUtils.isValidAccountName(
+						currentEOSAccountName.getCurrent()
+					) -> EOSWalletType.Available
 					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 					eosAccountNames.filter {
 						it.chainID.equals(Config.getEOSCurrentChain(), true)
@@ -289,7 +299,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getWalletType(hold: (WalletType, WalletTable) -> Unit) {
+		fun getWalletType(@UiThread hold: (WalletType, WalletTable) -> Unit) {
 			WalletTable.getCurrentWallet {
 				hold(getTargetWalletType(this), this)
 			}

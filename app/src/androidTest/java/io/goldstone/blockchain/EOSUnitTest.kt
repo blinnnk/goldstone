@@ -7,9 +7,11 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.eos.account.EosPrivateKey
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.*
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.eos.eosram.EOSRamModel
@@ -17,6 +19,7 @@ import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.netcpumodel.EOSNetCPUModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -56,7 +59,8 @@ class EOSUnitTest {
 			"eosio.token",
 			"eosio",
 			200000L,
-			"dd"
+			"dd",
+			CoinSymbol.eos
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		val compareResult = transactionInfoCode == expectResult
@@ -70,9 +74,9 @@ class EOSUnitTest {
 		val authorization = EOSAuthorization("eosio.token", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization, authorization)
 		val action = EOSAction(
-			"eosio.token",
+			EOSCodeName.EOSIOToken,
 			"00a6823403ea30550000000000ea3055400d03000000000004454f5300000000026464",
-			"transfer",
+			EOSTransactionMethod.Transfer,
 			authorizationObjects
 		)
 		val result = EOSAction.createMultiActionObjects(action, action)
@@ -97,9 +101,9 @@ class EOSUnitTest {
 		val authorization = EOSAuthorization("eosio.token", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 		val action = EOSAction(
-			"eosio.token",
+			EOSCodeName.EOSIOToken,
 			"00a6823403ea30550000000000ea3055400d03000000000004454f5300000000026464",
-			"transfer",
+			EOSTransactionMethod.Transfer,
 			authorizationObjects
 		)
 		val transaction = UnSignedTransaction(
@@ -158,7 +162,7 @@ class EOSUnitTest {
 		val data = "302933372dcaa683205c9cce4fe3bae6020000000000000004454f53000000000a74657374207472616e73"
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
-		val action = EOSAction("eosio.token", data, "transfer", authorizationObjects)
+		val action = EOSAction(EOSCodeName.EOSIOToken, data, EOSTransactionMethod.Transfer, authorizationObjects)
 		val serializedExpirationDate = EOSUtils.getExpirationCode(1535958970)
 		val serializedRefBlockNumber = EOSUtils.getRefBlockNumberCode(12873742)
 		val serializeRefBlockPrefix = EOSUtils.getRefBlockPrefixCode(1738495360)
@@ -205,9 +209,10 @@ class EOSUnitTest {
 	fun digestForSignature() {
 		val expectResult = "SIG_K1_KiKNEc71CkZpunpcrNa31kV9cg5JPrpAPp7SfSoweu7XbKMCwEoFrkLqysunhJc8kYPEW94UNnQ5SEuLeFKKfAoRRrUVLZ"
 		val hash = Sha256.from(Hex.decode("038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dcabadf8c5b0e7080559f67000000000100a6823403ea3055000000572d3ccdcd01302933372dcaa68300000000a8ed32322b302933372dcaa683205c9cce4fe3bae6020000000000000004454f53000000000a74657374207472616e73000000000000000000000000000000000000000000000000000000000000000000"))
-		val eosPrivateKey = EosPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv")
+		val eosPrivateKey = EOSPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv")
 		val result = eosPrivateKey.sign(hash).toString()
 		val compareResult = result == expectResult
+		LogUtil.debug("$position digestForSignature", result)
 		Assert.assertTrue("Get Wrong Signed Result", compareResult)
 	}
 
@@ -217,13 +222,14 @@ class EOSUnitTest {
 			"kingofdragon",
 			"wuxianyinli2",
 			2,
-			"test trans"
+			"test trans",
+			CoinSymbol.eos
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		val header = TransactionHeader(ExpirationType.FiveMinutes, 12873742, 1738495360)
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
-		val action = EOSAction("eosio.token", transactionInfoCode, "transfer", authorizationObjects)
+		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.Transfer, authorizationObjects)
 		EOSTransactionUtils.serialize(
 			EOSChain.Test,
 			header,
@@ -344,7 +350,7 @@ class EOSUnitTest {
 	@Test
 	fun signPackedData() {
 		val packedData = "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca8cad8f5b363393c1da1a00000000030000000000ea305500409e9a2264b89a01302933372dcaa68300000000a8ed323266302933372dcaa6831002551163076fef01000000010002a5bd18039fb67451d9c192fba2b64fe988284cce252b7ff0840604ad9c21bb450100000001000000010002a5bd18039fb67451d9c192fba2b64fe988284cce252b7ff0840604ad9c21bb45010000000000000000ea3055000000004873bd3e01302933372dcaa68300000000a8ed323220302933372dcaa6831002551163076fef50c300000000000004454f53000000000000000000ea305500003f2a1ba6a24a01302933372dcaa68300000000a8ed323231302933372dcaa6831002551163076fef50c300000000000004454f530000000050c300000000000004454f530000000000000000000000000000000000000000000000000000000000000000000000000000"
-		val signed = EosPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv").sign(Sha256.from(Hex.decode(packedData)))
+		val signed = EOSPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv").sign(Sha256.from(Hex.decode(packedData)))
 		LogUtil.debug("$position signPackedData", signed.toString())
 	}
 }

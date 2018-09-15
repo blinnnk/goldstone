@@ -4,7 +4,7 @@ import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.ethereum.Address
@@ -14,7 +14,7 @@ import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
@@ -76,14 +76,14 @@ object MultiChainUtils {
 		return when {
 			Address(address).isValid() -> AddressType.ETHERCOrETC
 			BTCUtils.isValidMainnetAddress(address)
-				&& symbol.equals(CryptoSymbol.btc(), true) -> AddressType.BTC
+				&& CoinSymbol(symbol).isBTC() -> AddressType.BTC
 			BTCUtils.isValidTestnetAddress(address) -> {
 				when {
-					symbol.equals(CryptoSymbol.bch, true) -> {
+					CoinSymbol(symbol).isBCH() -> {
 						if (Config.isTestEnvironment()) AddressType.BCH
 						else null
 					}
-					symbol.equals(CryptoSymbol.ltc, true) -> {
+					CoinSymbol(symbol).isLTC() -> {
 						if (Config.isTestEnvironment()) AddressType.LTC
 						else null
 					}
@@ -92,22 +92,26 @@ object MultiChainUtils {
 			}
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
 			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
+			EOSWalletUtils.isValidAddress(address) -> AddressType.EOS
+			EOSWalletUtils.isValidAccountName(address, false) ->
+				AddressType.EOSAccountName
 			else -> null
 		}
 	}
 
-	fun getAddressBySymbol(symbol: String?): String {
+	fun getAddressBySymbol(symbol: String?, isEOSAccountName: Boolean = true): String {
 		return when {
-			symbol.equals(CryptoSymbol.btc(), true) ->
+			CoinSymbol(symbol).isBTC() ->
 				AddressUtils.getCurrentBTCAddress()
-			symbol.equals(CryptoSymbol.ltc, true) ->
+			CoinSymbol(symbol).isLTC() ->
 				AddressUtils.getCurrentLTCAddress()
-			symbol.equals(CryptoSymbol.bch, true) ->
+			CoinSymbol(symbol).isBCH() ->
 				AddressUtils.getCurrentBCHAddress()
-			symbol.equals(CryptoSymbol.etc, true) ->
+			CoinSymbol(symbol).isETC() ->
 				Config.getCurrentETCAddress()
-			symbol.equals(CryptoSymbol.eos, true) ->
-				Config.getCurrentEOSAddress()
+			CoinSymbol(symbol).isEOS() ->
+				if (isEOSAccountName) Config.getCurrentEOSName()
+				else Config.getCurrentEOSAddress()
 			else ->
 				Config.getCurrentEthereumAddress()
 		}

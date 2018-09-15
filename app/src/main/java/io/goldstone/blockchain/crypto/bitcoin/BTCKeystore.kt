@@ -1,10 +1,11 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
+import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.multichain.CryptoValue.singleChainFilename
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoValue.singleChainFilename
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -47,7 +48,7 @@ fun Context.exportBase58PrivateKey(
 	password: String,
 	isSingleChainWallet: Boolean,
 	isTest: Boolean,
-	hold: (String?) -> Unit
+	@UiThread hold: (String?) -> Unit
 ) {
 	getPrivateKey(
 		walletAddress,

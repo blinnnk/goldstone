@@ -1,16 +1,18 @@
 package io.goldstone.blockchain.crypto.utils
 
 import android.text.format.DateUtils
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.text.DecimalFormat
@@ -24,27 +26,12 @@ data class InputCodeData(val type: String, val address: String, val count: Doubl
 
 object CryptoUtils {
 
-	fun scaleTo16(address: String): String {
-		return if (address.length < 16) address
-		else address.substring(0, 16) + "..."
-	}
-
-	fun scaleTo22(address: String): String {
-		return if (address.length < 22) address
-		else address.substring(0, 22) + "..."
-	}
-
-	fun scaleTo32(address: String): String {
-		return if (address.length < 32) address
-		else address.substring(0, 32) + "..."
-	}
-
 	fun scaleMiddleAddress(address: String, halfSize: Int = 12): String {
 		return if (address.length > halfSize) address.substring(0, halfSize) + " ... " + address.substring(
 			address.length - halfSize,
 			address.length
 		)
-		else "wrong address"
+		else address
 	}
 
 	fun formatDouble(value: Double): Double {
@@ -159,7 +146,7 @@ object CryptoUtils {
 	}
 }
 
-fun Double.toUnitValue(symbol: String = CryptoSymbol.eth): String {
+fun Double.toUnitValue(symbol: String = CoinSymbol.eth): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 18
 	val value = this / 1000000000000000000.0
@@ -171,8 +158,8 @@ fun Double.toEthCount(): Double {
 	return this / 1000000000000000000.0
 }
 
-fun Double.toEOSUnit(): Double {
-	return this * CryptoValue.eosDecimal
+fun Double.toEOSUnit(): Long {
+	return (this * 10000L).toLong()
 }
 
 fun Long.toEOSCount(): Double {
@@ -274,5 +261,13 @@ fun String.getObjectMD5HexString(): String {
 	} catch (error: Exception) {
 		println(error)
 		"error"
+	}
+}
+
+fun String.isValidDecimal(decimal: Int): Boolean {
+	return when {
+		getDecimalCount().isNull() -> return true
+		getDecimalCount().orZero() > decimal.orZero() -> false
+		else -> true
 	}
 }

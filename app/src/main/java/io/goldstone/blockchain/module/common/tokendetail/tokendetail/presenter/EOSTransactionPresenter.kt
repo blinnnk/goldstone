@@ -34,7 +34,7 @@ fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse { _, _, _ -> }
+			loadDataFromDatabaseOrElse()
 		}
 	}
 }

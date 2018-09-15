@@ -21,7 +21,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -346,7 +346,7 @@ class CreateWalletPresenter(
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach { defaults ->
-						when (defaults.chain_id) {
+						when (defaults.chainID) {
 							ChainID.Main.id,
 							ChainID.Ropsten.id,
 							ChainID.Kovan.id,

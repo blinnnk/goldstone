@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.orElse
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
@@ -13,8 +14,10 @@ import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
@@ -92,6 +95,8 @@ fun GasSelectionPresenter.transferBTC(
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
+									rootFragment,
+									fragment,
 									prepareReceiptModelFromBTCSeries(this@model, fee, it)
 								)
 								callback()

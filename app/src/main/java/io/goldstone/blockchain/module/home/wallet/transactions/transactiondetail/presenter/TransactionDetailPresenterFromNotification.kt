@@ -10,8 +10,9 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -40,7 +41,7 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 		 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 		 */
 		when {
-			CryptoSymbol.isBTCSeriesSymbol(transaction.symbol) ->
+			CoinSymbol(transaction.symbol).isBTCSeries() ->
 				getBitcoinSeriesTransaction(transaction)
 			else -> getETHERC20OrETCTransaction(transaction)
 		}
@@ -139,15 +140,15 @@ fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
 			fragment.apply {
 				showLoadingView(LoadingText.transactionData)
 				when {
-					info.symbol.equals(CryptoSymbol.pureBTCSymbol, true) ->
+					CoinSymbol(info.symbol).isBTC() ->
 						updateBTCTransactionByNotificationHash(info) {
 							removeLoadingView()
 						}
-					info.symbol.equals(CryptoSymbol.ltc, true) ->
+					CoinSymbol(info.symbol).isLTC() ->
 						updateLTCTransactionByNotificationHash(info) {
 							removeLoadingView()
 						}
-					info.symbol.equals(CryptoSymbol.bch, true) -> {
+					CoinSymbol(info.symbol).isBCH() -> {
 						updateBCHTransactionByNotificationHash(info) {
 							removeLoadingView()
 						}
@@ -277,8 +278,8 @@ private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 		(gas.toBigDecimal() * gasPrice.toBigDecimal())
 			.toDouble()
 			.toUnitValue(
-				if (symbol.equals(CryptoSymbol.etc, true)) CryptoSymbol.etc
-				else CryptoSymbol.eth
+				if (TokenContract(contractAddress).isETC()) CoinSymbol.etc
+				else CoinSymbol.eth
 			),
 		if (memo.isEmpty()) TransactionText.noMemo else memo,
 		fromAddress,

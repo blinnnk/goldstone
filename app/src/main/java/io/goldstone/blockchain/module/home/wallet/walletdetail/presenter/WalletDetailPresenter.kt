@@ -164,10 +164,7 @@ class WalletDetailPresenter(
 					ContainerID.main,
 					FragmentTag.tokenDetail
 				) {
-					putSerializable(
-						ArgumentKey.tokenDetail,
-						model
-					)
+					putSerializable(ArgumentKey.tokenDetail, model)
 				}
 			}
 		}

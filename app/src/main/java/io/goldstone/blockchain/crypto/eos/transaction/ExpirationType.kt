@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+
 /**
  * @author KaySaith
  * @date 2018/09/03

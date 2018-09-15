@@ -20,17 +20,18 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -75,7 +76,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 				showAccountInfo()
 				// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
-				if (CryptoSymbol.isBTCSeriesSymbol(rootFragment?.token?.symbol))
+				if (CoinSymbol(rootFragment?.token?.symbol).isBTCSeries())
 					showCustomChangeAddressCell()
 				else showMemoCell()
 
@@ -89,7 +90,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 					}
 				}.click {
 					it.showLoadingStatus()
-					presenter.goToGasEditorFragment {
+					presenter.goToGasEditorFragmentOrTransfer {
 						it.showLoadingStatus(false)
 					}
 				}.into(this)
@@ -157,7 +158,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			setTitle(PrepareTransferText.memoInformation)
 			memo.apply {
 				setTitle(PrepareTransferText.memo)
-				setSubtitle(CryptoUtils.scaleTo32(PrepareTransferText.addAMemo))
+				setSubtitle(PrepareTransferText.addAMemo.scaleTo(32))
 				showArrow()
 			}.click {
 				getParentContainer()?.showMemoInputView { content ->
@@ -179,7 +180,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			setTitle(PrepareTransferText.customChangeAddress)
 			customChangeAddressCell.apply {
 				setTitle(PrepareTransferText.changeAddress)
-				setSubtitle(CryptoUtils.scaleTo16(changeAddress))
+				setSubtitle(changeAddress.scaleTo(16))
 				showArrow()
 			}.click {
 				showCustomChangeAddressOverlay()
@@ -209,16 +210,18 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}.apply {
 				confirmEvent = Runnable {
 					val customAddress = addressInput.text?.toString().orEmpty()
-					if (presenter.getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
-						presenter.isValidAddressOrElse(customAddress) isTrue {
-							// 更新默认的自定义找零地址
-							changeAddress = customAddress
-						}
-					} else {
-						presenter.isValidLTCAddressOrElse(customAddress) isTrue {
-							// 更新默认的自定义找零地址
-							changeAddress = customAddress
-						}
+					when {
+						TokenContract(presenter.getToken()?.contract).isBTC() ||
+							TokenContract(presenter.getToken()?.contract).isBCH() ->
+							presenter.isValidAddressOrElse(customAddress) isTrue {
+								// 更新默认的自定义找零地址
+								changeAddress = customAddress
+							}
+						TokenContract(presenter.getToken()?.contract).isLTC() ->
+							presenter.isValidLTCAddressOrElse(customAddress) isTrue {
+								// 更新默认的自定义找零地址
+								changeAddress = customAddress
+							}
 					}
 				}
 			}.into(this)
@@ -267,13 +270,18 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
+		val isEOSTransfer = TokenContract(rootFragment?.token?.contract).isEOS()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {
 				updateConfirmButtonEvent { button ->
 					button.onClick {
-						hold(getMemoContent())
-						removeMemoInputView()
+						if (isValidMemoByChain(isEOSTransfer)) {
+							removeMemoInputView()
+							hold(getMemoContent())
+						} else {
+							this@apply.context.alert(PrepareTransferText.invalidEOSMemoSize)
+						}
 						button.preventDuplicateClicks()
 					}
 				}

@@ -9,10 +9,11 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSrResponse
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -79,17 +80,18 @@ object EOSAPI {
 	}
 
 	fun getAccountEOSBalance(accountName: String, hold: (balance: Double) -> Unit) {
-		getAccountBalanceBySymbol(accountName, CryptoSymbol.eos, hold)
+		getAccountBalanceBySymbol(accountName, CoinSymbol.eos, EOSCodeName.EOSIOToken, hold)
 	}
 
-	private fun getChainInfo(@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit) {
+	fun getChainInfo(
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit
+	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			EOSUrl.getInfo,
 			"",
 			true,
-			{
-				LogUtil.error("getChainInfo", it)
-			}
+			errorCallBack
 		) {
 			isNotEmpty() isTrue {
 				hold(EOSChainInfo(JSONObject(first())))
@@ -101,7 +103,7 @@ object EOSAPI {
 		signatures: List<String>,
 		packedTrxCode: String,
 		errorCallBack: (Throwable) -> Unit,
-		@WorkerThread hold: (EOSrResponse) -> Unit
+		hold: (EOSResponse) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -118,11 +120,12 @@ object EOSAPI {
 				errorCallBack,
 				false
 			) {
+				val response = JSONObject(it)
 				if (it.contains("processed")) {
-					val result = JSONObject(JSONObject(it).safeGet("processed"))
-					val transactionID = result.safeGet("transaction_id")
+					val result = JSONObject(response.safeGet("processed"))
+					val transactionID = response.safeGet("transaction_id")
 					val receipt = JSONObject(result.safeGet("receipt"))
-					hold(EOSrResponse(transactionID, receipt))
+					hold(EOSResponse(transactionID, receipt))
 				} else errorCallBack(Exception("Empty Result Response"))
 			}
 		}
@@ -130,22 +133,25 @@ object EOSAPI {
 
 	fun getTransactionHeaderFromChain(
 		expirationType: ExpirationType,
+		errorCallBack: (Throwable) -> Unit,
 		@WorkerThread hold: (header: TransactionHeader) -> Unit
 	) {
-		getChainInfo {
-			hold(TransactionHeader(it, expirationType))
+		getChainInfo(errorCallBack) { chainInfo ->
+			hold(TransactionHeader(chainInfo, expirationType))
 		}
 	}
 
+	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountBalanceBySymbol(
 		accountName: String,
 		symbol: String,
+		tokenCodeName: EOSCodeName = EOSCodeName.EOSIOToken,
 		hold: (balance: Double) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(
-				Pair("code", "eosio.token"),
+				Pair("code", tokenCodeName.value),
 				Pair("account", accountName),
 				Pair("symbol", symbol)
 			)
@@ -228,10 +234,35 @@ object EOSAPI {
 		}
 	}
 
+	fun getBlockNumberByTxID(
+		txID: String,
+		errorCallBack: (Throwable) -> kotlin.Unit,
+		@WorkerThread hold: (blockNumber: Int?) -> Unit
+	) {
+		getTransactionJSONObjectByTxID(txID, errorCallBack) {
+			hold(it.safeGet("block_num").toIntOrNull())
+		}
+	}
+
 	fun getCPUAndNETUsageByTxID(
 		txID: String,
 		errorCallBack: (Throwable) -> kotlin.Unit,
 		@WorkerThread hold: (cpuUsage: Long, netUsage: Long, status: String) -> Unit
+	) {
+		getTransactionJSONObjectByTxID(txID, errorCallBack) { transaction ->
+			val receipt = transaction.getTargetObject("trx", "receipt")
+			hold(
+				receipt.getTargetChild("cpu_usage_us").toLongOrZero(),
+				receipt.getTargetChild("net_usage_words").toLongOrZero(),
+				receipt.getTargetChild("status")
+			)
+		}
+	}
+
+	private fun getTransactionJSONObjectByTxID(
+		txID: String,
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (JSONObject) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -244,13 +275,8 @@ object EOSAPI {
 				EOSUrl.getTransaction,
 				errorCallBack,
 				false
-			) { transaction ->
-				val receipt = JSONObject(transaction).getTargetObject("trx", "receipt")
-				hold(
-					receipt.getTargetChild("cpu_usage_us").toLongOrZero(),
-					receipt.getTargetChild("net_usage_words").toLongOrZero(),
-					receipt.getTargetChild("status")
-				)
+			) {
+				hold(JSONObject(it))
 			}
 		}
 	}

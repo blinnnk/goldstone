@@ -8,20 +8,21 @@ import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import java.math.BigInteger
 
 /**
  * @date 2018/7/25 3:24 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(count: Double, callback: () -> Unit) {
+fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
+	count: Double, callback: () -> Unit
+) {
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
@@ -74,8 +75,8 @@ private fun PaymentPreparePresenter.generateTransaction(
 	val to: String
 	// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
 	when {
-		getToken()?.contract.equals(CryptoValue.ethContract, true)
-			or getToken()?.contract.equals(CryptoValue.etcContract, true) -> {
+		getToken()?.contract.equals(TokenContract.ethContract, true)
+			or getToken()?.contract.equals(TokenContract.etcContract, true) -> {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count)

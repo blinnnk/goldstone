@@ -185,22 +185,24 @@ fun Context.getPrivateKey(
 	isBTCSeriesWallet: Boolean,
 	isSingleChainWallet: Boolean,
 	errorCallback: (Throwable) -> Unit,
-	hold: (String) -> Unit
+	@UiThread hold: (String) -> Unit
 ) {
-	getKeystoreFile(
-		walletAddress,
-		password,
-		isBTCSeriesWallet,
-		isSingleChainWallet,
-		errorCallback
-	) { it ->
-		WalletUtil.getKeyPairFromWalletFile(
-			it,
+	doAsync {
+		getKeystoreFile(
+			walletAddress,
 			password,
+			isBTCSeriesWallet,
+			isSingleChainWallet,
 			errorCallback
-		)?.let {
-			runOnUiThread {
-				hold(it.privateKey.toString(16))
+		) { it ->
+			WalletUtil.getKeyPairFromWalletFile(
+				it,
+				password,
+				errorCallback
+			)?.let {
+				runOnUiThread {
+					hold(it.privateKey.toString(16))
+				}
 			}
 		}
 	}
@@ -221,11 +223,7 @@ fun Context.getPrivateKeyByWalletID(
 			it,
 			password,
 			errorCallback
-		)?.let {
-			runOnUiThread {
-				hold(it.privateKey)
-			}
-		}
+		)?.let { hold(it.privateKey) }
 	}
 }
 

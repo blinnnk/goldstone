@@ -68,7 +68,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 						visibility = View.GONE
 						lparams(matchParent, 200.uiPX())
 						gravity = Gravity.CENTER
-						LoadingView.addLoadingCircle(this, 50.uiPX())
+						LoadingView.addLoadingCircle(this, 60.uiPX())
 						textView("loading account info from chain") {
 							topPadding = 20.uiPX()
 							layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)

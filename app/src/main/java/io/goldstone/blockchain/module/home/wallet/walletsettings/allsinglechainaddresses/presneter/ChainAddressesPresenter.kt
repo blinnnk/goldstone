@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
@@ -68,7 +68,7 @@ class ChainAddressesPresenter(
 				}
 			},
 			qrCellClickEvent = {
-				val symbol = if (coinType == ChainType.BCH.id) CryptoSymbol.bch else ""
+				val symbol = if (coinType == ChainType.BCH.id) CoinSymbol.bch else ""
 				showQRCode(ContactModel(address, symbol))
 			},
 			keystoreCellClickEvent = {

@@ -5,15 +5,14 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.runOnUiThread
@@ -35,7 +34,7 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onLTCTransactionSucceed()
-				val address = MultiChainUtils.getAddressBySymbol(CryptoSymbol.ltc)
+				val address = MultiChainUtils.getAddressBySymbol(CoinSymbol.ltc)
 				updateWalletDetailLTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -66,7 +65,7 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 	callback: () -> Unit
 ) {
 	MyTokenTable.getBalanceWithContract(
-		CryptoValue.ltcContract,
+		TokenContract.ltcContract,
 		address,
 		false,
 		{ error, reason ->
@@ -75,7 +74,7 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	) {
-		MyTokenTable.updateBalanceWithContract(it, CryptoValue.ltcContract, address)
+		MyTokenTable.updateBalanceWithContract(it, TokenContract.ltcContract, address)
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }

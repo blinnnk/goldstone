@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.eosram
 
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import java.io.Serializable
 
 /**
@@ -27,7 +27,7 @@ data class EOSRamModel(
 		}
 		authorizationObjects = authorizationObjects.substringBeforeLast(",")
 		val eosCount = EOSUtils.convertAmountToValidFormat(eosAmount)
-		return "{\"account\":\"eosio\",\"name\":\"buyram\",\"authorization\":[$authorizationObjects],\"data\":{\"payer\":\"$payerName\",\"receiver\":\"$receiverName\",\"quant\":\"$eosCount ${CryptoSymbol.eos}\"},\"hex_data\":\"\"}"
+		return "{\"account\":\"eosio\",\"name\":\"buyram\",\"authorization\":[$authorizationObjects],\"data\":{\"payer\":\"$payerName\",\"receiver\":\"$receiverName\",\"quant\":\"$eosCount ${CoinSymbol.eos}\"},\"hex_data\":\"\"}"
 	}
 
 	override fun serialize(): String {

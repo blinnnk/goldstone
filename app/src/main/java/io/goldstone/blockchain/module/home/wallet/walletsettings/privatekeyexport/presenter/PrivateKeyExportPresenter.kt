@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter
 
+import android.app.Activity
+import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -16,15 +18,12 @@ import io.goldstone.blockchain.crypto.keystore.getPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 
 /**
  * @date 06/04/2018 1:02 AM
@@ -41,121 +40,116 @@ class PrivateKeyExportPresenter(
 		fragment.arguments?.getInt(ArgumentKey.chainType)
 	}
 
-	fun getPrivateKey(
-		password: String,
-		@UiThread hold: String?.() -> Unit
-	) {
-		if (password.isEmpty()) {
-			fragment.toast(ImportWalletText.exportWrongPassword)
-			hold(null)
-			return
-		}
-		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		WalletTable.getWalletType { walletType, wallet ->
-			if (walletType.content.equals(WalletType.MultiChain.content, true)) {
-				getPrivateKeyByWalletID(password, wallet.id, hold)
-			} else {
-				getPrivateKeyByAddress(password, hold)
-			}
+	fun getPrivateKey(password: String, hold: String?.() -> Unit) {
+		fragment.context?.apply {
+			getPrivateKey(this, address!!, chainType!!, password, hold)
 		}
 	}
 
-	private fun getPrivateKeyByWalletID(
-		password: String,
-		walletID: Int,
-		hold: String?.() -> Unit
-	) {
-		fragment.context?.getPrivateKeyByWalletID(
-			password,
-			walletID,
-			{
-				hold(null)
-				LogUtil.error("getPrivateKeyByWalletID", it)
-			}
+	companion object {
+		fun getPrivateKey(
+			context: Context,
+			address: String,
+			chainType: Int,
+			password: String,
+			@UiThread hold: String?.() -> Unit
 		) {
-			hold(when {
-				ChainType.isSamePrivateKeyRule(chainType!!) && Config.isTestEnvironment() -> {
-					val net =
-						if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-					ECKey.fromPrivate(it).getPrivateKeyAsWiF(net)
-				}
-				chainType == ChainType.LTC.id -> ECKey.fromPrivate(it).getPrivateKeyAsWiF(LitecoinNetParams())
-				chainType == ChainType.EOS.id -> EOSWalletUtils.generateKeyPairByPrivateKey(it).privateKey
-				chainType == ChainType.ETC.id || chainType == ChainType.ETH.id -> it.toString(16)
-				else -> null
-			})
+			if (password.isEmpty()) {
+				context.toast(ImportWalletText.exportWrongPassword)
+				hold(null)
+				return
+			}
+			(context as? Activity)?.apply { SoftKeyboard.hide(this) }
+			WalletTable.getWalletType { walletType, wallet ->
+				if (walletType == WalletType.MultiChain) context.apply {
+					getPrivateKeyByWalletID(
+						password,
+						wallet.id,
+						chainType,
+						hold
+					)
+				} else context.getPrivateKeyByAddress(address, chainType, password, hold)
+			}
 		}
-	}
 
-	private fun getPrivateKeyByAddress(
-		password: String,
-		hold: String?.() -> Unit
-	) {
-		address?.let {
+		private fun Context.getPrivateKeyByAddress(
+			address: String,
+			chainType: Int,
+			password: String,
+			hold: String?.() -> Unit
+		) {
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 			when (chainType) {
 				ChainType.BTC.id,
 				ChainType.BCH.id,
 				ChainType.EOS.id,
-				ChainType.AllTest.id -> getBTCPrivateKeyByAddress(
-					it,
-					password,
-					isSingleChainWallet,
-					hold
-				)
-				ChainType.LTC.id -> fragment.context?.exportLTCBase58PrivateKey(
-					it,
-					password,
-					isSingleChainWallet,
-					hold
-				)
-				else -> getETHERCorETCPrivateKeyByAddress(
-					it,
-					password,
-					isSingleChainWallet,
-					hold
-				)
+				ChainType.AllTest.id -> getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
+				ChainType.LTC.id -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
+				else -> getETHERCorETCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
 			}
 		}
-	}
 
-	private fun getETHERCorETCPrivateKeyByAddress(
-		address: String,
-		password: String,
-		isSingleChainWallet: Boolean,
-		hold: String.() -> Unit
-	) {
-		doAsync {
-			fragment.context?.getPrivateKey(
+		private fun Context.getETHERCorETCPrivateKeyByAddress(
+			address: String,
+			password: String,
+			isSingleChainWallet: Boolean,
+			hold: String.() -> Unit
+		) {
+			getPrivateKey(
 				address,
 				password,
 				false,
 				isSingleChainWallet,
 				{ error ->
-					GoldStoneAPI.context.runOnUiThread { hold("") }
+					hold("")
 					LogUtil.error("getPrivateKey", error)
 				},
 				hold
 			)
 		}
-	}
 
-	private fun getBTCPrivateKeyByAddress(
-		address: String,
-		password: String,
-		isSingleChainWallet: Boolean,
-		hold: String?.() -> Unit
-	) {
-		doAsync {
+		private fun Context.getBTCPrivateKeyByAddress(
+			address: String,
+			password: String,
+			isSingleChainWallet: Boolean,
+			@UiThread hold: String?.() -> Unit
+		) {
+			// 所有 `Get PrivateKey` 都在异步获取在主线程返回
 			val isTest = BTCUtils.isValidTestnetAddress(address)
-			fragment.context?.exportBase58PrivateKey(
-				address,
+			// hold 会在 `exportBase58PrivateKey` 中返回到主线程
+			exportBase58PrivateKey(address, password, isSingleChainWallet, isTest, hold)
+		}
+
+		private fun Context.getPrivateKeyByWalletID(
+			password: String,
+			walletID: Int,
+			chainType: Int,
+			@UiThread hold: String?.() -> Unit
+		) {
+			getPrivateKeyByWalletID(
 				password,
-				isSingleChainWallet,
-				isTest,
-				hold
-			)
+				walletID,
+				{
+					hold(null)
+					LogUtil.error("getPrivateKeyByWalletID", it)
+				}
+			) { privateKeyInteger ->
+				hold(when {
+					ChainType.isSamePrivateKeyRule(chainType) && Config.isTestEnvironment() -> {
+						val net =
+							if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
+						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(net)
+					}
+					chainType == ChainType.LTC.id ->
+						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
+					chainType == ChainType.EOS.id ->
+						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger).privateKey
+					chainType == ChainType.ETC.id || chainType == ChainType.ETH.id ->
+						privateKeyInteger.toString(16)
+					else -> null
+				})
+			}
 		}
 	}
 }

@@ -30,7 +30,7 @@ fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListMode
 				it.contract.equals(token?.contract, true)
 			}.isNotNull {
 				// 有数据后重新执行从数据库拉取数据
-				loadDataFromDatabaseOrElse { _, _, _ -> }
+				loadDataFromDatabaseOrElse()
 			} otherwise {
 				GoldStoneAPI.context.runOnUiThread {
 					// 链上和本地都没有数据就更新一个空数组作为默认

@@ -5,8 +5,8 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
 /**
@@ -83,24 +83,24 @@ object ChainURL {
 
 	fun getChainNameBySymbol(symbol: String): String {
 		return when {
-			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
-			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
-			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
-			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
-			symbol.equals(CryptoSymbol.bch, true) -> Config.getBCHCurrentChainName()
-			symbol.equals(CryptoSymbol.eos, true) -> Config.getEOSCurrentChainName()
+			CoinSymbol(symbol).isETH() -> Config.getCurrentChainName()
+			CoinSymbol(symbol).isETC() -> Config.getETCCurrentChainName()
+			CoinSymbol(symbol).isBTC() -> Config.getBTCCurrentChainName()
+			CoinSymbol(symbol).isLTC() -> Config.getLTCCurrentChainName()
+			CoinSymbol(symbol).isBCH() -> Config.getBCHCurrentChainName()
+			CoinSymbol(symbol).isEOS() -> Config.getEOSCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
 
 	fun getChainTypeBySymbol(symbol: String): ChainType {
 		return when {
-			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
-			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
-			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
-			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
-			symbol.equals(CryptoSymbol.bch, true) -> ChainType.BCH
-			symbol.equals(CryptoSymbol.eos, true) -> ChainType.EOS
+			CoinSymbol(symbol).isETH() -> ChainType.ETH
+			CoinSymbol(symbol).isETC() -> ChainType.ETC
+			CoinSymbol(symbol).isBTC() -> ChainType.BTC
+			CoinSymbol(symbol).isLTC() -> ChainType.LTC
+			CoinSymbol(symbol).isBCH() -> ChainType.BCH
+			CoinSymbol(symbol).isEOS() -> ChainType.EOS
 			else -> ChainType.ETH
 		}
 	}
@@ -110,8 +110,8 @@ object ChainURL {
 			transaction.isERC20Token -> transaction.to
 			ChainURL.etcChainName.any {
 				it.equals(chainName, true)
-			} -> CryptoValue.etcContract
-			else -> CryptoValue.ethContract
+			} -> TokenContract.etcContract
+			else -> TokenContract.ethContract
 		}
 	}
 
@@ -155,7 +155,8 @@ object ChainURL {
 	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC"
 	// LTC
 	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc"
-	@JvmStatic private val ltcTestnetWeb: (method: String) -> String = {
+	@JvmStatic
+	private val ltcTestnetWeb: (method: String) -> String = {
 		"https://chain.so/$it/LTCTEST/"
 	}
 	// ETC

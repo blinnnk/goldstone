@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.EOSWalletType
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.eos.EOSWalletType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -80,7 +80,7 @@ data class WalletDetailCellModel(
 							override fun concurrentJobs() {
 								myTokens.forEach { token ->
 									val type =
-										if (token.contract == CryptoValue.eosContract) eosWalletType
+										if (TokenContract(token.contract).isEOS()) eosWalletType
 										else EOSWalletType.None
 									localTokens.find {
 										it.contract.equals(token.contract, true)
@@ -148,7 +148,7 @@ data class WalletDetailCellModel(
 								override fun concurrentJobs() {
 									myTokens.forEach { token ->
 										val type =
-											if (token.contract == CryptoValue.eosContract) eosWalletType
+											if (token.contract == TokenContract.eosContract) eosWalletType
 											else EOSWalletType.None
 										localTokens.find {
 											it.contract.equals(token.contract, true)

@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 
 /**
  * @date 2018/8/8 2:16 AM
@@ -85,12 +85,12 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val newBTCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ${CryptoSymbol.btc()} Address"
-		HoneyLanguage.Chinese.code -> "新的${CryptoSymbol.btc()}地址"
-		HoneyLanguage.Japanese.code -> "新しい${CryptoSymbol.btc()}アドレス"
-		HoneyLanguage.Korean.code -> "새로운 ${CryptoSymbol.btc()} 주소"
+		HoneyLanguage.English.code -> "New ${CoinSymbol.btc()} Address"
+		HoneyLanguage.Chinese.code -> "新的${CoinSymbol.btc()}地址"
+		HoneyLanguage.Japanese.code -> "新しい${CoinSymbol.btc()}アドレス"
+		HoneyLanguage.Korean.code -> "새로운 ${CoinSymbol.btc()} 주소"
 		HoneyLanguage.Russian.code -> "Новый адрес BTC"
-		HoneyLanguage.TraditionalChinese.code -> "新的${CryptoSymbol.btc()}地址"
+		HoneyLanguage.TraditionalChinese.code -> "新的${CoinSymbol.btc()}地址"
 		else -> ""
 	}
 	@JvmField

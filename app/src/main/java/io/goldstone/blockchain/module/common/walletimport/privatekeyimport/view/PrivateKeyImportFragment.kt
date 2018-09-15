@@ -18,7 +18,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
@@ -165,8 +165,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				override val cellContent =
 					arrayListOf(
 						PrivateKeyType.ETHERCAndETC.content,
-						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.BTC.content),
-						CryptoSymbol.updateSymbolIfInReview(PrivateKeyType.AllBTCSeriesTest.content, true),
+						CoinSymbol.updateSymbolIfInReview(PrivateKeyType.BTC.content),
+						CoinSymbol.updateSymbolIfInReview(PrivateKeyType.AllBTCSeriesTest.content, true),
 						PrivateKeyType.LTC.content,
 						PrivateKeyType.BCH.content,
 						PrivateKeyType.EOS.content

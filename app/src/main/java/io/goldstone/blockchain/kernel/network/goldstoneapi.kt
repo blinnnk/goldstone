@@ -94,7 +94,7 @@ object GoldStoneAPI {
 									listOf<DefaultTokenTable>()
 								}.map {
 									it.apply {
-										it.chain_id = chainID
+										it.chainID = chainID
 										it.isDefault = true
 									}
 								}.apply {

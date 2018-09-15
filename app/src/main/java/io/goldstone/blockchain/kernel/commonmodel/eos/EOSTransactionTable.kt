@@ -11,6 +11,8 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
+import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
@@ -27,11 +29,31 @@ data class EOSTransactionTable(
 	var transactionData: EOSTransactionData,
 	var blockNumber: Int,
 	var time: Long,
-	var status: String,
+	var status: Boolean,
 	var recordAccountName: String,
 	var chainID: String,
 	var isPending: Boolean
 ) : Serializable {
+	constructor(
+		info: EOSTransactionInfo,
+		response: EOSResponse,
+		dataIndex: Int
+	) : this(
+		0,
+		dataIndex,
+		response.transactionID,
+		response.cupUsageByte,
+		response.netUsageByte,
+		EOSTransactionData(info),
+		0, // 需要在数块的时候获取
+		System.currentTimeMillis(),
+		response.executedStatus,
+		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
+		info.fromAccount,
+		Config.getEOSCurrentChain(),
+		true
+	)
+
 	constructor(data: JSONObject, recordAccountName: String) : this(
 		0,
 		dataIndex = data.safeGet("account_action_seq").toIntOrZero(),
@@ -41,7 +63,7 @@ data class EOSTransactionTable(
 		transactionData = EOSTransactionData(data.getTargetObject("action_trace", "act", "data")),
 		blockNumber = data.safeGet("block_num").toIntOrZero(),
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
-		status = "",
+		status = true,
 		recordAccountName = recordAccountName,
 		chainID = Config.getEOSCurrentChain(),
 		isPending = false
@@ -103,6 +125,12 @@ interface EOSTransactionDao {
 
 	@Query("UPDATE eosTransactions SET cupUsage = :cpuUsage, netUsage = :netUsage, status = :status WHERE txID LIKE :txID")
 	fun updateBandWidthAndStatusByTxID(txID: String, cpuUsage: Long, netUsage: Long, status: String)
+
+	@Query("UPDATE eosTransactions SET blockNumber = :blockNumber WHERE txID LIKE :txID")
+	fun updateBlockNumberByTxID(txID: String, blockNumber: Int)
+
+	@Query("UPDATE eosTransactions SET isPending = :pendingStatus WHERE txID LIKE :txID")
+	fun updatePendingStatusByTxID(txID: String, pendingStatus: Boolean = false)
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")
 	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>
