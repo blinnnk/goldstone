@@ -10,11 +10,11 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -42,6 +42,12 @@ class TokenDetailPresenter(
 	private var allData: List<TransactionListModel>? = null
 	val token by lazy {
 		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
+	}
+
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		// 从账单详情返回的时候重新加载本地数据, 账单详情界面可能是 `Observing` 状态恢复
+		loadDataFromDatabaseOrElse()
 	}
 
 	override fun updateData() {
@@ -111,12 +117,12 @@ class TokenDetailPresenter(
 				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
 				// `ETHERC20OrETC` 需要使用到 `localData`
 				when {
-					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
+					CoinSymbol(token?.symbol).isBTCSeries() -> {
 						// This localDataMaxIndex is BTCSeries Transactions Only
 						val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 					}
-					token?.symbol.equals(CryptoSymbol.eos, true) -> {
+					TokenContract(token?.contract).isEOS() -> {
 						// This localDataMaxIndex is EOSSeries Transactions Only
 						val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
@@ -136,32 +142,32 @@ class TokenDetailPresenter(
 		localDataMaxIndex: Int
 	) {
 		when {
-			token?.symbol.equals(CryptoSymbol.etc, true) -> {
+			TokenContract(token?.contract).isETC() -> {
 				if (!hasUpdateData) loadETCChainData(localETHERC20OrETCData)
 				hasUpdateData = true
 			}
 
-			token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
+			TokenContract(token?.contract).isBTC() -> {
 				if (!hasUpdateData) loadBTCChainData(localDataMaxIndex)
 				hasUpdateData = true
 			}
 
-			token?.symbol.equals(CryptoSymbol.bch, true) -> {
+			TokenContract(token?.contract).isBCH() -> {
 				if (!hasUpdateData) loadBCHChainData(localDataMaxIndex)
 				hasUpdateData = true
 			}
 
-			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+			TokenContract(token?.contract).isLTC() -> {
 				if (!hasUpdateData) loadLTCChainData(localDataMaxIndex)
 				hasUpdateData = true
 			}
 
-			token?.symbol.equals(CryptoSymbol.eth, true) -> {
+			TokenContract(token?.contract).isETH() -> {
 				if (!hasUpdateData) loadETHChainData(localETHERC20OrETCData)
 				hasUpdateData = true
 			}
 
-			token?.symbol.equals(CryptoSymbol.eos, true) -> {
+			TokenContract(token?.contract).isEOS() -> {
 				if (!hasUpdateData) loadEOSDataFromChain(localDataMaxIndex)
 				hasUpdateData = true
 			}
@@ -178,17 +184,17 @@ class TokenDetailPresenter(
 			localETHERC20OrETCData: List<TransactionListModel>?,
 			localBTCSeriesData: List<BTCSeriesTransactionTable>?,
 			localEOSSeriesData: List<EOSTransactionTable>?
-		) -> Unit
+		) -> Unit = { _, _, _ -> }
 	) {
 		when (Config.getCurrentWalletType()) {
 			WalletType.Bip44MultiChain.content, WalletType.MultiChain.content -> {
 				when {
-					token?.symbol.equals(CryptoSymbol.etc, true) ->
+					TokenContract(token?.contract).isETC() ->
 						getETHERC20OrETCData(Config.getCurrentETCAddress()) {
 							callback(it, null, null)
 						}
 
-					token?.symbol.equals(CryptoSymbol.pureBTCSymbol, true) -> {
+					TokenContract(token?.contract).isBTC() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBTCAddress(),
 							ChainType.BTC.id
@@ -197,7 +203,7 @@ class TokenDetailPresenter(
 						}
 					}
 
-					token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+					TokenContract(token?.contract).isLTC() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentLTCAddress(),
 							ChainType.LTC.id
@@ -206,7 +212,7 @@ class TokenDetailPresenter(
 						}
 					}
 
-					token?.symbol.equals(CryptoSymbol.bch, true) -> {
+					TokenContract(token?.contract).isBCH() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBCHAddress(),
 							ChainType.BCH.id
@@ -215,7 +221,7 @@ class TokenDetailPresenter(
 						}
 					}
 
-					token?.symbol.equals(CryptoSymbol.eos, true) -> getEOSSeriesData {
+					TokenContract(token?.contract).isEOS() -> getEOSSeriesData {
 						callback(null, null, it)
 					}
 
@@ -274,7 +280,7 @@ class TokenDetailPresenter(
 		TransactionTable.getCurrentChainByAddressAndContract(
 			address,
 			fragment.token?.contract.orEmpty(),
-			ChainID.getChainIDBySymbol(fragment.token?.symbol.orEmpty())
+			CoinSymbol(fragment.token?.symbol).getChainID()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(transactions, address)
@@ -317,11 +323,11 @@ class TokenDetailPresenter(
 			.getTransactionsByAddressAndChainType(address, chainType) { transactions ->
 				transactions.isNotEmpty() isTrue {
 					fragment.updatePageBy(
-						transactions.map {
+						transactions.asSequence().map {
 							TransactionListModel(it)
 						}.sortedByDescending {
 							it.timeStamp
-						},
+						}.toList(),
 						address
 					)
 					fragment.removeLoadingView()
@@ -352,7 +358,7 @@ class TokenDetailPresenter(
 		// 没网的时候返回空数据
 		val now = System.currentTimeMillis()
 		var emptyData = listOf<TokenBalanceTable>()
-		(0 until 7).forEach {
+		for (index in 0 until 7) {
 			emptyData += TokenBalanceTable(symbol, now)
 		}
 		emptyData.updateChartAndHeaderData()

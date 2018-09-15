@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.common.value
 
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 
 /**
  * @date 2018/5/25 8:14 PM
@@ -35,23 +34,6 @@ enum class ChainID(val id: String) {
 				BCHMain.id -> WebUrl.bchMain
 				BCHTest.id -> WebUrl.bchTest
 				else -> ""
-			}
-		}
-
-		fun getChainIDBySymbol(symbol: String): String {
-			return when {
-				symbol.equals(CryptoSymbol.btc(), true) -> {
-					if (Config.isTestEnvironment()) ChainID.BTCTest.id
-					else ChainID.BTCMain.id
-				}
-
-				symbol.equals(CryptoSymbol.etc, true) ->
-					Config.getETCCurrentChain()
-				symbol.equals(CryptoSymbol.ltc, true) ->
-					Config.getLTCCurrentChain()
-				symbol.equals(CryptoSymbol.bch, true) ->
-					Config.getBCHCurrentChain()
-				else -> Config.getCurrentChain()
 			}
 		}
 

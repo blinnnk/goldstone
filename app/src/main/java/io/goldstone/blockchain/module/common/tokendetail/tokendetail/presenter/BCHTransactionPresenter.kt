@@ -4,7 +4,7 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
@@ -38,7 +38,7 @@ fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse { _, _, _ -> }
+			loadDataFromDatabaseOrElse()
 		}
 	}
 }
@@ -69,7 +69,7 @@ private fun loadBCHTransactionsFromChain(
 				item,
 				pageInfo.maxDataIndex + index + 1,
 				address,
-				CryptoSymbol.bch,
+				CoinSymbol.bch,
 				false,
 				ChainType.BCH.id
 			)

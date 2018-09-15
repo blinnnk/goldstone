@@ -15,13 +15,13 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.ethereum.Address
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
+import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -79,7 +79,7 @@ class ContactInputPresenter(
 						ltcAddressText = it.address
 					}
 
-					AddressType.EOS -> {
+					AddressType.EOS, AddressType.EOSAccountName -> {
 						// TODO
 					}
 				}
@@ -113,13 +113,13 @@ class ContactInputPresenter(
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
 		if (!LTCWalletUtils.isValidAddress(ltcAddressText) && ltcAddressText.isNotEmpty()) {
-			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.ltc))
+			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.ltc))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
 		if (!BCHWalletUtils.isValidAddress(bchAddressText) && bchAddressText.isNotEmpty()) {
-			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.bch))
+			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.bch))
 			return
 		}
 
@@ -136,7 +136,7 @@ class ContactInputPresenter(
 			btcMainnetAddressText.isNotEmpty() &&
 			!BTCUtils.isValidMainnetAddress(btcMainnetAddressText)
 		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat(CryptoSymbol.btc()))
+			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.btc()))
 			return
 		}
 		// 符合以上规则的可以进入插入地址

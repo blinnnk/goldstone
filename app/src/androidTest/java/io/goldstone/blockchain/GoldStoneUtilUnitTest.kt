@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
@@ -132,7 +132,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
-			CryptoSymbol.btc(),
+			CoinSymbol.btc(),
 			ChainID.BTCMain.id,
 			{
 				LogUtil.error("getCoinInfo", it)

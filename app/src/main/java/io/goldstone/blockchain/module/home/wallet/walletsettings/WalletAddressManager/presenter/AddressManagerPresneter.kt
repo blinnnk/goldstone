@@ -23,8 +23,8 @@ import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -78,31 +78,31 @@ class AddressManagerPresenter(
 				arrayListOf<Pair<String, String>>().apply {
 					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
+						add(Pair(currentBTCAddress, CoinSymbol.btc()))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.btc()))
 					}
 					// Litecoin Mainnet and Testnet Addresses
 					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
+						add(Pair(currentLTCAddress, CoinSymbol.ltc))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.ltc))
 					}
 					// Bitcoin Cash Mainnet and Testnet Addresses
 					if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBCHAddress, CryptoSymbol.bch))
+						add(Pair(currentBCHAddress, CoinSymbol.bch))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.bch))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
 					}
 					// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
 					if (currentETHAndERCAddress.isNotEmpty()) {
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
-						add(Pair(currentETCAddress, CryptoSymbol.etc))
+						add(Pair(currentETHAndERCAddress, CoinSymbol.erc))
+						add(Pair(currentETHAndERCAddress, CoinSymbol.eth))
+						add(Pair(currentETCAddress, CoinSymbol.etc))
 					}
 					// EOS.io Mainnet and Testnet Addresses
 					if (currentEOSAddress.isNotEmpty()) {
-						add(Pair(currentEOSAddress, CryptoSymbol.eos))
+						add(Pair(currentEOSAddress, CoinSymbol.eos))
 					}
 				}
 			fragment.setMultiChainAddresses(addresses)
@@ -299,8 +299,8 @@ class AddressManagerPresenter(
 						// 新创建的账号插入所有对应的链的默认 `Token`
 						ChainID.getAllEthereumChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.eth,
-								CryptoValue.ethContract,
+								CoinSymbol.eth,
+								TokenContract.ethContract,
 								address,
 								it
 							)
@@ -337,8 +337,8 @@ class AddressManagerPresenter(
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 						ChainID.getAllETCChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.etc,
-								CryptoValue.etcContract,
+								CoinSymbol.etc,
+								TokenContract.etcContract,
 								address,
 								it
 							)
@@ -391,8 +391,8 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							ChainID.getAllEOSChainID().forEach {
 								insertNewAddressToMyToken(
-									CryptoSymbol.eos,
-									CryptoValue.eosContract,
+									CoinSymbol.eos,
+									TokenContract.eosContract,
 									eosKeyPair.address,
 									it
 								)
@@ -446,8 +446,8 @@ class AddressManagerPresenter(
 								)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
-									CryptoSymbol.btc(),
-									CryptoValue.btcContract,
+									CoinSymbol.btc(),
+									TokenContract.btcContract,
 									address,
 									ChainID.BTCMain.id
 								)
@@ -504,22 +504,22 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							// `BTCTest` 是 `BTCSeries` 公用的地址
 							insertNewAddressToMyToken(
-								CryptoSymbol.btc(),
-								CryptoValue.btcContract,
+								CoinSymbol.btc(),
+								TokenContract.btcContract,
 								address,
 								ChainID.BTCTest.id
 							)
 							// 插入 LTC 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								address,
 								ChainID.LTCTest.id
 							)
 							// 插入 BCH 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								address,
 								ChainID.BCHTest.id
 							)
@@ -572,8 +572,8 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								bchKeyPair.address,
 								ChainID.BCHMain.id
 							)
@@ -628,8 +628,8 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								ltcKeyPair.address,
 								ChainID.LTCMain.id
 							)
@@ -726,7 +726,7 @@ class AddressManagerPresenter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chainID }, address))
+						MyTokenTable.insert(MyTokenTable(it.apply { this.chainID = chainID }, address))
 					}
 				}
 			}

@@ -117,7 +117,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						// 移除掉一样的数据
 						serverTokens.filterNot { server ->
 							localTokens.any { local ->
-								local.chain_id.equals(server.chain_id, true)
+								local.chainID.equals(server.chainID, true)
 								&& local.contract.equals(server.contract, true)
 							}
 						}.apply {
@@ -147,7 +147,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 					
 					localTokens.any { local ->
-						local.chain_id.equals(server.chain_id, true)
+						local.chainID.equals(server.chainID, true)
 						&& local.contract.equals(server.contract, true)
 					}
 				}.apply {
@@ -160,7 +160,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								getTokenBySymbolContractAndChainID(
 									server.symbol,
 									server.contract,
-									server.chain_id
+									server.chainID
 								)?.let {
 									update(it.apply {
 										iconUrl = server.iconUrl

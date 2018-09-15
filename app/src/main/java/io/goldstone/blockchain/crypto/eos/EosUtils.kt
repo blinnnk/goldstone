@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isEvenCount
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.hexToLong
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import kotlinx.serialization.toUtf8Bytes
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -132,13 +134,21 @@ object EOSUtils {
 	@Throws
 	fun getRefBlockPrefix(headBlockID: String): Int {
 		if (headBlockID.length < 64) throw Exception("wrong head block id length")
-		return Integer.valueOf(toLittleEndian(headBlockID.substring(16, 24)), 16)
+		return try {
+			toLittleEndian(headBlockID.substring(16, 24)).hexToLong().toInt()
+		} catch (error: Exception) {
+			throw Exception("wrong head block id length wrong prefix")
+		}
 	}
 
 	@Throws
 	fun getRefBlockNumber(headBlockID: String): Int {
 		if (headBlockID.length < 64) throw Exception("wrong head block id length")
-		return Integer.valueOf(headBlockID.substring(0, 8), 16)
+		return try {
+			Integer.valueOf(headBlockID.substring(0, 8), 16)
+		} catch (error: Exception) {
+			throw Exception("wrong head block id length when Integer.valueOf")
+		}
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -173,6 +183,7 @@ object EOSUtils {
 		dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 		return dateFormat.parse(formattedDate).time
 	}
+
 	fun getExpirationCode(timeStamp: Long): String {
 		val writer = EosByteWriter(255)
 		writer.putIntLE(timeStamp.toInt())
@@ -209,5 +220,9 @@ object EOSUtils {
 	fun getHexDataByteLengthCode(hexData: String): String {
 		val formattedHexData = if (hexData.isEvenCount()) hexData else hexData + "0"
 		return EOSUtils.getVariableUInt(Hex.decode(formattedHexData).size)
+	}
+
+	fun isValidMemoSize(memo: String): Boolean {
+		return memo.toUtf8Bytes().size <= EOSValue.memoMaxCharacterSize
 	}
 }

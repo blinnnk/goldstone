@@ -26,11 +26,11 @@ object CryptoName {
 
 	fun getChainNameBySymbol(symbol: String?): String {
 		return when (symbol) {
-			CryptoSymbol.eos -> eos
-			CryptoSymbol.ltc -> ltc
-			CryptoSymbol.etc -> etc
-			CryptoSymbol.bch -> bch
-			CryptoSymbol.btc() -> btc
+			CoinSymbol.eos -> eos
+			CoinSymbol.ltc -> ltc
+			CoinSymbol.etc -> etc
+			CoinSymbol.bch -> bch
+			CoinSymbol.btc() -> btc
 			else -> eth
 		}
 	}
@@ -49,9 +49,9 @@ object CryptoName {
 
 	fun getBTCSeriesContractByChainName(name: String): String? {
 		return listOf(
-			Pair(ltc, CryptoValue.ltcContract),
-			Pair(bch, CryptoValue.bchContract),
-			Pair(btc, CryptoValue.btcContract)
+			Pair(ltc, TokenContract.ltcContract),
+			Pair(bch, TokenContract.bchContract),
+			Pair(btc, TokenContract.btcContract)
 		).firstOrNull {
 			it.first
 				.replace(" ", "")
@@ -78,15 +78,15 @@ enum class ChainType(val id: Int) {
 			getAllBTCSeriesType().any { it == id }
 
 		fun isSamePrivateKeyRule(id: Int): Boolean =
-			listOf(BCH.id, BTC.id, AllTest.id).any {it == id}
+			listOf(BCH.id, BTC.id, AllTest.id).any { it == id }
 
 		fun getChainTypeBySymbol(symbol: String?): Int = when (symbol) {
-			CryptoSymbol.btc() -> BTC.id
-			CryptoSymbol.ltc -> LTC.id
-			CryptoSymbol.eth -> ETH.id
-			CryptoSymbol.etc -> ETC.id
-			CryptoSymbol.bch -> BCH.id
-			CryptoSymbol.eos -> EOS.id
+			CoinSymbol.btc() -> BTC.id
+			CoinSymbol.ltc -> LTC.id
+			CoinSymbol.eth -> ETH.id
+			CoinSymbol.etc -> ETC.id
+			CoinSymbol.bch -> BCH.id
+			CoinSymbol.eos -> EOS.id
 			else -> ETH.id
 		}
 	}

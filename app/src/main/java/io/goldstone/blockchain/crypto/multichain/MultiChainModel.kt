@@ -1,7 +1,6 @@
-package io.goldstone.blockchain.crypto.bitcoin
+package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 
 /**
  * @date 2018/8/6 1:57 AM
@@ -48,16 +47,6 @@ data class MultiChainAddresses(
 		""
 	)
 
-	constructor(address: String, symbol: String) : this(
-		CryptoSymbol.eth.sameAs(symbol, address),
-		CryptoSymbol.etc.sameAs(symbol, address),
-		isBTCMainnetAddressOrEmpty(symbol, address),
-		isBTCSeriesTestnetAddressOrEmpty(symbol, address),
-		CryptoSymbol.ltc.sameAs(symbol, address),
-		CryptoSymbol.bch.sameAs(symbol, address),
-		CryptoSymbol.eos.sameAs(symbol, address)
-		)
-
 	// Ethereum Series
 	constructor(address: String) : this(
 		address,
@@ -70,21 +59,17 @@ data class MultiChainAddresses(
 	)
 
 	companion object {
-		private fun String.sameAs(symbol: String, address: String): String {
-			return if (symbol.equals(this, true)) address
-			else ""
-		}
 
 		private fun isBTCMainnetAddressOrEmpty(symbol: String, address: String): String {
 			return if (
-				CryptoSymbol.pureBTCSymbol.equals(symbol, true) &&
+				CoinSymbol.pureBTCSymbol.equals(symbol, true) &&
 				!Config.isTestEnvironment()
 			) address
 			else ""
 		}
 
 		private fun isBTCSeriesTestnetAddressOrEmpty(symbol: String, address: String): String {
-			return if (CryptoSymbol.isBTCSeriesSymbol(symbol) && Config.isTestEnvironment()) address else ""
+			return if (CoinSymbol(symbol).isBTCSeries() && Config.isTestEnvironment()) address else ""
 		}
 	}
 }

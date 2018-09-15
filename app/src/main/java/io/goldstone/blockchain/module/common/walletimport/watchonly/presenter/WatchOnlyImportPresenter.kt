@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.ethereum.Address

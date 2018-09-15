@@ -5,21 +5,19 @@ package io.goldstone.blockchain.crypto.eos.account
  * @date 2018/09/05
  */
 
-import io.goldstone.blockchain.crypto.eos.ecc.CurveParam
-import io.goldstone.blockchain.crypto.eos.ecc.EcDsa
-import io.goldstone.blockchain.crypto.eos.ecc.EcPoint
-import io.goldstone.blockchain.crypto.eos.ecc.Sha256
+import io.goldstone.blockchain.crypto.eos.ecc.*
 import io.goldstone.blockchain.crypto.eos.eccutils.EcSignature
 import io.goldstone.blockchain.crypto.eos.eccutils.EcTools
 import io.goldstone.blockchain.crypto.eos.eccutils.EosEcUtil
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
+import java.io.Serializable
 import java.math.BigInteger
 import java.security.SecureRandom
 import kotlin.experimental.and
 
-class EosPrivateKey(base58: String) {
+class EOSPrivateKey(base58: String): Serializable {
 
 	val asBigInteger: BigInteger
 	val publicKey: EosPublicKey

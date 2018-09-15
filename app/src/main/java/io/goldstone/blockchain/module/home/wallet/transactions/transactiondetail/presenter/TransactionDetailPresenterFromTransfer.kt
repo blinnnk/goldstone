@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
@@ -25,9 +25,10 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 		updateHeaderValue(headerData)
 		headerModel = headerData
 		when {
-			token.symbol.equals(CryptoSymbol.btc(), true) -> observerBTCTransaction()
-			token.symbol.equals(CryptoSymbol.ltc, true) -> observerLTCTransaction()
-			token.symbol.equals(CryptoSymbol.bch, true) -> observerBCHTransaction()
+			TokenContract(token.contract).isBTC() -> observerBTCTransaction()
+			TokenContract(token.contract).isLTC() -> observerLTCTransaction()
+			TokenContract(token.contract).isBCH() -> observerBCHTransaction()
+			TokenContract(token.contract).isEOS() -> observerEOSTransaction()
 			else -> observerTransaction()
 		}
 	}

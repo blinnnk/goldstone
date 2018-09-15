@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -36,41 +36,41 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 
 		when {
-			CryptoSymbol.isBTCSeriesSymbol(symbol) -> {
+			CoinSymbol(symbol).isBTCSeries() -> {
 				dataFromList?.let {
 					fragment.asyncData = generateModels(it).toArrayList()
 					updateHeaderValue(headerData)
 					fragment.removeLoadingView()
 					if (isPending) {
 						when {
-							symbol.equals(CryptoSymbol.btc(), true) -> observerBTCTransaction()
-							symbol.equals(CryptoSymbol.bch, true) -> observerBCHTransaction()
+							CoinSymbol(symbol).isBTC() -> observerBTCTransaction()
+							CoinSymbol(symbol).isBCH() -> observerBCHTransaction()
 							else -> observerLTCTransaction()
 						}
 					}
 				}
 			}
-			// 目前还没找到判断 EOS Token 系列的统一方法, 暂时使用 AccountName 进行判断
-			// 有可能其中地址是超短地址, 这个暂时没法判断, 所以对来往地址双重验证
-			EOSWalletUtils.isValidAccountName(fromAddress) ||
-				EOSWalletUtils.isValidAccountName(toAddress) -> {
+
+			EOSWalletUtils.isValidAccountName(fromAddress, false) -> {
 				dataFromList?.let {
 					// 本地没有 Miner 信息那么从链上拉取
-					fun updateUI(miner: String = "") {
+					fun updateUI(miner: String) {
 						fragment.asyncData = generateModels(it).toArrayList().apply {
 							if (miner.isNotEmpty()) first().info = miner
 						}
 						updateHeaderValue(headerData)
 						fragment.removeLoadingView()
 					}
-					if (it.minerFee.isEmpty()) getBandWidthUsageAndStatusBy(transactionHash) { cpuUsage, netUsage ->
+					if (it.minerFee.isEmpty()) getBandWidthUsageAndUpdateDatabase(transactionHash) { cpuUsage, netUsage ->
 						val miner = TransactionListModel.generateEOSMinerContent(cpuUsage, netUsage)
 						updateUI(miner)
-					} else updateUI()
+					} else updateUI("") // 如果没有 `Memo` 设置为 `空`
+
+					if (isPending) observerEOSTransaction()
 				}
 			}
 
-			symbol.equals(CryptoSymbol.etc, true) -> {
+			CoinSymbol(symbol).isETC() -> {
 				getETHERC20OrETCMemo(headerData)
 				if (isPending) observerTransaction()
 			}
@@ -86,7 +86,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 	}
 }
 
-private fun getBandWidthUsageAndStatusBy(txID: String, hold: (cpuUsage: Long, netUsage: Long) -> Unit) {
+private fun getBandWidthUsageAndUpdateDatabase(txID: String, hold: (cpuUsage: Long, netUsage: Long) -> Unit) {
 	EOSAPI.getCPUAndNETUsageByTxID(
 		txID,
 		{
@@ -103,7 +103,7 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChainName()
+			if (CoinSymbol(symbol).isETC()) Config.getETCCurrentChainName()
 			else getCurrentChainName()
 		) { memo ->
 			fragment.removeLoadingView()

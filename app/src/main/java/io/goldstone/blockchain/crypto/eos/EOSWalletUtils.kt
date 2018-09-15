@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.crypto.eos
 
-import com.blinnnk.util.TinyNumberUtils
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.eos.EOSValue.maxNameLength
+import io.goldstone.blockchain.crypto.eos.EOSValue.maxSpecialNameLength
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
@@ -22,7 +23,6 @@ import java.math.BigInteger
  */
 
 object EOSWalletUtils {
-	const val maxNameLength = 12
 	fun generateKeyPair(mnemonic: String, path: String): BaseKeyPair {
 		val seed = Mnemonic.mnemonicToSeed(mnemonic, "")
 		val privateKey = generateKey(seed, path).keyPair.privateKey
@@ -55,22 +55,76 @@ object EOSWalletUtils {
 	fun isValidAddress(address: String): Boolean {
 		return when {
 			address.length != CryptoValue.eosAddressLength -> false
-			!address.substring(0, 3).equals(CryptoSymbol.eos, true) -> false
+			!address.substring(0, 3).equals(CoinSymbol.eos, true) -> false
 			else -> true
 		}
 	}
 
-	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> Unit = {}): Boolean {
-		val illegalChars = Regex(".*[!@#\$%¥^&*()_=+?].*")
-		val isIllegalLength = accountName.length != maxNameLength
-		val containsIllegalCharacter = accountName.matches(illegalChars) || accountName.contains(" ")
-		val containsIllegalNumber = accountName.matches(Regex(".*[6-9].*")) || accountName.contains("0")
-		when {
-			isIllegalLength -> hold("Wrong Length")
-			containsIllegalCharacter -> hold("contains illegal character")
-			containsIllegalNumber -> hold("contains illegal number")
-			else -> hold("")
+	/**
+	 * EOS Account Name 没有找到特别清晰的官方文档进行校验
+	 * 这里采用了这个官方的回答进行校验
+	 * https://github.com/EOSIO/eos/issues/955
+	 */
+	fun isValidAccountName(
+		accountName: String,
+		isOnlyNormalName: Boolean = true,
+		hold: (invalidReason: EOSAccountNameChecker) -> Unit = {}
+	): Boolean {
+		val legalCharsIn12 = Regex(".*[a-z1-5.]{0,11}[a-z1-5].*")
+		val legalCharsAt13th = Regex(".*[a-j1-5].*")
+		// 是否是特殊账号决定长度判断的不同
+		val isLegalLength =
+			if (isOnlyNormalName) accountName.length == maxNameLength
+			else accountName.length in 2 .. maxSpecialNameLength
+		if (!isLegalLength) {
+			hold(
+				if (isOnlyNormalName) {
+					if (accountName.length < maxNameLength) EOSAccountNameChecker.TooShort
+					else EOSAccountNameChecker.TooLong
+				} else when {
+					accountName.length > maxSpecialNameLength -> EOSAccountNameChecker.TooLong
+					else -> EOSAccountNameChecker.TooShort
+				}
+			)
+			return false
 		}
-		return TinyNumberUtils.allFalse(isIllegalLength, containsIllegalCharacter, containsIllegalNumber)
+		val isIllegalSuffixSymbol = accountName.last().toString() == "."
+		if (isIllegalSuffixSymbol) {
+			hold(EOSAccountNameChecker.IllegalSuffix)
+			return false
+		}
+		val isLegalCharacter =
+		// 如果是普通用户名检查 `12` 位的规则
+			if (isOnlyNormalName) accountName.none { !it.toString().matches(legalCharsIn12) }
+			// 如果是特定用户名检查前 `12` 位的规则并且额外检查第 `13` 位的规则
+			else {
+				if (accountName.length > maxNameLength)
+					accountName.substring(0, 11).none { !it.toString().matches(legalCharsIn12) } &&
+						accountName.substring(12).none { !it.toString().matches(legalCharsAt13th) }
+				else accountName.none { !it.toString().matches(legalCharsIn12) }
+			}
+		return if (!isLegalCharacter) {
+			hold(
+				if (accountName.matches(Regex(".*[6-9].*")) || accountName.contains("9")) {
+					EOSAccountNameChecker.NumberOtherThan1To5
+				} else if (accountName.length > maxSpecialNameLength) {
+					if (accountName.substring(12).matches(Regex(".*[k-z].*")))
+						EOSAccountNameChecker.IllegalCharacterAt13th
+					else EOSAccountNameChecker.IsLongName
+				} else EOSAccountNameChecker.IsShortName
+			)
+			false
+		} else true
 	}
+}
+
+enum class EOSAccountNameChecker(val content: String) {
+	TooLong("Wrong length, this account name is longer than 12"),
+	TooShort("Wrong Length, this account name is shorter than 12"),
+	NumberOtherThan1To5("Illegal number in this account name, Only allowed in 1 ~ 5"),
+	IllegalCharacterAt13th("the 13th character is must in a~j or 1~5"),
+	ContainsIllegalSymbol("Illegal symbol in this account name, Only allowed '.'"),
+	IllegalSuffix("Illegal suffix in this account name, it never be allowed that contains '.' in name end"),
+	IsShortName("Attention this is a special short account name "),
+	IsLongName("Attention this is a special long account name ")
 }

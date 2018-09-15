@@ -6,7 +6,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.EOSWalletType
+import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 

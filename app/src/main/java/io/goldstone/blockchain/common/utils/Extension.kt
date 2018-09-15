@@ -13,9 +13,9 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.EOSUnit
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -100,12 +100,6 @@ fun <T> Fragment.getGrandFather(): T? {
 		LogUtil.error("getGrandFather", error)
 		null
 	}
-}
-
-
-fun String.toList(): List<String> {
-	return if (contains(",")) split(",")
-	else listOf(this)
 }
 
 fun JSONArray.toList(): List<String> {

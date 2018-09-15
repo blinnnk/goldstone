@@ -340,4 +340,26 @@ object TokenDetailText {
 		else -> ""
 	}
 
+	@JvmField
+	val accountNameSelection = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account Name Selection"
+		HoneyLanguage.Chinese.code -> "Account Name Selection"
+		HoneyLanguage.Japanese.code -> "Account Name Selection"
+		HoneyLanguage.Korean.code -> "Account Name Selection"
+		HoneyLanguage.Russian.code -> "Account Name Selection"
+		HoneyLanguage.TraditionalChinese.code -> "Account Name Selection"
+		else -> ""
+	}
+
+	@JvmField
+	val activationMethod = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Inactivation Account"
+		HoneyLanguage.Chinese.code -> "Inactivation Account"
+		HoneyLanguage.Japanese.code -> "Inactivation Account"
+		HoneyLanguage.Korean.code -> "Inactivation Account"
+		HoneyLanguage.Russian.code -> "Inactivation Account"
+		HoneyLanguage.TraditionalChinese.code -> "Inactivation Account"
+		else -> ""
+	}
+
 }

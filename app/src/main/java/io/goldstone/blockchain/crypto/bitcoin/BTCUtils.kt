@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
@@ -44,7 +44,7 @@ object BTCUtils {
 	fun isValidTestnetAddress(address: String): Boolean {
 		return when {
 			address.isEmpty() -> false
-			!CryptoValue.isBitcoinAddressLength(address)  -> false
+			!CryptoValue.isBitcoinAddressLength(address) -> false
 			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			address.substring(0, 1) != "m" && address.substring(0, 1) != "n" -> false
 			else -> true
@@ -53,10 +53,11 @@ object BTCUtils {
 }
 
 enum class AddressType(val value: String, val symbol: String) {
-	ETHERCOrETC("ethERCOrETC", CryptoSymbol.eth),
-	BTC("btc", CryptoSymbol.pureBTCSymbol),
-	BCH("bch", CryptoSymbol.bch),
-	BTCSeriesTest("btcTest", CryptoSymbol.pureBTCSymbol),
-	LTC("ltc", CryptoSymbol.ltc),
-	EOS("eos", CryptoSymbol.eos)
+	ETHERCOrETC("ethERCOrETC", CoinSymbol.eth),
+	BTC("btc", CoinSymbol.pureBTCSymbol),
+	BCH("bch", CoinSymbol.bch),
+	BTCSeriesTest("btcTest", CoinSymbol.pureBTCSymbol),
+	LTC("ltc", CoinSymbol.ltc),
+	EOS("eos", CoinSymbol.eos),
+	EOSAccountName("eosAccountName", CoinSymbol.eos),
 }

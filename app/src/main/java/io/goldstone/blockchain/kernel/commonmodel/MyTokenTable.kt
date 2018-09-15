@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -48,7 +49,7 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chain_id
+		data.chainID
 	)
 
 	constructor(
@@ -62,7 +63,7 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chain_id
+		data.chainID
 	)
 
 	companion object {
@@ -262,7 +263,7 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.equals(CryptoValue.ethContract, true) ->
+				contract.equals(TokenContract.ethContract, true) ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
 						errorCallback,
@@ -271,7 +272,7 @@ data class MyTokenTable(
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				contract.equals(CryptoValue.etcContract, true) ->
+				contract.equals(TokenContract.etcContract, true) ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
 						errorCallback,
@@ -280,28 +281,28 @@ data class MyTokenTable(
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				contract.equals(CryptoValue.btcContract, true) ->
+				contract.equals(TokenContract.btcContract, true) ->
 					BitcoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
-				contract.equals(CryptoValue.ltcContract, true) ->
+				contract.equals(TokenContract.ltcContract, true) ->
 					LitecoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
 
-				contract.equals(CryptoValue.bchContract, true) ->
+				contract.equals(TokenContract.bchContract, true) ->
 					BitcoinCashApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it else it.toSatoshi().toDouble()
 						callback(balance)
 					}
 
-				contract.equals(CryptoValue.eosContract, true) -> {
+				contract.equals(TokenContract.eosContract, true) -> {
+					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
+					// 网络请求在这额外校验一次.
 					if (EOSWalletUtils.isValidAccountName(Config.getCurrentEOSName())) {
 						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSName(), callback)
-					} else {
-						callback(0.0)
 					}
 				}
 

@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.MultiChainPath
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter

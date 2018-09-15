@@ -18,8 +18,9 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoName
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -74,7 +75,7 @@ class TokenInfoPresenter(
 	}
 
 	fun isBTCSeriesCoin(): Boolean {
-		return CryptoSymbol.isBTCSeriesSymbol(tokenInfo?.symbol)
+		return CoinSymbol(tokenInfo?.symbol).isBTCSeries()
 	}
 
 	private fun showBalance() {
@@ -88,9 +89,9 @@ class TokenInfoPresenter(
 
 	private fun showAddress() {
 		val net = when (tokenInfo?.symbol) {
-			CryptoSymbol.bch, CryptoSymbol.btc() ->
+			CoinSymbol.bch, CoinSymbol.btc() ->
 				if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-			CryptoSymbol.ltc -> if (Config.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
+			CoinSymbol.ltc -> if (Config.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
 			else -> null
 		}
 		val hash160 =
@@ -102,7 +103,7 @@ class TokenInfoPresenter(
 	private fun showTransactionInfo() {
 		val chainType = ChainType.getChainTypeBySymbol(tokenInfo?.symbol)
 		when {
-			CryptoSymbol.isBTCSeriesSymbol(tokenInfo?.symbol) -> BTCSeriesTransactionTable
+			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
 					if (transactions.isEmpty()) {
@@ -132,7 +133,7 @@ class TokenInfoPresenter(
 						fragment.updateLatestActivationDate(latestDate)
 					}
 				}
-			tokenInfo?.symbol == CryptoSymbol.etc -> {
+			TokenContract(tokenInfo?.contract).isETC() -> {
 				TransactionTable.getETCTransactionsByAddress(currentAddress) { transactions ->
 					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 					// 分别查询 `接收的总值` 和 `支出的总值`
@@ -204,7 +205,7 @@ class TokenInfoPresenter(
 		@UiThread hold: (Int) -> Unit
 	) {
 		when (tokenInfo?.symbol) {
-			CryptoSymbol.btc() -> BitcoinApi.getTransactionCount(
+			CoinSymbol.btc() -> BitcoinApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
@@ -213,7 +214,7 @@ class TokenInfoPresenter(
 			) {
 				GoldStoneAPI.context.runOnUiThread { hold(it) }
 			}
-			CryptoSymbol.ltc -> LitecoinApi.getTransactionCount(
+			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
@@ -222,7 +223,7 @@ class TokenInfoPresenter(
 			) {
 				GoldStoneAPI.context.runOnUiThread { hold(it) }
 			}
-			CryptoSymbol.bch -> BitcoinCashApi.getTransactionCount(
+			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(
 				currentAddress,
 				{
 					hold(0)
@@ -238,19 +239,19 @@ class TokenInfoPresenter(
 	companion object {
 		fun getDetailButtonInfo(tokenInfo: WalletDetailCellModel?, currentAddress: String): Pair<Int, String> {
 			val icon = when (tokenInfo?.symbol) {
-				CryptoSymbol.btc() -> R.drawable.blocktrail_icon
-				CryptoSymbol.ltc -> R.drawable.blockcypher_icon
-				CryptoSymbol.bch -> R.drawable.blocktrail_icon
-				CryptoSymbol.eos -> R.drawable.bloks_io_icon
-				CryptoSymbol.etc -> R.drawable.gastracker_icon
+				CoinSymbol.btc() -> R.drawable.blocktrail_icon
+				CoinSymbol.ltc -> R.drawable.blockcypher_icon
+				CoinSymbol.bch -> R.drawable.blocktrail_icon
+				CoinSymbol.eos -> R.drawable.bloks_io_icon
+				CoinSymbol.etc -> R.drawable.gastracker_icon
 				else -> R.drawable.etherscan_icon
 			}
 			val url = when (tokenInfo?.symbol) {
-				CryptoSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
-				CryptoSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
-				CryptoSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
-				CryptoSymbol.eos -> ChainURL.eosAddressDetail(currentAddress)
-				CryptoSymbol.etc -> ChainURL.etcAddressDetail(currentAddress)
+				CoinSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
+				CoinSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
+				CoinSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
+				CoinSymbol.eos -> ChainURL.eosAddressDetail(currentAddress)
+				CoinSymbol.etc -> ChainURL.etcAddressDetail(currentAddress)
 				else -> ChainURL.ethAddressDetail(currentAddress)
 			}
 			return Pair(icon, url)

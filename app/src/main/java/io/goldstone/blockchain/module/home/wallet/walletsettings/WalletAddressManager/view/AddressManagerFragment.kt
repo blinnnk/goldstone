@@ -25,7 +25,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
@@ -223,7 +223,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
 		val title = if (Config.isTestEnvironment()) {
-			"${CryptoSymbol.btc()}/${CryptoSymbol.ltc}/${CryptoSymbol.bch} Test Addresses"
+			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
 		} else {
 			WalletSettingsText.bitcoinAddress(Config.getYingYongBaoInReviewStatus())
 		}
@@ -362,7 +362,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
 					// `BCH` 需要在二维码页面下转换 `CashAddress` 和 `Legacy` 所以需要标记 `BCH Symbol`
-					val symbol = if (coinType == ChainType.BCH.id) CryptoSymbol.bch else ""
+					val symbol = if (coinType == ChainType.BCH.id) CoinSymbol.bch else ""
 					AddressManagerPresenter
 						.showQRCodeFragment(ContactModel(address, symbol), this)
 				}

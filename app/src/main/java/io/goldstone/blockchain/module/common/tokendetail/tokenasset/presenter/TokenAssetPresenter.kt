@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.utils.suffix
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
@@ -45,7 +45,7 @@ class TokenAssetPresenter(
 		getAccountTransactionCount()
 		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
-		val chainName = CryptoSymbol.eos suffix TokenDetailText.chainType
+		val chainName = CoinSymbol.eos suffix TokenDetailText.chainType
 		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
 			TokenInfoPresenter.showThirdPartyAddressDetail(
 				fragment.getGrandFather<TokenDetailOverlayFragment>(),
@@ -83,9 +83,9 @@ class TokenAssetPresenter(
 			fragment.setEOSBalance(balance)
 			val availableRAM = ramQuota - ramUsed
 			val availableCPU = cpuLimit.max - cpuLimit.used
-			val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CryptoSymbol.eos
+			val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
 			val availableNet = netLimit.max - netLimit.used
-			val netEOSValue = "${netWeight.toEOSCount()}" suffix CryptoSymbol.eos
+			val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
 			fragment.setResourcesValue(
 				availableRAM,
 				ramQuota,

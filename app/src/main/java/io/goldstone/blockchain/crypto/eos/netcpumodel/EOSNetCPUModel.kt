@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.netcpumodel
 
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import java.io.Serializable
 
 /**
@@ -29,7 +29,7 @@ data class EOSNetCPUModel(
 		val netEOSCount = EOSUtils.convertAmountToValidFormat(stakeNetEOSAmount)
 		val cpuEOSCount = EOSUtils.convertAmountToValidFormat(stakeCPUEOSAmount)
 		val transferTinyNumber = if (isTransfer) 1 else 0
-		return "{\"account\":\"eosio\",\"name\":\"delegatebw\",\"authorization\":[$authorizationObjects],\"data\":{\"from\":\"$fromAccountName\",\"receiver\":\"$receiverAccountName\",\"stake_net_quantity\":\"$netEOSCount ${CryptoSymbol.eos}\",\"stake_cpu_quantity\":\"$cpuEOSCount ${CryptoSymbol.eos}\",\"transfer\":$transferTinyNumber},\"hex_data\":\"\"}"
+		return "{\"account\":\"eosio\",\"name\":\"delegatebw\",\"authorization\":[$authorizationObjects],\"data\":{\"from\":\"$fromAccountName\",\"receiver\":\"$receiverAccountName\",\"stake_net_quantity\":\"$netEOSCount ${CoinSymbol.eos}\",\"stake_cpu_quantity\":\"$cpuEOSCount ${CoinSymbol.eos}\",\"transfer\":$transferTinyNumber},\"hex_data\":\"\"}"
 	}
 
 	override fun serialize(): String {

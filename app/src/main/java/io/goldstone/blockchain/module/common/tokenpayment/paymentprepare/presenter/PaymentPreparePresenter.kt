@@ -7,7 +7,8 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -23,7 +24,7 @@ class PaymentPreparePresenter(
 	override val fragment: PaymentPrepareFragment
 ) : BasePresenter<PaymentPrepareFragment>() {
 
-	private val rootFragment by lazy {
+	val rootFragment by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 	}
 
@@ -42,7 +43,7 @@ class PaymentPreparePresenter(
 		return rootFragment?.token
 	}
 
-	fun goToGasEditorFragment(callback: () -> Unit) {
+	fun goToGasEditorFragmentOrTransfer(callback: () -> Unit) {
 		val count = fragment.getTransferCount()
 		if (count == 0.0) {
 			fragment.context.alert(AlertText.emptyTransferValue)
@@ -50,33 +51,39 @@ class PaymentPreparePresenter(
 		} else {
 			fragment.toast(LoadingText.calculateGas)
 			when {
-				getToken()?.symbol.equals(CryptoSymbol.btc(), true) ->
-					prepareBTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
-						if (!isSuccessful) {
-							fragment.context.alert(
-								AlertText.balanceNotEnough
-							)
-						}
-						callback()
+				/** 准备 BTC 转账需要的参数 */
+				TokenContract(getToken()?.contract).isBTC() -> prepareBTCPaymentModel(
+					count, fragment.getChangeAddress()
+				) { error ->
+					if (error != TransferError.None) fragment.context?.alert(error.content)
+					// 恢复 Loading 按钮
+					callback()
+				}
+				/** 准备 LTC 转账需要的参数 */
+				TokenContract(getToken()?.contract).isLTC() -> prepareLTCPaymentModel(
+					count, fragment.getChangeAddress()
+				) { error ->
+					if (error != TransferError.None) fragment.context?.alert(error.content)
+					// 恢复 Loading 按钮
+					callback()
+				}
+				/** 准备 BCH 转账需要的参数 */
+				TokenContract(getToken()?.contract).isBCH() -> prepareBCHPaymentModel(
+					count, fragment.getChangeAddress()
+				) { error ->
+					if (error != TransferError.None) fragment.context?.alert(error.content)
+					// 恢复 Loading 按钮
+					callback()
+				}
+				/** 准备 EOS 转账需要的参数 */
+				TokenContract(getToken()?.contract).isEOS() -> transferEOS(count, getToken()?.symbol!!) { error ->
+					when (error) {
+						TransferError.BalanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
+						TransferError.IncorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)
+						else -> callback()
 					}
-				getToken()?.symbol.equals(CryptoSymbol.ltc, true) ->
-					prepareLTCPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
-						if (!isSuccessful) {
-							fragment.context.alert(
-								AlertText.balanceNotEnough
-							)
-						}
-						callback()
-					}
-				getToken()?.symbol.equals(CryptoSymbol.bch, true) -> {
-					prepareBCHPaymentModel(count, fragment.getChangeAddress()) { isSuccessful ->
-						if (!isSuccessful) {
-							fragment.context.alert(
-								AlertText.balanceNotEnough
-							)
-						}
-						callback()
-					}
+					// 恢复 Loading 按钮
+					callback()
 				}
 				else -> prepareETHERC20ETCPaymentModel(count, callback)
 			}

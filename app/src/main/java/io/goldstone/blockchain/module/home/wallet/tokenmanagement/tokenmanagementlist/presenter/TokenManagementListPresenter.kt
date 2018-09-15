@@ -9,11 +9,10 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
@@ -83,7 +82,7 @@ class TokenManagementListPresenter(
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) {
 							sortedList.filterNot {
-								CryptoSymbol.isBTCSeriesSymbol(it.symbol)
+								CoinSymbol(it.symbol).isBTCSeries()
 							}.let {
 								memoryTokenData = it.toArrayList()
 							}

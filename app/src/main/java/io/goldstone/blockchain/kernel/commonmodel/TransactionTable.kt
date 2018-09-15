@@ -11,8 +11,9 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -129,7 +130,7 @@ data class TransactionTable(
 		data.txReceiptStatus,
 		data.input,
 		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
-		else CryptoValue.ethContract,
+		else TokenContract.ethContract,
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
@@ -190,9 +191,9 @@ data class TransactionTable(
 		"1",
 		data.safeGet("input"),
 		when {
-			isETC -> CryptoValue.etcContract
+			isETC -> TokenContract.etcContract
 			CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")) -> data.safeGet("to")
-			else -> CryptoValue.ethContract
+			else -> TokenContract.ethContract
 		},
 		"",
 		"",
@@ -227,13 +228,13 @@ data class TransactionTable(
 		"0",
 		"1",
 		data.input,
-		CryptoValue.etcContract,
+		TokenContract.etcContract,
 		"",
 		"0",
 		"",
 		!data.from.equals(Config.getCurrentETCAddress(), true),
 		false,
-		CryptoSymbol.etc,
+		CoinSymbol.etc,
 		Config.getCurrentETCAddress(),
 		tokenReceiveAddress = data.to,
 		chainID = Config.getETCCurrentChain(),
@@ -447,7 +448,7 @@ interface TransactionDao {
 	)
 	fun getETCTransactionsByAddress(
 		walletAddress: String,
-		symbol: String = CryptoSymbol.etc,
+		symbol: String = CoinSymbol.etc,
 		chainID: String = Config.getETCCurrentChain()
 	): List<TransactionTable>
 

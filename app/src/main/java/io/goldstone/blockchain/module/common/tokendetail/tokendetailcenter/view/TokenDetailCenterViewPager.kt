@@ -6,7 +6,7 @@ import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
@@ -31,7 +31,7 @@ class TokenDetailCenterViewPager(
 		id = ViewPagerID.transactions
 		fragmentList.apply {
 			add(SubFragment(tokenDetail, FragmentTag.tokenDetail))
-			if (fragment.token?.contract.equals(CryptoValue.eosContract, true)) {
+			if (fragment.token?.contract.equals(TokenContract.eosContract, true)) {
 				add(SubFragment(tokenAsset, FragmentTag.tokenAsset))
 			} else {
 				add(SubFragment(tokenInfo, FragmentTag.tokenInfo))
