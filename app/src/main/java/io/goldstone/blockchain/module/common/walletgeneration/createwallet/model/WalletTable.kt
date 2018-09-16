@@ -18,7 +18,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -67,20 +67,53 @@ data class WalletTable(
 	var hasBackUpMnemonic: Boolean = false
 ) : Serializable {
 
-	companion object {
+	fun getCurrentAddressesAndChainID(): List<Pair<String, Int>> {
+		return listOf(
+			Pair(currentBTCAddress, MultiChainType.BTC.id),
+			Pair(currentLTCAddress, MultiChainType.LTC.id),
+			Pair(currentBCHAddress, MultiChainType.BCH.id),
+			Pair(currentBTCSeriesTestAddress, MultiChainType.AllTest.id),
+			Pair(currentETCAddress, MultiChainType.ETC.id),
+			Pair(currentETHAndERCAddress, MultiChainType.ETH.id),
+			Pair(currentEOSAddress, MultiChainType.EOS.id)
+		).filter { it.first.isNotEmpty() }
+	}
 
-		fun getAllCurrentAddresses(wallet: WalletTable): List<Pair<String, Int>> {
-			return listOf(
-				Pair(wallet.currentEOSAddress, ChainType.EOS.id),
-				Pair(wallet.currentBTCSeriesTestAddress, ChainType.AllTest.id),
-				Pair(wallet.currentBTCAddress, ChainType.BTC.id),
-				Pair(wallet.currentBCHAddress, ChainType.BCH.id),
-				Pair(wallet.currentLTCAddress, ChainType.LTC.id),
-				Pair(wallet.currentETHAndERCAddress, ChainType.ETH.id),
-				Pair(wallet.currentETCAddress, ChainType.ETC.id)
-			).filter { it.first.isNotEmpty() }
+	fun getCurrentAddresses(): List<String> {
+		return listOf(
+			currentBTCAddress,
+			currentBTCSeriesTestAddress,
+			currentETCAddress,
+			currentETHAndERCAddress,
+			currentLTCAddress,
+			currentBCHAddress,
+			currentEOSAddress
+		).asSequence().filter { it.isNotEmpty() }.distinctBy { it }.toList()
+	}
+
+	fun getTargetWalletType(): WalletType {
+		val types = listOf(
+			Pair(WalletType.BTCOnly, currentBTCAddress),
+			Pair(WalletType.BTCTestOnly, currentBTCSeriesTestAddress),
+			Pair(WalletType.ETHERCAndETCOnly, currentETHAndERCAddress),
+			Pair(WalletType.LTCOnly, currentLTCAddress),
+			Pair(WalletType.BCHOnly, currentBCHAddress),
+			Pair(WalletType.EOSOnly, currentEOSAddress)
+		).filter {
+			it.second.isNotEmpty()
 		}
+		return when (types.size) {
+			6 -> {
+				// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
+				// BIP44 钱包还是单纯的多链钱包
+				if (ethPath.isNotEmpty()) WalletType.Bip44MultiChain
+				else WalletType.MultiChain
+			}
+			else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
+		}
+	}
 
+	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
 				when (Config.getCurrentWalletType()) {
@@ -145,9 +178,7 @@ data class WalletTable(
 		}
 
 		fun getAll(hold: List<WalletTable>.() -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then (hold)
+			load { GoldStoneDataBase.database.walletDao().getAllWallets() } then (hold)
 		}
 
 		fun getAllETHAndERCAddresses(hold: List<String>.() -> Unit) {
@@ -171,14 +202,6 @@ data class WalletTable(
 				GoldStoneDataBase.database.walletDao().getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentLTCAddress })
-			}
-		}
-
-		fun getAllEOSAddresses(hold: List<String>.() -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then { it ->
-				hold(it.map { it.currentEOSAddress })
 			}
 		}
 
@@ -222,7 +245,7 @@ data class WalletTable(
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) {
 					WalletTable.getCurrentAddresses {
-						hold(it[0])
+						hold(it.first())
 					}
 				} else {
 					hold(null)
@@ -232,63 +255,15 @@ data class WalletTable(
 
 		fun getCurrentAddresses(hold: (List<String>) -> Unit) {
 			WalletTable.getCurrentWallet {
-				listOf(
-					currentBTCAddress,
-					currentBTCSeriesTestAddress,
-					currentETCAddress,
-					currentETHAndERCAddress,
-					currentLTCAddress,
-					currentBCHAddress,
-					currentEOSAddress
-				).filter {
-					it.isNotEmpty()
-				}.apply {
-					if (isEmpty()) hold(this)
-					else distinctBy { it }.let(hold)
-				}
-			}
-		}
-
-		fun getAddressesByWallet(wallet: WalletTable): List<String> {
-			return listOf(
-				wallet.currentBTCAddress,
-				wallet.currentBTCSeriesTestAddress,
-				wallet.currentETCAddress,
-				wallet.currentETHAndERCAddress,
-				wallet.currentLTCAddress,
-				wallet.currentBCHAddress,
-				wallet.currentEOSAddress
-			).filter { it.isNotEmpty() }.distinctBy { it }
-		}
-
-		fun getTargetWalletType(walletTable: WalletTable): WalletType {
-			val types = listOf(
-				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
-				Pair(WalletType.BTCTestOnly, walletTable.currentBTCSeriesTestAddress),
-				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentETHAndERCAddress),
-				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress),
-				Pair(WalletType.BCHOnly, walletTable.currentBCHAddress),
-				Pair(WalletType.EOSOnly, walletTable.currentEOSAddress)
-			).filter {
-				it.second.isNotEmpty()
-			}
-			return when (types.size) {
-				6 -> {
-					// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
-					// BIP44 钱包还是单纯的多链钱包
-					if (walletTable.ethPath.isNotEmpty()) WalletType.Bip44MultiChain
-					else WalletType.MultiChain
-				}
-				else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
+				hold(getCurrentAddresses())
 			}
 		}
 
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				val type = when {
-					EOSWalletUtils.isValidAccountName(
-						currentEOSAccountName.getCurrent()
-					) -> EOSWalletType.Available
+					EOSWalletUtils.isValidAccountName(currentEOSAccountName.getCurrent()) ->
+						EOSWalletType.Available
 					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 					eosAccountNames.filter {
 						it.chainID.equals(Config.getEOSCurrentChain(), true)
@@ -301,7 +276,7 @@ data class WalletTable(
 
 		fun getWalletType(@UiThread hold: (WalletType, WalletTable) -> Unit) {
 			WalletTable.getCurrentWallet {
-				hold(getTargetWalletType(this), this)
+				hold(getTargetWalletType(), this)
 			}
 		}
 
@@ -415,42 +390,15 @@ data class WalletTable(
 		}
 
 		fun updateName(newName: String, callback: () -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { name = newName })
-					}
-				}
-			} then {
-				callback()
-			}
+			load { GoldStoneDataBase.database.walletDao().updateWalletName(newName) } then { callback() }
 		}
 
-		fun updateHint(
-			newHint: String,
-			callback: () -> Unit = {}
-		) {
-			load {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { hint = newHint })
-					}
-				}
-			} then {
-				callback()
-			}
+		fun updateHint(newHint: String, callback: () -> Unit = {}) {
+			load { GoldStoneDataBase.database.walletDao().updateHint(newHint) } then { callback() }
 		}
 
 		fun updateHasBackupMnemonic(callback: () -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { hasBackUpMnemonic = true })
-					}
-				}
-			} then {
-				callback()
-			}
+			load { GoldStoneDataBase.database.walletDao().updateHasBackUp() } then { callback() }
 		}
 
 		fun updateETHAndERCAddresses(
@@ -607,10 +555,16 @@ data class WalletTable(
 			}
 		}
 
-		fun updateEOSAccountNames(accounts: List<EOSAccountInfo>) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().updateCurrentEOSAccountNames(accounts)
-			}
+		fun updateEOSAccountName(
+			accountNames: List<EOSAccountInfo>,
+			@UiThread callback: (hasDefaultAccount: Boolean) -> Unit
+		) {
+			GoldStoneDataBase.database.walletDao().updateCurrentEOSAccountNames(accountNames)
+			// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
+			if (accountNames.size == 1) {
+				val accountName = accountNames.first().name
+				WalletTable.updateEOSDefaultName(accountName) { callback(true) }
+			} else GoldStoneAPI.context.runOnUiThread { callback(false) }
 		}
 
 		fun updateEOSDefaultName(
@@ -640,7 +594,7 @@ data class WalletTable(
 			WalletTable.getCurrentWallet wallet@{
 				doAsync {
 					when (chainType) {
-						ChainType.ETH.id -> {
+						MultiChainType.ETH.id -> {
 							doAsync {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -652,7 +606,7 @@ data class WalletTable(
 							}
 						}
 
-						ChainType.ETC.id -> {
+						MultiChainType.ETC.id -> {
 							doAsync {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -664,7 +618,7 @@ data class WalletTable(
 							}
 						}
 
-						ChainType.LTC.id -> {
+						MultiChainType.LTC.id -> {
 							doAsync {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -676,7 +630,7 @@ data class WalletTable(
 							}
 						}
 
-						ChainType.BCH.id -> {
+						MultiChainType.BCH.id -> {
 							doAsync {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -688,7 +642,7 @@ data class WalletTable(
 							}
 						}
 
-						ChainType.EOS.id -> {
+						MultiChainType.EOS.id -> {
 							doAsync {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -700,7 +654,7 @@ data class WalletTable(
 							}
 						}
 
-						ChainType.BTC.id -> {
+						MultiChainType.BTC.id -> {
 							if (Config.isTestEnvironment()) {
 								GoldStoneDataBase.database.walletDao().update(
 									this@wallet.apply {
@@ -816,6 +770,15 @@ data class WalletTable(
 
 @Dao
 interface WalletDao {
+
+	@Query("UPDATE wallet SET hasBackUpMnemonic = :hasBackUp WHERE isUsing LIKE :isUsing")
+	fun updateHasBackUp(hasBackUp: Boolean = true, isUsing: Boolean = true)
+
+	@Query("UPDATE wallet SET hint = :hint WHERE isUsing LIKE :isUsing")
+	fun updateHint(hint: String, isUsing: Boolean = true)
+
+	@Query("UPDATE wallet SET name = :walletName WHERE isUsing LIKE :isUsing")
+	fun updateWalletName(walletName: String, isUsing: Boolean = true)
 
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?

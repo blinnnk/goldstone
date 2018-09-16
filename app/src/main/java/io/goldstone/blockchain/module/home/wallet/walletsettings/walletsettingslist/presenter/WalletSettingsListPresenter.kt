@@ -16,11 +16,12 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -115,13 +116,13 @@ class WalletSettingsListPresenter(
 		// get current wallet address
 		WalletTable.getCurrentWallet {
 			val addresses = listOf(
-				Pair(ethAddresses, ChainType.ETH.id),
-				Pair(etcAddresses, ChainType.ETC.id),
-				Pair(btcAddresses, ChainType.BTC.id),
-				Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
-				Pair(ltcAddresses, ChainType.LTC.id),
-				Pair(bchAddresses, ChainType.BCH.id),
-				Pair(eosAddresses, ChainType.EOS.id)
+				Pair(ethAddresses, MultiChainType.ETH.id),
+				Pair(etcAddresses, MultiChainType.ETC.id),
+				Pair(btcAddresses, MultiChainType.BTC.id),
+				Pair(btcSeriesTestAddresses, MultiChainType.AllTest.id),
+				Pair(ltcAddresses, MultiChainType.LTC.id),
+				Pair(bchAddresses, MultiChainType.BCH.id),
+				Pair(eosAddresses, MultiChainType.EOS.id)
 			)
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = addresses.size

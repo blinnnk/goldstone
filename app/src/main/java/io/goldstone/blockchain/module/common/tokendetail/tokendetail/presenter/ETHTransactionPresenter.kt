@@ -141,9 +141,7 @@ private fun mergeETHAndERC20Incoming(
 					}
 				) { it ->
 					// 把请求回来的数据转换成 `TransactionTable` 格式
-					logData = it.map {
-						TransactionTable(ERC20TransactionModel(it))
-					}
+					logData = it.map { TransactionTable(ERC20TransactionModel(it)) }
 					completeMark()
 				}
 			}
@@ -193,17 +191,17 @@ private fun diffNewDataAndUpdateLocalData(
 	}
 }
 
-private fun List<TransactionTable>.getUnkonwTokenInfo(callback: () -> Unit) {
+private fun List<TransactionTable>.getUnkonwnTokenInfo(callback: () -> Unit) {
 	DefaultTokenTable.getCurrentChainTokens { localTokens ->
 		filter {
 			it.isERC20Token && it.symbol.isEmpty()
-		}.distinctBy {
+		}.asSequence().distinctBy {
 			it.contractAddress
-		}.filter { unknowData ->
+		}.filter { unknownData ->
 			localTokens.find {
-				it.contract.equals(unknowData.contractAddress, true)
+				it.contract.equals(unknownData.contractAddress, true)
 			}.isNull()
-		}.let { filterData ->
+		}.toList().let { filterData ->
 			if (filterData.isEmpty()) {
 				callback()
 				return@getCurrentChainTokens
@@ -240,8 +238,8 @@ private fun filterCompletedData(
 	data: List<TransactionTable>,
 	hold: (newData: List<TransactionListModel>) -> Unit
 ) {
-	// 从 `Etherscan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
-	data.getUnkonwTokenInfo {
+	// 从 `EtherScan` 拉取下来的没有 `Symbol, Decimal` 的数据从链上获取信息插入到 `DefaultToken` 数据库
+	data.getUnkonwnTokenInfo {
 		// 把拉取到的数据加工数据格式并插入本地数据库
 		completeTransactionInfo(data) list@{
 			object : ConcurrentAsyncCombine() {
@@ -327,8 +325,7 @@ private fun completeTransactionInfo(
 								receiveAddress = transactionInfo?.address
 							}
 
-							TransactionTable.updateModelInfo(
-								transaction,
+							transaction.updateModelInfo(
 								true,
 								tokenInfo.symbol,
 								count.toString(),
@@ -338,8 +335,7 @@ private fun completeTransactionInfo(
 						}
 					} isFalse {
 						/** 不是 ERC20 币种直接默认为 `ETH` */
-						TransactionTable.updateModelInfo(
-							transaction,
+						transaction.updateModelInfo(
 							false,
 							CoinSymbol.eth,
 							transaction.value.toDouble().toEthCount().toString(),

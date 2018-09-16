@@ -3,8 +3,8 @@ package io.goldstone.blockchain.kernel.network.bitcoincash
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
@@ -81,7 +81,7 @@ object BitcoinCashApi {
 					address,
 					CoinSymbol.bch,
 					false,
-					ChainType.BCH.id
+					MultiChainType.BCH.id
 				)
 			)
 		}

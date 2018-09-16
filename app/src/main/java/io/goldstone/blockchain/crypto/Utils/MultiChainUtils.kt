@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.crypto.utils
 
-import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.ethereum.Address
@@ -14,6 +12,7 @@ import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import org.bitcoinj.core.DumpedPrivateKey
@@ -30,7 +29,7 @@ import java.math.BigInteger
 
 object MultiChainUtils {
 
-	fun getMultiChainAddressesByRootKey(rootKey: BigInteger): MultiChainAddresses {
+	fun getMultiChainAddressesByRootKey(rootKey: BigInteger): ChainAddresses {
 		val ethAddress = ECKeyPair.create(rootKey).getAddress().prepend0xPrefix()
 		val mainnet = MainNetParams.get()
 		val btcMainnetAddress = ECKey.fromPrivate(rootKey).toAddress(mainnet).toBase58()
@@ -39,7 +38,7 @@ object MultiChainUtils {
 		val ltcAddress = ECKey.fromPrivate(rootKey).toAddress(LitecoinNetParams()).toBase58()
 		val bchAddress = BCHWalletUtils.getAddressByPrivateKey(rootKey)
 		val eosAddress = EOSWalletUtils.generateKeyPairByPrivateKey(rootKey).address
-		return MultiChainAddresses(
+		return ChainAddresses(
 			ethAddress,
 			ethAddress,
 			btcMainnetAddress,
@@ -96,24 +95,6 @@ object MultiChainUtils {
 			EOSWalletUtils.isValidAccountName(address, false) ->
 				AddressType.EOSAccountName
 			else -> null
-		}
-	}
-
-	fun getAddressBySymbol(symbol: String?, isEOSAccountName: Boolean = true): String {
-		return when {
-			CoinSymbol(symbol).isBTC() ->
-				AddressUtils.getCurrentBTCAddress()
-			CoinSymbol(symbol).isLTC() ->
-				AddressUtils.getCurrentLTCAddress()
-			CoinSymbol(symbol).isBCH() ->
-				AddressUtils.getCurrentBCHAddress()
-			CoinSymbol(symbol).isETC() ->
-				Config.getCurrentETCAddress()
-			CoinSymbol(symbol).isEOS() ->
-				if (isEOSAccountName) Config.getCurrentEOSName()
-				else Config.getCurrentEOSAddress()
-			else ->
-				Config.getCurrentEthereumAddress()
 		}
 	}
 }

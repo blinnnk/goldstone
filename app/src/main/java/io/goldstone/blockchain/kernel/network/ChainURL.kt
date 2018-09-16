@@ -2,10 +2,8 @@ package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
@@ -69,49 +67,13 @@ object ChainURL {
 		ChainText.eosTest
 	)
 
-	fun getChainNameByChainType(type: ChainType): String {
-		return when (type) {
-			ChainType.ETH -> Config.getCurrentChainName()
-			ChainType.ETC -> Config.getETCCurrentChainName()
-			ChainType.BTC -> Config.getBTCCurrentChainName()
-			ChainType.LTC -> Config.getLTCCurrentChainName()
-			ChainType.BCH -> Config.getBCHCurrentChainName()
-			ChainType.EOS -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
-		}
-	}
-
-	fun getChainNameBySymbol(symbol: String): String {
+	fun getContractByTransaction(transaction: TransactionTable, chainName: String): TokenContract {
 		return when {
-			CoinSymbol(symbol).isETH() -> Config.getCurrentChainName()
-			CoinSymbol(symbol).isETC() -> Config.getETCCurrentChainName()
-			CoinSymbol(symbol).isBTC() -> Config.getBTCCurrentChainName()
-			CoinSymbol(symbol).isLTC() -> Config.getLTCCurrentChainName()
-			CoinSymbol(symbol).isBCH() -> Config.getBCHCurrentChainName()
-			CoinSymbol(symbol).isEOS() -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
-		}
-	}
-
-	fun getChainTypeBySymbol(symbol: String): ChainType {
-		return when {
-			CoinSymbol(symbol).isETH() -> ChainType.ETH
-			CoinSymbol(symbol).isETC() -> ChainType.ETC
-			CoinSymbol(symbol).isBTC() -> ChainType.BTC
-			CoinSymbol(symbol).isLTC() -> ChainType.LTC
-			CoinSymbol(symbol).isBCH() -> ChainType.BCH
-			CoinSymbol(symbol).isEOS() -> ChainType.EOS
-			else -> ChainType.ETH
-		}
-	}
-
-	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
-		return when {
-			transaction.isERC20Token -> transaction.to
+			transaction.isERC20Token -> TokenContract(transaction.to)
 			ChainURL.etcChainName.any {
 				it.equals(chainName, true)
-			} -> TokenContract.etcContract
-			else -> TokenContract.ethContract
+			} -> TokenContract.getETH()
+			else -> TokenContract.getETH()
 		}
 	}
 
@@ -181,9 +143,9 @@ object ChainURL {
 	}
 	val ethAddressDetail: (address: String) -> String = {
 		val header = when (Config.getCurrentChain()) {
-			ChainID.Ropsten.id -> ethRopstenWeb
-			ChainID.Kovan.id -> ethKovanWeb
-			ChainID.Rinkeby.id -> ethRinkebyWeb
+			ChainID.ropsten -> ethRopstenWeb
+			ChainID.kovan -> ethKovanWeb
+			ChainID.rinkeby -> ethRinkebyWeb
 			else -> ethMainnetWeb
 		}
 		"$header/address/$it"

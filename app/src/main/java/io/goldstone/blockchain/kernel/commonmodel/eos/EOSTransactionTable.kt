@@ -91,9 +91,7 @@ data class EOSTransactionTable(
 		fun preventDuplicateInsert(name: String, table: EOSTransactionTable) {
 			doAsync {
 				GoldStoneDataBase.database.eosTransactionDao().apply {
-					if (getDataByTxIDAndRecordName(table.txID, name).isNull()) {
-						insert(table)
-					}
+					if (getDataByTxIDAndRecordName(table.txID, name).isNull()) insert(table)
 				}
 			}
 		}

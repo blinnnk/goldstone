@@ -2,9 +2,7 @@ package io.goldstone.blockchain.crypto.utils
 
 import android.text.format.DateUtils
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
@@ -12,7 +10,6 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.text.DecimalFormat
@@ -38,8 +35,8 @@ object CryptoUtils {
 		return DecimalFormat("0.000000000").format(value).toDouble()
 	}
 
-	fun toCountByDecimal(value: Double, decimal: Double = 18.0): Double {
-		return value / Math.pow(10.0, decimal)
+	fun toCountByDecimal(value: Double, decimal: Int = CryptoValue.ethDecimal): Double {
+		return value / Math.pow(10.0, decimal.toDouble())
 	}
 
 	fun toCountByDecimal(value: Long, decimal: Int = 18): Double {
@@ -66,8 +63,8 @@ object CryptoUtils {
 		}
 	}
 
-	fun toValueWithDecimal(count: Double, decimal: Double = 18.0): BigInteger {
-		return (count.toBigDecimal() * Math.pow(10.0, decimal).toBigDecimal()).toBigInteger()
+	fun toValueWithDecimal(count: Double, decimal: Int = CryptoValue.ethDecimal): BigInteger {
+		return (count.toBigDecimal() * Math.pow(10.0, decimal.toDouble()).toBigDecimal()).toBigInteger()
 	}
 
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {

@@ -27,7 +27,6 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
@@ -64,7 +63,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	override val presenter = PaymentPreparePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		changeAddress = MultiChainUtils.getAddressBySymbol(rootFragment?.token?.symbol)
+		changeAddress = CoinSymbol(rootFragment?.token?.symbol).getAddress()
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)
@@ -264,7 +263,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private fun setFromAddress() {
 		from.setSubtitle(
 			CryptoUtils.scaleMiddleAddress(
-				MultiChainUtils.getAddressBySymbol(presenter.getToken()?.symbol)
+				CoinSymbol(presenter.getToken()?.symbol).getAddress()
 			)
 		)
 	}

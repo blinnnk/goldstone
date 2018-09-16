@@ -4,13 +4,14 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toIntOrZero
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
@@ -41,7 +42,7 @@ data class DefaultTokenTable(
 	@SerializedName("name")
 	var name: String,
 	@SerializedName("decimals")
-	var decimals: Double,
+	var decimals: Int,
 	var totalSupply: String? = null,
 	// 个人通过 `Contract` 搜索到的, 和 `Server` 与 `Local` Json 数据都不同的部分.
 	var isDefault: Boolean = true,
@@ -70,7 +71,7 @@ data class DefaultTokenTable(
 		0,
 		0.0,
 		"",
-		0.0,
+		0,
 		"",
 		true,
 		0,
@@ -89,7 +90,7 @@ data class DefaultTokenTable(
 		0,
 		data.price.toDoubleOrNull().orZero(),
 		data.name,
-		data.decimal.toDouble(),
+		data.decimal,
 		"",
 		isDefault,
 		data.weight,
@@ -107,7 +108,7 @@ data class DefaultTokenTable(
 		localData.safeGet("force_show").toInt(),
 		localData.safeGet("price").toDouble(),
 		localData.safeGet("name"),
-		localData.safeGet("decimals").toDouble(),
+		localData.safeGet("decimals").toIntOrZero(),
 		localData.safeGet("total_supply"),
 		TinyNumberUtils.isTrue(localData.safeGet("is_default")),
 		if (localData.safeGet("weight").isEmpty()) 0
@@ -130,7 +131,7 @@ data class DefaultTokenTable(
 		0,
 		0.0,
 		"",
-		0.0,
+		0,
 		data.supply,
 		false,
 		0,
@@ -149,7 +150,7 @@ data class DefaultTokenTable(
 	constructor(
 		contract: String,
 		symbol: String,
-		decimals: Double
+		decimals: Int
 	) : this(
 		0,
 		"",
@@ -163,8 +164,15 @@ data class DefaultTokenTable(
 		"",
 		false,
 		0,
-		CoinSymbol(symbol).getChainID()
+		TokenContract(contract).getCurrentChainID()
 	)
+
+	infix fun insertThen(callback: () -> Unit) {
+		doAsync {
+			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
+			GoldStoneAPI.context.runOnUiThread { callback() }
+		}
+	}
 
 	companion object {
 
@@ -232,7 +240,7 @@ data class DefaultTokenTable(
 								callback()
 							} else {
 								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-								update(targetTokens.filterNot { default ->
+								update(targetTokens.asSequence().filterNot { default ->
 									ChainID.getTestChains().any { it.equals(default.chainID, true) }
 								}.first().apply {
 									exchange = data.exchange
@@ -252,63 +260,25 @@ data class DefaultTokenTable(
 			}
 		}
 
-		fun updateTokenPrice(
-			contract: String,
-			newPrice: Double,
-			callback: () -> Unit = {}
-		) {
-			doAsync {
+		fun updateTokenPrice(contract: String, newPrice: Double, callback: () -> Unit = {}) {
+			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply { price = newPrice })
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
-					}
-			}
+					.updateTokenPrice(newPrice, contract, TokenContract(contract).getCurrentChainID())
+			} then { callback() }
 		}
 
 		fun updateTokenName(contract: String, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply { this.name = name })
-						}
-					}
+					.updateTokenName(name, contract, TokenContract(contract).getCurrentChainID())
 			}
 		}
 
-		fun updateTokenDefaultStatus(
-			contract: String,
-			isDefault: Boolean,
-			name: String,
-			callback: () -> Unit
-		) {
-			doAsync {
+		fun updateTokenDefaultStatus(contract: String, isDefault: Boolean, name: String, callback: () -> Unit) {
+			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply {
-								this.isDefault = isDefault
-								this.name = name
-							})
-							callback()
-						}
-					}
-			}
-		}
-
-		fun insertToken(
-			token: DefaultTokenTable,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.defaultTokenDao().insert(token)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
+					.updateTokenDefaultStatusAndName(isDefault, name, contract, TokenContract(contract).getCurrentChainID())
+			} then { callback() }
 		}
 	}
 }
@@ -318,6 +288,15 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
+
+	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenPrice(newPrice: Double, contract: String, chainID: String)
+
+	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenName(newName: String, contract: String, chainID: String)
+
+	@Query("UPDATE defaultTokens SET name = :newName, isDefault = :isDefault WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenDefaultStatusAndName(isDefault: Boolean, newName: String, contract: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain")
 	fun getCurrentChainTokens(

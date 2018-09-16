@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.utils.suffix
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -36,7 +35,7 @@ class TokenAssetPresenter(
 	}
 
 	private val currentAddress by lazy {
-		MultiChainUtils.getAddressBySymbol(tokenInfo?.symbol)
+		CoinSymbol(tokenInfo?.symbol).getAddress()
 	}
 
 	override fun onFragmentViewCreated() {

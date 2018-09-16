@@ -17,11 +17,10 @@ import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoName
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -57,7 +56,7 @@ class TokenInfoPresenter(
 	}
 
 	private val currentAddress by lazy {
-		MultiChainUtils.getAddressBySymbol(tokenInfo?.symbol)
+		CoinSymbol(tokenInfo?.symbol).getAddress()
 	}
 
 	override fun onFragmentViewCreated() {
@@ -101,7 +100,7 @@ class TokenInfoPresenter(
 	}
 
 	private fun showTransactionInfo() {
-		val chainType = ChainType.getChainTypeBySymbol(tokenInfo?.symbol)
+		val chainType = TokenContract(tokenInfo?.contract).getCurrentChainType().id
 		when {
 			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
@@ -119,9 +118,9 @@ class TokenInfoPresenter(
 						fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 						// 分别查询 `接收的总值` 和 `支出的总值`
 						val totalReceiveValue =
-							transactions.filter { it.isReceive }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+							transactions.asSequence().filter { it.isReceive }.sumByDouble { it.value.toDoubleOrNull().orZero() }
 						val totalSentValue =
-							transactions.filter { !it.isReceive && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+							transactions.asSequence().filter { !it.isReceive && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
 						setTotalValue(totalReceiveValue, totalSentValue)
 						// 获取最近一笔交易的时间显示最后活跃时间
 						val latestDate =
@@ -138,9 +137,9 @@ class TokenInfoPresenter(
 					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 					// 分别查询 `接收的总值` 和 `支出的总值`
 					val totalReceiveValue =
-						transactions.filter { it.isReceived }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+						transactions.asSequence().filter { it.isReceived }.sumByDouble { it.value.toDoubleOrNull().orZero() }
 					val totalSentValue =
-						transactions.filter { !it.isReceived && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+						transactions.asSequence().filter { !it.isReceived && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
 					setTotalValue(totalReceiveValue, totalSentValue)
 					// 获取最近一笔交易的时间显示最后活跃时间
 					val latestDate =
@@ -160,7 +159,7 @@ class TokenInfoPresenter(
 						{ error, reason ->
 							LogUtil.error("getUsableNonce $reason", error)
 						},
-						ChainType.ETH,
+						MultiChainType.ETH,
 						currentAddress
 					) {
 						val convertedCount = it.toInt()
@@ -175,11 +174,11 @@ class TokenInfoPresenter(
 					)
 					// 分别查询 `接收的总值` 和 `支出的总值`
 					val totalReceiveValue =
-						transactions.filter {
+						transactions.asSequence().filter {
 							it.isReceived && it.symbol.equals(tokenInfo?.symbol, true)
 						}.sumByDouble { it.value.toDoubleOrNull().orZero() }
 					val totalSentValue =
-						transactions.filter {
+						transactions.asSequence().filter {
 							!it.isReceived && !it.isFee && it.symbol.equals(tokenInfo?.symbol, true)
 						}.sumByDouble { it.value.toDoubleOrNull().orZero() }
 					setTotalValue(totalReceiveValue, totalSentValue)

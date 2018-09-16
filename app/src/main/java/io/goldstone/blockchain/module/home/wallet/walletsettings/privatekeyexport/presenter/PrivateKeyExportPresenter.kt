@@ -18,6 +18,7 @@ import io.goldstone.blockchain.crypto.keystore.getPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.bitcoinj.core.ECKey
@@ -81,11 +82,11 @@ class PrivateKeyExportPresenter(
 			val isSingleChainWallet =
 				!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 			when (chainType) {
-				ChainType.BTC.id,
-				ChainType.BCH.id,
-				ChainType.EOS.id,
-				ChainType.AllTest.id -> getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
-				ChainType.LTC.id -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
+				MultiChainType.BTC.id,
+				MultiChainType.BCH.id,
+				MultiChainType.EOS.id,
+				MultiChainType.AllTest.id -> getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
+				MultiChainType.LTC.id -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
 				else -> getETHERCorETCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
 			}
 		}
@@ -141,11 +142,11 @@ class PrivateKeyExportPresenter(
 							if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(net)
 					}
-					chainType == ChainType.LTC.id ->
+					ChainType(chainType).isLTC() ->
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
-					chainType == ChainType.EOS.id ->
+					ChainType(chainType).isEOS() ->
 						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger).privateKey
-					chainType == ChainType.ETC.id || chainType == ChainType.ETH.id ->
+					ChainType(chainType).isETC() || ChainType(chainType).isETH() ->
 						privateKeyInteger.toString(16)
 					else -> null
 				})

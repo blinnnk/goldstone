@@ -353,14 +353,7 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		hold: (DefaultTokenTable) -> Unit
 	) {
-		val chainID = when {
-			TokenContract(info.contract).isBTC() -> ChainID.BTCMain.id
-			TokenContract(info.contract).isLTC() -> ChainID.LTCMain.id
-			TokenContract(info.contract).isBCH() -> ChainID.BCHMain.id
-			TokenContract(info.contract).isETC() -> ChainID.ETCMain.id
-			TokenContract(info.contract).isEOS() -> ChainID.EOSMain.id
-			else -> ChainID.Main.id
-		}
+		val chainID = TokenContract(info.contract).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,
 			chainID,

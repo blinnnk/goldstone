@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainID
 
 /**
  * @author KaySaith
@@ -8,6 +8,6 @@ import io.goldstone.blockchain.common.value.ChainID
  */
 
 enum class EOSChain(val id: String) {
-	Main(ChainID.EOSMain.id),
-	Test(ChainID.EOSTest.id)
+	Main(ChainID.eosMain),
+	Test(ChainID.eosTest)
 }

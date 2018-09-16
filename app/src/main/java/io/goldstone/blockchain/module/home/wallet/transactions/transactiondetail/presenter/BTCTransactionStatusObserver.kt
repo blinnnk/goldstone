@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -34,7 +33,7 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBTCTransactionSucceed()
-				val address = MultiChainUtils.getAddressBySymbol(CoinSymbol.btc())
+				val address = CoinSymbol.getBTC().getAddress()
 				updateWalletDetailBTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -64,8 +63,8 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
 	address: String,
 	callback: () -> Unit
 ) {
-	MyTokenTable.getBalanceWithContract(
-		TokenContract.btcContract,
+	MyTokenTable.getBalanceByContract(
+		TokenContract.getBTC(),
 		address,
 		false,
 		{ error, reason ->
@@ -74,7 +73,7 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	) {
-		MyTokenTable.updateBalanceWithContract(it, TokenContract.btcContract, address)
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getBTC())
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }

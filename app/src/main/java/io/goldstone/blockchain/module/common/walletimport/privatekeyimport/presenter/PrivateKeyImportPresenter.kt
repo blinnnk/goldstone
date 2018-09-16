@@ -9,12 +9,12 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
-import io.goldstone.blockchain.crypto.multichain.MultiChainPath
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.keystore.getWalletByPrivateKey
 import io.goldstone.blockchain.crypto.keystore.keyString
 import io.goldstone.blockchain.crypto.keystore.storeRootKeyByWalletID
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
@@ -99,13 +99,14 @@ class PrivateKeyImportPresenter(
 						multiChainAddresses,
 						walletName,
 						"",
-						MultiChainPath(),
+						ChainPath(),
 						hint,
 						callback
 					)
 				}
 			}
 		}
+
 		/**
 		 * 导入 `keystore` 是先把 `keystore` 解密成 `private key` 在存储, 所以这个方法是公用的
 		 */
@@ -156,10 +157,10 @@ class PrivateKeyImportPresenter(
 					address?.let {
 						WalletImportPresenter.insertWalletToDatabase(
 							context,
-							MultiChainAddresses(it),
+							ChainAddresses(it),
 							name,
 							"",
-							MultiChainPath(),
+							ChainPath(),
 							hint,
 							callback
 						)

@@ -21,11 +21,11 @@ object GenerateMultiChainWallet {
 		context: Context,
 		password: String,
 		hold: (
-			multiChainAddresses: MultiChainAddresses,
+			multiChainAddresses: ChainAddresses,
 			mnemonic: String
 		) -> Unit
 	) {
-		val path = MultiChainPath(
+		val path = ChainPath(
 			DefaultPath.ethPath,
 			DefaultPath.etcPath,
 			DefaultPath.btcPath,
@@ -44,10 +44,10 @@ object GenerateMultiChainWallet {
 		context: Context,
 		mnemonic: String,
 		password: String,
-		path: MultiChainPath,
-		hold: (multiChainAddresses: MultiChainAddresses) -> Unit
+		path: ChainPath,
+		hold: (multiChainAddresses: ChainAddresses) -> Unit
 	) {
-		val addresses = MultiChainAddresses()
+		val addresses = ChainAddresses()
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount: Int = DefaultPath.allPaths().size
 			override fun concurrentJobs() {

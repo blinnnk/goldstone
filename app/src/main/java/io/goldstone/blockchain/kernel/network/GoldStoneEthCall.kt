@@ -8,11 +8,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.callChainBy
@@ -44,7 +45,7 @@ object GoldStoneEthCall {
 		hold: (
 			symbol: String,
 			name: String,
-			decimal: Double
+			decimal: Int
 		) -> Unit
 	) {
 		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
@@ -63,7 +64,7 @@ object GoldStoneEthCall {
 		chainName: String,
 		hold: (
 			symbol: String,
-			decimal: Double
+			decimal: Int
 		) -> Unit
 	) {
 		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
@@ -105,7 +106,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getUsableNonce(
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
-		chainType: ChainType,
+		chainType: MultiChainType,
 		address: String,
 		holdValue: (BigInteger) -> Unit
 	) {
@@ -125,7 +126,7 @@ object GoldStoneEthCall {
 				errorCallback(error, reason)
 				LogUtil.error(EthereumMethod.GetTransactionCount.display, error)
 			},
-			ChainURL.getChainNameByChainType(chainType)
+			ChainType(chainType.id).getCurrentChainName()
 		) {
 			holdValue(it.hexToDecimal().toBigDecimal().toBigInteger())
 		}
@@ -389,7 +390,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
-		holdValue: (Double) -> Unit
+		holdValue: (Int) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -409,7 +410,7 @@ object GoldStoneEthCall {
 			},
 			chainName
 		) {
-			holdValue(it.hexToDecimal())
+			holdValue(it.hexToDecimal().toInt())
 		}
 	}
 
@@ -507,10 +508,10 @@ object GoldStoneEthCall {
 		if (substring(0, 2) == "0x") substring(2 until length) else this
 
 	@JvmStatic
-	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
+	private fun getCurrentEncryptStatusByChainType(type: MultiChainType): Boolean {
 		return when (type) {
-			ChainType.ETC -> Config.isEncryptETCNodeRequest()
-			ChainType.ETH -> Config.isEncryptERCNodeRequest()
+			MultiChainType.ETC -> Config.isEncryptETCNodeRequest()
+			MultiChainType.ETH -> Config.isEncryptERCNodeRequest()
 			else -> Config.isEncryptERCNodeRequest()
 		}
 	}

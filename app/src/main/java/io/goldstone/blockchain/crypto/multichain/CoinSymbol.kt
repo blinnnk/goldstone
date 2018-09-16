@@ -1,13 +1,15 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
+import java.io.Serializable
 
 
 /**
  * @author KaySaith
  * @date  2018/09/14
  */
-class CoinSymbol(val symbol: String?) {
+class CoinSymbol(val symbol: String?) : Serializable {
 	fun isEOS(): Boolean {
 		return symbol.equals(CoinSymbol.eos, true)
 	}
@@ -36,6 +38,24 @@ class CoinSymbol(val symbol: String?) {
 		return allBTCSeriesSymbol().any { it.equals(symbol, true) }
 	}
 
+	fun getAddress(isEOSAccountName: Boolean = true): String {
+		return when {
+			CoinSymbol(symbol).isBTC() ->
+				AddressUtils.getCurrentBTCAddress()
+			CoinSymbol(symbol).isLTC() ->
+				AddressUtils.getCurrentLTCAddress()
+			CoinSymbol(symbol).isBCH() ->
+				AddressUtils.getCurrentBCHAddress()
+			CoinSymbol(symbol).isETC() ->
+				Config.getCurrentETCAddress()
+			CoinSymbol(symbol).isEOS() ->
+				if (isEOSAccountName) Config.getCurrentEOSName()
+				else Config.getCurrentEOSAddress()
+			else ->
+				Config.getCurrentEthereumAddress()
+		}
+	}
+
 	fun getChainID(): String {
 		return when {
 			symbol.equals(CoinSymbol.btc(), true) ->
@@ -52,7 +72,25 @@ class CoinSymbol(val symbol: String?) {
 		}
 	}
 
+	fun getCurrentChainName(): String {
+		return when {
+			CoinSymbol(symbol).isETH() -> Config.getCurrentChainName()
+			CoinSymbol(symbol).isETC() -> Config.getETCCurrentChainName()
+			CoinSymbol(symbol).isBTC() -> Config.getBTCCurrentChainName()
+			CoinSymbol(symbol).isLTC() -> Config.getLTCCurrentChainName()
+			CoinSymbol(symbol).isBCH() -> Config.getBCHCurrentChainName()
+			CoinSymbol(symbol).isEOS() -> Config.getEOSCurrentChainName()
+			else -> Config.getCurrentChainName()
+		}
+	}
+
 	companion object {
+		fun getETH(): CoinSymbol = CoinSymbol(eth)
+		fun getETC(): CoinSymbol = CoinSymbol(etc)
+		fun getBTC(): CoinSymbol = CoinSymbol(pureBTCSymbol)
+		fun getLTC(): CoinSymbol = CoinSymbol(ltc)
+		fun getBCH(): CoinSymbol = CoinSymbol(bch)
+		fun getEOS(): CoinSymbol = CoinSymbol(eos)
 		const val eth = "ETH"
 		const val etc = "ETC"
 		const val pureBTCSymbol = "BTC"

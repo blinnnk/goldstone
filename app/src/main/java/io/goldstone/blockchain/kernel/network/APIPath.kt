@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 
 /**
@@ -83,28 +83,28 @@ object EtherScanApi {
 	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
 	private val etherScanHeader: (chainID: String) -> String = {
 		when (it) {
-			ChainID.Main.id -> mainHeader
-			ChainID.Ropsten.id -> ropstenHeader
-			ChainID.Kovan.id -> kovanHeader
-			ChainID.Rinkeby.id -> rinkebyHeader
+			ChainID.ethMain -> mainHeader
+			ChainID.ropsten -> ropstenHeader
+			ChainID.kovan -> kovanHeader
+			ChainID.rinkeby -> rinkebyHeader
 			else -> ropstenHeader
 		}
 	}
 	private val etherScanLogHeader: (chainID: String) -> String = {
 		when (it) {
-			ChainID.Main.id -> mainLogHeader
-			ChainID.Ropsten.id -> ropstenLogHeader
-			ChainID.Kovan.id -> kovanLogHeader
-			ChainID.Rinkeby.id -> rinkebyLogHeader
+			ChainID.ethMain -> mainLogHeader
+			ChainID.ropsten -> ropstenLogHeader
+			ChainID.kovan -> kovanLogHeader
+			ChainID.rinkeby -> rinkebyLogHeader
 			else -> ropstenLogHeader
 		}
 	}
 	private val transactionDetailHeader: (currentChain: String) -> String = {
 		when (it) {
-			ChainID.Main.id -> "https://etherscan.io/tx/"
-			ChainID.Ropsten.id -> "https://ropsten.etherscan.io/tx/"
-			ChainID.Kovan.id -> "https://kovan.etherscan.io/tx/"
-			ChainID.Rinkeby.id -> "https://rinkeby.etherscan.io/tx/"
+			ChainID.ethMain -> "https://etherscan.io/tx/"
+			ChainID.ropsten -> "https://ropsten.etherscan.io/tx/"
+			ChainID.kovan -> "https://kovan.etherscan.io/tx/"
+			ChainID.rinkeby -> "https://rinkeby.etherscan.io/tx/"
 			else -> "https://etherscan.io/tx/"
 		}
 	}

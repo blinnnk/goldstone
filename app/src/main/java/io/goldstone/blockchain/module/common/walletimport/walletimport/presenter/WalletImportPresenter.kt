@@ -8,8 +8,8 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
-import io.goldstone.blockchain.crypto.multichain.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -38,10 +38,10 @@ class WalletImportPresenter(
 
 		fun insertWalletToDatabase(
 			context: Context?,
-			multiChainAddresses: MultiChainAddresses,
+			multiChainAddresses: ChainAddresses,
 			name: String,
 			encryptMnemonic: String,
-			multiChainPath: MultiChainPath,
+			multiChainPath: ChainPath,
 			hint: String?,
 			callback: (Boolean) -> Unit
 		) {

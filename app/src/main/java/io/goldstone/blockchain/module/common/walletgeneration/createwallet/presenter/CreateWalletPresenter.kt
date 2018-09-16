@@ -18,10 +18,10 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -248,7 +248,7 @@ class CreateWalletPresenter(
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
 		fun generateMyTokenInfo(
-			addresses: MultiChainAddresses,
+			addresses: ChainAddresses,
 			errorCallback: (Exception) -> Unit,
 			callback: (Boolean) -> Unit
 		) {
@@ -322,7 +322,7 @@ class CreateWalletPresenter(
 		}
 
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
-			currentAddresses: MultiChainAddresses,
+			currentAddresses: ChainAddresses,
 			callback: (Boolean) -> Unit
 		) {
 			filter {
@@ -339,7 +339,7 @@ class CreateWalletPresenter(
 		}
 
 		private fun List<DefaultTokenTable>.insertNewAccount(
-			currentAddresses: MultiChainAddresses,
+			currentAddresses: ChainAddresses,
 			callback: () -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
@@ -347,58 +347,47 @@ class CreateWalletPresenter(
 				override fun concurrentJobs() {
 					forEach { defaults ->
 						when (defaults.chainID) {
-							ChainID.Main.id,
-							ChainID.Ropsten.id,
-							ChainID.Kovan.id,
-							ChainID.Rinkeby.id -> {
+							ChainID.ethMain,
+							ChainID.ropsten,
+							ChainID.kovan,
+							ChainID.rinkeby -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.ethAddress))
+									MyTokenTable(defaults, currentAddresses.ethAddress).insert()
 								}
 							}
 
-							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
+							ChainID.etcMain, ChainID.etcTest -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.etcAddress))
+									MyTokenTable(defaults, currentAddresses.etcAddress).insert()
 								}
 							}
 
-							ChainID.EOSMain.id, ChainID.EOSTest.id -> {
+							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eosAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.eosAddress))
+									MyTokenTable(defaults, currentAddresses.eosAddress).insert()
 								}
 							}
 
-							ChainID.BTCMain.id -> {
+							ChainID.btcMain -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcAddress))
+									MyTokenTable(defaults, currentAddresses.btcAddress).insert()
 								}
 							}
 
-							ChainID.BTCTest.id -> {
+							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress).insert()
 								}
 							}
-							ChainID.LTCMain.id -> {
+							ChainID.ltcMain -> {
 								if (currentAddresses.ltcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.ltcAddress))
-								}
-							}
-							ChainID.LTCTest.id -> {
-								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.ltcAddress).insert()
 								}
 							}
 
-							ChainID.BCHMain.id -> {
+							ChainID.bchMain -> {
 								if (currentAddresses.bchAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.bchAddress))
-								}
-							}
-
-							ChainID.BCHTest.id -> {
-								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.bchAddress).insert()
 								}
 							}
 						}

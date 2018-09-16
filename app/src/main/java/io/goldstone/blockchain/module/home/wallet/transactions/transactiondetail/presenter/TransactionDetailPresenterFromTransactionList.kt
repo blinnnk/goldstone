@@ -8,7 +8,6 @@ import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -104,7 +103,7 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 			currentHash,
 			isReceived,
 			if (CoinSymbol(symbol).isETC()) Config.getETCCurrentChainName()
-			else getCurrentChainName()
+			else CoinSymbol(getUnitSymbol()).getCurrentChainName()
 		) { memo ->
 			fragment.removeLoadingView()
 			fragment.asyncData = generateModels(this).toArrayList().apply {
@@ -124,7 +123,7 @@ private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 					{ error, reason ->
 						LogUtil.error("getCurrentChainToken $reason", error)
 					},
-					ChainURL.getChainNameBySymbol(symbol)
+					CoinSymbol(symbol).getCurrentChainName()
 				) {
 					DefaultTokenTable.updateTokenName(contract, it)
 				}

@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TransactionText
@@ -14,13 +17,11 @@ import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -47,8 +48,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	when {
 		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
 		TokenContract(token?.contract).isETH() -> {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!,
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
 				true,
 				{ error, reason ->
@@ -62,8 +63,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		}
 
 		TokenContract(token?.contract).isETC() -> {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!,
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentETCAddress(),
 				true,
 				{ error, reason ->
@@ -79,8 +80,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		else -> {
 			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			// 首先查询 `Token Balance` 余额
-			MyTokenTable.getBalanceWithContract(
-				token?.contract.orEmpty(),
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
 				true,
 				{ error, reason ->
@@ -88,8 +89,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				}
 			) { tokenBalance ->
 				// 查询 `ETH` 余额
-				MyTokenTable.getBalanceWithContract(
-					TokenContract.ethContract,
+				MyTokenTable.getBalanceByContract(
+					TokenContract.getETH(),
 					Config.getCurrentEthereumAddress(),
 					true,
 					{ error, reason ->
@@ -182,7 +183,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 				// Generate Transaction Model
 				val raw = Transaction().apply {
 					chain =
-						ChainDefinition(CryptoValue.chainID(getToken()?.contract.orEmpty()).toLong())
+						ChainDefinition(TokenContract(getToken()?.contract).getCurrentChainID().toLong())
 					nonce = this@model.nonce
 					gasPrice = getSelectedGasPrice(currentMinerType)
 					gasLimit =
@@ -203,7 +204,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 							callback()
 						}
 					},
-					ChainURL.getChainNameBySymbol(getToken()?.symbol.orEmpty())
+					CoinSymbol(getToken()?.symbol).getCurrentChainName()
 				) { taxHash ->
 					LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 					// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的

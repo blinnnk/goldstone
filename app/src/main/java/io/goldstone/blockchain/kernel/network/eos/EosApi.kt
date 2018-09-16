@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos
 
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orZero
@@ -15,12 +16,15 @@ import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -37,7 +41,7 @@ object EOSAPI {
 			ParameterUtil.prepareObjectContent(Pair("account_name", accountName))
 		).let { it ->
 			val api =
-				if (targetNet.isEmpty()) EOSUrl.getAccountInfo
+				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
 				else EOSUrl.getAccountInfoInTargetNet(targetNet)
 			RequisitionUtil.postRequest(
 				it,
@@ -54,14 +58,14 @@ object EOSAPI {
 		publicKey: String,
 		errorCallBack: (Throwable) -> Unit,
 		targetNet: String = "",
-		@WorkerThread hold: (accountNames: List<String>) -> Unit
+		@UiThread hold: (accountNames: List<EOSAccountInfo>) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey))
 		).let { it ->
 			val api =
-				if (targetNet.isEmpty()) EOSUrl.getKeyAccount
+				if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
 				else EOSUrl.getKeyAccountInTargetNet(targetNet)
 			RequisitionUtil.postRequest(
 				it,
@@ -74,7 +78,10 @@ object EOSAPI {
 				(0 until namesJsonArray.length()).forEach {
 					names += namesJsonArray.get(it).toString()
 				}
-				hold(names)
+				// 生成指定的包含链信息的结果类型
+				val accountNames =
+					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain()) }
+				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 			}
 		}
 	}
@@ -88,7 +95,7 @@ object EOSAPI {
 		@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
-			EOSUrl.getInfo,
+			EOSUrl.getInfo(),
 			"",
 			true,
 			errorCallBack
@@ -116,7 +123,7 @@ object EOSAPI {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EOSUrl.pushTransaction,
+				EOSUrl.pushTransaction(),
 				errorCallBack,
 				false
 			) {
@@ -158,7 +165,7 @@ object EOSAPI {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EOSUrl.getAccountEOSBalance,
+				EOSUrl.getAccountEOSBalance(),
 				{
 					LogUtil.error("getAccountEOSBalance", it)
 				},
@@ -222,7 +229,7 @@ object EOSAPI {
 			RequisitionUtil.postRequest<String>(
 				it,
 				"actions",
-				EOSUrl.getTransactionHistory,
+				EOSUrl.getTransactionHistory(),
 				true,
 				errorCallBack,
 				false
@@ -272,7 +279,7 @@ object EOSAPI {
 		).let { it ->
 			RequisitionUtil.postRequest(
 				it,
-				EOSUrl.getTransaction,
+				EOSUrl.getTransaction(),
 				errorCallBack,
 				false
 			) {

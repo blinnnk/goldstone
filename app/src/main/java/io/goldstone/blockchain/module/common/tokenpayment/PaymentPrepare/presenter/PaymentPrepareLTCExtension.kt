@@ -17,7 +17,6 @@ import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -58,7 +57,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	changeAddress: String,
 	hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = MultiChainUtils.getAddressBySymbol(CoinSymbol.ltc)
+	val myAddress = CoinSymbol.getLTC().getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -92,7 +91,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,

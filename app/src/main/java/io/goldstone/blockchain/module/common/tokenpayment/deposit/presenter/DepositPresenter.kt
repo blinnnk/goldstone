@@ -4,8 +4,8 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
@@ -162,10 +162,9 @@ class DepositPresenter(
 			val chainID = if (content.contains("chain_id"))
 				content.substringAfter("chain_id=").substringBefore("e18")
 			else ""
-			val contract = if (
-				chainID.equals(ChainID.ETCMain.id, true) ||
-				chainID.equals(ChainID.ETCTest.id, true)
-			) TokenContract.etcContract else TokenContract.ethContract
+			val contract =
+				if (ChainID(chainID).isETCMain() || ChainID(chainID).isETCTest())
+					TokenContract.etcContract else TokenContract.ethContract
 			return if (content.contains("?")) {
 				val address = content.substringBefore("?").substringAfter(":")
 				val value = content.substringAfter("value=").substringBefore("e18")
@@ -184,7 +183,7 @@ class DepositPresenter(
 				else ""
 			val chainID =
 				when {
-					chainIDContent.isEmpty() -> ChainID.Main.id
+					chainIDContent.isEmpty() -> ChainID.ethMain
 					chainIDContent.contains("&") -> chainIDContent.substringBefore("&")
 					else -> chainIDContent
 				}

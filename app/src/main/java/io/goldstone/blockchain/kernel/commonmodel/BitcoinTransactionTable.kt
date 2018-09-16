@@ -9,10 +9,10 @@ import com.blinnnk.extension.toIntOrZero
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -244,7 +244,7 @@ data class BTCSeriesTransactionTable(
 					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
 					val formattedAddress =
 						if (
-							chainType == ChainType.BCH.id &&
+							ChainType(chainType).isBCH() &&
 							(
 								address.substring(0, 1).equals("m", true) ||
 									address.substring(0, 1).equals("n", true)
