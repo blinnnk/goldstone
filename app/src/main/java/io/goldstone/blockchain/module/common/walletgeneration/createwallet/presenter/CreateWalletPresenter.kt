@@ -352,42 +352,42 @@ class CreateWalletPresenter(
 							ChainID.kovan,
 							ChainID.rinkeby -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.ethAddress))
+									MyTokenTable(defaults, currentAddresses.ethAddress).insert()
 								}
 							}
 
 							ChainID.etcMain, ChainID.etcTest -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.etcAddress))
+									MyTokenTable(defaults, currentAddresses.etcAddress).insert()
 								}
 							}
 
 							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eosAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.eosAddress))
+									MyTokenTable(defaults, currentAddresses.eosAddress).insert()
 								}
 							}
 
 							ChainID.btcMain -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcAddress))
+									MyTokenTable(defaults, currentAddresses.btcAddress).insert()
 								}
 							}
 
 							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress).insert()
 								}
 							}
 							ChainID.ltcMain -> {
 								if (currentAddresses.ltcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.ltcAddress))
+									MyTokenTable(defaults, currentAddresses.ltcAddress).insert()
 								}
 							}
 
 							ChainID.bchMain -> {
 								if (currentAddresses.bchAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(defaults, currentAddresses.bchAddress))
+									MyTokenTable(defaults, currentAddresses.bchAddress).insert()
 								}
 							}
 						}

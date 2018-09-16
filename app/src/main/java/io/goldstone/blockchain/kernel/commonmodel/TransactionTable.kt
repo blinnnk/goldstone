@@ -242,26 +242,22 @@ data class TransactionTable(
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
 
+	fun updateModelInfo(
+		isERC20Token: Boolean,
+		symbol: String,
+		value: String,
+		tokenReceiveAddress: String?
+	) {
+		this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
+		this.isERC20Token = isERC20Token
+		this.symbol = symbol
+		this.value = value
+		this.tokenReceiveAddress = tokenReceiveAddress
+		this.recordOwnerAddress = Config.getCurrentEthereumAddress()
+		this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
+	}
+
 	companion object {
-
-		fun updateModelInfo(
-			transaction: TransactionTable,
-			isERC20Token: Boolean,
-			symbol: String,
-			value: String,
-			tokenReceiveAddress: String?
-		) {
-			transaction.apply {
-				this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
-				this.isERC20Token = isERC20Token
-				this.symbol = symbol
-				this.value = value
-				this.tokenReceiveAddress = tokenReceiveAddress
-				this.recordOwnerAddress = Config.getCurrentEthereumAddress()
-				this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
-			}
-		}
-
 		// `ERC` 类型的 `Transactions` 专用
 		fun getERCTransactionsByAddress(
 			address: String,

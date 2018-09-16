@@ -56,7 +56,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		wallet: WalletTable,
 		callback: () -> Unit
 	) {
-		val type = WalletTable.getTargetWalletType(wallet)
+		val type = wallet.getTargetWalletType()
 		when (type) {
 			WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
 				cacheWalletData(wallet, callback)

@@ -35,7 +35,8 @@ data class WalletListModel(
 
 	companion object {
 		fun getSubtitleByType(wallet: WalletTable): String {
-			return when (WalletTable.getTargetWalletType(wallet)) {
+			val walletType = wallet.getTargetWalletType()
+			return when (walletType) {
 				WalletType.LTCOnly -> wallet.currentLTCAddress
 				WalletType.BCHOnly -> wallet.currentBCHAddress
 				WalletType.Bip44MultiChain -> WalletText.bip44MultiChain

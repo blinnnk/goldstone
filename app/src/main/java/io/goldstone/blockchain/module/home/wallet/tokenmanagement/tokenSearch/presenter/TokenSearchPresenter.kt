@@ -89,11 +89,10 @@ class TokenSearchPresenter(
 							insertToMyToken(switch, localToken)
 						}
 					} otherwise {
-						DefaultTokenTable.insertToken(searchToken.apply {
+						searchToken.apply {
 							isDefault = switch.isChecked
-							// 区分 `ETC` 插入的 `ChainID`
 							chainID = TokenContract(contract).getCurrentChainID()
-						}) {
+						} insertThen {
 							insertToMyToken(switch, searchToken)
 						}
 					}

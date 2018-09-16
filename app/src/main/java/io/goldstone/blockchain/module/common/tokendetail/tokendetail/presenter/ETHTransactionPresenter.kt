@@ -325,8 +325,7 @@ private fun completeTransactionInfo(
 								receiveAddress = transactionInfo?.address
 							}
 
-							TransactionTable.updateModelInfo(
-								transaction,
+							transaction.updateModelInfo(
 								true,
 								tokenInfo.symbol,
 								count.toString(),
@@ -336,8 +335,7 @@ private fun completeTransactionInfo(
 						}
 					} isFalse {
 						/** 不是 ERC20 币种直接默认为 `ETH` */
-						TransactionTable.updateModelInfo(
-							transaction,
+						transaction.updateModelInfo(
 							false,
 							CoinSymbol.eth,
 							transaction.value.toDouble().toEthCount().toString(),

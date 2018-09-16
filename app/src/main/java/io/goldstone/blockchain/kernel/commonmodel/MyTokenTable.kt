@@ -69,24 +69,23 @@ data class MyTokenTable(
 		data.chainID
 	)
 
-	companion object {
-
-		fun insert(model: MyTokenTable) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					// 防止重复添加
-					if (getTargetChainTokenByContractAndAddress(
-							model.contract,
-							model.ownerAddress,
-							model.chainID
-						).isNull()
-					) {
-						insert(model)
-					}
+	fun insert() {
+		doAsync {
+			GoldStoneDataBase.database.myTokenDao().apply {
+				// 防止重复添加
+				if (getTargetChainTokenByContractAndAddress(
+						contract,
+						ownerAddress,
+						chainID
+					).isNull()
+				) {
+					insert(this@MyTokenTable)
 				}
 			}
 		}
+	}
 
+	companion object {
 		fun updateEOSAccountName(name: String, address: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address)
@@ -236,17 +235,15 @@ data class MyTokenTable(
 						myTokenDao().getCurrentChainTokensBy(currentAddress).find {
 							it.contract.equals(contract, true)
 						}.isNull() isTrue {
-							insert(
-								MyTokenTable(
-									0,
-									currentAddress,
-									currentAddress,
-									symbol,
-									0.0,
-									contract,
-									TokenContract(contract).getCurrentChainID()
-								)
-							)
+							MyTokenTable(
+								0,
+								currentAddress,
+								currentAddress,
+								symbol,
+								0.0,
+								contract,
+								TokenContract(contract).getCurrentChainID()
+							).insert()
 							// 没有网络不用检查间隔直接插入数据库
 							GoldStoneAPI.context.runOnUiThread {
 								callback()

@@ -4,7 +4,6 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -59,8 +58,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 	private val attentionView by lazy {
 		AttentionTextView(context!!).apply {
+			topPadding = 20.uiPX()
 			text = ImportWalletText.notBip44WalletAttention
-			setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 			isCenter()
 		}
 	}

@@ -726,7 +726,7 @@ class AddressManagerPresenter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(MyTokenTable(it.apply { this.chainID = chainID }, address))
+						MyTokenTable(it.apply { this.chainID = chainID }, address).insert()
 					}
 				}
 			}

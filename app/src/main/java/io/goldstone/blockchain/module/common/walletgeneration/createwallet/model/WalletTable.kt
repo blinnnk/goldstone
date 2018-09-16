@@ -91,6 +91,28 @@ data class WalletTable(
 		).asSequence().filter { it.isNotEmpty() }.distinctBy { it }.toList()
 	}
 
+	fun getTargetWalletType(): WalletType {
+		val types = listOf(
+			Pair(WalletType.BTCOnly, currentBTCAddress),
+			Pair(WalletType.BTCTestOnly, currentBTCSeriesTestAddress),
+			Pair(WalletType.ETHERCAndETCOnly, currentETHAndERCAddress),
+			Pair(WalletType.LTCOnly, currentLTCAddress),
+			Pair(WalletType.BCHOnly, currentBCHAddress),
+			Pair(WalletType.EOSOnly, currentEOSAddress)
+		).filter {
+			it.second.isNotEmpty()
+		}
+		return when (types.size) {
+			6 -> {
+				// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
+				// BIP44 钱包还是单纯的多链钱包
+				if (ethPath.isNotEmpty()) WalletType.Bip44MultiChain
+				else WalletType.MultiChain
+			}
+			else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
+		}
+	}
+
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
@@ -237,28 +259,6 @@ data class WalletTable(
 			}
 		}
 
-		fun getTargetWalletType(walletTable: WalletTable): WalletType {
-			val types = listOf(
-				Pair(WalletType.BTCOnly, walletTable.currentBTCAddress),
-				Pair(WalletType.BTCTestOnly, walletTable.currentBTCSeriesTestAddress),
-				Pair(WalletType.ETHERCAndETCOnly, walletTable.currentETHAndERCAddress),
-				Pair(WalletType.LTCOnly, walletTable.currentLTCAddress),
-				Pair(WalletType.BCHOnly, walletTable.currentBCHAddress),
-				Pair(WalletType.EOSOnly, walletTable.currentEOSAddress)
-			).filter {
-				it.second.isNotEmpty()
-			}
-			return when (types.size) {
-				6 -> {
-					// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
-					// BIP44 钱包还是单纯的多链钱包
-					if (walletTable.ethPath.isNotEmpty()) WalletType.Bip44MultiChain
-					else WalletType.MultiChain
-				}
-				else -> types.firstOrNull()?.first ?: WalletType.Bip44MultiChain
-			}
-		}
-
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				val type = when {
@@ -276,7 +276,7 @@ data class WalletTable(
 
 		fun getWalletType(@UiThread hold: (WalletType, WalletTable) -> Unit) {
 			WalletTable.getCurrentWallet {
-				hold(getTargetWalletType(this), this)
+				hold(getTargetWalletType(), this)
 			}
 		}
 

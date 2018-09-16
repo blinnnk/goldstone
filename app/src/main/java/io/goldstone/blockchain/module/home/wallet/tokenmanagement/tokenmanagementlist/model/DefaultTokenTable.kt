@@ -167,6 +167,13 @@ data class DefaultTokenTable(
 		TokenContract(contract).getCurrentChainID()
 	)
 
+	infix fun insertThen(callback: () -> Unit) {
+		doAsync {
+			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
+			GoldStoneAPI.context.runOnUiThread { callback() }
+		}
+	}
+
 	companion object {
 
 		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
@@ -233,7 +240,7 @@ data class DefaultTokenTable(
 								callback()
 							} else {
 								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-								update(targetTokens.filterNot { default ->
+								update(targetTokens.asSequence().filterNot { default ->
 									ChainID.getTestChains().any { it.equals(default.chainID, true) }
 								}.first().apply {
 									exchange = data.exchange
@@ -253,63 +260,25 @@ data class DefaultTokenTable(
 			}
 		}
 
-		fun updateTokenPrice(
-			contract: String,
-			newPrice: Double,
-			callback: () -> Unit = {}
-		) {
-			doAsync {
+		fun updateTokenPrice(contract: String, newPrice: Double, callback: () -> Unit = {}) {
+			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply { price = newPrice })
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
-					}
-			}
+					.updateTokenPrice(newPrice, contract, TokenContract(contract).getCurrentChainID())
+			} then { callback() }
 		}
 
 		fun updateTokenName(contract: String, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply { this.name = name })
-						}
-					}
+					.updateTokenName(name, contract, TokenContract(contract).getCurrentChainID())
 			}
 		}
 
-		fun updateTokenDefaultStatus(
-			contract: String,
-			isDefault: Boolean,
-			name: String,
-			callback: () -> Unit
-		) {
-			doAsync {
+		fun updateTokenDefaultStatus(contract: String, isDefault: Boolean, name: String, callback: () -> Unit) {
+			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getCurrentChainTokenByContract(contract)?.let {
-							update(it.apply {
-								this.isDefault = isDefault
-								this.name = name
-							})
-							callback()
-						}
-					}
-			}
-		}
-
-		fun insertToken(
-			token: DefaultTokenTable,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.defaultTokenDao().insert(token)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
+					.updateTokenDefaultStatusAndName(isDefault, name, contract, TokenContract(contract).getCurrentChainID())
+			} then { callback() }
 		}
 	}
 }
@@ -319,6 +288,15 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
+
+	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenPrice(newPrice: Double, contract: String, chainID: String)
+
+	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenName(newName: String, contract: String, chainID: String)
+
+	@Query("UPDATE defaultTokens SET name = :newName, isDefault = :isDefault WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenDefaultStatusAndName(isDefault: Boolean, newName: String, contract: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain")
 	fun getCurrentChainTokens(
