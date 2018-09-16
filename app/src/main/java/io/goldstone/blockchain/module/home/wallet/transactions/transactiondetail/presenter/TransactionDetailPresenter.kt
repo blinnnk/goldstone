@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
@@ -91,15 +90,7 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	fun getCurrentChainName(): String {
-		return ChainURL.getChainNameBySymbol(
-			data?.token?.symbol
-				?: dataFromList?.symbol
-				?: notificationData?.symbol.orEmpty()
-		)
-	}
-
-	private fun getUnitSymbol(): String {
+	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
 		return when {
 			CoinSymbol(symbol).isETC() -> CoinSymbol.etc

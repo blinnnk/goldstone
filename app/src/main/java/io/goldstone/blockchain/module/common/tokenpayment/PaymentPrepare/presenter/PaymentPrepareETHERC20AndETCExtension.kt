@@ -7,10 +7,13 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
-import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.*
-import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
+import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -26,7 +29,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
-		ChainURL.getChainTypeBySymbol(fragment.rootFragment?.token?.symbol.orEmpty()),
+		TokenContract(fragment.rootFragment?.token?.contract).getCurrentChainType(),
 		callback
 	) { model ->
 		fragment.rootFragment?.apply {
@@ -47,7 +50,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
-	chainType: ChainType,
+	chainType: MultiChainType,
 	callback: () -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
@@ -56,7 +59,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
 		},
 		chainType,
-		MultiChainUtils.getAddressBySymbol(getToken()?.symbol)
+		CoinSymbol(getToken()?.symbol).getAddress()
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 	}
@@ -93,17 +96,17 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
+		CoinSymbol(getToken()?.symbol).getAddress(),
 		data,
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 			callback()
 		},
-		ChainURL.getChainNameBySymbol(getToken()?.symbol.orEmpty())
+		CoinSymbol(getToken()?.symbol).getCurrentChainName()
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				MultiChainUtils.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				nonce,
 				limit,
 				to,

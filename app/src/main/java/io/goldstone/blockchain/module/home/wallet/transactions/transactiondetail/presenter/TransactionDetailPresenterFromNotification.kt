@@ -9,9 +9,8 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -105,7 +104,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		ChainID.getChainNameByID(info.chainID),
+		ChainID(info.chainID).getChainName(),
 		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
@@ -116,7 +115,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
-			this.memo = getMemoFromInputCode(receipt.input, CryptoValue.isToken(receipt.contractAddress))
+			this.memo = getMemoFromInputCode(receipt.input, TokenContract(receipt.contractAddress).isERC20Token())
 			this.fromAddress = info.fromAddress
 		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
@@ -185,7 +184,7 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID.getThirdPartyURLByChainID(info.chainID),
+		ChainID(info.chainID).getThirdPartyURL(),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -214,7 +213,7 @@ fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
 	LitecoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID.getThirdPartyURLByChainID(info.chainID),
+		ChainID(info.chainID).getThirdPartyURL(),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())
@@ -243,7 +242,7 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID.getThirdPartyURLByChainID(info.chainID),
+		ChainID(info.chainID).getThirdPartyURL(),
 		{
 			LogUtil.error("updateBTCTransactionByNotificationHash", it)
 			fragment.context?.alert(it.toString())

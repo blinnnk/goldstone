@@ -8,9 +8,12 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.*
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toBTCCount
+import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -227,7 +230,7 @@ data class MyTokenTable(
 		) {
 			WalletTable.getCurrentWallet {
 				doAsync {
-					val currentAddress = MultiChainUtils.getAddressBySymbol(symbol)
+					val currentAddress = CoinSymbol(symbol).getAddress()
 					GoldStoneDataBase.database.apply {
 						// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 						myTokenDao().getCurrentChainTokensBy(currentAddress).find {
@@ -241,7 +244,7 @@ data class MyTokenTable(
 									symbol,
 									0.0,
 									contract,
-									CryptoValue.chainID(contract)
+									TokenContract(contract).getCurrentChainID()
 								)
 							)
 							// 没有网络不用检查间隔直接插入数据库
@@ -254,8 +257,8 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getBalanceWithContract(
-			contract: String,
+		fun getBalanceByContract(
+			contract: TokenContract,
 			ownerName: String,
 			convertByDecimal: Boolean = false,
 			errorCallback: (error: Throwable?, reason: String?) -> Unit,
@@ -263,42 +266,42 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.equals(TokenContract.ethContract, true) ->
+				contract.isETH() ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
 						errorCallback,
-						Config.getCurrentChainName()
+						contract.getCurrentChainName()
 					) {
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				contract.equals(TokenContract.etcContract, true) ->
+				contract.isETC() ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
 						errorCallback,
-						Config.getETCCurrentChainName()
+						contract.getCurrentChainName()
 					) {
 						val balance = if (convertByDecimal) it.toEthCount() else it
 						callback(balance)
 					}
-				contract.equals(TokenContract.btcContract, true) ->
+				contract.isBTC() ->
 					BitcoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
-				contract.equals(TokenContract.ltcContract, true) ->
+				contract.isLTC() ->
 					LitecoinApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
 						callback(balance)
 					}
 
-				contract.equals(TokenContract.bchContract, true) ->
+				contract.isBCH() ->
 					BitcoinCashApi.getBalance(ownerName) {
 						val balance = if (convertByDecimal) it else it.toSatoshi().toDouble()
 						callback(balance)
 					}
 
-				contract.equals(TokenContract.eosContract, true) -> {
+				contract.isEOS() -> {
 					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 					// 网络请求在这额外校验一次.
 					if (EOSWalletUtils.isValidAccountName(Config.getCurrentEOSName())) {
@@ -306,7 +309,7 @@ data class MyTokenTable(
 					}
 				}
 
-				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
+				else -> DefaultTokenTable.getCurrentChainToken(contract.contract.orEmpty()) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerName,
@@ -315,7 +318,7 @@ data class MyTokenTable(
 					) {
 						val balance =
 							if (convertByDecimal)
-								CryptoUtils.toCountByDecimal(it, token?.decimals.orElse(0.0))
+								CryptoUtils.toCountByDecimal(it, token?.decimals.orZero())
 							else it
 						callback(balance)
 					}
@@ -323,14 +326,14 @@ data class MyTokenTable(
 			}
 		}
 
-		fun updateBalanceWithContract(
+		fun updateBalanceByContract(
 			balance: Double,
 			address: String,
-			contract: String
+			contract: TokenContract
 		) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					getCurrentChainTokenByContractAndAddress(contract, address).let { it ->
+					getCurrentChainTokenByContractAndAddress(contract.contract.orEmpty(), address).let { it ->
 						it?.let {
 							update(it.apply { this.balance = balance })
 						}

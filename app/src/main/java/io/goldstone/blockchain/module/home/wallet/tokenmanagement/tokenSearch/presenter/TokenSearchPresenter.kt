@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -91,7 +92,7 @@ class TokenSearchPresenter(
 						DefaultTokenTable.insertToken(searchToken.apply {
 							isDefault = switch.isChecked
 							// 区分 `ETC` 插入的 `ChainID`
-							chainID = CryptoValue.chainID(contract)
+							chainID = TokenContract(contract).getCurrentChainID()
 						}) {
 							insertToMyToken(switch, searchToken)
 						}

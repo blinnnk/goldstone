@@ -9,7 +9,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.DeviceName
+import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.ethereum.Address

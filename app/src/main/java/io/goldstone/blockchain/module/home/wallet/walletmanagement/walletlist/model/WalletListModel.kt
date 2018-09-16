@@ -25,7 +25,7 @@ data class WalletListModel(
 	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
-		WalletTable.getAddressesByWallet(data).first(),
+		data.getCurrentAddresses().first(),
 		getSubtitleByType(data),
 		balance,
 		data.isWatchOnly,

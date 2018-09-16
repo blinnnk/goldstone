@@ -10,7 +10,8 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAfterColonContent
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -41,7 +42,7 @@ abstract class TransactionStatusObserver {
 			if (transaction.isNull()) {
 				GoldStoneEthCall.getTransactionByHash(
 					transactionHash,
-					ChainID.getChainNameByID(chainID),
+					ChainID(chainID).getChainName(),
 					{
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
@@ -60,7 +61,7 @@ abstract class TransactionStatusObserver {
 					{ error, reason ->
 						LogUtil.error("checkStatus getBlockNumber $reason", error)
 					},
-					ChainID.getChainNameByID(chainID)
+					ChainID(chainID).getChainName()
 				) { blockNumber ->
 					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
 					val hasConfirmed = blockInterval > targetInterval
@@ -83,7 +84,7 @@ abstract class TransactionStatusObserver {
 						}
 					} else {
 						if (ChainURL.etcChainName.any {
-								it.equals(ChainID.getChainNameByID(chainID), true)
+								it.equals(ChainID(chainID).getChainName(), true)
 							}) {
 							isFailed = false
 							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
@@ -96,7 +97,7 @@ abstract class TransactionStatusObserver {
 								{ error, reason ->
 									LogUtil.error("checkStatusByTransaction$reason", error)
 								},
-								ChainID.getChainNameByID(chainID)
+								ChainID(chainID).getChainName()
 							) { failed ->
 								isFailed = failed
 								if (isFailed == true) {
@@ -145,7 +146,7 @@ fun TransactionDetailPresenter.observerTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	val currentActivity = fragment.getMainActivity()
 	object : TransactionStatusObserver() {
-		override val chainID: String = ChainID.getChainIDByName(getCurrentChainName())
+		override val chainID: String = ChainID.getChainIDByName(CoinSymbol(getUnitSymbol()).getCurrentChainName())
 		override val transactionHash = currentHash
 		override fun getStatus(
 			confirmed: Boolean,
@@ -217,7 +218,7 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 private fun TransactionDetailPresenter.getTransactionFromChain() {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		getCurrentChainName(),
+		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
 		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
@@ -298,13 +299,14 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		getCurrentChainName(),
+		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
 		errorCallback = { error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 		}
 	) { transaction ->
-		val contract = ChainURL.getContractByTransaction(transaction, getCurrentChainName())
-		MyTokenTable.getBalanceWithContract(
+		val contract =
+			ChainURL.getContractByTransaction(transaction, CoinSymbol(getUnitSymbol()).getCurrentChainName())
+		MyTokenTable.getBalanceByContract(
 			contract,
 			address,
 			false,
@@ -314,7 +316,7 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
 				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		) {
-			MyTokenTable.updateBalanceWithContract(it, contract, address)
+			MyTokenTable.updateBalanceByContract(it, address, contract)
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}

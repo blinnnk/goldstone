@@ -4,7 +4,8 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.ChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import org.bitcoinj.core.*
 
 /**
@@ -21,7 +22,7 @@ object BTCWalletUtils {
 		val seed = Mnemonic.mnemonicToSeed(mnemonicCode, "")
 		val keyPair =
 			ECKey.fromPrivate(generateKey(seed, path).keyPair.privateKey, true)
-		val isTest = CryptoValue.isBTCTest(CryptoValue.pathCoinType(path))
+		val isTest = ChainType.isBTCTest(ChainPath.pathToChainType(path))
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val currentID = if (isTest) testNetID else mainNetID

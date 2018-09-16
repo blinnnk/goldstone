@@ -11,13 +11,13 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.multichain.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
@@ -141,7 +141,7 @@ class WatchOnlyImportPresenter(
 				) { thisWallet ->
 					if (thisWallet.isNull()) return@insert
 					CreateWalletPresenter.generateMyTokenInfo(
-						MultiChainAddresses(
+						ChainAddresses(
 							currentETHAndERCAddress,
 							currentETCAddress,
 							currentBTCAddress,
@@ -159,13 +159,13 @@ class WatchOnlyImportPresenter(
 						// 注册钱包地址用于发送 `Push`
 						val addressPairs =
 							listOf(
-								Pair(currentBTCAddress, ChainType.BTC.id),
-								Pair(currentLTCAddress, ChainType.LTC.id),
-								Pair(currentBCHAddress, ChainType.BCH.id),
-								Pair(currentBTCTestAddress, ChainType.AllTest.id),
-								Pair(currentETCAddress, ChainType.ETC.id),
-								Pair(currentETHAndERCAddress, ChainType.ETH.id),
-								Pair(currentEOSAddress, ChainType.EOS.id)
+								Pair(currentBTCAddress, MultiChainType.BTC.id),
+								Pair(currentLTCAddress, MultiChainType.LTC.id),
+								Pair(currentBCHAddress, MultiChainType.BCH.id),
+								Pair(currentBTCTestAddress, MultiChainType.AllTest.id),
+								Pair(currentETCAddress, MultiChainType.ETC.id),
+								Pair(currentETHAndERCAddress, MultiChainType.ETH.id),
+								Pair(currentEOSAddress, MultiChainType.EOS.id)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
 						XinGePushReceiver.registerSingleAddress(

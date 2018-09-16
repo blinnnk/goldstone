@@ -314,31 +314,29 @@ data class TransactionTable(
 					.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
 				// 如果是 `ETH` or `ETC` 需要查询出所有相关的 `Miner` 作为账单记录
 				var fee = listOf<TransactionTable>()
-				if (!CryptoValue.isToken(contract)) {
+				if (!TokenContract(contract).isERC20Token()) {
 					fee = GoldStoneDataBase
 						.database
 						.transactionDao()
 						.getCurrentChainFee(walletAddress, true, chainID)
 				}
-				transactions += fee.filter { CryptoValue.isToken(it.contractAddress) }
+				transactions += fee.filter { TokenContract(it.contractAddress).isERC20Token() }
 				GoldStoneAPI.context.runOnUiThread {
 					hold(
-						if (
-							CryptoValue.isToken(contract)
-						) {
-							transactions.filter {
+						if (TokenContract(contract).isERC20Token()) {
+							transactions.asSequence().filter {
 								!it.isFee
 							}.map {
 								TransactionListModel(it)
 							}.sortedByDescending {
 								it.timeStamp
-							}.toArrayList()
+							}.toList()
 						} else {
-							transactions.map {
+							transactions.asSequence().map {
 								TransactionListModel(it)
 							}.sortedByDescending {
 								it.timeStamp
-							}.toArrayList()
+							}.toList()
 						}
 					)
 				}

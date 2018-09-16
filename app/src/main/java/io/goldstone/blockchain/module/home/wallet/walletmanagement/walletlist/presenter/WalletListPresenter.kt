@@ -134,7 +134,7 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { myTokens ->
+							MyTokenTable.getMyTokensByAddress(wallet.getCurrentAddresses()) { myTokens ->
 								WalletTable.getTargetWalletType(wallet).let { walletType ->
 									if (myTokens.isEmpty()) {
 										data.add(WalletListModel(wallet, 0.0, walletType.content))

@@ -19,7 +19,12 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
 	object : EOSTransactionObserver() {
 		override val hash = currentHash
 		@WorkerThread
-		override fun getStatus(confirmed: Boolean, blockInterval: Int, blockNumber: Int) {
+		override fun getStatus(
+			confirmed: Boolean,
+			blockNumber: Int,
+			confirmedCount: Int,
+			totalCount: Int
+		) {
 			// Update Database BlockNumber
 			GoldStoneDataBase.database.eosTransactionDao()
 				.updateBlockNumberByTxID(currentHash, blockNumber)
@@ -27,9 +32,13 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
 				GoldStoneDataBase.database.eosTransactionDao().updatePendingStatusByTxID(currentHash)
 			GoldStoneAPI.context.runOnUiThread {
 				if (confirmed) {
-					onEOSTransactionSucceed(blockNumber)
-					updateConformationBarFinished()
-				} else showConformationInterval(blockInterval)
+					onEOSTransactionSucceed()
+					updateConformationBarFinished(totalCount)
+					updateTokenDetailPendingStatus()
+					updateBlockNumberInUI(blockNumber)
+				} else {
+					showConformationInterval(confirmedCount, totalCount, true)
+				}
 			}
 		}
 	}.start()
@@ -38,7 +47,7 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
-private fun TransactionDetailPresenter.onEOSTransactionSucceed(blockNumber: Int) {
+private fun TransactionDetailPresenter.onEOSTransactionSucceed() {
 	data?.apply {
 		updateHeaderValue(
 			TransactionHeaderModel(
@@ -50,7 +59,6 @@ private fun TransactionDetailPresenter.onEOSTransactionSucceed(blockNumber: Int)
 				false
 			)
 		)
-		updateBlockNumberInUI(blockNumber)
 	}
 
 	dataFromList?.apply {
@@ -64,7 +72,6 @@ private fun TransactionDetailPresenter.onEOSTransactionSucceed(blockNumber: Int)
 				false
 			)
 		)
-		updateBlockNumberInUI(blockNumber)
 	}
 }
 
@@ -76,6 +83,9 @@ private fun TransactionDetailPresenter.updateBlockNumberInUI(blockNumber: Int) {
 	fragment.asyncData?.clear()
 	fragment.asyncData?.addAll(data)
 	fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
+}
+
+private fun TransactionDetailPresenter.updateTokenDetailPendingStatus() {
 	fragment.parentFragment
 		?.getChildFragment<TokenDetailCenterFragment>()
 		?.presenter?.refreshTransactionListFromDatabase()

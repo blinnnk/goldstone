@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.value
 
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**
@@ -148,7 +149,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.currentChain)
 				.equals("Default", true)
 		) {
-			ChainID.Main.id
+			ChainID.ethMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
 		}
@@ -175,7 +176,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.ltcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
 		}
@@ -185,7 +186,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.etcMainGasTracker
+			ChainText.ltcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
 		}
@@ -205,7 +206,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.bchMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
 		}
@@ -215,7 +216,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.etcMainGasTracker
+			ChainText.bchMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
 		}
@@ -235,7 +236,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.EOSMain.id
+			ChainID.eosMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
 		}
@@ -265,7 +266,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.etcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 		}
@@ -294,7 +295,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.BTCMain.id
+			ChainID.btcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
 		}

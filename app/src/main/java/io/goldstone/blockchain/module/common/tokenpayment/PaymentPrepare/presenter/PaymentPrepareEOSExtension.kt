@@ -14,8 +14,8 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.error.TransferError
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
@@ -105,7 +105,7 @@ private fun Context.getPasswordAndTransferByInfo(
 			PrivateKeyExportPresenter.getPrivateKey(
 				context,
 				Config.getCurrentEOSAddress(),
-				ChainType.EOS.id,
+				MultiChainType.EOS.id,
 				password
 			) {
 				if (!isNullOrEmpty()) transferEOSToken(

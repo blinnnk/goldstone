@@ -20,6 +20,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.text.SimpleDateFormat

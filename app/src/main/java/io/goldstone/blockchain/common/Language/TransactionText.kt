@@ -251,13 +251,39 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
-	val confirmedBlocks = when (currentLanguage) {
-		HoneyLanguage.English.code -> "6 blocks have comfirmed"
-		HoneyLanguage.Chinese.code -> "6 个区块已经确认了本次转账"
-		HoneyLanguage.Japanese.code -> "6つのブロックが今回の振込を確認されました"
-		HoneyLanguage.Korean.code -> "6 블록에서이 양도가 확인되었습니다"
-		HoneyLanguage.Russian.code -> "6 блоков подтвердили данный перевод"
-		HoneyLanguage.TraditionalChinese.code -> "6 個區塊已經確認了本次轉賬"
+	val confirmedBlocks: (IntervalCount: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "$it blocks have confirmed"
+			HoneyLanguage.Chinese.code -> "$it 个区块已经确认了本次转账"
+			HoneyLanguage.Japanese.code -> "$it つのブロックが今回の振込を確認されました"
+			HoneyLanguage.Korean.code -> "$it 블록에서이 양도가 확인되었습니다"
+			HoneyLanguage.Russian.code -> "$it блоков подтвердили данный перевод"
+			HoneyLanguage.TraditionalChinese.code -> "$it 個區塊已經確認了本次轉賬"
+			else -> ""
+		}
+	}
+
+	@JvmField
+	val irreversibleConfirmedBlocks: (IntervalCount: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.Chinese.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.Japanese.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.Korean.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.Russian.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.TraditionalChinese.code -> "$it blocks confirmed later will be irreversible"
+			else -> ""
+		}
+	}
+
+	@JvmField
+	val irreversibleBlockConfirmed = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.Chinese.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.Japanese.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.Korean.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.Russian.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.TraditionalChinese.code -> "Irreversible block has confirmed this transaction"
 		else -> ""
 	}
 }

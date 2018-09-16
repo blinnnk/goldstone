@@ -27,7 +27,7 @@ data class WalletDetailCellModel(
 	var iconUrl: String = "",
 	var symbol: String = "",
 	var tokenName: String = "",
-	var decimal: Double = 0.0,
+	var decimal: Int = 0,
 	var count: Double = 0.0,
 	var price: Double = 0.0,
 	var currency: Double = 0.0,
@@ -57,11 +57,11 @@ data class WalletDetailCellModel(
 	)
 
 	companion object {
-		fun Boolean.convertBalance(balance: Double, decimal: Double): Double {
+		fun Boolean.convertBalance(balance: Double, decimal: Int): Double {
 			return if (this) {
 				balance.formatCount(9).toDoubleOrNull().orElse(0.0)
 			} else {
-				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal))
+				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal.toDouble()))
 			}
 		}
 
@@ -154,8 +154,8 @@ data class WalletDetailCellModel(
 											it.contract.equals(token.contract, true)
 										}?.let { targetToken ->
 											// 链上查余额
-											MyTokenTable.getBalanceWithContract(
-												targetToken.contract,
+											MyTokenTable.getBalanceByContract(
+												TokenContract(targetToken.contract),
 												token.ownerName,
 												false,
 												{ error, reason ->
@@ -163,14 +163,14 @@ data class WalletDetailCellModel(
 													tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
 													completeMark()
 													fragment.context?.apply { chainError(reason, error, this) }
-													LogUtil.error("getBalanceWithContract $reason", error)
+													LogUtil.error("targetToken.contract $reason", error)
 												}
 											) { balance ->
 												// 更新数据的余额信息
-												MyTokenTable.updateBalanceWithContract(
+												MyTokenTable.updateBalanceByContract(
 													balance,
 													token.ownerName,
-													targetToken.contract
+													TokenContract(targetToken.contract)
 												)
 												val hasDecimal = type == EOSWalletType.Available
 												tokenList.add(

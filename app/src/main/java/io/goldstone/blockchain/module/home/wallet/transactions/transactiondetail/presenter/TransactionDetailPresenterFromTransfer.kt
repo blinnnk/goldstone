@@ -35,22 +35,25 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 }
 
 fun TransactionDetailPresenter.showConformationInterval(
-	intervalCount: Int
-) {
+	intervalCount: Int,
+	irreversibleCount: Int = 6,
+	isEOSTransaction: Boolean = false
+	) {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) { it ->
 		it.apply {
 			headerModel?.let {
 				updateHeaderValue(it)
 			}
-			updateConformationBar(intervalCount)
+			if (isEOSTransaction) updateEOSConformationBar(intervalCount, irreversibleCount)
+			else updateConformationBar(intervalCount, irreversibleCount)
 		}
 	}
 }
 
-fun TransactionDetailPresenter.updateConformationBarFinished() {
+fun TransactionDetailPresenter.updateConformationBarFinished(totalCount: Int = CryptoValue.confirmBlockNumber) {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-		it.apply {
-			updateConformationBar(CryptoValue.confirmBlockNumber)
-		}
+		// 只有 `EOS` 计算不可逆块的完全完成的时候会出现 `totalCount < 0` 的情况
+		if (totalCount < 0) it.updateEOSConformationBarFinished()
+		else it.updateConformationBar(totalCount, totalCount)
 	}
 }

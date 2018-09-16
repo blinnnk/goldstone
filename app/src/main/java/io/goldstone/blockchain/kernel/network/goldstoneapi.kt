@@ -12,7 +12,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel

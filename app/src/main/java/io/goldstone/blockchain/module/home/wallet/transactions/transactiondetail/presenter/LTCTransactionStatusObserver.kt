@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -34,7 +33,7 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onLTCTransactionSucceed()
-				val address = MultiChainUtils.getAddressBySymbol(CoinSymbol.ltc)
+				val address = CoinSymbol.getLTC().getAddress()
 				updateWalletDetailLTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -64,8 +63,8 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 	address: String,
 	callback: () -> Unit
 ) {
-	MyTokenTable.getBalanceWithContract(
-		TokenContract.ltcContract,
+	MyTokenTable.getBalanceByContract(
+		TokenContract.getLTC(),
 		address,
 		false,
 		{ error, reason ->
@@ -74,7 +73,7 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	) {
-		MyTokenTable.updateBalanceWithContract(it, TokenContract.ltcContract, address)
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getLTC())
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }

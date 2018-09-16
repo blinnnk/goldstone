@@ -59,35 +59,3 @@ object CryptoName {
 		}?.second
 	}
 }
-
-enum class ChainType(val id: Int) {
-	BTC(0),
-	AllTest(1),
-	LTC(2),
-	BCH(145),
-	EOS(194),
-	ETH(60),
-	ETC(61),
-	ERC(100); // 需要调大不然可能会和自然 `Type` 冲突
-
-	companion object {
-		private fun getAllBTCSeriesType(): List<Int> =
-			listOf(LTC.id, AllTest.id, BTC.id, BCH.id)
-
-		fun isBTCSeriesChainType(id: Int): Boolean =
-			getAllBTCSeriesType().any { it == id }
-
-		fun isSamePrivateKeyRule(id: Int): Boolean =
-			listOf(BCH.id, BTC.id, AllTest.id).any { it == id }
-
-		fun getChainTypeBySymbol(symbol: String?): Int = when (symbol) {
-			CoinSymbol.btc() -> BTC.id
-			CoinSymbol.ltc -> LTC.id
-			CoinSymbol.eth -> ETH.id
-			CoinSymbol.etc -> ETC.id
-			CoinSymbol.bch -> BCH.id
-			CoinSymbol.eos -> EOS.id
-			else -> ETH.id
-		}
-	}
-}

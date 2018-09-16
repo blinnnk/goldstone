@@ -12,8 +12,8 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -197,7 +197,7 @@ class TokenDetailPresenter(
 					TokenContract(token?.contract).isBTC() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBTCAddress(),
-							ChainType.BTC.id
+							MultiChainType.BTC.id
 						) {
 							callback(null, it, null)
 						}
@@ -206,7 +206,7 @@ class TokenDetailPresenter(
 					TokenContract(token?.contract).isLTC() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentLTCAddress(),
-							ChainType.LTC.id
+							MultiChainType.LTC.id
 						) {
 							callback(null, it, null)
 						}
@@ -215,7 +215,7 @@ class TokenDetailPresenter(
 					TokenContract(token?.contract).isBCH() -> {
 						getBTCSeriesData(
 							AddressUtils.getCurrentBCHAddress(),
-							ChainType.BCH.id
+							MultiChainType.BCH.id
 						) {
 							callback(null, it, null)
 						}
@@ -234,7 +234,7 @@ class TokenDetailPresenter(
 			WalletType.BCHOnly.content ->
 				getBTCSeriesData(
 					Config.getCurrentBCHAddress(),
-					ChainType.BCH.id
+					MultiChainType.BCH.id
 				) {
 					callback(null, it, null)
 				}
@@ -247,7 +247,7 @@ class TokenDetailPresenter(
 			WalletType.BTCTestOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCSeriesTestAddress(),
-					ChainType.BTC.id
+					MultiChainType.BTC.id
 				) {
 					callback(null, it, null)
 				}
@@ -256,7 +256,7 @@ class TokenDetailPresenter(
 			WalletType.BTCOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentBTCAddress(),
-					ChainType.BTC.id
+					MultiChainType.BTC.id
 				) {
 					callback(null, it, null)
 				}
@@ -265,7 +265,7 @@ class TokenDetailPresenter(
 			WalletType.LTCOnly.content -> {
 				getBTCSeriesData(
 					Config.getCurrentLTCAddress(),
-					ChainType.LTC.id
+					MultiChainType.LTC.id
 				) {
 					callback(null, it, null)
 				}

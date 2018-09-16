@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.utils.MultiChainUtils.getAddressBySymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -78,7 +78,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 		) {
 			MyTokenTable.getMyTokenByContractAndWalletAddress(
 				token.contract,
-				getAddressBySymbol(token.symbol)
+				CoinSymbol(token.symbol).getAddress()
 			) { myToken ->
 				WalletTable.getCurrentEOSWalletType { eosWalletType ->
 					// 准备数据
