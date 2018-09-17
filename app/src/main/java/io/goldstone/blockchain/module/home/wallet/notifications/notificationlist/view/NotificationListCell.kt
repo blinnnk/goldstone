@@ -15,7 +15,6 @@ import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationType
@@ -26,10 +25,10 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class NotificationListCell(context: Context) : BaseValueCell(context) {
-	
+
 	var model: NotificationTable? by observing(null) {
 		info.apply {
-			title.text = CryptoUtils.scaleTo16(model?.title.orEmpty())
+			title.text = model?.title?.scaleTo(16)
 		}
 		date.text =
 			HoneyDateUtil.getSinceTime(
@@ -42,27 +41,24 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 					if (NotificationTable.getReceiveStatus(model?.extra.orEmpty()).orFalse()) {
 						setIconColor(Spectrum.green)
 						setIconResource(R.drawable.receive_icon)
-						info.subtitle.text =
-							CryptoUtils
-								.scaleTo22(CommonText.from + " " + model?.content.orEmpty())
+						info.subtitle.text = (CommonText.from + " " + model?.content.orEmpty()).scaleTo(22)
 					} else {
 						setIconColor(GrayScale.midGray)
 						setIconResource(R.drawable.send_icon)
-						info.subtitle.text =
-							CryptoUtils.scaleTo22(CommonText.to + " " + model?.content.orEmpty())
+						info.subtitle.text = (CommonText.to + " " + model?.content.orEmpty()).scaleTo(22)
 					}
 				}
-				
+
 				NotificationType.System.code -> {
 					setIconColor(Spectrum.green)
 					setIconResource(R.drawable.system_notification_icon)
-					info.subtitle.text = CryptoUtils.scaleTo22(model?.content.orEmpty())
+					info.subtitle.text = model?.content?.scaleTo(22)
 				}
 			}
 		}
 	}
 	private val date by lazy { TextView(context) }
-	
+
 	init {
 		date.apply {
 			textColor = GrayScale.midGray

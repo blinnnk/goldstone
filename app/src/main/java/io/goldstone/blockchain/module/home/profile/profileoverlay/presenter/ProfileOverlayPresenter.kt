@@ -7,12 +7,9 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -20,6 +17,7 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
@@ -78,28 +76,37 @@ class ProfileOverlayPresenter(
 		}
 	}
 
-	private lateinit var mini: MiniOverlay
-	private fun showWalletAddingMethodDashboard() {
+	fun showWalletAddingMethodDashboard() {
 		val menuData = listOf(
 			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
-			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet)
+			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet),
+			Pair(R.drawable.watch_only_icon, ImportWalletText.importWatchWallet)
 		)
+		var mini: MiniOverlay? = null
 		fragment.overlayView.apply {
 			mini = MiniOverlay(context) { cell, title ->
 				cell.onClick {
-					if (title.equals(CreateWalletText.create, true)) {
-						showCreateWalletFragment()
-					} else {
-						showImportWalletFragment()
+					when (title) {
+						CreateWalletText.create -> showCreateWalletFragment()
+						ImportWalletText.importWallet -> showImportWalletFragment()
+						else -> showWatchWalletImportFragment()
 					}
-					mini.removeSelf()
+					mini?.removeSelf()
 					cell.preventDuplicateClicks()
 				}
 			}
-			mini.model = menuData
-			mini.into(this)
-			mini.setTopLeft()
+			mini?.model = menuData
+			mini?.into(this)
+			mini?.setTopLeft()
 		}
+	}
+
+	private fun showWatchWalletImportFragment() {
+		fragment.overlayView.header.showAddButton(false)
+		showTargetFragment<WatchOnlyImportFragment>(
+			ImportMethodText.watchOnly,
+			WalletText.wallet
+		)
 	}
 
 	private fun showAboutFragment() {

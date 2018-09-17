@@ -87,7 +87,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 					}
 				}
 			}
-			addCorner(CornerSize.small, Spectrum.white)
+			addCorner(CornerSize.small.toInt(), Spectrum.white)
 		}
 		container.setCenterInParent()
 	}

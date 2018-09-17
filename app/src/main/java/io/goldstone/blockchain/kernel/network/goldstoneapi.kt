@@ -7,18 +7,16 @@ import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequest
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.postRequestGetJsonObject
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestData
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoData
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
@@ -95,7 +93,7 @@ object GoldStoneAPI {
 									listOf<DefaultTokenTable>()
 								}.map {
 									it.apply {
-										it.chain_id = chainID
+										it.chainID = chainID
 										it.isDefault = true
 									}
 								}.apply {
@@ -104,9 +102,8 @@ object GoldStoneAPI {
 						}
 					}
 
-					override fun mergeCallBack() {
-						hold(allDefaultTokens)
-					}
+					override fun mergeCallBack() = hold(allDefaultTokens)
+
 				}.start()
 			}
 		}
@@ -259,7 +256,7 @@ object GoldStoneAPI {
 		pair: String,
 		marketIds: String,
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<QuotationSelectionTable>) -> Unit
+		hold: (List<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
@@ -268,7 +265,7 @@ object GoldStoneAPI {
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(toArrayList())
+			hold(this)
 		}
 	}
 	
@@ -346,7 +343,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
-		postRequest(
+		RequisitionUtil.postRequest(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(
@@ -392,7 +389,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (List<QuotationSelectionLineChartModel>) -> Unit
 	) {
-		postRequestGetJsonObject(
+		RequisitionUtil.postRequest(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(
@@ -413,7 +410,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
 	) {
-		postRequest(
+		RequisitionUtil.postRequest(
 			RequestBody.create(
 				requestContentType,
 				content
@@ -431,7 +428,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit = {},
 		hold: (String) -> Unit
 	) {
-		postRequest(
+		RequisitionUtil.postRequest(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(
@@ -453,7 +450,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
-		postRequestGetJsonObject<String>(
+		RequisitionUtil.postRequest<String>(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(true, Pair("time", time))
@@ -485,7 +482,7 @@ object GoldStoneAPI {
 		errorCallback: (Exception) -> Unit,
 		@UiThread hold: (List<TokenPriceModel>) -> Unit
 	) {
-		postRequestGetJsonObject<TokenPriceModel>(
+		RequisitionUtil.postRequest<TokenPriceModel>(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(true, Pair("address_list", addressList))

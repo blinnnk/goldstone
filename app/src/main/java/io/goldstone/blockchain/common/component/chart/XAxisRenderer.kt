@@ -9,7 +9,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 /**
  * @date: 2018/8/1.
  * @author: yanglihai
- * @description: 绘制横轴gridline的render
+ * @description: 绘制横轴 gridLine 的 render
  */
 class XAxisRenderer(
   viewPortHandler: ViewPortHandler,

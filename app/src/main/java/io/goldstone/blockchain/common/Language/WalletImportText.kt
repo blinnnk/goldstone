@@ -121,6 +121,26 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val supportedChain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Supported Chain Type"
+		HoneyLanguage.Chinese.code -> "Supported Chain Type"
+		HoneyLanguage.Japanese.code -> "Supported Chain Type"
+		HoneyLanguage.Korean.code -> "Supported Chain Type"
+		HoneyLanguage.Russian.code -> "Supported Chain Type"
+		HoneyLanguage.TraditionalChinese.code -> "Supported Chain Type"
+		else -> ""
+	}
+	@JvmField
+	val importWatchWallet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Import Watch Wallet"
+		HoneyLanguage.Chinese.code -> "Import Watch Wallet"
+		HoneyLanguage.Japanese.code -> "Import Watch Wallet"
+		HoneyLanguage.Korean.code -> "Import Watch Wallet"
+		HoneyLanguage.Russian.code -> "Import Watch Wallet"
+		HoneyLanguage.TraditionalChinese.code -> "Import Watch Wallet"
+		else -> ""
+	}
+	@JvmField
 	val mnemonicHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter your mnemonic, split with spaces"
 		HoneyLanguage.Chinese.code -> "按顺序输入助记词，使用空格间隔"
@@ -135,7 +155,7 @@ object ImportWalletText {
 		HoneyLanguage.English.code -> "Keystore is a JSON encrypted private key file. You need to enter the wallet password corresponding to the keystore. You can change your password at any time after importing."
 		HoneyLanguage.Chinese.code -> "Keystore是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"
 		HoneyLanguage.Japanese.code -> "KeystoreはJSON形式で暗号化されたプライベートキーファイルです。Keystoreに対応するウォレット・パスワードを入力する必要があります。インポート後いつでもパスワードを変更することが可能です。"
-		HoneyLanguage.Korean.code -> "Keystore는 JSON으로 암호화 된 개인 키 파일입니다. 키 스토어에 해당하는 지갑 암호를 입력해야합니다. 가져온 후에는 언제든지 비밀번호를 변경할 수 있습니다."
+		HoneyLanguage.Korean.code -> "Keystore 는 JSON 으로 암호화 된 개인 키 파일입니다. 키 스토어에 해당하는 지갑 암호를 입력해야합니다. 가져온 후에는 언제든지 비밀번호를 변경할 수 있습니다."
 		HoneyLanguage.Russian.code -> "Keystore - это зашифрованный файл с закрытым ключом в формате JSON. Вам нужно ввести соответствующий пароль кошелька для получения Keystore. После импорта, Вы можете изменять пароль в любое время."
 		HoneyLanguage.TraditionalChinese.code -> "Keystore是一種JSON格式的加密私鑰文件。您需要輸入獲得Keystore時對應的錢包密碼。您可以在導入後隨時修改密碼。"
 		else -> ""
@@ -261,6 +281,16 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val importWalletDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "we supported that import multi-chain wallet by any single mnemonic, private key or keystore file"
+		HoneyLanguage.Chinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Japanese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Korean.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.Russian.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.TraditionalChinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		else -> ""
+	}
+	@JvmField
 	val exportWrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect password, try again"
 		HoneyLanguage.Chinese.code -> "请输入正确的密码"
@@ -301,7 +331,7 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val addressFromatAlert = when (currentLanguage) {
+	val addressFormatAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid address"
 		HoneyLanguage.Chinese.code -> "地址格式不对"
 		HoneyLanguage.Japanese.code -> "アドレス形式が違っています"

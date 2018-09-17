@@ -33,35 +33,35 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
-	
+
 	private val info = TwoLineTitles(context)
 	private val gradientView = GradientView(context)
 	private val icon = RoundIcon(context)
 	private var pendingIcon: ProgressBar? = null
 	private val conformationBar by lazy { TextView(context) }
-	
+
 	init {
 		gradientView.apply {
 			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
-		
+
 		verticalLayout {
 			layoutParams =
 				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), wrapContent).apply {
 					leftMargin = (ScreenSize.Width * 0.1).toInt()
 					topMargin = 50.uiPX()
 				}
-			
+
 			gravity = Gravity.CENTER_HORIZONTAL
-			
+
 			icon.apply {
 				y += 5.uiPX()
 				iconSize = 60.uiPX()
 				setColorFilter(GrayScale.Opacity2Black)
 				elevation = 10.uiPX().toFloat()
 			}.into(this)
-			
+
 			info.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
 				isCenter = true
@@ -69,7 +69,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 				setWildStyle()
 			}.into(this)
 		}
-		
+
 		conformationBar.apply {
 			visibility = View.GONE
 			textSize = fontSize(12)
@@ -81,14 +81,28 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}.into(this)
 		conformationBar.setAlignParentBottom()
 	}
-	
+
 	@SuppressLint("SetTextI18n")
-	fun updateConformationBar(confirmedCount: Int) {
+	fun updateConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
 		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks}"
+		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks(latestIrreversibleCount)}"
 		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
 	}
-	
+
+	@SuppressLint("SetTextI18n")
+	fun updateEOSConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
+		conformationBar.visibility = View.VISIBLE
+		conformationBar.text = "$confirmedCount / ${TransactionText.irreversibleConfirmedBlocks(latestIrreversibleCount)}"
+		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
+	}
+
+	@SuppressLint("SetTextI18n")
+	fun updateEOSConformationBarFinished() {
+		conformationBar.visibility = View.VISIBLE
+		conformationBar.text = TransactionText.irreversibleBlockConfirmed
+		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
+	}
+
 	@SuppressLint("SetTextI18n")
 	fun setIconStyle(
 		headerModel: TransactionHeaderModel
@@ -101,14 +115,14 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			"${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address
-		
+
 		if (headerModel.isError) {
 			icon.iconColor = Spectrum.lightRed
 			icon.src = R.drawable.error_icon
 			showPendingIcon(false)
 			return
 		}
-		
+
 		if (headerModel.isPending) {
 			icon.iconColor = Spectrum.lightRed
 			showPendingIcon()
@@ -124,7 +138,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
 	private fun showPendingIcon(status: Boolean = true) {
 		pendingIcon isNotNull {
 			if (!status) removeView(pendingIcon)

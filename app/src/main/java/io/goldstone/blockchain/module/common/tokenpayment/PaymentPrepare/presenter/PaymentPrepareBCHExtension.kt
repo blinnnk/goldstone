@@ -1,22 +1,24 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isNotNull
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
-import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
+import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -27,31 +29,30 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (isSuccess: Boolean) -> Unit
+	@UiThread callback: (TransferError) -> Unit
 ) {
-	generateBCHPaymentModel(count, changeAddress) {
-		it isNotNull {
-			fragment.rootFragment?.apply {
-				presenter.showTargetFragment<GasSelectionFragment>(
-					TokenDetailText.customGas,
-					TokenDetailText.paymentValue,
-					Bundle().apply {
-						putSerializable(ArgumentKey.btcSeriesPrepareModel, it)
-					})
-				callback(true)
-			}
-		} otherwise {
-			callback(false)
+	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
+		callback(TransferError.IncorrectDecimal)
+	else generateBCHPaymentModel(count, changeAddress) { error, paymentModel ->
+		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
+			presenter.showTargetFragment<GasSelectionFragment>(
+				TokenDetailText.customGas,
+				TokenDetailText.paymentValue,
+				Bundle().apply {
+					putSerializable(ArgumentKey.btcSeriesPrepareModel, paymentModel)
+				})
+			callback(error)
 		}
+		else callback(error)
 	}
 }
 
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
+	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -61,7 +62,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 		false
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			// TODO Alert
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -69,7 +70,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -88,14 +89,14 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(it)
+					hold(TransferError.None, it)
 				}
 			}
 		}

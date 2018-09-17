@@ -5,14 +5,13 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.runOnUiThread
@@ -34,7 +33,7 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBTCTransactionSucceed()
-				val address = WalletTable.getAddressBySymbol(CryptoSymbol.btc())
+				val address = CoinSymbol.getBTC().getAddress()
 				updateWalletDetailBTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -64,8 +63,8 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
 	address: String,
 	callback: () -> Unit
 ) {
-	MyTokenTable.getBalanceWithContract(
-		CryptoValue.btcContract,
+	MyTokenTable.getBalanceByContract(
+		TokenContract.getBTC(),
 		address,
 		false,
 		{ error, reason ->
@@ -74,7 +73,7 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	) {
-		MyTokenTable.updateBalanceWithContract(it, CryptoValue.btcContract, address)
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getBTC())
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }

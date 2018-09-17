@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -10,8 +11,9 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -23,6 +25,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
+import java.io.Serializable
 
 /**
  * @date 07/04/2018 7:32 PM
@@ -57,7 +60,7 @@ data class TransactionTable(
 	@SerializedName("isError")
 	var hasError: String,
 	@SerializedName("txreceipt_status")
-	var txreceipt_status: String,
+	var txReceiptStatus: String,
 	@SerializedName("input")
 	var input: String,
 	@SerializedName("contractAddress")
@@ -80,7 +83,7 @@ data class TransactionTable(
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
-) {
+) : Serializable {
 
 	/** 默认的 `constructor` */
 	@Ignore
@@ -124,10 +127,10 @@ data class TransactionTable(
 		data.gas,
 		data.gasPrice,
 		data.hasError,
-		data.txreceipt_status,
+		data.txReceiptStatus,
 		data.input,
 		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
-		else CryptoValue.ethContract,
+		else TokenContract.ethContract,
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
@@ -188,9 +191,9 @@ data class TransactionTable(
 		"1",
 		data.safeGet("input"),
 		when {
-			isETC -> CryptoValue.etcContract
+			isETC -> TokenContract.etcContract
 			CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")) -> data.safeGet("to")
-			else -> CryptoValue.ethContract
+			else -> TokenContract.ethContract
 		},
 		"",
 		"",
@@ -225,13 +228,13 @@ data class TransactionTable(
 		"0",
 		"1",
 		data.input,
-		CryptoValue.etcContract,
+		TokenContract.etcContract,
 		"",
 		"0",
 		"",
 		!data.from.equals(Config.getCurrentETCAddress(), true),
 		false,
-		CryptoSymbol.etc,
+		CoinSymbol.etc,
 		Config.getCurrentETCAddress(),
 		tokenReceiveAddress = data.to,
 		chainID = Config.getETCCurrentChain(),
@@ -239,30 +242,26 @@ data class TransactionTable(
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
 
+	fun updateModelInfo(
+		isERC20Token: Boolean,
+		symbol: String,
+		value: String,
+		tokenReceiveAddress: String?
+	) {
+		this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
+		this.isERC20Token = isERC20Token
+		this.symbol = symbol
+		this.value = value
+		this.tokenReceiveAddress = tokenReceiveAddress
+		this.recordOwnerAddress = Config.getCurrentEthereumAddress()
+		this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
+	}
+
 	companion object {
-
-		fun updateModelInfo(
-			transaction: TransactionTable,
-			isERC20Token: Boolean,
-			symbol: String,
-			value: String,
-			tokenReceiveAddress: String?
-		) {
-			transaction.apply {
-				this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
-				this.isERC20Token = isERC20Token
-				this.symbol = symbol
-				this.value = value
-				this.tokenReceiveAddress = tokenReceiveAddress
-				this.recordOwnerAddress = Config.getCurrentEthereumAddress()
-				this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
-			}
-		}
-
 		// `ERC` 类型的 `Transactions` 专用
 		fun getERCTransactionsByAddress(
 			address: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
+			@UiThread hold: (ArrayList<TransactionListModel>) -> Unit
 		) {
 			load {
 				GoldStoneDataBase
@@ -311,31 +310,29 @@ data class TransactionTable(
 					.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
 				// 如果是 `ETH` or `ETC` 需要查询出所有相关的 `Miner` 作为账单记录
 				var fee = listOf<TransactionTable>()
-				if (!CryptoValue.isToken(contract)) {
+				if (!TokenContract(contract).isERC20Token()) {
 					fee = GoldStoneDataBase
 						.database
 						.transactionDao()
 						.getCurrentChainFee(walletAddress, true, chainID)
 				}
-				transactions += fee.filter { CryptoValue.isToken(it.contractAddress) }
+				transactions += fee.filter { TokenContract(it.contractAddress).isERC20Token() }
 				GoldStoneAPI.context.runOnUiThread {
 					hold(
-						if (
-							CryptoValue.isToken(contract)
-						) {
-							transactions.filter {
+						if (TokenContract(contract).isERC20Token()) {
+							transactions.asSequence().filter {
 								!it.isFee
 							}.map {
 								TransactionListModel(it)
 							}.sortedByDescending {
 								it.timeStamp
-							}.toArrayList()
+							}.toList()
 						} else {
-							transactions.map {
+							transactions.asSequence().map {
 								TransactionListModel(it)
 							}.sortedByDescending {
 								it.timeStamp
-							}.toArrayList()
+							}.toList()
 						}
 					)
 				}
@@ -445,7 +442,7 @@ interface TransactionDao {
 	)
 	fun getETCTransactionsByAddress(
 		walletAddress: String,
-		symbol: String = CryptoSymbol.etc,
+		symbol: String = CoinSymbol.etc,
 		chainID: String = Config.getETCCurrentChain()
 	): List<TransactionTable>
 

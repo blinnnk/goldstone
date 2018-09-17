@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.*
 
 /**
@@ -15,7 +15,7 @@ data class GasSelectionModel(
 	val info: String = "≈ 0.00 Gwei (${TransactionText.gasPrice}) * 0.000 (${TransactionText.gasLimit})",
 	var type: String = LoadingText.calculating,
 	var currentType: String = "",
-	val unitSymbol: String = CryptoSymbol.eth
+	val unitSymbol: String = CoinSymbol.eth
 ) {
 
 	constructor(

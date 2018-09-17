@@ -12,11 +12,11 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainNameID
+import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoName
+import io.goldstone.blockchain.crypto.multichain.CryptoName
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
@@ -86,14 +86,14 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 						CryptoName.eos -> NodeSelectionSectionCell(context).eosType().into(this)
 						else -> NodeSelectionSectionCell(context).etcType().into(this)
 					}
-					// Nodes of One Chain
+					// Nodes of Main or Test Chain
 					val chainChild = nodes.filter {
 						it.first.equals(chain.first, true)
 					}
 					// Generate cell with chain and node data
 					chainChild.forEachIndexed { index, pair ->
 						var isSelected = false
-						if (pair.second == presenter.getDefaultOrCurrentChainName(
+						if (pair.second == presenter.getCurrentChainName(
 								fromMainnetSetting.orTrue(),
 								getChainTypeByName(chain.first)
 							)
@@ -130,7 +130,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}.click {
 					fromMainnetSetting?.let { fromMainnet ->
 						// 更新是否是测试环境的参数
-						Config.updateIsTestEnvironment(!fromMainnet)
+						Config.updateIsTestEnvironment(fromMainnet == false)
 						selectedNode.forEach { pair ->
 							when {
 								pair.first.equals(CryptoName.eth, true) ->
@@ -187,24 +187,24 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		}
 	}
 
-	private fun getChainTypeByName(name: String): ChainType {
+	private fun getChainTypeByName(name: String): MultiChainType {
 		return when (name) {
-			CryptoName.eth -> ChainType.ETH
-			CryptoName.btc -> ChainType.BTC
-			CryptoName.ltc -> ChainType.LTC
-			CryptoName.bch -> ChainType.BCH
-			CryptoName.eos -> ChainType.EOS
-			else -> ChainType.ETC
+			CryptoName.eth -> MultiChainType.ETH
+			CryptoName.btc -> MultiChainType.BTC
+			CryptoName.ltc -> MultiChainType.LTC
+			CryptoName.bch -> MultiChainType.BCH
+			CryptoName.eos -> MultiChainType.EOS
+			else -> MultiChainType.ETC
 		}
 	}
 
-	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
+	private fun clearAllRadio(maxIndex: Int, type: MultiChainType) {
 		val start = when (type) {
-			ChainType.ETC -> 10
-			ChainType.BTC -> 20
-			ChainType.LTC -> 30
-			ChainType.BCH -> 40
-			ChainType.EOS -> 50
+			MultiChainType.ETC -> 10
+			MultiChainType.BTC -> 20
+			MultiChainType.LTC -> 30
+			MultiChainType.BCH -> 40
+			MultiChainType.EOS -> 50
 			else -> 0
 		}
 		(start until maxIndex + start).forEach {

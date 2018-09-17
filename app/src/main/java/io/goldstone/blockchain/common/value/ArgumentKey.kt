@@ -63,6 +63,7 @@ object SharesPreference {
 	const val unregisterGoldStoneID = "unregisterGoldStoneID"
 	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
+	const val currentEOSName= "currentEOSName"
 	const val currentETCAddress = "currentETCAddress"
 	const val currentEOSAddress = "currentEOSAddress"
 	const val currentLTCAddress = "currentLTCAddress"

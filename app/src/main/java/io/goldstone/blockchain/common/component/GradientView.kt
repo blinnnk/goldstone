@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.utils.UIUtils.setGradientColor
  * @author KaySaith
  */
 enum class GradientType {
-	
 	Blue,
 	PinkToYellow,
 	BlueGreen,
@@ -27,21 +26,21 @@ enum class GradientType {
 }
 
 class GradientView(context: Context) : View(context) {
-	
+
 	private val paint = Paint()
 	private var shaderStyle: LinearGradient? = null
-	
+
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		val rectF = RectF(0f, 0f, width.toFloat(), height.toFloat())
-		
+
 		shaderStyle?.let {
 			paint.shader = it
 		}
 		canvas?.drawRect(rectF, paint)
 	}
-	
+
 	// Set Style through `GradientType`
 	fun setStyle(
 		type: GradientType,

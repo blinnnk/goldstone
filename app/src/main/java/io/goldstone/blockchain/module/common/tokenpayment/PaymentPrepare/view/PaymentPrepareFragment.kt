@@ -14,22 +14,23 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ValueInputView
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -50,11 +51,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		getParentFragment<TokenDetailOverlayFragment>()
 	}
 	private val inputView by lazy { ValueInputView(context!!) }
-	private val sendInfo by lazy { GraySqualCell(context!!) }
-	private val from by lazy { GraySqualCell(context!!) }
-	private val memo by lazy { GraySqualCell(context!!) }
-	private val customChangeAddressCell by lazy { GraySqualCell(context!!) }
-	private val price by lazy { GraySqualCell(context!!) }
+	private val sendInfo by lazy { GraySquareCell(context!!) }
+	private val from by lazy { GraySquareCell(context!!) }
+	private val memo by lazy { GraySquareCell(context!!) }
+	private val customChangeAddressCell by lazy { GraySquareCell(context!!) }
+	private val price by lazy { GraySquareCell(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
@@ -62,43 +63,40 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	override val presenter = PaymentPreparePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		changeAddress = WalletTable.getAddressBySymbol(rootFragment?.token?.symbol)
+		changeAddress = CoinSymbol(rootFragment?.token?.symbol).getAddress()
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)
-			relativeLayout {
+			verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				verticalLayout {
-					gravity = Gravity.CENTER_HORIZONTAL
-					lparams(matchParent, matchParent)
 
-					inputView.into(this)
+				inputView.into(this)
 
-					showAccountInfo()
-					// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
-					if (CryptoSymbol.isBTCSeriesSymbol(rootFragment?.token?.symbol))
-						showCustomChangeAddressCell()
-					else showMemoCell()
+				showAccountInfo()
+				// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
+				if (CoinSymbol(rootFragment?.token?.symbol).isBTCSeries())
+					showCustomChangeAddressCell()
+				else showMemoCell()
 
-					showUnitPrice()
+				showUnitPrice()
 
-					confirmButton.apply {
-						setGrayStyle(20.uiPX())
-						text = CommonText.next.toUpperCase()
-						setMargins<LinearLayout.LayoutParams> {
-							bottomMargin = 30.uiPX()
-						}
-					}.click {
-						it.showLoadingStatus()
-						presenter.goToGasEditorFragment {
-							it.showLoadingStatus(false)
-						}
-					}.into(this)
-					// 扫描二维码进入后的样式判断
-					if (count > 0) {
-						inputView.setInputValue(count)
-						confirmButton.setBlueStyle(20.uiPX())
+				confirmButton.apply {
+					setGrayStyle(20.uiPX())
+					text = CommonText.next.toUpperCase()
+					setMargins<LinearLayout.LayoutParams> {
+						bottomMargin = 30.uiPX()
 					}
+				}.click {
+					it.showLoadingStatus()
+					presenter.goToGasEditorFragmentOrTransfer {
+						it.showLoadingStatus(false)
+					}
+				}.into(this)
+				// 扫描二维码进入后的样式判断
+				if (count > 0) {
+					inputView.setInputValue(count)
+					confirmButton.setBlueStyle(20.uiPX())
 				}
 			}
 		}
@@ -159,7 +157,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			setTitle(PrepareTransferText.memoInformation)
 			memo.apply {
 				setTitle(PrepareTransferText.memo)
-				setSubtitle(CryptoUtils.scaleTo32(PrepareTransferText.addAMemo))
+				setSubtitle(PrepareTransferText.addAMemo.scaleTo(32))
 				showArrow()
 			}.click {
 				getParentContainer()?.showMemoInputView { content ->
@@ -181,7 +179,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			setTitle(PrepareTransferText.customChangeAddress)
 			customChangeAddressCell.apply {
 				setTitle(PrepareTransferText.changeAddress)
-				setSubtitle(CryptoUtils.scaleTo16(changeAddress))
+				setSubtitle(changeAddress.scaleTo(16))
 				showArrow()
 			}.click {
 				showCustomChangeAddressOverlay()
@@ -211,16 +209,18 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 			}.apply {
 				confirmEvent = Runnable {
 					val customAddress = addressInput.text?.toString().orEmpty()
-					if (presenter.getToken()?.symbol.equals(CryptoSymbol.btc(), true)) {
-						presenter.isValidAddressOrElse(customAddress) isTrue {
-							// 更新默认的自定义找零地址
-							changeAddress = customAddress
-						}
-					} else {
-						presenter.isValidLTCAddressOrElse(customAddress) isTrue {
-							// 更新默认的自定义找零地址
-							changeAddress = customAddress
-						}
+					when {
+						TokenContract(presenter.getToken()?.contract).isBTC() ||
+							TokenContract(presenter.getToken()?.contract).isBCH() ->
+							presenter.isValidAddressOrElse(customAddress) isTrue {
+								// 更新默认的自定义找零地址
+								changeAddress = customAddress
+							}
+						TokenContract(presenter.getToken()?.contract).isLTC() ->
+							presenter.isValidLTCAddressOrElse(customAddress) isTrue {
+								// 更新默认的自定义找零地址
+								changeAddress = customAddress
+							}
 					}
 				}
 			}.into(this)
@@ -263,19 +263,24 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private fun setFromAddress() {
 		from.setSubtitle(
 			CryptoUtils.scaleMiddleAddress(
-				WalletTable.getAddressBySymbol(presenter.getToken()?.symbol)
+				CoinSymbol(presenter.getToken()?.symbol).getAddress()
 			)
 		)
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
+		val isEOSTransfer = TokenContract(rootFragment?.token?.contract).isEOS()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {
 				updateConfirmButtonEvent { button ->
 					button.onClick {
-						hold(getMemoContent())
-						removeMemoInputView()
+						if (isValidMemoByChain(isEOSTransfer)) {
+							removeMemoInputView()
+							hold(getMemoContent())
+						} else {
+							this@apply.context.alert(PrepareTransferText.invalidEOSMemoSize)
+						}
 						button.preventDuplicateClicks()
 					}
 				}
@@ -311,7 +316,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
 				if (memoInputView.isNull()) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
 				} else {
 					removeMemoInputView()

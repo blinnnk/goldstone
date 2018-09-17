@@ -14,13 +14,13 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -42,20 +42,20 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
-	
+
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val privateKeyTextView by lazy { TextView(context) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = KeystoreExportPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			attentionView.apply {
 				isCenter()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 				text = ImportWalletText.exportKeystore
 			}.into(this)
 			privateKeyTextView.apply {
@@ -78,7 +78,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
 			}.into(this)
-			
+
 			passwordInput.apply {
 				setPasswordInput()
 				setMargins<LinearLayout.LayoutParams> {
@@ -86,16 +86,13 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				}
 				title = CreateWalletText.password
 			}.into(this)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm
-				setBlueStyle()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 15.uiPX()
-				}
+				setBlueStyle(15.uiPX())
 			}.click { button ->
 				button.showLoadingStatus()
-				presenter.getKeystoreJson(passwordInput.text.toString()) {
+				presenter.getKeystoreJSON(passwordInput.text.toString()) {
 					if (!it.isNullOrBlank()) {
 						privateKeyTextView.text = it
 					}
@@ -104,7 +101,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			}.into(this)
 		}
 	}
-	
+
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		parentFragment?.let {
@@ -113,7 +110,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

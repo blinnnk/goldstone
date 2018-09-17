@@ -1,10 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
@@ -166,12 +161,10 @@ class WalletDetailPresenter(
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
 				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-					ContainerID.main, FragmentTag.tokenDetail
+					ContainerID.main,
+					FragmentTag.tokenDetail
 				) {
-					putSerializable(
-						ArgumentKey.tokenDetail,
-						model
-					)
+					putSerializable(ArgumentKey.tokenDetail, model)
 				}
 			}
 		}
@@ -192,7 +185,7 @@ class WalletDetailPresenter(
 						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
 						GoldStoneAPI.getUnreadCount(goldStoneID, time) { unreadCount ->
 							uiThread {
-								if (unreadCount.isNotEmpty() && unreadCount.toIntOrNull().orZero() > 0) {
+								if (unreadCount.isNotEmpty() && unreadCount.toIntOrZero() > 0) {
 									fragment.setNotificationUnreadCount(unreadCount)
 								} else {
 									fragment.recoveryNotifyButtonStyle()
@@ -206,8 +199,8 @@ class WalletDetailPresenter(
 	}
 
 	private fun WalletDetailFragment.showSelectionListOverlayView(
-		myTokens: ArrayList<MyTokenTable>,
-		defaultTokens: ArrayList<DefaultTokenTable>,
+		myTokens: List<MyTokenTable>,
+		defaultTokens: List<DefaultTokenTable>,
 		isShowAddress: Boolean
 	) {
 		// Prepare token list and show content scroll overlay view
@@ -235,7 +228,7 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun updateUIByData(data: ArrayList<WalletDetailCellModel>) {
+	private fun updateUIByData(data: List<WalletDetailCellModel>) {
 		if (data.isNotEmpty()) {
 			load {
 				/** 先按照资产情况排序, 资产为零的按照权重排序 */
@@ -299,6 +292,7 @@ class WalletDetailPresenter(
 				WalletType.BTCTestOnly.content -> currentBTCSeriesTestAddress
 				WalletType.LTCOnly.content -> currentLTCAddress
 				WalletType.BCHOnly.content -> currentBCHAddress
+				WalletType.EOSOnly.content -> currentEOSAddress
 				else -> WalletText.multiChainWallet
 			}
 			WalletDetailHeaderModel(

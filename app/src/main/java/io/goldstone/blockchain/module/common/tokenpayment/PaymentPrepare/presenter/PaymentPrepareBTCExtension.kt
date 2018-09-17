@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.scaleTo
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
@@ -11,17 +12,18 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -31,22 +33,22 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (isSuccess: Boolean) -> Unit
+	callback: (errors: TransferError) -> Unit
 ) {
-	generateBTCPaymentModel(count, changeAddress) {
-		it isNotNull {
+	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
+		callback(TransferError.IncorrectDecimal)
+	else generateBTCPaymentModel(count, changeAddress) { error, model ->
+		if (!model.isNull()) {
 			fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
 					TokenDetailText.customGas,
 					TokenDetailText.paymentValue,
 					Bundle().apply {
-						putSerializable(ArgumentKey.btcSeriesPrepareModel, it)
+						putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
 					})
-				callback(true)
+				callback(TransferError.None)
 			}
-		} otherwise {
-			callback(false)
-		}
+		} else callback(error)
 	}
 }
 
@@ -58,9 +60,9 @@ fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
 			BTCUtils.isValidMainnetAddress(address)
 		}
 		if (isValidAddress) {
-			fragment.updateChangeAddress(CryptoUtils.scaleTo22(address))
+			fragment.updateChangeAddress(address.scaleTo(22))
 		} else {
-			fragment.context.alert(ImportWalletText.addressFromatAlert)
+			fragment.context.alert(ImportWalletText.addressFormatAlert)
 		}
 		fragment.activity?.let { SoftKeyboard.hide(it) }
 		return isValidAddress
@@ -72,14 +74,15 @@ fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
 private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (PaymentBTCSeriesModel?) -> Unit
+	hold: (error: TransferError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = WalletTable.getAddressBySymbol(getToken()?.symbol)
+	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.btcTest else ChainText.btcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -87,7 +90,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -106,14 +109,14 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(it)
+					hold(TransferError.None, it)
 				}
 			}
 		}

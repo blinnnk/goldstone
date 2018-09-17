@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
@@ -77,10 +77,10 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 
 	private fun ContactTable.generateSubtitleIntro(): String {
 		val addresses = listOf(
-			Pair("${CryptoSymbol.etc}/${CryptoSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
-			Pair(CryptoSymbol.btc(), btcMainnetAddress.isNotEmpty()),
-			Pair(CryptoSymbol.ltc, ltcAddress.isNotEmpty()),
-			Pair(CryptoSymbol.bch, bchAddress.isNotEmpty()),
+			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
+			Pair(CoinSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair(CoinSymbol.ltc, ltcAddress.isNotEmpty()),
+			Pair(CoinSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
 		)
 		val count = addresses.filter { it.second }.size

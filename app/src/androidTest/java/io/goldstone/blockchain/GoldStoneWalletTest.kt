@@ -6,12 +6,14 @@ import android.support.test.filters.LargeTest
 import android.support.test.internal.util.LogUtil
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.utils.toHexString
-import io.goldstone.blockchain.crypto.walletfile.*
+import io.goldstone.blockchain.crypto.ethereum.walletfile.*
+import io.goldstone.blockchain.crypto.ethereum.publicKeyFromPrivate
+import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
 import org.junit.Rule
@@ -31,7 +33,7 @@ class GoldStoneWalletTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 
 	@Test
 	fun signTransaction() {
@@ -50,7 +52,7 @@ class GoldStoneWalletTest {
 		val result = transaction.encodeRLP(signatureData).toHexString()
 		val expected =
 			"result0xf86c098504a817c800825208946e3df901a984d50b68355eede503cbfc1ead8f13880de0b6b3a76400008026a0f2ee3d057dc5e12a29e2b3c2f3b9f61e867fcd585d65c09f72c65a3c22160e07a048bb82ab020ceb40c55c54bcf4c2421afced529d0c65596fcc1806d0a9db5880"
-		LogUtil.logDebug(positon + "signTransaction", result)
+		LogUtil.logDebug(position + "signTransaction", result)
 		Assert.assertTrue("Sign Transaction wrong", result.equals(expected, true))
 	}
 
@@ -90,7 +92,7 @@ class GoldStoneWalletTest {
 	@Test
 	fun generateLitecoinAccount() {
 		LTCWalletUtils.getPrivateKeyFromWIFKey("T8DGhBg9M1WJdTcjLVvsHWZPAFgbov6VckWxHZKix591eGaoS6Ws", ChainPrefix.Litecoin).let {
-			LogUtil.logDebug(positon + "getPrivateKeyFromWIFKey", it)
+			LogUtil.logDebug(position + "getPrivateKeyFromWIFKey", it)
 		}
 	}
 }

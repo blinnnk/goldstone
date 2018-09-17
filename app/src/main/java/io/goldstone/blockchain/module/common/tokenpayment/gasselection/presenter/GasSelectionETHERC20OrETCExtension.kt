@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TransactionText
@@ -9,17 +12,22 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.*
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
+import io.goldstone.blockchain.crypto.ethereum.Transaction
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -39,9 +47,9 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 ) {
 	when {
 		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
-		token?.contract.equals(CryptoValue.ethContract, true) -> {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!,
+		TokenContract(token?.contract).isETH() -> {
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
 				true,
 				{ error, reason ->
@@ -54,9 +62,9 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			}
 		}
 
-		token?.contract.equals(CryptoValue.etcContract, true) -> {
-			MyTokenTable.getBalanceWithContract(
-				token?.contract!!,
+		TokenContract(token?.contract).isETC() -> {
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentETCAddress(),
 				true,
 				{ error, reason ->
@@ -72,8 +80,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		else -> {
 			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			// 首先查询 `Token Balance` 余额
-			MyTokenTable.getBalanceWithContract(
-				token?.contract.orEmpty(),
+			MyTokenTable.getBalanceByContract(
+				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
 				true,
 				{ error, reason ->
@@ -81,8 +89,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				}
 			) { tokenBalance ->
 				// 查询 `ETH` 余额
-				MyTokenTable.getBalanceWithContract(
-					CryptoValue.ethContract,
+				MyTokenTable.getBalanceByContract(
+					TokenContract.getETH(),
 					Config.getCurrentEthereumAddress(),
 					true,
 					{ error, reason ->
@@ -134,8 +142,9 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
 private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
-	if (getToken()?.symbol.equals(CryptoSymbol.etc, true))
-		Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress()
+	if (TokenContract(getToken()?.contract).isETC())
+		Config.getCurrentETCAddress()
+	else Config.getCurrentEthereumAddress()
 
 private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	password: String,
@@ -143,7 +152,7 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 ) {
 	doAsync {
 		val isSingleChainWallet =
-			!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+			!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 		// 获取当前账户的私钥
 		fragment.context?.getPrivateKey(
 			getETHERC20OrETCAddress(),
@@ -174,7 +183,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 				// Generate Transaction Model
 				val raw = Transaction().apply {
 					chain =
-						ChainDefinition(CryptoValue.chainID(getToken()?.contract.orEmpty()).toLong())
+						ChainDefinition(TokenContract(getToken()?.contract).getCurrentChainID().toLong())
 					nonce = this@model.nonce
 					gasPrice = getSelectedGasPrice(currentMinerType)
 					gasLimit =
@@ -195,7 +204,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 							callback()
 						}
 					},
-					ChainURL.getChainNameBySymbol(getToken()?.symbol.orEmpty())
+					CoinSymbol(getToken()?.symbol).getCurrentChainName()
 				) { taxHash ->
 					LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
 					// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
@@ -212,6 +221,8 @@ fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
 					// 主线程跳转到账目详情界面
 					fragment.context?.runOnUiThread {
 						goToTransactionDetailFragment(
+							rootFragment,
+							fragment,
 							prepareReceiptModel(
 								this@model,
 								countWithDecimal,
@@ -277,10 +288,12 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 
 fun GasSelectionPresenter.getUnitSymbol(): String {
 	return when {
-		getToken()?.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-		getToken()?.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
-		getToken()?.symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
-		else -> CryptoSymbol.eth
+		TokenContract(getToken()?.contract).isETC() -> CoinSymbol.etc
+		TokenContract(getToken()?.contract).isBTC() -> CoinSymbol.btc()
+		TokenContract(getToken()?.contract).isBCH() -> CoinSymbol.bch
+		TokenContract(getToken()?.contract).isEOS() -> CoinSymbol.eos
+		TokenContract(getToken()?.contract).isLTC() -> CoinSymbol.ltc
+		else -> CoinSymbol.eth
 	}
 }
 
@@ -306,13 +319,13 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			isPending = true
 			recordOwnerAddress = getETHERC20OrETCAddress()
 			tokenReceiveAddress = toWalletAddress
-			isERC20Token = token!!.symbol == CryptoSymbol.eth
+			isERC20Token = token!!.symbol == CoinSymbol.eth
 			nonce = raw.nonce.toString()
 			to = raw.toWalletAddress
 			input = raw.inputData
 			contractAddress = token!!.contract
 			chainID =
-				if (symbol.equals(CryptoSymbol.etc, true)) Config.getETCCurrentChain()
+				if (TokenContract(contractAddress).isETC()) Config.getETCCurrentChain()
 				else Config.getCurrentChain()
 			memo = memoData
 			minerFee =

@@ -6,12 +6,15 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.updateEOSAccountName
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -28,53 +31,82 @@ import java.io.File
 class SplashPresenter(val activity: SplashActivity) {
 
 	fun hasAccountThenLogin() {
-		WalletTable.getAll {
-			isNotEmpty() isTrue {
-				WalletTable.getWalletType {
-					when (it) {
-						WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
-						}
-						WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BTCOnly.content)
-						}
-
-						WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.LTCOnly.content)
-						}
-
-						WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.EOSOnly.content)
-						}
-
-						WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
-							cacheWalletData()
-							Config.updateCurrentWalletType(WalletType.BCHOnly.content)
-						}
-
-						WalletType.ETHERCAndETCOnly -> {
-							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-								cacheWalletData()
-							} else NodeSelectionPresenter.setAllMainnet {
-								cacheWalletData()
-							}
-							Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
-						}
-
-						WalletType.MultiChain -> {
-							if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-								cacheWalletData()
-							} else NodeSelectionPresenter.setAllMainnet {
-								cacheWalletData()
-							}
-							Config.updateCurrentWalletType(WalletType.MultiChain.content)
+		WalletTable.getCurrentWallet {
+			if (eosAccountNames.isEmpty()) {
+				EOSAPI.getAccountNameByPublicKey(
+					currentEOSAddress,
+					{ activity.alert("${it.message}") }
+				) { accounts ->
+					updateEOSAccountName(accounts) { hasDefaultName ->
+						cacheDataAndSetNetBy(
+							// 如果是含有 DefaultName 的钱包需要更新临时缓存钱包的内的值
+							this.apply { if (hasDefaultName) currentEOSAccountName.updateCurrent(accounts.first().name) }
+						) {
+							activity.jump<MainActivity>()
 						}
 					}
 				}
+			} else cacheDataAndSetNetBy(this) {
+				activity.jump<MainActivity>()
+			}
+		}
+	}
+
+	private fun cacheDataAndSetNetBy(
+		wallet: WalletTable,
+		callback: () -> Unit
+	) {
+		val type = wallet.getTargetWalletType()
+		when (type) {
+			WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
+				cacheWalletData(wallet, callback)
+				Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
+			}
+			WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+				Config.updateCurrentWalletType(WalletType.BTCOnly.content)
+			}
+
+			WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+				Config.updateCurrentWalletType(WalletType.LTCOnly.content)
+			}
+
+			WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+				Config.updateCurrentWalletType(WalletType.EOSOnly.content)
+			}
+
+			WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+				Config.updateCurrentWalletType(WalletType.BCHOnly.content)
+			}
+
+			WalletType.ETHERCAndETCOnly -> {
+				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+					cacheWalletData(wallet, callback)
+				} else NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData(wallet, callback)
+				}
+				Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
+			}
+
+			WalletType.Bip44MultiChain -> {
+				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+					cacheWalletData(wallet, callback)
+				} else NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData(wallet, callback)
+				}
+				Config.updateCurrentWalletType(WalletType.Bip44MultiChain.content)
+			}
+
+			WalletType.MultiChain -> {
+				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+					cacheWalletData(wallet, callback)
+				} else NodeSelectionPresenter.setAllMainnet {
+					cacheWalletData(wallet, callback)
+				}
+				Config.updateCurrentWalletType(WalletType.MultiChain.content)
 			}
 		}
 	}
@@ -173,8 +205,8 @@ class SplashPresenter(val activity: SplashActivity) {
 		return dir.delete()
 	}
 
-	private fun cacheWalletData() {
-		WalletTable.getCurrentWallet {
+	private fun cacheWalletData(wallet: WalletTable, callback: () -> Unit) {
+		wallet.apply {
 			doAsync {
 				Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 				Config.updateCurrentBTCAddress(currentBTCAddress)
@@ -183,13 +215,12 @@ class SplashPresenter(val activity: SplashActivity) {
 				Config.updateCurrentLTCAddress(currentLTCAddress)
 				Config.updateCurrentBCHAddress(currentBCHAddress)
 				Config.updateCurrentEOSAddress(currentEOSAddress)
+				Config.updateCurrentEOSName(currentEOSAccountName.getCurrent())
 				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
 				Config.updateCurrentWalletID(id)
 				Config.updateCurrentBalance(balance.orElse(0.0))
 				Config.updateCurrentName(name)
-				uiThread {
-					activity.jump<MainActivity>()
-				}
+				uiThread { callback() }
 			}
 		}
 	}

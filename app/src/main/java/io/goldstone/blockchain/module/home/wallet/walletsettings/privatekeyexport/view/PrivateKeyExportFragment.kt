@@ -68,7 +68,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.heavy(context)
 			}.click {
-				// 如果 `textview` 的内容不是默认的 `placeholder` 就可以支持点击复制
+				// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
 				if (it.text.isNotEmpty()) {
 					context.clickToCopy(privateKeyTextView.text.toString())
 				}
@@ -84,19 +84,14 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
-				setBlueStyle()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 15.uiPX()
-				}
+				setBlueStyle(15.uiPX())
 			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKeyByAddress(passwordInput.text.toString()) privateKey@{
-					GoldStoneAPI.context.runOnUiThread {
-						this@privateKey?.let {
-							privateKeyTextView.text = it
-						}
-						it.showLoadingStatus(false)
+				presenter.getPrivateKey(passwordInput.text.toString()) privateKey@{
+					this@privateKey?.let {
+						privateKeyTextView.text = it
 					}
+					it.showLoadingStatus(false)
 				}
 			}.into(this)
 		}

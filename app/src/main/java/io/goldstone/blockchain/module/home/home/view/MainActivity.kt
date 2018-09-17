@@ -10,6 +10,7 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
+import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
@@ -19,7 +20,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
-import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment

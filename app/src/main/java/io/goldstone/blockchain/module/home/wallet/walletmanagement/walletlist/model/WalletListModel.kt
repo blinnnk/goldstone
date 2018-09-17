@@ -8,7 +8,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
  * @rewriteDate 26/07/2018 3:30 PM
- * @rewriter wcx
+ * @reWriter wcx
  * @description 修改avatar通过id获取
  */
 data class WalletListModel(
@@ -25,7 +25,7 @@ data class WalletListModel(
 	constructor(data: WalletTable, balance: Double, type: String) : this(
 		data.id,
 		data.name,
-		WalletTable.getAddressesByWallet(data).first(),
+		data.getCurrentAddresses().first(),
 		getSubtitleByType(data),
 		balance,
 		data.isWatchOnly,
@@ -35,9 +35,11 @@ data class WalletListModel(
 
 	companion object {
 		fun getSubtitleByType(wallet: WalletTable): String {
-			return when (WalletTable.getTargetWalletType(wallet)) {
+			val walletType = wallet.getTargetWalletType()
+			return when (walletType) {
 				WalletType.LTCOnly -> wallet.currentLTCAddress
 				WalletType.BCHOnly -> wallet.currentBCHAddress
+				WalletType.Bip44MultiChain -> WalletText.bip44MultiChain
 				WalletType.MultiChain -> WalletText.multiChain
 				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
 				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses

@@ -5,6 +5,7 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.value.Spectrum
 
 /**
  * @data 07/12/2018 18/56
@@ -134,20 +135,20 @@ class UnlimitedAvatar(
 		val backgroundHeight = background?.height?.toFloat() ?: 0f
 		val foregroundWidth = foreground.width
 		val foregroundHeight = foreground.height
-		val newmap = Bitmap.createBitmap(
+		val newMap = Bitmap.createBitmap(
 			backgroundWidth.toInt(),
 			backgroundHeight.toInt(), Bitmap.Config.ARGB_8888
 		)
 		// 创建画笔
 		val paint = Paint().apply {
-			color = Color.WHITE
+			color = Spectrum.white
 			shader = LinearGradient(
 				backgroundWidth,
 				0f,
 				backgroundWidth,
 				backgroundHeight,
-				Color.WHITE,
-				Color.TRANSPARENT,
+				Spectrum.white,
+				Color.parseColor("#00FFFFFF"),
 				Shader.TileMode.MIRROR
 			)
 			isAntiAlias = true // 设置画笔的锯齿效果
@@ -295,7 +296,7 @@ class UnlimitedAvatar(
 			close()
 		}
 
-		Canvas(newmap).apply {
+		Canvas(newMap).apply {
 			// 第一个三角形
 			drawBitmap(
 				background!!,
@@ -347,7 +348,7 @@ class UnlimitedAvatar(
 			save()
 			restore()
 		}
-		return newmap
+		return newMap
 	}
 
 	// 根据资源文件获取bitmap

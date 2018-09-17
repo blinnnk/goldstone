@@ -9,6 +9,7 @@ import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
@@ -45,7 +46,7 @@ private fun GasSelectionPresenter.getCurrentWalletBCHPrivateKey(
 	hold: (String?) -> Unit
 ) {
 	val isSingleChainWallet =
-		!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
+		!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
@@ -96,6 +97,8 @@ fun GasSelectionPresenter.transferBCH(
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
+									rootFragment,
+									fragment,
 									prepareReceiptModelFromBTCSeries(this@model, fee, it)
 								)
 								callback()

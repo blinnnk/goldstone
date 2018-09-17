@@ -38,18 +38,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	private val buttonHeight = 50.uiPX()
 	private var viewHeight = 0
 	private var keyboardHeight = 0
-	private val confirmButton by lazy {
-		TextView(context).apply {
-			text = CommonText.confirm
-			typeface = GoldStoneFont.heavy(context)
-			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
-			textSize = fontSize(14)
-			textColor = GrayScale.midGray
-			gravity = Gravity.CENTER
-			setAlignParentBottom()
-			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
-		}
-	}
+	private val confirmButton by lazy { generateConfirmButton() }
 	override val presenter = AddressSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -157,6 +146,19 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 				headerTitle = TokenDetailText.tokenDetail
 				presenter.popFragmentFrom<AddressSelectionFragment>()
 			}
+		}
+	}
+
+	private fun generateConfirmButton(): TextView {
+		return TextView(context).apply {
+			text = CommonText.confirm
+			typeface = GoldStoneFont.heavy(context)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
+			textSize = fontSize(14)
+			textColor = GrayScale.midGray
+			gravity = Gravity.CENTER
+			setAlignParentBottom()
+			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
 		}
 	}
 }

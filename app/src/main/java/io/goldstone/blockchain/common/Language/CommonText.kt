@@ -39,6 +39,16 @@ object CommonText {
 		else -> ""
 	}
 	@JvmField
+	val calculating = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Calculating ..."
+		HoneyLanguage.Chinese.code -> "Calculating ..."
+		HoneyLanguage.Japanese.code -> "Calculating ..."
+		HoneyLanguage.Korean.code -> "Calculating ..."
+		HoneyLanguage.Russian.code -> "Calculating ..."
+		HoneyLanguage.TraditionalChinese.code -> "Calculating ..."
+		else -> ""
+	}
+	@JvmField
 	val wrongChainID = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Chain ID"
 		HoneyLanguage.Chinese.code -> "错误的链 ID"

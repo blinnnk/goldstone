@@ -37,7 +37,7 @@ class MiniOverlay(
 			model.forEachIndexed { index, pair ->
 				topPadding = 10.uiPX()
 				bottomPadding = 10.uiPX()
-				addCorner(CornerSize.small, Spectrum.white)
+				addCorner(CornerSize.small.toInt(), Spectrum.white)
 				elevation = ShadowSize.Overlay
 				BaseCell(context).apply {
 					setHorizontalPadding()
@@ -98,7 +98,7 @@ class MiniOverlay(
 	
 	fun setTopLeft() {
 		if (this::dashBoard.isInitialized) {
-			dashBoard.scale(1)
+			dashBoard.scale(1, false, 60)
 			dashBoard.y = 20.uiPX().toFloat()
 			dashBoard.x = 20.uiPX().toFloat()
 		}

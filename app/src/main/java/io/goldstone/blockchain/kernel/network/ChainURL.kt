@@ -3,9 +3,8 @@ package io.goldstone.blockchain.kernel.network
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
 /**
@@ -68,49 +67,13 @@ object ChainURL {
 		ChainText.eosTest
 	)
 
-	fun getChainNameByChainType(type: ChainType): String {
-		return when (type) {
-			ChainType.ETH -> Config.getCurrentChainName()
-			ChainType.ETC -> Config.getETCCurrentChainName()
-			ChainType.BTC -> Config.getBTCCurrentChainName()
-			ChainType.LTC -> Config.getLTCCurrentChainName()
-			ChainType.BCH -> Config.getBCHCurrentChainName()
-			ChainType.EOS -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
-		}
-	}
-
-	fun getChainNameBySymbol(symbol: String): String {
+	fun getContractByTransaction(transaction: TransactionTable, chainName: String): TokenContract {
 		return when {
-			symbol.equals(CryptoSymbol.eth, true) -> Config.getCurrentChainName()
-			symbol.equals(CryptoSymbol.etc, true) -> Config.getETCCurrentChainName()
-			symbol.equals(CryptoSymbol.btc(), true) -> Config.getBTCCurrentChainName()
-			symbol.equals(CryptoSymbol.ltc, true) -> Config.getLTCCurrentChainName()
-			symbol.equals(CryptoSymbol.bch, true) -> Config.getBCHCurrentChainName()
-			symbol.equals(CryptoSymbol.eos, true) -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
-		}
-	}
-
-	fun getChainTypeBySymbol(symbol: String): ChainType {
-		return when {
-			symbol.equals(CryptoSymbol.eth, true) -> ChainType.ETH
-			symbol.equals(CryptoSymbol.etc, true) -> ChainType.ETC
-			symbol.equals(CryptoSymbol.btc(), true) -> ChainType.BTC
-			symbol.equals(CryptoSymbol.ltc, true) -> ChainType.LTC
-			symbol.equals(CryptoSymbol.bch, true) -> ChainType.BCH
-			symbol.equals(CryptoSymbol.eos, true) -> ChainType.EOS
-			else -> ChainType.ETH
-		}
-	}
-
-	fun getContractByTransaction(transaction: TransactionTable, chainName: String): String {
-		return when {
-			transaction.isERC20Token -> transaction.to
+			transaction.isERC20Token -> TokenContract(transaction.to)
 			ChainURL.etcChainName.any {
 				it.equals(chainName, true)
-			} -> CryptoValue.etcContract
-			else -> CryptoValue.ethContract
+			} -> TokenContract.getETH()
+			else -> TokenContract.getETH()
 		}
 	}
 
@@ -132,8 +95,8 @@ object ChainURL {
 	private const val bchMain = "https://btc-node-mainnet.goldstone.io/bch"
 	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** EOS Chain Address */
-	private const val eosMain = "https://api1.eosasia.one"
-	private const val eosTest = "https://api.jungle.alohaeos.com"
+	const val eosMain = "https://api1.eosasia.one"
+	const val eosTest = "https://junglehistory.cryptolions.io"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMordenTest = "https://web3.gastracker.io/morden"
@@ -147,40 +110,96 @@ object ChainURL {
 
 	/** Transaction Html View */
 	// BCH
-	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC/tx/"
-	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC/tx/"
+	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC"
+	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC"
 	// BTC
-	private const val btcMainnetWeb = "https://www.blocktrail.com/BTC/tx/"
-	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC/tx/"
+	private const val btcMainnetWeb = "https://www.blocktrail.com/BTC"
+	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC"
 	// LTC
-	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc/tx/"
-	private const val ltcTestnetWeb = "https://chain.so/tx/LTCTEST/"
+	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc"
+	@JvmStatic
+	private val ltcTestnetWeb: (method: String) -> String = {
+		"https://chain.so/$it/LTCTEST/"
+	}
 	// ETC
-	private const val etcMainnetWeb = "https://gastracker.io/tx/"
-	private const val etcTestnetWeb = "http://mordenexplorer.ethernode.io/tx/"
+	private const val etcMainnetWeb = "https://gastracker.io"
+	private const val etcTestnetWeb = "http://mordenexplorer.ethernode.io"
+	// ETH
+	private const val ethMainnetWeb = "https://etherscan.io"
+	private const val ethRopstenWeb = "https://ropsten.etherscan.io"
+	private const val ethKovanWeb = "https://kovan.etherscan.io"
+	private const val ethRinkebyWeb = "https://rinkeby.etherscan.io"
 	// EOS
-	private const val eosMainnetWeb = "https://eosmonitor.io/txn/"
+	private const val eosMainnetWeb = "https://bloks.io"
+	private const val eosJungleWeb = "https://jungle.bloks.io"
 	// TODO 这里还没找到第三方的测试查账
 	private const val eosTestnetWeb = "https://eosmonitor.io/txn/"
 
-	val etcWebHeader: () -> String = {
-		if (Config.isTestEnvironment()) etcTestnetWeb
+	/** Address Detail URL*/
+	val btcAddressDetail: (address: String) -> String = {
+		val header = if (Config.isTestEnvironment()) btcTestnetWeb
+		else btcMainnetWeb
+		"$header/address/$it"
+	}
+	val ethAddressDetail: (address: String) -> String = {
+		val header = when (Config.getCurrentChain()) {
+			ChainID.ropsten -> ethRopstenWeb
+			ChainID.kovan -> ethKovanWeb
+			ChainID.rinkeby -> ethRinkebyWeb
+			else -> ethMainnetWeb
+		}
+		"$header/address/$it"
+	}
+	val bchAddressDetail: (address: String) -> String = {
+		val header = if (Config.isTestEnvironment()) bchTestnetWeb
+		else bchMainnetWeb
+		"$header/address/$it"
+	}
+
+	val etcAddressDetail: (address: String) -> String = {
+		val header = if (Config.isTestEnvironment()) etcTestnetWeb
 		else etcMainnetWeb
+		"$header/addr/$it"
+	}
+
+	val ltcAddressDetail: (address: String) -> String = {
+		if (Config.isTestEnvironment()) ltcTestnetWeb("address") + it
+		else "$ltcMainnetWeb/address/$it"
+	}
+
+	val eosAddressDetail: (address: String) -> String = {
+		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		else eosMainnetWeb
+		"$header/account/$it"
+	}
+
+	/** Transaction Detail URL */
+	val eosTransactionDetail: (txID: String) -> String = {
+		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		else eosMainnetWeb
+		"$header/transaction/$it"
+	}
+	val etcWebHeader: () -> String = {
+		val header = if (Config.isTestEnvironment()) etcTestnetWeb
+		else etcMainnetWeb
+		"$header/tx/"
 	}
 
 	val bchWebHeader: () -> String = {
-		if (Config.isTestEnvironment()) bchTestnetWeb
+		val header = if (Config.isTestEnvironment()) bchTestnetWeb
 		else bchMainnetWeb
+		"$header/tx/"
 	}
 
 	val ltcWebHeader: () -> String = {
-		if (Config.isTestEnvironment()) ltcTestnetWeb
-		else ltcMainnetWeb
+		if (Config.isTestEnvironment()) ltcTestnetWeb("tx")
+		else "$ltcMainnetWeb/tx/"
 	}
 
 	val btcWebHeader: () -> String = {
-		if (Config.isTestEnvironment()) btcTestnetWeb
+		val header = if (Config.isTestEnvironment()) btcTestnetWeb
 		else btcMainnetWeb
+		"$header/tx/"
 	}
 
 	@JvmStatic

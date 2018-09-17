@@ -14,7 +14,7 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
@@ -76,7 +76,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 	fun setData(name: String, isSelected: Boolean, id: Int? = null): NodeSelectionCell {
 		title.text =
 			if (Config.getYingYongBaoInReviewStatus() && name.contains("BTC", true))
-				CryptoSymbol.btc() + " " + name.substringAfter(" ")
+				CoinSymbol.btc() + " " + name.substringAfter(" ")
 			else name
 		radio.isChecked = isSelected
 		id?.let { this.id = it }

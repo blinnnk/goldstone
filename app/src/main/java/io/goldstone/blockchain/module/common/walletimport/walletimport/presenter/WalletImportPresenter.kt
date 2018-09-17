@@ -8,9 +8,10 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -23,22 +24,10 @@ class WalletImportPresenter(
 	override val fragment: WalletImportFragment
 ) : BaseOverlayPresenter<WalletImportFragment>() {
 
-	fun onClickMenuBarItem() {
-		fragment.apply {
-			menuBar.clickEvent = Runnable {
-				menuBar.onClickItem {
-					viewPager.setSelectedStyle(id, menuBar)
-					viewPager.setCurrentItem(id, true)
-				}
-			}
-		}
-	}
-
 	companion object {
-
 		// 非 `Bip44` 钱包, 本地没有 `Path index` 返回 `-1` 进行标记
 		fun childAddressValue(address: String, index: Int): String {
-			return if (index == -1) ""
+			return if (index == -1) address
 			else "$address|$index"
 		}
 
@@ -49,17 +38,17 @@ class WalletImportPresenter(
 
 		fun insertWalletToDatabase(
 			context: Context?,
-			multiChainAddresses: MultiChainAddresses,
+			multiChainAddresses: ChainAddresses,
 			name: String,
 			encryptMnemonic: String,
-			multiChainPath: MultiChainPath,
+			multiChainPath: ChainPath,
 			hint: String?,
 			callback: (Boolean) -> Unit
 		) {
 			// 不为空的地址进行
 			val currentAddress =
 				arrayListOf(
-					multiChainAddresses.etcAddress,
+					multiChainAddresses.ethAddress,
 					multiChainAddresses.etcAddress,
 					multiChainAddresses.btcAddress,
 					multiChainAddresses.btcSeriesTestAddress,
@@ -82,6 +71,7 @@ class WalletImportPresenter(
 							currentLTCAddress = multiChainAddresses.ltcAddress,
 							currentBCHAddress = multiChainAddresses.bchAddress,
 							currentEOSAddress = multiChainAddresses.eosAddress,
+							currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
 							isUsing = true,
 							hint = hint,
 							isWatchOnly = false,
@@ -116,6 +106,7 @@ class WalletImportPresenter(
 								multiChainAddresses.eosAddress,
 								getAddressIndexFromPath(multiChainPath.eosPath)
 							),
+							eosAccountNames = listOf(),
 							ethPath = multiChainPath.ethPath,
 							btcPath = multiChainPath.btcPath,
 							etcPath = multiChainPath.etcPath,

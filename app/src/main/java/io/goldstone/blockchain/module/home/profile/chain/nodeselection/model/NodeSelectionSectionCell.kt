@@ -10,8 +10,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.CryptoName
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoName
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -49,42 +49,42 @@ class NodeSelectionSectionCell(context: Context) : LinearLayout(context) {
 
 	fun ethType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.eth_icon
-		titles.title.text = CryptoSymbol.eth
+		titles.title.text = CoinSymbol.eth
 		titles.subtitle.text = CryptoName.eth
 		return this
 	}
 
 	fun btcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.btc_icon
-		titles.title.text = CryptoSymbol.btc()
-		titles.subtitle.text = CryptoSymbol.updateNameIfInReview(CryptoName.btc)
+		titles.title.text = CoinSymbol.btc()
+		titles.subtitle.text = CoinSymbol.updateNameIfInReview(CryptoName.btc)
 		return this
 	}
 
 	fun ltcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.ltc_icon
-		titles.title.text = CryptoSymbol.ltc
+		titles.title.text = CoinSymbol.ltc
 		titles.subtitle.text = CryptoName.ltc
 		return this
 	}
 
 	fun bchType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.bch_icon
-		titles.title.text = CryptoSymbol.bch
+		titles.title.text = CoinSymbol.bch
 		titles.subtitle.text = CryptoName.bch
 		return this
 	}
 
 	fun eosType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.eos_icon
-		titles.title.text = CryptoSymbol.eos
+		titles.title.text = CoinSymbol.eos
 		titles.subtitle.text = CryptoName.eos
 		return this
 	}
 
 	fun etcType(): NodeSelectionSectionCell {
 		icon.imageResource = R.drawable.etc_icon
-		titles.title.text = CryptoSymbol.etc
+		titles.title.text = CoinSymbol.etc
 		titles.subtitle.text = CryptoName.etc
 		return this
 	}

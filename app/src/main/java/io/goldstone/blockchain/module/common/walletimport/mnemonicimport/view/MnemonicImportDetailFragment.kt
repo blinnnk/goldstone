@@ -17,8 +17,8 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainPath
+import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -63,7 +63,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				lparams(matchParent, matchParent)
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
-					setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
 
 				pathSettings
@@ -116,12 +116,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
-					setBlueStyle()
-					y += 10.uiPX()
+					setBlueStyle(10.uiPX())
 				}.click {
 					it.showLoadingStatus()
 					presenter.importWalletByMnemonic(
-						MultiChainPath(
+						ChainPath(
 							defaultPath[0],
 							defaultPath[1],
 							defaultPath[2],
@@ -141,7 +140,6 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						if (isSuccessful) activity?.jump<SplashActivity>()
 					}
 				}.into(this)
-
 
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsMnemonic.setUnderline()

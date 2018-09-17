@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.markettokencenter.view
 
 import android.support.v4.app.Fragment
-import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
@@ -70,10 +69,6 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 				}
 			}
 		}
-	}
-
-	fun showMenuBar(isShow: Boolean) {
-		menuBar.visibility = if (isShow) View.VISIBLE else View.GONE
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {

@@ -343,7 +343,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	private val calculateHandler = Handler()
 	
 	private val calculateRunnable = Runnable {
-		 calculateVisibleIndex()
+		calculateVisibleIndex()
 	}
 	
 	private val disCalculateRunnable = Runnable {

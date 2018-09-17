@@ -109,12 +109,12 @@ object BTCSeriesTransactionUtils {
 		var money = 0L
 		val utxos = arrayListOf<UTXO>()
 		unspentModel.forEach {
-			//当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
-			// 就跳出循环, 这个时候就得到了合符条件的utxos数组
+			// 当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
+			// 就跳出循环, 这个时候就得到了合符条件的 `utxos` 数组
 			if (money >= (sendValue + fee)) {
 				return@forEach
 			}
-			// 遍历unspents, 组装合适的item
+			// 遍历 `unspents`, 组装合适的 `item`
 			val utxo = UTXO(
 				Sha256Hash.wrap(it.txid),
 				it.outputNumber,
@@ -134,7 +134,6 @@ object BTCSeriesTransactionUtils {
 		)
 		// 消费列表总金额 - 已经转账的金额 - 手续费 就等于需要返回给自己的金额了
 		val leave = money - sendValue - fee
-		// 输出-转给自己
 		if (leave > 0) {
 			// 输出-转给自己
 			transaction.addOutput(

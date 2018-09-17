@@ -10,8 +10,8 @@ import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
@@ -66,11 +66,11 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 					if (it.isFee) it.minerFee.substringBefore(" ") else it.count.formatCount()
 				subtitle.text = if (it.isFee) {
 					when {
-						it.symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-						it.symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
-						it.symbol.equals(CryptoSymbol.ltc, true) -> CryptoSymbol.ltc
-						it.symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
-						else -> CryptoSymbol.eth
+						TokenContract(it.contract).isETC() -> CoinSymbol.etc
+						TokenContract(it.contract).isBCH() -> CoinSymbol.bch
+						TokenContract(it.contract).isLTC() -> CoinSymbol.ltc
+						TokenContract(it.contract).isBTC() -> CoinSymbol.btc()
+						else -> CoinSymbol.eth
 					}
 				} else it.symbol
 			}

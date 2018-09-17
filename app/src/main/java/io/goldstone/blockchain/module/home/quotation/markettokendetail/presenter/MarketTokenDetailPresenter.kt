@@ -17,8 +17,7 @@ import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -354,14 +353,7 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		hold: (DefaultTokenTable) -> Unit
 	) {
-		val chainID = when {
-			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
-			info.symbol.equals(CryptoSymbol.btc(), true) -> ChainID.BTCMain.id
-			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.LTCMain.id
-			info.symbol.equals(CryptoSymbol.bch, true) -> ChainID.BCHMain.id
-			info.symbol.equals(CryptoSymbol.etc, true) -> ChainID.ETCMain.id
-			else -> ChainID.Main.id
-		}
+		val chainID = TokenContract(info.contract).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,
 			chainID,

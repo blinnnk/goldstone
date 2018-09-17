@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
@@ -10,6 +11,8 @@ import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
@@ -45,8 +48,8 @@ private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
 	hold: (String?) -> Unit
 ) {
 	val isSingleChainWallet =
-		!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-	if(Config.isTestEnvironment()) {
+		!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
+	if (Config.isTestEnvironment()) {
 		fragment.context?.exportBase58PrivateKey(
 			walletAddress,
 			password,
@@ -105,6 +108,8 @@ fun GasSelectionPresenter.transferLTC(
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
+									rootFragment,
+									fragment,
 									prepareReceiptModelFromBTCSeries(this@model, fee, it)
 								)
 								callback()

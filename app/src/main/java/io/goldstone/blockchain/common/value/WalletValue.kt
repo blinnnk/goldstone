@@ -7,13 +7,13 @@ import java.io.Serializable
  * @author KaySaith
  */
 enum class WalletType(val content: String) {
-
 	BTCOnly("btcOnly"),
 	ETHERCAndETCOnly("ethERCAndEtc"),
 	BTCTestOnly("btctestOnly"),
 	LTCOnly("ltcOnly"),
 	BCHOnly("bchOnly"),
 	EOSOnly("eosOnly"),
+	Bip44MultiChain("bip44MultiChain"),
 	MultiChain("multiChain");
 
 	companion object {
@@ -25,7 +25,6 @@ enum class WalletType(val content: String) {
 		}
 	}
 }
-
 object DataValue {
 	const val pageCount = 50
 	const val quotationDataCount = 10

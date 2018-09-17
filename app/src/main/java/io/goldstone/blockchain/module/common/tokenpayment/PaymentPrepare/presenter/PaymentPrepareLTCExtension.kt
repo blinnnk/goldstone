@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.scaleTo
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
@@ -11,19 +11,19 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -34,37 +34,36 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (isSuccess: Boolean) -> Unit
+	callback: (TransferError) -> Unit
 ) {
-	generateLTCPaymentModel(count, changeAddress) {
-		it isNotNull {
-			fragment.rootFragment?.apply {
-				presenter.showTargetFragment<GasSelectionFragment>(
-					TokenDetailText.customGas,
-					TokenDetailText.paymentValue,
-					Bundle().apply {
-						putSerializable(ArgumentKey.btcSeriesPrepareModel, it)
-					})
-				callback(true)
-			}
-		} otherwise {
-			callback(false)
+	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
+		callback(TransferError.IncorrectDecimal)
+	else generateLTCPaymentModel(count, changeAddress) { error, model ->
+		if (!model.isNull()) fragment.rootFragment?.apply {
+			presenter.showTargetFragment<GasSelectionFragment>(
+				TokenDetailText.customGas,
+				TokenDetailText.paymentValue,
+				Bundle().apply {
+					putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
+				})
+			callback(error)
 		}
+		else callback(error)
 	}
 }
 
 private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (PaymentBTCSeriesModel?) -> Unit
+	hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = WalletTable.getAddressBySymbol(CryptoSymbol.ltc)
+	val myAddress = CoinSymbol.getLTC().getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			// TODO Alert
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -72,7 +71,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -92,14 +91,14 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(it)
+					hold(TransferError.None, it)
 				}
 			}
 		}
@@ -111,8 +110,8 @@ fun PaymentPreparePresenter.isValidLTCAddressOrElse(address: String): Boolean {
 		val isValidAddress =
 			if (Config.isTestEnvironment()) BTCUtils.isValidTestnetAddress(address)
 			else LTCWalletUtils.isValidAddress(address)
-		if (isValidAddress) fragment.updateChangeAddress(CryptoUtils.scaleTo22(address))
-		else fragment.context.alert(ImportWalletText.addressFromatAlert)
+		if (isValidAddress) fragment.updateChangeAddress(address.scaleTo(22))
+		else fragment.context.alert(ImportWalletText.addressFormatAlert)
 		fragment.activity?.let { SoftKeyboard.hide(it) }
 		isValidAddress
 	} else {

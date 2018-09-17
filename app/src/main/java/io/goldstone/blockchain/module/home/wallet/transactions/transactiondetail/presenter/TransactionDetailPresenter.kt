@@ -11,11 +11,10 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
@@ -91,22 +90,15 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	fun getCurrentChainName(): String {
-		return ChainURL.getChainNameBySymbol(
-			data?.token?.symbol
-				?: dataFromList?.symbol
-				?: notificationData?.symbol.orEmpty()
-		)
-	}
-
-	private fun getUnitSymbol(): String {
+	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
 		return when {
-			symbol.equals(CryptoSymbol.etc, true) -> CryptoSymbol.etc
-			symbol.equals(CryptoSymbol.btc(), true) -> CryptoSymbol.btc()
-			symbol.equals(CryptoSymbol.ltc, true) -> CryptoSymbol.ltc
-			symbol.equals(CryptoSymbol.bch, true) -> CryptoSymbol.bch
-			else -> CryptoSymbol.eth
+			CoinSymbol(symbol).isETC() -> CoinSymbol.etc
+			CoinSymbol(symbol).isBTC() -> CoinSymbol.btc()
+			CoinSymbol(symbol).isLTC() -> CoinSymbol.ltc
+			CoinSymbol(symbol).isBCH() -> CoinSymbol.bch
+			CoinSymbol(symbol).isEOS() -> CoinSymbol.eos
+			else -> CoinSymbol.eth
 		}
 	}
 
@@ -147,8 +139,8 @@ class TransactionDetailPresenter(
 		fragment.parentFragment.apply {
 			val webTitle =
 				when {
-					symbol.equals(CryptoSymbol.etc, true) -> TransactionText.gasTracker
-					CryptoSymbol.isBTCSeriesSymbol(symbol) -> TransactionText.transactionWeb
+					CoinSymbol(symbol).isETC() -> TransactionText.gasTracker
+					CoinSymbol(symbol).isBTCSeries() -> TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
 			when (this) {
@@ -165,13 +157,13 @@ class TransactionDetailPresenter(
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
 	fun generateModels(
 		receipt: Any? = null
-	): ArrayList<TransactionDetailModel> {
+	): List<TransactionDetailModel> {
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
-		val timstamp =
+		val timStamp =
 			data?.timestamp
 				?: dataFromList?.timeStamp?.toLongOrNull()
 				?: notificationData?.timeStamp.orElse(0L)
-		val date = TimeUtils.formatDate(timstamp.toMillisecond())
+		val date = TimeUtils.formatDate(timStamp.toMillisecond())
 		val memo =
 			if (data?.memo.isNull()) TransactionText.noMemo
 			else data?.memo
@@ -248,22 +240,20 @@ class TransactionDetailPresenter(
 		).mapIndexed { index, it ->
 			TransactionDetailModel(receiptData[index].toString(), it)
 		}.let { models ->
-			return if (CryptoSymbol.isBTCSeriesSymbol(getUnitSymbol())) {
+			return if (CoinSymbol(getUnitSymbol()).isBTCSeries()) {
 				// 如果是 `比特币` 账单不显示 `Memo`
 				models.filterNot {
 					it.description.equals(TransactionText.memo, true)
-				}.toArrayList()
-			} else {
-				models.toArrayList()
-			}
+				}
+			} else models
 		}
 	}
 
 	private fun formattedMinerFee(): String? {
 		val dataMinerFee =
-			if (CryptoSymbol.isBTCSeriesSymbol(data?.token?.symbol))
-				data?.minnerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toString()
-			else data?.minnerFee
+			if (CoinSymbol(data?.token?.symbol).isBTCSeries())
+				data?.minerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toPlainString()
+			else data?.minerFee
 		return if (data.isNull()) dataFromList?.minerFee
 		else "$dataMinerFee ${getUnitSymbol()}"
 	}

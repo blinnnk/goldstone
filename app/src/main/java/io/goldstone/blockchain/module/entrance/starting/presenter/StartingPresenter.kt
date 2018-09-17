@@ -116,7 +116,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						// 移除掉一样的数据
 						serverTokens.filterNot { server ->
 							localTokens.any { local ->
-								local.chain_id.equals(server.chain_id, true)
+								local.chainID.equals(server.chainID, true)
 								&& local.contract.equals(server.contract, true)
 							}
 						}.apply {
@@ -186,9 +186,9 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			localTokens: ArrayList<DefaultTokenTable>
 		) {
 			doAsync {
-				val unmanuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+				val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
 				filter { server ->
-					unmanuallyData.find {
+					unManuallyData.find {
 						it.serverTokenID.equals(server.serverTokenID, true)
 					}?.let {
 						// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
@@ -197,7 +197,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 					
 					localTokens.any { local ->
-						local.chain_id.equals(server.chain_id, true)
+						local.chainID.equals(server.chainID, true)
 						&& local.contract.equals(server.contract, true)
 					}
 				}.apply {
@@ -210,7 +210,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								getTokenBySymbolContractAndChainID(
 									server.symbol,
 									server.contract,
-									server.chain_id
+									server.chainID
 								)?.let {
 									update(it.apply {
 										iconUrl = server.iconUrl

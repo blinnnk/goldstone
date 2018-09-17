@@ -7,7 +7,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.QuotationText
@@ -64,12 +64,12 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 
 	var model: PriceHistoryModel? by observing(null) {
 		model?.apply {
-			dayPrice.setPricesubtitle("$dayHighest / $dayLow", baseSymbol)
-			totalPrice.setPricesubtitle("$totalHighest / $totalLow", baseSymbol)
+			dayPrice.setPriceSubtitle("$dayHighest / $dayLow", baseSymbol)
+			totalPrice.setPriceSubtitle("$totalHighest / $totalLow", baseSymbol)
 		}
 	}
-	private val dayPrice = GraySqualCell(context)
-	private val totalPrice = GraySqualCell(context)
+	private val dayPrice = GraySquareCell(context)
+	private val totalPrice = GraySquareCell(context)
 
 	init {
 		setTitle(QuotationText.priceHistory)

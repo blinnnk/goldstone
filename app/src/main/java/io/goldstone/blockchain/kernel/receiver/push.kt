@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
+import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
@@ -20,11 +21,10 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.TinyNumber
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.ChainType
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
-import io.goldstone.blockchain.crypto.toJsonObject
+import io.goldstone.blockchain.crypto.keystore.toJsonObject
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneCode
@@ -153,106 +153,53 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		fun registerAddressesForPush(wallet: WalletTable?, isRemove: Boolean = false) {
 			wallet?.apply {
 				val option = if (isRemove) 0 else 1
-				WalletTable.getTargetWalletType(this).let { type ->
-					when (type) {
-						WalletType.MultiChain -> {
-							val ethSeries =
-								AddressManagerPresenter.convertToChildAddresses(ethAddresses)
-									.map { Pair(it.first, ChainType.ETH.id) }
-							val btcSeries =
-								AddressManagerPresenter.convertToChildAddresses(btcAddresses)
-									.map { Pair(it.first, ChainType.BTC.id) }
-							val ltcSeries =
-								AddressManagerPresenter.convertToChildAddresses(ltcAddresses)
-									.map { Pair(it.first, ChainType.LTC.id) }
-							val bchSeries =
-								AddressManagerPresenter.convertToChildAddresses(bchAddresses)
-									.map { Pair(it.first, ChainType.BCH.id) }
-							val btcTestSeries =
-								AddressManagerPresenter.convertToChildAddresses(btcSeriesTestAddresses)
-									.map { Pair(it.first, ChainType.AllTest.id) }
-							val etcSeries =
-								AddressManagerPresenter.convertToChildAddresses(etcAddresses)
-									.map { Pair(it.first, ChainType.ETC.id) }
-							val eosSeries =
-								AddressManagerPresenter.convertToChildAddresses(eosAddresses)
-									.map { Pair(it.first, ChainType.EOS.id) }
-							val all =
-								ethSeries
-									.plus(btcSeries)
-									.plus(btcTestSeries)
-									.plus(etcSeries)
-									.plus(ltcSeries)
-									.plus(bchSeries)
-									.plus(eosSeries)
-									.map {
-										AddressCommissionModel(it.first, it.second, option, id)
-									}.map { prepareAddressData(it) }
-							GoldStoneAPI.registerWalletAddresses(
-								AesCrypto.encrypt("$all").orEmpty(),
-								{
-									LogUtil.error("registerAddressesAfterGenerateWallet", it)
-								}
-							) {
-								if (!isRemove) updateRegisterAddressesStatus(it)
+				val walletType = getTargetWalletType()
+				when (walletType) {
+					WalletType.Bip44MultiChain -> {
+						val ethSeries =
+							AddressManagerPresenter.convertToChildAddresses(ethAddresses)
+								.map { Pair(it.first, MultiChainType.ETH.id) }
+						val btcSeries =
+							AddressManagerPresenter.convertToChildAddresses(btcAddresses)
+								.map { Pair(it.first, MultiChainType.BTC.id) }
+						val ltcSeries =
+							AddressManagerPresenter.convertToChildAddresses(ltcAddresses)
+								.map { Pair(it.first, MultiChainType.LTC.id) }
+						val bchSeries =
+							AddressManagerPresenter.convertToChildAddresses(bchAddresses)
+								.map { Pair(it.first, MultiChainType.BCH.id) }
+						val btcTestSeries =
+							AddressManagerPresenter.convertToChildAddresses(btcSeriesTestAddresses)
+								.map { Pair(it.first, MultiChainType.AllTest.id) }
+						val etcSeries =
+							AddressManagerPresenter.convertToChildAddresses(etcAddresses)
+								.map { Pair(it.first, MultiChainType.ETC.id) }
+						val eosSeries =
+							AddressManagerPresenter.convertToChildAddresses(eosAddresses)
+								.map { Pair(it.first, MultiChainType.EOS.id) }
+						val all =
+							ethSeries.asSequence()
+								.plus(btcSeries)
+								.plus(btcTestSeries)
+								.plus(etcSeries)
+								.plus(ltcSeries)
+								.plus(bchSeries)
+								.plus(eosSeries)
+								.map {
+									AddressCommissionModel(it.first, it.second, option, id)
+								}.map { prepareAddressData(it) }
+								.toList()
+						GoldStoneAPI.registerWalletAddresses(
+							AesCrypto.encrypt("$all").orEmpty(),
+							{
+								LogUtil.error("registerAddressesAfterGenerateWallet", it)
 							}
+						) {
+							if (!isRemove) updateRegisterAddressesStatus(it)
 						}
-
-						WalletType.BTCOnly -> {
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentBTCAddress,
-									ChainType.BTC.id,
-									option,
-									id
-								)
-							)
-						}
-						WalletType.BCHOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentBCHAddress,
-									ChainType.BCH.id,
-									option,
-									id
-								)
-							)
-						WalletType.EOSOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentEOSAddress,
-									ChainType.EOS.id,
-									option,
-									id
-								)
-							)
-						WalletType.LTCOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentLTCAddress,
-									ChainType.LTC.id,
-									option,
-									id
-								)
-							)
-						WalletType.BTCTestOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentBTCSeriesTestAddress,
-									ChainType.AllTest.id,
-									option,
-									id
-								)
-							)
-						WalletType.ETHERCAndETCOnly ->
-							registerSingleAddress(
-								AddressCommissionModel(
-									currentETHAndERCAddress,
-									ChainType.ETH.id,
-									option,
-									id
-								)
-							)
+					}
+					else -> getCurrentAddressesAndChainID().forEach {
+						registerSingleAddress(AddressCommissionModel(it.first, it.second, option, id))
 					}
 				}
 			}

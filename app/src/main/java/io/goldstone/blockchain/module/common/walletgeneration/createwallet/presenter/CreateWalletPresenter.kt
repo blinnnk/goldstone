@@ -8,30 +8,27 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.ReasonText
-import com.blinnnk.util.UnsafeReasons
-import com.blinnnk.util.checkPasswordInRules
-import com.blinnnk.util.replaceFragmentAndSetArgument
-import io.goldstone.blockchain.common.language.CreateWalletText
+import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.DefaultPath
+import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -109,7 +106,7 @@ class CreateWalletPresenter(
 	}
 
 	private fun setConfirmButtonStyle(confirmButton: RoundButton) {
-		if (passwordText.count() * repeatPasswordText.count() != 0) {
+		if (passwordText.length * repeatPasswordText.length != 0) {
 			confirmButton.setBlueStyle(20.uiPX())
 		} else {
 			confirmButton.setGrayStyle(20.uiPX())
@@ -139,6 +136,7 @@ class CreateWalletPresenter(
 						multiChainAddresses.ltcAddress,
 						multiChainAddresses.bchAddress,
 						multiChainAddresses.eosAddress,
+						EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
 						ethAddresses = WalletImportPresenter.childAddressValue(
 							multiChainAddresses.ethAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
@@ -167,6 +165,7 @@ class CreateWalletPresenter(
 							multiChainAddresses.eosAddress,
 							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
 						),
+						eosAccountNames = listOf(),
 						ethPath = DefaultPath.ethPath,
 						btcPath = DefaultPath.btcPath,
 						etcPath = DefaultPath.etcPath,
@@ -181,7 +180,7 @@ class CreateWalletPresenter(
 					generateMyTokenInfo(
 						multiChainAddresses,
 						{
-							LogUtil.error("generateWalletWith")
+							LogUtil.error("generateWalletWith", it)
 						}) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
@@ -195,7 +194,6 @@ class CreateWalletPresenter(
 							}
 						}
 					}
-
 					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
 			}
@@ -250,7 +248,7 @@ class CreateWalletPresenter(
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
 		fun generateMyTokenInfo(
-			addresses: MultiChainAddresses,
+			addresses: ChainAddresses,
 			errorCallback: (Exception) -> Unit,
 			callback: (Boolean) -> Unit
 		) {
@@ -324,7 +322,7 @@ class CreateWalletPresenter(
 		}
 
 		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
-			currentAddresses: MultiChainAddresses,
+			currentAddresses: ChainAddresses,
 			callback: (Boolean) -> Unit
 		) {
 			filter {
@@ -341,65 +339,55 @@ class CreateWalletPresenter(
 		}
 
 		private fun List<DefaultTokenTable>.insertNewAccount(
-			currentAddresses: MultiChainAddresses,
+			currentAddresses: ChainAddresses,
 			callback: () -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
-					forEach {
-						when (it.chain_id) {
-							ChainID.Main.id,
-							ChainID.Ropsten.id,
-							ChainID.Kovan.id,
-							ChainID.Rinkeby.id -> {
+					forEach { defaults ->
+						when (defaults.chainID) {
+							ChainID.ethMain,
+							ChainID.ropsten,
+							ChainID.kovan,
+							ChainID.rinkeby -> {
 								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ethAddress))
+									MyTokenTable(defaults, currentAddresses.ethAddress).insert()
 								}
 							}
 
-							ChainID.ETCMain.id, ChainID.ETCTest.id -> {
+							ChainID.etcMain, ChainID.etcTest -> {
 								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.etcAddress))
+									MyTokenTable(defaults, currentAddresses.etcAddress).insert()
 								}
 							}
 
-							ChainID.EOSMain.id, ChainID.EOSTest.id -> {
+							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eosAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.eosAddress))
+									MyTokenTable(defaults, currentAddresses.eosAddress).insert()
 								}
 							}
 
-							ChainID.BTCMain.id -> {
+							ChainID.btcMain -> {
 								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcAddress))
+									MyTokenTable(defaults, currentAddresses.btcAddress).insert()
 								}
 							}
 
-							ChainID.BTCTest.id -> {
+							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress).insert()
 								}
 							}
-							ChainID.LTCMain.id -> {
+							ChainID.ltcMain -> {
 								if (currentAddresses.ltcAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.ltcAddress))
-								}
-							}
-							ChainID.LTCTest.id -> {
-								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.ltcAddress).insert()
 								}
 							}
 
-							ChainID.BCHMain.id -> {
+							ChainID.bchMain -> {
 								if (currentAddresses.bchAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.bchAddress))
-								}
-							}
-							ChainID.BCHTest.id -> {
-								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable.insert(MyTokenTable(it, currentAddresses.btcSeriesTestAddress))
+									MyTokenTable(defaults, currentAddresses.bchAddress).insert()
 								}
 							}
 						}

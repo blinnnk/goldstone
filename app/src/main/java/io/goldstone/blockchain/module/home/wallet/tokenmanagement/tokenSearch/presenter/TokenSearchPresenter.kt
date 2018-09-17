@@ -2,14 +2,18 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 
 import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
+import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.ChainID
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -58,7 +62,7 @@ class TokenSearchPresenter(
 							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
 								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
 								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot {
-									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
+									CoinSymbol(it.symbol).isBTCSeries()
 								}.toArrayList())
 							} else {
 								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result)
@@ -85,11 +89,10 @@ class TokenSearchPresenter(
 							insertToMyToken(switch, localToken)
 						}
 					} otherwise {
-						DefaultTokenTable.insertToken(searchToken.apply {
+						searchToken.apply {
 							isDefault = switch.isChecked
-							// 区分 `ETC` 插入的 `ChainID`
-							chain_id = CryptoValue.chainID(contract)
-						}) {
+							chainID = TokenContract(contract).getCurrentChainID()
+						} insertThen {
 							insertToMyToken(switch, searchToken)
 						}
 					}
@@ -176,7 +179,7 @@ class TokenSearchPresenter(
 										null,
 										status,
 										0,
-										ChainID.getChainIDBySymbol(symbol),
+										CoinSymbol(symbol).getChainID(),
 										isUsed = status
 									)
 								)

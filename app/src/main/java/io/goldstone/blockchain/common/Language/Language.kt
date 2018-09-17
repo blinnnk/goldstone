@@ -144,7 +144,7 @@ object PincodeText {
 		HoneyLanguage.English.code -> "Show PIN"
 		HoneyLanguage.Chinese.code -> "显示PIN码"
 		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN코드 표시"
+		HoneyLanguage.Korean.code -> "PIN 코드 표시"
 		HoneyLanguage.Russian.code -> "Показать PIN-код"
 		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
 		else -> ""
@@ -386,7 +386,7 @@ object QAText {
 	}
 }
 
-object ImportMenubar {
+object ImportMethodText {
 	@JvmField
 	val mnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic"

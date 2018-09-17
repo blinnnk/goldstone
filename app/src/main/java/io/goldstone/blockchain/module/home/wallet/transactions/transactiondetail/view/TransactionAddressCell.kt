@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.eos.EOSValue
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
@@ -55,7 +56,8 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setAddress(address: String) {
-		val fixWidthAddress = object : FixTextLength() {
+		val fixWidthAddress = if (address.length <= EOSValue.maxNameLength) address
+		else object : FixTextLength() {
 			override val maxWidth: Float = ScreenSize.widthWithPadding - 90.uiPX() * 1f
 			override var text: String = address
 			override val textSize: Float = fontSize(12.uiPX())

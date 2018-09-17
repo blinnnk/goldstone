@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletimport.watchonly.view
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -26,7 +25,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
@@ -47,23 +46,16 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val addressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var currentType = CryptoValue.PrivateKeyType.ETHERCAndETC.content
+	private var currentType = PrivateKeyType.ETHERCAndETC.content
 	override val presenter = WatchOnlyImportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-
-			(attentionView.parent as? ViewGroup)?.apply {
-				findViewById<AttentionTextView>(ElementID.attentionText).isNotNull {
-					/** 临时解决异常的 `The specified child already has a parent` 错误 */
-					removeAllViews()
-				}
-			}
-
 			attentionView.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
+				isCenter()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				text = WatchOnlyText.intro
 			}.into(this)
 

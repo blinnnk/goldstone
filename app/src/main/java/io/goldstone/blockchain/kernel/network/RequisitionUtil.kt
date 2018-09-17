@@ -12,7 +12,8 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
-import io.goldstone.blockchain.crypto.toJsonObject
+import io.goldstone.blockchain.crypto.keystore.keyString
+import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import okhttp3.*
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
-	inline fun <reified T> postRequestGetJsonObject(
+	inline fun <reified T> postRequest(
 		body: RequestBody,
 		keyName: String,
 		path: String,
@@ -68,10 +69,9 @@ object RequisitionUtil {
 						hold(gson.fromJson(jsonData, collectionType))
 					} catch (error: Exception) {
 						LogUtil.error(keyName, error)
-						GoldStoneCode.showErrorCodeReason(data) {
-							GoldStoneAPI.context.runOnUiThread {
-								errorCallback(error)
-							}
+						GoldStoneCode.showErrorCodeReason(data)
+						GoldStoneAPI.context.runOnUiThread {
+							errorCallback(error)
 						}
 					}
 				}
@@ -92,7 +92,6 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-
 		getcryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {

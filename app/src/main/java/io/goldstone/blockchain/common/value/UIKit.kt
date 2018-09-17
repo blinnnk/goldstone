@@ -13,7 +13,6 @@ import org.jetbrains.anko.px2sp
  * Common interface parameters, including color, original size, etc.
  */
 object GrayScale {
-	
 	@JvmField
 	val black = Color.parseColor("#FF000000")
 	@JvmField
@@ -46,6 +45,8 @@ object Spectrum {
 	@JvmField
 	val lightBlue = Color.parseColor("#FF2882D2")
 	@JvmField
+	val grayBlue = Color.parseColor("#FFA0BBD3")
+	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
 	val opacity8Green = Color.parseColor("#CC1CC881")
@@ -75,15 +76,17 @@ object WalletColor {
 	private val purple = Color.parseColor("#FF3F4E92")
 	private val blue = Color.parseColor("#FF2A7EDA")
 	private val cyan = Color.parseColor("#FF1BA2A9")
-	private val darkPuple = Color.parseColor("#FF603361")
+	private val darkPurple = Color.parseColor("#FF603361")
 	private val grayYellow = Color.parseColor("#FF717335")
 	private val blueGray = Color.parseColor("#FF4B5C6E")
-	fun getALl(): List<Int> = listOf(purple, blue, cyan, darkPuple, grayYellow, blueGray)
+	fun getAll(): List<Int> = listOf(purple, blue, cyan, darkPurple, grayYellow, blueGray)
 }
 
 object ShadowSize {
 	@JvmField
 	val Header = 3.uiPX().toFloat()
+	@JvmField
+	val Cell = 5.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
 	@JvmField
@@ -92,7 +95,7 @@ object ShadowSize {
 
 object PaddingSize {
 	@JvmField
-	val device = 20.uiPX()
+	val device = 15.uiPX()
 	@JvmField
 	val content = 10.uiPX()
 }
@@ -101,7 +104,9 @@ object CornerSize {
 	@JvmField
 	val cell = 3.uiPX()
 	@JvmField
-	val small = 5.uiPX()
+	val small = 5.uiPX().toFloat()
+	@JvmField
+	val normal = 7.uiPX().toFloat()
 	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField

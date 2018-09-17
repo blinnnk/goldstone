@@ -108,6 +108,16 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
+	val bip44MultiChain = when (currentLanguage) {
+		HoneyLanguage.English.code -> "BIP44 MULTI-CHAIN"
+		HoneyLanguage.Chinese.code -> "BIP44 MULTI-CHAIN"
+		HoneyLanguage.Japanese.code -> "BIP44 MULTI-CHAIN"
+		HoneyLanguage.Korean.code -> "BIP44 MULTI-CHAIN"
+		HoneyLanguage.Russian.code -> "BIP44 MULTI-CHAIN"
+		HoneyLanguage.TraditionalChinese.code -> "BIP44 MULTI-CHAIN"
+		else -> ""
+	}
+	@JvmField
 	val multiChain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "MULTI-CHAIN"
 		HoneyLanguage.Chinese.code -> "支持多链"

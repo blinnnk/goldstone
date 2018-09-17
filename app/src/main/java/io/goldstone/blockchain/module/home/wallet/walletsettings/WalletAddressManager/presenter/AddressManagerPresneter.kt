@@ -11,16 +11,20 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -52,7 +56,7 @@ class AddressManagerPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)) {
+		if (Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)) {
 			fragment.showCreatorDashboard()
 		}
 	}
@@ -74,31 +78,31 @@ class AddressManagerPresenter(
 				arrayListOf<Pair<String, String>>().apply {
 					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
 					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
+						add(Pair(currentBTCAddress, CoinSymbol.btc()))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.btc()))
 					}
 					// Litecoin Mainnet and Testnet Addresses
 					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
+						add(Pair(currentLTCAddress, CoinSymbol.ltc))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.ltc))
 					}
 					// Bitcoin Cash Mainnet and Testnet Addresses
 					if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBCHAddress, CryptoSymbol.bch))
+						add(Pair(currentBCHAddress, CoinSymbol.bch))
 					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.bch))
+						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
 					}
 					// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
 					if (currentETHAndERCAddress.isNotEmpty()) {
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
-						add(Pair(currentETCAddress, CryptoSymbol.etc))
+						add(Pair(currentETHAndERCAddress, CoinSymbol.erc))
+						add(Pair(currentETHAndERCAddress, CoinSymbol.eth))
+						add(Pair(currentETCAddress, CoinSymbol.etc))
 					}
 					// EOS.io Mainnet and Testnet Addresses
 					if (currentEOSAddress.isNotEmpty()) {
-						add(Pair(currentEOSAddress, CryptoSymbol.eos))
+						add(Pair(currentEOSAddress, CoinSymbol.eos))
 					}
 				}
 			fragment.setMultiChainAddresses(addresses)
@@ -175,7 +179,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETHAndERCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.ETH.id) }
 			)
 		}
 	}
@@ -185,7 +189,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.ETC.id) }
 			)
 		}
 	}
@@ -195,7 +199,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allEOSAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.EOS.id) }
 			)
 		}
 	}
@@ -205,7 +209,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBtcAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.BTC.id) }
 			)
 		}
 	}
@@ -215,7 +219,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allLTCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.LTC.id) }
 			)
 		}
 	}
@@ -225,7 +229,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBCHAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.BCH.id) }
 			)
 		}
 	}
@@ -295,8 +299,8 @@ class AddressManagerPresenter(
 						// 新创建的账号插入所有对应的链的默认 `Token`
 						ChainID.getAllEthereumChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.eth,
-								CryptoValue.ethContract,
+								CoinSymbol.eth,
+								TokenContract.ethContract,
 								address,
 								it
 							)
@@ -305,7 +309,7 @@ class AddressManagerPresenter(
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
 								address,
-								ChainType.ETH.id,
+								MultiChainType.ETH.id,
 								1,
 								wallet.id
 							)
@@ -333,8 +337,8 @@ class AddressManagerPresenter(
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 						ChainID.getAllETCChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.etc,
-								CryptoValue.etcContract,
+								CoinSymbol.etc,
+								TokenContract.etcContract,
 								address,
 								it
 							)
@@ -343,7 +347,7 @@ class AddressManagerPresenter(
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
 								address,
-								ChainType.ETC.id,
+								MultiChainType.ETC.id,
 								1,
 								wallet.id
 							)
@@ -387,8 +391,8 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							ChainID.getAllEOSChainID().forEach {
 								insertNewAddressToMyToken(
-									CryptoSymbol.eos,
-									CryptoValue.eosContract,
+									CoinSymbol.eos,
+									TokenContract.eosContract,
 									eosKeyPair.address,
 									it
 								)
@@ -397,7 +401,7 @@ class AddressManagerPresenter(
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									eosKeyPair.address,
-									ChainType.EOS.id,
+									MultiChainType.EOS.id,
 									1,
 									wallet.id
 								)
@@ -442,16 +446,16 @@ class AddressManagerPresenter(
 								)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
-									CryptoSymbol.btc(),
-									CryptoValue.btcContract,
+									CoinSymbol.btc(),
+									TokenContract.btcContract,
 									address,
-									ChainID.BTCMain.id
+									ChainID.btcMain
 								)
 								// 注册新增的子地址
 								XinGePushReceiver.registerSingleAddress(
 									AddressCommissionModel(
 										address,
-										ChainType.BTC.id,
+										MultiChainType.BTC.id,
 										1,
 										wallet.id
 									)
@@ -500,30 +504,30 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							// `BTCTest` 是 `BTCSeries` 公用的地址
 							insertNewAddressToMyToken(
-								CryptoSymbol.btc(),
-								CryptoValue.btcContract,
+								CoinSymbol.btc(),
+								TokenContract.btcContract,
 								address,
-								ChainID.BTCTest.id
+								ChainID.btcTest
 							)
 							// 插入 LTC 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								address,
-								ChainID.LTCTest.id
+								ChainID.ltcTest
 							)
 							// 插入 BCH 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								address,
-								ChainID.BCHTest.id
+								ChainID.bchTest
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									address,
-									ChainType.AllTest.id,
+									MultiChainType.AllTest.id,
 									1,
 									wallet.id
 								)
@@ -568,16 +572,16 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								bchKeyPair.address,
-								ChainID.BCHMain.id
+								ChainID.bchMain
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									bchKeyPair.address,
-									ChainType.BCH.id,
+									MultiChainType.BCH.id,
 									1,
 									wallet.id
 								)
@@ -624,16 +628,16 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								ltcKeyPair.address,
-								ChainID.LTCMain.id
+								ChainID.ltcMain
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									ltcKeyPair.address,
-									ChainType.LTC.id,
+									MultiChainType.LTC.id,
 									1,
 									wallet.id
 								)
@@ -701,11 +705,11 @@ class AddressManagerPresenter(
 			}
 			WalletTable.getCurrentWallet {
 				when (chainType) {
-					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC.id ->
+					MultiChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+					MultiChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
+					MultiChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
+					MultiChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
+					MultiChainType.BTC.id ->
 						if (Config.isTestEnvironment())
 							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
 						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
@@ -722,7 +726,7 @@ class AddressManagerPresenter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chainID }, address))
+						MyTokenTable(it.apply { this.chainID = chainID }, address).insert()
 					}
 				}
 			}

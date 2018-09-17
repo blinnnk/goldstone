@@ -10,17 +10,18 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainAddresses
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.isValid
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -52,41 +53,41 @@ class WatchOnlyImportPresenter(
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		when (addressType) {
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHERCAndETC.content -> {
 				if (!Address(address).isValid()) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
 			}
 
-			CryptoValue.PrivateKeyType.BTC.content -> {
+			PrivateKeyType.BTC.content -> {
 				if (!BTCUtils.isValidMainnetAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
 			}
 
-			CryptoValue.PrivateKeyType.LTC.content -> {
+			PrivateKeyType.LTC.content -> {
 				if (!LTCWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
 			}
 
-			CryptoValue.PrivateKeyType.EOS.content -> {
+			PrivateKeyType.EOS.content -> {
 				if (!EOSWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
 			}
 
-			CryptoValue.PrivateKeyType.BCH.content -> {
+			PrivateKeyType.BCH.content -> {
 				if (!BCHWalletUtils.isValidAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -94,7 +95,7 @@ class WatchOnlyImportPresenter(
 
 			else -> {
 				if (!BTCUtils.isValidTestnetAddress(address)) {
-					fragment.context?.alert(ImportWalletText.addressFromatAlert)
+					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
 					return
 				}
@@ -120,6 +121,7 @@ class WatchOnlyImportPresenter(
 						currentLTCAddress = currentLTCAddress,
 						currentBCHAddress = currentBCHAddress,
 						currentEOSAddress = currentEOSAddress,
+						currentEOSAccountName = EOSDefaultAllChainName(currentEOSAddress, currentEOSAddress),
 						ethPath = "",
 						etcPath = "",
 						btcPath = "",
@@ -133,12 +135,13 @@ class WatchOnlyImportPresenter(
 						bchAddresses = "",
 						btcSeriesTestAddresses = "",
 						ltcAddresses = "",
-						eosAddresses = ""
+						eosAddresses = "",
+						eosAccountNames = listOf()
 					)
 				) { thisWallet ->
 					if (thisWallet.isNull()) return@insert
 					CreateWalletPresenter.generateMyTokenInfo(
-						MultiChainAddresses(
+						ChainAddresses(
 							currentETHAndERCAddress,
 							currentETCAddress,
 							currentBTCAddress,
@@ -156,13 +159,13 @@ class WatchOnlyImportPresenter(
 						// 注册钱包地址用于发送 `Push`
 						val addressPairs =
 							listOf(
-								Pair(currentBTCAddress, ChainType.BTC.id),
-								Pair(currentLTCAddress, ChainType.LTC.id),
-								Pair(currentBCHAddress, ChainType.BCH.id),
-								Pair(currentBTCTestAddress, ChainType.AllTest.id),
-								Pair(currentETCAddress, ChainType.ETC.id),
-								Pair(currentETHAndERCAddress, ChainType.ETH.id),
-								Pair(currentEOSAddress, ChainType.EOS.id)
+								Pair(currentBTCAddress, MultiChainType.BTC.id),
+								Pair(currentLTCAddress, MultiChainType.LTC.id),
+								Pair(currentBCHAddress, MultiChainType.BCH.id),
+								Pair(currentBTCTestAddress, MultiChainType.AllTest.id),
+								Pair(currentETCAddress, MultiChainType.ETC.id),
+								Pair(currentETHAndERCAddress, MultiChainType.ETH.id),
+								Pair(currentEOSAddress, MultiChainType.EOS.id)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
 						XinGePushReceiver.registerSingleAddress(
@@ -184,24 +187,24 @@ class WatchOnlyImportPresenter(
 
 	private fun setAddressByChainType(address: String, addressType: String) {
 		when (addressType) {
-			CryptoValue.PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHERCAndETC.content -> {
 				currentETHAndERCAddress = address
 				currentETCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.BTC.content -> {
+			PrivateKeyType.BTC.content -> {
 				currentBTCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.LTC.content -> {
+			PrivateKeyType.LTC.content -> {
 				currentLTCAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.BCH.content -> {
+			PrivateKeyType.BCH.content -> {
 				currentBCHAddress = address
 			}
 
-			CryptoValue.PrivateKeyType.EOS.content -> {
+			PrivateKeyType.EOS.content -> {
 				currentEOSAddress = address
 			}
 

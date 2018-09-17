@@ -6,29 +6,30 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.crypto.utils.toDataStringFromAddress
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import java.math.BigInteger
 
 /**
  * @date 2018/7/25 3:24 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(count: Double, callback: () -> Unit) {
+fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
+	count: Double, callback: () -> Unit
+) {
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
-		ChainURL.getChainTypeBySymbol(fragment.rootFragment?.token?.symbol.orEmpty()),
+		TokenContract(fragment.rootFragment?.token?.contract).getCurrentChainType(),
 		callback
 	) { model ->
 		fragment.rootFragment?.apply {
@@ -49,7 +50,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(count: Double, callba
 private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
-	chainType: ChainType,
+	chainType: MultiChainType,
 	callback: () -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
@@ -58,7 +59,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
 		},
 		chainType,
-		WalletTable.getAddressBySymbol(getToken()?.symbol)
+		CoinSymbol(getToken()?.symbol).getAddress()
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
 	}
@@ -77,35 +78,35 @@ private fun PaymentPreparePresenter.generateTransaction(
 	val to: String
 	// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
 	when {
-		getToken()?.contract.equals(CryptoValue.ethContract, true)
-			or getToken()?.contract.equals(CryptoValue.etcContract, true) -> {
+		getToken()?.contract.equals(TokenContract.ethContract, true)
+			or getToken()?.contract.equals(TokenContract.etcContract, true) -> {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count)
 		}
-		
+
 		else -> {
 			to = getToken()?.contract.orEmpty()
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
 			data = SolidityCode.contractTransfer + // 方法
-				toAddress.toDataStringFromAddress() + // 地址
+				toAddress.toAddressCode(false) + // 地址
 				countWithDecimal.toDataString() + // 数量
 				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 		}
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		WalletTable.getAddressBySymbol(getToken()?.symbol),
+		CoinSymbol(getToken()?.symbol).getAddress(),
 		data,
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString())
 			callback()
 		},
-		ChainURL.getChainNameBySymbol(getToken()?.symbol.orEmpty())
+		CoinSymbol(getToken()?.symbol).getCurrentChainName()
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				nonce,
 				limit,
 				to,

@@ -12,7 +12,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ExplanationTitle
-import io.goldstone.blockchain.common.component.cell.GraySqualCell
+import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
@@ -39,7 +39,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	private val footer by lazy {
 		GasSelectionFooter(context!!)
 	}
-	private val spendingCell by lazy { GraySqualCell(context!!) }
+	private val spendingCell by lazy { GraySquareCell(context!!) }
 	private lateinit var gasLayout: LinearLayout
 	private lateinit var container: RelativeLayout
 	override val presenter = GasSelectionPresenter(this)
@@ -94,7 +94,6 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 								putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas)
 							}
 						)
-						recoverHeader()
 					}
 				}.into(this)
 			}

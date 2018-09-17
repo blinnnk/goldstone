@@ -5,17 +5,15 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainPath
+import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -26,7 +24,7 @@ class MnemonicImportDetailPresenter(
 ) : BasePresenter<MnemonicImportDetailFragment>() {
 
 	fun importWalletByMnemonic(
-		multiChainPath: MultiChainPath,
+		multiChainPath: ChainPath,
 		mnemonic: String,
 		password: String,
 		repeatPassword: String,
@@ -73,7 +71,7 @@ class MnemonicImportDetailPresenter(
 		}
 	}
 
-	private fun isValidPath(multiChainPath: MultiChainPath): Boolean {
+	private fun isValidPath(multiChainPath: ChainPath): Boolean {
 		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.ethPath)) {
 			fragment.context?.alert(ImportWalletText.pathAlert)
 			false
@@ -94,7 +92,7 @@ class MnemonicImportDetailPresenter(
 
 	private fun importWallet(
 		mnemonic: String,
-		multiChainPath: MultiChainPath,
+		multiChainPath: ChainPath,
 		password: String,
 		name: String,
 		hint: String? = null,

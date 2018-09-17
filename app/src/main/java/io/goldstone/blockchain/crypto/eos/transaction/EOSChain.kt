@@ -1,0 +1,13 @@
+package io.goldstone.blockchain.crypto.eos.transaction
+
+import io.goldstone.blockchain.crypto.multichain.ChainID
+
+/**
+ * @author KaySaith
+ * @date 2018/09/03
+ */
+
+enum class EOSChain(val id: String) {
+	Main(ChainID.eosMain),
+	Test(ChainID.eosTest)
+}

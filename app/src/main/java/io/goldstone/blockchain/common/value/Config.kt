@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.value
 
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 
 /**
@@ -50,6 +51,13 @@ object Config {
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 
 	/** Coin Address In SharedPreference */
+	// EOS Account Name
+	fun getCurrentEOSName(): String =
+		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName)
+
+	fun updateCurrentEOSName(name: String) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSName, name)
+
 	fun getCurrentEthereumAddress(): String =
 		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 
@@ -141,7 +149,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.currentChain)
 				.equals("Default", true)
 		) {
-			ChainID.Main.id
+			ChainID.ethMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain)
 		}
@@ -168,7 +176,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.ltcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
 		}
@@ -178,7 +186,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.etcMainGasTracker
+			ChainText.ltcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
 		}
@@ -198,7 +206,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.bchMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
 		}
@@ -208,7 +216,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
 				.equals("Default", true)
 		) {
-			ChainText.etcMainGasTracker
+			ChainText.bchMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
 		}
@@ -228,7 +236,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.EOSMain.id
+			ChainID.eosMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
 		}
@@ -258,7 +266,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.ETCMain.id
+			ChainID.etcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 		}
@@ -287,7 +295,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.BTCMain.id
+			ChainID.btcMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
 		}
@@ -327,8 +335,10 @@ object Config {
 	fun updateWalletCount(count: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)
 
-	fun getMaxWalletID(): Int =
-		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+	fun getMaxWalletID(): Int {
+		val default = GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+		return if (default == -1) 0 else default
+	}
 
 	fun updateMaxWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)

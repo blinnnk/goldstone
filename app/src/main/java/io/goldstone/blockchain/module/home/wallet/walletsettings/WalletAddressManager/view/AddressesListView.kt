@@ -9,8 +9,8 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -60,7 +60,7 @@ class AddressesListView(
 					var isDefault = false
 					// 默认最多显示 `4` 条地址
 					if (index >= maxCount) return@forEachIndexed
-					GraySqualCellWithButtons(context).apply cell@{
+					GraySquareCellWithButtons(context).apply cell@{
 						// 如果列表中有默认地址那么更改样式
 						if (currentAddresses.any { it.equals(data.first, true) }) {
 							isDefault = true

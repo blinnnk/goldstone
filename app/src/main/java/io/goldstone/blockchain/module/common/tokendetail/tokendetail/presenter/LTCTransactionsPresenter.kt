@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
@@ -21,7 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentLTCAddress()
-	LitecoinApi.getTransactionsCount(
+	LitecoinApi.getTransactionCount(
 		address,
 		{
 			fragment.removeLoadingView()
@@ -40,7 +40,7 @@ fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
 			}
-			loadDataFromDatabaseOrElse { _, _ -> }
+			loadDataFromDatabaseOrElse()
 		}
 	}
 }
@@ -71,9 +71,9 @@ private fun loadLitecoinTransactionsFromChain(
 				item,
 				pageInfo.maxDataIndex + index + 1,
 				address,
-				CryptoSymbol.ltc,
+				CoinSymbol.ltc,
 				false,
-				ChainType.LTC.id
+				MultiChainType.LTC.id
 			)
 		}.map {
 			// 插入转账数据到数据库

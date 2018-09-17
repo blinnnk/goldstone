@@ -43,7 +43,7 @@ class QuotationManagementPresenter(
 		}
 	}
 
-	override fun afterUpdateAdapterDataset(recyclerView: BaseRecyclerView) {
+	override fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {
 		fragment.updateSelectionOrderID()
 	}
 
@@ -51,23 +51,21 @@ class QuotationManagementPresenter(
 		fragment.asyncData.orEmptyArray()
 
 	private fun QuotationManagementFragment.updateSelectionOrderID() {
-		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { fromPosition, toPosition ->
+		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { _, toPosition ->
 			val data = getCurrentAsyncData()
-			if (fromPosition != null && toPosition != null) {
-				// 通过权重判断简单的实现了排序效果
-				val newOrderID = when (toPosition) {
-					0 -> data[toPosition + 1].orderID + 0.1
-					data.lastIndex -> data[toPosition - 1].orderID - 0.1
-					else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
-				}
-				QuotationSelectionTable.updateSelectionOrderIDBy(
-					data[toPosition].pair, newOrderID
-				) {
-					// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
-					fragment.asyncData?.find {
-						it.baseSymbol == data[toPosition].baseSymbol
-					}?.orderID = newOrderID
-				}
+			// 通过权重判断简单的实现了排序效果
+			val newOrderID = when (toPosition) {
+				0 -> data[toPosition + 1].orderID + 0.1
+				data.lastIndex -> data[toPosition - 1].orderID - 0.1
+				else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
+			}
+			QuotationSelectionTable.updateSelectionOrderIDBy(
+				data[toPosition].pair, newOrderID
+			) {
+				// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
+				fragment.asyncData?.find {
+					it.baseSymbol == data[toPosition].baseSymbol
+				}?.orderID = newOrderID
 			}
 		}
 	}

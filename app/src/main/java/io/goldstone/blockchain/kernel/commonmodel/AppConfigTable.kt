@@ -13,8 +13,8 @@ import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -140,9 +140,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateRetryTimes(
-			times: Int
-		) {
+		fun updateRetryTimes(times: Int) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {

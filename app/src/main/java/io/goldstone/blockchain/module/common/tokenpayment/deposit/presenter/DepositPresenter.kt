@@ -4,11 +4,10 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoName
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CryptoName
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
@@ -35,7 +34,7 @@ class DepositPresenter(
 	fun generateQRCode(amount: Double = 0.0, callback: () -> Unit = {}) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			val content = when {
-				token?.symbol.equals(CryptoSymbol.etc) -> {
+				TokenContract(token?.contract).isETC() -> {
 					generateETHOrETCCode(
 						Config.getCurrentETCAddress(),
 						amount,
@@ -43,7 +42,7 @@ class DepositPresenter(
 					)
 				}
 
-				token?.symbol.equals(CryptoSymbol.eth) -> {
+				TokenContract(token?.contract).isETH() -> {
 					generateETHOrETCCode(
 						Config.getCurrentEthereumAddress(),
 						amount,
@@ -51,21 +50,21 @@ class DepositPresenter(
 					)
 				}
 
-				token?.symbol.equals(CryptoSymbol.btc(), true) -> {
+				TokenContract(token?.contract).isBTC() -> {
 					val address = if (Config.isTestEnvironment())
 						Config.getCurrentBTCSeriesTestAddress()
 					else Config.getCurrentBTCAddress()
 					generateBitcoinCode(address, amount)
 				}
 
-				token?.symbol.equals(CryptoSymbol.ltc, true) -> {
+				TokenContract(token?.contract).isLTC() -> {
 					val address = if (Config.isTestEnvironment())
 						Config.getCurrentBTCSeriesTestAddress()
 					else Config.getCurrentLTCAddress()
 					generateLitecoinCode(address, amount)
 				}
 
-				token?.symbol.equals(CryptoSymbol.bch, true) -> {
+				TokenContract(token?.contract).isBCH() -> {
 					val address = if (Config.isTestEnvironment())
 						Config.getCurrentBTCSeriesTestAddress()
 					else Config.getCurrentBCHAddress()
@@ -163,10 +162,9 @@ class DepositPresenter(
 			val chainID = if (content.contains("chain_id"))
 				content.substringAfter("chain_id=").substringBefore("e18")
 			else ""
-			val contract = if (
-				chainID.equals(ChainID.ETCMain.id, true) ||
-				chainID.equals(ChainID.ETCTest.id, true)
-			) CryptoValue.etcContract else CryptoValue.ethContract
+			val contract =
+				if (ChainID(chainID).isETCMain() || ChainID(chainID).isETCTest())
+					TokenContract.etcContract else TokenContract.ethContract
 			return if (content.contains("?")) {
 				val address = content.substringBefore("?").substringAfter(":")
 				val value = content.substringAfter("value=").substringBefore("e18")
@@ -185,7 +183,7 @@ class DepositPresenter(
 				else ""
 			val chainID =
 				when {
-					chainIDContent.isEmpty() -> ChainID.Main.id
+					chainIDContent.isEmpty() -> ChainID.ethMain
 					chainIDContent.contains("&") -> chainIDContent.substringBefore("&")
 					else -> chainIDContent
 				}

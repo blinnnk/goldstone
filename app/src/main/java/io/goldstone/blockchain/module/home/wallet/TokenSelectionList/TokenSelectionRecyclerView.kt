@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -14,9 +14,10 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.walletfile.WalletUtil.getAddressBySymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -75,33 +76,39 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 			token: DefaultTokenTable,
 			putArgument: Bundle.() -> Unit
 		) {
-			MyTokenTable.getTokenBalance(
+			MyTokenTable.getMyTokenByContractAndWalletAddress(
 				token.contract,
-				getAddressBySymbol(token.symbol),
-				false
-			) { balance ->
-				// 准备数据
-				val model = WalletDetailCellModel(
-					token,
-					balance.orElse(0.0),
-					false
-				)
-				// 显示 `ContentOverlay`
-				(context as? MainActivity)?.apply {
-					getMainContainer()?.apply {
-						findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
-							removeView(it)
-						}
-					}
-					findIsItExist(FragmentTag.tokenDetail) isFalse {
-						addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-							ContainerID.main,
-							FragmentTag.tokenDetail
-						) {
-							putSerializable(ArgumentKey.tokenDetail, model)
-							putArgument(this)
-						}
-					}
+				CoinSymbol(token.symbol).getAddress()
+			) { myToken ->
+				WalletTable.getCurrentEOSWalletType { eosWalletType ->
+					// 准备数据
+					val model = WalletDetailCellModel(
+						token,
+						myToken?.balance.orZero(),
+						eosWalletType
+					)
+					// 显示 `ContentOverlay`
+					(context as? MainActivity)?.showDashboard(model, putArgument)
+				}
+			}
+		}
+
+		private fun MainActivity.showDashboard(
+			model: WalletDetailCellModel,
+			putArgument: Bundle.() -> Unit
+		) {
+			getMainContainer()?.apply {
+				findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
+					removeView(it)
+				}
+			}
+			findIsItExist(FragmentTag.tokenDetail) isFalse {
+				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
+					ContainerID.main,
+					FragmentTag.tokenDetail
+				) {
+					putSerializable(ArgumentKey.tokenDetail, model)
+					putArgument(this)
 				}
 			}
 		}
