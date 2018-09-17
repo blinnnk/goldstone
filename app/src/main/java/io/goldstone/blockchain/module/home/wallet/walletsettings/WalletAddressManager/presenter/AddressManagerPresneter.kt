@@ -44,11 +44,6 @@ class AddressManagerPresenter(
 	override val fragment: AddressManagerFragment
 ) : BasePresenter<AddressManagerFragment>() {
 
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		getMultiChainAddresses()
-	}
-
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
@@ -66,64 +61,44 @@ class AddressManagerPresenter(
 		}
 	}
 
-	private fun getMultiChainAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setMultiChainAddresses(getCurrentAddressAndSymbol())
-		}
+	fun getMultiChainAddresses(wallet: WalletTable) {
+		fragment.setMultiChainAddresses(wallet.getCurrentAddressAndSymbol())
 	}
 
-	fun getEthereumAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
-		}
+	fun getEthereumAddresses(wallet: WalletTable) {
+		fragment.setEthereumAddressesModel(convertToChildAddresses(wallet.ethAddresses))
 	}
 
-	fun getBitcoinCashAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(bchAddresses))
-		}
+	fun getBitcoinCashAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.bchAddresses))
 	}
 
-	fun getBitcoinCashTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinCashTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getEthereumClassicAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
-		}
+	fun getEthereumClassicAddresses(wallet: WalletTable) {
+		fragment.setEthereumClassicAddressesModel(convertToChildAddresses(wallet.etcAddresses))
 	}
 
-	fun getBitcoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
-		}
+	fun getBitcoinAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcAddresses))
 	}
 
-	fun getBitcoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getLitecoinTestAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(ltcAddresses))
-		}
+	fun getLitecoinAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.ltcAddresses))
 	}
 
-	fun getEOSAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEOSAddressesModel(convertToChildAddresses(eosAddresses))
-		}
+	fun getEOSAddresses(wallet: WalletTable) {
+		fragment.setEOSAddressesModel(convertToChildAddresses(wallet.eosAddresses))
 	}
 
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
@@ -137,7 +112,7 @@ class AddressManagerPresenter(
 		)
 	}
 
-	fun showAllETHAndERCAddresses(): Runnable {
+	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETHAndERCAddresses,

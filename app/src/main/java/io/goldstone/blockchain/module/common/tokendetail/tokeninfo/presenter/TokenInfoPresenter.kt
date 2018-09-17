@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter
 
 import android.os.Bundle
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.toMillisecond
+import com.blinnnk.extension.*
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
@@ -13,7 +10,6 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams

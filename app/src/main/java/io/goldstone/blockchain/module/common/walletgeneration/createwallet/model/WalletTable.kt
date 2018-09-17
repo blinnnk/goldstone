@@ -128,7 +128,7 @@ data class WalletTable(
 
 	fun getAddressDescription(): String {
 		val walletType = getWalletType()
-		return when  {
+		return when {
 			walletType.isLTC() -> currentLTCAddress
 			walletType.isBCH() -> currentBCHAddress
 			walletType.isETHSeries() -> currentETHAndERCAddress
@@ -303,9 +303,7 @@ data class WalletTable(
 		}
 
 		fun getCurrentAddresses(hold: (List<String>) -> Unit) {
-			WalletTable.getCurrentWallet {
-				hold(getCurrentAddresses())
-			}
+			WalletTable.getCurrentWallet { hold(getCurrentAddresses()) }
 		}
 
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {

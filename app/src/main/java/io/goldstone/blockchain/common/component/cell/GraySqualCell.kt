@@ -33,6 +33,7 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		x += 20.uiPX()
 		gravity = Gravity.CENTER_VERTICAL
 	}
+
 	protected val subtitle = TextView(context).apply {
 		visibility = View.GONE
 		textSize = fontSize(12)

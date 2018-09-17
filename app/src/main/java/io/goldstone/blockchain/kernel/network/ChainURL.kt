@@ -97,6 +97,7 @@ object ChainURL {
 	/** EOS Chain Address */
 	const val eosMain = "https://api1.eosasia.one"
 	const val eosTest = "https://junglehistory.cryptolions.io"
+	const val eosTestBackUp = "https://api.jungle.alohaeos.com"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMordenTest = "https://web3.gastracker.io/morden"

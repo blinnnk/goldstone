@@ -46,16 +46,18 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private val currentMultiChainAddressesView by lazy {
-		AddressesListView(context!!, 7) { moreButton, address, isDefault, title ->
-			val chainType = ChainType.getChainTypeBySymbol(title)
-			moreButton.onClick {
+		AddressesListView(context!!, 7) { cell, isDefault ->
+			val chainType = ChainType.getChainTypeBySymbol(cell.getTitle())
+			// EOS 需要在默认地址中显示激活状态
+			if (CoinSymbol(cell.getTitle()).isEOS()) cell.showDescriptionTitle("inactivation publickey")
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					chainType,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
@@ -67,82 +69,83 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 	private val ethSeriesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.ETH.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 	private val etcAddressesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.ETC.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 	private val btcAddressesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.BTC.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 	private val ltcAddressesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.LTC.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 
 	private val eosAddressesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.showDescriptionTitle("inactivation publickey")
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.EOS.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
 
 	private val bchAddressesView by lazy {
-		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
-			moreButton.onClick {
+		AddressesListView(context!!, 3) { cell, isDefault ->
+			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					address,
+					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+					cell.getSubtitle(),
 					MultiChainType.BCH.id,
 					!isDefault
 				)
-				moreButton.preventDuplicateClicks()
+				cell.moreButton.preventDuplicateClicks()
 			}
 		}
 	}
@@ -154,42 +157,53 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			lparams(matchParent, matchParent)
 			verticalLayout parent@{
 				gravity = Gravity.CENTER_HORIZONTAL
-				lparams {
-					width = matchParent
-					height = matchParent
-					topPadding = 20.uiPX()
-				}
-				currentMultiChainAddressesView.into(this)
+				lparams(matchParent, matchParent)
+				topPadding = 20.uiPX()
 				// 不为空才显示 `bip44` 规则的子地址界面
 				WalletTable.getCurrentWallet {
+					val walletCurrentAddresses = getCurrentAddresses()
+					currentMultiChainAddressesView.into(this@parent)
+					currentMultiChainAddressesView.currentAddresses = walletCurrentAddresses
+					presenter.getMultiChainAddresses(this)
 					if (ethAddresses.isNotEmpty()) {
+						// ETHSeries List
 						ethSeriesView.into(this@parent)
+						ethSeriesView.currentAddresses = walletCurrentAddresses
+						ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
+						presenter.getEthereumAddresses(this)
+						// ETC List
 						etcAddressesView.into(this@parent)
-						btcAddressesView.into(this@parent)
-						eosAddressesView.into(this@parent)
-						ethSeriesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
+						etcAddressesView.currentAddresses = walletCurrentAddresses
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
-						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
-						if (!Config.isTestEnvironment()) {
-							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
-							bchAddressesView.into(this@parent)
-							ltcAddressesView.into(this@parent)
-							ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
-							bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
-						}
+						presenter.getEthereumClassicAddresses(this)
+						// BTC List
+						btcAddressesView.into(this@parent)
+						btcAddressesView.currentAddresses = walletCurrentAddresses
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
-						presenter.getEthereumAddresses()
-						presenter.getEthereumClassicAddresses()
-						presenter.getEOSAddresses()
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
-						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
-						else presenter.getBitcoinAddresses()
-						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
-						if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
-						else presenter.getLitecoinAddresses()
-						// `Litecoin` 的主网测试网地址根据环境显示不同的数据
-						if (Config.isTestEnvironment()) presenter.getBitcoinCashTestAddresses()
-						else presenter.getBitcoinCashAddresses()
+						// EOS List
+						eosAddressesView.into(this@parent)
+						eosAddressesView.currentAddresses = walletCurrentAddresses
+						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
+						presenter.getEOSAddresses(this)
+						if (!Config.isTestEnvironment()) {
+							presenter.getBitcoinAddresses(this)
+							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
+							// BCH List
+							bchAddressesView.into(this@parent)
+							bchAddressesView.currentAddresses = walletCurrentAddresses
+							bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
+							presenter.getBitcoinCashAddresses(this)
+							// LTC List
+							ltcAddressesView.into(this@parent)
+							ltcAddressesView.currentAddresses = walletCurrentAddresses
+							ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
+							presenter.getLitecoinAddresses(this)
+						} else {
+							presenter.getBitcoinTestAddresses(this)
+							presenter.getBitcoinCashTestAddresses(this)
+							presenter.getLitecoinTestAddresses(this)
+						}
 					} else {
 						hideAddButton()
 						attentionView.into(this@parent)
@@ -326,12 +340,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun showCellMoreDashboard(
-		top: Float,
-		address: String,
-		coinType: Int,
-		hasDefaultCell: Boolean
-	) {
+	private fun showCellMoreDashboard(top: Float, address: String, coinType: Int, hasDefaultCell: Boolean) {
 		AddressManagerFragment.showMoreDashboard(
 			getParentContainer(),
 			top,
@@ -344,17 +353,19 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					// 更新默认地址后同时更新首页的列表
 					else {
 						updateWalletDetail()
-						when (coinType) {
-							MultiChainType.ETH.id -> presenter.getEthereumAddresses()
-							MultiChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-							MultiChainType.EOS.id -> presenter.getEOSAddresses()
-							MultiChainType.LTC.id -> {
-								if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
-								else presenter.getLitecoinAddresses()
-							}
-							MultiChainType.BTC.id -> {
-								if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
-								else presenter.getBitcoinAddresses()
+						WalletTable.getCurrentWallet {
+							when (coinType) {
+								MultiChainType.ETH.id -> presenter.getEthereumAddresses(this)
+								MultiChainType.ETC.id -> presenter.getEthereumClassicAddresses(this)
+								MultiChainType.EOS.id -> presenter.getEOSAddresses(this)
+								MultiChainType.LTC.id -> {
+									if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
+									else presenter.getLitecoinAddresses(this)
+								}
+								MultiChainType.BTC.id -> {
+									if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
+									else presenter.getBitcoinAddresses(this)
+								}
 							}
 						}
 						toast(CommonText.succeed)

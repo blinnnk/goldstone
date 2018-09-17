@@ -45,8 +45,6 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					if (actor.name == defaultActorName && defaultIndex.isNull()) {
 						setRadioStatus(true)
 						defaultIndex = index
-					} else {
-						setRadioStatus(index == 0)
 					}
 					setAccountInfo(actor.name, actor.permission.value)
 				}.click {

@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toBigIntegerOrZero
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.isNullValue
-import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -35,7 +35,7 @@ data class EOSAccountTable(
 	val ramUsed: BigInteger,
 	val ramQuota: BigInteger,
 	val cpuWeight: BigInteger,
-	val netWeight: BigInteger,
+	var netWeight: BigInteger,
 	@Embedded(prefix = "totalResource")
 	val totalResource: TotalResources,
 	@Embedded(prefix = "delegateInfo")
@@ -67,6 +67,15 @@ data class EOSAccountTable(
 	)
 
 	companion object {
+
+		fun update(newTable: EOSAccountTable, accountName: String) {
+			doAsync {
+				GoldStoneDataBase.database.eosAccountDao().apply {
+					val target = getAccount(accountName)
+					if (!target.isNull()) update(newTable)
+				}
+			}
+		}
 
 		fun getAccountByName(
 			name: String,
