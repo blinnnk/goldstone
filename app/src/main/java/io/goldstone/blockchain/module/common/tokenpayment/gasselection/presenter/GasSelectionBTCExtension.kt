@@ -2,19 +2,17 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.widget.LinearLayout
 import com.blinnnk.extension.orElse
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
@@ -114,8 +112,7 @@ private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 	password: String,
 	hold: (String?) -> Unit
 ) {
-	val isSingleChainWallet =
-		!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
+	val isSingleChainWallet = !WalletType(Config.getCurrentWalletType()).isBIP44()
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,

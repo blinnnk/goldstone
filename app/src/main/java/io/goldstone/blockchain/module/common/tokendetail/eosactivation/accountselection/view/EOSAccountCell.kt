@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyRadioButton
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GrayCardView
 import io.goldstone.blockchain.common.component.TwoLineTitles
@@ -52,7 +52,15 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 	@SuppressLint("SetTextI18n")
 	fun setAccountInfo(name: String, authorization: String) {
 		info.title.text = "Account Name: $name"
-		info.subtitle.text = "Authorization: $authorization"
+		val wholeString = "Authorization: $authorization"
+		info.subtitle.text = CustomTargetTextStyle(
+			authorization,
+			wholeString,
+			GrayScale.gray,
+			12.uiPX(),
+			false,
+			false
+		)
 	}
 
 	fun getName(): String {

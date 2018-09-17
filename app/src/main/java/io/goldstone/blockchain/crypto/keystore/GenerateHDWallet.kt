@@ -11,11 +11,11 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import org.ethereum.geth.Geth
@@ -292,7 +292,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 	doAsync {
 		when (Config.getCurrentWalletType()) {
 			// 多链钱包随便找一个名下钱包地址进行验证即可
-			WalletType.Bip44MultiChain.content -> {
+			WalletType.bip44MultiChain -> {
 				verifyKeystorePassword(
 					password,
 					Config.getCurrentBTCAddress(),
@@ -301,7 +301,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 					hold
 				)
 			}
-			WalletType.MultiChain.content -> {
+			WalletType.multiChain -> {
 				verifyKeystorePasswordByWalletID(
 					password,
 					walletID,

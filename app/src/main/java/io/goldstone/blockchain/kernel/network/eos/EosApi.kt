@@ -27,6 +27,7 @@ import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
+import java.math.BigInteger
 
 object EOSAPI {
 
@@ -254,13 +255,13 @@ object EOSAPI {
 	fun getCPUAndNETUsageByTxID(
 		txID: String,
 		errorCallBack: (Throwable) -> kotlin.Unit,
-		@WorkerThread hold: (cpuUsage: Long, netUsage: Long, status: String) -> Unit
+		@WorkerThread hold: (cpuUsage: BigInteger, netUsage: BigInteger, status: String) -> Unit
 	) {
 		getTransactionJSONObjectByTxID(txID, errorCallBack) { transaction ->
 			val receipt = transaction.getTargetObject("trx", "receipt")
 			hold(
-				receipt.getTargetChild("cpu_usage_us").toLongOrZero(),
-				receipt.getTargetChild("net_usage_words").toLongOrZero(),
+				receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
+				receipt.getTargetChild("net_usage_words").toBigIntegerOrZero(),
 				receipt.getTargetChild("status")
 			)
 		}

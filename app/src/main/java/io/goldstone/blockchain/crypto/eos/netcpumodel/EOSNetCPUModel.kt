@@ -6,6 +6,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @author KaySaith
@@ -16,8 +17,8 @@ data class EOSNetCPUModel(
 	val authorizations: List<EOSAuthorization>,
 	val fromAccountName: String,
 	val receiverAccountName: String,
-	val stakeNetEOSAmount: Long,
-	val stakeCPUEOSAmount: Long,
+	val stakeNetEOSAmount: BigInteger,
+	val stakeCPUEOSAmount: BigInteger,
 	val isTransfer: Boolean
 ) : Serializable, EOSModel {
 	override fun createObject(): String {

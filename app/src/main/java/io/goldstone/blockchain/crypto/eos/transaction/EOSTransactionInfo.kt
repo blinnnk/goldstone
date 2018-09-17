@@ -8,6 +8,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @author KaySaith
@@ -17,7 +18,7 @@ import java.io.Serializable
 data class EOSTransactionInfo(
 	val fromAccount: String,
 	val toAccount: String,
-	val amount: Long, // 这里是把精度包含进去的最小单位的值, 签名的时候会对这个值直接转换
+	val amount: BigInteger, // 这里是把精度包含进去的最小单位的值, 签名的时候会对这个值直接转换
 	val symbol: String,
 	val decimal: Int,
 	val memo: String,
@@ -30,7 +31,7 @@ data class EOSTransactionInfo(
 	constructor(
 		fromAccount: String,
 		toAccount: String,
-		amount: Long
+		amount: BigInteger
 	) : this(
 		fromAccount,
 		toAccount,
@@ -44,7 +45,7 @@ data class EOSTransactionInfo(
 	constructor(
 		fromAccount: String,
 		toAccount: String,
-		amount: Long,
+		amount: BigInteger,
 		memo: String,
 		symbol: String
 	) : this(
@@ -80,7 +81,7 @@ data class EOSTransactionInfo(
 	}
 
 	companion object {
-		fun serializedEOSAmount(amount: Long): String {
+		fun serializedEOSAmount(amount: BigInteger): String {
 			val amountCode = EOSUtils.convertAmountToCode(amount)
 			val decimalCode = EOSUtils.getEvenHexOfDecimal(CryptoValue.eosDecimal)
 			val symbolCode = CoinSymbol.eos.toByteArray().toNoPrefixHexString()

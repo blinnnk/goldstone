@@ -10,10 +10,10 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -45,7 +45,7 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (WalletType.isBTCSeriesType(Config.getCurrentWalletType())) {
+						canSearch = if (WalletType(Config.getCurrentWalletType()).isBTCSeries()) {
 							fragment.context.alert(
 								"This is a single block chain wallet so you canot add other crypot currency"
 							)
@@ -59,7 +59,7 @@ class TokenSearchPresenter(
 				canSearch isTrue {
 					searchTokenByContractOrSymbol(defaultTokens) { result ->
 						context?.runOnUiThread {
-							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
+							if (WalletType(Config.getCurrentWalletType()).isETHSeries()) {
 								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
 								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot {
 									CoinSymbol(it.symbol).isBTCSeries()

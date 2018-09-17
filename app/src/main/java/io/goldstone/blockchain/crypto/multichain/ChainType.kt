@@ -1,7 +1,13 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 
@@ -62,6 +68,58 @@ class ChainType(val id: Int) : Serializable {
 			else -> {
 				if (Config.getETCCurrentChain() == ChainID.etcMain) ChainText.etcMorden
 				else Config.getETCCurrentChainName()
+			}
+		}
+	}
+
+	// 与 `WalletTable` 有关联的非纯粹但是便捷的方法
+	fun updateCurrentAddress(
+		newAddress: String,
+		@UiThread callback: (isSwitchEOSAddress: Boolean) -> Unit
+	) {
+		doAsync {
+			val walletDao = GoldStoneDataBase.database.walletDao()
+			val currentWallet = walletDao.findWhichIsUsing(true)
+			when (id) {
+				MultiChainType.ETH.id -> {
+					Config.updateCurrentEthereumAddress(newAddress)
+					currentWallet?.currentETHAndERCAddress = newAddress
+				}
+				MultiChainType.ETC.id -> {
+					currentWallet?.currentETCAddress = newAddress
+					Config.updateCurrentETCAddress(newAddress)
+				}
+				MultiChainType.LTC.id -> {
+					currentWallet?.currentLTCAddress = newAddress
+					Config.updateCurrentLTCAddress(newAddress)
+				}
+				MultiChainType.BCH.id -> {
+					currentWallet?.currentBCHAddress = newAddress
+					Config.updateCurrentBCHAddress(newAddress)
+				}
+				MultiChainType.EOS.id -> {
+					currentWallet?.currentEOSAddress = newAddress
+					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
+					// 好在其他流程中重新走检查 `Account Name` 的逻辑
+					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
+					currentWallet?.eosAccountNames = listOf()
+					Config.updateCurrentEOSAddress(newAddress)
+				}
+				MultiChainType.BTC.id -> {
+					if (Config.isTestEnvironment()) {
+						currentWallet?.currentBTCSeriesTestAddress = newAddress
+						Config.updateCurrentBTCSeriesTestAddress(newAddress)
+					} else {
+						currentWallet?.currentBTCAddress = newAddress
+						Config.updateCurrentBTCAddress(newAddress)
+					}
+				}
+			}
+			currentWallet?.apply {
+				GoldStoneDataBase.database.walletDao().update(this)
+				GoldStoneAPI.context.runOnUiThread {
+					callback(ChainType(this@ChainType.id).isEOS())
+				}
 			}
 		}
 	}

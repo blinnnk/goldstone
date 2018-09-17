@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -19,6 +18,7 @@ import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.bitcoinj.core.ECKey
@@ -62,7 +62,7 @@ class PrivateKeyExportPresenter(
 			}
 			(context as? Activity)?.apply { SoftKeyboard.hide(this) }
 			WalletTable.getWalletType { walletType, wallet ->
-				if (walletType == WalletType.MultiChain) context.apply {
+				if (walletType.isMultiChain()) context.apply {
 					getPrivateKeyByWalletID(
 						password,
 						wallet.id,
@@ -79,19 +79,18 @@ class PrivateKeyExportPresenter(
 			password: String,
 			hold: String?.() -> Unit
 		) {
-			val isSingleChainWallet =
-				!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
+			val isSingleChainWallet = !WalletType(Config.getCurrentWalletType()).isBIP44()
 			when (chainType) {
 				MultiChainType.BTC.id,
 				MultiChainType.BCH.id,
 				MultiChainType.EOS.id,
 				MultiChainType.AllTest.id -> getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
 				MultiChainType.LTC.id -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
-				else -> getETHERCorETCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
+				else -> getETHSeriesPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
 			}
 		}
 
-		private fun Context.getETHERCorETCPrivateKeyByAddress(
+		private fun Context.getETHSeriesPrivateKeyByAddress(
 			address: String,
 			password: String,
 			isSingleChainWallet: Boolean,

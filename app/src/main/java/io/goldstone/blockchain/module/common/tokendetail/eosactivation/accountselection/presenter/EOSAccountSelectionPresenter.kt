@@ -45,28 +45,26 @@ class EOSAccountSelectionPresenter(
 				eosAccountNames.filter {
 					it.chainID.equals(Config.getEOSCurrentChain(), true)
 				}
-			var actors = listOf<AccountActor>()
+			val actors = arrayListOf<AccountActor>()
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = currentChainNames.size
 				override fun concurrentJobs() {
 					currentChainNames.forEach { account ->
 						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
 							// 本地为空的话从网络获取数据
-							if (localAccount.isNull()) {
-								EOSAPI.getAccountInfoByName(
-									account.name,
-									{
-										completeMark()
-										LogUtil.error("getAccountInfoByName", it)
-									}
-								) { eosAccount ->
-									// 插入数据库
-									EOSAccountTable.preventDuplicateInsert(eosAccount)
-									actors += getAccountActorByPublicKey(eosAccount, account.name)
+							if (localAccount.isNull()) EOSAPI.getAccountInfoByName(
+								account.name,
+								{
 									completeMark()
+									LogUtil.error("getAccountInfoByName", it)
 								}
+							) { eosAccount ->
+								actors.addAll(getAccountActorByPublicKey(eosAccount, account.name))
+								// 插入数据库
+								EOSAccountTable.preventDuplicateInsert(eosAccount)
+								completeMark()
 							} else {
-								actors += getAccountActorByPublicKey(localAccount!!, account.name)
+								actors.addAll(getAccountActorByPublicKey(localAccount!!, account.name))
 								completeMark()
 							}
 						}
@@ -85,14 +83,12 @@ class EOSAccountSelectionPresenter(
 		account: EOSAccountTable,
 		name: String
 	): List<AccountActor> {
-		var actors = listOf<AccountActor>()
-		account.permissions.forEach { permission ->
-			permission.requiredAuthorization.getKeys().forEach {
-				if (it.publicKey == Config.getCurrentEOSAddress()) {
-					actors += AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
-				}
-			}
-		}
-		return actors
+		return account.permissions.asSequence().map { permission ->
+			permission.requiredAuthorization.getKeys().asSequence().filter {
+				it.publicKey == Config.getCurrentEOSAddress()
+			}.map {
+				AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
+			}.toList()
+		}.toList().flatten()
 	}
 }

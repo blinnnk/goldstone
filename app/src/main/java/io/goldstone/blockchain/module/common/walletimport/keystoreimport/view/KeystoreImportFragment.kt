@@ -47,8 +47,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				lparams(matchParent, matchParent)
 				attentionText.apply {
 					isCenter()
-					topPadding = 30.uiPX()
-					bottomPadding = 20.uiPX()
+					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					text = ImportWalletText.importWalletDescription
 				}.into(this)

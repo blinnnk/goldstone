@@ -10,6 +10,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.text.DecimalFormat
@@ -19,7 +20,7 @@ import java.util.*
  * @date 01/04/2018 7:54 PM
  * @author KaySaith
  */
-data class InputCodeData(val type: String, val address: String, val count: Double)
+data class InputCodeData(val type: String, val address: String, val amount: BigInteger)
 
 object CryptoUtils {
 
@@ -31,35 +32,29 @@ object CryptoUtils {
 		else address
 	}
 
-	fun formatDouble(value: Double): Double {
-		return DecimalFormat("0.000000000").format(value).toDouble()
+	fun toCountByDecimal(value: BigInteger, decimal: Int = CryptoValue.ethDecimal): Double {
+		return value.toDouble() / Math.pow(10.0, decimal.toDouble())
 	}
 
 	fun toCountByDecimal(value: Double, decimal: Int = CryptoValue.ethDecimal): Double {
 		return value / Math.pow(10.0, decimal.toDouble())
 	}
 
-	fun toCountByDecimal(value: Long, decimal: Int = 18): Double {
-		return value / Math.pow(10.0, decimal.toDouble())
-	}
-
 	fun toTargetUnit(
-		value: Long,
+		value: BigInteger,
 		decimal: Double,
 		hexadecimal: Double
 	): Double {
-		return value / Math.pow(hexadecimal, decimal)
+		return value.toDouble() / Math.pow(hexadecimal, decimal)
 	}
 
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
 		} else if (!isHex) {
-			(gas!!.toBigDecimal() * gasPrice!!.toBigDecimal()).toDouble().toEthCount().toBigDecimal()
-				.toString()
+			(gas!!.toBigDecimal() * gasPrice!!.toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
 		} else {
-			(gas!!.hexToDecimal().toBigDecimal() * gasPrice!!.hexToDecimal().toBigDecimal())
-				.toDouble().toEthCount().toBigDecimal().toString()
+			(gas!!.hexToDecimal().toBigDecimal() * gasPrice!!.hexToDecimal().toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
 		}
 	}
 
@@ -69,17 +64,16 @@ object CryptoUtils {
 
 	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
-		var count: Double
+		var amount: BigInteger
 		isTransferInputCode(inputCode) isTrue {
 			// analysis input code and get the received address
 			address = inputCode.substring(
 				SolidityCode.contractTransfer.length, SolidityCode.contractTransfer.length + 64
 			)
-			address =
-				toHexValue(address.substring(address.length - 40, address.length))
+			address = toHexValue(address.substring(address.length - 40, address.length))
 			// analysis input code and get the received count
-			count = inputCode.substring(74, 138).hexToDecimal()
-			return InputCodeData("transfer", address, count)
+			amount = inputCode.substring(74, 138).hexToDecimal()
+			return InputCodeData("transfer", address, amount)
 		} otherwise {
 			LogUtil.debug("loadTransferInfoFromInputData", "not a contract transfer")
 			return null
@@ -151,15 +145,19 @@ fun Double.toUnitValue(symbol: String = CoinSymbol.eth): String {
 	return "$prefix${formatEditor.format(this / 1000000000000000000.0)} $symbol"
 }
 
-fun Double.toEthCount(): Double {
-	return this / 1000000000000000000.0
+fun BigInteger.toEthCount(): Double {
+	return CryptoUtils.toCountByDecimal(this, CryptoValue.ethDecimal)
 }
 
-fun Double.toEOSUnit(): Long {
-	return (this * 10000L).toLong()
+fun BigDecimal.toEthCount(): Double {
+	return (this / BigDecimal.valueOf(1000000000000000000)).toDouble()
 }
 
-fun Long.toEOSCount(): Double {
+fun Double.toEOSUnit(): BigInteger {
+	return (this.toBigDecimal() * BigDecimal.valueOf(10000L)).toBigInteger()
+}
+
+fun BigInteger.toEOSCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
 }
 

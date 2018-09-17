@@ -2,9 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toLongOrZero
+import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
 import org.json.JSONObject
 import java.io.Serializable
+import java.math.BigInteger
 
 
 /**
@@ -17,14 +18,14 @@ import java.io.Serializable
  * {"available":840178,"max":858312,"used":18134}
  */
 data class ResourceLimit(
-	val used: Long,
-	val available: Long,
-	val max: Long
+	val used: BigInteger,
+	val available: BigInteger,
+	val max: BigInteger
 ) : Serializable {
 	constructor(data: JSONObject) : this(
-		data.safeGet("used").toLongOrZero(),
-		data.safeGet("available").toLongOrZero(),
-		data.safeGet("max").toLongOrZero()
+		data.safeGet("used").toBigIntegerOrZero(),
+		data.safeGet("available").toBigIntegerOrZero(),
+		data.safeGet("max").toBigIntegerOrZero()
 	)
 }
 
@@ -33,9 +34,9 @@ class ResourceLimitConverter {
 	fun revertJSONObject(content: String): ResourceLimit {
 		val resourceData = JSONObject(content)
 		return ResourceLimit(
-			resourceData.safeGet("used").toLongOrZero(),
-			resourceData.safeGet("available").toLongOrZero(),
-			resourceData.safeGet("max").toLongOrZero()
+			resourceData.safeGet("used").toBigIntegerOrZero(),
+			resourceData.safeGet("available").toBigIntegerOrZero(),
+			resourceData.safeGet("max").toBigIntegerOrZero()
 		)
 	}
 

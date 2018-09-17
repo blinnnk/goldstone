@@ -8,8 +8,8 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -28,34 +28,18 @@ class TokenManagementListPresenter(
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 
 	override fun updateData() {
-		checkWalletType {
-			// 首先显示内存中的数据
-			if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
-			// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
-			fragment.getParentFragment<TokenManagementFragment> {
-				prepareMyDefaultTokens(it)
-			}
+		// 首先显示内存中的数据
+		if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
+		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
+		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
+		fragment.getParentFragment<TokenManagementFragment> {
+			prepareMyDefaultTokens(WalletType(Config.getCurrentWalletType()).isETHSeries())
 		}
 	}
 
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
-	}
-
-	private fun checkWalletType(callback: (isETHERCAndETCWallet: Boolean) -> Unit) {
-		when (Config.getCurrentWalletType()) {
-			WalletType.BTCTestOnly.content,
-			WalletType.BTCOnly.content,
-			WalletType.LTCOnly.content,
-			WalletType.BCHOnly.content -> {
-				fragment.showAttentionView()
-				callback(false)
-			}
-
-			WalletType.ETHERCAndETCOnly.content -> callback(true)
-			else -> callback(false)
-		}
 	}
 
 	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {

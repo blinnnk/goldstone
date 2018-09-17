@@ -23,6 +23,7 @@ import io.goldstone.blockchain.kernel.network.EtherScanApi.eosTransactionDetail
 import io.goldstone.blockchain.kernel.network.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @date 24/03/2018 7:09 PM
@@ -65,7 +66,7 @@ data class TransactionListModel(
 		if (data.blockNumber == 0) "" else "${data.blockNumber}",
 		data.txID,
 		data.transactionData.memo,
-		if (data.cupUsage * data.netUsage == 0L) "" else generateEOSMinerContent(data.cupUsage, data.netUsage),
+		if (data.cupUsage * data.netUsage == BigInteger.ZERO) "" else generateEOSMinerContent(data.cupUsage, data.netUsage),
 		generateTransactionURL(data.txID, CoinSymbol.eos),
 		data.isPending,
 		data.time.toString(),
@@ -133,7 +134,7 @@ data class TransactionListModel(
 
 	companion object {
 
-		fun generateEOSMinerContent(cpuUsage: Long, netUsage: Long): String {
+		fun generateEOSMinerContent(cpuUsage: BigInteger, netUsage: BigInteger): String {
 			return "cpu usage: ${cpuUsage.convertToTimeUnit()}, net usage: ${netUsage.convertToDiskUnit()}"
 		}
 

@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -30,6 +31,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.To
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoView
 import org.jetbrains.anko.*
+import java.math.BigInteger
 
 
 /**
@@ -60,6 +62,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			showArrow()
 			setTitle(TokenDetailText.authority)
 			setSubtitle(Config.getCurrentEOSName())
+			click { presenter.showPublickKeyAccountNames() }
 		}
 	}
 
@@ -134,13 +137,13 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	}
 
 	fun setResourcesValue(
-		ramAvailable: Long,
-		ramTotal: Long,
-		cpuAvailable: Long,
-		cpuTotal: Long,
+		ramAvailable: BigInteger,
+		ramTotal: BigInteger,
+		cpuAvailable: BigInteger,
+		cpuTotal: BigInteger,
 		cpuWeight: String,
-		netAvailable: Long,
-		netTotal: Long,
+		netAvailable: BigInteger,
+		netTotal: BigInteger,
 		netWeight: String
 	) {
 		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)

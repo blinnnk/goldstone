@@ -17,6 +17,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.io.Serializable
+import java.math.BigInteger
 
 @Entity(tableName = "eosTransactions")
 data class EOSTransactionTable(
@@ -24,8 +25,8 @@ data class EOSTransactionTable(
 	var id: Int,
 	var dataIndex: Int,
 	var txID: String,
-	var cupUsage: Long,
-	var netUsage: Long,
+	var cupUsage: BigInteger,
+	var netUsage: BigInteger,
 	var transactionData: EOSTransactionData,
 	var blockNumber: Int,
 	var time: Long,
@@ -58,8 +59,8 @@ data class EOSTransactionTable(
 		0,
 		dataIndex = data.safeGet("account_action_seq").toIntOrZero(),
 		txID = data.getTargetChild("action_trace", "trx_id"),
-		cupUsage = 0L,
-		netUsage = 0L,
+		cupUsage = BigInteger.ZERO,
+		netUsage = BigInteger.ZERO,
 		transactionData = EOSTransactionData(data.getTargetObject("action_trace", "act", "data")),
 		blockNumber = data.safeGet("block_num").toIntOrZero(),
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
@@ -73,8 +74,8 @@ data class EOSTransactionTable(
 
 		fun updateBandWidthAndStatusBy(
 			txID: String,
-			cpuUsage: Long,
-			netUsage: Long,
+			cpuUsage: BigInteger,
+			netUsage: BigInteger,
 			status: String
 		) {
 			doAsync {
@@ -122,7 +123,7 @@ data class EOSTransactionTable(
 interface EOSTransactionDao {
 
 	@Query("UPDATE eosTransactions SET cupUsage = :cpuUsage, netUsage = :netUsage, status = :status WHERE txID LIKE :txID")
-	fun updateBandWidthAndStatusByTxID(txID: String, cpuUsage: Long, netUsage: Long, status: String)
+	fun updateBandWidthAndStatusByTxID(txID: String, cpuUsage: BigInteger, netUsage: BigInteger, status: String)
 
 	@Query("UPDATE eosTransactions SET blockNumber = :blockNumber WHERE txID LIKE :txID")
 	fun updateBlockNumberByTxID(txID: String, blockNumber: Int)

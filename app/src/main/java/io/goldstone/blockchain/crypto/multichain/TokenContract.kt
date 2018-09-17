@@ -39,6 +39,10 @@ class TokenContract(val contract: String?) : Serializable {
 		return (!TokenContract(contract).isETH() && !TokenContract(contract).isETC())
 	}
 
+	fun isBTCSeries(): Boolean {
+		return isBTCSeries(contract!!)
+	}
+
 	fun getCurrentChainID(): String {
 		return when {
 			contract.equals(etcContract, true) -> Config.getETCCurrentChain()
@@ -74,7 +78,7 @@ class TokenContract(val contract: String?) : Serializable {
 		}
 	}
 
-	fun getCurrentChainType(): MultiChainType {
+	fun getChainType(): MultiChainType {
 		return when {
 			contract.equals(etcContract, true) -> MultiChainType.ETC
 			contract.equals(btcContract, true) -> MultiChainType.BTC
@@ -130,5 +134,9 @@ class TokenContract(val contract: String?) : Serializable {
 		const val ltcContract = "0x2"
 		const val bchContract = "0x145"
 		const val eosContract = "0x194"
+		@JvmStatic
+		val isBTCSeries: (contract: String) -> Boolean = { contract ->
+			listOf(btcContract, ltcContract, bchContract).any { it.equals(contract, true) }
+		}
 	}
 }
