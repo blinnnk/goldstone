@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.runOnUiThread
+import java.math.BigInteger
 
 
 /**
@@ -26,7 +27,7 @@ class EOSTransaction(
 	/** "{\"actor\":\"fromAccountName\",\"permission\":\"active\"}" */
 	private val fromAccount: EOSAuthorization,
 	private val toAccountName: String,
-	private val amount: Long,
+	private val amount: BigInteger,
 	private val memo: String,
 	private val expirationType: ExpirationType,
 	private val symbol: String = CoinSymbol.eos

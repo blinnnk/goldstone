@@ -310,19 +310,15 @@ private fun completeTransactionInfo(
 						}?.let { tokenInfo ->
 							transaction.logIndex.isNotEmpty() isTrue {
 								count = CryptoUtils.toCountByDecimal(
-									transaction.value.toDouble(),
+									transaction.value.toBigInteger(),
 									tokenInfo.decimals.orZero()
 								)
 								receiveAddress = transaction.to
 							} otherwise {
 								// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-								val transactionInfo = CryptoUtils
-									.loadTransferInfoFromInputData(transaction.input)
-								count = CryptoUtils.toCountByDecimal(
-									transactionInfo?.count.orElse(0.0),
-									tokenInfo.decimals.orZero()
-								)
-								receiveAddress = transactionInfo?.address
+								val transactionInfo = CryptoUtils.loadTransferInfoFromInputData(transaction.input)
+								count = CryptoUtils.toCountByDecimal(transactionInfo?.amount!!, tokenInfo.decimals.orZero())
+								receiveAddress = transactionInfo.address
 							}
 
 							transaction.updateModelInfo(
@@ -338,7 +334,7 @@ private fun completeTransactionInfo(
 						transaction.updateModelInfo(
 							false,
 							CoinSymbol.eth,
-							transaction.value.toDouble().toEthCount().toString(),
+							transaction.value.toBigInteger().toEthCount().toString(),
 							transaction.to
 						)
 						completeMark()

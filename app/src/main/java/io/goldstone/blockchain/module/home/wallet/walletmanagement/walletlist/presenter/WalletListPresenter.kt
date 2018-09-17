@@ -9,8 +9,6 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -38,9 +36,9 @@ class WalletListPresenter(
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
 			if (it.isNull()) return@switchCurrentWallet
-			val walletType = it?.getTargetWalletType()
-			when (walletType) {
-				WalletType.BTCOnly -> {
+			val walletType = it?.getWalletType()!!
+			when {
+				walletType.isBTC() -> {
 					if (Config.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Mainnet") {
 							NodeSelectionPresenter.setAllMainnet {
@@ -50,7 +48,7 @@ class WalletListPresenter(
 					} else fragment.activity?.jump<SplashActivity>()
 				}
 
-				WalletType.BTCTestOnly -> {
+				walletType.isBTCTest() -> {
 					if (!Config.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Testnet") {
 							NodeSelectionPresenter.setAllTestnet {
@@ -60,7 +58,7 @@ class WalletListPresenter(
 					} else fragment.activity?.jump<SplashActivity>()
 				}
 
-				WalletType.LTCOnly -> {
+				walletType.isLTC() -> {
 					if (Config.isTestEnvironment()) {
 						showConfirmationAlertView("Litecoin Mainnet") {
 							NodeSelectionPresenter.setAllMainnet {
@@ -70,7 +68,7 @@ class WalletListPresenter(
 					} else fragment.activity?.jump<SplashActivity>()
 				}
 
-				WalletType.BCHOnly -> {
+				walletType.isBCH() -> {
 					if (Config.isTestEnvironment()) {
 						showConfirmationAlertView(" Bitcoin Cash Mainnet") {
 							NodeSelectionPresenter.setAllMainnet {
@@ -80,7 +78,7 @@ class WalletListPresenter(
 					} else fragment.activity?.jump<SplashActivity>()
 				}
 
-				WalletType.Bip44MultiChain -> {
+				walletType.isBIP44() -> {
 					if (Config.isTestEnvironment()) {
 						NodeSelectionPresenter.setAllTestnet {
 							fragment.activity?.jump<SplashActivity>()
@@ -134,23 +132,20 @@ class WalletListPresenter(
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
 							MyTokenTable.getMyTokensByAddress(wallet.getCurrentAddresses()) { myTokens ->
-								val targetWalletType = wallet.getTargetWalletType()
+								val targetWalletType = wallet.getWalletType()
 								if (myTokens.isEmpty()) {
-									data.add(WalletListModel(wallet, 0.0, targetWalletType.content))
+									data.add(WalletListModel(wallet, 0.0, targetWalletType.type!!))
 									completeMark()
 								} else {
 									val balance = myTokens.sumByDouble { walletToken ->
 										val thisToken = allTokens.find {
 											it.contract.equals(walletToken.contract, true)
 										}!!
-										CryptoUtils.toCountByDecimal(
-											walletToken.balance,
-											thisToken.decimals
-										) * thisToken.price
+										walletToken.balance * thisToken.price
 									}
 
 									// 计算当前钱包下的 `token` 对应的货币总资产
-									WalletListModel(wallet, balance, targetWalletType.content).let {
+									WalletListModel(wallet, balance, targetWalletType.type!!).let {
 										data.add(it)
 										completeMark()
 									}

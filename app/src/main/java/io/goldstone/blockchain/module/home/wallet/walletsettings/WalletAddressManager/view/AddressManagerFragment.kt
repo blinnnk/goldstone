@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
 
+import android.app.Activity
 import android.content.Context
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -26,7 +27,9 @@ import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
@@ -63,7 +66,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			isCenter()
 		}
 	}
-	private val ethAndERCAddressesView by lazy {
+	private val ethSeriesView by lazy {
 		AddressesListView(context!!, 3) { moreButton, address, isDefault, _ ->
 			moreButton.onClick {
 				showCellMoreDashboard(
@@ -146,7 +149,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	override val presenter = AddressManagerPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		showCreatorDashboard()
+		if (WalletType(Config.getCurrentWalletType()).isBIP44()) showCreatorDashboard()
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout parent@{
@@ -160,11 +163,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				// 不为空才显示 `bip44` 规则的子地址界面
 				WalletTable.getCurrentWallet {
 					if (ethAddresses.isNotEmpty()) {
-						ethAndERCAddressesView.into(this@parent)
+						ethSeriesView.into(this@parent)
 						etcAddressesView.into(this@parent)
 						btcAddressesView.into(this@parent)
 						eosAddressesView.into(this@parent)
-						ethAndERCAddressesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
+						ethSeriesView.checkAllEvent = presenter.showAllETHAndERCAddresses()
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 						if (!Config.isTestEnvironment()) {
@@ -206,8 +209,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
-		ethAndERCAddressesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
-		ethAndERCAddressesView.model = model
+		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
+		ethSeriesView.model = model
 	}
 
 	fun setBitcoinCashAddressesModel(model: List<Pair<String, String>>) {
@@ -271,7 +274,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			when (title) {
 				WalletSettingsText.newETHAndERCAddress ->
 					AddressManagerPresenter.createETHAndERCAddress(this, password) {
-						ethAndERCAddressesView.model = it
+						ethSeriesView.model = it
 					}
 
 				WalletSettingsText.newETCAddress ->
@@ -335,28 +338,28 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				AddressManagerPresenter.setDefaultAddress(coinType, address) {
+				ChainType(coinType).updateCurrentAddress(address) { isSwitchEOSAddress ->
+					// 如果是更改了 `EOS` 的默认地址, 那么跳回首页重新走检测 `AccountName` 流程
+					if (isSwitchEOSAddress) showSwitchEOSAddressAlertAndJump(context)
 					// 更新默认地址后同时更新首页的列表
-					updateWalletDetail()
-					when (coinType) {
-						MultiChainType.ETH.id -> presenter.getEthereumAddresses()
-						MultiChainType.ETC.id -> presenter.getEthereumClassicAddresses()
-						MultiChainType.EOS.id -> presenter.getEOSAddresses()
-						MultiChainType.LTC.id -> {
-							if (Config.isTestEnvironment())
-								presenter.getLitecoinTestAddresses()
-							else presenter.getLitecoinAddresses()
-						}
-						MultiChainType.BTC.id -> {
-							if (Config.isTestEnvironment()) {
-								presenter.getBitcoinTestAddresses()
-							} else {
-								presenter.getBitcoinAddresses()
+					else {
+						updateWalletDetail()
+						when (coinType) {
+							MultiChainType.ETH.id -> presenter.getEthereumAddresses()
+							MultiChainType.ETC.id -> presenter.getEthereumClassicAddresses()
+							MultiChainType.EOS.id -> presenter.getEOSAddresses()
+							MultiChainType.LTC.id -> {
+								if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses()
+								else presenter.getLitecoinAddresses()
+							}
+							MultiChainType.BTC.id -> {
+								if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses()
+								else presenter.getBitcoinAddresses()
 							}
 						}
+						toast(CommonText.succeed)
+						AddressManagerFragment.removeDashboard(context)
 					}
-					toast(CommonText.succeed)
-					AddressManagerFragment.removeDashboard(context)
 				}
 			},
 			qrCellClickEvent = {
@@ -402,6 +405,17 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	companion object {
+
+		fun showSwitchEOSAddressAlertAndJump(context: Context?) {
+			context?.showAlertView(
+				"Switching EOS Address",
+				"eos account depends on eos public key, if you switch default address we will re-check the account name for you",
+				false
+			) {
+				(context as? Activity)?.jump<SplashActivity>()
+			}
+		}
+
 		fun verifyMultiChainWalletPassword(
 			context: Context,
 			callback: (password: String) -> Unit

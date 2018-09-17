@@ -5,6 +5,8 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -14,6 +16,7 @@ import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
@@ -26,23 +29,30 @@ import org.jetbrains.anko.*
  * @date  2018/09/11
  */
 class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>() {
+
+	private val defaultActorName by lazy { arguments?.getString(ArgumentKey.defaultEOSAccountName) }
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private lateinit var container: LinearLayout
 	private lateinit var loadingView: LinearLayout
-	private var selectedIndex = 0
+	private var defaultIndex: Int? = null
 
 	private var accountActors: List<AccountActor> by observing(listOf()) {
 		accountActors.forEachIndexed { index, actor ->
 			container.apply {
 				EOSAccountCell(context).apply {
 					id = index // for clearing radio checked status
-					setRadioStatus(index == 0)
+					if (actor.name == defaultActorName && defaultIndex.isNull()) {
+						setRadioStatus(true)
+						defaultIndex = index
+					} else {
+						setRadioStatus(index == 0)
+					}
 					setAccountInfo(actor.name, actor.permission.value)
 				}.click {
 					clearRadiosStatus(accountActors.size)
 					it.setRadioStatus(true)
-					selectedIndex = it.id
+					defaultIndex = it.id
 				}.into(this)
 			}
 		}
@@ -82,7 +92,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(20.uiPX())
 				}.click {
-					container.findViewById<EOSAccountCell>(selectedIndex)?.getName()?.apply {
+					container.findViewById<EOSAccountCell>(defaultIndex.orZero())?.getName()?.apply {
 						presenter.setEOSDefaultName(this)
 					}
 				}.into(this)

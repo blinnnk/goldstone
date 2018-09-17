@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.database
 
 import android.arch.persistence.room.*
 import android.content.Context
+import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import java.math.BigInteger
 
 /**
  * @date 03/04/2018 12:53 PM
@@ -56,7 +58,8 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 	RequiredAuthorizationConverter::class,
 	EOSAccountInfoConverter::class,
 	EOSDefaultAllChainNameConverter::class,
-	EOSTransactionDataConverter::class
+	EOSTransactionDataConverter::class,
+	BigintegerConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao
@@ -110,6 +113,25 @@ class ListStringConverter {
 		}
 		return if (stringContent.isEmpty()) stringContent
 		else stringContent.substringBeforeLast(",")
+	}
+}
+
+/**
+ * 高精度的数字只能不用 `BigInteger` 来存储数据库增加类型转换
+ */
+class BigintegerConverter {
+	@TypeConverter
+	fun revertString(content: String): BigInteger {
+		return when {
+			content.isEmpty() -> BigInteger.ZERO
+			content.any { !it.toString().matches(Regex(".*[0-9].*")) } -> BigInteger.ZERO
+			else -> content.toBigInteger()
+		}
+	}
+
+	@TypeConverter
+	fun convertBigInteger(content: BigInteger): String {
+		return content.toBigDecimal().toPlainString()
 	}
 }
 

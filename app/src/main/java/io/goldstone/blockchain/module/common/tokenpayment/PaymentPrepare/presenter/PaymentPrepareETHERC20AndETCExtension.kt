@@ -29,7 +29,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
-		TokenContract(fragment.rootFragment?.token?.contract).getCurrentChainType(),
+		TokenContract(fragment.rootFragment?.token?.contract).getChainType(),
 		callback
 	) { model ->
 		fragment.rootFragment?.apply {

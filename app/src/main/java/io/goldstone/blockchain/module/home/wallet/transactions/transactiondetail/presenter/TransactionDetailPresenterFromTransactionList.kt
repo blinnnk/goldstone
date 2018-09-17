@@ -15,6 +15,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.runOnUiThread
+import java.math.BigInteger
 
 /**
  * @date 2018/6/6 3:59 PM
@@ -85,7 +86,10 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 	}
 }
 
-private fun getBandWidthUsageAndUpdateDatabase(txID: String, hold: (cpuUsage: Long, netUsage: Long) -> Unit) {
+private fun getBandWidthUsageAndUpdateDatabase(
+	txID: String,
+	hold: (cpuUsage: BigInteger, netUsage: BigInteger) -> Unit
+) {
 	EOSAPI.getCPUAndNETUsageByTxID(
 		txID,
 		{

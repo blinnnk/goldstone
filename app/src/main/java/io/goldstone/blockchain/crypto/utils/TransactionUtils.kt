@@ -11,10 +11,10 @@ object TransactionUtils {
 	
 	fun signTransaction(
 		transaction: Transaction,
-		pirvateKey: String
+		privateKey: String
 	): String {
-		val publicKey = publicKeyFromPrivate(pirvateKey.hexToBigInteger())
-		val keyPair = ECKeyPair(pirvateKey.hexToBigInteger(), publicKey)
+		val publicKey = publicKeyFromPrivate(privateKey.hexToBigInteger())
+		val keyPair = ECKeyPair(privateKey.hexToBigInteger(), publicKey)
 		val signatureData =
 			transaction.signViaEIP155(keyPair, transaction.chain!!)
 		return transaction.encodeRLP(signatureData).toHexString()

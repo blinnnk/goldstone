@@ -14,7 +14,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 fun TransactionDetailPresenter.updateDataFromTransfer() {
 	data?.apply {
 		currentHash = taxHash
-		count = CryptoUtils.toCountByDecimal(value.toBigDecimal().toDouble(), token.decimal)
+		count = CryptoUtils.toCountByDecimal(value, token.decimal)
 		fragment.asyncData = generateModels().toArrayList()
 		val headerData = TransactionHeaderModel(
 			count,
@@ -38,7 +38,7 @@ fun TransactionDetailPresenter.showConformationInterval(
 	intervalCount: Int,
 	irreversibleCount: Int = 6,
 	isEOSTransaction: Boolean = false
-	) {
+) {
 	fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) { it ->
 		it.apply {
 			headerModel?.let {

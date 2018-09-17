@@ -7,9 +7,10 @@ import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.hexToLong
+import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import kotlinx.serialization.toUtf8Bytes
+import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,7 +41,7 @@ object EOSUtils {
 		if (!content.isEvenCount()) throw Exception("content length must be even")
 		var endianValue = ""
 		var startIndex = content.length
-		(0 until content.length / 2).forEach {
+		for (index in 0 until content.length / 2) {
 			startIndex -= 2
 			endianValue += content.substring(startIndex, startIndex + 2)
 		}
@@ -77,13 +78,13 @@ object EOSUtils {
 		return writer.toBytes().toNoPrefixHexString()
 	}
 
-	fun convertAmountToCode(amount: Long): String {
+	fun convertAmountToCode(amount: BigInteger): String {
 		val amountHex = amount.toString(16)
 		val evenCountHex = amountHex.completeToEvent()
 		val littleEndianAmountHex = toLittleEndian(evenCountHex)
 		var completeZero = ""
 		val completeCount = 16 - littleEndianAmountHex.count()
-		(0 until completeCount).forEach {
+		for (index in 0 until completeCount) {
 			completeZero += "0"
 		}
 		return littleEndianAmountHex + completeZero
@@ -135,7 +136,7 @@ object EOSUtils {
 	fun getRefBlockPrefix(headBlockID: String): Int {
 		if (headBlockID.length < 64) throw Exception("wrong head block id length")
 		return try {
-			toLittleEndian(headBlockID.substring(16, 24)).hexToLong().toInt()
+			toLittleEndian(headBlockID.substring(16, 24)).hexToDecimal().toInt()
 		} catch (error: Exception) {
 			throw Exception("wrong head block id length wrong prefix")
 		}
@@ -199,7 +200,7 @@ object EOSUtils {
 		return dateFormat.parse(utcDate).time / 1000
 	}
 
-	fun convertAmountToValidFormat(amount: Long): String {
+	fun convertAmountToValidFormat(amount: BigInteger): String {
 		val count = CryptoUtils.toCountByDecimal(amount, CryptoValue.eosDecimal)
 		val decimalCount = count.getDecimalCount()
 		return when (decimalCount) {
@@ -211,7 +212,7 @@ object EOSUtils {
 
 	fun completeZero(count: Int): String {
 		var completeZero = ""
-		(0 until count).forEach {
+		for (index in 0 until count) {
 			completeZero += "0"
 		}
 		return completeZero

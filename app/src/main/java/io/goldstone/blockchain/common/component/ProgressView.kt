@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import java.math.BigInteger
 
 
 /**
@@ -91,18 +92,18 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 		this.subtitle.text = subtitle
 	}
 
-	private var leftValue = 0L
+	private var leftValue = BigInteger.ZERO
 	@SuppressLint("SetTextI18n")
-	fun setLeftValue(value: Long, description: String, isTime: Boolean = false) {
+	fun setLeftValue(value: BigInteger, description: String, isTime: Boolean = false) {
 		leftValue = value
 		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
 		leftValueView.text = "$convertedValue $description"
 		setProgressValue()
 	}
 
-	private var rightValue = 0L
+	private var rightValue = BigInteger.ZERO
 	@SuppressLint("SetTextI18n")
-	fun setRightValue(value: Long, description: String, isTime: Boolean = false) {
+	fun setRightValue(value: BigInteger, description: String, isTime: Boolean = false) {
 		rightValue = value
 		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
 		rightValueView.text = "$convertedValue $description"
@@ -110,7 +111,7 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 	}
 
 	private fun setProgressValue() {
-		val percent: Double = if (rightValue == 0L) 0.0 else leftValue / rightValue.toDouble()
+		val percent: Double = if (rightValue == BigInteger.ZERO) 0.0 else leftValue.toDouble() / rightValue.toDouble()
 		progressValueView.measure(0, 0)
 		val width = measuredWidth - marginSize * 2
 		progressValueView.updateWidthAnimation((width * percent).toInt())

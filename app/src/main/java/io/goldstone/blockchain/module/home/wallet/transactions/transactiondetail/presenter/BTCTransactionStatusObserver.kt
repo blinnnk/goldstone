@@ -66,7 +66,6 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
 	MyTokenTable.getBalanceByContract(
 		TokenContract.getBTC(),
 		address,
-		false,
 		{ error, reason ->
 			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
 			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)

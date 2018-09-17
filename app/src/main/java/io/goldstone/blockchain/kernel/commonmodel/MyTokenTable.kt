@@ -13,7 +13,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
-import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -37,7 +36,7 @@ data class MyTokenTable(
 	var ownerName: String, // `EOS` 的 `account name` 会复用这个值作为 `Token` 唯一标识
 	var ownerAddress: String,
 	var symbol: String,
-	var balance: Double,
+	var balance: Double, // 含有精度的余额 eg: `1.02` BTC
 	var contract: String,
 	var chainID: String
 ) {
@@ -92,13 +91,12 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokens(callback: (List<MyTokenTable>) -> Unit) {
+		fun getMyTokens(@UiThread callback: (List<MyTokenTable>) -> Unit) {
 			WalletTable.getCurrentAddresses { addresses ->
 				doAsync {
 					var allTokens = listOf<MyTokenTable>()
 					addresses.forEachOrEnd { item, isEnd ->
-						allTokens += GoldStoneDataBase.database.myTokenDao()
-							.getCurrentChainTokensBy(item)
+						allTokens += GoldStoneDataBase.database.myTokenDao().getCurrentChainTokensBy(item)
 						if (isEnd) {
 							GoldStoneAPI.context.runOnUiThread {
 								callback(allTokens)
@@ -111,7 +109,7 @@ data class MyTokenTable(
 
 		fun getMyTokensByAddress(
 			addresses: List<String>,
-			hold: (List<MyTokenTable>) -> Unit
+			@UiThread hold: (List<MyTokenTable>) -> Unit
 		) {
 			doAsync {
 				var allTokens = listOf<MyTokenTable>()
@@ -143,7 +141,6 @@ data class MyTokenTable(
 		fun getTokenBalance(
 			contract: String,
 			ownerName: String,
-			convertByDecimal: Boolean = true,
 			callback: (Double?) -> Unit
 		) {
 			load {
@@ -151,16 +148,8 @@ data class MyTokenTable(
 					.getCurrentChainTokenByContractAndAddress(contract, ownerName)
 			} then { token ->
 				if (token.isNull()) callback(null)
-				else {
-					if (!convertByDecimal) {
-						callback(token?.balance.orZero())
-					} else {
-						DefaultTokenTable.getCurrentChainToken(contract) {
-							it?.apply {
-								callback(CryptoUtils.toCountByDecimal(token?.balance.orZero(), it.decimals))
-							}
-						}
-					}
+				else DefaultTokenTable.getCurrentChainToken(contract) {
+					it?.apply { callback(token?.balance.orZero()) }
 				}
 			}
 		}
@@ -257,7 +246,6 @@ data class MyTokenTable(
 		fun getBalanceByContract(
 			contract: TokenContract,
 			ownerName: String,
-			convertByDecimal: Boolean = false,
 			errorCallback: (error: Throwable?, reason: String?) -> Unit,
 			callback: (balance: Double) -> Unit
 		) {
@@ -269,7 +257,7 @@ data class MyTokenTable(
 						errorCallback,
 						contract.getCurrentChainName()
 					) {
-						val balance = if (convertByDecimal) it.toEthCount() else it
+						val balance = it.toEthCount()
 						callback(balance)
 					}
 				contract.isETC() ->
@@ -278,23 +266,23 @@ data class MyTokenTable(
 						errorCallback,
 						contract.getCurrentChainName()
 					) {
-						val balance = if (convertByDecimal) it.toEthCount() else it
+						val balance = it.toEthCount()
 						callback(balance)
 					}
 				contract.isBTC() ->
 					BitcoinApi.getBalance(ownerName) {
-						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
+						val balance = it.toBTCCount()
 						callback(balance)
 					}
 				contract.isLTC() ->
 					LitecoinApi.getBalance(ownerName) {
-						val balance = if (convertByDecimal) it.toBTCCount() else it.toDouble()
+						val balance = it.toBTCCount()
 						callback(balance)
 					}
 
 				contract.isBCH() ->
 					BitcoinCashApi.getBalance(ownerName) {
-						val balance = if (convertByDecimal) it else it.toSatoshi().toDouble()
+						val balance = it
 						callback(balance)
 					}
 
@@ -311,12 +299,9 @@ data class MyTokenTable(
 						token?.contract.orEmpty(),
 						ownerName,
 						errorCallback,
-						Config.getCurrentChainName()
+						contract.getCurrentChainName()
 					) {
-						val balance =
-							if (convertByDecimal)
-								CryptoUtils.toCountByDecimal(it, token?.decimals.orZero())
-							else it
+						val balance = CryptoUtils.toCountByDecimal(it, token?.decimals.orZero())
 						callback(balance)
 					}
 				}

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.safeGet
@@ -24,6 +25,7 @@ import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
+import java.math.BigInteger
 
 /**
  * @date 21/03/2018 11:12 PM
@@ -117,7 +119,7 @@ fun String.isNullValue(): Boolean {
 
 infix fun String.suffix(content: String) = this + " " + content
 
-fun Long.convertToDiskUnit(): String {
+fun BigInteger.convertToDiskUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
 	val diskUnit = when (convertValue) {
 		0 -> EOSUnit.Byte.value
@@ -128,16 +130,16 @@ fun Long.convertToDiskUnit(): String {
 	return result suffix diskUnit
 }
 
-fun Long.convertToTimeUnit(): String {
+fun BigInteger.convertToTimeUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
-	val sixtyHexadecimal = if (convertValue > 2) (this / 1000 * 1000 / 60).toInt() else 0
+	val sixtyHexadecimal = if (convertValue > 2) (this.toDouble() / 1000 * 1000 / 60).toInt() else 0
 	val diskUnit = when {
 		convertValue == 0 -> EOSUnit.MUS.value
 		convertValue == 1 -> EOSUnit.MS.value
 		sixtyHexadecimal == 0 -> EOSUnit.SEC.value
 		else -> EOSUnit.MIN.value
 	}
-	val value = if (convertValue > 2) this / 1000 * 1000 else this
+	val value = if (convertValue > 2) this / BigInteger.valueOf(1000) * BigInteger.valueOf(1000) else this
 	val hexadecimal = if (convertValue > 2) 60.0 else 1000.0
 	val decimal = if (convertValue > 2) sixtyHexadecimal else convertValue
 	val result = CryptoUtils.toTargetUnit(value, decimal.toDouble(), hexadecimal).formatCount(5)
@@ -170,3 +172,6 @@ fun JSONObject.getTargetObject(vararg keys: String): JSONObject {
 		throw Exception("goldstone getTargetObject has error")
 	}
 }
+
+fun BigInteger?.orZero() = (if (isNull()) BigInteger.ZERO else this)!!
+fun String.toBigIntegerOrZero() = toBigIntegerOrNull() ?: BigInteger.ZERO

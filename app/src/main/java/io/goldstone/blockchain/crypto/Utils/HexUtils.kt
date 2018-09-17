@@ -13,13 +13,8 @@ fun Byte.toHexString() = toInt().let {
 	CHARS[it.shr(4) and 0x0f].toString() + CHARS[it.and(0x0f)].toString()
 }
 
-fun Char.fromHexToInt() = CHARS.indexOf(this)
-
 fun ByteArray.toHexString(prefix: String = "0x") = prefix + joinToString("") { it.toHexString() }
-fun List<Byte>.toHexString(prefix: String = "0x") = toByteArray().toHexString(prefix)
-
 fun ByteArray.toNoPrefixHexString() = toHexString("")
-fun List<Byte>.toNoPrefixHexString() = toHexString("")
 
 fun String.hexToByteArray(): ByteArray {
 	if (length % 2 != 0)

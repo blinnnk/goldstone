@@ -233,15 +233,15 @@ class WalletDetailPresenter(
 			load {
 				/** 先按照资产情况排序, 资产为零的按照权重排序 */
 				val hasPrice =
-					data.filter { it.price * it.count != 0.0 }
-						.sortedByDescending { it.count * it.price }
+					data.asSequence().filter { it.price * it.count != 0.0 }
+						.sortedByDescending { it.count * it.price }.toList()
 				val hasBalance =
-					data.filter { it.count != 0.0 && it.price == 0.0 }
-						.sortedByDescending { it.count }
+					data.asSequence().filter { it.count != 0.0 && it.price == 0.0 }
+						.sortedByDescending { it.count }.toList()
 				val others =
-					data.filter { it.count == 0.0 }
-						.sortedByDescending { it.weight }
-				hasPrice.plus(hasBalance).plus(others).toArrayList()
+					data.asSequence().filter { it.count == 0.0 }
+						.sortedByDescending { it.weight }.toList()
+				hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
 			} then {
 				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
 				fragment.updateHeaderValue()
@@ -286,15 +286,7 @@ class WalletDetailPresenter(
 		// Once the calculation is finished then update `WalletTable`
 		Config.updateCurrentBalance(totalBalance.orElse(0.0))
 		WalletTable.getCurrentWallet {
-			val subtitle = when (Config.getCurrentWalletType()) {
-				WalletType.ETHERCAndETCOnly.content -> currentETHAndERCAddress
-				WalletType.BTCOnly.content -> currentBTCAddress
-				WalletType.BTCTestOnly.content -> currentBTCSeriesTestAddress
-				WalletType.LTCOnly.content -> currentLTCAddress
-				WalletType.BCHOnly.content -> currentBCHAddress
-				WalletType.EOSOnly.content -> currentEOSAddress
-				else -> WalletText.multiChainWallet
-			}
+			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
 				null,
 				Config.getCurrentName(),
