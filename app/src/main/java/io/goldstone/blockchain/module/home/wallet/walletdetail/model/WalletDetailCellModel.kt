@@ -198,6 +198,7 @@ data class WalletDetailCellModel(
 			GoldStoneEthCall.getTokenName(
 				contract,
 				{ error, reason ->
+					callback(this)
 					LogUtil.error("getTokenName $reason", error)
 					errorCallback(error)
 				},
@@ -205,7 +206,7 @@ data class WalletDetailCellModel(
 			) {
 				val name = if (it.isEmpty()) symbol else it
 				DefaultTokenTable.updateTokenName(TokenContract(contract), name)
-				callback(this.apply { this.name = name })
+				callback(apply { this.name = name })
 			}
 		}
 

@@ -126,11 +126,7 @@ data class MyTokenTable(
 		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
-						ownerName,
-						contract.getCurrentChainID().id
-					)
+					.getTokenByContractAndAddress(contract.contract.orEmpty(), ownerName, contract.getCurrentChainID().id)
 			} then { token ->
 				if (token.isNull()) callback(null) else callback(token?.balance.orZero())
 			}

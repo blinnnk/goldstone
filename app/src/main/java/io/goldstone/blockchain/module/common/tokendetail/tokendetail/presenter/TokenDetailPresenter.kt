@@ -191,7 +191,7 @@ class TokenDetailPresenter(
 			walletType.isBIP44() || walletType.isMultiChain() -> {
 				when {
 					token?.contract.isETC() ->
-						getETHERC20OrETCData(token?.contract.getAddress()) {
+						getETHSeriesData(token?.contract.getAddress()) {
 							callback(it, null, null)
 						}
 
@@ -205,7 +205,7 @@ class TokenDetailPresenter(
 						callback(null, null, it)
 					}
 
-					else -> getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
+					else -> getETHSeriesData(token?.contract.getAddress()) {
 						callback(it, null, null)
 					}
 				}
@@ -221,20 +221,19 @@ class TokenDetailPresenter(
 			}
 
 			walletType.isETHSeries() ->
-				getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
+				getETHSeriesData(Config.getCurrentEthereumAddress()) {
 					callback(it, null, null)
 				}
 		}
 	}
 
-	private fun getETHERC20OrETCData(
+	private fun getETHSeriesData(
 		address: String,
 		callback: (List<TransactionListModel>) -> Unit
 	) {
 		TransactionTable.getByAddressAndContract(
 			address,
-			fragment.token?.contract!!,
-			CoinSymbol(fragment.token?.symbol).getChainID()
+			fragment.token?.contract!!
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(transactions, address)
@@ -298,7 +297,7 @@ class TokenDetailPresenter(
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract.orEmpty(), ownerName) {
+				data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {
 					it.updateChartAndHeaderData()
 				}
 			} otherwise {

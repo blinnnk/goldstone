@@ -129,6 +129,8 @@ data class TransactionTable(
 		data.hasError,
 		data.txReceiptStatus,
 		data.input,
+		// 奇怪的情况, 极其少见的情况下自己给自己转账解析为 Contract 转账, 待研究
+		// eg: https://ropsten.etherscan.io/tx/0xbda369f2ddc689d6039bf2dc96fc73af2bee1be8a87d88ceb4a9b552066f92ff
 		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
 		else TokenContract.ethContract,
 		data.cumulativeGasUsed,
@@ -264,8 +266,7 @@ data class TransactionTable(
 			@UiThread hold: (List<TransactionListModel>) -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.transactionDao()
-					.getTransactionsByAddress(address, Config.getCurrentChain().id)
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, Config.getCurrentChain().id)
 			} then { it ->
 				hold(it.map { TransactionListModel(it) })
 			}
@@ -293,16 +294,16 @@ data class TransactionTable(
 		fun getByAddressAndContract(
 			walletAddress: String,
 			contract: TokenContract,
-			chainID: ChainID,
 			hold: (List<TransactionListModel>) -> Unit
 		) {
+			val chainID = contract.getCurrentChainID().id
 			load {
 				val dao = GoldStoneDataBase.database.transactionDao()
-				var transactions = dao.getByAddressAndContract(walletAddress, contract.contract.orEmpty(), chainID.id)
+				var transactions = dao.getByAddressAndContract(walletAddress, contract.contract.orEmpty(), chainID)
 				// 如果是 `ETH` or `ETC` 需要查询出所有相关的 `Miner` 作为账单记录
 				var fee = listOf<TransactionTable>()
 				if (!contract.isERC20Token()) {
-					fee = dao.getCurrentChainFee(walletAddress, true, chainID.id)
+					fee = dao.getCurrentChainFee(walletAddress, true, chainID)
 				}
 				transactions += fee.filter { TokenContract(it.contractAddress).isERC20Token() }
 				transactions
@@ -440,6 +441,9 @@ interface TransactionDao {
 
 	@Insert
 	fun insert(token: TransactionTable)
+
+	@Insert
+	fun insertAll(tokens: List<TransactionTable>)
 
 	@Update
 	fun update(token: TransactionTable)
