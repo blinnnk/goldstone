@@ -165,8 +165,9 @@ data class WalletTable(
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
-				when (Config.getCurrentWalletType()) {
-					WalletType.bip44MultiChain -> {
+				val currentType = Config.getCurrentWalletType()
+				when {
+					currentType.isBIP44() -> {
 						val ethAddressCount = ethAddresses.split(",").size
 						val etcAddressCount = etcAddresses.split(",").size
 						val btcAddressCount = btcAddresses.split(",").size
@@ -184,12 +185,12 @@ data class WalletTable(
 								eosAddressCount
 						)
 					}
-					WalletType.ethSeries -> hold(1)
-					WalletType.btcTestOnly -> hold(1)
-					WalletType.btcOnly -> hold(1)
-					WalletType.ltcOnly -> hold(1)
-					WalletType.bchOnly -> hold(1)
-					WalletType.eosOnly -> hold(1)
+					currentType.isETHSeries() -> hold(1)
+					currentType.isBTCTest() -> hold(1)
+					currentType.isBTC() -> hold(1)
+					currentType.isLTC() -> hold(1)
+					currentType.isBCH() -> hold(1)
+					currentType.isEOS() -> hold(1)
 				}
 			}
 		}
@@ -313,7 +314,7 @@ data class WalletTable(
 						EOSWalletType.Available
 					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 					eosAccountNames.filter {
-						it.chainID.equals(Config.getEOSCurrentChain(), true)
+						it.chainID.equals(Config.getEOSCurrentChain().id, true)
 					}.size > 1 -> EOSWalletType.NoDefault
 					else -> EOSWalletType.Inactivated
 				}

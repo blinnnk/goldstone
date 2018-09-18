@@ -75,7 +75,7 @@ data class DefaultTokenTable(
 		"",
 		true,
 		0,
-		Config.getCurrentChain()
+		Config.getCurrentChain().id
 	)
 
 	constructor(
@@ -94,7 +94,7 @@ data class DefaultTokenTable(
 		"",
 		isDefault,
 		data.weight,
-		Config.getCurrentChain()
+		Config.getCurrentChain().id
 	)
 
 	constructor(
@@ -125,7 +125,7 @@ data class DefaultTokenTable(
 	constructor(data: CoinInfoModel) : this(
 		0,
 		"",
-		data.contract,
+		data.contract.contract.orEmpty(),
 		"",
 		data.symbol,
 		0,
@@ -164,7 +164,7 @@ data class DefaultTokenTable(
 		"",
 		false,
 		0,
-		TokenContract(contract).getCurrentChainID()
+		TokenContract(contract).getCurrentChainID().id
 	)
 
 	infix fun insertThen(callback: () -> Unit) {
@@ -204,26 +204,18 @@ data class DefaultTokenTable(
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			load {
-				GoldStoneDataBase
-					.database
-					.defaultTokenDao()
+				GoldStoneDataBase.database.defaultTokenDao()
 					.getTokenBySymbolAndContractFromAllChains(symbol, contract)
-			} then {
-				if (it.isNotEmpty()) {
-					hold(it[0])
-				} else {
-					hold(null)
-				}
-			}
+			} then { hold(it?.firstOrNull()) }
 		}
 
 		fun getCurrentChainToken(
-			contract: String,
+			contract: TokenContract,
 			hold: (DefaultTokenTable?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.getCurrentChainTokenByContract(contract)
+					.getTokenByContract(contract.contract.orEmpty(), contract.getCurrentChainID().id)
 			} then (hold)
 		}
 
@@ -234,7 +226,7 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenBySymbolAndContractFromAllChains(data.symbol, data.contract).let { targetTokens ->
+						getTokenBySymbolAndContractFromAllChains(data.symbol, data.contract.contract.orEmpty())?.let { targetTokens ->
 							if (targetTokens.isEmpty()) {
 								insert(DefaultTokenTable(data))
 								callback()
@@ -260,24 +252,24 @@ data class DefaultTokenTable(
 			}
 		}
 
-		fun updateTokenPrice(contract: String, newPrice: Double, callback: () -> Unit = {}) {
+		fun updateTokenPrice(contract: TokenContract, newPrice: Double, callback: () -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenPrice(newPrice, contract, TokenContract(contract).getCurrentChainID())
+					.updateTokenPrice(newPrice, contract.contract.orEmpty(), contract.getCurrentChainID().id)
 			} then { callback() }
 		}
 
-		fun updateTokenName(contract: String, name: String) {
+		fun updateTokenName(contract: TokenContract, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenName(name, contract, TokenContract(contract).getCurrentChainID())
+					.updateTokenName(name, contract.contract.orEmpty(), contract.getCurrentChainID().id)
 			}
 		}
 
-		fun updateTokenDefaultStatus(contract: String, isDefault: Boolean, name: String, callback: () -> Unit) {
+		fun updateTokenDefaultStatus(contract: TokenContract, isDefault: Boolean, name: String, callback: () -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenDefaultStatusAndName(isDefault, name, contract, TokenContract(contract).getCurrentChainID())
+					.updateTokenDefaultStatusAndName(isDefault, name, contract.contract.orEmpty(), contract.getCurrentChainID().id)
 			} then { callback() }
 		}
 	}
@@ -300,48 +292,30 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain")
 	fun getCurrentChainTokens(
-		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain(),
-		ltcChain: String = Config.getLTCCurrentChain(),
-		bchChain: String = Config.getBCHCurrentChain(),
-		eosChain: String = Config.getEOSCurrentChain()
+		ercChain: String = Config.getCurrentChain().id,
+		etcChain: String = Config.getETCCurrentChain().id,
+		btcChain: String = Config.getBTCCurrentChain().id,
+		ltcChain: String = Config.getLTCCurrentChain().id,
+		bchChain: String = Config.getBCHCurrentChain().id,
+		eosChain: String = Config.getEOSCurrentChain().id
 	): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain)")
 	fun getDefaultTokens(
 		isDefault: Boolean = true,
-		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain(),
-		ltcChain: String = Config.getLTCCurrentChain(),
-		bchChain: String = Config.getBCHCurrentChain(),
-		eosChain: String = Config.getEOSCurrentChain()
+		ercChain: String = Config.getCurrentChain().id,
+		etcChain: String = Config.getETCCurrentChain().id,
+		btcChain: String = Config.getBTCCurrentChain().id,
+		ltcChain: String = Config.getLTCCurrentChain().id,
+		bchChain: String = Config.getBCHCurrentChain().id,
+		eosChain: String = Config.getEOSCurrentChain().id
 	): List<DefaultTokenTable>
 
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND (chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain)")
-	fun getCurrentChainTokenByContract(
-		contract: String,
-		ercChain: String = Config.getCurrentChain(),
-		etcChain: String = Config.getETCCurrentChain(),
-		btcChain: String = Config.getBTCCurrentChain(),
-		ltcChain: String = Config.getLTCCurrentChain(),
-		bchChain: String = Config.getBCHCurrentChain(),
-		eosChain: String = Config.getEOSCurrentChain()
-	): DefaultTokenTable?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chainID LIKE :chainID")
+	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?
 
 	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND contract LIKE :contract")
-	fun getTokenBySymbolAndContractFromAllChains(
-		symbol: String,
-		contract: String
-	): List<DefaultTokenTable>
-
-	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND chainID LIKE :chainID AND  contract LIKE :contract")
-	fun getTokenBySymbolContractAndChainID(
-		symbol: String,
-		contract: String,
-		chainID: String
-	): DefaultTokenTable?
+	fun getTokenBySymbolAndContractFromAllChains(symbol: String, contract: String): List<DefaultTokenTable>?
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

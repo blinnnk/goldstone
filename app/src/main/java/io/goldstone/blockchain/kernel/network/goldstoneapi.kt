@@ -12,8 +12,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -133,7 +133,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getETCTransactions(
-		chainID: String,
+		chainID: ChainID,
 		address: String,
 		startBlock: String,
 		errorCallback: (Exception) -> Unit,
@@ -142,7 +142,7 @@ object GoldStoneAPI {
 		requestData<ETCTransactionModel>(
 			APIPath.getETCTransactions(
 				APIPath.currentUrl,
-				chainID,
+				chainID.id,
 				address,
 				startBlock
 			),
@@ -311,7 +311,6 @@ object GoldStoneAPI {
 		deviceID: String,
 		isChina: Int,
 		isAndroid: Int,
-		chainID: Int,
 		country: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
@@ -326,7 +325,6 @@ object GoldStoneAPI {
 					Pair("device", deviceID),
 					Pair("push_type", isChina),
 					Pair("os", isAndroid),
-					Pair("chainid", chainID),
 					Pair("country", country)
 				)
 			),

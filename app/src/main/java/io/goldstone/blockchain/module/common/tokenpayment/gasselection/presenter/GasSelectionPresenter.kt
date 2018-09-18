@@ -16,9 +16,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -160,13 +158,13 @@ class GasSelectionPresenter(
 		// 检查网络并执行转账操作
 		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 			when {
-				TokenContract(getToken()?.contract).isBTC() ->
+				getToken()?.contract.isBTC() ->
 					prepareToTransferBTC(footer, callback)
-				TokenContract(getToken()?.contract).isLTC() ->
+				getToken()?.contract.isLTC() ->
 					prepareToTransferLTC(footer, callback)
-				TokenContract(getToken()?.contract).isBCH() ->
+				getToken()?.contract.isBCH() ->
 					prepareToTransferBCH(footer, callback)
-				TokenContract(getToken()?.contract).isEOS() -> {
+				getToken()?.contract.isEOS() -> {
 					// TODO EOS
 				}
 				else -> prepareToTransfer(footer, callback)
@@ -179,7 +177,7 @@ class GasSelectionPresenter(
 	}
 
 	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
-		val isValid = isValidDecimal(token?.decimal?.toInt().orZero())
+		val isValid = isValidDecimal(token?.decimal.orZero())
 		if (!isValid) fragment.context?.alert(AlertText.transferWrongDecimal)
 		return isValid
 	}
@@ -200,19 +198,19 @@ class GasSelectionPresenter(
 				fragment.showMaskView(false)
 			}) {
 			when {
-				TokenContract(getToken()?.contract).isBTC() ->
+				getToken()?.contract.isBTC() ->
 					prepareBTCSeriesModel?.apply {
 						transferBTC(this, it?.text.toString(), callback)
 					}
-				TokenContract(getToken()?.contract).isLTC() ->
+				getToken()?.contract.isLTC() ->
 					prepareBTCSeriesModel?.apply {
 						transferLTC(this, it?.text.toString(), callback)
 					}
-				TokenContract(getToken()?.contract).isBCH() ->
+				getToken()?.contract.isBCH() ->
 					prepareBTCSeriesModel?.apply {
 						transferBCH(this, it?.text.toString(), callback)
 					}
-				TokenContract(getToken()?.contract).isEOS() -> {
+				getToken()?.contract.isEOS() -> {
 					// TODO EOS
 				}
 				else -> transfer(it?.text.toString(), callback)
@@ -294,12 +292,12 @@ class GasSelectionPresenter(
 	) {
 		val coinContract =
 			when {
-				TokenContract(rootFragment?.token?.contract).isETC() -> TokenContract.etcContract
-				TokenContract(rootFragment?.token?.contract).isBTC() -> TokenContract.btcContract
-				TokenContract(rootFragment?.token?.contract).isLTC() -> TokenContract.ltcContract
-				TokenContract(rootFragment?.token?.contract).isEOS() -> TokenContract.eosContract
-				TokenContract(rootFragment?.token?.contract).isBCH() -> TokenContract.bchContract
-				else -> TokenContract.ethContract
+				getToken()?.contract.isETC() -> TokenContract.getETC()
+				getToken()?.contract.isBTC() -> TokenContract.getBTC()
+				getToken()?.contract.isLTC() -> TokenContract.getLTC()
+				getToken()?.contract.isEOS() -> TokenContract.getEOS()
+				getToken()?.contract.isBCH() -> TokenContract.getBCH()
+				else -> TokenContract.getETH()
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(

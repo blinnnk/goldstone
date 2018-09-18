@@ -12,9 +12,7 @@ import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
-import io.goldstone.blockchain.crypto.multichain.ChainAddresses
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
+import io.goldstone.blockchain.crypto.multichain.*
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams

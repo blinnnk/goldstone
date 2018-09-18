@@ -68,7 +68,7 @@ fun checkAddressNameInContacts(
 fun getTokenTransactions(
 	startBlock: String,
 	errorCallback: (Throwable) -> Unit,
-	hold: (ArrayList<TransactionListModel>) -> Unit
+	hold: (List<TransactionListModel>) -> Unit
 ) {
 	getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
 		hasData.isNotEmpty() isTrue {
@@ -168,7 +168,7 @@ private fun diffNewDataAndUpdateLocalData(
 	GoldStoneDataBase.database.transactionDao().apply {
 		getTransactionsByAddress(
 			Config.getCurrentEthereumAddress(),
-			Config.getCurrentChain()
+			Config.getCurrentChain().id
 		).let { localData ->
 			newData.filterNot { new ->
 				localData.any {

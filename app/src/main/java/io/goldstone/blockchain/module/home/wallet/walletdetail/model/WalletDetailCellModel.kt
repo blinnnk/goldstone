@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -30,7 +31,7 @@ data class WalletDetailCellModel(
 	var count: Double = 0.0,
 	var price: Double = 0.0,
 	var currency: Double = 0.0,
-	var contract: String = "",
+	var contract: TokenContract,
 	var weight: Int = 0,
 	var eosWalletType: EOSWalletType
 ) : Serializable {
@@ -47,7 +48,7 @@ data class WalletDetailCellModel(
 		CryptoUtils.toCountByDecimal(amount, data.decimals),
 		data.price,
 		CryptoUtils.toCountByDecimal(amount, data.decimals) * data.price,
-		data.contract,
+		TokenContract(data.contract),
 		data.weight,
 		eosWalletType
 	)
@@ -64,7 +65,7 @@ data class WalletDetailCellModel(
 		balance,
 		data.price,
 		balance * data.price,
-		data.contract,
+		TokenContract(data.contract),
 		data.weight,
 		eosWalletType
 	)
@@ -203,7 +204,7 @@ data class WalletDetailCellModel(
 				Config.getCurrentChainName()
 			) {
 				val name = if (it.isEmpty()) symbol else it
-				DefaultTokenTable.updateTokenName(contract, name)
+				DefaultTokenTable.updateTokenName(TokenContract(contract), name)
 				callback(this.apply { this.name = name })
 			}
 		}
@@ -224,7 +225,7 @@ data class WalletDetailCellModel(
 					override fun concurrentJobs() {
 						newPrices.forEach {
 							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(it.contract, it.price)
+							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract), it.price)
 							completeMark()
 						}
 					}

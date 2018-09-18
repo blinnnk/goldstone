@@ -10,34 +10,6 @@ import java.io.Serializable
  * @date  2018/09/14
  */
 class CoinSymbol(val symbol: String?) : Serializable {
-	fun isEOS(): Boolean {
-		return symbol.equals(CoinSymbol.eos, true)
-	}
-
-	fun isETH(): Boolean {
-		return symbol.equals(CoinSymbol.etc, true)
-	}
-
-	fun isBTC(): Boolean {
-		return symbol.equals(CoinSymbol.btc(), true)
-	}
-
-	fun isLTC(): Boolean {
-		return symbol.equals(CoinSymbol.ltc, true)
-	}
-
-	fun isBCH(): Boolean {
-		return symbol.equals(CoinSymbol.bch, true)
-	}
-
-	fun isETC(): Boolean {
-		return symbol.equals(CoinSymbol.etc, true)
-	}
-
-	fun isBTCSeries(): Boolean {
-		return allBTCSeriesSymbol().any { it.equals(symbol, true) }
-	}
-
 	fun getAddress(isEOSAccountName: Boolean = true): String {
 		return when {
 			CoinSymbol(symbol).isBTC() ->
@@ -56,7 +28,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 		}
 	}
 
-	fun getChainID(): String {
+	fun getChainID(): ChainID {
 		return when {
 			symbol.equals(CoinSymbol.btc(), true) ->
 				Config.getBTCCurrentChain()
@@ -122,5 +94,62 @@ class CoinSymbol(val symbol: String?) : Serializable {
 			) "Bitc."
 			else name
 		}
+	}
+}
+
+fun CoinSymbol?.isEOS(): Boolean {
+	return this?.symbol.equals(CoinSymbol.eos, true)
+}
+
+fun CoinSymbol?.isETH(): Boolean {
+	return this?.symbol.equals(CoinSymbol.etc, true)
+}
+
+fun CoinSymbol?.isBTC(): Boolean {
+	return this?.symbol.equals(CoinSymbol.btc(), true)
+}
+
+fun CoinSymbol?.isLTC(): Boolean {
+	return this?.symbol.equals(CoinSymbol.ltc, true)
+}
+
+fun CoinSymbol?.isBCH(): Boolean {
+	return this?.symbol.equals(CoinSymbol.bch, true)
+}
+
+fun CoinSymbol?.isETC(): Boolean {
+	return this?.symbol.equals(CoinSymbol.etc, true)
+}
+
+fun CoinSymbol?.isBTCSeries(): Boolean {
+	return CoinSymbol.allBTCSeriesSymbol().any { it.equals(this?.symbol, true) }
+}
+
+fun CoinSymbol?.getContract(): TokenContract? {
+	return when {
+		CoinSymbol(this?.symbol).isBTC() ->
+			TokenContract.getBTC()
+		CoinSymbol(this?.symbol).isLTC() ->
+			TokenContract.getLTC()
+		CoinSymbol(this?.symbol).isBCH() ->
+			TokenContract.getBCH()
+		CoinSymbol(this?.symbol).isETC() ->
+			TokenContract.getETC()
+		CoinSymbol(this?.symbol).isETH() ->
+			TokenContract.getETH()
+		CoinSymbol(this?.symbol).isEOS() ->
+			TokenContract.getEOS()
+		else -> null
+	}
+}
+
+fun CoinSymbol?.getChainSymbol(): CoinSymbol {
+	return when {
+		isETC() -> CoinSymbol.getETC()
+		isBTC() -> CoinSymbol.getBTC()
+		isLTC() -> CoinSymbol.getLTC()
+		isBCH() -> CoinSymbol.getBCH()
+		isEOS() -> CoinSymbol.getEOS()
+		else -> CoinSymbol.getETH()
 	}
 }

@@ -12,6 +12,9 @@ import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.getChainSymbol
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isETC
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -92,14 +95,7 @@ class TransactionDetailPresenter(
 
 	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return when {
-			CoinSymbol(symbol).isETC() -> CoinSymbol.etc
-			CoinSymbol(symbol).isBTC() -> CoinSymbol.btc()
-			CoinSymbol(symbol).isLTC() -> CoinSymbol.ltc
-			CoinSymbol(symbol).isBCH() -> CoinSymbol.bch
-			CoinSymbol(symbol).isEOS() -> CoinSymbol.eos
-			else -> CoinSymbol.eth
-		}
+		return CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
 	}
 
 	fun showAddContactsButton(cell: TransactionDetailCell) {

@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import org.ethereum.geth.Geth
@@ -290,9 +289,10 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 	hold: (Boolean) -> Unit
 ) {
 	doAsync {
-		when (Config.getCurrentWalletType()) {
+		val currentType = Config.getCurrentWalletType()
+		when {
 			// 多链钱包随便找一个名下钱包地址进行验证即可
-			WalletType.bip44MultiChain -> {
+			currentType.isBIP44() -> {
 				verifyKeystorePassword(
 					password,
 					Config.getCurrentBTCAddress(),
@@ -301,7 +301,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 					hold
 				)
 			}
-			WalletType.multiChain -> {
+			currentType.isMultiChain() -> {
 				verifyKeystorePasswordByWalletID(
 					password,
 					walletID,

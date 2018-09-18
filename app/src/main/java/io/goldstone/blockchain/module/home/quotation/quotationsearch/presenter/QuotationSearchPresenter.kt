@@ -31,7 +31,7 @@ class QuotationSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.searchInputLinstener(
+			overlayView.header.searchInputListener(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {

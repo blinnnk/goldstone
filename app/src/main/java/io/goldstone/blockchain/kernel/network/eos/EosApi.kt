@@ -85,7 +85,7 @@ object EOSAPI {
 				}
 				// 生成指定的包含链信息的结果类型
 				val accountNames =
-					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain(), Config.getCurrentEOSAddress()) }
+					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
 				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 			}
 		}

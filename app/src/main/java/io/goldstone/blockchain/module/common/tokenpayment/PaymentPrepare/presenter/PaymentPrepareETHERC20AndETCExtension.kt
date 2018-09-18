@@ -7,9 +7,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
@@ -29,7 +27,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
-		TokenContract(fragment.rootFragment?.token?.contract).getChainType(),
+		fragment.rootFragment?.token?.contract.getChainType(),
 		callback
 	) { model ->
 		fragment.rootFragment?.apply {
@@ -78,15 +76,14 @@ private fun PaymentPreparePresenter.generateTransaction(
 	val to: String
 	// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
 	when {
-		getToken()?.contract.equals(TokenContract.ethContract, true)
-			or getToken()?.contract.equals(TokenContract.etcContract, true) -> {
+		getToken()?.contract.isETH() || getToken()?.contract.isETC() -> {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count)
 		}
 
 		else -> {
-			to = getToken()?.contract.orEmpty()
+			to = getToken()?.contract?.contract.orEmpty()
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toAddressCode(false) + // 地址

@@ -8,7 +8,10 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.error.TransferError
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.crypto.multichain.isBTC
+import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.isLTC
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -52,7 +55,7 @@ class PaymentPreparePresenter(
 			fragment.toast(LoadingText.calculateGas)
 			when {
 				/** 准备 BTC 转账需要的参数 */
-				TokenContract(getToken()?.contract).isBTC() -> prepareBTCPaymentModel(
+				getToken()?.contract.isBTC() -> prepareBTCPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
 					if (error != TransferError.None) fragment.context?.alert(error.content)
@@ -60,7 +63,7 @@ class PaymentPreparePresenter(
 					callback()
 				}
 				/** 准备 LTC 转账需要的参数 */
-				TokenContract(getToken()?.contract).isLTC() -> prepareLTCPaymentModel(
+				getToken()?.contract.isLTC() -> prepareLTCPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
 					if (error != TransferError.None) fragment.context?.alert(error.content)
@@ -68,7 +71,7 @@ class PaymentPreparePresenter(
 					callback()
 				}
 				/** 准备 BCH 转账需要的参数 */
-				TokenContract(getToken()?.contract).isBCH() -> prepareBCHPaymentModel(
+				getToken()?.contract.isBCH() -> prepareBCHPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
 					if (error != TransferError.None) fragment.context?.alert(error.content)
@@ -76,7 +79,7 @@ class PaymentPreparePresenter(
 					callback()
 				}
 				/** 准备 EOS 转账需要的参数 */
-				TokenContract(getToken()?.contract).isEOS() -> transferEOS(count, getToken()?.symbol!!) { error ->
+				getToken()?.contract.isEOS() -> transferEOS(count, getToken()?.symbol!!) { error ->
 					when (error) {
 						TransferError.BalanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
 						TransferError.IncorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)

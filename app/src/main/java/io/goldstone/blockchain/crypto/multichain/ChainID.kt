@@ -28,12 +28,12 @@ class ChainID(val id: String) : Serializable {
 
 	fun isCurrent(): Boolean {
 		return when (id) {
-			btcMain, btcTest -> id.equals(Config.getBTCCurrentChain(), true)
-			ltcMain, ltcTest -> id.equals(Config.getLTCCurrentChain(), true)
-			bchMain, bchTest -> id.equals(Config.getBCHCurrentChain(), true)
-			ethMain, ropsten, rinkeby, kovan -> id.equals(Config.getCurrentChain(), true)
-			etcMain, etcTest -> id.equals(Config.getETCCurrentChain(), true)
-			eosMain, eosTest -> id.equals(Config.getEOSCurrentChain(), true)
+			btcMain, btcTest -> id.equals(Config.getBTCCurrentChain().id, true)
+			ltcMain, ltcTest -> id.equals(Config.getLTCCurrentChain().id, true)
+			bchMain, bchTest -> id.equals(Config.getBCHCurrentChain().id, true)
+			ethMain, ropsten, rinkeby, kovan -> id.equals(Config.getCurrentChain().id, true)
+			etcMain, etcTest -> id.equals(Config.getETCCurrentChain().id, true)
+			eosMain, eosTest -> id.equals(Config.getEOSCurrentChain().id, true)
 			else -> false
 		}
 	}
@@ -102,6 +102,20 @@ class ChainID(val id: String) : Serializable {
 	}
 
 	companion object {
+		fun getETHMain(): ChainID = ChainID(ethMain)
+		fun getRopsten(): ChainID = ChainID(ropsten)
+		fun getRinkeby(): ChainID = ChainID(rinkeby)
+		fun getKovan(): ChainID = ChainID(kovan)
+		fun getETCMain(): ChainID = ChainID(etcMain)
+		fun getETCTest(): ChainID = ChainID(etcTest)
+		fun getBTCMain(): ChainID = ChainID(btcMain)
+		fun getBTCTest(): ChainID = ChainID(btcTest)
+		fun getBCHMain(): ChainID = ChainID(bchMain)
+		fun getBCHTest(): ChainID = ChainID(bchTest)
+		fun getLTCMain(): ChainID = ChainID(ltcMain)
+		fun getLTCTest(): ChainID = ChainID(ltcTest)
+		fun getEOSMain(): ChainID = ChainID(eosMain)
+		fun getEOSTest(): ChainID = ChainID(eosTest)
 		const val ethMain = "1"
 		const val ropsten = "3"
 		const val rinkeby = "4"

@@ -5,7 +5,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
-import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
@@ -45,7 +44,7 @@ private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
 	password: String,
 	hold: (String?) -> Unit
 ) {
-	val isSingleChainWallet = !WalletType(Config.getCurrentWalletType()).isBIP44()
+	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	if (Config.isTestEnvironment()) {
 		fragment.context?.exportBase58PrivateKey(
 			walletAddress,

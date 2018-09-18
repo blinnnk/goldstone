@@ -11,7 +11,6 @@ import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFileByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
-import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
@@ -66,7 +65,7 @@ class KeystoreExportPresenter(
 	) {
 		doAsync {
 			val isSingleChainWallet =
-				!WalletType(Config.getCurrentWalletType()).isBIP44()
+				!Config.getCurrentWalletType().isBIP44()
 			if (ChainAddresses.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
 				getBTCSeriesKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
