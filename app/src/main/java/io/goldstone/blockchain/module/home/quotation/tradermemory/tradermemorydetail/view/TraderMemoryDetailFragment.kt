@@ -30,6 +30,10 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				textView {
 					text = "买卖记录/大单交易"
 				}
+				frameLayout {
+
+				}
+
 				textView {
 					text = "持量大户"
 				}

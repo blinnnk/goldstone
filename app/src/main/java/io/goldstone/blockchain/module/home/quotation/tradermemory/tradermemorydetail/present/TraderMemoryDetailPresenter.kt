@@ -9,5 +9,5 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemoryde
  */
 class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragment)
 	: BasePresenter<TraderMemoryDetailFragment>() {
-	
+
 }
