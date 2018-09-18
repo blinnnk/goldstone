@@ -16,9 +16,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class WalletSettingsListFragment :
 	BaseRecyclerFragment<WalletSettingsListPresenter, WalletSettingsListModel>() {
-	
+
 	override val presenter = WalletSettingsListPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?
 	) {
@@ -32,7 +32,7 @@ class WalletSettingsListFragment :
 			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null

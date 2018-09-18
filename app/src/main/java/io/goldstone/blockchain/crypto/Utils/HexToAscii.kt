@@ -43,32 +43,25 @@ private fun checkCode(dec: Int): String {
 	if (dec < 32 || dec in 127 .. 160) string = ""
 	return string
 }
+
 /**
  * `hash` 值转换为 `Decimal`
+ * 超长数字会导致 直接 转换 `Long` 或 `Double` 丢失精度, 转换类型的时候需要斟酌
  */
-fun String.hexToDecimal(): Double {
+fun String.hexToDecimal(): BigInteger {
 	// 以太坊的地址都是含有 `0x` 开头, 这里首先去掉 `0x`
-	var hexNum =
-		if (this.substring(0, 2) == "0x") replace("0x", "")
-		else this
-	val digits = "0123456789ABCDEF"
-	hexNum = hexNum.toUpperCase()
-	var value: BigInteger = BigInteger.valueOf(0)
-	(0 until hexNum.length).map { hexNum[it] }.map { digits.indexOf(it.toString()) }
-		.forEachIndexed { index, it ->
-			value += (Math.pow(16.0, hexNum.length - (index + 1.0)) * it).toBigDecimal().toBigInteger()
-		}
-	return value.toDouble()
+	val hexValue = clean0xPrefix()
+	return BigInteger(hexValue, 16)
 }
 
 fun String.toDecimalFromHex(): String {
-	return hexToDecimal().formatCount(3)
+	return hexToDecimal().toDouble().formatCount(3)
+}
+
+fun String.toDoubleFromHex(): Double {
+	return hexToDecimal().toDouble()
 }
 
 fun String.toIntFromHex(): Int {
 	return hexToDecimal().toInt()
-}
-
-fun String.hexToLong(): Long {
-	return toDecimalFromHex().toLong()
 }

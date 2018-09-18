@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.accountregister
 
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toLongOrZero
+import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
 import org.json.JSONObject
 import java.io.Serializable
+import java.math.BigInteger
 
 
 /**
@@ -12,14 +13,14 @@ import java.io.Serializable
  */
 data class EOSResponse(
 	val transactionID: String,
-	val cupUsageByte: Long,
-	val netUsageByte: Long,
+	val cupUsageByte: BigInteger,
+	val netUsageByte: BigInteger,
 	val executedStatus: Boolean
 ) : Serializable {
 	constructor(transactionID: String, receipt: JSONObject) : this(
 		transactionID,
-		receipt.safeGet("cpu_usage_us").toLongOrZero(),
-		receipt.safeGet("net_usage_words").toLongOrZero() * 8,
+		receipt.safeGet("cpu_usage_us").toBigIntegerOrZero(),
+		receipt.safeGet("net_usage_words").toBigIntegerOrZero() * BigInteger.valueOf(8),
 		receipt.safeGet("status").equals("executed", true)
 	)
 }

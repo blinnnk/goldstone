@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -8,6 +9,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.utils.suffix
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -15,6 +17,7 @@ import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -51,6 +54,16 @@ class TokenAssetPresenter(
 				info.second
 			)
 		}
+	}
+
+	fun showPublickKeyAccountNames() {
+		fragment.getGrandFather<TokenDetailOverlayFragment>()
+			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
+			TokenDetailText.accountNameSelection,
+			TokenDetailText.tokenDetail,
+			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName()) },
+			2
+		)
 	}
 
 	private fun getAccountTransactionCount() {

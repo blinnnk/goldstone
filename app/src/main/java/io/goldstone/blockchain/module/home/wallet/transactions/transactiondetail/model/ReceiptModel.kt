@@ -29,7 +29,7 @@ data class ReceiptModel(
 		info.fromAccount,
 		info.toAccount,
 		TransactionListModel.generateEOSMinerContent(response.cupUsageByte, response.netUsageByte),
-		BigInteger.valueOf(info.amount),
+		info.amount,
 		token,
 		response.transactionID,
 		System.currentTimeMillis(),

@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -21,10 +20,7 @@ import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -56,9 +52,7 @@ class AddressManagerPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)) {
-			fragment.showCreatorDashboard()
-		}
+		if (WalletType(Config.getCurrentWalletType()).isBIP44()) fragment.showCreatorDashboard()
 	}
 
 	fun setBackEvent() {
@@ -74,38 +68,7 @@ class AddressManagerPresenter(
 
 	private fun getMultiChainAddresses() {
 		WalletTable.getCurrentWallet {
-			val addresses =
-				arrayListOf<Pair<String, String>>().apply {
-					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
-					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBTCAddress, CoinSymbol.btc()))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.btc()))
-					}
-					// Litecoin Mainnet and Testnet Addresses
-					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentLTCAddress, CoinSymbol.ltc))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.ltc))
-					}
-					// Bitcoin Cash Mainnet and Testnet Addresses
-					if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBCHAddress, CoinSymbol.bch))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
-					}
-					// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
-					if (currentETHAndERCAddress.isNotEmpty()) {
-						add(Pair(currentETHAndERCAddress, CoinSymbol.erc))
-						add(Pair(currentETHAndERCAddress, CoinSymbol.eth))
-						add(Pair(currentETCAddress, CoinSymbol.etc))
-					}
-					// EOS.io Mainnet and Testnet Addresses
-					if (currentEOSAddress.isNotEmpty()) {
-						add(Pair(currentEOSAddress, CoinSymbol.eos))
-					}
-				}
-			fragment.setMultiChainAddresses(addresses)
+			fragment.setMultiChainAddresses(getCurrentAddressAndSymbol())
 		}
 	}
 
@@ -649,14 +612,6 @@ class AddressManagerPresenter(
 					}
 				}
 			}
-		}
-
-		fun setDefaultAddress(
-			chainType: Int,
-			defaultAddress: String,
-			callback: () -> Unit
-		) {
-			WalletTable.updateCurrentAddressByChainType(chainType, defaultAddress, callback)
 		}
 
 		fun getCellDashboardMenu(

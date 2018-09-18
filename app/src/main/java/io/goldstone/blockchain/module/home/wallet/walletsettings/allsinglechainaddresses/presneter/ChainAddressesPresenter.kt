@@ -59,13 +59,17 @@ class ChainAddressesPresenter(
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				AddressManagerPresenter.setDefaultAddress(coinType, address) {
-					// 更新钱包默认地址, 同时更新首页的数据
-					updateWalletDetail()
-					updateData()
-					AddressManagerFragment.removeDashboard(fragment.context)
-					updateDefaultStyle(coinType)
-					fragment.toast(CommonText.succeed)
+				ChainType(coinType).updateCurrentAddress(address) { isSwitchEOSAddress ->
+					if (isSwitchEOSAddress)
+						AddressManagerFragment.showSwitchEOSAddressAlertAndJump(fragment.context)
+					else {
+						// 更新钱包默认地址, 同时更新首页的数据
+						updateWalletDetail()
+						updateData()
+						AddressManagerFragment.removeDashboard(fragment.context)
+						updateDefaultStyle(coinType)
+						fragment.toast(CommonText.succeed)
+					}
 				}
 			},
 			qrCellClickEvent = {

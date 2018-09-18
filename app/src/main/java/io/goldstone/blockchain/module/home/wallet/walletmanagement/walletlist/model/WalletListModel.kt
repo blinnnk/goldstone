@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
-import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
@@ -26,26 +24,10 @@ data class WalletListModel(
 		data.id,
 		data.name,
 		data.getCurrentAddresses().first(),
-		getSubtitleByType(data),
+		data.getAddressDescription(),
 		balance,
 		data.isWatchOnly,
 		data.isUsing,
 		type
 	)
-
-	companion object {
-		fun getSubtitleByType(wallet: WalletTable): String {
-			val walletType = wallet.getTargetWalletType()
-			return when (walletType) {
-				WalletType.LTCOnly -> wallet.currentLTCAddress
-				WalletType.BCHOnly -> wallet.currentBCHAddress
-				WalletType.Bip44MultiChain -> WalletText.bip44MultiChain
-				WalletType.MultiChain -> WalletText.multiChain
-				WalletType.ETHERCAndETCOnly -> wallet.currentETHAndERCAddress
-				WalletType.BTCTestOnly -> wallet.btcSeriesTestAddresses
-				WalletType.BTCOnly -> wallet.btcAddresses
-				WalletType.EOSOnly -> wallet.eosAddresses
-			}
-		}
-	}
 }

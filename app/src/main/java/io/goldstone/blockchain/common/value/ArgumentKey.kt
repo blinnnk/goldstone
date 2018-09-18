@@ -33,6 +33,7 @@ object ArgumentKey {
 	const val address = "address"
 	const val chainType = "chainType"
 	const val coinType = "coinType"
+	const val defaultEOSAccountName = "defaultEOSAccountName"
 }
 
 object IntentKey {

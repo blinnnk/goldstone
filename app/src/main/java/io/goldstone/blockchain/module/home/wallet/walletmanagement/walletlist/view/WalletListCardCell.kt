@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import me.itangqi.waveloadingview.WaveLoadingView
@@ -28,16 +29,7 @@ import java.util.*
 class WalletListCardCell(context: Context) : RelativeLayout(context) {
 
 	var model: WalletListModel by observing(WalletListModel()) {
-		val currentType = when {
-			model.isWatchOnly -> WalletText.watchOnly
-			model.type.equals(WalletType.ETHERCAndETCOnly.content, true) -> WalletText.ethERCAndETC
-			model.type.equals(WalletType.LTCOnly.content, true) -> WalletText.ltcMainnet
-			model.type.equals(WalletType.BCHOnly.content, true) -> WalletText.bchMainnet
-			model.type.equals(WalletType.BTCOnly.content, true) -> WalletText.btcMainnet
-			model.type.equals(WalletType.BTCTestOnly.content, true) -> WalletText.bitcoinTestnet
-			model.type.equals(WalletType.EOSOnly.content, true) -> WalletText.eosWallet
-			else -> WalletText.multiChain
-		}
+		val currentType = if (model.isWatchOnly) WalletText.watchOnly else WalletType(model.type).type
 		nameInfo.title.text = model.addressName
 		nameInfo.subtitle.text = model.subtitle.scaleTo(28)
 		walletInfo.title.text = currentType

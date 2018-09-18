@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toLongOrZero
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.isNullValue
+import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -13,6 +13,7 @@ import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
+import java.math.BigInteger
 
 
 /**
@@ -31,10 +32,10 @@ data class EOSAccountTable(
 	val netLimit: ResourceLimit,
 	@Embedded(prefix = "cpuLimit")
 	val cpuLimit: ResourceLimit,
-	val ramUsed: Long,
-	val ramQuota: Long,
-	val cpuWeight: Long,
-	val netWeight: Long,
+	val ramUsed: BigInteger,
+	val ramQuota: BigInteger,
+	val cpuWeight: BigInteger,
+	val netWeight: BigInteger,
 	@Embedded(prefix = "totalResource")
 	val totalResource: TotalResources,
 	@Embedded(prefix = "delegateInfo")
@@ -54,10 +55,10 @@ data class EOSAccountTable(
 		data.safeGet("created"),
 		ResourceLimit(JSONObject(data.safeGet("net_limit"))),
 		ResourceLimit(JSONObject(data.safeGet("cpu_limit"))),
-		data.safeGet("ram_usage").toLongOrZero(),
-		data.safeGet("ram_quota").toLongOrZero(),
-		data.safeGet("cpu_weight").toLongOrZero(),
-		data.safeGet("net_weight").toLongOrZero(),
+		data.safeGet("ram_usage").toBigIntegerOrZero(),
+		data.safeGet("ram_quota").toBigIntegerOrZero(),
+		data.safeGet("cpu_weight").toBigIntegerOrZero(),
+		data.safeGet("net_weight").toBigIntegerOrZero(),
 		TotalResources(JSONObject(data.safeGet("total_resources"))),
 		checkDelegateBandWidthDataOrGetObject(data),
 		checkVoterDataOrGetObject(data),

@@ -11,13 +11,13 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -51,7 +51,6 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
-				true,
 				{ error, reason ->
 					fragment.context?.apply {
 						GoldStoneDialog.chainError(reason, error, this)
@@ -66,7 +65,6 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				TokenContract(token?.contract),
 				Config.getCurrentETCAddress(),
-				true,
 				{ error, reason ->
 					fragment.context?.apply {
 						GoldStoneDialog.chainError(reason, error, this)
@@ -83,7 +81,6 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				TokenContract(token?.contract),
 				Config.getCurrentEthereumAddress(),
-				true,
 				{ error, reason ->
 					fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
 				}
@@ -92,7 +89,6 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				MyTokenTable.getBalanceByContract(
 					TokenContract.getETH(),
 					Config.getCurrentEthereumAddress(),
-					true,
 					{ error, reason ->
 						LogUtil.error("checkBalanceIsValid $reason", error)
 					}
@@ -151,8 +147,7 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	hold: (String?) -> Unit
 ) {
 	doAsync {
-		val isSingleChainWallet =
-			!Config.getCurrentWalletType().equals(WalletType.Bip44MultiChain.content, true)
+		val isSingleChainWallet = !WalletType(Config.getCurrentWalletType()).isBIP44()
 		// 获取当前账户的私钥
 		fragment.context?.getPrivateKey(
 			getETHERC20OrETCAddress(),
@@ -246,7 +241,7 @@ private fun GasSelectionPresenter.prepareReceiptModel(
 	return ReceiptModel(
 		raw.fromAddress,
 		raw.toWalletAddress,
-		(raw.gasLimit * raw.gasPrice).toDouble().toEthCount().toBigDecimal().toString(),
+		(raw.gasLimit * raw.gasPrice).toEthCount().toBigDecimal().toPlainString(),
 		value,
 		getToken()!!,
 		taxHash,
@@ -311,8 +306,7 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			timeStamp =
 				(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 			fromAddress = getETHERC20OrETCAddress()
-			this.value = CryptoUtils
-				.toCountByDecimal(value.toDouble(), token!!.decimal).formatCount()
+			this.value = CryptoUtils.toCountByDecimal(value, token!!.decimal).formatCount()
 			hash = taxHash
 			gasPrice = getSelectedGasPrice(currentMinerType).toString()
 			gasUsed = raw.gasLimit.toString()

@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog.Companion.chainError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -10,7 +9,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -18,6 +16,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @date 23/03/2018 11:57 PM
@@ -38,33 +37,39 @@ data class WalletDetailCellModel(
 
 	constructor(
 		data: DefaultTokenTable,
-		balance: Double,
-		eosWalletType: EOSWalletType,
-		countHasDecimal: Boolean = false
+		amount: BigInteger,
+		eosWalletType: EOSWalletType
 	) : this(
 		data.iconUrl,
 		data.symbol,
 		data.name,
 		data.decimals,
-		if (countHasDecimal) balance else CryptoUtils.toCountByDecimal(balance, data.decimals),
+		CryptoUtils.toCountByDecimal(amount, data.decimals),
 		data.price,
-		CryptoUtils.formatDouble(
-			countHasDecimal.convertBalance(balance, data.decimals) * data.price
-		),
+		CryptoUtils.toCountByDecimal(amount, data.decimals) * data.price,
+		data.contract,
+		data.weight,
+		eosWalletType
+	)
+
+	constructor(
+		data: DefaultTokenTable,
+		balance: Double,
+		eosWalletType: EOSWalletType
+	) : this(
+		data.iconUrl,
+		data.symbol,
+		data.name,
+		data.decimals,
+		balance,
+		data.price,
+		balance * data.price,
 		data.contract,
 		data.weight,
 		eosWalletType
 	)
 
 	companion object {
-		fun Boolean.convertBalance(balance: Double, decimal: Int): Double {
-			return if (this) {
-				balance.formatCount(9).toDoubleOrNull().orElse(0.0)
-			} else {
-				CryptoUtils.formatDouble(balance / Math.pow(10.0, decimal.toDouble()))
-			}
-		}
-
 		fun getLocalModels(hold: (List<WalletDetailCellModel>) -> Unit) {
 			MyTokenTable.getMyTokens { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
@@ -102,8 +107,7 @@ data class WalletDetailCellModel(
 												completeMark()
 											}
 										} else {
-											val hasDecimal = type == EOSWalletType.Available
-											tokenList.add(WalletDetailCellModel(targetToken, token.balance, type, hasDecimal))
+											tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
 											completeMark()
 										}
 									}
@@ -148,7 +152,7 @@ data class WalletDetailCellModel(
 								override fun concurrentJobs() {
 									myTokens.forEach { token ->
 										val type =
-											if (token.contract == TokenContract.eosContract) eosWalletType
+											if (TokenContract(token.contract).isEOS()) eosWalletType
 											else EOSWalletType.None
 										localTokens.find {
 											it.contract.equals(token.contract, true)
@@ -157,7 +161,6 @@ data class WalletDetailCellModel(
 											MyTokenTable.getBalanceByContract(
 												TokenContract(targetToken.contract),
 												token.ownerName,
-												false,
 												{ error, reason ->
 													// 如果出错的话余额暂时设定用旧的值
 													tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
@@ -172,10 +175,7 @@ data class WalletDetailCellModel(
 													token.ownerName,
 													TokenContract(targetToken.contract)
 												)
-												val hasDecimal = type == EOSWalletType.Available
-												tokenList.add(
-													WalletDetailCellModel(targetToken, balance, type, hasDecimal)
-												)
+												tokenList.add(WalletDetailCellModel(targetToken, balance, type))
 												completeMark()
 											}
 										}

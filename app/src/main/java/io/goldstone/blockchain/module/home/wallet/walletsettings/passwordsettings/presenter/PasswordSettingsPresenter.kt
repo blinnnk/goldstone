@@ -9,14 +9,14 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.WalletType
+import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.keystore.updatePassword
 import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -79,9 +79,9 @@ class PasswordSettingsPresenter(
 		wallet: WalletTable,
 		passwordHint: String
 	) {
-		when (type) {
+		when {
 			// 删除多链钱包下的所有地址对应的数据
-			WalletType.Bip44MultiChain -> {
+			type.isBIP44() -> {
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount = 4
 					override fun concurrentJobs() {

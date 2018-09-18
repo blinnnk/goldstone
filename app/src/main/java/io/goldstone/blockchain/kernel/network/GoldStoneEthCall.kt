@@ -14,7 +14,10 @@ import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.MultiChainType
-import io.goldstone.blockchain.crypto.utils.*
+import io.goldstone.blockchain.crypto.utils.hexToDecimal
+import io.goldstone.blockchain.crypto.utils.toAscii
+import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
+import io.goldstone.blockchain.crypto.utils.toIntFromHex
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.callChainBy
 import okhttp3.MediaType
@@ -166,7 +169,7 @@ object GoldStoneEthCall {
 		blockHash: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
-		holdValue: (Long) -> Unit
+		holdValue: (BigInteger) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -189,7 +192,7 @@ object GoldStoneEthCall {
 		) {
 			if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
 			else {
-				holdValue(JSONObject(it).safeGet("timestamp").hexToLong())
+				holdValue(JSONObject(it).safeGet("timestamp").hexToDecimal())
 			}
 		}
 	}
@@ -334,7 +337,7 @@ object GoldStoneEthCall {
 		address: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
-		holdValue: (Double) -> Unit
+		holdValue: (BigInteger) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -447,7 +450,7 @@ object GoldStoneEthCall {
 		address: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
-		holdValue: (Double) -> Unit
+		holdValue: (BigInteger) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -475,7 +478,7 @@ object GoldStoneEthCall {
 		contractAddress: String,
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
 		chainName: String,
-		holdValue: (Double) -> Unit
+		holdValue: (BigInteger) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(

@@ -11,10 +11,9 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -117,7 +116,7 @@ class TokenDetailPresenter(
 				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
 				// `ETHERC20OrETC` 需要使用到 `localData`
 				when {
-					CoinSymbol(token?.symbol).isBTCSeries() -> {
+					TokenContract(token?.contract).isBTCSeries() -> {
 						// This localDataMaxIndex is BTCSeries Transactions Only
 						val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
@@ -186,37 +185,18 @@ class TokenDetailPresenter(
 			localEOSSeriesData: List<EOSTransactionTable>?
 		) -> Unit = { _, _, _ -> }
 	) {
-		when (Config.getCurrentWalletType()) {
-			WalletType.Bip44MultiChain.content, WalletType.MultiChain.content -> {
+		val walletType = WalletType(Config.getCurrentWalletType())
+		val coin = TokenContract(token?.contract)
+		when {
+			walletType.isBIP44() || walletType.isMultiChain() -> {
 				when {
-					TokenContract(token?.contract).isETC() ->
-						getETHERC20OrETCData(Config.getCurrentETCAddress()) {
+					coin.isETC() ->
+						getETHERC20OrETCData(coin.getAddress()) {
 							callback(it, null, null)
 						}
 
-					TokenContract(token?.contract).isBTC() -> {
-						getBTCSeriesData(
-							AddressUtils.getCurrentBTCAddress(),
-							MultiChainType.BTC.id
-						) {
-							callback(null, it, null)
-						}
-					}
-
-					TokenContract(token?.contract).isLTC() -> {
-						getBTCSeriesData(
-							AddressUtils.getCurrentLTCAddress(),
-							MultiChainType.LTC.id
-						) {
-							callback(null, it, null)
-						}
-					}
-
-					TokenContract(token?.contract).isBCH() -> {
-						getBTCSeriesData(
-							AddressUtils.getCurrentBCHAddress(),
-							MultiChainType.BCH.id
-						) {
+					coin.isBTCSeries() -> {
+						getBTCSeriesData(coin) {
 							callback(null, it, null)
 						}
 					}
@@ -231,45 +211,19 @@ class TokenDetailPresenter(
 				}
 			}
 
-			WalletType.BCHOnly.content ->
-				getBTCSeriesData(
-					Config.getCurrentBCHAddress(),
-					MultiChainType.BCH.id
-				) {
+			coin.isBTCSeries() ->
+				getBTCSeriesData(coin) {
 					callback(null, it, null)
 				}
 
-			WalletType.ETHERCAndETCOnly.content ->
+			coin.isEOS() -> getEOSSeriesData {
+				callback(null, null, it)
+			}
+
+			walletType.isETHSeries() ->
 				getETHERC20OrETCData(Config.getCurrentEthereumAddress()) {
 					callback(it, null, null)
 				}
-
-			WalletType.BTCTestOnly.content -> {
-				getBTCSeriesData(
-					Config.getCurrentBTCSeriesTestAddress(),
-					MultiChainType.BTC.id
-				) {
-					callback(null, it, null)
-				}
-			}
-
-			WalletType.BTCOnly.content -> {
-				getBTCSeriesData(
-					Config.getCurrentBTCAddress(),
-					MultiChainType.BTC.id
-				) {
-					callback(null, it, null)
-				}
-			}
-
-			WalletType.LTCOnly.content -> {
-				getBTCSeriesData(
-					Config.getCurrentLTCAddress(),
-					MultiChainType.LTC.id
-				) {
-					callback(null, it, null)
-				}
-			}
 		}
 	}
 
@@ -315,12 +269,11 @@ class TokenDetailPresenter(
 	}
 
 	private fun getBTCSeriesData(
-		address: String,
-		chainType: Int,
+		coin: TokenContract,
 		callback: (List<BTCSeriesTransactionTable>) -> Unit
 	) {
 		BTCSeriesTransactionTable
-			.getTransactionsByAddressAndChainType(address, chainType) { transactions ->
+			.getTransactionsByAddressAndChainType(coin.getAddress(), coin.getChainType().id) { transactions ->
 				transactions.isNotEmpty() isTrue {
 					fragment.updatePageBy(
 						transactions.asSequence().map {
@@ -328,7 +281,7 @@ class TokenDetailPresenter(
 						}.sortedByDescending {
 							it.timeStamp
 						}.toList(),
-						address
+						coin.getAddress()
 					)
 					fragment.removeLoadingView()
 				}

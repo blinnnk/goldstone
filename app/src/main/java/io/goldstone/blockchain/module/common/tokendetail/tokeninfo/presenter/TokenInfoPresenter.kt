@@ -100,7 +100,7 @@ class TokenInfoPresenter(
 	}
 
 	private fun showTransactionInfo() {
-		val chainType = TokenContract(tokenInfo?.contract).getCurrentChainType().id
+		val chainType = TokenContract(tokenInfo?.contract).getChainType().id
 		when {
 			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->

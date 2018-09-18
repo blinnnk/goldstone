@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -56,57 +55,44 @@ class SplashPresenter(val activity: SplashActivity) {
 		wallet: WalletTable,
 		callback: () -> Unit
 	) {
-		val type = wallet.getTargetWalletType()
-		when (type) {
-			WalletType.BTCTestOnly -> NodeSelectionPresenter.setAllTestnet {
+		val type = wallet.getWalletType()
+		type.updateSharedPreference()
+		when {
+			type.isBTCTest() -> NodeSelectionPresenter.setAllTestnet {
 				cacheWalletData(wallet, callback)
-				Config.updateCurrentWalletType(WalletType.BTCTestOnly.content)
 			}
-			WalletType.BTCOnly -> NodeSelectionPresenter.setAllMainnet {
+			type.isBTC() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
-				Config.updateCurrentWalletType(WalletType.BTCOnly.content)
 			}
-
-			WalletType.LTCOnly -> NodeSelectionPresenter.setAllMainnet {
+			type.isLTC() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
-				Config.updateCurrentWalletType(WalletType.LTCOnly.content)
 			}
-
-			WalletType.EOSOnly -> NodeSelectionPresenter.setAllMainnet {
+			type.isEOS() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
-				Config.updateCurrentWalletType(WalletType.EOSOnly.content)
 			}
-
-			WalletType.BCHOnly -> NodeSelectionPresenter.setAllMainnet {
+			type.isBCH() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
-				Config.updateCurrentWalletType(WalletType.BCHOnly.content)
 			}
-
-			WalletType.ETHERCAndETCOnly -> {
+			type.isETHSeries() -> {
 				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}
-				Config.updateCurrentWalletType(WalletType.ETHERCAndETCOnly.content)
 			}
-
-			WalletType.Bip44MultiChain -> {
+			type.isBIP44() -> {
 				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}
-				Config.updateCurrentWalletType(WalletType.Bip44MultiChain.content)
 			}
-
-			WalletType.MultiChain -> {
+			type.isMultiChain() -> {
 				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}
-				Config.updateCurrentWalletType(WalletType.MultiChain.content)
 			}
 		}
 	}

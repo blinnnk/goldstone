@@ -58,10 +58,18 @@ private fun loadTransactionsFromChain(
 		pageInfo.to,
 		errorCallback
 	) { transactionList ->
+		/**
+		 * @Important
+		 * 通过 `EOS History Chain` 获取的转账历史数据会出现重复的情况, 具体原因还不详
+		 * 这里先在本地做去重复处理, 但是问题依旧, 并且拉取重复的数据很消耗流量.
+		 * 需要时刻跟进随时更改这里的实现.
+		 * */
 		// Calculate All Inputs to get transfer value
-		successCallback(transactionList.map {
-			// 插入转账数据到数据库
-			EOSTransactionTable.preventDuplicateInsert(accountName, it)
-		}.isNotEmpty())
+		successCallback(
+			transactionList.asSequence().distinctBy { it.txID }.map {
+				// 插入转账数据到数据库
+				EOSTransactionTable.preventDuplicateInsert(accountName, it)
+			}.toList().isNotEmpty()
+		)
 	}
 }
