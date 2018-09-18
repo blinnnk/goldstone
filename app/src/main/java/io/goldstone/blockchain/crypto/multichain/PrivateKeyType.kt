@@ -8,7 +8,7 @@ import java.io.Serializable
  * @date  2018/09/07
  */
 enum class PrivateKeyType(val content: String) : Serializable {
-	ETHERCAndETC("ETH, ERC20 And ETC"),
+	ETHSeries("ETH, ERC20 And ETC"),
 	BTCEOSAndBCH("BTC, EOS And BCH"),
 	BTC("BTC"),
 	BCH("BCH"),

@@ -97,33 +97,13 @@ class CoinSymbol(val symbol: String?) : Serializable {
 	}
 }
 
-fun CoinSymbol?.isEOS(): Boolean {
-	return this?.symbol.equals(CoinSymbol.eos, true)
-}
-
-fun CoinSymbol?.isETH(): Boolean {
-	return this?.symbol.equals(CoinSymbol.etc, true)
-}
-
-fun CoinSymbol?.isBTC(): Boolean {
-	return this?.symbol.equals(CoinSymbol.btc(), true)
-}
-
-fun CoinSymbol?.isLTC(): Boolean {
-	return this?.symbol.equals(CoinSymbol.ltc, true)
-}
-
-fun CoinSymbol?.isBCH(): Boolean {
-	return this?.symbol.equals(CoinSymbol.bch, true)
-}
-
-fun CoinSymbol?.isETC(): Boolean {
-	return this?.symbol.equals(CoinSymbol.etc, true)
-}
-
-fun CoinSymbol?.isBTCSeries(): Boolean {
-	return CoinSymbol.allBTCSeriesSymbol().any { it.equals(this?.symbol, true) }
-}
+fun CoinSymbol?.isEOS() = this?.symbol.equals(CoinSymbol.eos, true)
+fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.etc, true)
+fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.btc(), true)
+fun CoinSymbol?.isLTC() = this?.symbol.equals(CoinSymbol.ltc, true)
+fun CoinSymbol?.isBCH() = this?.symbol.equals(CoinSymbol.bch, true)
+fun CoinSymbol?.isETC() = this?.symbol.equals(CoinSymbol.etc, true)
+fun CoinSymbol?.isBTCSeries() = CoinSymbol.allBTCSeriesSymbol().any { it.equals(this?.symbol, true) }
 
 fun CoinSymbol?.getContract(): TokenContract? {
 	return when {
@@ -139,7 +119,7 @@ fun CoinSymbol?.getContract(): TokenContract? {
 			TokenContract.getETH()
 		CoinSymbol(this?.symbol).isEOS() ->
 			TokenContract.getEOS()
-		else -> null
+		else -> null // ERC20 Token 返回 `null`
 	}
 }
 

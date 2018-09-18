@@ -164,7 +164,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 			object : RadioDashboard() {
 				override val cellContent =
 					arrayListOf(
-						PrivateKeyType.ETHERCAndETC.content,
+						PrivateKeyType.ETHSeries.content,
 						CoinSymbol.updateSymbolIfInReview(PrivateKeyType.BTC.content),
 						CoinSymbol.updateSymbolIfInReview(PrivateKeyType.AllBTCSeriesTest.content, true),
 						PrivateKeyType.LTC.content,

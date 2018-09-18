@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
@@ -104,7 +103,7 @@ class AddressSelectionPresenter(
 				return
 			}
 
-			AddressType.ETHERCOrETC -> {
+			AddressType.ETHSeries -> {
 				if (token?.contract.isBTCSeries() || token?.contract.isEOS()) {
 					fragment.context.alert("this is not a valid bitcoin address")
 					return
