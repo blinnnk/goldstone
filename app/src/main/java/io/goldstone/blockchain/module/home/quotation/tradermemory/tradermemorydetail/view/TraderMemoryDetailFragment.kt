@@ -2,12 +2,15 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemoryd
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
 
+/**
+ * @date 18/09/2018 6:36 PM
+ * @author wcx
+ */
 class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 	override val presenter: TraderMemoryDetailPresenter = TraderMemoryDetailPresenter(this)
 

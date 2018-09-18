@@ -10,8 +10,8 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.TraderMemoryDe
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
 
 /**
- * @date 21/04/2018 4:14 PM
- * @author KaySaith
+ * @date 18/09/2018 6:36 PM
+ * @author wcx
  */
 class TraderMemoryOverlayFragment : BaseOverlayFragment<TraderMemoryOverlayPresenter>() {
 
