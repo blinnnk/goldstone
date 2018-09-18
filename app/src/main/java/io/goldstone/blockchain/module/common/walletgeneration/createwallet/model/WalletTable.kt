@@ -607,7 +607,13 @@ data class WalletTable(
 			@UiThread callback: (hasDefaultAccount: Boolean) -> Unit
 		) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().updateCurrentEOSAccountNames(accountNames)
+				GoldStoneDataBase.database.walletDao().apply {
+					// 增量存储同一公钥下的多 `AccountName`
+					var currentAccountNames =
+						getWalletByAddress(Config.getCurrentEOSAddress())?.eosAccountNames ?: listOf()
+					currentAccountNames += accountNames
+					updateCurrentEOSAccountNames(currentAccountNames)
+				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.size == 1) {
 					val accountName = accountNames.first().name

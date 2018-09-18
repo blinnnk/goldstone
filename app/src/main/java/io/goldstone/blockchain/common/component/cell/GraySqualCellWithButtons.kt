@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.cell
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -48,7 +49,8 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 	protected val description by lazy {
 		TextView(context).apply {
 			textSize = fontSize(11)
-			typeface = GoldStoneFont.heavy(context)
+			typeface = GoldStoneFont.medium(context)
+			setTypeface(typeface, Typeface.ITALIC)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			gravity = Gravity.CENTER_VERTICAL
 			visibility = View.GONE
@@ -114,13 +116,12 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 		updateStyle(Normal, true)
 	}
 
-	fun showDescriptionTitle(text: String, color: Int = GrayScale.gray) {
+	fun showDescriptionTitle(text: String, color: Int = GrayScale.midGray) {
 		description.visibility = View.VISIBLE
 		description.text = text
 		description.textColor = color
-		subtitle.y -= 6.uiPX()
-		description.y += 7.uiPX()
-
+		subtitle.y -= 5.uiPX()
+		description.y += 8.uiPX()
 	}
 
 	fun setSubtitle(text: String) {

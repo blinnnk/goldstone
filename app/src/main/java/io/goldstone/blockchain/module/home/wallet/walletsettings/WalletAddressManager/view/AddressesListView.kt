@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
@@ -28,6 +29,8 @@ class AddressesListView(
 	maxCount: Int = 4,
 	private val hold: (
 		cell: GraySquareCellWithButtons,
+		data: Pair<String, String>,
+		wallet: WalletTable?,
 		isDefault: Boolean
 	) -> Unit
 ) : TopBottomLineCell(context) {
@@ -36,11 +39,12 @@ class AddressesListView(
 		lparams(matchParent, matchParent)
 	}
 	var checkAllEvent: Runnable? = null
-	var currentAddresses: List<String>? = null
+	var currentWallet: WalletTable? = null
+	private val currentAddresses by lazy { currentWallet?.getCurrentAddresses() }
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
-			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
+			// 如果是当前使用的多链那么 `data.second`` 会是对应的链的缩写用此判断做缩进
 			if (isNotEmpty() && firstOrNull()?.second?.toIntOrNull().isNull()) hideButton()
 			else updateButtonTitle("${CommonText.checkAll} (${model?.size})")
 			// 计算最大显示个数
@@ -63,8 +67,8 @@ class AddressesListView(
 						context.clickToCopy(data.first)
 						copyButton.preventDuplicateClicks()
 					}
-					hold(this, isDefault)
-					setTitle("${data.second}.")
+					hold(this, data, currentWallet, isDefault)
+					setTitle(data.second)
 					setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 12))
 				}.into(cellLayout)
 			}

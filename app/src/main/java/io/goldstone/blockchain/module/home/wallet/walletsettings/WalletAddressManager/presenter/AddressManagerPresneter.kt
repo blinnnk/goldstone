@@ -3,12 +3,15 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressm
 import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
@@ -23,9 +26,11 @@ import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.getTargetKeyName
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -48,6 +53,19 @@ class AddressManagerPresenter(
 		super.onFragmentShowFromHidden()
 		setBackEvent()
 		if (WalletType(Config.getCurrentWalletType()).isBIP44()) fragment.showCreatorDashboard()
+	}
+
+	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
+		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
+			EOSAPI.getAccountNameByPublicKey(
+				key,
+				{ LogUtil.error("showEOSPublickeyDescription", it) }
+			) { chainNames ->
+				WalletTable.updateEOSAccountName(chainNames) {
+					val description = if (it) "available publickey" else "inactivation publickey"
+					cell.showDescriptionTitle(description)
+				}
+			} else cell.showDescriptionTitle("available publickey")
 	}
 
 	fun setBackEvent() {

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import java.io.Serializable
 
@@ -25,6 +26,18 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 
+	fun isCurrent(): Boolean {
+		return when (id) {
+			btcMain, btcTest -> id.equals(Config.getBTCCurrentChain(), true)
+			ltcMain, ltcTest -> id.equals(Config.getLTCCurrentChain(), true)
+			bchMain, bchTest -> id.equals(Config.getBCHCurrentChain(), true)
+			ethMain, ropsten, rinkeby, kovan -> id.equals(Config.getCurrentChain(), true)
+			etcMain, etcTest -> id.equals(Config.getETCCurrentChain(), true)
+			eosMain, eosTest -> id.equals(Config.getEOSCurrentChain(), true)
+			else -> false
+		}
+	}
+
 	fun getContract(): String? {
 		return when (id) {
 			etcMain, etcTest -> TokenContract.etcContract
@@ -33,6 +46,18 @@ class ChainID(val id: String) : Serializable {
 			bchMain, bchTest -> TokenContract.bchContract
 			eosMain, eosTest -> TokenContract.eosContract
 			else -> null
+		}
+	}
+
+	fun getCurrentAddress(): String {
+		return when (id) {
+			etcMain, etcTest -> Config.getCurrentETCAddress()
+			btcTest, ltcTest, bchTest -> Config.getCurrentBTCSeriesTestAddress()
+			btcMain -> Config.getCurrentBTCAddress()
+			ltcMain -> Config.getCurrentLTCAddress()
+			bchMain -> Config.getCurrentBCHAddress()
+			eosMain, eosTest -> Config.getCurrentEOSAddress()
+			else -> Config.getCurrentETCAddress()
 		}
 	}
 

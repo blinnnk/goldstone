@@ -46,14 +46,16 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private val currentMultiChainAddressesView by lazy {
-		AddressesListView(context!!, 7) { cell, isDefault ->
-			val chainType = ChainType.getChainTypeBySymbol(cell.getTitle())
+		AddressesListView(context!!, 7) { cell, data, wallet, isDefault ->
+			val chainType = ChainType.getChainTypeBySymbol(data.second)
 			// EOS 需要在默认地址中显示激活状态
-			if (CoinSymbol(cell.getTitle()).isEOS()) cell.showDescriptionTitle("inactivation publickey")
+			if (CoinSymbol(data.second).isEOS()) {
+				presenter.showEOSPublickeyDescription(cell, data.first, wallet)
+			}
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					chainType,
 					!isDefault
 				)
@@ -69,11 +71,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 	private val ethSeriesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
+		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.ETH.id,
 					!isDefault
 				)
@@ -82,11 +84,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 	private val etcAddressesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
+		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.ETC.id,
 					!isDefault
 				)
@@ -95,11 +97,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 	private val btcAddressesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
+		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.BTC.id,
 					!isDefault
 				)
@@ -108,11 +110,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 	private val ltcAddressesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
+		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.LTC.id,
 					!isDefault
 				)
@@ -122,12 +124,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private val eosAddressesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
-			cell.showDescriptionTitle("inactivation publickey")
+		AddressesListView(context!!, 3) { cell, data, wallet, isDefault ->
+			presenter.showEOSPublickeyDescription(cell, data.first, wallet)
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.EOS.id,
 					!isDefault
 				)
@@ -137,11 +139,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private val bchAddressesView by lazy {
-		AddressesListView(context!!, 3) { cell, isDefault ->
+		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					cell.getSubtitle(),
+					data.first,
 					MultiChainType.BCH.id,
 					!isDefault
 				)
@@ -161,29 +163,28 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				topPadding = 20.uiPX()
 				// 不为空才显示 `bip44` 规则的子地址界面
 				WalletTable.getCurrentWallet {
-					val walletCurrentAddresses = getCurrentAddresses()
 					currentMultiChainAddressesView.into(this@parent)
-					currentMultiChainAddressesView.currentAddresses = walletCurrentAddresses
+					currentMultiChainAddressesView.currentWallet = this
 					presenter.getMultiChainAddresses(this)
 					if (ethAddresses.isNotEmpty()) {
 						// ETHSeries List
 						ethSeriesView.into(this@parent)
-						ethSeriesView.currentAddresses = walletCurrentAddresses
+						ethSeriesView.currentWallet = this
 						ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 						presenter.getEthereumAddresses(this)
 						// ETC List
 						etcAddressesView.into(this@parent)
-						etcAddressesView.currentAddresses = walletCurrentAddresses
+						etcAddressesView.currentWallet = this
 						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 						presenter.getEthereumClassicAddresses(this)
 						// BTC List
 						btcAddressesView.into(this@parent)
-						btcAddressesView.currentAddresses = walletCurrentAddresses
+						btcAddressesView.currentWallet = this
 						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						// EOS List
 						eosAddressesView.into(this@parent)
-						eosAddressesView.currentAddresses = walletCurrentAddresses
+						eosAddressesView.currentWallet = this
 						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 						presenter.getEOSAddresses(this)
 						if (!Config.isTestEnvironment()) {
@@ -191,12 +192,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
 							// BCH List
 							bchAddressesView.into(this@parent)
-							bchAddressesView.currentAddresses = walletCurrentAddresses
+							bchAddressesView.currentWallet = this
 							bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 							presenter.getBitcoinCashAddresses(this)
 							// LTC List
 							ltcAddressesView.into(this@parent)
-							ltcAddressesView.currentAddresses = walletCurrentAddresses
+							ltcAddressesView.currentWallet = this
 							ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 							presenter.getLitecoinAddresses(this)
 						} else {

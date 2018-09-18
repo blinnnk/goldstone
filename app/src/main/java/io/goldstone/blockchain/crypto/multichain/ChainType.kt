@@ -102,7 +102,6 @@ class ChainType(val id: Int) : Serializable {
 					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
 					// 好在其他流程中重新走检查 `Account Name` 的逻辑
 					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
-					currentWallet?.eosAccountNames = listOf()
 					Config.updateCurrentEOSAddress(newAddress)
 				}
 				MultiChainType.BTC.id -> {

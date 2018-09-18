@@ -53,7 +53,8 @@ object EOSAPI {
 					getAccountInfoByName(accountName, errorCallBack, "", hold)
 					hasRetry = true
 				}
-				hold(EOSAccountTable(JSONObject(result)))
+				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
+				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
 			}
 		}
 	}
@@ -84,7 +85,7 @@ object EOSAPI {
 				}
 				// 生成指定的包含链信息的结果类型
 				val accountNames =
-					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain()) }
+					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain(), Config.getCurrentEOSAddress()) }
 				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 			}
 		}
