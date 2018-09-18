@@ -10,116 +10,6 @@ import java.io.Serializable
  * @date  2018/09/14
  */
 class TokenContract(val contract: String?) : Serializable {
-	fun isEOS(): Boolean {
-		return contract.equals(eosContract, true)
-	}
-
-	fun isETH(): Boolean {
-		return contract.equals(ethContract, true)
-	}
-
-	fun isBTC(): Boolean {
-		return contract.equals(btcContract, true)
-	}
-
-	fun isLTC(): Boolean {
-		return contract.equals(ltcContract, true)
-	}
-
-	fun isBCH(): Boolean {
-		return contract.equals(bchContract, true)
-	}
-
-	fun isETC(): Boolean {
-		return contract.equals(etcContract, true)
-	}
-
-	// 在 `Ethereum` 或 `Ethereum Classic` 的链下使用
-	fun isERC20Token(): Boolean {
-		return (!TokenContract(contract).isETH() && !TokenContract(contract).isETC())
-	}
-
-	fun isBTCSeries(): Boolean {
-		return isBTCSeries(contract!!)
-	}
-
-	fun getCurrentChainID(): String {
-		return when {
-			contract.equals(etcContract, true) -> Config.getETCCurrentChain()
-			contract.equals(btcContract, true) -> Config.getBTCCurrentChain()
-			contract.equals(ltcContract, true) -> Config.getLTCCurrentChain()
-			contract.equals(bchContract, true) -> Config.getBCHCurrentChain()
-			contract.equals(eosContract, true) -> Config.getEOSCurrentChain()
-			contract.equals(ethContract, true) -> Config.getCurrentChain()
-			else -> Config.getCurrentChain() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-		}
-	}
-
-	fun getCurrentChainName(): String {
-		return when {
-			contract.equals(etcContract, true) -> Config.getETCCurrentChainName()
-			contract.equals(btcContract, true) -> Config.getBTCCurrentChainName()
-			contract.equals(ltcContract, true) -> Config.getLTCCurrentChainName()
-			contract.equals(bchContract, true) -> Config.getBCHCurrentChainName()
-			contract.equals(eosContract, true) -> Config.getEOSCurrentChainName()
-			contract.equals(ethContract, true) -> Config.getCurrentChainName()
-			else -> Config.getCurrentChainName() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-		}
-	}
-
-	fun getMainnetChainID(): String {
-		return when {
-			contract.equals(etcContract, true) -> ChainID.etcMain
-			contract.equals(btcContract, true) -> ChainID.btcMain
-			contract.equals(ltcContract, true) -> ChainID.ltcMain
-			contract.equals(bchContract, true) -> ChainID.bchMain
-			contract.equals(eosContract, true) -> ChainID.eosMain
-			else -> ChainID.ethMain
-		}
-	}
-
-	fun getChainType(): MultiChainType {
-		return when {
-			contract.equals(etcContract, true) -> MultiChainType.ETC
-			contract.equals(btcContract, true) -> MultiChainType.BTC
-			contract.equals(ltcContract, true) -> MultiChainType.LTC
-			contract.equals(bchContract, true) -> MultiChainType.BCH
-			contract.equals(eosContract, true) -> MultiChainType.EOS
-			contract.equals(ethContract, true) -> MultiChainType.ETH
-			else -> MultiChainType.ETH // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-		}
-	}
-
-	fun getAddress(isEOSAccountName: Boolean = true): String {
-		return when {
-			TokenContract(contract).isBTC() ->
-				AddressUtils.getCurrentBTCAddress()
-			TokenContract(contract).isLTC() ->
-				AddressUtils.getCurrentLTCAddress()
-			TokenContract(contract).isBCH() ->
-				AddressUtils.getCurrentBCHAddress()
-			TokenContract(contract).isETC() ->
-				Config.getCurrentETCAddress()
-			TokenContract(contract).isEOS() ->
-				if (isEOSAccountName) Config.getCurrentEOSName()
-				else Config.getCurrentEOSAddress()
-			else ->
-				Config.getCurrentEthereumAddress()
-		}
-	}
-
-	fun getDecimal(): Int? {
-		return when {
-			contract.equals(etcContract, true) -> CryptoValue.etcDecimal
-			contract.equals(btcContract, true) -> CryptoValue.btcSeriesDecimal
-			contract.equals(ltcContract, true) -> CryptoValue.btcSeriesDecimal
-			contract.equals(bchContract, true) -> CryptoValue.btcSeriesDecimal
-			contract.equals(eosContract, true) -> CryptoValue.eosDecimal
-			contract.equals(ethContract, true) -> CryptoValue.ethDecimal
-			else -> null // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-		}
-	}
-
 	companion object {
 		fun getETH(): TokenContract = TokenContract(TokenContract.ethContract)
 		fun getETC(): TokenContract = TokenContract(TokenContract.etcContract)
@@ -135,8 +25,132 @@ class TokenContract(val contract: String?) : Serializable {
 		const val bchContract = "0x145"
 		const val eosContract = "0x194"
 		@JvmStatic
-		val isBTCSeries: (contract: String) -> Boolean = { contract ->
+		val isBTCSeries: (contract: String?) -> Boolean = { contract ->
 			listOf(btcContract, ltcContract, bchContract).any { it.equals(contract, true) }
 		}
+	}
+}
+
+fun TokenContract?.orEmpty() = TokenContract("")
+
+fun TokenContract?.isEOS(): Boolean {
+	return this?.contract.equals(TokenContract.eosContract, true)
+}
+
+fun TokenContract?.isETH(): Boolean {
+	return this?.contract.equals(TokenContract.ethContract, true)
+}
+
+fun TokenContract?.isBTC(): Boolean {
+	return this?.contract.equals(TokenContract.btcContract, true)
+}
+
+fun TokenContract?.isLTC(): Boolean {
+	return this?.contract.equals(TokenContract.ltcContract, true)
+}
+
+fun TokenContract?.isBCH(): Boolean {
+	return this?.contract.equals(TokenContract.bchContract, true)
+}
+
+fun TokenContract?.isETC(): Boolean {
+	return this?.contract.equals(TokenContract.etcContract, true)
+}
+
+// 在 `Ethereum` 或 `Ethereum Classic` 的链下使用
+fun TokenContract?.isERC20Token(): Boolean {
+	return (!isETH() && !isETC())
+}
+
+fun TokenContract?.isBTCSeries(): Boolean {
+	return TokenContract.isBTCSeries(this?.contract)
+}
+
+fun TokenContract?.getChainType(): MultiChainType {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> MultiChainType.ETC
+		this?.contract.equals(TokenContract.btcContract, true) -> MultiChainType.BTC
+		this?.contract.equals(TokenContract.ltcContract, true) -> MultiChainType.LTC
+		this?.contract.equals(TokenContract.bchContract, true) -> MultiChainType.BCH
+		this?.contract.equals(TokenContract.eosContract, true) -> MultiChainType.EOS
+		this?.contract.equals(TokenContract.ethContract, true) -> MultiChainType.ETH
+		else -> MultiChainType.ETH // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+	}
+}
+
+fun TokenContract?.getSymbol(): CoinSymbol {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> CoinSymbol.getETC()
+		this?.contract.equals(TokenContract.btcContract, true) -> CoinSymbol.getBTC()
+		this?.contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.getLTC()
+		this?.contract.equals(TokenContract.bchContract, true) -> CoinSymbol.getBCH()
+		this?.contract.equals(TokenContract.eosContract, true) -> CoinSymbol.getEOS()
+		this?.contract.equals(TokenContract.ethContract, true) -> CoinSymbol.getETH()
+		else -> CoinSymbol.getETH() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+	}
+}
+
+fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
+	return when {
+		TokenContract(this?.contract).isBTC() ->
+			AddressUtils.getCurrentBTCAddress()
+		TokenContract(this?.contract).isLTC() ->
+			AddressUtils.getCurrentLTCAddress()
+		TokenContract(this?.contract).isBCH() ->
+			AddressUtils.getCurrentBCHAddress()
+		TokenContract(this?.contract).isETC() ->
+			Config.getCurrentETCAddress()
+		TokenContract(this?.contract).isEOS() ->
+			if (isEOSAccountName) Config.getCurrentEOSName()
+			else Config.getCurrentEOSAddress()
+		else ->
+			Config.getCurrentEthereumAddress()
+	}
+}
+
+fun TokenContract?.getCurrentChainID(): ChainID {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> Config.getETCCurrentChain()
+		this?.contract.equals(TokenContract.btcContract, true) -> Config.getBTCCurrentChain()
+		this?.contract.equals(TokenContract.ltcContract, true) -> Config.getLTCCurrentChain()
+		this?.contract.equals(TokenContract.bchContract, true) -> Config.getBCHCurrentChain()
+		this?.contract.equals(TokenContract.eosContract, true) -> Config.getEOSCurrentChain()
+		this?.contract.equals(TokenContract.ethContract, true) -> Config.getCurrentChain()
+		else -> Config.getCurrentChain() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+	}
+}
+
+fun TokenContract?.getCurrentChainName(): String {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> Config.getETCCurrentChainName()
+		this?.contract.equals(TokenContract.btcContract, true) -> Config.getBTCCurrentChainName()
+		this?.contract.equals(TokenContract.ltcContract, true) -> Config.getLTCCurrentChainName()
+		this?.contract.equals(TokenContract.bchContract, true) -> Config.getBCHCurrentChainName()
+		this?.contract.equals(TokenContract.eosContract, true) -> Config.getEOSCurrentChainName()
+		this?.contract.equals(TokenContract.ethContract, true) -> Config.getCurrentChainName()
+		else -> Config.getCurrentChainName() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+	}
+}
+
+fun TokenContract?.getMainnetChainID(): String {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> ChainID.etcMain
+		this?.contract.equals(TokenContract.btcContract, true) -> ChainID.btcMain
+		this?.contract.equals(TokenContract.ltcContract, true) -> ChainID.ltcMain
+		this?.contract.equals(TokenContract.bchContract, true) -> ChainID.bchMain
+		this?.contract.equals(TokenContract.eosContract, true) -> ChainID.eosMain
+		else -> ChainID.ethMain
+	}
+}
+
+fun TokenContract?.getDecimal(): Int? {
+	return when {
+		this?.contract.equals(TokenContract.etcContract, true) -> CryptoValue.etcDecimal
+		this?.contract.equals(TokenContract.btcContract, true) -> CryptoValue.btcSeriesDecimal
+		this?.contract.equals(TokenContract.ltcContract, true) -> CryptoValue.btcSeriesDecimal
+		this?.contract.equals(TokenContract.bchContract, true) -> CryptoValue.btcSeriesDecimal
+		this?.contract.equals(TokenContract.eosContract, true) -> CryptoValue.eosDecimal
+		this?.contract.equals(TokenContract.ethContract, true) -> CryptoValue.ethDecimal
+		else -> null // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }

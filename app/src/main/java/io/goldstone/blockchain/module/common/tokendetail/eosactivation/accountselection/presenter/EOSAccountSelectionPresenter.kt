@@ -43,7 +43,7 @@ class EOSAccountSelectionPresenter(
 		WalletTable.getCurrentWallet {
 			val currentChainNames =
 				eosAccountNames.filter {
-					it.chainID.equals(Config.getEOSCurrentChain(), true)
+					it.chainID.equals(Config.getEOSCurrentChain().id, true)
 				}
 			val actors = arrayListOf<AccountActor>()
 			object : ConcurrentAsyncCombine() {

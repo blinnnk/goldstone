@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.toList
+import com.blinnnk.extension.toList
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable

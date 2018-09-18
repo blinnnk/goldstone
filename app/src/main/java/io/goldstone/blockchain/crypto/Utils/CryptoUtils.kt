@@ -94,9 +94,7 @@ object CryptoUtils {
 	}
 
 	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
-		return if (inputCode.length >= 138 && isTransferInputCode(
-				inputCode
-			)
+		return if (inputCode.length >= 138 && isTransferInputCode(inputCode)
 		) {
 			hold()
 			true

@@ -3,12 +3,15 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressm
 import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
@@ -20,12 +23,17 @@ import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.getTargetKeyName
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -44,15 +52,23 @@ class AddressManagerPresenter(
 	override val fragment: AddressManagerFragment
 ) : BasePresenter<AddressManagerFragment>() {
 
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		getMultiChainAddresses()
-	}
-
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (WalletType(Config.getCurrentWalletType()).isBIP44()) fragment.showCreatorDashboard()
+		if (Config.getCurrentWalletType().isBIP44()) fragment.showCreatorDashboard()
+	}
+
+	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
+		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
+			EOSAPI.getAccountNameByPublicKey(
+				key,
+				{ LogUtil.error("showEOSPublickeyDescription", it) }
+			) { chainNames ->
+				WalletTable.updateEOSAccountName(chainNames) {
+					val description = if (it) "available publickey" else "inactivation publickey"
+					cell.showDescriptionTitle(description)
+				}
+			} else cell.showDescriptionTitle("available publickey")
 	}
 
 	fun setBackEvent() {
@@ -66,64 +82,44 @@ class AddressManagerPresenter(
 		}
 	}
 
-	private fun getMultiChainAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setMultiChainAddresses(getCurrentAddressAndSymbol())
-		}
+	fun getMultiChainAddresses(wallet: WalletTable) {
+		fragment.setMultiChainAddresses(wallet.getCurrentAddressAndSymbol())
 	}
 
-	fun getEthereumAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
-		}
+	fun getEthereumAddresses(wallet: WalletTable) {
+		fragment.setEthereumAddressesModel(convertToChildAddresses(wallet.ethAddresses))
 	}
 
-	fun getBitcoinCashAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(bchAddresses))
-		}
+	fun getBitcoinCashAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.bchAddresses))
 	}
 
-	fun getBitcoinCashTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinCashTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getEthereumClassicAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
-		}
+	fun getEthereumClassicAddresses(wallet: WalletTable) {
+		fragment.setEthereumClassicAddressesModel(convertToChildAddresses(wallet.etcAddresses))
 	}
 
-	fun getBitcoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
-		}
+	fun getBitcoinAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcAddresses))
 	}
 
-	fun getBitcoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getLitecoinTestAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(ltcAddresses))
-		}
+	fun getLitecoinAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.ltcAddresses))
 	}
 
-	fun getEOSAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEOSAddressesModel(convertToChildAddresses(eosAddresses))
-		}
+	fun getEOSAddresses(wallet: WalletTable) {
+		fragment.setEOSAddressesModel(convertToChildAddresses(wallet.eosAddresses))
 	}
 
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
@@ -137,7 +133,7 @@ class AddressManagerPresenter(
 		)
 	}
 
-	fun showAllETHAndERCAddresses(): Runnable {
+	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETHAndERCAddresses,

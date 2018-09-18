@@ -165,16 +165,18 @@ class ChainAddressesPresenter(
 			it is AddressManagerFragment
 		}?.let {
 			if (it is AddressManagerFragment) {
-				when (coinType) {
-					MultiChainType.ETH.id -> it.presenter.getEthereumAddresses()
-					MultiChainType.ETC.id -> it.presenter.getEthereumClassicAddresses()
-					MultiChainType.LTC.id -> it.presenter.getLitecoinAddresses()
-					MultiChainType.BCH.id -> it.presenter.getBitcoinCashAddresses()
-					MultiChainType.BTC.id -> {
-						if (Config.isTestEnvironment()) {
-							it.presenter.getBitcoinTestAddresses()
-						} else {
-							it.presenter.getBitcoinAddresses()
+				WalletTable.getCurrentWallet {
+					when (coinType) {
+						MultiChainType.ETH.id -> it.presenter.getEthereumAddresses(this)
+						MultiChainType.ETC.id -> it.presenter.getEthereumClassicAddresses(this)
+						MultiChainType.LTC.id -> it.presenter.getLitecoinAddresses(this)
+						MultiChainType.BCH.id -> it.presenter.getBitcoinCashAddresses(this)
+						MultiChainType.BTC.id -> {
+							if (Config.isTestEnvironment()) {
+								it.presenter.getBitcoinTestAddresses(this)
+							} else {
+								it.presenter.getBitcoinAddresses(this)
+							}
 						}
 					}
 				}

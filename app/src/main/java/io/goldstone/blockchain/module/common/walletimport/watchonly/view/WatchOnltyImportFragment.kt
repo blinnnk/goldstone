@@ -46,7 +46,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val addressInput by lazy { WalletEditText(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
-	private var currentType = PrivateKeyType.ETHERCAndETC.content
+	private var currentType = PrivateKeyType.ETHSeries.content
 	override val presenter = WatchOnlyImportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {

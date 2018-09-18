@@ -35,7 +35,7 @@ object CryptoName {
 		}
 	}
 
-	fun getBTCSeriesChainIDByName(name: String): String? {
+	fun getBTCSeriesChainIDByName(name: String): ChainID? {
 		return listOf(
 			Pair(ltc, Config.getLTCCurrentChain()),
 			Pair(bch, Config.getBCHCurrentChain()),

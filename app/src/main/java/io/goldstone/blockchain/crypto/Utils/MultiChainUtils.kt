@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.utils
 
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.bitcoin.AddressType
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -12,9 +11,7 @@ import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
-import io.goldstone.blockchain.crypto.multichain.ChainAddresses
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
+import io.goldstone.blockchain.crypto.multichain.*
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -51,7 +48,7 @@ object MultiChainUtils {
 
 	fun getRootPrivateKey(privateKey: String): BigInteger {
 		return when (detectPrivateKeyType(privateKey)) {
-			PrivateKeyType.ETHERCAndETC -> ECKeyPair.getPrivateKey(privateKey)
+			PrivateKeyType.ETHSeries -> ECKeyPair.getPrivateKey(privateKey)
 			PrivateKeyType.BTCEOSAndBCH ->
 				DumpedPrivateKey.fromBase58(MainNetParams.get(), privateKey).key.privKey
 			PrivateKeyType.LTC ->
@@ -63,7 +60,7 @@ object MultiChainUtils {
 
 	private fun detectPrivateKeyType(privateKey: String): PrivateKeyType? {
 		return when {
-			WalletUtil.isValidPrivateKey(privateKey) -> PrivateKeyType.ETHERCAndETC
+			WalletUtil.isValidPrivateKey(privateKey) -> PrivateKeyType.ETHSeries
 			BTCUtils.isValidMainnetPrivateKey(privateKey) -> PrivateKeyType.BTCEOSAndBCH
 			BTCUtils.isValidTestnetPrivateKey(privateKey) -> PrivateKeyType.AllBTCSeriesTest
 			LTCWalletUtils.isValidPrivateKey(privateKey) -> PrivateKeyType.LTC
@@ -73,7 +70,7 @@ object MultiChainUtils {
 
 	fun isValidMultiChainAddress(address: String, symbol: String): AddressType? {
 		return when {
-			Address(address).isValid() -> AddressType.ETHERCOrETC
+			Address(address).isValid() -> AddressType.ETHSeries
 			BTCUtils.isValidMainnetAddress(address)
 				&& CoinSymbol(symbol).isBTC() -> AddressType.BTC
 			BTCUtils.isValidTestnetAddress(address) -> {

@@ -53,7 +53,7 @@ class WatchOnlyImportPresenter(
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
 		when (addressType) {
-			PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHSeries.content -> {
 				if (!Address(address).isValid()) {
 					fragment.context?.alert(ImportWalletText.addressFormatAlert)
 					callback()
@@ -187,7 +187,7 @@ class WatchOnlyImportPresenter(
 
 	private fun setAddressByChainType(address: String, addressType: String) {
 		when (addressType) {
-			PrivateKeyType.ETHERCAndETC.content -> {
+			PrivateKeyType.ETHSeries.content -> {
 				currentETHAndERCAddress = address
 				currentETCAddress = address
 			}

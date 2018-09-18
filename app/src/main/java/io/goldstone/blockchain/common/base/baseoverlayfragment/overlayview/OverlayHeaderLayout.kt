@@ -163,7 +163,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 	
-	fun searchInputLinstener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
+	fun searchInputListener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
 		searchInput.editText.setOnFocusChangeListener { _, isChanged ->
 			isFocus(isChanged)
 		}

@@ -62,7 +62,7 @@ private fun loadTransactionsFromChain(
 		errorCallback
 	) { transactions ->
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.mapIndexed { index, item ->
+		successCallback(transactions.asSequence().mapIndexed { index, item ->
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
@@ -80,6 +80,6 @@ private fun loadTransactionsFromChain(
 				BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
 			}
 			TransactionListModel(it)
-		}.isNotEmpty())
+		}.toList().isNotEmpty())
 	}
 }

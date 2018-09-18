@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter
 
 import android.os.Bundle
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.toMillisecond
+import com.blinnnk.extension.*
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
@@ -13,14 +10,10 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getGrandFather
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoName
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -100,7 +93,7 @@ class TokenInfoPresenter(
 	}
 
 	private fun showTransactionInfo() {
-		val chainType = TokenContract(tokenInfo?.contract).getChainType().id
+		val chainType = tokenInfo?.contract.getChainType().id
 		when {
 			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
@@ -132,7 +125,7 @@ class TokenInfoPresenter(
 						fragment.updateLatestActivationDate(latestDate)
 					}
 				}
-			TokenContract(tokenInfo?.contract).isETC() -> {
+			tokenInfo?.contract.isETC() -> {
 				TransactionTable.getETCTransactionsByAddress(currentAddress) { transactions ->
 					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 					// 分别查询 `接收的总值` 和 `支出的总值`

@@ -24,8 +24,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
@@ -210,13 +209,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				confirmEvent = Runnable {
 					val customAddress = addressInput.text?.toString().orEmpty()
 					when {
-						TokenContract(presenter.getToken()?.contract).isBTC() ||
-							TokenContract(presenter.getToken()?.contract).isBCH() ->
+						presenter.getToken()?.contract.isBTC() || presenter.getToken()?.contract.isBCH() ->
 							presenter.isValidAddressOrElse(customAddress) isTrue {
 								// 更新默认的自定义找零地址
 								changeAddress = customAddress
 							}
-						TokenContract(presenter.getToken()?.contract).isLTC() ->
+						presenter.getToken()?.contract.isLTC() ->
 							presenter.isValidLTCAddressOrElse(customAddress) isTrue {
 								// 更新默认的自定义找零地址
 								changeAddress = customAddress
@@ -269,7 +267,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
-		val isEOSTransfer = TokenContract(rootFragment?.token?.contract).isEOS()
+		val isEOSTransfer = rootFragment?.token?.contract.isEOS()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import java.io.Serializable
 
@@ -25,6 +26,18 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 
+	fun isCurrent(): Boolean {
+		return when (id) {
+			btcMain, btcTest -> id.equals(Config.getBTCCurrentChain().id, true)
+			ltcMain, ltcTest -> id.equals(Config.getLTCCurrentChain().id, true)
+			bchMain, bchTest -> id.equals(Config.getBCHCurrentChain().id, true)
+			ethMain, ropsten, rinkeby, kovan -> id.equals(Config.getCurrentChain().id, true)
+			etcMain, etcTest -> id.equals(Config.getETCCurrentChain().id, true)
+			eosMain, eosTest -> id.equals(Config.getEOSCurrentChain().id, true)
+			else -> false
+		}
+	}
+
 	fun getContract(): String? {
 		return when (id) {
 			etcMain, etcTest -> TokenContract.etcContract
@@ -33,6 +46,18 @@ class ChainID(val id: String) : Serializable {
 			bchMain, bchTest -> TokenContract.bchContract
 			eosMain, eosTest -> TokenContract.eosContract
 			else -> null
+		}
+	}
+
+	fun getCurrentAddress(): String {
+		return when (id) {
+			etcMain, etcTest -> Config.getCurrentETCAddress()
+			btcTest, ltcTest, bchTest -> Config.getCurrentBTCSeriesTestAddress()
+			btcMain -> Config.getCurrentBTCAddress()
+			ltcMain -> Config.getCurrentLTCAddress()
+			bchMain -> Config.getCurrentBCHAddress()
+			eosMain, eosTest -> Config.getCurrentEOSAddress()
+			else -> Config.getCurrentETCAddress()
 		}
 	}
 
@@ -77,6 +102,20 @@ class ChainID(val id: String) : Serializable {
 	}
 
 	companion object {
+		fun getETHMain(): ChainID = ChainID(ethMain)
+		fun getRopsten(): ChainID = ChainID(ropsten)
+		fun getRinkeby(): ChainID = ChainID(rinkeby)
+		fun getKovan(): ChainID = ChainID(kovan)
+		fun getETCMain(): ChainID = ChainID(etcMain)
+		fun getETCTest(): ChainID = ChainID(etcTest)
+		fun getBTCMain(): ChainID = ChainID(btcMain)
+		fun getBTCTest(): ChainID = ChainID(btcTest)
+		fun getBCHMain(): ChainID = ChainID(bchMain)
+		fun getBCHTest(): ChainID = ChainID(bchTest)
+		fun getLTCMain(): ChainID = ChainID(ltcMain)
+		fun getLTCTest(): ChainID = ChainID(ltcTest)
+		fun getEOSMain(): ChainID = ChainID(eosMain)
+		fun getEOSTest(): ChainID = ChainID(eosTest)
 		const val ethMain = "1"
 		const val ropsten = "3"
 		const val rinkeby = "4"

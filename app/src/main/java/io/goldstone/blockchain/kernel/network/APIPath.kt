@@ -81,30 +81,30 @@ object EtherScanApi {
 	private const val kovanLogHeader = "https://kovan.etherscan.io"
 	private const val ropstenLogHeader = "https://ropsten.etherscan.io"
 	private const val rinkebyLogHeader = "https://rinkeby.etherscan.io"
-	private val etherScanHeader: (chainID: String) -> String = {
-		when (it) {
-			ChainID.ethMain -> mainHeader
-			ChainID.ropsten -> ropstenHeader
-			ChainID.kovan -> kovanHeader
-			ChainID.rinkeby -> rinkebyHeader
+	private val etherScanHeader: (chainID: ChainID) -> String = {
+		when {
+			it.isETHMain() -> mainHeader
+			it.isRopsten() -> ropstenHeader
+			it.isKovan() -> kovanHeader
+			it.isRinkeby() -> rinkebyHeader
 			else -> ropstenHeader
 		}
 	}
-	private val etherScanLogHeader: (chainID: String) -> String = {
-		when (it) {
-			ChainID.ethMain -> mainLogHeader
-			ChainID.ropsten -> ropstenLogHeader
-			ChainID.kovan -> kovanLogHeader
-			ChainID.rinkeby -> rinkebyLogHeader
+	private val etherScanLogHeader: (chainID: ChainID) -> String = {
+		when {
+			it.isETHMain() -> mainLogHeader
+			it.isRopsten() -> ropstenLogHeader
+			it.isKovan() -> kovanLogHeader
+			it.isRinkeby() -> rinkebyLogHeader
 			else -> ropstenLogHeader
 		}
 	}
-	private val transactionDetailHeader: (currentChain: String) -> String = {
-		when (it) {
-			ChainID.ethMain -> "https://etherscan.io/tx/"
-			ChainID.ropsten -> "https://ropsten.etherscan.io/tx/"
-			ChainID.kovan -> "https://kovan.etherscan.io/tx/"
-			ChainID.rinkeby -> "https://rinkeby.etherscan.io/tx/"
+	private val transactionDetailHeader: (currentChain: ChainID) -> String = {
+		when {
+			it.isETHMain() -> "https://etherscan.io/tx/"
+			it.isRopsten() -> "https://ropsten.etherscan.io/tx/"
+			it.isKovan() -> "https://kovan.etherscan.io/tx/"
+			it.isRinkeby() -> "https://rinkeby.etherscan.io/tx/"
 			else -> "https://etherscan.io/tx/"
 		}
 	}

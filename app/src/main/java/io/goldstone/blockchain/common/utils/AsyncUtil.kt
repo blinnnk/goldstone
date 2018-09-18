@@ -52,6 +52,7 @@ abstract class ConcurrentAsyncCombine {
 
 	abstract var asyncCount: Int
 	private var finishedCount: Int by observing(0) {
+		System.out.println("async$asyncCount and $finishedCount")
 		if (finishedCount == asyncCount) {
 			if (getResultInMainThread()) {
 				GoldStoneAPI.context.runOnUiThread { mergeCallBack() }

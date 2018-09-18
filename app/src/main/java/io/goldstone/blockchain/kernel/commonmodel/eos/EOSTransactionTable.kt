@@ -2,17 +2,14 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toIntOrZero
-import io.goldstone.blockchain.common.utils.getTargetChild
-import io.goldstone.blockchain.common.utils.getTargetObject
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
@@ -51,7 +48,7 @@ data class EOSTransactionTable(
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount,
-		Config.getEOSCurrentChain(),
+		Config.getEOSCurrentChain().id,
 		true
 	)
 
@@ -66,7 +63,7 @@ data class EOSTransactionTable(
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
 		status = true,
 		recordAccountName = recordAccountName,
-		chainID = Config.getEOSCurrentChain(),
+		chainID = Config.getEOSCurrentChain().id,
 		isPending = false
 	)
 
@@ -99,13 +96,10 @@ data class EOSTransactionTable(
 
 		fun getTransactionByAccountName(
 			name: String,
-			chainID: String,
+			chainID: ChainID,
 			@UiThread hold: (List<EOSTransactionTable>) -> Unit
 		) {
-			load {
-				GoldStoneDataBase.database.eosTransactionDao()
-					.getDataByRecordAccountByTargetChainID(name, chainID)
-			} then (hold)
+			load { GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id) } then (hold)
 		}
 
 		fun deleteByAddress(accountName: String) {
@@ -135,7 +129,7 @@ interface EOSTransactionDao {
 	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
-	fun getDataByRecordAccountByTargetChainID(recordAccountName: String, chainID: String): List<EOSTransactionTable>
+	fun getDataByRecordAccount(recordAccountName: String, chainID: String): List<EOSTransactionTable>
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND txID LIKE :txID")
 	fun getDataByTxIDAndRecordName(txID: String, recordAccountName: String): EOSTransactionTable?

@@ -62,7 +62,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			showArrow()
 			setTitle(TokenDetailText.authority)
 			setSubtitle(Config.getCurrentEOSName())
-			click { presenter.showPublickKeyAccountNames() }
+			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
 

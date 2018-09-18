@@ -18,7 +18,6 @@ import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.MultiChainType
-import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.bitcoinj.core.ECKey
@@ -79,7 +78,7 @@ class PrivateKeyExportPresenter(
 			password: String,
 			hold: String?.() -> Unit
 		) {
-			val isSingleChainWallet = !WalletType(Config.getCurrentWalletType()).isBIP44()
+			val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 			when (chainType) {
 				MultiChainType.BTC.id,
 				MultiChainType.BCH.id,
