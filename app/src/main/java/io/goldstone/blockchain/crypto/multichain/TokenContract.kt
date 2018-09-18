@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
 import java.io.Serializable
@@ -31,7 +32,7 @@ class TokenContract(val contract: String?) : Serializable {
 	}
 }
 
-fun TokenContract?.orEmpty() = TokenContract("")
+fun TokenContract?.orEmpty() = if (isNull()) TokenContract("") else this!!
 
 fun TokenContract?.isEOS(): Boolean {
 	return this?.contract.equals(TokenContract.eosContract, true)

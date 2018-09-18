@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
@@ -263,7 +264,7 @@ class MarketTokenDetailPresenter(
 					try {
 						resetData(
 							dateType,
-							data.sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
+							data.asSequence().sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
@@ -271,7 +272,7 @@ class MarketTokenDetailPresenter(
 									entry.open.toFloat(),
 									entry.close.toFloat(),
 									entry.time)
-							}
+							}.toList()
 						)
 					} catch (error: Exception) {
 						LogUtil.error("updateChartUI", error)
@@ -349,10 +350,9 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	// Async Function
 	private fun loadCoinInfoFromServer(
 		info: QuotationModel,
-		hold: (DefaultTokenTable) -> Unit
+		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
 		val chainID = TokenContract(info.contract).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component
 
 import android.content.Context
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addCircleBorder
@@ -22,6 +23,7 @@ open class GrayCardView(context: Context) : RelativeLayout(context) {
 
 	protected var container = verticalLayout {
 		topPadding = 5.uiPX()
+		gravity = Gravity.CENTER_HORIZONTAL
 		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 		elevation = 4f
 	}

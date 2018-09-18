@@ -35,7 +35,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
-	
+
 	private val footer by lazy {
 		GasSelectionFooter(context!!)
 	}
@@ -43,29 +43,29 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	private lateinit var gasLayout: LinearLayout
 	private lateinit var container: RelativeLayout
 	override val presenter = GasSelectionPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		container = relativeLayout {
 			lparams(matchParent, matchParent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				
+
 				spendingCell.apply {
 					setTitle(PrepareTransferText.willSpending)
 				}.into(this)
-				
+
 				spendingCell.setMargins<LinearLayout.LayoutParams> {
 					topMargin = 30.uiPX()
 					bottomMargin = 20.uiPX()
 				}
-				
+
 				gasLayout = verticalLayout {
 					gravity = Gravity.CENTER_HORIZONTAL
 					lparams(matchParent, wrapContent)
 					presenter.generateGasSelections(this)
 				}
-				
+
 				footer.apply {
 					getCustomButton {
 						onClick {
@@ -82,7 +82,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						}
 					}
 				}.into(this)
-				
+
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsGas.setUnderline()
 				}.click {
@@ -99,19 +99,19 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 			}
 		}
 	}
-	
+
 	fun clearGasLayout() {
 		gasLayout.removeAllViews()
 	}
-	
+
 	fun getGasLayout(): LinearLayout {
 		return gasLayout
 	}
-	
+
 	fun setSpendingValue(value: String) {
 		spendingCell.setSubtitle(value)
 	}
-	
+
 	fun showMaskView(isShow: Boolean = false) {
 		if (isShow) {
 			if (container.findViewById<View>(ElementID.mask).isNull()) {
@@ -135,7 +135,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

@@ -137,6 +137,9 @@ interface EOSTransactionDao {
 	@Insert
 	fun insert(transaction: EOSTransactionTable)
 
+	@Insert
+	fun insertAll(transactions: List<EOSTransactionTable>)
+
 	@Update
 	fun update(transaction: EOSTransactionTable)
 

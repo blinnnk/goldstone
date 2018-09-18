@@ -23,10 +23,10 @@ import org.jetbrains.anko.verticalLayout
  */
 @Suppress("DEPRECATION")
 class TokenInformation(context: Context) : TopBottomLineCell(context) {
-	
+
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		rank.setSubtitle(model.rankValue)
-		avalibleSupply.setSubtitle(model.avaliableSupply)
+		availableSupply.setSubtitle(model.availableSupply)
 		// 服务器返回的是带 `,` 的字符串这里加工成 `Double`
 		marketCap.setSubtitle(
 			model.marketCap.replace(",", "")
@@ -36,22 +36,22 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 		startDate.setSubtitle(model.startDate)
 	}
 	private val rank = GraySquareCell(context)
-	private val avalibleSupply = GraySquareCell(context)
+	private val availableSupply = GraySquareCell(context)
 	private val marketCap = GraySquareCell(context)
 	private val startDate = GraySquareCell(context)
-	
+
 	init {
 		setHorizontalPadding(PaddingSize.device.toFloat())
 		setTitle(QuotationText.tokenInformation)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 250.uiPX())
 		verticalLayout {
 			rank.into(this)
-			avalibleSupply.into(this)
+			availableSupply.into(this)
 			marketCap.into(this)
 			startDate.into(this)
-			
+
 			rank.setTitle(QuotationText.rank)
-			avalibleSupply.setTitle(QuotationText.totalSupply)
+			availableSupply.setTitle(QuotationText.totalSupply)
 			marketCap.setTitle(QuotationText.marketCap)
 			startDate.setTitle(QuotationText.startDate)
 		}.setAlignParentBottom()

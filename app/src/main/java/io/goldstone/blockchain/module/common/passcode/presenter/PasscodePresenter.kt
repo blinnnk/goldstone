@@ -84,7 +84,7 @@ class PasscodePresenter(
 				handler.postDelayed(refreshRunnable, 1000L)
 			} else {
 				resetConfig()
-				fragment.recoveryAfterFrezon()
+				fragment.recoveryAfterFreeze()
 			}
 		}
 	}

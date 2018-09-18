@@ -123,9 +123,14 @@ object BorderSize {
 }
 
 object ScreenSize {
+	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
+	@JvmStatic
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
+	@JvmStatic
 	var heightWithOutHeader = fullHeight - HomeSize.headerHeight
+	@JvmStatic
+	var heightWithoutTabBar = fullHeight - HomeSize.tabBarHeight
 }
 
 object CommonCellSize {

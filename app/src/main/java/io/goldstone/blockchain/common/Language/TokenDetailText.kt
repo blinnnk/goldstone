@@ -127,6 +127,26 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
+	val delegateCPUTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delegate CPU"
+		HoneyLanguage.Chinese.code -> "Delegate CPU"
+		HoneyLanguage.Japanese.code -> "Delegate CPU"
+		HoneyLanguage.Korean.code -> "Delegate CPU"
+		HoneyLanguage.Russian.code -> "Delegate CPU"
+		HoneyLanguage.TraditionalChinese.code -> "Delegate CPU"
+		else -> ""
+	}
+	@JvmField
+	val refundCPUTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Refund CPU"
+		HoneyLanguage.Chinese.code -> "Refund CPU"
+		HoneyLanguage.Japanese.code -> "Refund CPU"
+		HoneyLanguage.Korean.code -> "Refund CPU"
+		HoneyLanguage.Russian.code -> "Refund CPU"
+		HoneyLanguage.TraditionalChinese.code -> "Refund CPU"
+		else -> ""
+	}
+	@JvmField
 	val ram = when (currentLanguage) {
 		HoneyLanguage.English.code -> "RAM"
 		HoneyLanguage.Chinese.code -> "RAM"
@@ -359,6 +379,17 @@ object TokenDetailText {
 		HoneyLanguage.Korean.code -> "Inactivation Account"
 		HoneyLanguage.Russian.code -> "Inactivation Account"
 		HoneyLanguage.TraditionalChinese.code -> "Inactivation Account"
+		else -> ""
+	}
+
+	@JvmField
+	val tradingCPU = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Trading CPU"
+		HoneyLanguage.Chinese.code -> "Trading CPU"
+		HoneyLanguage.Japanese.code -> "Trading CPU"
+		HoneyLanguage.Korean.code -> "Trading CPU"
+		HoneyLanguage.Russian.code -> "Trading CPU"
+		HoneyLanguage.TraditionalChinese.code -> "Trading CPU"
 		else -> ""
 	}
 

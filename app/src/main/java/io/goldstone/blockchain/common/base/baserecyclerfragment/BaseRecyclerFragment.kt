@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
-import android.app.Notification
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment

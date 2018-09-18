@@ -221,7 +221,7 @@ object EOSAPI {
 		from: Int,
 		to: Int,
 		errorCallBack: (Throwable) -> Unit,
-		hold: (data: List<EOSTransactionTable>) -> Unit
+		@WorkerThread hold: (data: List<EOSTransactionTable>) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,

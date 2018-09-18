@@ -7,12 +7,12 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.TagCell
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -28,13 +28,13 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
-	
+
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val skipButton by lazy { RoundButton(context!!) }
 	private val attentionTextView by lazy { AttentionTextView(context!!) }
 	override val presenter = MnemonicBackupPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -71,7 +71,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 			}
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?
@@ -81,7 +81,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 				parent.presenter.removeSelfFromActivity()
 				this.activity?.jump<SplashActivity>()
 			}
-			
+
 			is WalletSettingsFragment -> {
 				parent.headerTitle = WalletSettingsText.walletSettings
 				parent.presenter.showWalletSettingListFragment()

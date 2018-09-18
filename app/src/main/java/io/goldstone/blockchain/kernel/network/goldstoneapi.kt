@@ -515,7 +515,7 @@ object GoldStoneAPI {
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(CoinInfoModel(JSONObject(this[0]), symbol, chainID))
+			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
 		}
 	}
 }
