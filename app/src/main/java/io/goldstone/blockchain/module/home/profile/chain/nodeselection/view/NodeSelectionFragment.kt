@@ -12,9 +12,9 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable

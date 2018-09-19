@@ -30,7 +30,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	var marginTop = 0
 	private val shadowSize = 1.uiPX().toFloat()
-	private val buttonHeight = 45.uiPX()
+	private val buttonHeight = 40.uiPX()
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize
@@ -91,25 +91,6 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			text = recoveryText
 			isEnabled = true
 		}
-	}
-	
-	fun setWhiteStyle() {
-		layoutParams = LinearLayout.LayoutParams(
-			ScreenSize.widthWithPadding,
-			buttonHeight
-		).apply {
-			topMargin = marginTop
-			bottomMargin = 5.uiPX()
-		}
-		
-		addTouchRippleAnimation(
-			Spectrum.white,
-			Spectrum.yellow,
-			RippleMode.Square,
-			layoutParams.height / 2f
-		)
-		textPaint.color = Spectrum.blue
-		invalidate()
 	}
 	
 	fun setGrayStyle(top: Int? = null) {

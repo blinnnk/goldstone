@@ -172,7 +172,8 @@ class ChainID(val id: String) : Serializable {
 				kovan,
 				rinkeby,
 				ltcTest,
-				bchTest
+				bchTest,
+				eosTest
 			)
 		}
 

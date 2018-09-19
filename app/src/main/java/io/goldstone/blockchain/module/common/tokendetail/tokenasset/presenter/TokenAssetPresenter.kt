@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -65,6 +66,32 @@ class TokenAssetPresenter(
 			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName()) },
 			2
 		)
+	}
+
+	fun showResourceTradingFragmentByTitle(title: String) {
+		when (title) {
+			TokenDetailText.delegateCPU -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+			TokenDetailText.delegateNET -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+			TokenDetailText.tradeRAM -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+		}
 	}
 
 	private fun updateAccountInfo() {

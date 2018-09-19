@@ -13,6 +13,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.convertToDiskUnit
 import io.goldstone.blockchain.common.utils.convertToTimeUnit
+import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -71,10 +72,10 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 				height = progressViewHeight
 				alignParentBottom()
 			}
-			addCorner(progressViewHeight, Spectrum.grayBlue)
+			addCorner(CornerSize.small.toInt(), Spectrum.grayBlue)
 			progressValueView = relativeLayout {
 				lparams(0, matchParent)
-				addCorner(progressViewHeight, Spectrum.blue)
+				addCorner(CornerSize.small.toInt(), Spectrum.blue)
 			}
 			leftValueView.into(this)
 			leftValueView.setCenterInVertical()

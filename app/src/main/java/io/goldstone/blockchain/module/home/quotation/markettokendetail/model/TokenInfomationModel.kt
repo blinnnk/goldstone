@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  */
 data class TokenInformationModel(
 	val rankValue: String = "",
-	val avaliableSupply: String = "",
+	val availableSupply: String = "",
 	val marketCap: String = "",
 	val socialMedia: String = "",
 	val website: String = "",
