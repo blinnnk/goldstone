@@ -1,9 +1,9 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.presenter
+package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.presenter
 
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
 
 /**
  * @date 18/09/2018 6:36 PM

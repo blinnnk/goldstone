@@ -1,18 +1,24 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 18/09/2018 6:36 PM
@@ -23,37 +29,50 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 
 	@SuppressLint("ResourceType", "CommitTransaction")
 	override fun AnkoContext<Fragment>.initView() {
-		scrollView {
-			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-			verticalLayout {
+		relativeLayout {
+			scrollView {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-				gravity = Gravity.CENTER_HORIZONTAL
+				verticalLayout {
+					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+					gravity = Gravity.CENTER_HORIZONTAL
 
-				textView {
-					text = "基础信息"
-				}
-				textView {
-					text = "线形图"
-				}
-				frameLayout {
-					layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
-						topMargin = 10.uiPX()
-						bottomMargin = 10.uiPX()
+					textView {
+						text = "基础信息"
 					}
-					id = 9999
-				}
-				addFragmentAndSetArgument<TraderMemorySalesRecordAndLargeSingleRecordFragment>(9999) {
-				}
+					textView {
+						text = "线形图"
+					}
+					frameLayout {
+						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
+							topMargin = 10.uiPX()
+							bottomMargin = 10.uiPX()
+						}
+						id = ElementID.traderMemorySalesRecordAndLargeSingleRecord
+					}
+					addFragmentAndSetArgument<TraderMemorySalesRecordAndLargeSingleRecordFragment>(
+						ElementID.traderMemorySalesRecordAndLargeSingleRecord
+					) {
+					}
 
-				textView {
-					text = "持量大户"
+					textView {
+						text = "持量大户"
+					}
+					textView {
+						text = "成交资金分布"
+					}
+					textView {
+						text = "买入/卖出"
+					}
 				}
-				textView {
-					text = "成交资金分布"
-				}
-				textView {
-					text = "买入/卖出"
-				}
+			}
+
+			val roundButton = RoundButton(context)
+			roundButton.into(this)
+			roundButton.apply {
+				text = "买入/卖出 RAM"
+				setBlueStyle(20.uiPX(), ScreenSize.widthWithPadding - 40.uiPX())
+				setAlignParentBottom()
+				setCenterInHorizontal()
 			}
 		}
 	}

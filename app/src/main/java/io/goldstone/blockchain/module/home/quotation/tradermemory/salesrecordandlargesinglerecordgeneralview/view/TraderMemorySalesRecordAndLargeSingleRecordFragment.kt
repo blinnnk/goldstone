@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.view
+package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view
 
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.TraderMemoryDetailOverlay.view.TraderMemoryOverlayFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.presenter.TraderMemorySalesRecordAndLargeSingleRecordPresenter
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.presenter.TraderMemorySalesRecordAndLargeSingleRecordPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
@@ -27,7 +27,7 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
 class TraderMemorySalesRecordAndLargeSingleRecordFragment
 	: BaseFragment<TraderMemorySalesRecordAndLargeSingleRecordPresenter>() {
 
-	// 这个 `Model` 是服务 `ViewPager` 中的 `TraderMemorySalesRecordFragment`
+	// 这个 `Model` 是服务 `ViewPager` 中的 `TraderMemorySalesRecordAndLargeSingleRecordListFragment`
 	val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
 	}

@@ -94,7 +94,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setWhiteStyle() {
-		layoutParams = LinearLayout.LayoutParams(
+		layoutParams = RelativeLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {
@@ -113,7 +113,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setGrayStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(
+		layoutParams = RelativeLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {
@@ -132,7 +132,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
-		layoutParams = LinearLayout.LayoutParams(width, buttonHeight).apply {
+		layoutParams = RelativeLayout.LayoutParams(width, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
@@ -148,7 +148,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setDarkStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(
+		layoutParams = RelativeLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {
@@ -167,7 +167,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGreenStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(
+		layoutParams = RelativeLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {

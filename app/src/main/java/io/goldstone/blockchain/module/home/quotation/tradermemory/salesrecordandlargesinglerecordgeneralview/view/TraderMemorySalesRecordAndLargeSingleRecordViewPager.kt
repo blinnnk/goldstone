@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.view
+package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view
 
 import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
@@ -7,9 +7,7 @@ import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.largesinglerecord.view.TraderMemoryLargeSingleRecordFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecord.view.TraderMemorySalesRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordlist.view.TraderMemorySalesRecordAndLargeSingleRecordListFragment
 import java.util.*
 
 @SuppressLint("ViewConstructor")
@@ -22,17 +20,17 @@ class TraderMemorySalesRecordAndLargeSingleRecordViewPager(val fragment: Fragmen
 
 	private var fragmentList = ArrayList<SubFragment>()
 	private val traderMemorySalesRecord by lazy {
-		TraderMemorySalesRecordFragment()
+		TraderMemorySalesRecordAndLargeSingleRecordListFragment(true)
 	}
 	private val traderMemoryLargeSingleRecord by lazy {
-		TraderMemoryLargeSingleRecordFragment()
+		TraderMemorySalesRecordAndLargeSingleRecordListFragment(false)
 	}
 
 	init {
 		id = ViewPagerID.transactions
 		fragmentList.apply {
-			add(SubFragment(traderMemorySalesRecord, "traderMemorySalesRecord"))
-			add(SubFragment(traderMemoryLargeSingleRecord, "traderMemoryLargeSingleRecord"))
+			add(SubFragment(traderMemorySalesRecord, FragmentTag.traderMemorySalesRecord))
+			add(SubFragment(traderMemoryLargeSingleRecord, FragmentTag.traderMemoryLargeSingleRecord))
 		}
 		adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
 	}

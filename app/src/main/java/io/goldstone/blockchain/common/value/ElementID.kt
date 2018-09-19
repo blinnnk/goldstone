@@ -5,7 +5,7 @@ package io.goldstone.blockchain.common.value
  * @author KaySaith
  */
 object ContainerID {
-	
+
 	const val splash = 10001
 	const val overlay = 10002
 	const val content = 10003
@@ -32,6 +32,7 @@ object ElementID {
 	const val mask = 20017
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
+	const val traderMemorySalesRecordAndLargeSingleRecord = 20020
 }
 
 object ViewPagerID {

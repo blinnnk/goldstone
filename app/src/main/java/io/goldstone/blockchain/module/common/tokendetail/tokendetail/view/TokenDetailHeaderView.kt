@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
+import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -55,5 +56,9 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 			},
 			true
 		)
+	}
+
+	fun setLineChartInvisible() {
+		lineChart.visibility = View.GONE
 	}
 }
