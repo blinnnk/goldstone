@@ -20,8 +20,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.*
 import java.math.BigInteger
 
 object EOSAPI {
@@ -289,6 +288,46 @@ object EOSAPI {
 				false
 			) {
 				hold(JSONObject(it))
+			}
+		}
+	}
+	
+	fun getRamBalance(
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (ramBalance: String, eosBalance: String) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "rammarket"),
+				Pair("json", "true")
+			)
+		).let { it ->
+			RequisitionUtil.postRequest(
+				it,
+				EOSUrl.getTableRows(),
+				errorCallBack,
+				false
+			) {
+				try {
+					val balance = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
+					balance?.apply {
+						var ramBalance = JSONObject(getString("base")).getString("balance")
+						if (ramBalance.contains("RAM")) {
+							ramBalance = ramBalance.replace("RAM", "")
+						}
+						var quoteBalance = JSONObject(getString("quote")).getString("balance")
+						if (quoteBalance.contains("EOS")) {
+							quoteBalance = quoteBalance.replace("EOS", "")
+						}
+						hold(ramBalance.trim(), quoteBalance.trim())
+					}
+					
+				} catch (error: JSONException) {
+					errorCallBack(error)
+				}
 			}
 		}
 	}

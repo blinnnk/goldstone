@@ -35,4 +35,8 @@ object EOSUrl {
 	val pushTransaction: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
 	}
+	
+	val getTableRows:() -> String = {
+		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
+	}
 }
