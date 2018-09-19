@@ -7,7 +7,6 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
-import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -25,7 +24,8 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  * @author wcx
  */
 
-class TraderMemorySalesRecordAndLargeSingleRecordFragment : BaseFragment<TraderMemorySalesRecordAndLargeSingleRecordPresenter>() {
+class TraderMemorySalesRecordAndLargeSingleRecordFragment
+	: BaseFragment<TraderMemorySalesRecordAndLargeSingleRecordPresenter>() {
 
 	// 这个 `Model` 是服务 `ViewPager` 中的 `TraderMemorySalesRecordFragment`
 	val currencyInfo by lazy {
@@ -36,10 +36,10 @@ class TraderMemorySalesRecordAndLargeSingleRecordFragment : BaseFragment<TraderM
 		ViewPagerMenu(context!!)
 	}
 	private val viewPager by lazy {
-		TraderMemorySalesRecordViewPager(this)
+		TraderMemorySalesRecordAndLargeSingleRecordViewPager(this)
 	}
 	private val menuTitles =
-		arrayListOf(QuotationText.quotationInfo)
+		arrayListOf("买卖记录", "大单记录")
 
 	override val presenter = TraderMemorySalesRecordAndLargeSingleRecordPresenter(this)
 

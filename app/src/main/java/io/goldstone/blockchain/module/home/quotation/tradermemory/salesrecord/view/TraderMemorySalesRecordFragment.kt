@@ -14,6 +14,7 @@ class TraderMemorySalesRecordFragment :
 	override val presenter: TraderMemorySalesRecordPresenter = TraderMemorySalesRecordPresenter(this)
 
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TraderMemorySalesRecordModel>?) {
+
 	}
 
 }

@@ -8,6 +8,8 @@ import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.largesinglerecord.view.TraderMemoryLargeSingleRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecord.view.TraderMemorySalesRecordFragment
 import java.util.*
 
 @SuppressLint("ViewConstructor")
@@ -16,17 +18,21 @@ import java.util.*
  * @author wcx
  */
 
-class TraderMemorySalesRecordViewPager(val fragment: Fragment) : ViewPager(fragment.context!!) {
+class TraderMemorySalesRecordAndLargeSingleRecordViewPager(val fragment: Fragment) : ViewPager(fragment.context!!) {
 
 	private var fragmentList = ArrayList<SubFragment>()
-	private val marketDetail by lazy {
-		MarketTokenDetailFragment()
+	private val traderMemorySalesRecord by lazy {
+		TraderMemorySalesRecordFragment()
+	}
+	private val traderMemoryLargeSingleRecord by lazy {
+		TraderMemoryLargeSingleRecordFragment()
 	}
 
 	init {
 		id = ViewPagerID.transactions
 		fragmentList.apply {
-			add(SubFragment(marketDetail, FragmentTag.tokenMarketDetail))
+			add(SubFragment(traderMemorySalesRecord, "traderMemorySalesRecord"))
+			add(SubFragment(traderMemoryLargeSingleRecord, "traderMemoryLargeSingleRecord"))
 		}
 		adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
 	}

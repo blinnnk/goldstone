@@ -1,9 +1,16 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecord.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
 
@@ -14,6 +21,7 @@ import org.jetbrains.anko.*
 class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 	override val presenter: TraderMemoryDetailPresenter = TraderMemoryDetailPresenter(this)
 
+	@SuppressLint("ResourceType", "CommitTransaction")
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -27,11 +35,14 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				textView {
 					text = "线形图"
 				}
-				textView {
-					text = "买卖记录/大单交易"
-				}
 				frameLayout {
-
+					layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
+						topMargin = 10.uiPX()
+						bottomMargin = 10.uiPX()
+					}
+					id = 9999
+				}
+				addFragmentAndSetArgument<TraderMemorySalesRecordAndLargeSingleRecordFragment>(9999) {
 				}
 
 				textView {
