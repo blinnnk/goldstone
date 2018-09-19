@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter
 
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -32,7 +31,7 @@ open class BaseTradingPresenter(
 		setUsageValue()
 	}
 
-	protected fun setUsageValue() {
+	private fun setUsageValue() {
 		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
 			when (fragment.tradingType) {
 				TradingType.CPU -> {
@@ -53,17 +52,16 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	protected fun updateLocalResourceData(@WorkerThread callback: () -> Unit) {
+	fun updateLocalDataAndUI() {
 		val currentAccountName = Config.getCurrentEOSName()
 		EOSAPI.getAccountInfoByName(
 			currentAccountName,
 			{ LogUtil.error("updateLocalResourceData", it) }
 		) { newData ->
-			System.out.println("newData $newData")
 			EOSAccountTable.getAccountByName(currentAccountName, false) { localData ->
 				localData?.let { local ->
 					GoldStoneDataBase.database.eosAccountDao().update(newData.apply { this.id = local.id })
-					callback()
+					setUsageValue()
 				}
 			}
 		}

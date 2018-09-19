@@ -59,6 +59,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
 				topPadding = 10.uiPX()
+				bottomPadding = 10.uiPX()
 				delegateTitle.into(this)
 				delegateTitle.setSubtitle("0.0027 ", "Current Price: 0.0027 EOS/MS/Day", Spectrum.blue)
 				incomeTradingCard.into(this)
