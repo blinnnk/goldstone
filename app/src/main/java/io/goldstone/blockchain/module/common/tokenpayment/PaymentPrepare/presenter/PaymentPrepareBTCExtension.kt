@@ -36,7 +36,7 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 	callback: (errors: TransferError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.IncorrectDecimal)
+		callback(TransferError.incorrectDecimal)
 	else generateBTCPaymentModel(count, changeAddress) { error, model ->
 		if (!model.isNull()) {
 			fragment.rootFragment?.apply {
@@ -46,7 +46,7 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 					Bundle().apply {
 						putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
 					})
-				callback(TransferError.None)
+				callback(TransferError.none)
 			}
 		} else callback(error)
 	}
@@ -82,7 +82,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.GetWrongFeeFromChain, null)
+			hold(TransferError.getWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -90,7 +90,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.BalanceIsNotEnough, null)
+					hold(TransferError.balanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -116,7 +116,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.None, it)
+					hold(TransferError.none, it)
 				}
 			}
 		}

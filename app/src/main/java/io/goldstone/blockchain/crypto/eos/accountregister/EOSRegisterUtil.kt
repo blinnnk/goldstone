@@ -3,7 +3,7 @@ package io.goldstone.blockchain.crypto.eos.accountregister
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.eosram.EOSRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
-import io.goldstone.blockchain.crypto.eos.netcpumodel.EOSNetCPUModel
+import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSChain
 
 /**
@@ -17,7 +17,7 @@ object EOSRegisterUtil {
 		header: TransactionHeader,
 		newAccountModel: EOSNewAccountModel,
 		ramModel: EOSRamModel,
-		netCPUModel: EOSNetCPUModel,
+		netCPUModel: BandWidthModel,
 		isPackedData: Boolean
 	): String {
 		val contextFreeAction = "00"
@@ -28,6 +28,6 @@ object EOSRegisterUtil {
 		val packedData = header.serialize() + contextFreeAction + serializedActionSize +
 			newAccountModel.serialize() + ramModel.serialize() + netAndCpuSerializedData + serializedTransactionExtensions
 		return if (isPackedData) packedData
-		else chainID.id + packedData + EOSUtils.completeZero(EOSNetCPUModel.totalSerializedCount - netAndCpuSerializedData.length)
+		else chainID.id + packedData + EOSUtils.completeZero(BandWidthModel.totalSerializedCount - netAndCpuSerializedData.length)
 	}
 }

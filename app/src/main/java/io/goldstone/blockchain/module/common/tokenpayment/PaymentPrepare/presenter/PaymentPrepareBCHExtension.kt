@@ -32,7 +32,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	@UiThread callback: (TransferError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.IncorrectDecimal)
+		callback(TransferError.incorrectDecimal)
 	else generateBCHPaymentModel(count, changeAddress) { error, paymentModel ->
 		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
@@ -62,7 +62,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 		false
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.GetWrongFeeFromChain, null)
+			hold(TransferError.getWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -70,7 +70,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.BalanceIsNotEnough, null)
+					hold(TransferError.balanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -96,7 +96,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.None, it)
+					hold(TransferError.none, it)
 				}
 			}
 		}

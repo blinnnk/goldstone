@@ -12,7 +12,8 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
-import io.goldstone.blockchain.crypto.keystore.keyString
+import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.crypto.error.RequestError
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -188,7 +189,7 @@ object RequisitionUtil {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: (Throwable) -> Unit,
+		crossinline errorCallback: (GoldStoneError) -> Unit,
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
@@ -201,7 +202,7 @@ object RequisitionUtil {
 			Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
-				GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
+				GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.postFailed(error)) }
 				LogUtil.error("$api $keyName", error)
 			}
 
@@ -218,7 +219,7 @@ object RequisitionUtil {
 						hold(gson.fromJson(jsonData, collectionType))
 					}
 				} catch (error: Exception) {
-					GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
+					GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.resolveDataError(error)) }
 					LogUtil.error(keyName, error)
 					GoldStoneCode.showErrorCodeReason(data)
 				}

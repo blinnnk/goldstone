@@ -78,15 +78,6 @@ data class EOSAccountTable(
 			} then { hold(!it.isNull()) }
 		}
 
-		fun update(newTable: EOSAccountTable, accountName: String) {
-			doAsync {
-				GoldStoneDataBase.database.eosAccountDao().apply {
-					val target = getAccount(accountName)
-					if (!target.isNull()) update(newTable)
-				}
-			}
-		}
-
 		fun getAccountByName(
 			name: String,
 			getResultInUIThread: Boolean = true,
