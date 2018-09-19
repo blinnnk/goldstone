@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
@@ -14,6 +16,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.math.BigInteger
 
 
@@ -33,7 +36,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	private val confirmButton by lazy {
 		RoundButton(context).apply {
-			setBlueStyle(20.uiPX(), contentWidth)
+			setBlueStyle(20.uiPX(), contentWidth, 40.uiPX())
 			text = CommonText.confirm
 		}
 	}
@@ -68,22 +71,42 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		accountNameEditText.showButton()
 	}
 
-	fun setProcessValue(type: String, subtitle: String, leftValue: BigInteger, rightValue: BigInteger) {
+	fun setProcessValue(type: String, subtitle: String, leftValue: BigInteger, rightValue: BigInteger, isTime: Boolean) {
 		processCell.setTitle(type)
 		processCell.setSubtitle(subtitle)
 		processCell.setLeftValue(
 			leftValue,
 			TokenDetailText.available,
-			true
+			isTime
 		)
 		processCell.setRightValue(
 			rightValue,
 			TokenDetailText.total,
-			true
+			isTime
 		)
 	}
 
 	fun setAccountHint(hint: String) {
 		accountNameEditText.setHint(hint)
+	}
+
+	fun getInputValue(): Pair<String, Double> {
+		return Pair(accountNameEditText.getContent(), amountEditText.getContent().toDoubleOrZero())
+	}
+
+	fun setConfirmClickEvent(action: () -> Unit) {
+		confirmButton.onClick {
+			action()
+			confirmButton.preventDuplicateClicks()
+		}
+	}
+
+	fun clearInput() {
+		accountNameEditText.clearText()
+		amountEditText.clearText()
+	}
+
+	fun showLoading(status: Boolean) {
+		confirmButton.showLoadingStatus(status)
 	}
 }

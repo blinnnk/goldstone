@@ -1,11 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
-import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -13,23 +9,20 @@ import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI.context
-import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter.Companion.checkBalanceIsEnoughOrElse
+import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter.Companion.showGetPrivateKeyDashboard
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -40,12 +33,12 @@ import org.jetbrains.anko.runOnUiThread
 // EOS 的 `Token` 转币只需写对 `Token` 的 `Symbol` 就可以转账成功
 fun PaymentPreparePresenter.transferEOS(
 	count: Double,
-	symbol: String,
-	@UiThread callback: (error: TransferError) -> Unit
+	symbol: CoinSymbol,
+	@UiThread callback: (error: GoldStoneError) -> Unit
 ) {
 	val accountName = Config.getCurrentEOSName()
 	if (!count.toString().isValidDecimal(CryptoValue.eosDecimal))
-		callback(TransferError.IncorrectDecimal)
+		callback(TransferError.incorrectDecimal)
 	checkBalanceIsEnoughOrElse(accountName, symbol, count) { hasEnoughBalance ->
 		if (hasEnoughBalance) {
 			// 准备转账信息
@@ -54,23 +47,23 @@ fun PaymentPreparePresenter.transferEOS(
 					accountName,
 					count,
 					fragment.getMemoContent(),
-					symbol
+					symbol.symbol!!
 				)
 			// 向用户获取解锁 `Keystore` 密码获取 `KeyStore` 中的 `PrivateKey` 进行签名
-			fragment.context?.getPasswordAndTransferByInfo(eosTransactionInfo) { response, error ->
-				// 如果 response 不为空, 那么插入转账数据的 `Pending Data` 到数据库
-				if (!response.isNull()) insertPendingDataAndGoToTransactionDetail(eosTransactionInfo, response!!) {
-					callback(error)
-				} else callback(error)
+			showGetPrivateKeyDashboard(fragment.context) { privateKey, error ->
+				if (privateKey.isNull()) callback(error)
+				else transferEOSToken(eosTransactionInfo, privateKey!!, callback) { response ->
+					insertPendingDataAndGoToTransactionDetail(eosTransactionInfo, response, callback)
+				}
 			}
-		} else callback(TransferError.BalanceIsNotEnough)
+		} else callback(TransferError.balanceIsNotEnough)
 	}
 }
 
 private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 	info: EOSTransactionInfo,
 	response: EOSResponse,
-	callback: () -> Unit
+	callback: (GoldStoneError) -> Unit
 ) {
 	val receiptModel = ReceiptModel(info, response, getToken()!!)
 	GasSelectionPresenter.goToTransactionDetailFragment(
@@ -87,44 +80,13 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 			insert(transaction)
 		}
 	}
-	callback()
-}
-
-private fun Context.getPasswordAndTransferByInfo(
-	info: EOSTransactionInfo,
-	callback: (response: EOSResponse?, error: TransferError) -> Unit
-) {
-	showAlertView(
-		"Transfer EOS Token",
-		"prepare to transfer eos token, now you should enter your password",
-		true
-	) { passwordInput ->
-		if (passwordInput.isNull()) return@showAlertView
-		val password = passwordInput!!.text.toString()
-		if (password.isNotEmpty()) WalletTable.getCurrentWallet {
-			PrivateKeyExportPresenter.getPrivateKey(
-				context,
-				Config.getCurrentEOSAddress(),
-				MultiChainType.EOS.id,
-				password
-			) {
-				if (!isNullOrEmpty()) transferEOSToken(
-					info,
-					EOSPrivateKey(this!!),
-					{ callback(null, TransferError.GetChainInfoError) } // Error callback
-				) {
-					callback(it, TransferError.None)
-				}
-				else alert("decrypt your keystore by password found error")
-			}
-		} else alert(CommonText.enterPassword)
-	}
+	callback(TransferError.none)
 }
 
 private fun transferEOSToken(
 	info: EOSTransactionInfo,
 	privateKey: EOSPrivateKey,
-	errorCallback: (Throwable) -> Unit,
+	errorCallback: (GoldStoneError) -> Unit,
 	hold: (EOSResponse) -> Unit
 ) {
 	EOSTransaction(
@@ -136,19 +98,6 @@ private fun transferEOSToken(
 		ExpirationType.FiveMinutes,
 		info.symbol
 	).send(privateKey, errorCallback, hold)
-}
-
-private fun checkBalanceIsEnoughOrElse(
-	accountName: String,
-	symbol: String,
-	transferCount: Double,
-	@UiThread hold: (isEnough: Boolean) -> Unit
-) {
-	EOSAPI.getAccountBalanceBySymbol(accountName, symbol) { balance ->
-		GoldStoneAPI.context.runOnUiThread {
-			hold(balance >= transferCount)
-		}
-	}
 }
 
 private fun PaymentPreparePresenter.generateEOSPaymentModel(

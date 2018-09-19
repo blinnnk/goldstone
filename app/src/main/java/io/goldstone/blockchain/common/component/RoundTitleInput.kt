@@ -88,6 +88,14 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 		button.visibility = View.VISIBLE
 	}
 
+	fun getContent(): String {
+		return if (editText.text.isNullOrEmpty()) editText.hint.toString() else editText.text.toString()
+	}
+
+	fun clearText() {
+		editText.text.clear()
+	}
+
 	fun setButtonClickEvent(action: () -> Unit) {
 		button.onClick {
 			action()

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
@@ -96,7 +97,7 @@ object EOSAPI {
 	}
 
 	fun getChainInfo(
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (GoldStoneError) -> Unit,
 		@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
@@ -145,7 +146,7 @@ object EOSAPI {
 
 	fun getTransactionHeaderFromChain(
 		expirationType: ExpirationType,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (GoldStoneError) -> Unit,
 		@WorkerThread hold: (header: TransactionHeader) -> Unit
 	) {
 		getChainInfo(errorCallBack) { chainInfo ->

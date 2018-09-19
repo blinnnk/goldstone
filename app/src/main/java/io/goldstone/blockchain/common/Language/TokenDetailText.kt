@@ -393,4 +393,26 @@ object TokenDetailText {
 		else -> ""
 	}
 
+	@JvmField
+	val tradingNET = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Trading NET"
+		HoneyLanguage.Chinese.code -> "Trading NET"
+		HoneyLanguage.Japanese.code -> "Trading NET"
+		HoneyLanguage.Korean.code -> "Trading NET"
+		HoneyLanguage.Russian.code -> "Trading NET"
+		HoneyLanguage.TraditionalChinese.code -> "Trading NET"
+		else -> ""
+	}
+
+	@JvmField
+	val tradingRAM = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Trading RAM"
+		HoneyLanguage.Chinese.code -> "Trading RAM"
+		HoneyLanguage.Japanese.code -> "Trading RAM"
+		HoneyLanguage.Korean.code -> "Trading RAM"
+		HoneyLanguage.Russian.code -> "Trading RAM"
+		HoneyLanguage.TraditionalChinese.code -> "Trading RAM"
+		else -> ""
+	}
+
 }
