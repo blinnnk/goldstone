@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.google.gson.Gson
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.kernel.network.eos.model.EosBalanceModel
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
@@ -294,7 +296,7 @@ object EOSAPI {
 	
 	fun getRamBalance(
 		errorCallBack: (Throwable) -> Unit,
-		@WorkerThread hold: (ramBalance: String, eosBalance: String) -> Unit
+		@WorkerThread hold: (EosBalanceModel) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -314,15 +316,20 @@ object EOSAPI {
 				try {
 					val balance = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
 					balance?.apply {
-						var ramBalance = JSONObject(getString("base")).getString("balance")
-						if (ramBalance.contains("RAM")) {
-							ramBalance = ramBalance.replace("RAM", "")
+						val model = Gson().fromJson(balance.toString(), EosBalanceModel::class.java)
+						model?.apply {
+							if (model.base.balance.contains("RAM")) {
+								model.base.balance = model.base.balance.replace("RAM", "").trim()
+							}
+							if (model.quote.balance.contains("EOS")) {
+								model.quote.balance = model.quote.balance.replace("EOS", "").trim()
+							}
+							if (model.supply.contains("RAMCORE")) {
+								model.supply = model.supply.replace("RAMCORE","").trim()
+							}
+							hold(model)
 						}
-						var quoteBalance = JSONObject(getString("quote")).getString("balance")
-						if (quoteBalance.contains("EOS")) {
-							quoteBalance = quoteBalance.replace("EOS", "")
-						}
-						hold(ramBalance.trim(), quoteBalance.trim())
+						
 					}
 					
 				} catch (error: JSONException) {
