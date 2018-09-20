@@ -230,6 +230,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	}
 	
 	private fun resetFormatLimit() {
+		if (realData.isEmpty()) return
 		val valueString = BigDecimal(realData[0].high.toString()).toPlainString()
 		if (!valueString.contains(".")) {
 			axisLeft.valueFormatter = CandleLeftLabelFormatter(0)

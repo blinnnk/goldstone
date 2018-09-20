@@ -6,7 +6,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenCandleChart
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EosRamPriceTrendCandleChart
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EosRamPriceTrendFragment
 import org.jetbrains.anko.runOnUiThread
 
@@ -18,13 +18,16 @@ import org.jetbrains.anko.runOnUiThread
 class EosRamPriceTrendPresenter(override val fragment: EosRamPriceTrendFragment)
 	: BasePresenter<EosRamPriceTrendFragment>() {
 	
-	fun updateCandleData(candleChart: MarketTokenCandleChart,
-		dateType: Int) {
-		updateEosRamPriceTrendcy(candleChart, "1min", dateType)
+	fun updateCandleData(
+		candleChart: EosRamPriceTrendCandleChart,
+		pair: String,
+		dateType: Int
+	) {
+		updateEosRamPriceTrendcy(candleChart, pair , dateType)
 	}
 	
 	private fun updateEosRamPriceTrendcy(
-		candleChart: MarketTokenCandleChart,
+		candleChart: EosRamPriceTrendCandleChart,
 		period: String,
 		dateType: Int
 	) {
@@ -50,7 +53,7 @@ class EosRamPriceTrendPresenter(override val fragment: EosRamPriceTrendFragment)
 		}
 	}
 	
-	private fun MarketTokenCandleChart.updateCandleChartUI(
+	private fun EosRamPriceTrendCandleChart.updateCandleChartUI(
 		data: ArrayList<CandleChartModel>,
 		dateType:Int
 	) {

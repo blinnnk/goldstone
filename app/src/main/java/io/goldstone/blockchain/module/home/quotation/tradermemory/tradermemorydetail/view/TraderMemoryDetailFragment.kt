@@ -37,9 +37,8 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						text = "基础信息"
 					}.lparams(matchParent, 300.uiPX())
 					frameLayout {
-						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 						id = ElementID.chartView
-					}
+					}.lparams(matchParent, wrapContent)
 					addFragmentAndSetArgument<EosRamPriceTrendFragment>(ElementID.chartView) {}
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {

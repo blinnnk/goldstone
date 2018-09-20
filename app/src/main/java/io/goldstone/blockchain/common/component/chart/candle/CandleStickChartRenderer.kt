@@ -2,7 +2,9 @@ package io.goldstone.blockchain.common.component.chart.candle
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import com.blinnnk.extension.isTrue
 import com.github.mikephil.charting.animation.ChartAnimator
+import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
@@ -44,6 +46,12 @@ class CandleStickChartRenderer(
     canvas: Canvas,
     dataSet: ICandleDataSet
   ) {
+		
+		(dataSet as? CandleDataSet)?.values?.apply {
+			isEmpty() isTrue {
+				return
+			}
+		}
 	
 		val candleRectRadius = 3f // 蜡烛矩形的圆角
 		
