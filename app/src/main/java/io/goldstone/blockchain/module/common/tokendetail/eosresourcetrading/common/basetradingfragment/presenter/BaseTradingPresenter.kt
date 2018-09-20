@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -179,10 +180,7 @@ open class BaseTradingPresenter(
 			tradingCount: Double,
 			symbol: CoinSymbol,
 			isSellRam: Boolean = false,
-			hold: (
-				privateKey: EOSPrivateKey?,
-				error: GoldStoneError
-			) -> Unit
+			hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
 			isValidInputValue(Pair(toAccountName, tradingCount)) { error ->
@@ -195,7 +193,12 @@ open class BaseTradingPresenter(
 						// 检查发起账户的 `RAM` 余额是否足够
 						if (it < tradingCount.toLong().toBigInteger()) hold(null, TransferError.BalanceIsNotEnough)
 						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
-					} else EOSAPI.getAccountBalanceBySymbol(fromAccountName, symbol) { balance ->
+					} else EOSAPI.getAccountBalanceBySymbol(
+						fromAccountName,
+						symbol,
+						EOSCodeName.EOSIOToken,
+						{ hold(null, it) }
+					) { balance ->
 						// 检查发起账户的余额是否足够
 						if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
 						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)

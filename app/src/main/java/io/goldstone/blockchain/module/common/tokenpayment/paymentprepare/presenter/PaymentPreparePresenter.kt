@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.error.AccountError
 import io.goldstone.blockchain.crypto.error.GoldStoneError
-import io.goldstone.blockchain.crypto.error.PassowrdError
+import io.goldstone.blockchain.crypto.error.PasswordError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -154,7 +154,7 @@ class PaymentPreparePresenter(
 						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)
 						else hold(null, AccountError.DecryptKeyStoreError)
 					}
-				} else hold(null, PassowrdError.InputIsEmpty)
+				} else hold(null, PasswordError.InputIsEmpty)
 			}
 		}
 

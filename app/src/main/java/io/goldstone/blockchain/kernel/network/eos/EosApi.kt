@@ -110,8 +110,18 @@ object EOSAPI {
 		}
 	}
 
-	fun getAccountEOSBalance(accountName: String, hold: (balance: Double) -> Unit) {
-		getAccountBalanceBySymbol(accountName, CoinSymbol.EOS, EOSCodeName.EOSIOToken, hold)
+	fun getAccountEOSBalance(
+		accountName: String,
+		errorCallBack: (GoldStoneError) -> kotlin.Unit,
+		hold: (balance: Double) -> Unit
+	) {
+		getAccountBalanceBySymbol(
+			accountName,
+			CoinSymbol.EOS,
+			EOSCodeName.EOSIOToken,
+			errorCallBack,
+			hold
+		)
 	}
 
 	fun getChainInfo(
@@ -136,30 +146,25 @@ object EOSAPI {
 		errorCallBack: (GoldStoneError) -> Unit,
 		hold: (EOSResponse) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("signatures", signatures.toJsonArray()),
 				Pair("packed_trx", packedTrxCode),
 				Pair("compression", "none"),
 				Pair("packed_context_free_data", "00")
-			)
-		).let { requestBody ->
-			RequisitionUtil.postRequest(
-				requestBody,
-				EOSUrl.pushTransaction(),
-				{ errorCallBack(RequestError.PostFailed(it)) },
-				false
-			) {
-				val response = JSONObject(it)
-				if (it.contains("processed")) {
-					val result = JSONObject(response.safeGet("processed"))
-					val transactionID = response.safeGet("transaction_id")
-					val receipt = JSONObject(result.safeGet("receipt"))
-					hold(EOSResponse(transactionID, receipt))
-				} else GoldStoneAPI.context.runOnUiThread {
-					errorCallBack(RequestError.ResolveDataError(GoldStoneError(it)))
-				}
+			),
+			EOSUrl.pushTransaction(),
+			errorCallBack,
+			false
+		) {
+			val response = JSONObject(it)
+			if (it.contains("processed")) {
+				val result = JSONObject(response.safeGet("processed"))
+				val transactionID = response.safeGet("transaction_id")
+				val receipt = JSONObject(result.safeGet("receipt"))
+				hold(EOSResponse(transactionID, receipt))
+			} else GoldStoneAPI.context.runOnUiThread {
+				errorCallBack(RequestError.ResolveDataError(GoldStoneError(it)))
 			}
 		}
 	}
@@ -178,30 +183,24 @@ object EOSAPI {
 	fun getAccountBalanceBySymbol(
 		accountName: String,
 		symbol: CoinSymbol,
-		tokenCodeName: EOSCodeName = EOSCodeName.EOSIOToken,
+		tokenCodeName: EOSCodeName,
+		errorCallBack: (GoldStoneError) -> Unit,
 		@UiThread hold: (balance: Double) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("code", tokenCodeName.value),
 				Pair("account", accountName),
 				Pair("symbol", symbol.symbol)
-			)
-		).let { it ->
-			RequisitionUtil.postRequest(
-				it,
-				EOSUrl.getAccountEOSBalance(),
-				{
-					LogUtil.error("getAccountEOSBalance", it)
-				},
-				false
-			) {
-				val balances = JSONArray(it)
-				val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
-				GoldStoneAPI.context.runOnUiThread {
-					hold(balance.toDoubleOrNull().orZero())
-				}
+			),
+			EOSUrl.getAccountEOSBalance(),
+			errorCallBack,
+			false
+		) {
+			val balances = JSONArray(it)
+			val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
+			GoldStoneAPI.context.runOnUiThread {
+				hold(balance.toDoubleOrNull().orZero())
 			}
 		}
 	}
@@ -210,90 +209,64 @@ object EOSAPI {
 	fun getAccountResource(
 		accountName: String,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		@UiThread hold: (resource: TotalResources) -> Unit
+		errorCallBack: (GoldStoneError) -> Unit,
+		@WorkerThread hold: (resource: TotalResources?) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.postSingle<TotalResources>(
 			ParameterUtil.prepareObjectContent(
 				Pair("scope", accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "userres"),
 				Pair("json", true)
-			)
-		).let { requestBody ->
-			RequisitionUtil.postRequest<TotalResources>(
-				requestBody,
-				"rows",
-				EOSUrl.getTableRows(),
-				false,
-				{
-					LogUtil.error("getAccountEOSBalance", it)
-				},
-				false
-			) {
-				GoldStoneAPI.context.runOnUiThread {
-					hold(it.first())
-				}
-			}
-		}
+			),
+			EOSUrl.getTableRows(),
+			"rows",
+			errorCallBack,
+			false,
+			hold
+		)
 	}
 
 	fun getRecycledBandWidthList(
 		accountName: String,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		@UiThread hold: (data: List<RefundRequestInfo>) -> Unit
+		errorCallback: (GoldStoneError) -> Unit,
+		@WorkerThread hold: (data: List<RefundRequestInfo>) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("scope", accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "refunds"),
 				Pair("json", true)
-			)
-		).let { requestBody ->
-			RequisitionUtil.postRequest<RefundRequestInfo>(
-				requestBody,
-				"rows",
-				EOSUrl.getTableRows(),
-				false,
-				{ LogUtil.error("getRecycledBandWidthList", it) },
-				false
-			) {
-				GoldStoneAPI.context.runOnUiThread {
-					hold(it)
-				}
-			}
-		}
+			),
+			EOSUrl.getTableRows(),
+			"rows",
+			errorCallback,
+			false,
+			hold
+		)
 	}
 
 	fun getDelegateBandWidthList(
 		accountName: String,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		@UiThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>) -> Unit
+		errorCallback: (GoldStoneError) -> Unit,
+		@WorkerThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("scope", accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "delband"),
 				Pair("json", true)
-			)
-		).let { requestBody ->
-			RequisitionUtil.postRequest<DelegateBandWidthInfo>(
-				requestBody,
-				"rows",
-				EOSUrl.getTableRows(),
-				false,
-				{ LogUtil.error("getMyDelegateBandWidth", it) },
-				false
-			) {
-				GoldStoneAPI.context.runOnUiThread {
-					hold(it)
-				}
-			}
-		}
+			),
+			EOSUrl.getTableRows(),
+			"rows",
+			errorCallback,
+			false,
+			hold
+		)
 	}
 
 	fun getTransactionsLastIndex(
@@ -333,30 +306,23 @@ object EOSAPI {
 		accountName: String,
 		from: Int,
 		to: Int,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallback: (GoldStoneError) -> Unit,
 		@WorkerThread hold: (data: List<EOSTransactionTable>) -> Unit
 	) {
-
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
+		RequisitionUtil.postString(
 			ParameterUtil.prepareObjectContent(
 				Pair("account_name", accountName),
 				Pair("pos", from),
 				Pair("offset", to)
-			)
-		).let { it ->
-			RequisitionUtil.postRequest<String>(
-				it,
-				"actions",
-				EOSUrl.getTransactionHistory(),
-				true,
-				errorCallBack,
-				false
-			) { transactions ->
-				JSONArray(transactions.first()).toList().map {
-					EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName())
-				}.let(hold)
-			}
+			),
+			EOSUrl.getTransactionHistory(),
+			"actions",
+			errorCallback,
+			false
+		) { jsonString ->
+			JSONArray(jsonString).toList().map {
+				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName())
+			}.let(hold)
 		}
 	}
 
@@ -387,23 +353,16 @@ object EOSAPI {
 
 	private fun getTransactionJSONObjectByTxID(
 		txID: String,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallback: (GoldStoneError) -> Unit,
 		@WorkerThread hold: (JSONObject) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareObjectContent(
-				Pair("id", txID)
-			)
-		).let { it ->
-			RequisitionUtil.postRequest(
-				it,
-				EOSUrl.getTransaction(),
-				errorCallBack,
-				false
-			) {
-				hold(JSONObject(it))
-			}
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("id", txID)),
+			EOSUrl.getTransaction(),
+			errorCallback,
+			false
+		) { jsonString ->
+			hold(JSONObject(jsonString))
 		}
 	}
 }

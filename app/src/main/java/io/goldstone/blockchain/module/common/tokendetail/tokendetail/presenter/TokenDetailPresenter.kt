@@ -112,7 +112,7 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
-		loadDataFromDatabaseOrElse { ethERC20OrETCLocalData, localBTCSeriesData, localEOSSeriesData ->
+		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData, localEOSSeriesData ->
 			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
 				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
 				// `ETHERC20OrETC` 需要使用到 `localData`
@@ -127,8 +127,8 @@ class TokenDetailPresenter(
 						val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 					}
-					!ethERC20OrETCLocalData.isNull() || !ethERC20OrETCLocalData?.isEmpty().orFalse() -> {
-						fragment.loadDataFromChain(ethERC20OrETCLocalData!!, 0)
+					!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
+						fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
 					}
 				}
 			}
@@ -181,7 +181,7 @@ class TokenDetailPresenter(
 
 	fun loadDataFromDatabaseOrElse(
 		callback: (
-			localETHERC20OrETCData: List<TransactionListModel>?,
+			localETHSeriesData: List<TransactionListModel>?,
 			localBTCSeriesData: List<BTCSeriesTransactionTable>?,
 			localEOSSeriesData: List<EOSTransactionTable>?
 		) -> Unit = { _, _, _ -> }
