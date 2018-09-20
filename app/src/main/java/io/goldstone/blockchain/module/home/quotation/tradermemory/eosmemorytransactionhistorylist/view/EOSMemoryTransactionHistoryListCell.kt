@@ -1,23 +1,28 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordlist.view
+package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.view
 
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.OneToTwoLinesOfText
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordlist.model.TraderMemorySalesRecordAndLargeSingleRecordListModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListTable
 
 /**
  * @date 18/09/2018 6:36 PM
  * @author wcx
  */
 @SuppressLint("ViewConstructor")
-class TraderMemorySalesRecordAndLargeSingleRecordListCell(
+class EOSMemoryTransactionHistoryListCell(
 	context: Context,
 	private val salesRecord: Boolean
 ) : OneToTwoLinesOfText(context) {
 
-	var model: TraderMemorySalesRecordAndLargeSingleRecordListModel by observing(TraderMemorySalesRecordAndLargeSingleRecordListModel()) {
-
+	var model: EOSMemoryTransactionHistoryListTable by observing(EOSMemoryTransactionHistoryListTable()) {
+		setText(
+			model.time.toString(),
+			model.txId,
+			model.quantity.toString(),
+			model.type.toString()
+		)
 	}
 
 	init {
