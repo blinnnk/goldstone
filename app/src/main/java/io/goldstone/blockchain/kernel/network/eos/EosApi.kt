@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.kernel.network.eos.model.EOSGolbalModel
 import io.goldstone.blockchain.kernel.network.eos.model.EosBalanceModel
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
@@ -334,6 +335,34 @@ object EOSAPI {
 					
 				} catch (error: JSONException) {
 					errorCallBack(error)
+				}
+			}
+		}
+	}
+	
+	fun getGlobalInformation(
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (EOSGolbalModel) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "global"),
+				Pair("json", "true")
+			)
+		).let {
+			RequisitionUtil.postRequest(
+				it,
+				EOSUrl.getTableRows(),
+				errorCallBack,
+				false
+			) {
+				val globalInformation = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
+				globalInformation?.apply {
+					val model = Gson().fromJson(globalInformation.toString(), EOSGolbalModel::class.java)
+					hold(model)
 				}
 			}
 		}
