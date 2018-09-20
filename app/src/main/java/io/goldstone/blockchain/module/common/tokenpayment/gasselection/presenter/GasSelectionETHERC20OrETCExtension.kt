@@ -49,10 +49,9 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
 				Config.getCurrentEthereumAddress(),
-				{ error, reason ->
-					fragment.context?.apply {
-						GoldStoneDialog.chainError(reason, error, this)
-					}
+				{
+					hold(false)
+					GoldStoneDialog.chainError(it, fragment.context)
 				}
 			) {
 				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
@@ -63,10 +62,9 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
 				Config.getCurrentETCAddress(),
-				{ error, reason ->
-					fragment.context?.apply {
-						GoldStoneDialog.chainError(reason, error, this)
-					}
+				{
+					hold(false)
+					GoldStoneDialog.chainError(it, fragment.context)
 				}
 			) {
 				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
@@ -79,16 +77,18 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
 				Config.getCurrentEthereumAddress(),
-				{ error, reason ->
-					fragment.context?.apply { GoldStoneDialog.chainError(reason, error, this) }
+				{
+					hold(false)
+					GoldStoneDialog.chainError(it, fragment.context)
 				}
 			) { tokenBalance ->
 				// 查询 `ETH` 余额
 				MyTokenTable.getBalanceByContract(
 					TokenContract.getETH(),
 					Config.getCurrentEthereumAddress(),
-					{ error, reason ->
-						LogUtil.error("checkBalanceIsValid $reason", error)
+					{
+						hold(false)
+						LogUtil.error("checkBalanceIsValid", it)
 					}
 				) { ethBalance ->
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够

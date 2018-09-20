@@ -6,7 +6,7 @@ package io.goldstone.blockchain.crypto.error
  * @date  2018/09/14
  */
 
-open class GoldStoneError(override val message: String) : Throwable(message) {
+open class GoldStoneError(override val message: String, val tag: String = "GoldStoneError") : Throwable(message) {
 	fun isNone(): Boolean = message.equals(GoldStoneError.None.message, true)
 
 	companion object {
@@ -38,6 +38,25 @@ class StakeBandWidthError(override val message: String) : GoldStoneError(message
 	}
 }
 
+class EthereumRPCError(override val message: String) : GoldStoneError(message) {
+	companion object {
+		/** EOS Delegate/Refund CPU Errors */
+		@JvmStatic
+		val GetSymbol: (Throwable) -> EthereumRPCError = {
+			EthereumRPCError("Ethereum RPC Error Of Getting Symbol ${it.message}")
+		}
+		@JvmStatic
+		val GetTokenName: (Throwable) -> EthereumRPCError = {
+			EthereumRPCError("Ethereum RPC Error Of Getting Token Name ${it.message}")
+		}
+
+		@JvmStatic
+		val GetTokenDecimal: (Throwable) -> EthereumRPCError = {
+			EthereumRPCError("Ethereum RPC Error Of Getting Token Decimal ${it.message}")
+		}
+	}
+}
+
 class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
@@ -49,7 +68,7 @@ class AccountError(val content: String) : GoldStoneError(content) {
 	}
 }
 
-class PassowrdError(val content: String) : GoldStoneError(content) {
+class PasswordError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
 		val InputIsEmpty = AccountError("please enter your password to unlock your wallet")
@@ -61,12 +80,12 @@ class PassowrdError(val content: String) : GoldStoneError(content) {
 class RequestError(override val message: String) : GoldStoneError(message) {
 	companion object {
 		@JvmStatic
-		val PostFailed: (errorDetail: Throwable) -> GoldStoneError = { error ->
-			AccountError("post request failed || ${error.message}")
+		val PostFailed: (errorDetail: Throwable) -> RequestError = { error ->
+			RequestError("post request failed || ${error.message}")
 		}
 		@JvmStatic
-		val ResolveDataError: (errorDetail: Throwable) -> GoldStoneError = { error ->
-			AccountError("resolve request result data failed || ${error.message}")
+		val ResolveDataError: (errorDetail: Throwable) -> RequestError = { error ->
+			RequestError("resolve request result data failed || ${error.message}")
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common
 
 import android.content.Context
-import android.graphics.Color
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -11,6 +10,7 @@ import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize

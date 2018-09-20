@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
@@ -29,6 +30,101 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
+	fun post(
+		condition: String,
+		api: String,
+		errorCallback: (RequestError) -> Unit,
+		isEncrypt: Boolean,
+		@WorkerThread hold: (String) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			condition
+		).let { requestBody ->
+			RequisitionUtil.postRequest(
+				requestBody,
+				api,
+				{ errorCallback(RequestError.PostFailed(it)) },
+				isEncrypt,
+				hold
+			)
+		}
+	}
+
+	inline fun <reified T> post(
+		condition: String,
+		api: String,
+		keyName: String,
+		noinline errorCallback: (RequestError) -> Unit,
+		isEncrypt: Boolean,
+		@WorkerThread noinline hold: (List<T>) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			condition
+		).let { requestBody ->
+			RequisitionUtil.postRequest(
+				requestBody,
+				keyName,
+				api,
+				false,
+				{ errorCallback(RequestError.PostFailed(it)) },
+				isEncrypt,
+				hold
+			)
+		}
+	}
+
+	inline fun <reified T> postSingle(
+		condition: String,
+		api: String,
+		keyName: String,
+		noinline errorCallback: (RequestError) -> Unit,
+		isEncrypt: Boolean,
+		@WorkerThread noinline holdSingle: (T?) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			condition
+		).let { requestBody ->
+			RequisitionUtil.postRequest<T>(
+				requestBody,
+				keyName,
+				api,
+				false,
+				{ errorCallback(RequestError.PostFailed(it)) },
+				isEncrypt
+			) {
+				holdSingle(it.firstOrNull())
+			}
+		}
+	}
+
+	fun postString(
+		condition: String,
+		api: String,
+		keyName: String,
+		errorCallback: (RequestError) -> Unit,
+		isEncrypt: Boolean,
+		@WorkerThread holdString: (String?) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			condition
+		).let { requestBody ->
+			RequisitionUtil.postRequest<String>(
+				requestBody,
+				keyName,
+				api,
+				true,
+				{ errorCallback(RequestError.PostFailed(it)) },
+				isEncrypt
+			) {
+				holdString(it.firstOrNull())
+			}
+		}
+	}
+
 	inline fun <reified T> postRequest(
 		body: RequestBody,
 		keyName: String,
@@ -45,7 +141,7 @@ object RequisitionUtil {
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
 
-		getcryptoRequest(body, path, isEncrypt) {
+		getCryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
@@ -93,7 +189,7 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		getcryptoRequest(body, path, isEncrypt) {
+		getCryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
@@ -253,7 +349,7 @@ object RequisitionUtil {
 	}
 
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
-	fun getcryptoRequest(
+	fun getCryptoRequest(
 		body: RequestBody,
 		path: String,
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
@@ -318,7 +414,7 @@ object RequisitionUtil {
 			if (ChainURL.etcChainName.any { it.equals(chainName, true) })
 				ChainURL.currentETCChain(chainName)
 			else ChainURL.currentChain(chainName)
-		getcryptoRequest(body, chainUrl, isEncrypt) { it ->
+		getCryptoRequest(body, chainUrl, isEncrypt) { it ->
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {

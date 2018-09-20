@@ -122,8 +122,8 @@ private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 			if (token.name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
 					token.contract,
-					{ error, reason ->
-						LogUtil.error("getCurrentChainToken $reason", error)
+					{
+						LogUtil.error("getCurrentChainToken", it)
 					},
 					contract.getCurrentChainName()
 				) {

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
@@ -10,6 +11,7 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -217,8 +219,8 @@ data class MyTokenTable(
 		fun getBalanceByContract(
 			contract: TokenContract,
 			ownerName: String,
-			errorCallback: (error: Throwable?, reason: String?) -> Unit,
-			callback: (balance: Double) -> Unit
+			errorCallback: (GoldStoneError) -> Unit,
+			@WorkerThread callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
@@ -261,7 +263,7 @@ data class MyTokenTable(
 					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 					// 网络请求在这额外校验一次.
 					if (EOSWalletUtils.isValidAccountName(Config.getCurrentEOSName())) {
-						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSName(), callback)
+						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSName(), errorCallback, callback)
 					}
 				}
 
