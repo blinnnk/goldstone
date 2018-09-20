@@ -77,12 +77,7 @@ data class EOSTransactionTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.eosTransactionDao()
-					.updateBandWidthAndStatusByTxID(
-						txID,
-						cpuUsage,
-						netUsage,
-						status
-					)
+					.updateBandWidthAndStatusByTxID(txID, cpuUsage, netUsage, status)
 			}
 		}
 
@@ -99,7 +94,9 @@ data class EOSTransactionTable(
 			chainID: ChainID,
 			@UiThread hold: (List<EOSTransactionTable>) -> Unit
 		) {
-			load { GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id) } then (hold)
+			load {
+				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id)
+			} then (hold)
 		}
 
 		fun deleteByAddress(accountName: String) {

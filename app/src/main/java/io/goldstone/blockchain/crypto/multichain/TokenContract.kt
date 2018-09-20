@@ -81,13 +81,13 @@ fun TokenContract?.getChainType(): MultiChainType {
 
 fun TokenContract?.getSymbol(): CoinSymbol {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> CoinSymbol.getETC()
-		this?.contract.equals(TokenContract.btcContract, true) -> CoinSymbol.getBTC()
-		this?.contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.getLTC()
-		this?.contract.equals(TokenContract.bchContract, true) -> CoinSymbol.getBCH()
-		this?.contract.equals(TokenContract.eosContract, true) -> CoinSymbol.getEOS()
-		this?.contract.equals(TokenContract.ethContract, true) -> CoinSymbol.getETH()
-		else -> CoinSymbol.getETH() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+		this?.contract.equals(TokenContract.etcContract, true) -> CoinSymbol.ETC
+		this?.contract.equals(TokenContract.btcContract, true) -> CoinSymbol.BTC
+		this?.contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.LTC
+		this?.contract.equals(TokenContract.bchContract, true) -> CoinSymbol.BCH
+		this?.contract.equals(TokenContract.eosContract, true) -> CoinSymbol.EOS
+		this?.contract.equals(TokenContract.ethContract, true) -> CoinSymbol.ETH
+		else -> CoinSymbol.ETH// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }
 

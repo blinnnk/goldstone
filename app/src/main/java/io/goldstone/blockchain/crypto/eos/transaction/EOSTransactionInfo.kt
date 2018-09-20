@@ -1,12 +1,21 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
+import android.content.Context
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -57,6 +66,50 @@ data class EOSTransactionInfo(
 		memo,
 		true
 	)
+
+	fun trade(context: Context?, callback: (error: GoldStoneError, response: EOSResponse?) -> Unit) {
+		prepare(context) { privateKey, error ->
+			if (error.isNone() && !privateKey.isNull()) {
+				transfer(
+					privateKey!!,
+					{ callback(it, null) }
+				) {
+					callback(GoldStoneError.None, it)
+				}
+			} else callback(error, null)
+		}
+	}
+
+	private fun prepare(
+		context: Context?,
+		hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+	) {
+		BaseTradingPresenter.prepareTransaction(
+			context,
+			fromAccount,
+			toAccount,
+			amount.toCount(decimal),
+			CoinSymbol(symbol),
+			false,
+			hold
+		)
+	}
+
+	private fun transfer(
+		privateKey: EOSPrivateKey,
+		errorCallback: (GoldStoneError) -> Unit,
+		hold: (EOSResponse) -> Unit
+	) {
+		EOSTransaction(
+			EOSAuthorization(fromAccount, EOSActor.Active),
+			toAccount,
+			amount,
+			memo,
+			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
+			ExpirationType.FiveMinutes,
+			symbol
+		).send(privateKey, errorCallback, hold)
+	}
 
 	override fun createObject(): String {
 		return ParameterUtil.prepareObjectContent(

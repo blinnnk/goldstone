@@ -112,10 +112,10 @@ class TokenAssetPresenter(
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
 			if (onlyUpdateLocalData) return@getAccountByName
-			EOSAPI.getAccountInfoByName(
+			EOSAPI.getAccountInfo(
 				accountName,
 				{
-					LogUtil.error("getAccountInfoByName", it)
+					LogUtil.error("getAccountInfo", it)
 				}
 			) { eosAccount ->
 				val newData =
@@ -173,10 +173,10 @@ class TokenAssetPresenter(
 
 	private fun checkAndSetAccountValue() {
 		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
-			if (account.isNull()) EOSAPI.getAccountInfoByName(
+			if (account.isNull()) EOSAPI.getAccountInfo(
 				Config.getCurrentEOSName(),
 				{
-					LogUtil.error("getAccountInfoByName", it)
+					LogUtil.error("getAccountInfo", it)
 				}
 			) {
 				EOSAccountTable.preventDuplicateInsert(it)

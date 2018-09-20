@@ -7,7 +7,7 @@ package io.goldstone.blockchain.crypto.error
  */
 
 open class GoldStoneError(override val message: String) : Throwable(message) {
-	fun isNone(): Boolean = this != GoldStoneError.None
+	fun isNone(): Boolean = message.equals(GoldStoneError.None.message, true)
 
 	companion object {
 		@JvmStatic
@@ -44,6 +44,15 @@ class AccountError(val content: String) : GoldStoneError(content) {
 		val DecryptKeyStoreError = AccountError("decrypt your keystore by password found error")
 		@JvmStatic
 		val InvalidAccountName = AccountError("invalid eos account name")
+		@JvmStatic
+		val None = AccountError(GoldStoneError.None.message)
+	}
+}
+
+class PassowrdError(val content: String) : GoldStoneError(content) {
+	companion object {
+		@JvmStatic
+		val InputIsEmpty = AccountError("please enter your password to unlock your wallet")
 		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
 	}

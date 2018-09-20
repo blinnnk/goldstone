@@ -59,7 +59,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	changeAddress: String,
 	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = CoinSymbol.getLTC().getAddress()
+	val myAddress = CoinSymbol.LTC.getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费

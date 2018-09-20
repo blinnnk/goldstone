@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common
 
 import android.content.Context
+import android.graphics.Color
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -12,10 +14,8 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.linearLayout
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.wrapContent
 import java.math.BigInteger
 
 
@@ -35,7 +35,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	private val confirmButton by lazy {
 		RoundButton(context).apply {
-			setBlueStyle(5.uiPX(), contentWidth, 40.uiPX())
+			setBlueStyle(15.uiPX(), contentWidth, 40.uiPX())
 			text = CommonText.confirm
 		}
 	}
@@ -72,19 +72,21 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
+	private lateinit var radioContainer: LinearLayout
+
 	init {
-		setCardParams(ScreenSize.widthWithPadding, 330.uiPX())
+		setCardParams(ScreenSize.widthWithPadding, wrapContent)
 		getContainer().apply {
+			bottomPadding = 10.uiPX()
 			processCell.into(this)
 			SpaceSplitLine(context).apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 			}.into(getContainer())
 			accountNameEditText.into(this)
 			amountEditText.into(this)
-			linearLayout {
-				layoutParams = LinearLayout.LayoutParams(wrapContent, 40.uiPX()).apply {
-					topMargin = 10.uiPX()
-				}
+			radioContainer = linearLayout {
+				layoutParams = LinearLayout.LayoutParams(wrapContent, 30.uiPX())
+				y = 10.uiPX().toFloat()
 				transferResourceRadio.into(this)
 				rentResourceRadio.into(this)
 				transferResourceRadio.onClick {
@@ -116,6 +118,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			TokenDetailText.total,
 			isTime
 		)
+	}
+
+	fun showRadios(status: Boolean) {
+		radioContainer.visibility = if (status) View.VISIBLE else View.GONE
 	}
 
 	fun setAccountHint(hint: String) {

@@ -7,6 +7,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.SessionTitleView
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
@@ -35,7 +36,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		TradingCardView(context!!).apply {
 			setAccountHint(Config.getCurrentEOSName())
 			setConfirmClickEvent {
-				presenter.gainConfirmEvent { showLoading(false) }
+				showLoading(true)
+				presenter.gainConfirmEvent {
+					showLoading(false)
+					if (!it.isNone()) context.alert(it.message)
+				}
 			}
 		}
 	}
@@ -44,7 +49,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		TradingCardView(context!!).apply {
 			setAccountHint(Config.getCurrentEOSName())
 			setConfirmClickEvent {
-				presenter.refundOrSellConfirmEvent { showLoading(false) }
+				showLoading(true)
+				presenter.refundOrSellConfirmEvent {
+					showLoading(false)
+					if (!it.isNone()) context.alert(it.message)
+				}
 			}
 		}
 	}
@@ -66,6 +75,13 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				refundTitle.setSubtitle("0.0019", "Current Price: 0.0019 EOS/Byte/Day", Spectrum.blue)
 				expendTradingCard.into(this)
 			}
+			// 某些行为不需要设置 `租赁或转出` 的选项
+			if (tradingType.isRAM()) {
+				incomeTradingCard.showRadios(false)
+				expendTradingCard.showRadios(false)
+			} else {
+				expendTradingCard.showRadios(false)
+			}
 		}
 	}
 
@@ -84,15 +100,8 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	}
 
 	fun getInputValue(stakeType: StakeType): Pair<String, Double> {
-		return if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
-			incomeTradingCard.getInputValue()
+		return if (stakeType.isDelegate() || stakeType.isBuyRam()) incomeTradingCard.getInputValue()
 		else expendTradingCard.getInputValue()
-	}
-
-	fun showLoading(status: Boolean, stakeType: StakeType) {
-		if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
-			incomeTradingCard.showLoading(status)
-		else expendTradingCard.showLoading(status)
 	}
 
 	fun clearInputValue() {
@@ -101,19 +110,26 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	}
 
 	fun isSelectedTransfer(stakeType: StakeType): Boolean =
-		if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
-			incomeTradingCard.isSelectedTransfer()
+		if (stakeType.isDelegate()) incomeTradingCard.isSelectedTransfer()
 		else expendTradingCard.isSelectedTransfer()
-
 }
 
-enum class TradingType {
-	CPU, NET, RAM
+enum class TradingType(val value: String) {
+	CPU("cpu"), NET("net"), RAM("ram");
+
+	fun isCPU(): Boolean = value.equals(CPU.value, true)
+	fun isNET(): Boolean = value.equals(NET.value, true)
+	fun isRAM(): Boolean = value.equals(RAM.value, true)
 }
 
 enum class StakeType(val value: String) {
 	Delegate("delegatebw"),
 	Refund("undelegatebw"),
 	BuyRam("buyram"),
-	SellRam("sellram")
+	SellRam("sellram");
+
+	fun isBuyRam(): Boolean = value.equals(BuyRam.value, true)
+	fun isSellRam(): Boolean = value.equals(SellRam.value, true)
+	fun isDelegate(): Boolean = value.equals(Delegate.value, true)
+	fun isRefund(): Boolean = value.equals(Refund.value, true)
 }

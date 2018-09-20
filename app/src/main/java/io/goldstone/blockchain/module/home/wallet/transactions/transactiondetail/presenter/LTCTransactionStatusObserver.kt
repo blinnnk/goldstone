@@ -33,7 +33,7 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onLTCTransactionSucceed()
-				val address = CoinSymbol.getLTC().getAddress()
+				val address = CoinSymbol.LTC.getAddress()
 				updateWalletDetailLTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()

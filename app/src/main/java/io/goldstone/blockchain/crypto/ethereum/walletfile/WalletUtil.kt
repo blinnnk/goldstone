@@ -4,6 +4,8 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
 import io.goldstone.blockchain.crypto.utils.clean0xPrefix
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/6/17 9:51 PM
@@ -41,7 +43,7 @@ object WalletUtil {
 			wallet.decrypt(password)
 		} catch (error: Exception) {
 			LogUtil.error("getKeyPairFromWalletFile", error)
-			errorCallback(error)
+			GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
 			null
 		}
 	}

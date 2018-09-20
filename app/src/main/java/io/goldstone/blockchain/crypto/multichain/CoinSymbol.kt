@@ -57,12 +57,6 @@ class CoinSymbol(val symbol: String?) : Serializable {
 	}
 
 	companion object {
-		fun getETH(): CoinSymbol = CoinSymbol(eth)
-		fun getETC(): CoinSymbol = CoinSymbol(etc)
-		fun getBTC(): CoinSymbol = CoinSymbol(pureBTCSymbol)
-		fun getLTC(): CoinSymbol = CoinSymbol(ltc)
-		fun getBCH(): CoinSymbol = CoinSymbol(bch)
-		fun getEOS(): CoinSymbol = CoinSymbol(eos)
 		const val eth = "ETH"
 		const val etc = "ETC"
 		const val pureBTCSymbol = "BTC"
@@ -70,6 +64,18 @@ class CoinSymbol(val symbol: String?) : Serializable {
 		const val bch = "BCH"
 		const val erc = "ERC"
 		const val eos = "EOS"
+		@JvmStatic
+		val ETH: CoinSymbol = CoinSymbol(eth)
+		@JvmStatic
+		val ETC: CoinSymbol = CoinSymbol(etc)
+		@JvmStatic
+		val BTC: CoinSymbol = CoinSymbol(pureBTCSymbol)
+		@JvmStatic
+		val LTC: CoinSymbol = CoinSymbol(ltc)
+		@JvmStatic
+		val BCH: CoinSymbol = CoinSymbol(bch)
+		@JvmStatic
+		val EOS: CoinSymbol = CoinSymbol(eos)
 		@JvmStatic
 		val btc: () -> String = {
 			if (Config.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
@@ -125,11 +131,11 @@ fun CoinSymbol?.getContract(): TokenContract? {
 
 fun CoinSymbol?.getChainSymbol(): CoinSymbol {
 	return when {
-		isETC() -> CoinSymbol.getETC()
-		isBTC() -> CoinSymbol.getBTC()
-		isLTC() -> CoinSymbol.getLTC()
-		isBCH() -> CoinSymbol.getBCH()
-		isEOS() -> CoinSymbol.getEOS()
-		else -> CoinSymbol.getETH()
+		isETC() -> CoinSymbol.ETC
+		isBTC() -> CoinSymbol.BTC
+		isLTC() -> CoinSymbol.LTC
+		isBCH() -> CoinSymbol.BCH
+		isEOS() -> CoinSymbol.EOS
+		else -> CoinSymbol.ETH
 	}
 }
