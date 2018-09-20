@@ -31,7 +31,8 @@ enum class EOSTransactionMethod(val value: String) {
 }
 
 enum class EOSCodeName(val value: String) {
-	EOSIOToken("eosio.token")
+	EOSIOToken("eosio.token"),
+	EOSIO("eosio")
 }
 
 data class EOSTransactionSerialization(

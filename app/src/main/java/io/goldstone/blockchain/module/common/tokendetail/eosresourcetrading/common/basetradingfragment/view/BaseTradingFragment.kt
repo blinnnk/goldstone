@@ -44,7 +44,6 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		TradingCardView(context!!).apply {
 			setAccountHint(Config.getCurrentEOSName())
 			setConfirmClickEvent {
-				System.out.println("hello fuck you")
 				presenter.refundOrSellConfirmEvent { showLoading(false) }
 			}
 		}
@@ -85,12 +84,14 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	}
 
 	fun getInputValue(stakeType: StakeType): Pair<String, Double> {
-		return if (stakeType == StakeType.Delegate) incomeTradingCard.getInputValue()
+		return if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
+			incomeTradingCard.getInputValue()
 		else expendTradingCard.getInputValue()
 	}
 
 	fun showLoading(status: Boolean, stakeType: StakeType) {
-		if (stakeType == StakeType.Delegate) incomeTradingCard.showLoading(status)
+		if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
+			incomeTradingCard.showLoading(status)
 		else expendTradingCard.showLoading(status)
 	}
 
@@ -99,6 +100,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		expendTradingCard.clearInput()
 	}
 
+	fun isSelectedTransfer(stakeType: StakeType): Boolean =
+		if (stakeType == StakeType.Delegate || stakeType == StakeType.BuyRam)
+			incomeTradingCard.isSelectedTransfer()
+		else expendTradingCard.isSelectedTransfer()
+
 }
 
 enum class TradingType {
@@ -106,5 +112,8 @@ enum class TradingType {
 }
 
 enum class StakeType(val value: String) {
-	Delegate("delegatebw"), Refund("undelegatebw")
+	Delegate("delegatebw"),
+	Refund("undelegatebw"),
+	BuyRam("buyram"),
+	SellRam("sellram")
 }

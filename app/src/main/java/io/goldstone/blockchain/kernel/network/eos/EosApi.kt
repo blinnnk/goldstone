@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.crypto.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
@@ -30,7 +31,7 @@ object EOSAPI {
 	var hasRetry = false
 	fun getAccountInfoByName(
 		accountName: String,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (GoldStoneError) -> Unit,
 		targetNet: String = "",
 		@WorkerThread hold: (EOSAccountTable) -> Unit
 	) {
@@ -44,7 +45,10 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				errorCallBack,
+				{
+					errorCallBack(RequestError.PostFailed(it))
+					LogUtil.error("getAccountInfoByName", it)
+				},
 				false
 			) { result ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况

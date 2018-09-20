@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -33,10 +34,10 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (errors: TransferError) -> Unit
+	callback: (errors: GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.incorrectDecimal)
+		callback(TransferError.IncorrectDecimal)
 	else generateBTCPaymentModel(count, changeAddress) { error, model ->
 		if (!model.isNull()) {
 			fragment.rootFragment?.apply {
@@ -46,7 +47,7 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 					Bundle().apply {
 						putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
 					})
-				callback(TransferError.none)
+				callback(GoldStoneError.None)
 			}
 		} else callback(error)
 	}
@@ -74,7 +75,7 @@ fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
 private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (error: TransferError, PaymentBTCSeriesModel?) -> Unit
+	hold: (error: GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
@@ -82,7 +83,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.getWrongFeeFromChain, null)
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -90,7 +91,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.balanceIsNotEnough, null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -116,7 +117,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.none, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}

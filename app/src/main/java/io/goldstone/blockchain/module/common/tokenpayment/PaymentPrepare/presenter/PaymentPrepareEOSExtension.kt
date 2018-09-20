@@ -38,7 +38,7 @@ fun PaymentPreparePresenter.transferEOS(
 ) {
 	val accountName = Config.getCurrentEOSName()
 	if (!count.toString().isValidDecimal(CryptoValue.eosDecimal))
-		callback(TransferError.incorrectDecimal)
+		callback(TransferError.IncorrectDecimal)
 	checkBalanceIsEnoughOrElse(accountName, symbol, count) { hasEnoughBalance ->
 		if (hasEnoughBalance) {
 			// 准备转账信息
@@ -56,7 +56,7 @@ fun PaymentPreparePresenter.transferEOS(
 					insertPendingDataAndGoToTransactionDetail(eosTransactionInfo, response, callback)
 				}
 			}
-		} else callback(TransferError.balanceIsNotEnough)
+		} else callback(TransferError.BalanceIsNotEnough)
 	}
 }
 
@@ -80,7 +80,7 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 			insert(transaction)
 		}
 	}
-	callback(TransferError.none)
+	callback(GoldStoneError.None)
 }
 
 private fun transferEOSToken(

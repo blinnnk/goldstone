@@ -70,7 +70,7 @@ class PaymentPreparePresenter(
 				getToken()?.contract.isBTC() -> prepareBTCPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
-					if (error != TransferError.none) fragment.context?.alert(error.content)
+					if (!error.isNone()) fragment.context?.alert(error.message)
 					// 恢复 Loading 按钮
 					callback()
 				}
@@ -78,7 +78,7 @@ class PaymentPreparePresenter(
 				getToken()?.contract.isLTC() -> prepareLTCPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
-					if (error != TransferError.none) fragment.context?.alert(error.content)
+					if (error != GoldStoneError.None) fragment.context?.alert(error.message)
 					// 恢复 Loading 按钮
 					callback()
 				}
@@ -86,15 +86,15 @@ class PaymentPreparePresenter(
 				getToken()?.contract.isBCH() -> prepareBCHPaymentModel(
 					count, fragment.getChangeAddress()
 				) { error ->
-					if (error != TransferError.none) fragment.context?.alert(error.content)
+					if (!error.isNone()) fragment.context?.alert(error.message)
 					// 恢复 Loading 按钮
 					callback()
 				}
 				/** 准备 EOS 转账需要的参数 */
 				getToken()?.contract.isEOS() -> transferEOS(count, CoinSymbol(getToken()?.symbol)) { error ->
 					when (error) {
-						TransferError.balanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
-						TransferError.incorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)
+						TransferError.BalanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
+						TransferError.IncorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)
 						else -> callback()
 					}
 					// 恢复 Loading 按钮
@@ -136,7 +136,10 @@ class PaymentPreparePresenter(
 			context?.showAlertView(
 				"Transfer EOS Token",
 				"prepare to transfer eos token, now you should enter your password",
-				true
+				true,
+				{
+					hold(null, AccountError.None)
+				}
 			) { passwordInput ->
 				if (passwordInput.isNull()) return@showAlertView
 				val password = passwordInput!!.text.toString()
@@ -147,8 +150,8 @@ class PaymentPreparePresenter(
 						MultiChainType.EOS.id,
 						password
 					) {
-						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), TransferError.none)
-						else hold(null, AccountError.decryptKeyStoreError)
+						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)
+						else hold(null, AccountError.DecryptKeyStoreError)
 					}
 				} else context.alert(CommonText.enterPassword)
 			}
@@ -172,8 +175,8 @@ class PaymentPreparePresenter(
 			accountName: String,
 			checkCount: Double,
 			tradingType: TradingType,
-			errorCallback: (Throwable) -> Unit,
-			@UiThread hold: (isEnough: Boolean) -> Unit
+			errorCallback: (GoldStoneError) -> Unit,
+			@UiThread hold: (GoldStoneError) -> Unit
 		) {
 			EOSAPI.getAccountInfoByName(
 				accountName,
@@ -184,7 +187,9 @@ class PaymentPreparePresenter(
 					TradingType.NET -> it.netWeight > checkCount.toEOSUnit()
 					TradingType.RAM -> true // 待处理内存的 `EOS` 余额判断　
 				}
-				GoldStoneAPI.context.runOnUiThread { hold(isEnough) }
+				GoldStoneAPI.context.runOnUiThread {
+					hold(if (isEnough) GoldStoneError.None else TransferError.BalanceIsNotEnough)
+				}
 			}
 		}
 	}
