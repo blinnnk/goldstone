@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.crypto.eos.eosram
 
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -18,7 +20,8 @@ data class EOSRamModel(
 	val authorizations: List<EOSAuthorization>,
 	val payerName: String,
 	val receiverName: String,
-	val eosAmount: BigInteger
+	val eosAmount: BigInteger,
+	val isBuying: Boolean
 ) : Serializable, EOSModel {
 	@Throws
 	override fun createObject(): String {
@@ -28,12 +31,16 @@ data class EOSRamModel(
 		}
 		authorizationObjects = authorizationObjects.substringBeforeLast(",")
 		val eosCount = EOSUtils.convertAmountToValidFormat(eosAmount)
-		return "{\"account\":\"eosio\",\"name\":\"buyram\",\"authorization\":[$authorizationObjects],\"data\":{\"payer\":\"$payerName\",\"receiver\":\"$receiverName\",\"quant\":\"$eosCount ${CoinSymbol.eos}\"},\"hex_data\":\"\"}"
+		val method =
+			if (isBuying) StakeType.BuyRam else StakeType.SellRam
+		return "{\"account\":\"eosio\",\"name\":\"${method.value}\",\"authorization\":[$authorizationObjects],\"data\":{\"payer\":\"$payerName\",\"receiver\":\"$receiverName\",\"quant\":\"$eosCount ${CoinSymbol.eos}\"},\"hex_data\":\"\"}"
 	}
 
 	override fun serialize(): String {
-		val serializedAccount = EOSUtils.getLittleEndianCode("eosio")
-		val serializedMethodName = EOSUtils.getLittleEndianCode("buyram")
+		val method =
+			if (isBuying) StakeType.BuyRam else StakeType.SellRam
+		val serializedAccount = EOSUtils.getLittleEndianCode(EOSCodeName.EOSIO.value)
+		val serializedMethodName = EOSUtils.getLittleEndianCode(method.value)
 		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
 		var serializedAuthorizations = ""
 		authorizations.forEach {

@@ -7,16 +7,15 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.GrayCardView
-import io.goldstone.blockchain.common.component.ProgressView
-import io.goldstone.blockchain.common.component.RoundTitleInput
-import io.goldstone.blockchain.common.component.SpaceSplitLine
+import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
+import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.wrapContent
 import java.math.BigInteger
 
 
@@ -36,7 +35,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	private val confirmButton by lazy {
 		RoundButton(context).apply {
-			setBlueStyle(20.uiPX(), contentWidth, 40.uiPX())
+			setBlueStyle(5.uiPX(), contentWidth, 40.uiPX())
 			text = CommonText.confirm
 		}
 	}
@@ -59,16 +58,49 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
+	private val radioCellWidth = 100.uiPX()
+	private val transferResourceRadio by lazy {
+		RadioWithTitle(context).apply { setTitle("Transfer") }.apply {
+			setRadioStatus(true)
+			layoutParams = LinearLayout.LayoutParams(radioCellWidth, matchParent)
+		}
+	}
+
+	private val rentResourceRadio by lazy {
+		RadioWithTitle(context).apply { setTitle("Rent") }.apply {
+			layoutParams = LinearLayout.LayoutParams(radioCellWidth, matchParent)
+		}
+	}
+
 	init {
-		setCardParams(ScreenSize.widthWithPadding, 300.uiPX())
-		addView(processCell)
-		SpaceSplitLine(context).apply {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
-		}.into(getContainer())
-		accountNameEditText.into(getContainer())
-		amountEditText.into(getContainer())
-		addView(confirmButton)
-		accountNameEditText.showButton()
+		setCardParams(ScreenSize.widthWithPadding, 330.uiPX())
+		getContainer().apply {
+			processCell.into(this)
+			SpaceSplitLine(context).apply {
+				layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
+			}.into(getContainer())
+			accountNameEditText.into(this)
+			amountEditText.into(this)
+			linearLayout {
+				layoutParams = LinearLayout.LayoutParams(wrapContent, 40.uiPX()).apply {
+					topMargin = 10.uiPX()
+				}
+				transferResourceRadio.into(this)
+				rentResourceRadio.into(this)
+				transferResourceRadio.onClick {
+					rentResourceRadio.setRadioStatus(false)
+					transferResourceRadio.setRadioStatus(true)
+					preventDuplicateClicks()
+				}
+				rentResourceRadio.onClick {
+					rentResourceRadio.setRadioStatus(true)
+					transferResourceRadio.setRadioStatus(false)
+					preventDuplicateClicks()
+				}
+			}
+			confirmButton.into(this)
+			accountNameEditText.showButton()
+		}
 	}
 
 	fun setProcessValue(type: String, subtitle: String, leftValue: BigInteger, rightValue: BigInteger, isTime: Boolean) {
@@ -105,6 +137,8 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		accountNameEditText.clearText()
 		amountEditText.clearText()
 	}
+
+	fun isSelectedTransfer(): Boolean = transferResourceRadio.getRadioStatus()
 
 	fun showLoading(status: Boolean) {
 		confirmButton.showLoadingStatus(status)

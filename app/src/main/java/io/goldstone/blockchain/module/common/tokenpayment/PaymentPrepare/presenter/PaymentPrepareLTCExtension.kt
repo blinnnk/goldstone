@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.scaleTo
@@ -13,6 +14,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -34,10 +36,10 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (TransferError) -> Unit
+	callback: (GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.incorrectDecimal)
+		callback(TransferError.IncorrectDecimal)
 	else generateLTCPaymentModel(count, changeAddress) { error, model ->
 		if (!model.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
@@ -55,7 +57,7 @@ fun PaymentPreparePresenter.prepareLTCPaymentModel(
 private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol.getLTC().getAddress()
 	val chainName =
@@ -63,7 +65,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(chainName, 3, true) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.getWrongFeeFromChain, null)
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -71,7 +73,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.balanceIsNotEnough, null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -98,7 +100,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.none, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}

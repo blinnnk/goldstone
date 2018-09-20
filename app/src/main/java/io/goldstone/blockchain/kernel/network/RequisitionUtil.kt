@@ -202,7 +202,7 @@ object RequisitionUtil {
 			Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
-				GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.postFailed(error)) }
+				GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.PostFailed(error)) }
 				LogUtil.error("$api $keyName", error)
 			}
 
@@ -219,7 +219,7 @@ object RequisitionUtil {
 						hold(gson.fromJson(jsonData, collectionType))
 					}
 				} catch (error: Exception) {
-					GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.resolveDataError(error)) }
+					GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.ResolveDataError(error)) }
 					LogUtil.error(keyName, error)
 					GoldStoneCode.showErrorCodeReason(data)
 				}

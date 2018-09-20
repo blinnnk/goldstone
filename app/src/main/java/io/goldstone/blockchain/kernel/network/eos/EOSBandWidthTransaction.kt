@@ -36,8 +36,8 @@ class EOSBandWidthTransaction(
 		// 这个状态下其实是否 `transfer` 无意义, 所以当程序辨别这种情况的时候默认修改这个值为 `false`
 		val transferStatus = if (stakeToSelf) false else isTransfer
 		// 判断抵押对象, 因为我们的界面是把 `CPU` 和 `NET` 切分的, 所以这里判断当前的值是什么
+		val netEOSCount = if (tradingType == TradingType.NET) count else BigInteger.ZERO
 		val cpuEOSCount = if (tradingType == TradingType.CPU) count else BigInteger.ZERO
-		val netEOSCount = if (tradingType == TradingType.NET) BigInteger.ZERO else count
 		val bandWidthInfo = BandWidthModel(
 			listOf(fromAccount),
 			fromAccount.actor,

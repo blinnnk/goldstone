@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
+import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -29,10 +30,10 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread callback: (TransferError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.incorrectDecimal)
+		callback(TransferError.IncorrectDecimal)
 	else generateBCHPaymentModel(count, changeAddress) { error, paymentModel ->
 		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
@@ -50,7 +51,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
@@ -62,7 +63,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 		false
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.getWrongFeeFromChain, null)
+			hold(TransferError.GetWrongFeeFromChain, null)
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
@@ -70,7 +71,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 			if (unspents.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.balanceIsNotEnough, null)
+					hold(TransferError.BalanceIsNotEnough, null)
 				}
 				return@getUnspentListByAddress
 			}
@@ -96,7 +97,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.none, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}
