@@ -39,16 +39,16 @@ object EOSRAMUtil {
 		EOSAPI.getRamBalance({
 			LogUtil.error("getRAMAmountByCoin", it)
 		}) { model ->
-			val r = model.supply.toDouble()
-			val c = model.quote.balance.toDouble() + pair.first
-			val f = model.quote.weight.toDouble() / 1000.toDouble()
-			val nE = -r * (1 - Math.pow(1 + (pair.first / c), f))
+			val ramTotal = model.supply.toDouble()
+			val eosBalance = model.quote.balance.toDouble() + pair.first
+			val mi = model.quote.weight.toDouble() / 1000.toDouble()
+			val ramcoreOfEOS = -ramTotal * (1 - Math.pow(1 + (pair.first / eosBalance), mi))
 			
-			val nR = model.supply.toDouble() - pair.first
-			val nC = model.base.balance.toDouble()
-			val nF = 1000 / model.base.weight.toDouble()
+			val ramcoreTotal = model.supply.toDouble() - pair.first
+			val RAMBalance = model.base.balance.toDouble()
+			val constF = 1000 / model.base.weight.toDouble()
 			
-			var nT = nC * (Math.pow(1 + (nE / nR), nF) - 1)
+			var ramAmount = RAMBalance * (Math.pow(1 + (ramcoreOfEOS / ramcoreTotal), constF) - 1)
 			
 			val divisor = when(unit.value) {
 				EOSUnit.Byte.value -> 1
@@ -57,9 +57,9 @@ object EOSRAMUtil {
 				else -> 1
 			}
 			
-			nT /= divisor
+			ramAmount /= divisor
 			
-			hold(nT)
+			hold(ramAmount)
 		}
 	}
 	
