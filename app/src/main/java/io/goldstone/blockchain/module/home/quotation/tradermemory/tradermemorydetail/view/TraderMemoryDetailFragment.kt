@@ -4,19 +4,15 @@ import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EosRamPriceTrendFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -52,7 +48,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						}
 						id = ElementID.traderMemorySalesRecordAndLargeSingleRecord
 					}
-					addFragmentAndSetArgument<TraderMemorySalesRecordAndLargeSingleRecordFragment>(
+					addFragmentAndSetArgument<EOSMemoryTransactionHistoryFragment>(
 						ElementID.traderMemorySalesRecordAndLargeSingleRecord
 					) {
 					}
@@ -73,9 +69,13 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 			roundButton.into(this)
 			roundButton.apply {
 				text = "买入/卖出 RAM"
+				y -= 10.uiPX()
 				setBlueStyle(20.uiPX(), ScreenSize.widthWithPadding - 40.uiPX())
 				setAlignParentBottom()
 				setCenterInHorizontal()
+				onClick {
+					presenter.sendRAM()
+				}
 			}
 		}
 	}

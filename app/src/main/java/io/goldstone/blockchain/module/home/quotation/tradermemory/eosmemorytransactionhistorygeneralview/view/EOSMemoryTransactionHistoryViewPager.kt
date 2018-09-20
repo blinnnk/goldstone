@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view
+package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view
 
 import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
@@ -7,7 +7,7 @@ import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.ViewPagerID
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordlist.view.TraderMemorySalesRecordAndLargeSingleRecordListFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.view.EOSMemoryTransactionHistoryListFragment
 import java.util.*
 
 @SuppressLint("ViewConstructor")
@@ -16,14 +16,14 @@ import java.util.*
  * @author wcx
  */
 
-class TraderMemorySalesRecordAndLargeSingleRecordViewPager(val fragment: Fragment) : ViewPager(fragment.context!!) {
+class EOSMemoryTransactionHistoryViewPager(val fragment: Fragment) : ViewPager(fragment.context!!) {
 
 	private var fragmentList = ArrayList<SubFragment>()
 	private val traderMemorySalesRecord by lazy {
-		TraderMemorySalesRecordAndLargeSingleRecordListFragment(true)
+		EOSMemoryTransactionHistoryListFragment(true)
 	}
 	private val traderMemoryLargeSingleRecord by lazy {
-		TraderMemorySalesRecordAndLargeSingleRecordListFragment(false)
+		EOSMemoryTransactionHistoryListFragment(false)
 	}
 
 	init {

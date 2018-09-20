@@ -8,7 +8,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.TraderMemoryDetailOverlay.presenter.TraderMemoryOverlayPresenter
-import io.goldstone.blockchain.module.home.quotation.tradermemory.salesrecordandlargesinglerecordgeneralview.view.TraderMemorySalesRecordAndLargeSingleRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 
 /**
  * @date 18/09/2018 6:36 PM
@@ -32,7 +32,7 @@ class TraderMemoryOverlayFragment : BaseOverlayFragment<TraderMemoryOverlayPrese
 
 	companion object {
 		fun removeContentOverlayOrElse(
-			fragment: TraderMemorySalesRecordAndLargeSingleRecordFragment,
+			fragment: EOSMemoryTransactionHistoryFragment,
 			callback: () -> Unit
 		) {
 			fragment.getParentContainer()

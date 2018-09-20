@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.UiThread
+import android.util.Log
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
@@ -12,8 +13,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -24,6 +25,7 @@ import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -533,6 +535,29 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			hold(this.toArrayList())
+		}
+	
+	}
+	@JvmStatic
+	fun getEOSMemoryTransactionHistory(
+		account: String,
+		errorCallback: (Exception) -> Unit = {},
+		hold: (EOSMemoryTransactionHistoryListModel?) -> Unit
+	) {
+		requestData<String>(
+			APIPath.getEOSMemoryTransactionHistory(APIPath.currentUrl) + account,
+			"",
+			true,
+			errorCallback,
+			isEncrypt = true
+		) {
+			val data = JSONObject(this[0])
+			Log.e("EOSMemory", "++" + data.toString())
+			val gson = Gson()
+			val eosMemoryTransactionHistoryListModel = gson.fromJson(data.toString(), EOSMemoryTransactionHistoryListModel::class.java)
+			GoldStoneAPI.context.runOnUiThread {
+				hold(eosMemoryTransactionHistoryListModel)
+			}
 		}
 	}
 }
