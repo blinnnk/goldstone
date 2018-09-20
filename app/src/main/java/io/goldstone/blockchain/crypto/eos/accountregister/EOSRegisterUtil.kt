@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.accountregister
 
 import io.goldstone.blockchain.crypto.eos.EOSUtils
-import io.goldstone.blockchain.crypto.eos.eosram.EOSRamModel
+import io.goldstone.blockchain.crypto.eos.eosram.EOSBuyRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSChain
@@ -16,7 +16,7 @@ object EOSRegisterUtil {
 		chainID: EOSChain,
 		header: TransactionHeader,
 		newAccountModel: EOSNewAccountModel,
-		ramModel: EOSRamModel,
+		ramModel: EOSBuyRamModel,
 		netCPUModel: BandWidthModel,
 		isPackedData: Boolean
 	): String {

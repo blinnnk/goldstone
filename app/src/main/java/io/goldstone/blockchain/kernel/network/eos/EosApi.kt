@@ -18,7 +18,10 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
@@ -29,7 +32,7 @@ import java.math.BigInteger
 object EOSAPI {
 
 	var hasRetry = false
-	fun getAccountInfoByName(
+	fun getAccountInfo(
 		accountName: String,
 		errorCallBack: (GoldStoneError) -> Unit,
 		targetNet: String = "",
@@ -47,7 +50,7 @@ object EOSAPI {
 				api,
 				{
 					errorCallBack(RequestError.PostFailed(it))
-					LogUtil.error("getAccountInfoByName", it)
+					LogUtil.error("getAccountInfo", it)
 				},
 				false
 			) { result ->
@@ -55,12 +58,23 @@ object EOSAPI {
 				// TODO 整体的链重试需要思考怎么封装
 				if (!hasRetry && result.contains("NODEOS_UNREACHABLE")) {
 					EOSUrl.currentEOSTestUrl = ChainURL.eosTestBackUp
-					getAccountInfoByName(accountName, errorCallBack, "", hold)
+					getAccountInfo(accountName, errorCallBack, "", hold)
 					hasRetry = true
 				}
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
 				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
 			}
+		}
+	}
+
+	fun getAvailableRamBytes(
+		accountName: String,
+		errorCallBack: (GoldStoneError) -> Unit,
+		hold: (BigInteger) -> Unit
+	) {
+		getAccountInfo(accountName, errorCallBack) {
+			val availableRAM = it.ramQuota - it.ramUsed
+			hold(availableRAM)
 		}
 	}
 
@@ -97,7 +111,7 @@ object EOSAPI {
 	}
 
 	fun getAccountEOSBalance(accountName: String, hold: (balance: Double) -> Unit) {
-		getAccountBalanceBySymbol(accountName, CoinSymbol.eos, EOSCodeName.EOSIOToken, hold)
+		getAccountBalanceBySymbol(accountName, CoinSymbol.EOS, EOSCodeName.EOSIOToken, hold)
 	}
 
 	fun getChainInfo(
@@ -119,7 +133,7 @@ object EOSAPI {
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (GoldStoneError) -> Unit,
 		hold: (EOSResponse) -> Unit
 	) {
 		RequestBody.create(
@@ -130,11 +144,11 @@ object EOSAPI {
 				Pair("compression", "none"),
 				Pair("packed_context_free_data", "00")
 			)
-		).let { it ->
+		).let { requestBody ->
 			RequisitionUtil.postRequest(
-				it,
+				requestBody,
 				EOSUrl.pushTransaction(),
-				errorCallBack,
+				{ errorCallBack(RequestError.PostFailed(it)) },
 				false
 			) {
 				val response = JSONObject(it)
@@ -143,7 +157,9 @@ object EOSAPI {
 					val transactionID = response.safeGet("transaction_id")
 					val receipt = JSONObject(result.safeGet("receipt"))
 					hold(EOSResponse(transactionID, receipt))
-				} else errorCallBack(Exception("Empty Result Response"))
+				} else GoldStoneAPI.context.runOnUiThread {
+					errorCallBack(RequestError.ResolveDataError(GoldStoneError(it)))
+				}
 			}
 		}
 	}
@@ -161,16 +177,16 @@ object EOSAPI {
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountBalanceBySymbol(
 		accountName: String,
-		symbol: String,
+		symbol: CoinSymbol,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIOToken,
-		hold: (balance: Double) -> Unit
+		@UiThread hold: (balance: Double) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(
 				Pair("code", tokenCodeName.value),
 				Pair("account", accountName),
-				Pair("symbol", symbol)
+				Pair("symbol", symbol.symbol)
 			)
 		).let { it ->
 			RequisitionUtil.postRequest(
@@ -183,7 +199,99 @@ object EOSAPI {
 			) {
 				val balances = JSONArray(it)
 				val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
-				hold(balance.toDoubleOrNull().orZero())
+				GoldStoneAPI.context.runOnUiThread {
+					hold(balance.toDoubleOrNull().orZero())
+				}
+			}
+		}
+	}
+
+	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
+	fun getAccountResource(
+		accountName: String,
+		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
+		@UiThread hold: (resource: TotalResources) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", accountName),
+				Pair("code", tokenCodeName.value),
+				Pair("table", "userres"),
+				Pair("json", true)
+			)
+		).let { requestBody ->
+			RequisitionUtil.postRequest<TotalResources>(
+				requestBody,
+				"rows",
+				EOSUrl.getTableRows(),
+				false,
+				{
+					LogUtil.error("getAccountEOSBalance", it)
+				},
+				false
+			) {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(it.first())
+				}
+			}
+		}
+	}
+
+	fun getRecycledBandWidthList(
+		accountName: String,
+		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
+		@UiThread hold: (data: List<RefundRequestInfo>) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", accountName),
+				Pair("code", tokenCodeName.value),
+				Pair("table", "refunds"),
+				Pair("json", true)
+			)
+		).let { requestBody ->
+			RequisitionUtil.postRequest<RefundRequestInfo>(
+				requestBody,
+				"rows",
+				EOSUrl.getTableRows(),
+				false,
+				{ LogUtil.error("getRecycledBandWidthList", it) },
+				false
+			) {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(it)
+				}
+			}
+		}
+	}
+
+	fun getDelegateBandWidthList(
+		accountName: String,
+		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
+		@UiThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", accountName),
+				Pair("code", tokenCodeName.value),
+				Pair("table", "delband"),
+				Pair("json", true)
+			)
+		).let { requestBody ->
+			RequisitionUtil.postRequest<DelegateBandWidthInfo>(
+				requestBody,
+				"rows",
+				EOSUrl.getTableRows(),
+				false,
+				{ LogUtil.error("getMyDelegateBandWidth", it) },
+				false
+			) {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(it)
+				}
 			}
 		}
 	}
@@ -228,6 +336,7 @@ object EOSAPI {
 		errorCallBack: (Throwable) -> Unit,
 		@WorkerThread hold: (data: List<EOSTransactionTable>) -> Unit
 	) {
+
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(
@@ -261,7 +370,7 @@ object EOSAPI {
 		}
 	}
 
-	fun getCPUAndNETUsageByTxID(
+	fun getBandWidthByTxID(
 		txID: String,
 		errorCallBack: (Throwable) -> kotlin.Unit,
 		@WorkerThread hold: (cpuUsage: BigInteger, netUsage: BigInteger, status: String) -> Unit

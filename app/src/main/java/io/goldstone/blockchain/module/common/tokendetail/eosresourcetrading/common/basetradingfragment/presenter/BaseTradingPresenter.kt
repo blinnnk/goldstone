@@ -7,9 +7,9 @@ import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
@@ -17,18 +17,21 @@ import io.goldstone.blockchain.crypto.error.AccountError
 import io.goldstone.blockchain.crypto.error.GoldStoneError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
+import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSBuyRamTransaction
+import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSSellRamTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import org.jetbrains.anko.support.v4.toast
-
 
 /**
  * @author KaySaith
@@ -39,11 +42,15 @@ open class BaseTradingPresenter(
 ) : BasePresenter<BaseTradingFragment>() {
 
 	open fun gainConfirmEvent(callback: (GoldStoneError) -> Unit) {
-		delegateResource(fragment, fragment.tradingType, callback)
+		if (fragment.tradingType == TradingType.RAM)
+			fragment.tradingRam(StakeType.BuyRam, callback)
+		else fragment.stakeResource(fragment.tradingType, StakeType.Delegate, callback)
 	}
 
 	open fun refundOrSellConfirmEvent(callback: (GoldStoneError) -> Unit) {
-		refundResource(fragment, fragment.tradingType, callback)
+		if (fragment.tradingType == TradingType.RAM)
+			fragment.tradingRam(StakeType.SellRam, callback)
+		else fragment.stakeResource(fragment.tradingType, StakeType.Refund, callback)
 	}
 
 	override fun onFragmentViewCreated() {
@@ -72,179 +79,85 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	private fun buyRam(
-		tradingType: TradingType,
-		callback: (GoldStoneError) -> Unit
-	) {
-		prepareTransaction(fragment, StakeType.BuyRam) { fragment, accountName, toAccountName, count, stakeType, error ->
-			if (!error.isNone()) {
+	private fun BaseTradingFragment.tradingRam(stakeType: StakeType, callback: (GoldStoneError) -> Unit) {
+		val fromAccount = Config.getCurrentEOSName()
+		val chainID = Config.getEOSCurrentChain()
+		val toAccountName = getInputValue(stakeType).first
+		val tradingCount = getInputValue(stakeType).second
+		prepareTransaction(
+			context,
+			fromAccount,
+			toAccountName,
+			tradingCount,
+			CoinSymbol.EOS,
+			stakeType.isSellRam()
+		) { privateKey, error ->
+			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
+			fun completeEvent() {
+				// 清空输入框里面的值
+				fragment.clearInputValue()
+				// 成功提示
+				fragment.toast(CommonText.succeed)
+				// 更新数据库数据并且更新界面的数据
+				fragment.presenter.updateLocalDataAndUI()
 				callback(error)
-				return@prepareTransaction
 			}
-			PaymentPreparePresenter.checkBalanceIsEnoughOrElse(
-				accountName,
-				CoinSymbol.getEOS(),
-				count
-			) { hasEnoughBalance ->
-				if (!hasEnoughBalance) {
-					callback(TransferError.BalanceIsNotEnough)
-					return@checkBalanceIsEnoughOrElse
-				}
-				getPrivateKeyAndSendTransaction(
-					fragment.context,
-					fragment.isSelectedTransfer(stakeType),
+			if (error.isNone() && !privateKey.isNull()) {
+				if (stakeType.isBuyRam()) EOSBuyRamTransaction(
+					chainID,
+					fromAccount,
 					toAccountName,
-					count,
-					tradingType,
-					stakeType
-				) {
-					completeEvent(fragment, callback)
+					tradingCount.toEOSUnit(),
+					ExpirationType.FiveMinutes
+				).send(privateKey!!, callback) {
+					completeEvent()
+				} else EOSSellRamTransaction(
+					chainID,
+					fromAccount,
+					tradingCount.toLong().toBigInteger(),
+					ExpirationType.FiveMinutes
+				).send(privateKey!!, callback) {
+					completeEvent()
 				}
-			}
-		}
-
-	}
-
-	private fun <T : BaseTradingFragment> delegateResource(
-		fragment: T,
-		tradingType: TradingType,
-		callback: (GoldStoneError) -> Unit
-	) {
-		val stakeType = StakeType.Delegate
-		fragment.showLoading(true, stakeType)
-		val currentAccountName = Config.getCurrentEOSName()
-		// first is name, second is eos amount
-		val inputValue = fragment.getInputValue(stakeType)
-		isValidInputValue(fragment.context, inputValue) { error ->
-			if (!error.isNone()) {
-				callback(error)
-				return@isValidInputValue
-			}
-			PaymentPreparePresenter.checkBalanceIsEnoughOrElse(
-				currentAccountName,
-				CoinSymbol.getEOS(),
-				inputValue.second
-			) { hasEnoughBalance ->
-				if (hasEnoughBalance) getPrivateKeyAndSendTransaction(
-					fragment.context,
-					fragment.isSelectedTransfer(stakeType),
-					inputValue.first,
-					inputValue.second,
-					tradingType,
-					stakeType
-				) {
-					completeEvent(fragment, callback)
-				} else {
-					callback(TransferError.BalanceIsNotEnough)
-				}
-			}
+			} else callback(error)
 		}
 	}
 
-	private fun <T : BaseTradingFragment> refundResource(
-		fragment: T,
-		tradingType: TradingType,
-		callback: (GoldStoneError) -> Unit
-	) {
-		val stakeType = StakeType.Refund
-		fragment.showLoading(true, stakeType)
-		val currentAccountName = Config.getCurrentEOSName()
-		// first is name, second is eos amount
-		val inputValue = fragment.getInputValue(stakeType)
-		isValidInputValue(fragment.context, inputValue) { error ->
-			if (!error.isNone()) {
-				callback(error)
-				return@isValidInputValue
-			}
-			PaymentPreparePresenter.checkResourceIsEnoughOrElse(
-				currentAccountName,
-				inputValue.second,
-				tradingType,
-				callback
-			) { transferError ->
-				if (transferError.isNone()) getPrivateKeyAndSendTransaction(
-					fragment.context,
-					false, // 释放 `bandWidth` 不用传递这个字段
-					inputValue.first,
-					inputValue.second,
-					tradingType,
-					stakeType
-				) {
-					if (it.isNone()) completeEvent(fragment, callback)
-					else callback(it)
-				} else {
-					callback(TransferError.BalanceIsNotEnough)
-				}
-			}
-		}
-	}
-
-	private fun completeEvent(
-		fragment: BaseTradingFragment,
-		callback: (GoldStoneError) -> Unit
-	) {
-		// 清空输入框里面的值
-		fragment.clearInputValue()
-		// 成功提示
-		fragment.toast(CommonText.succeed)
-		// 更新数据库数据并且更新界面的数据
-		fragment.presenter.updateLocalDataAndUI()
-		callback(GoldStoneError.None)
-	}
-
-	private fun isValidInputValue(
-		context: Context?,
-		inputValue: Pair<String, Double>,
-		callback: (GoldStoneError) -> Unit
-	) {
-		// 检查用户名是否正确
-		if (!EOSWalletUtils.isValidAccountName(inputValue.first)) {
-			context.alert("Wrong EOS Account Name Formatted, Please Check And Re-Enter")
-			callback(AccountError.InvalidAccountName)
-			return
-		} else if (inputValue.second == 0.0) {
-			context.alert("Please Enter EOS Amount That You Decide To Buy")
-			callback(TransferError.TradingInputIsEmpty)
-			return
-		} else callback(GoldStoneError.None)
-	}
-
-	private fun getPrivateKeyAndSendTransaction(
-		context: Context?,
-		isTransfer: Boolean,
-		toAccountName: String,
-		stakeCount: Double,
+	private fun BaseTradingFragment.stakeResource(
 		tradingType: TradingType,
 		stakeType: StakeType,
 		callback: (GoldStoneError) -> Unit
 	) {
-		PaymentPreparePresenter.showGetPrivateKeyDashboard(context) { privateKey, error ->
-			if (privateKey.isNull()) {
-				// 用户主动取消输入密码也会到这里
-				if (error != GoldStoneError.None) context.alert(error.message)
-				callback(AccountError.None)
-			} else EOSBandWidthTransaction(
-				Config.getEOSCurrentChain(),
-				EOSAuthorization(Config.getCurrentEOSName(), EOSActor.Active),
-				toAccountName,
-				stakeCount.toEOSUnit(),
-				tradingType,
-				stakeType,
-				isTransfer,
-				ExpirationType.FiveMinutes
-			).send(
-				privateKey!!,
-				callback
-			) {
-				// TODO 用 Response 做点什么
-				callback(AccountError.None)
-			}
+		val fromAccount = Config.getCurrentEOSName()
+		val toAccountName = getInputValue(stakeType).first
+		val transferCount = getInputValue(stakeType).second
+		prepareTransaction(context, fromAccount, toAccountName, transferCount, CoinSymbol.EOS) { privateKey, error ->
+			if (error.isNone() && !privateKey.isNull()) {
+				EOSBandWidthTransaction(
+					Config.getEOSCurrentChain(),
+					EOSAuthorization(fromAccount, EOSActor.Active),
+					toAccountName,
+					transferCount.toEOSUnit(),
+					tradingType,
+					stakeType,
+					fragment.isSelectedTransfer(stakeType),
+					ExpirationType.FiveMinutes
+				).send(privateKey!!, callback) {
+					// 清空输入框里面的值
+					fragment.clearInputValue()
+					// 成功提示
+					fragment.toast(CommonText.succeed)
+					// 更新数据库数据并且更新界面的数据
+					fragment.presenter.updateLocalDataAndUI()
+					callback(error)
+				}
+			} else callback(error)
 		}
 	}
 
 	private fun updateLocalDataAndUI() {
 		val currentAccountName = Config.getCurrentEOSName()
-		EOSAPI.getAccountInfoByName(
+		EOSAPI.getAccountInfo(
 			currentAccountName,
 			{ LogUtil.error("updateLocalResourceData", it) }
 		) { newData ->
@@ -257,31 +170,53 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	private fun <T : BaseTradingFragment> prepareTransaction(
-		fragment: T,
-		stakeType: StakeType,
-		hold: (
-			fragment: T,
-			accountName: String,
+	companion object {
+
+		fun prepareTransaction(
+			context: Context?,
+			fromAccountName: String,
 			toAccountName: String,
-			count: Double,
-			stakeType: StakeType,
-			error: GoldStoneError
-		) -> Unit
-	) {
-		fragment.showLoading(true, stakeType)
-		val currentAccountName = Config.getCurrentEOSName()
-		// first is name, second is eos amount
-		val inputValue = fragment.getInputValue(stakeType)
-		isValidInputValue(fragment.context, inputValue) { isValidInput ->
-			hold(
-				fragment,
-				currentAccountName,
-				fragment.getInputValue(stakeType).first,
-				fragment.getInputValue(stakeType).second,
-				stakeType,
-				isValidInput
-			)
+			tradingCount: Double,
+			symbol: CoinSymbol,
+			isSellRam: Boolean = false,
+			hold: (
+				privateKey: EOSPrivateKey?,
+				error: GoldStoneError
+			) -> Unit
+		) {
+			// 检出用户的输入值是否合规
+			isValidInputValue(Pair(toAccountName, tradingCount)) { error ->
+				if (!error.isNone()) hold(null, error) else {
+					// 检查余额
+					if (isSellRam) EOSAPI.getAvailableRamBytes(
+						fromAccountName,
+						{ hold(null, error) }
+					) {
+						// 检查发起账户的 `RAM` 余额是否足够
+						if (it < tradingCount.toLong().toBigInteger()) hold(null, TransferError.BalanceIsNotEnough)
+						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+					} else EOSAPI.getAccountBalanceBySymbol(fromAccountName, symbol) { balance ->
+						// 检查发起账户的余额是否足够
+						if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+					}
+				}
+			}
+		}
+
+		private fun isValidInputValue(
+			inputValue: Pair<String, Double>,
+			callback: (GoldStoneError) -> Unit
+		) {
+			if (!EOSWalletUtils.isValidAccountName(inputValue.first)) {
+				// 检查用户名是否正确
+				callback(AccountError.InvalidAccountName)
+			} else if (inputValue.second == 0.0) {
+				callback(TransferError.TradingInputIsEmpty)
+			} else if (!inputValue.second.toString().isValidDecimal(CryptoValue.eosDecimal)) {
+				// 检出输入值的精度是否正确
+				callback(TransferError.IncorrectDecimal)
+			} else callback(GoldStoneError.None)
 		}
 	}
 }

@@ -159,6 +159,10 @@ fun BigInteger.toEOSCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
 }
 
+fun BigInteger.toCount(decimal: Int): Double {
+	return CryptoUtils.toCountByDecimal(this, decimal)
+}
+
 fun Double.toBTCCount(): Double {
 	return this / 100000000.0
 }

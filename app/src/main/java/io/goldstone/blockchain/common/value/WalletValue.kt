@@ -7,7 +7,7 @@ import java.io.Serializable
  * @author KaySaith
  */
 object DataValue {
-	const val pageCount = 50
+	const val pageCount = 100
 	const val quotationDataCount = 10
 	const val candleChartCount = 100
 }

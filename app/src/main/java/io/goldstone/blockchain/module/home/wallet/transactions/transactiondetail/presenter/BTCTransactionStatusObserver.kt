@@ -33,7 +33,7 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBTCTransactionSucceed()
-				val address = CoinSymbol.getBTC().getAddress()
+				val address = CoinSymbol.BTC.getAddress()
 				updateWalletDetailBTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()

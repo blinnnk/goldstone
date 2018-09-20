@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.doAsync
@@ -218,11 +219,14 @@ fun Context.getPrivateKeyByWalletID(
 		walletID,
 		errorCallback
 	) { it ->
-		WalletUtil.getKeyPairFromWalletFile(
-			it,
-			password,
-			errorCallback
-		)?.let { hold(it.privateKey) }
+		doAsync {
+			// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
+			WalletUtil.getKeyPairFromWalletFile(
+				it,
+				password,
+				errorCallback
+			)?.let { GoldStoneAPI.context.runOnUiThread { hold(it.privateKey) } }
+		}
 	}
 }
 

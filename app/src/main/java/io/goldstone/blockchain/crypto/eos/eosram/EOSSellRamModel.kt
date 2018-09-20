@@ -5,23 +5,20 @@ import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import java.io.Serializable
 import java.math.BigInteger
 
+
 /**
  * @author KaySaith
- * @date 2018/09/05
+ * @date  2018/09/20
  */
 
-
-data class EOSRamModel(
+data class EOSSellRamModel(
 	val authorizations: List<EOSAuthorization>,
 	val payerName: String,
-	val receiverName: String,
-	val eosAmount: BigInteger,
-	val isBuying: Boolean
+	val ramByte: BigInteger
 ) : Serializable, EOSModel {
 	@Throws
 	override fun createObject(): String {
@@ -30,29 +27,24 @@ data class EOSRamModel(
 			authorizationObjects += it.createObject() + ","
 		}
 		authorizationObjects = authorizationObjects.substringBeforeLast(",")
-		val eosCount = EOSUtils.convertAmountToValidFormat(eosAmount)
-		val method =
-			if (isBuying) StakeType.BuyRam else StakeType.SellRam
-		return "{\"account\":\"eosio\",\"name\":\"${method.value}\",\"authorization\":[$authorizationObjects],\"data\":{\"payer\":\"$payerName\",\"receiver\":\"$receiverName\",\"quant\":\"$eosCount ${CoinSymbol.eos}\"},\"hex_data\":\"\"}"
+		val method = StakeType.SellRam.value
+		return "{\"account\":\"eosio\",\"name\":\"$method\",\"authorization\":[$authorizationObjects],\"data\":{\"account\":\"$payerName\",\"bytes\":$ramByte}}"
 	}
 
 	override fun serialize(): String {
-		val method =
-			if (isBuying) StakeType.BuyRam else StakeType.SellRam
+		val method = StakeType.SellRam.value
 		val serializedAccount = EOSUtils.getLittleEndianCode(EOSCodeName.EOSIO.value)
-		val serializedMethodName = EOSUtils.getLittleEndianCode(method.value)
+		val serializedMethodName = EOSUtils.getLittleEndianCode(method)
 		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
 		var serializedAuthorizations = ""
 		authorizations.forEach {
 			serializedAuthorizations += it.serialize()
 		}
-		val serializedBuyInfo = EOSTransactionInfo(
-			payerName,
-			receiverName,
-			eosAmount
-		).serialize()
-		val hexDataLength = EOSUtils.getHexDataByteLengthCode(serializedBuyInfo)
+		val serializedPayerName = EOSUtils.getLittleEndianCode(payerName)
+		val serializedRamByte = EOSUtils.convertAmountToCode(ramByte)
+		val serializedSellData = serializedPayerName + serializedRamByte
+		val hexDataLength = EOSUtils.getHexDataByteLengthCode(serializedSellData)
 		return serializedAccount + serializedMethodName + serializedAuthorizationSize +
-			serializedAuthorizations + hexDataLength + serializedBuyInfo
+			serializedAuthorizations + hexDataLength + serializedSellData
 	}
 }

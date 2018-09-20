@@ -33,7 +33,7 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBCHTransactionSucceed()
-				val address = CoinSymbol.getBCH().getAddress()
+				val address = CoinSymbol.BCH.getAddress()
 				updateWalletDetailBCHValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()

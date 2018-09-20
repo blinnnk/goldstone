@@ -8,6 +8,7 @@ import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.crypto.error.RequestError
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.runOnUiThread
@@ -19,6 +20,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 abstract class EOSTransactionInterface {
 
+	@Throws
 	abstract fun serialized(
 		errorCallback: (GoldStoneError) -> Unit,
 		@UiThread hold: (EOSTransactionSerialization) -> Unit
@@ -35,6 +37,7 @@ abstract class EOSTransactionInterface {
 				listOf(signature),
 				data.packedTX,
 				{
+					errorCallback(RequestError.PostFailed(it))
 					LogUtil.error("EOSTransaction, Send", it)
 				}
 			) {

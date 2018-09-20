@@ -36,7 +36,7 @@ class RadioWithTitle(context: Context) : LinearLayout(context) {
 	}
 
 	init {
-		gravity = Gravity.CENTER
+		gravity = Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
 		layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
 		linearLayout {
 			lparams(wrapContent, matchParent)

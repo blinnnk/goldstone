@@ -6,7 +6,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
@@ -15,6 +14,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.error.AccountError
 import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.crypto.error.PassowrdError
 import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -131,13 +131,14 @@ class PaymentPreparePresenter(
 
 		fun showGetPrivateKeyDashboard(
 			context: Context?,
-			hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			context?.showAlertView(
 				"Transfer EOS Token",
 				"prepare to transfer eos token, now you should enter your password",
 				true,
 				{
+					// User click cancel button
 					hold(null, AccountError.None)
 				}
 			) { passwordInput ->
@@ -153,20 +154,7 @@ class PaymentPreparePresenter(
 						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)
 						else hold(null, AccountError.DecryptKeyStoreError)
 					}
-				} else context.alert(CommonText.enterPassword)
-			}
-		}
-
-		fun checkBalanceIsEnoughOrElse(
-			accountName: String,
-			symbol: CoinSymbol,
-			transferCount: Double,
-			@UiThread hold: (isEnough: Boolean) -> Unit
-		) {
-			EOSAPI.getAccountBalanceBySymbol(accountName, symbol.symbol!!) { balance ->
-				GoldStoneAPI.context.runOnUiThread {
-					hold(balance >= transferCount)
-				}
+				} else hold(null, PassowrdError.InputIsEmpty)
 			}
 		}
 
@@ -178,7 +166,7 @@ class PaymentPreparePresenter(
 			errorCallback: (GoldStoneError) -> Unit,
 			@UiThread hold: (GoldStoneError) -> Unit
 		) {
-			EOSAPI.getAccountInfoByName(
+			EOSAPI.getAccountInfo(
 				accountName,
 				errorCallback
 			) {
