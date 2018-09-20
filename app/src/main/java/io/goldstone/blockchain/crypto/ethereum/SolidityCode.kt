@@ -5,7 +5,6 @@ package io.goldstone.blockchain.crypto.ethereum
  * @author KaySaith
  */
 object SolidityCode {
-
 	const val contractTransfer = "0xa9059cbb"
 	const val ethTransfer = "0x"
 	const val ethCall = "0x95d89b41000000000000000000000000"

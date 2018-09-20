@@ -7,11 +7,11 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity

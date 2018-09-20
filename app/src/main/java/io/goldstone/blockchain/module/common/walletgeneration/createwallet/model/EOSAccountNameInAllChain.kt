@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
 import org.json.JSONObject
 
@@ -27,18 +26,20 @@ data class EOSDefaultAllChainName(
 	}
 
 	fun getCurrent(): String {
-		return when (Config.getEOSCurrentChain()) {
-			ChainID.eosMain -> main
-			ChainID.eosTest -> jungle
+		val currentChainID = Config.getEOSCurrentChain()
+		return when {
+			currentChainID.isEOSMain() -> main
+			currentChainID.isEOSTest() -> jungle
 			else -> main
 		}
 	}
 
 	fun updateCurrent(name: String): EOSDefaultAllChainName {
+		val currentChainID = Config.getEOSCurrentChain()
 		return apply {
-			when (Config.getEOSCurrentChain()) {
-				ChainID.eosMain -> main = name
-				ChainID.eosTest -> jungle = name
+			when {
+				currentChainID.isEOSMain() -> main = name
+				currentChainID.isEOSTest() -> jungle = name
 				else -> main = name
 			}
 		}

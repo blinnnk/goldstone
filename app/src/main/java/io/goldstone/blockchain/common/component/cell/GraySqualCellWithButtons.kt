@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.cell
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -26,15 +27,16 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context) {
 
-	private val cellHeight = 45.uiPX()
+	private var cellHeight = 45.uiPX()
 	protected val title = TextView(context).apply {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.heavy(context)
-		textColor = GrayScale.gray
+		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		x += 20.uiPX()
 		gravity = Gravity.CENTER_VERTICAL
 	}
+
 	protected val subtitle = TextView(context).apply {
 		visibility = View.GONE
 		textSize = fontSize(12)
@@ -42,6 +44,17 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		gravity = Gravity.CENTER_VERTICAL
+	}
+
+	protected val description by lazy {
+		TextView(context).apply {
+			textSize = fontSize(11)
+			typeface = GoldStoneFont.medium(context)
+			setTypeface(typeface, Typeface.ITALIC)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+			gravity = Gravity.CENTER_VERTICAL
+			visibility = View.GONE
+		}
 	}
 
 	val copyButton by lazy {
@@ -76,6 +89,7 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 			addView(lineView)
 			addView(title)
 			addView(subtitle)
+			addView(description)
 			addView(copyButton)
 			copyButton.setAlignParentRight()
 			copyButton.x -= 30.uiPX()
@@ -87,7 +101,9 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 
 	fun <T : CharSequence> setTitle(text: T) {
 		title.text = text
-		subtitle.leftPadding = 25.uiPX() + text.measureTextWidth(13.uiPX().toFloat()).toInt()
+		val paddingSize = 25.uiPX() + text.measureTextWidth(13.uiPX().toFloat()).toInt()
+		subtitle.leftPadding = paddingSize
+		description.leftPadding = paddingSize
 	}
 
 	fun showOnlyCopyButton(action: () -> Unit) {
@@ -98,6 +114,14 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 			action()
 		}
 		updateStyle(Normal, true)
+	}
+
+	fun showDescriptionTitle(text: String, color: Int = GrayScale.midGray) {
+		description.visibility = View.VISIBLE
+		description.text = text
+		description.textColor = color
+		subtitle.y -= 5.uiPX()
+		description.y += 8.uiPX()
 	}
 
 	fun setSubtitle(text: String) {
@@ -115,6 +139,9 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 			Default -> lineView.backgroundColor = Spectrum.blue
 		}
 	}
+
+	fun getTitle(): String = title.text.toString()
+	fun getSubtitle(): String = subtitle.text.toString()
 
 	companion object {
 		enum class CellType {

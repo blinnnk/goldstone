@@ -2,11 +2,10 @@ package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toLongOrZero
-import io.goldstone.blockchain.common.utils.*
+import com.blinnnk.extension.*
+import com.google.gson.Gson
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
@@ -16,21 +15,19 @@ import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.kernel.network.ParameterUtil
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.kernel.network.eos.model.EosBalanceModel
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
-import org.json.JSONArray
-import org.json.JSONObject
+import org.json.*
 import java.math.BigInteger
 
 object EOSAPI {
 
+	var hasRetry = false
 	fun getAccountInfoByName(
 		accountName: String,
 		errorCallBack: (Throwable) -> Unit,
@@ -40,17 +37,25 @@ object EOSAPI {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(Pair("account_name", accountName))
-		).let { it ->
+		).let { requestBody ->
 			val api =
 				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
 				else EOSUrl.getAccountInfoInTargetNet(targetNet)
 			RequisitionUtil.postRequest(
-				it,
+				requestBody,
 				api,
 				errorCallBack,
 				false
 			) { result ->
-				hold(EOSAccountTable(JSONObject(result)))
+				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
+				// TODO 整体的链重试需要思考怎么封装
+				if (!hasRetry && result.contains("NODEOS_UNREACHABLE")) {
+					EOSUrl.currentEOSTestUrl = ChainURL.eosTestBackUp
+					getAccountInfoByName(accountName, errorCallBack, "", hold)
+					hasRetry = true
+				}
+				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
+				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
 			}
 		}
 	}
@@ -81,7 +86,7 @@ object EOSAPI {
 				}
 				// 生成指定的包含链信息的结果类型
 				val accountNames =
-					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain()) }
+					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
 				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 			}
 		}
@@ -217,7 +222,7 @@ object EOSAPI {
 		from: Int,
 		to: Int,
 		errorCallBack: (Throwable) -> Unit,
-		hold: (data: List<EOSTransactionTable>) -> Unit
+		@WorkerThread hold: (data: List<EOSTransactionTable>) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -285,6 +290,51 @@ object EOSAPI {
 				false
 			) {
 				hold(JSONObject(it))
+			}
+		}
+	}
+	
+	fun getRamBalance(
+		errorCallBack: (Throwable) -> Unit,
+		@WorkerThread hold: (EosBalanceModel) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "rammarket"),
+				Pair("json", "true")
+			)
+		).let { it ->
+			RequisitionUtil.postRequest(
+				it,
+				EOSUrl.getTableRows(),
+				errorCallBack,
+				false
+			) {
+				try {
+					val balance = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
+					balance?.apply {
+						val model = Gson().fromJson(balance.toString(), EosBalanceModel::class.java)
+						model?.apply {
+							if (model.base.balance.contains("RAM")) {
+								model.base.balance = model.base.balance.replace("RAM", "").trim()
+							}
+							if (model.quote.balance.contains("EOS")) {
+								model.quote.balance = model.quote.balance.replace("EOS", "").trim()
+							}
+							if (model.supply.contains("RAMCORE")) {
+								model.supply = model.supply.replace("RAMCORE","").trim()
+							}
+							hold(model)
+						}
+						
+					}
+					
+				} catch (error: JSONException) {
+					errorCallBack(error)
+				}
 			}
 		}
 	}

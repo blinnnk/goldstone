@@ -318,7 +318,6 @@ fun Context.registerDevice(
 					goldStoneID,
 					isChina,
 					0,
-					Config.getCurrentChain().toInt(),
 					CountryCode.currentCountry,
 					{
 						// Error Callback

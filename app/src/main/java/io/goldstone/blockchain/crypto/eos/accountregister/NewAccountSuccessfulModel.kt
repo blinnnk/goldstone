@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.accountregister
 
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
+import com.blinnnk.extension.toBigIntegerOrZero
 import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger

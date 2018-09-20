@@ -10,8 +10,7 @@ import io.goldstone.blockchain.common.base.basecell.BaseValueCell
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.textColor
@@ -56,7 +55,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			info.apply {
 				title.text = it.addressName.scaleTo(14)
 				subtitle.text =
-					if (Config.getCurrentLanguageCode() == 0) it.addressInfo
+					if (Config.getCurrentLanguageCode() == 0) it.addressInfo.scaleTo(32)
 					else it.addressInfo.scaleTo(26)
 			}
 
@@ -65,13 +64,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 					(if (it.isReceived) "+" else "-") +
 					if (it.isFee) it.minerFee.substringBefore(" ") else it.count.formatCount()
 				subtitle.text = if (it.isFee) {
-					when {
-						TokenContract(it.contract).isETC() -> CoinSymbol.etc
-						TokenContract(it.contract).isBCH() -> CoinSymbol.bch
-						TokenContract(it.contract).isLTC() -> CoinSymbol.ltc
-						TokenContract(it.contract).isBTC() -> CoinSymbol.btc()
-						else -> CoinSymbol.eth
-					}
+					it.contract.getSymbol().symbol
 				} else it.symbol
 			}
 		}

@@ -10,7 +10,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.AttentionTextView
@@ -18,6 +17,7 @@ import io.goldstone.blockchain.common.component.ExplanationTitle
 import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -38,20 +38,20 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
-	
+
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val attentionTextView by lazy { AttentionTextView(context!!) }
 	override val presenter = MnemonicConfirmationPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			
+
 			attentionTextView.apply { text = CreateWalletText.mnemonicConfirmationDescription }.into(this)
-			
+
 			mnemonicInput.apply {
 				hint = WalletSettingsText.backUpMnemonicGotBefore
 			}.into(this)
@@ -62,7 +62,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 				var contentWidth = 0
 				var contentTopMargin = 0
 				var modulus = 0
-				
+
 				mnemonicCode?.split(" ".toRegex())?.shuffled()?.forEachIndexed { index, content ->
 					val wordWidth = content.measureTextWidth(15.uiPX().toFloat()).toInt() + 20.uiPX()
 					var isSelected = false
@@ -75,12 +75,12 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 						addCorner(15.uiPX(), GrayScale.whiteGray)
 						layoutParams = RelativeLayout.LayoutParams(wordWidth, 30.uiPX())
 						gravity = Gravity.CENTER
-						
+
 						onClick {
 							selectMnemonic(mnemonicInput, !isSelected)
 							isSelected = !isSelected
 						}
-						
+
 						if (contentWidth > ScreenSize.widthWithPadding - 110.uiPX()) {
 							contentWidth = 0
 							modulus = index
@@ -92,7 +92,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 					}
 				}
 			}
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				marginTop = 20.uiPX()
@@ -100,7 +100,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			}.click {
 				presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
 			}.into(this)
-			
+
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsMnemonic.setUnderline()
 			}.click {
@@ -113,7 +113,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			}.into(this)
 		}
 	}
-	
+
 	private fun BaseOverlayFragment<*>.showWebView() {
 		presenter.showTargetFragment<WebViewFragment>(
 			QAText.whatIsMnemonic,
@@ -123,7 +123,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			}
 		)
 	}
-	
+
 	@SuppressLint("SetTextI18n")
 	private fun TextView.selectMnemonic(
 		input: EditText,
@@ -146,7 +146,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			input.setText(input.text.toString() + newContent)
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?
@@ -156,7 +156,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 			parent.presenter.popFragmentFrom<MnemonicConfirmationFragment>()
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -164,7 +164,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		super.onViewCreated(view, savedInstanceState)
 		backEventForSplashActivity()
 	}
-	
+
 	private fun backEventForSplashActivity() {
 		val currentActivity = activity
 		if (currentActivity is SplashActivity) {

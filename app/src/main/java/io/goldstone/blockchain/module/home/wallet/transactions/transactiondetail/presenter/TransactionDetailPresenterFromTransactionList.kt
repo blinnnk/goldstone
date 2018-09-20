@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -36,15 +36,15 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 
 		when {
-			CoinSymbol(symbol).isBTCSeries() -> {
+			contract.isBTCSeries() -> {
 				dataFromList?.let {
 					fragment.asyncData = generateModels(it).toArrayList()
 					updateHeaderValue(headerData)
 					fragment.removeLoadingView()
 					if (isPending) {
 						when {
-							CoinSymbol(symbol).isBTC() -> observerBTCTransaction()
-							CoinSymbol(symbol).isBCH() -> observerBCHTransaction()
+							contract.isBTC() -> observerBTCTransaction()
+							contract.isBCH() -> observerBCHTransaction()
 							else -> observerLTCTransaction()
 						}
 					}
@@ -70,7 +70,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				}
 			}
 
-			CoinSymbol(symbol).isETC() -> {
+			contract.isETC() -> {
 				getETHERC20OrETCMemo(headerData)
 				if (isPending) observerTransaction()
 			}
@@ -106,7 +106,7 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			if (CoinSymbol(symbol).isETC()) Config.getETCCurrentChainName()
+			if (contract.isETC()) Config.getETCCurrentChainName()
 			else CoinSymbol(getUnitSymbol()).getCurrentChainName()
 		) { memo ->
 			fragment.removeLoadingView()
@@ -120,14 +120,14 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 
 private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 	DefaultTokenTable.getCurrentChainToken(contract) { defaultToken ->
-		defaultToken?.apply {
-			if (name.isEmpty()) {
+		defaultToken?.let { token ->
+			if (token.name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
-					contract,
+					token.contract,
 					{ error, reason ->
 						LogUtil.error("getCurrentChainToken $reason", error)
 					},
-					CoinSymbol(symbol).getCurrentChainName()
+					contract.getCurrentChainName()
 				) {
 					DefaultTokenTable.updateTokenName(contract, it)
 				}

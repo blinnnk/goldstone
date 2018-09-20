@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.imageResource
@@ -33,12 +33,12 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			// 显示默认图判断
 			when {
 				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
-				CoinSymbol(symbol).isETH() -> icon.image.imageResource = R.drawable.eth_icon
-				CoinSymbol(symbol).isETC() -> icon.image.imageResource = R.drawable.etc_icon
-				CoinSymbol(symbol).isLTC() -> icon.image.imageResource = R.drawable.ltc_icon
-				CoinSymbol(symbol).isBCH() -> icon.image.imageResource = R.drawable.bch_icon
-				CoinSymbol(symbol).isEOS() -> icon.image.imageResource = R.drawable.eos_icon
-				CoinSymbol(symbol).isBTC() ->
+				TokenContract(contract).isETH() -> icon.image.imageResource = R.drawable.eth_icon
+				TokenContract(contract).isETC() -> icon.image.imageResource = R.drawable.etc_icon
+				TokenContract(contract).isLTC() -> icon.image.imageResource = R.drawable.ltc_icon
+				TokenContract(contract).isBCH() -> icon.image.imageResource = R.drawable.bch_icon
+				TokenContract(contract).isEOS() -> icon.image.imageResource = R.drawable.eos_icon
+				TokenContract(contract).isBTC() ->
 					icon.image.imageResource =
 						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon

@@ -29,11 +29,6 @@ class EosRamPriceTrendCandleChart(context: Context) : CandleStickChart(context) 
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width, 260.uiPX())
 	}
 	
-	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-		requestDisallowInterceptTouchEvent(true)
-		return super.dispatchTouchEvent(ev)
-	}
-	
 	override fun highlightValue(high: Highlight?, callListener: Boolean) {
 		highLightValueHandler.removeCallbacks(highLightValueRunnable)
 		super.highlightValue(high, callListener)

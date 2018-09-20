@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -49,7 +49,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 			getParentFragment<TokenDetailOverlayFragment> {
 				token?.apply { prepareSymbolPrice(contract) }
-				if (TokenContract(token?.contract).isBCH()) {
+				if (token?.contract.isBCH()) {
 					showConvertAddressButton()
 				}
 			}
@@ -66,7 +66,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	}
 
 	private var symbolPrice: Double = 0.0
-	private fun prepareSymbolPrice(contract: String) {
+	private fun prepareSymbolPrice(contract: TokenContract) {
 		DefaultTokenTable.getCurrentChainToken(contract) {
 			symbolPrice = it?.price.orElse(0.0)
 		}
@@ -111,19 +111,19 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		WalletTable.getCurrentWallet {
 			getParentFragment<TokenDetailOverlayFragment> {
 				when {
-					TokenContract(token?.contract).isBTC() -> {
+					token?.contract.isBTC() -> {
 						if (Config.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentBTCAddress)
 					}
 
-					TokenContract(token?.contract).isLTC() -> {
+					token?.contract.isLTC() -> {
 						if (Config.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentLTCAddress)
 					}
 
-					TokenContract(token?.contract).isBCH() -> {
+					token?.contract.isBCH() -> {
 						if (Config.isTestEnvironment()) {
 							val bchTestAddress =
 								if (convertBCHAddress) BCHUtil.instance.encodeCashAddressByLegacy(currentBTCSeriesTestAddress)
@@ -139,7 +139,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						}
 					}
 
-					TokenContract(token?.contract).isETC() ->
+					token?.contract.isETC() ->
 						qrView.setAddressText(currentETCAddress)
 					else -> qrView.setAddressText(currentETHAndERCAddress)
 				}

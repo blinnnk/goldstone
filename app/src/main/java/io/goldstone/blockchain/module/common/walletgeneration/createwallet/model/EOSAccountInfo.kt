@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 
 import android.arch.persistence.room.TypeConverter
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -14,16 +17,30 @@ import org.json.JSONObject
 
 data class EOSAccountInfo(
 	val name: String,
-	val chainID: String
+	val chainID: String,
+	val publicKey: String
 ) : RoomModel {
 	constructor(data: JSONObject) : this(
 		data.safeGet("name"),
-		data.safeGet("chainID")
+		data.safeGet("chainID"),
+		data.safeGet("publicKey")
 	)
 
-	override fun getObject(): String {
-		return "{\"name\":\"$name\",\"chainID\":\"$chainID\"}"
+	fun hasActivated(): Boolean {
+		return ChainID(chainID).isCurrent() && publicKey.equals(Config.getCurrentEOSAddress(), true)
 	}
+
+	override fun getObject(): String {
+		return "{\"name\":\"$name\",\"chainID\":\"$chainID\",\"publicKey\":\"$publicKey\"}"
+	}
+}
+
+fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
+	return !find { it.hasActivated() }.isNull()
+}
+
+fun List<EOSAccountInfo>.getTargetKeyName(key: String): String? {
+	return find { it.publicKey.equals(key, true) }?.name
 }
 
 class EOSAccountInfoConverter {

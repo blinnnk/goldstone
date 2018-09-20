@@ -10,8 +10,7 @@ import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.convertToDiskUnit
 import io.goldstone.blockchain.common.utils.convertToTimeUnit
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -47,7 +46,7 @@ data class TransactionListModel(
 	val timeStamp: String,
 	val value: String,
 	val hasError: Boolean,
-	var contract: String,
+	var contract: TokenContract,
 	var isFailed: Boolean,
 	var isFee: Boolean = false
 ) : Serializable {
@@ -72,7 +71,7 @@ data class TransactionListModel(
 		data.time.toString(),
 		data.transactionData.quantity.substringBeforeLast(" "),
 		false,
-		"",
+		TokenContract(""),
 		false,
 		false
 	)
@@ -96,7 +95,7 @@ data class TransactionListModel(
 		data.timeStamp,
 		data.value,
 		data.hasError == "1",
-		data.contractAddress,
+		TokenContract(data.contractAddress),
 		data.isFailed,
 		data.isFee
 	)
@@ -127,7 +126,7 @@ data class TransactionListModel(
 		data.timeStamp,
 		data.value.toDouble().toString(),
 		false,
-		getContractBySymbol(data.symbol),
+		CoinSymbol(data.symbol).getContract().orEmpty(),
 		false,
 		data.isFee
 	)
@@ -159,14 +158,6 @@ data class TransactionListModel(
 				data.transactionData.toName,
 				data.transactionData.fromName
 			).scaleTo(32)
-		}
-
-		fun getContractBySymbol(symbol: String): String {
-			return when (symbol) {
-				CoinSymbol.btc() -> TokenContract.btcContract
-				CoinSymbol.ltc -> TokenContract.ltcContract
-				else -> TokenContract.bchContract
-			}
 		}
 
 		fun formatToAddress(toAddress: String): String {

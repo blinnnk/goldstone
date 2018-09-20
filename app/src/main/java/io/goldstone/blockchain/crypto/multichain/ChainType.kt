@@ -39,7 +39,8 @@ class ChainType(val id: Int) : Serializable {
 	fun getMainnetChainName(): String {
 		return when (id) {
 			MultiChainType.ETH.id -> {
-				if (Config.getCurrentChain() != ChainID.ethMain) ChainText.infuraMain
+				// 这个是节点选择显示链名字的地方用到的, 如果当前不是主网链, 那么默认推荐使用 `InfuraMain`
+				if (!Config.getCurrentChain().isETHMain()) ChainText.infuraMain
 				else Config.getCurrentChainName()
 			}
 
@@ -49,7 +50,7 @@ class ChainType(val id: Int) : Serializable {
 			MultiChainType.EOS.id -> ChainText.eosMain
 
 			else -> {
-				if (Config.getETCCurrentChain() != ChainID.ethMain) ChainText.etcMainGasTracker
+				if (!Config.getETCCurrentChain().isETCMain()) ChainText.etcMainGasTracker
 				else Config.getETCCurrentChainName()
 			}
 		}
@@ -58,7 +59,8 @@ class ChainType(val id: Int) : Serializable {
 	fun getTestnetChainName(): String {
 		return when (id) {
 			MultiChainType.ETH.id -> {
-				if (Config.getCurrentChain() == ChainID.ethMain) ChainText.infuraRopsten
+				// 这个是节点选择显示链名字的地方用到的, 如果当前是主网链, 那么默认推荐使用 `InfuraRopsten`
+				if (Config.getCurrentChain().isETHMain()) ChainText.infuraRopsten
 				else Config.getCurrentChainName()
 			}
 			MultiChainType.BTC.id -> ChainText.btcTest
@@ -66,7 +68,7 @@ class ChainType(val id: Int) : Serializable {
 			MultiChainType.BCH.id -> ChainText.bchTest
 			MultiChainType.EOS.id -> ChainText.eosTest
 			else -> {
-				if (Config.getETCCurrentChain() == ChainID.etcMain) ChainText.etcMorden
+				if (Config.getETCCurrentChain().isETCMain()) ChainText.etcMorden
 				else Config.getETCCurrentChainName()
 			}
 		}
@@ -102,7 +104,6 @@ class ChainType(val id: Int) : Serializable {
 					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
 					// 好在其他流程中重新走检查 `Account Name` 的逻辑
 					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
-					currentWallet?.eosAccountNames = listOf()
 					Config.updateCurrentEOSAddress(newAddress)
 				}
 				MultiChainType.BTC.id -> {

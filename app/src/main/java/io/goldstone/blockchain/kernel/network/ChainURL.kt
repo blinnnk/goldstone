@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
@@ -97,6 +96,7 @@ object ChainURL {
 	/** EOS Chain Address */
 	const val eosMain = "https://api1.eosasia.one"
 	const val eosTest = "https://junglehistory.cryptolions.io"
+	const val eosTestBackUp = "https://api.jungle.alohaeos.com"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMordenTest = "https://web3.gastracker.io/morden"
@@ -142,10 +142,11 @@ object ChainURL {
 		"$header/address/$it"
 	}
 	val ethAddressDetail: (address: String) -> String = {
-		val header = when (Config.getCurrentChain()) {
-			ChainID.ropsten -> ethRopstenWeb
-			ChainID.kovan -> ethKovanWeb
-			ChainID.rinkeby -> ethRinkebyWeb
+		val currentChain = Config.getCurrentChain()
+		val header = when {
+			currentChain.isRopsten() -> ethRopstenWeb
+			currentChain.isKovan() -> ethKovanWeb
+			currentChain.isRinkeby() -> ethRinkebyWeb
 			else -> ethMainnetWeb
 		}
 		"$header/address/$it"

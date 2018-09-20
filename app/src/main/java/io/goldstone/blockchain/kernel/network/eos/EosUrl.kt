@@ -4,8 +4,9 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.network.ChainURL
 
 object EOSUrl {
+	var currentEOSTestUrl = ChainURL.eosTest // 网络出问题后会在 `Error` 中更改这个值
 	private val currentURL: () -> String = {
-		if (Config.isTestEnvironment()) ChainURL.eosTest else ChainURL.eosMain
+		if (Config.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
 	}
 	val getKeyAccount: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"
@@ -33,5 +34,9 @@ object EOSUrl {
 	}
 	val pushTransaction: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
+	}
+	
+	val getTableRows:() -> String = {
+		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
 	}
 }

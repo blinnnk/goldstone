@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -31,6 +32,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.To
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.math.BigInteger
 
 
@@ -62,7 +64,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			showArrow()
 			setTitle(TokenDetailText.authority)
 			setSubtitle(Config.getCurrentEOSName())
-			click { presenter.showPublickKeyAccountNames() }
+			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
 
@@ -211,6 +213,10 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			x = 5.uiPX() * position * 1f
 			setCardParams(cardWidth, 130.uiPX())
 			getContainer().apply {
+				onClick {
+					presenter.showResourceTradingFragmentByTitle(info.second)
+					preventDuplicateClicks()
+				}
 				imageView {
 					setColorFilter(GrayScale.gray)
 					scaleType = ImageView.ScaleType.CENTER_INSIDE

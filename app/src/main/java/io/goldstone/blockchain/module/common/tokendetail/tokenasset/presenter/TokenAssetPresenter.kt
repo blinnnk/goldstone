@@ -1,14 +1,14 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
 import android.os.Bundle
+import com.blinnnk.extension.getGrandFather
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.suffix
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getGrandFather
-import io.goldstone.blockchain.common.utils.suffix
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -54,9 +55,10 @@ class TokenAssetPresenter(
 				info.second
 			)
 		}
+		updateAccountInfo()
 	}
 
-	fun showPublickKeyAccountNames() {
+	fun showPublicKeyAccountNames() {
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			TokenDetailText.accountNameSelection,
@@ -64,6 +66,47 @@ class TokenAssetPresenter(
 			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName()) },
 			2
 		)
+	}
+
+	fun showResourceTradingFragmentByTitle(title: String) {
+		when (title) {
+			TokenDetailText.delegateCPU -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+			TokenDetailText.delegateNET -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+			TokenDetailText.tradeRAM -> fragment.getGrandFather<TokenDetailOverlayFragment>()
+				?.presenter?.showTargetFragment<CPUTradingFragment>(
+				TokenDetailText.tradingCPU,
+				TokenDetailText.tokenDetail,
+				Bundle(),
+				2
+			)
+		}
+	}
+
+	private fun updateAccountInfo() {
+		val accountName = Config.getCurrentEOSName()
+		EOSAPI.getAccountInfoByName(
+			accountName,
+			{
+				LogUtil.error("getAccountInfoByName", it)
+			}
+		) { eosAccount ->
+			EOSAccountTable.update(eosAccount, accountName)
+			GoldStoneAPI.context.runOnUiThread {
+				eosAccount.updateUIValue()
+			}
+		}
 	}
 
 	private fun getAccountTransactionCount() {
@@ -90,25 +133,26 @@ class TokenAssetPresenter(
 		}
 	}
 
+	private fun EOSAccountTable.updateUIValue() {
+		fragment.setEOSBalance(balance)
+		val availableRAM = ramQuota - ramUsed
+		val availableCPU = cpuLimit.max - cpuLimit.used
+		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
+		val availableNet = netLimit.max - netLimit.used
+		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
+		fragment.setResourcesValue(
+			availableRAM,
+			ramQuota,
+			availableCPU,
+			cpuLimit.max,
+			cpuEOSValue,
+			availableNet,
+			netLimit.max,
+			netEOSValue
+		)
+	}
+
 	private fun checkAndSetAccountValue() {
-		fun EOSAccountTable.setValue() {
-			fragment.setEOSBalance(balance)
-			val availableRAM = ramQuota - ramUsed
-			val availableCPU = cpuLimit.max - cpuLimit.used
-			val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
-			val availableNet = netLimit.max - netLimit.used
-			val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
-			fragment.setResourcesValue(
-				availableRAM,
-				ramQuota,
-				availableCPU,
-				cpuLimit.max,
-				cpuEOSValue,
-				availableNet,
-				netLimit.max,
-				netEOSValue
-			)
-		}
 		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
 			if (account.isNull()) EOSAPI.getAccountInfoByName(
 				Config.getCurrentEOSName(),
@@ -117,8 +161,8 @@ class TokenAssetPresenter(
 				}
 			) {
 				EOSAccountTable.preventDuplicateInsert(it)
-				GoldStoneAPI.context.runOnUiThread { it.setValue() }
-			} else account?.setValue()
+				GoldStoneAPI.context.runOnUiThread { it.updateUIValue() }
+			} else account?.updateUIValue()
 		}
 	}
 

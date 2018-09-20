@@ -30,7 +30,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 	var marginTop = 0
 	private val shadowSize = 1.uiPX().toFloat()
-	private val buttonHeight = 45.uiPX()
+	private val buttonHeight = 40.uiPX()
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize

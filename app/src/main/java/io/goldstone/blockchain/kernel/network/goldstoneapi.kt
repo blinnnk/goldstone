@@ -135,7 +135,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getETCTransactions(
-		chainID: String,
+		chainID: ChainID,
 		address: String,
 		startBlock: String,
 		errorCallback: (Exception) -> Unit,
@@ -144,7 +144,7 @@ object GoldStoneAPI {
 		requestData<ETCTransactionModel>(
 			APIPath.getETCTransactions(
 				APIPath.currentUrl,
-				chainID,
+				chainID.id,
 				address,
 				startBlock
 			),
@@ -274,7 +274,7 @@ object GoldStoneAPI {
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
 		errorCallback: (Throwable) -> Unit,
-		address: String = Config.getCurrentEthereumAddress(),
+		address: String,
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
 		requestUnCryptoData<ERC20TransactionModel>(
@@ -313,7 +313,6 @@ object GoldStoneAPI {
 		deviceID: String,
 		isChina: Int,
 		isAndroid: Int,
-		chainID: Int,
 		country: String,
 		errorCallback: (Exception) -> Unit,
 		hold: (String) -> Unit
@@ -328,7 +327,6 @@ object GoldStoneAPI {
 					Pair("device", deviceID),
 					Pair("push_type", isChina),
 					Pair("os", isAndroid),
-					Pair("chainid", chainID),
 					Pair("country", country)
 				)
 			),
@@ -519,7 +517,7 @@ object GoldStoneAPI {
 			errorCallback,
 			isEncrypt = true
 		) {
-			hold(CoinInfoModel(JSONObject(this[0]), symbol, chainID))
+			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
 		}
 	}
 	fun getEosRamPriceTendcyCandle(

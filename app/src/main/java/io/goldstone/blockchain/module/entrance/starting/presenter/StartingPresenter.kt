@@ -33,15 +33,15 @@ import org.jetbrains.anko.runOnUiThread
  */
 class StartingPresenter(override val fragment: StartingFragment) :
 	BasePresenter<StartingFragment>() {
-	
+
 	fun showCreateWalletFragment() {
 		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.splash)
 	}
-	
+
 	fun showImportWalletFragment() {
 		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.splash)
 	}
-	
+
 	fun updateWalletInfoForUserInfo(walletList: List<WalletTable>) {
 		walletList.apply {
 			// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
@@ -49,9 +49,9 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			Config.updateWalletCount(size)
 		}
 	}
-	
+
 	companion object {
-		
+
 		fun updateShareContentFromServer() {
 			GoldStoneAPI.getShareContent(
 				{
@@ -67,7 +67,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				AppConfigTable.updateShareContent(shareText)
 			}
 		}
-		
+
 		fun insertLocalTokens(context: Context, callback: () -> Unit) {
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
@@ -81,7 +81,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 			}
 		}
-		
+
 		fun insertLocalCurrency(context: Context, callback: () -> Unit) {
 			doAsync {
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
@@ -96,16 +96,16 @@ class StartingPresenter(override val fragment: StartingFragment) :
 							} else {
 								SupportCurrencyTable(item)
 							}
-						
+
 						GoldStoneDataBase.database.currencyDao().insert(model)
-						
+
 						context.runOnUiThread {
 							if (isEnd) callback()
 						}
 					}
 			}
 		}
-		
+
 		fun updateLocalDefaultTokens(errorCallback: (Exception) -> Unit) {
 			doAsync {
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
@@ -118,7 +118,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						serverTokens.filterNot { server ->
 							localTokens.any { local ->
 								local.chainID.equals(server.chainID, true)
-								&& local.contract.equals(server.contract, true)
+									&& local.contract.equals(server.contract, true)
 							}
 						}.apply {
 							if (isEmpty()) return@getAllTokens
@@ -131,10 +131,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				}
 			}
 		}
-		
-		private fun ArrayList<DefaultTokenTable>.updateLocalTokenIcon(
-			localTokens: ArrayList<DefaultTokenTable>
-		) {
+
+		private fun ArrayList<DefaultTokenTable>.updateLocalTokenIcon(localTokens: ArrayList<DefaultTokenTable>) {
 			doAsync {
 				val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
 				filter { server ->
@@ -142,33 +140,25 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						it.serverTokenID.equals(server.serverTokenID, true)
 					}?.let {
 						// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
-						GoldStoneDataBase.database
-							.defaultTokenDao().update(it.apply { isDefault = false })
+						GoldStoneDataBase.database.defaultTokenDao().update(it.apply { isDefault = false })
 					}
-					
+
 					localTokens.any { local ->
 						local.chainID.equals(server.chainID, true)
-						&& local.contract.equals(server.contract, true)
+							&& local.contract.equals(server.contract, true)
 					}
 				}.apply {
 					if (isEmpty()) return@doAsync
 					forEach { server ->
-						GoldStoneDataBase
-							.database
-							.defaultTokenDao()
-							.apply {
-								getTokenBySymbolContractAndChainID(
-									server.symbol,
-									server.contract,
-									server.chainID
-								)?.let {
-									update(it.apply {
-										iconUrl = server.iconUrl
-										isDefault = server.isDefault
-										forceShow = server.forceShow
-									})
-								}
+						GoldStoneDataBase.database.defaultTokenDao().apply {
+							getTokenByContract(server.contract, server.chainID)?.let {
+								update(it.apply {
+									iconUrl = server.iconUrl
+									isDefault = server.isDefault
+									forceShow = server.forceShow
+								})
 							}
+						}
 					}
 				}
 			}

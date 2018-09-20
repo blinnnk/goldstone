@@ -9,7 +9,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -33,7 +34,7 @@ class TokenManagementListPresenter(
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
 		fragment.getParentFragment<TokenManagementFragment> {
-			prepareMyDefaultTokens(WalletType(Config.getCurrentWalletType()).isETHSeries())
+			prepareMyDefaultTokens(Config.getCurrentWalletType().isETHSeries())
 		}
 	}
 
@@ -65,7 +66,7 @@ class TokenManagementListPresenter(
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) {
 							sortedList.filterNot {
-								CoinSymbol(it.symbol).isBTCSeries()
+								TokenContract(it.contract).isBTCSeries()
 							}.let {
 								memoryTokenData = it.toArrayList()
 							}
@@ -90,13 +91,13 @@ class TokenManagementListPresenter(
 			switch.isClickable = false
 			if (switch.isChecked) {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(token.symbol, token.contract) {
+				MyTokenTable.insertBySymbolAndContract(token.symbol, TokenContract(token.contract)) {
 					switch.isClickable = true
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
 				MyTokenTable.deleteByContract(
-					token.contract,
+					TokenContract(token.contract),
 					CoinSymbol(token.symbol).getAddress()
 				) {
 					switch.isClickable = true

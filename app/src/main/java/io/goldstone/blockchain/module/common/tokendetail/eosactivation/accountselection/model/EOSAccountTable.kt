@@ -2,10 +2,12 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toBigIntegerOrZero
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.isNullValue
-import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -35,7 +37,7 @@ data class EOSAccountTable(
 	val ramUsed: BigInteger,
 	val ramQuota: BigInteger,
 	val cpuWeight: BigInteger,
-	val netWeight: BigInteger,
+	var netWeight: BigInteger,
 	@Embedded(prefix = "totalResource")
 	val totalResource: TotalResources,
 	@Embedded(prefix = "delegateInfo")
@@ -45,9 +47,10 @@ data class EOSAccountTable(
 	@Embedded(prefix = "refundInfo")
 	val refundInfo: RefundRequestInfo?,
 	@SerializedName("permissions")
-	val permissions: List<PermissionsInfo>
+	val permissions: List<PermissionsInfo>,
+	val recordPublicKey: String
 ) : Serializable {
-	constructor(data: JSONObject) : this(
+	constructor(data: JSONObject, recordPublicKey: String) : this(
 		0,
 		data.safeGet("account_name"),
 		data.safeGet("core_liquid_balance"),
@@ -63,10 +66,26 @@ data class EOSAccountTable(
 		checkDelegateBandWidthDataOrGetObject(data),
 		checkVoterDataOrGetObject(data),
 		checkRefundRequestOrGetObject(data),
-		PermissionsInfo.getPermissions(JSONArray(data.safeGet("permissions")))
+		PermissionsInfo.getPermissions(JSONArray(data.safeGet("permissions"))),
+		recordPublicKey
 	)
 
 	companion object {
+
+		fun isActivationPublicKey(publicKey: String, hold: (Boolean) -> Unit) {
+			load {
+				GoldStoneDataBase.database.eosAccountDao().getByKey(publicKey)
+			} then { hold(!it.isNull()) }
+		}
+
+		fun update(newTable: EOSAccountTable, accountName: String) {
+			doAsync {
+				GoldStoneDataBase.database.eosAccountDao().apply {
+					val target = getAccount(accountName)
+					if (!target.isNull()) update(newTable)
+				}
+			}
+		}
 
 		fun getAccountByName(
 			name: String,
@@ -117,6 +136,9 @@ interface EOSAccountDao {
 
 	@Query("SELECT * FROM eosAccount WHERE name LIKE :name")
 	fun getAccount(name: String): EOSAccountTable?
+
+	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	fun getByKey(publicKey: String): EOSAccountTable?
 
 	@Insert
 	fun insert(table: EOSAccountTable)
