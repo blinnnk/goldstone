@@ -65,6 +65,14 @@ object APIPath {
 	) -> String = { header, pair, period, size ->
 		"$header/chart/lineData?pair=$pair&period=$period&size=$size"
 	}
+	
+	val getEosRamPriceTendcyCandle: (
+		header: String,
+		period: String,
+		size: Int
+	) -> String = { header, period, size ->
+		"$header/eosram/lineData?period=$period&size=$size"
+	}
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}

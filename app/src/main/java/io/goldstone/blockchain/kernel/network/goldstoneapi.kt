@@ -520,6 +520,21 @@ object GoldStoneAPI {
 			hold(CoinInfoModel(JSONObject(this[0]), symbol, chainID))
 		}
 	}
+	fun getEosRamPriceTendcyCandle(
+		period: String,
+		size: Int,
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<CandleChartModel>) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
+			"ticks",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
+	}
 }
 
 

@@ -218,14 +218,14 @@ open class PieChart : PieRadarChartBase<PieData> {
    */
   var maxAngle: Float
     get() = mMaxAngle
-    set(maxangle) {
-      var maxangle = maxangle
+    set(angle) {
+      var tempangle = angle
       
-      if (maxangle > 360) maxangle = 360f
+      if (angle > 360) tempangle = 360f
       
-      if (maxangle < 90) maxangle = 90f
+      if (angle < 90) tempangle = 90f
       
-      this.mMaxAngle = maxangle
+      this.mMaxAngle = tempangle
     }
   
   constructor(context: Context) : super(context)
@@ -501,8 +501,7 @@ open class PieChart : PieRadarChartBase<PieData> {
   }
   
   override fun getRadius(): Float {
-    return if (circleBox == null) 0f
-    else Math.min(
+    return Math.min(
       circleBox.width() / 2f,
       circleBox.height() / 2f
     )

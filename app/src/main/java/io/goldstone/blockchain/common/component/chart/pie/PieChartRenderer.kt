@@ -21,6 +21,7 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 
+@Suppress("DEPRECATION")
 /**
  * @date: 2018/9/18.
  * @author: yanglihai
@@ -54,7 +55,7 @@ class PieChartRenderer(
    */
   val paintEntryLabels: Paint
   
-  private var centerTextLayout: StaticLayout? = null
+  private lateinit var centerTextLayout: StaticLayout
   private var centerTextLastValue: CharSequence? = null
   private val centerTextLastBounds = RectF()
   private val rectBuffer = arrayOf(
@@ -794,10 +795,11 @@ class PieChartRenderer(
           0f,
           false
         )
+				
       }
       
       //float layoutWidth = Utils.getStaticLayoutMaxWidth(mCenterTextLayout);
-      val layoutHeight = centerTextLayout!!.height.toFloat()
+      val layoutHeight = centerTextLayout.height.toFloat()
       
       canvas.save()
       if (Build.VERSION.SDK_INT >= 18) {
@@ -814,7 +816,7 @@ class PieChartRenderer(
         boundingRect.left,
         boundingRect.top + (boundingRect.height() - layoutHeight) / 2f
       )
-      centerTextLayout!!.draw(canvas)
+      centerTextLayout.draw(canvas)
       
       canvas.restore()
       
