@@ -26,6 +26,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -520,7 +521,7 @@ object GoldStoneAPI {
 			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
 		}
 	}
-	fun getEosRamPriceTendcyCandle(
+	fun getEOSRAMPriceTendcyCandle(
 		period: String,
 		size: Int,
 		errorCallback: (Exception) -> Unit,
@@ -535,6 +536,25 @@ object GoldStoneAPI {
 			hold(this.toArrayList())
 		}
 	
+	}
+	
+	fun getEOSRAMPriceToday(
+		errorCallback: (Exception) -> Unit,
+		hold: (CandleChartModel) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
+			"ticks",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			if (isNotEmpty()) {
+				hold(this[0])
+			} else {
+				errorCallback(Exception("no values for ticks"))
+			}
+		}
+		
 	}
 	@JvmStatic
 	fun getEOSMemoryTransactionHistory(

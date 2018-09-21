@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * @date: 2018/9/20.
  * @author: yanglihai
- * @description:
+ * @description: eos global 信息model
  */
 
 class EOSGolbalModel {

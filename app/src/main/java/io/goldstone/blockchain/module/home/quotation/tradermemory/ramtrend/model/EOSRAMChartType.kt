@@ -7,13 +7,13 @@ import io.goldstone.blockchain.common.language.DateAndTimeText
  * @author: yanglihai
  * @description:
  */
-enum class EosRamChartType(
+enum class EOSRAMChartType(
 	val code: Int,
 	val info: String,
 	val display: String
 ) {
 	
-	MINUTE(0, "1min", DateAndTimeText.minute.toUpperCase()),
+	Minute(0, "1min", DateAndTimeText.minute.toUpperCase()),
 	Hour(1, "1hour", DateAndTimeText.hour.toUpperCase()),
-	DAY(2, "1day", DateAndTimeText.day.toUpperCase())
+	Day(2, "1day", DateAndTimeText.day.toUpperCase())
 }
