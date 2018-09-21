@@ -11,18 +11,18 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.ValueInputView
-import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.edittext.ValueInputView
+import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -31,8 +31,12 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.present
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.verticalLayout
+import kotlin.apply
 
 /**
  * @date 2018/5/15 10:18 PM
@@ -190,13 +194,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		getParentContainer()?.apply {
 			val addressInput = WalletEditText(context)
 			DashboardOverlay(context) {
-				textView {
-					text = PrepareTransferText.customChangeAddress
-					textSize = fontSize(16)
-					textColor = GrayScale.black
-					typeface = GoldStoneFont.black(context)
-					gravity = Gravity.CENTER_HORIZONTAL
-				}
 				addressInput.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						width = ScreenSize.widthWithPadding - 40.uiPX()
@@ -221,7 +218,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 							}
 					}
 				}
-			}.into(this)
+			}.showTitle(PrepareTransferText.customChangeAddress).into(this)
 		}
 	}
 

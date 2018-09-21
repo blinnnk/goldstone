@@ -7,14 +7,14 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
-import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -130,7 +130,7 @@ object RequisitionUtil {
 		keyName: String,
 		path: String,
 		justData: Boolean = false,
-		noinline errorCallback: (Exception) -> Unit,
+		noinline errorCallback: (RequestError) -> Unit,
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		crossinline hold: (List<T>) -> Unit
 	) {
@@ -140,11 +140,11 @@ object RequisitionUtil {
 				.connectTimeout(20, TimeUnit.SECONDS)
 				.readTimeout(30, TimeUnit.SECONDS)
 				.build()
-		getCryptoRequest(body, path, isEncrypt) {
-			client.newCall(it).enqueue(object : Callback {
+		getCryptoRequest(body, path, isEncrypt) { requestBody ->
+			client.newCall(requestBody).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(error)
+						errorCallback(RequestError.PostFailed(error))
 					}
 					LogUtil.error(path, error)
 				}
@@ -167,7 +167,7 @@ object RequisitionUtil {
 						LogUtil.error(keyName, error)
 						GoldStoneCode.showErrorCodeReason(data)
 						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(error)
+							errorCallback(RequestError.ResolveDataError(error))
 						}
 					}
 				}

@@ -21,7 +21,7 @@ import org.jetbrains.anko.wrapContent
 class AttentionTextView(context: Context) : TextView(context) {
 	
 	init {
-		topPadding = 50.uiPX()
+		topPadding = 45.uiPX()
 		id = ElementID.attentionText
 		textSize = fontSize(14)
 		textColor = GrayScale.midGray

@@ -24,6 +24,8 @@ object EOSValue {
 	const val maxNameLength = 12
 	const val maxSpecialNameLength = 32
 	const val memoMaxCharacterSize = 256
+	const val defaultRegisterAssignRAM = 4096
+	const val defaultRegisterAssignBandWidth = 0.1
 }
 
 enum class EOSTransactionMethod(val value: String) {

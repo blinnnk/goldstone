@@ -99,7 +99,7 @@ object EOSWalletUtils {
 				else accountName.none { !it.toString().matches(legalCharsIn12) }
 			}
 		return if (!isLegalCharacter) {
-			if (accountName.matches(Regex(".*[6-9].*")) || accountName.contains("9")) {
+			if (accountName.matches(Regex(".*[6-9].*")) || accountName.contains("0")) {
 				EOSAccountNameChecker.NumberOtherThan1To5
 			} else if (accountName.length > maxSpecialNameLength) {
 				if (accountName.substring(12).matches(Regex(".*[k-z].*")))

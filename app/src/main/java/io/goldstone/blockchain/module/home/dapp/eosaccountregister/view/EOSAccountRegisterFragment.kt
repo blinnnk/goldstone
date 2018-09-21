@@ -1,23 +1,37 @@
 package io.goldstone.blockchain.module.home.dapp.eosaccountregister.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.convertToDouble
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import org.jetbrains.anko.*
 import java.math.BigInteger
@@ -34,6 +48,9 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	private val publickeyInput by lazy { WalletEditText(context!!) }
 	private val settingButton by lazy { GraySquareCell(context!!) }
 	private val resourceCoast by lazy { GraySquareCell(context!!) }
+	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
+	private var assignResources =
+		listOf(MutablePair("RAM (Bytes)", "4096"), MutablePair("CPU (EOS)", "0.1"), MutablePair("NET (EOS)", "0.1"))
 
 	override val presenter = EOSAccountRegisterPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
@@ -68,19 +85,20 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				}.into(this)
 
-				ColumnSectionTitle(context).apply {
-					showTitles(listOf(Pair("Assign RAM", "4096 Bytes"), Pair("Assign CPU", "0.1 EOS"), Pair("Assign NET", "0.1 EOS")))
+				gridSessionTitle.apply {
+					showTitles(assignResources)
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				}.into(this)
 
 				settingButton.apply {
 					showArrow()
 					setTitle("Advanced Settings")
+				}.click {
+					getParentContainer()?.showCustomDashboard(assignResources)
 				}.into(this)
 
 				resourceCoast.apply {
 					setTitle("Estimated Expenditure")
-					setSubtitle("0.3 EOS ≈ 45.72 (CNY)")
 				}.into(this)
 
 				confirmButton.apply {
@@ -91,9 +109,9 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					presenter.registerAccount(
 						accountNameInput.getContent(),
 						publickeyInput.getContent(),
-						BigInteger.valueOf(4096),
-						0.5,
-						0.5
+						BigInteger.valueOf(assignResources[0].right.toLong()),
+						assignResources[1].right.toDouble(),
+						assignResources[1].right.toDouble()
 					) {
 						if (!it.isNone()) context.alert(it.message)
 						button.showLoadingStatus(false)
@@ -101,6 +119,50 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				}.into(this)
 			}
 		}
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		setExpenditure()
+	}
+
+	private fun setExpenditure() {
+		presenter.getEOSPrice { price ->
+			val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble()
+			resourceCoast.setSubtitle("$eosCount EOS ≈ ${(eosCount * price).formatCurrency()} (${Config.getCurrencyCode()})")
+		}
+	}
+
+	private fun ViewGroup.showCustomDashboard(values: List<MutablePair<String, String>>) {
+		DashboardOverlay(context) {
+			values.forEachIndexed { index, mutablePair ->
+				RoundInput(context!!).apply {
+					setNumberInput()
+					id = index
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.overlayContentWidth, 56.uiPX())
+					this.title = mutablePair.left
+					hint = mutablePair.right
+				}.into(this)
+			}
+		}.apply {
+			confirmEvent = Runnable {
+				(0 until values.size).forEach { index ->
+					val newValue = findViewById<RoundInput>(index)?.getContent()
+					if (!newValue.isNullOrEmpty()) {
+						val formattedNumber =
+							if (values[index].left.contains(TokenDetailText.ram, true)) "${newValue?.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
+							else "${newValue?.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
+						// 更新界面上的值
+						gridSessionTitle.updateValues(index, formattedNumber)
+						// 更新内存里面的值
+						assignResources[index].right = formattedNumber
+						// 更新预估价值
+						setExpenditure()
+					}
+				}
+				activity?.let { SoftKeyboard.hide(it) }
+			}
+		}.showTitle("CUSTOM ASSIGN RESOURCES").into(this)
 	}
 
 }
