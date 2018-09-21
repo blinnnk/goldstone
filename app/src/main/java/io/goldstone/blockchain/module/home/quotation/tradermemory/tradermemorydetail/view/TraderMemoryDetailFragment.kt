@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EosRamPriceTrendFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
@@ -32,14 +32,11 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				verticalLayout {
 					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
-
-					textView {
-						text = "基础信息"
-					}.lparams(matchParent, 300.uiPX())
+					
 					frameLayout {
 						id = ElementID.chartView
 					}.lparams(matchParent, wrapContent)
-					addFragmentAndSetArgument<EosRamPriceTrendFragment>(ElementID.chartView) {}
+					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {}
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
 							topMargin = 10.uiPX()

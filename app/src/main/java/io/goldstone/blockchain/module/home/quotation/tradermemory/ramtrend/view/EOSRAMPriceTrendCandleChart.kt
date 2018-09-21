@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.utils.TimeUtils
  * @author: yanglihai
  * @description: 详情的蜡烛图
  */
-class EosRamPriceTrendCandleChart(context: Context) : CandleStickChart(context) {
+class EOSRAMPriceTrendCandleChart(context: Context) : CandleStickChart(context) {
 	private val highLightValueHandler by lazy { Handler() }
 	private val highLightValueRunnable by lazy {
 		Runnable {
