@@ -15,11 +15,11 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
-import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.container.GrayCardView
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -80,7 +80,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 
 	private val assetCard by lazy {
 		GrayCardView(context!!).apply {
-			setCardParams(ScreenSize.widthWithPadding, 255.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 255.uiPX())
 		}
 	}
 
@@ -211,7 +211,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		val cardWidth = (ScreenSize.widthWithPadding - 10.uiPX()) / 3
 		GrayCardView(context).apply {
 			x = 5.uiPX() * position * 1f
-			setCardParams(cardWidth, 130.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {
 					presenter.showResourceTradingFragmentByTitle(info.second)

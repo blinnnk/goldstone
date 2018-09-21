@@ -8,7 +8,8 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.ProgressView
+import io.goldstone.blockchain.common.component.SpaceSplitLine
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
@@ -16,8 +17,11 @@ import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.bottomPadding
+import org.jetbrains.anko.linearLayout
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.wrapContent
 import java.math.BigInteger
 
 
@@ -77,13 +81,13 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 	private lateinit var radioContainer: LinearLayout
 
 	init {
-		setCardParams(ScreenSize.widthWithPadding, wrapContent)
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 		getContainer().apply {
 			bottomPadding = 10.uiPX()
 			processCell.into(this)
 			SpaceSplitLine(context).apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
-			}.into(getContainer())
+			}.into(this)
 			accountNameEditText.into(this)
 			amountEditText.into(this)
 			radioContainer = linearLayout {

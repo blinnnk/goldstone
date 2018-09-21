@@ -281,10 +281,7 @@ data class WalletTable(
 
 		fun getCurrentWallet(@UiThread hold: WalletTable.() -> Unit) {
 			load {
-				GoldStoneDataBase
-					.database
-					.walletDao()
-					.findWhichIsUsing(true)
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 					?.apply { balance = Config.getCurrentBalance() }
 			} then {
 				it?.apply(hold)

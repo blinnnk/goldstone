@@ -10,6 +10,7 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
@@ -291,26 +292,11 @@ interface DefaultTokenDao {
 	@Query("UPDATE defaultTokens SET name = :newName, isDefault = :isDefault WHERE contract LIKE :contract AND chainID LIKE :chainID")
 	fun updateTokenDefaultStatusAndName(isDefault: Boolean, newName: String, contract: String, chainID: String)
 
-	@Query("SELECT * FROM defaultTokens WHERE chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain")
-	fun getCurrentChainTokens(
-		ercChain: String = Config.getCurrentChain().id,
-		etcChain: String = Config.getETCCurrentChain().id,
-		btcChain: String = Config.getBTCCurrentChain().id,
-		ltcChain: String = Config.getLTCCurrentChain().id,
-		bchChain: String = Config.getBCHCurrentChain().id,
-		eosChain: String = Config.getEOSCurrentChain().id
-	): List<DefaultTokenTable>
+	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
+	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chianIDs()): List<DefaultTokenTable>
 
-	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND (chainID LIKE :ercChain OR chainID LIKE :eosChain OR chainID LIKE :bchChain OR chainID LIKE :ltcChain OR chainID LIKE :etcChain OR chainID LIKE :btcChain)")
-	fun getDefaultTokens(
-		isDefault: Boolean = true,
-		ercChain: String = Config.getCurrentChain().id,
-		etcChain: String = Config.getETCCurrentChain().id,
-		btcChain: String = Config.getBTCCurrentChain().id,
-		ltcChain: String = Config.getLTCCurrentChain().id,
-		bchChain: String = Config.getBCHCurrentChain().id,
-		eosChain: String = Config.getEOSCurrentChain().id
-	): List<DefaultTokenTable>
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chainID IN (:currentChainIDs)")
+	fun getDefaultTokens(currentChainIDs: List<String> = Current.chianIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chainID LIKE :chainID")
 	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?

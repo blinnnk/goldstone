@@ -292,7 +292,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress ORDER BY balance DESC ")
 	fun getTokensBy(walletAddress: String): List<MyTokenTable>
 
-	@Query("SELECT * FROM myTokens WHERE ownerName LIKE :walletAddress")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens")

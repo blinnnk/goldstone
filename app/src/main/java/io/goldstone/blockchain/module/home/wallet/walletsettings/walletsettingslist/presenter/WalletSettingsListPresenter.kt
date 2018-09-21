@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter
 
-import android.support.v4.app.Fragment
+import android.app.Activity
+import android.content.Context
 import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
 import com.blinnnk.util.SoftKeyboard
@@ -74,34 +75,33 @@ class WalletSettingsListPresenter(
 
 	fun showTargetFragment(title: String) {
 		when {
-			title.equals(WalletSettingsText.delete, true) -> deleteWallet()
+			title.equals(WalletSettingsText.delete, true) -> fragment.context?.deleteWallet()
 			title.equals(WalletSettingsText.balance, true) -> return
-
-			else -> {
-				fragment.getParentFragment<WalletSettingsFragment>()?.apply {
-					headerTitle = title
-					presenter.showTargetFragmentByTitle(title)
-				}
+			else -> fragment.getParentFragment<WalletSettingsFragment>()?.apply {
+				headerTitle = title
+				presenter.showTargetFragmentByTitle(title)
 			}
 		}
 	}
 
 	/** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
-	private fun deleteWallet() {
-		fragment.context?.showAlertView(
+	private fun Context.deleteWallet() {
+		showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
 			!Config.getCurrentIsWatchOnlyOrNot()
 		) { passwordInput ->
-			if (Config.getCurrentIsWatchOnlyOrNot()) {
-				WalletTable.getWatchOnlyWallet { deleteWatchOnlyWallet(first, second) }
+			if (Config.getCurrentIsWatchOnlyOrNot()) WalletTable.getWatchOnlyWallet {
+				deleteWatchOnlyWallet(first, second)
 			} else {
 				val password = passwordInput?.text.toString()
 				WalletTable.getCurrentWallet {
-					fragment.context?.verifyCurrentWalletKeyStorePassword(password, id) {
-						GoldStoneAPI.context.runOnUiThread {
-							if (it) fragment.deleteWalletData(password)
-							else fragment.context.alert(CommonText.wrongPassword)
+					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
+						if (isCorrect) {
+							runOnUiThread { getMainActivity()?.showLoadingView() }
+							fragment.context?.deleteWalletData(this, password)
+						} else GoldStoneAPI.context.runOnUiThread {
+							fragment.context.alert(CommonText.wrongPassword)
 						}
 					}
 				}
@@ -109,10 +109,9 @@ class WalletSettingsListPresenter(
 		}
 	}
 
-	private fun WalletSettingsListFragment.deleteWalletData(password: String) {
-		getMainActivity()?.showLoadingView()
+	private fun Context.deleteWalletData(wallet: WalletTable, password: String) {
 		// get current wallet address
-		WalletTable.getCurrentWallet {
+		wallet.apply {
 			val addresses = listOf(
 				Pair(ethAddresses, ChainType.ETH),
 				Pair(etcAddresses, ChainType.ETC),
@@ -145,14 +144,14 @@ class WalletSettingsListPresenter(
 					WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 						XinGePushReceiver.registerAddressesForPush(wallet, true)
-						activity?.jump<SplashActivity>()
+						(this@deleteWalletData as? Activity)?.jump<SplashActivity>()
 					}
 				}
 			}.start()
 		}
 	}
 
-	private fun Fragment.deleteRoutineWallet(
+	private fun Context.deleteRoutineWallet(
 		address: String,
 		password: String,
 		chainType: ChainType,
@@ -161,7 +160,7 @@ class WalletSettingsListPresenter(
 		callback: () -> Unit
 	) {
 		// delete `keystore` file
-		context?.deleteAccount(
+		deleteAccount(
 			address,
 			password,
 			ChainType.isBTCSeriesChainType(chainType),
