@@ -4,11 +4,16 @@ import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendCandleChart
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.textColor
 
 /**
  * @date: 2018/9/20.
@@ -17,6 +22,25 @@ import org.jetbrains.anko.runOnUiThread
  */
 class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	: BasePresenter<EOSRAMPriceTrendFragment>() {
+	
+	private var todayOpenPrice: String? = null
+	private var todayCurrentPrice: String? = null
+	
+	override fun onFragmentCreateView() {
+		super.onFragmentCreateView()
+		getTodayPrice()
+		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.ramInformationHeader.apply {
+					currentPrice.text = it.toString()
+					todayCurrentPrice = it.toString()
+					setTrendPercent()
+					
+				}
+			}
+			
+		}
+	}
 	
 	fun updateCandleData(
 		candleChart: EOSRAMPriceTrendCandleChart,
@@ -34,7 +58,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		// 请求的数据条目数量
 		val size = DataValue.candleChartCount
 		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getEosRamPriceTendcyCandle(
+		GoldStoneAPI.getEOSRAMPriceTendcyCandle(
 			period,
 			size,
 			{
@@ -68,6 +92,42 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			}
 		)
 		
+	}
+	
+	private fun getTodayPrice() {
+		GoldStoneAPI.getEOSRAMPriceToday( {
+			// Show the error exception to user
+			fragment.context.alert(it.toString().showAfterColonContent())
+		}) {
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.ramInformationHeader.apply {
+					this@EOSRAMPriceTrendPresenter.todayOpenPrice = it.open
+					startPrice.text = it.open
+					highPrice.text = it.high
+					lowPrice.text = it.low
+					setTrendPercent()
+				}
+			}
+			
+		}
+	}
+	
+	private fun setTrendPercent() {
+		todayOpenPrice?.let { open ->
+			todayCurrentPrice?.let { current ->
+				var trend = (current.toDouble() - open.toDouble()) / open.toDouble()
+				trend *= 100.toDouble()
+				fragment.ramInformationHeader.apply {
+					if (trend > 0) {
+						trendcyPercent.text = "+$trend%"
+						trendcyPercent.textColor = Spectrum.green
+					} else {
+						trendcyPercent.text = "-$trend%"
+						trendcyPercent.textColor = Spectrum.red
+					}
+				}
+			}
+		}
 	}
 }
 

@@ -22,7 +22,7 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 	private val candleChart by lazy { EOSRAMPriceTrendCandleChart(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
 	
-	private val ramInformationHeader by lazy { RAMInformationHeader(context!!) }
+	val ramInformationHeader by lazy { RAMInformationHeader(context!!) }
 	
 	override val presenter: EOSRAMPriceTrendPresenter = EOSRAMPriceTrendPresenter(this)
 	
