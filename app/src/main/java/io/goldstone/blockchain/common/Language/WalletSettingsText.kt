@@ -55,7 +55,7 @@ object WalletSettingsText {
 
 	@JvmField
 	val newETHAndERCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ETH & ERC20 Token Address"
+		HoneyLanguage.English.code -> "New ETH Series Address"
 		HoneyLanguage.Chinese.code -> "新的ETH和ERC20代币地址"
 		HoneyLanguage.Japanese.code -> "新しいETHおよびERC20トークンアドレス"
 		HoneyLanguage.Korean.code -> "새로운 ETH 및 ERC20 토큰 주소"

@@ -11,6 +11,7 @@ import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -357,7 +358,7 @@ object GoldStoneAPI {
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (List<QuotationSelectionLineChartModel>) -> Unit
 	) {
 		RequisitionUtil.postRequest(
@@ -418,7 +419,7 @@ object GoldStoneAPI {
 
 	fun getNotificationList(
 		time: Long,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (ArrayList<NotificationTable>) -> Unit
 	) {
 		RequisitionUtil.postRequest<String>(
@@ -450,7 +451,7 @@ object GoldStoneAPI {
 
 	fun getPriceByContractAddress(
 		addressList: JsonArray,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		@UiThread hold: (List<TokenPriceModel>) -> Unit
 	) {
 		RequisitionUtil.postRequest<TokenPriceModel>(

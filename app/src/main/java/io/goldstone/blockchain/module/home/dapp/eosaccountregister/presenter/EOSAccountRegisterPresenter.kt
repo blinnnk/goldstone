@@ -2,21 +2,26 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.EOSRPCError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -29,6 +34,20 @@ class EOSAccountRegisterPresenter(
 	override val fragment: EOSAccountRegisterFragment
 ) : BasePresenter<EOSAccountRegisterFragment>() {
 
+	fun getEOSPrice(hold: (price: Double) -> Unit) {
+		GoldStoneAPI.getPriceByContractAddress(
+			listOf(TokenContract.eosContract).toJsonArray(),
+			{
+				// 网络获取价格出错后从本地数据库获取价格
+				DefaultTokenTable.getCurrentChainToken(TokenContract.getEOS()) { token ->
+					hold(token?.price.orZero())
+				}
+			}
+		) {
+			hold(it.first().price)
+		}
+	}
+
 	fun registerAccount(
 		newAccountName: String,
 		publicKey: String,
@@ -37,7 +56,6 @@ class EOSAccountRegisterPresenter(
 		netAEOSCount: Double,
 		callback: (GoldStoneError) -> Unit
 	) {
-		System.out.println("ram $ramAmount, cpu $cpuEOSCount net $netAEOSCount")
 		val creatorAccountName = Config.getCurrentEOSName()
 		val totalSpent = (cpuEOSCount + netAEOSCount) + 2.0 // TODO 内存假设就是 2 颗 EOS
 		checkNewAccountInfoInChain(newAccountName, publicKey) { validAccountName, validPublicKey, error ->
@@ -60,7 +78,7 @@ class EOSAccountRegisterPresenter(
 						EOSAuthorization(creatorAccountName, EOSActor.Active),
 						validAccountName.orEmpty(),
 						validPublicKey.orEmpty(),
-						BigInteger.valueOf(4096),
+						ramAmount,
 						cpuEOSCount.toEOSUnit(),
 						netAEOSCount.toEOSUnit()
 					).send(privateKey!!, callback) {

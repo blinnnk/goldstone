@@ -54,7 +54,6 @@ class TokenAssetPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		checkAndSetAccountValue()
 		getAccountTransactionCount()
 		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
@@ -153,7 +152,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun EOSAccountTable.updateUIValue() {
-		fragment.setEOSBalance(balance)
+		fragment.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
@@ -170,20 +169,4 @@ class TokenAssetPresenter(
 			netEOSValue
 		)
 	}
-
-	private fun checkAndSetAccountValue() {
-		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
-			if (account.isNull()) EOSAPI.getAccountInfo(
-				Config.getCurrentEOSName(),
-				{
-					LogUtil.error("getAccountInfo", it)
-				}
-			) {
-				EOSAccountTable.preventDuplicateInsert(it)
-				GoldStoneAPI.context.runOnUiThread { it.updateUIValue() }
-			} else account?.updateUIValue()
-		}
-	}
-
-
 }

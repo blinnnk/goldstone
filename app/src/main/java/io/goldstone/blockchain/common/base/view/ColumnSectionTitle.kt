@@ -6,10 +6,14 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.MutablePair
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
 
 
@@ -27,7 +31,7 @@ open class ColumnSectionTitle(context: Context) : GridLayout(context) {
 	}
 
 	private val titleWidth = ScreenSize.widthWithPadding / 3
-	fun showTitles(titles: List<Pair<String, String>>) {
+	fun showTitles(titles: List<MutablePair<String, String>>) {
 		removeAllViews()
 		columnCount = titles.size
 		titles.forEachIndexed { index, pair ->
@@ -36,9 +40,18 @@ open class ColumnSectionTitle(context: Context) : GridLayout(context) {
 					layoutParams = LinearLayout.LayoutParams(titleWidth, matchParent)
 					isCenter = true
 					id = index
-					setBlackTitles(fontSize(12))
-					title.text = pair.first
-					subtitle.text = pair.second
+					title.apply {
+						textSize = fontSize(14)
+						text = pair.left
+						textColor = GrayScale.black
+						typeface = GoldStoneFont.black(context)
+					}
+					subtitle.apply {
+						textSize = fontSize(16)
+						text = pair.right
+						textColor = GrayScale.midGray
+						typeface = GoldStoneFont.black(context)
+					}
 				}
 			)
 		}

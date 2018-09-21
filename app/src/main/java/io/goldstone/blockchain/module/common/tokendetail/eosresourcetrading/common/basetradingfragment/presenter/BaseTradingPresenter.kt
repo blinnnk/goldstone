@@ -227,7 +227,7 @@ open class BaseTradingPresenter(
 			} else if (inputValue.second == 0.0) {
 				callback(TransferError.TradingInputIsEmpty)
 			} else if (isSellRam && !inputValue.second.isSameValueAsInt()) {
-				// 检查输的卖出的 `EOS` 的值是否正确
+				// 检查输入的卖出的 `EOS` 的值是否正确
 				callback(TransferError.wrongRAMInputValue)
 			} else if (!inputValue.second.toString().isValidDecimal(CryptoValue.eosDecimal)) {
 				// 检查输入值的精度是否正确

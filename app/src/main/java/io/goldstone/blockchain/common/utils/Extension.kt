@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
@@ -121,3 +122,17 @@ fun BigInteger.convertToTimeUnit(): String {
 
 fun String.isIntOnly(): Boolean = all { it.toString().matches(Regex(".*[0-9].*")) }
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
+
+
+fun String.convertToDouble(decimal: Int): Double? {
+	val illegalSymbol = Regex(".*[!@#\$%¥^&*()_=+?].*")
+	val convertedNumber = if (matches(Regex(".*[a-z].*")) || matches(Regex(".[A-Z]*.")) || matches(illegalSymbol)) null
+	else if (filter { it.toString() == "." }.count() > 1) null
+	else if (!contains(".") && substring(0, 1) == "0") substring(0, 1) + "." + substring(1)
+	else this
+	return if (convertedNumber.isNull()) null
+	else if (convertedNumber!!.contains(".") && convertedNumber.substringAfter(".").length > decimal) convertedNumber.substring(0, convertedNumber.indexOf(".") + decimal).toDouble()
+	else convertedNumber.toDouble()
+}
+
+class MutablePair<L, R>(var left: L, var right: R)
