@@ -36,7 +36,9 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 					frameLayout {
 						id = ElementID.chartView
 					}.lparams(matchParent, wrapContent)
-					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {}
+					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {
+						putSerializable("model", presenter.ramMarketModel)
+					}
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
 							topMargin = 10.uiPX()

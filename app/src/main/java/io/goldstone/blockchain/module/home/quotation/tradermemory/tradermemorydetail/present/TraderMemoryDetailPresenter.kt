@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present
 
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMMarketHeaderModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.model.RAMMarketModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
 
 /**
@@ -10,6 +12,8 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemoryde
 class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragment)
 	: BasePresenter<TraderMemoryDetailFragment>() {
 
+	var ramMarketModel = RAMMarketModel(RAMMarketHeaderModel())
+	
 	fun sendRAM() {
 
 	}
